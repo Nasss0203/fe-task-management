@@ -1,4 +1,4 @@
-import { ThemeProvider } from "@/src/config/theme-provider";
+import { ThemeProvider } from "@/config/theme-provider";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import Providers from "../config/providers";
