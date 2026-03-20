@@ -1,1 +1,1 @@
-export { default as SidebarMenuButtonCustom } from "./button-sidebar";
+export { default as SidebarMenuButtonV2 } from "./button-sidebar";

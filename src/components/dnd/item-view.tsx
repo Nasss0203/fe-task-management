@@ -3,6 +3,8 @@
 import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
 import * as React from "react";
+import { AvaGroup } from "../avatar";
+import { Separator } from "../ui/separator";
 
 type ItemViewProps = React.HTMLAttributes<HTMLDivElement> & {
 	id: string;
@@ -14,13 +16,13 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 	({ id, isOverlay, status, className, ...props }, ref) => {
 		const STATUS_STYLE: Record<string, { background: string }> = {
 			todo: {
-				background: "bg-neutral-600/80",
+				background: "bg-neutral-600/60",
 			},
 			inProgress: {
-				background: "bg-blue-500/40",
+				background: "bg-blue-500/20",
 			},
 			done: {
-				background: "bg-emerald-500/50",
+				background: "bg-emerald-500/30",
 			},
 		};
 
@@ -37,14 +39,39 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 					className ?? "",
 				)}
 			>
-				<div className=''>
+				<div className='flex flex-col gap-1'>
 					<div className='flex items-center gap-1'>
 						<div className=''>
 							<Plus size={14}></Plus>
 						</div>
-						<div className='font-medium'>{id}</div>
+						<div>{id}</div>
 					</div>
-					<div></div>
+					<div className='text-sm font-medium line-clamp-2 mb-2'>
+						Lorem ipsum dolor sit amet consectetur adipisicing elit.
+						Nisi sunt necessitatibus odio sed, perferendis dicta
+						voluptatem animi voluptatum consequuntur, obcaecati
+						fugit aspernatur. Autem unde voluptatem nostrum
+						voluptatibus quaerat, soluta alias.
+					</div>
+					<div className='flex items-center gap-1 flex-wrap'>
+						<div className='text-[10px] px-1.5 py-1 bg-blue-500 rounded-sm inline-block'>
+							Trung bình
+						</div>
+						<div className='text-[10px] px-1.5 py-1 bg-blue-500 rounded-sm inline-block'>
+							Trung bình
+						</div>
+						<div className='text-[10px] px-1.5 py-1 bg-blue-500 rounded-sm inline-block'>
+							Trung bình
+						</div>
+						<div className='text-[10px] px-1.5 py-1 bg-green-500 rounded-sm inline-block'>
+							Ai biết gì đâu
+						</div>
+					</div>
+					<Separator className='my-1.5' />
+					<div className='flex items-center justify-between'>
+						<AvaGroup></AvaGroup>
+						<time className='text-xs'>Mar 10, 2020</time>
+					</div>
 				</div>
 			</div>
 		);

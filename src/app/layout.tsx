@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/config/theme-provider";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
@@ -30,6 +31,7 @@ export default function RootLayout({
 					disableTransitionOnChange
 				>
 					<Providers>{children}</Providers>
+					<Toaster />
 				</ThemeProvider>
 			</body>
 		</html>

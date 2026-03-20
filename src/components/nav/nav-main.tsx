@@ -1,23 +1,32 @@
 "use client";
 
-import { ChevronRight, type LucideIcon } from "lucide-react";
+import { ChevronRight, Ellipsis, type LucideIcon } from "lucide-react";
 
 import {
 	Collapsible,
 	CollapsibleContent,
 	CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import {
-	SidebarGroup,
-	SidebarGroupLabel,
-	SidebarMenu,
-	SidebarMenuItem,
-	SidebarMenuSub,
-	SidebarMenuSubButton,
-	SidebarMenuSubItem,
-} from "@/components/ui/sidebar";
 import Link from "next/link";
-import { SidebarMenuButtonCustom } from "../sidebar";
+import { DialogTask } from "../dialog";
+import {
+	PopoverContentV2,
+	PopoverDescriptionV2,
+	PopoverHeaderV2,
+	PopoverTitleV2,
+	PopoverTriggerV2,
+	PopoverV2,
+} from "../popover/popover-custom";
+import { SidebarMenuButtonV2 } from "../sidebar";
+import {
+	SidebarGroupLabelV2,
+	SidebarGroupV2,
+	SidebarMenuItemV2,
+	SidebarMenuSubButtonV2,
+	SidebarMenuSubItemV2,
+	SidebarMenuSubV2,
+	SidebarMenuV2,
+} from "../sidebar/sidebar-custom";
 
 export function NavMain({
 	items,
@@ -34,9 +43,9 @@ export function NavMain({
 	}[];
 }) {
 	return (
-		<SidebarGroup>
-			<SidebarGroupLabel>Platform</SidebarGroupLabel>
-			<SidebarMenu>
+		<SidebarGroupV2>
+			<SidebarGroupLabelV2>Platform</SidebarGroupLabelV2>
+			<SidebarMenuV2>
 				{items.map((item) => (
 					<Collapsible
 						key={item.title}
@@ -44,36 +53,64 @@ export function NavMain({
 						defaultOpen={item.isActive}
 						className='group/collapsible'
 					>
-						<SidebarMenuItem>
-							<Link href={item.url}>
-								<SidebarMenuButtonCustom
-									tooltip={item.title}
-									variant={"default"}
+						<SidebarMenuItemV2>
+							<SidebarMenuButtonV2
+								tooltip={item.title}
+								variant={"default"}
+								className=''
+							>
+								<CollapsibleTrigger
+									asChild
+									className='hover:bg-neutral-700 rounded-xs '
 								>
-									{item.icon && <item.icon />}
+									<ChevronRight className='transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+								</CollapsibleTrigger>
+								<Link href={item.url}>
 									<span>{item.title}</span>
-									<CollapsibleTrigger asChild>
-										<ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
-									</CollapsibleTrigger>
-								</SidebarMenuButtonCustom>
-							</Link>
+								</Link>
+								<PopoverV2>
+									<PopoverTriggerV2
+										asChild
+										className='hover:bg-neutral-700 rounded-xs ml-auto'
+									>
+										<Ellipsis size={12} />
+									</PopoverTriggerV2>
+									<PopoverContentV2
+										align='start'
+										side='right'
+										sideOffset={15}
+									>
+										<PopoverHeaderV2>
+											<PopoverTitleV2>
+												Trang
+											</PopoverTitleV2>
+											<PopoverDescriptionV2>
+												Description text here.
+											</PopoverDescriptionV2>
+										</PopoverHeaderV2>
+									</PopoverContentV2>
+								</PopoverV2>
+								<DialogTask></DialogTask>
+							</SidebarMenuButtonV2>
 							<CollapsibleContent>
-								<SidebarMenuSub>
+								<SidebarMenuSubV2>
 									{item.items?.map((subItem) => (
-										<SidebarMenuSubItem key={subItem.title}>
-											<SidebarMenuSubButton asChild>
+										<SidebarMenuSubItemV2
+											key={subItem.title}
+										>
+											<SidebarMenuSubButtonV2 asChild>
 												<a href={subItem.url}>
 													<span>{subItem.title}</span>
 												</a>
-											</SidebarMenuSubButton>
-										</SidebarMenuSubItem>
+											</SidebarMenuSubButtonV2>
+										</SidebarMenuSubItemV2>
 									))}
-								</SidebarMenuSub>
+								</SidebarMenuSubV2>
 							</CollapsibleContent>
-						</SidebarMenuItem>
+						</SidebarMenuItemV2>
 					</Collapsible>
 				))}
-			</SidebarMenu>
-		</SidebarGroup>
+			</SidebarMenuV2>
+		</SidebarGroupV2>
 	);
 }

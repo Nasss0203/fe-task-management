@@ -35,7 +35,8 @@ const RestPage = () => {
 						type='text'
 						name=''
 						id=''
-						defaultValue={"Title"}
+						defaultValue={"Workspace"}
+						placeholder='Workspace'
 						className='text-2xl font-bold outline-none'
 					/>
 				</div>

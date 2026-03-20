@@ -42,7 +42,7 @@ export default function ColumnDnd({
 			dot: "bg-sky-400",
 			badge: "bg-sky-500/20 text-sky-100",
 			label: "Đang thực hiện",
-			background: "bg-blue-500/30",
+			background: "bg-blue-500/20",
 			ring: "ring-sky-400/40",
 		},
 		done: {
@@ -69,7 +69,7 @@ export default function ColumnDnd({
 				<div className={cn("flex items-center justify-between")}>
 					<div
 						className={cn(
-							"px-1.5 py-0.5 rounded-full inline-flex items-center gap-x-1",
+							"px-2 py-1.5 rounded-full inline-flex items-center gap-x-1",
 							s.badge,
 						)}
 					>
