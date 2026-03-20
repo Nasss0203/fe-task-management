@@ -2,7 +2,7 @@
 import { useSortable } from "@dnd-kit/react/sortable";
 import { ItemView } from "./item-view";
 
-const ItemsDnd = ({ id, column, index, status }: any) => {
+const ItemsDnd = ({ id, column, index, status, name }: any) => {
 	const { ref } = useSortable({
 		id,
 		index,
@@ -13,7 +13,7 @@ const ItemsDnd = ({ id, column, index, status }: any) => {
 
 	return (
 		<div ref={ref}>
-			<ItemView id={id} status={status} />
+			<ItemView id={id} status={status} name={name} />
 		</div>
 	);
 };

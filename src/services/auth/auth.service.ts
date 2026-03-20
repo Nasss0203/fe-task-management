@@ -1,30 +1,17 @@
 import instance from "../axios";
-import { AuthResponse, LoginDto, RegisterDto } from "./type";
+import { AuthGetMeResponse, AuthResponse, LoginDto, RegisterDto } from "./type";
 
-export const login = async (data: LoginDto): Promise<AuthResponse> => {
+export const loginApi = async (data: LoginDto): Promise<AuthResponse> => {
 	const response = await instance.post<AuthResponse>("/auth/login", data);
-
-	if (typeof window !== "undefined") {
-		localStorage.setItem("access_token", response.data.accessToken);
-
-		if (response.data.refreshToken) {
-			localStorage.setItem("refresh_token", response.data.refreshToken);
-		}
-	}
-
 	return response.data;
 };
 
-export const register = async (data: RegisterDto): Promise<AuthResponse> => {
+export const registerApi = async (data: RegisterDto): Promise<AuthResponse> => {
 	const response = await instance.post<AuthResponse>("/auth/register", data);
+	return response.data;
+};
 
-	if (typeof window !== "undefined") {
-		localStorage.setItem("access_token", response.data.accessToken);
-
-		if (response.data.refreshToken) {
-			localStorage.setItem("refresh_token", response.data.refreshToken);
-		}
-	}
-
+export const getMeApi = async (): Promise<AuthGetMeResponse> => {
+	const response = await instance.get<AuthGetMeResponse>("/auth/me");
 	return response.data;
 };

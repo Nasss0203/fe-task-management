@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { useRegister } from "@/hooks/use-auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
@@ -36,10 +37,11 @@ const formSchema = z.object({
 		.max(32, "Bug title must be at most 32 characters."),
 	password: z
 		.string()
-		.min(20, "Description must be at least 20 characters.")
+		// .min(20, "Description must be at least 20 characters.")
 		.max(100, "Description must be at most 100 characters."),
 });
 const SignUp = () => {
+	const { mutate } = useRegister();
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -64,6 +66,7 @@ const SignUp = () => {
 				"--border-radius": "calc(var(--radius)  + 4px)",
 			} as React.CSSProperties,
 		});
+		mutate(data);
 	}
 	return (
 		<div className='w-125  flex items-center'>

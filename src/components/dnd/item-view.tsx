@@ -10,10 +10,11 @@ type ItemViewProps = React.HTMLAttributes<HTMLDivElement> & {
 	id: string;
 	isOverlay?: boolean;
 	status: string;
+	name: string;
 };
 
 export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
-	({ id, isOverlay, status, className, ...props }, ref) => {
+	({ id, isOverlay, status, name, className, ...props }, ref) => {
 		const STATUS_STYLE: Record<string, { background: string }> = {
 			todo: {
 				background: "bg-neutral-600/60",
@@ -44,7 +45,7 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 						<div className=''>
 							<Plus size={14}></Plus>
 						</div>
-						<div>{id}</div>
+						<div>{name}</div>
 					</div>
 					<div className='text-sm font-medium line-clamp-2 mb-2'>
 						Lorem ipsum dolor sit amet consectetur adipisicing elit.

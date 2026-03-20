@@ -4,12 +4,34 @@ export interface LoginDto {
 }
 
 export interface RegisterDto {
-	name: string;
+	username: string;
 	email: string;
 	password: string;
 }
 
 export interface AuthResponse {
-	accessToken: string;
-	refreshToken?: string;
+	data: {
+		access_token: string;
+		refresh_token?: string;
+	};
+}
+
+export interface AuthGetMeResponse {
+	data: {
+		id: string;
+		email: string;
+		username: string;
+		isActive: boolean;
+		createdAt: string;
+		updatedAt: string;
+	};
+}
+
+export interface GetMeResponse {
+	id: string;
+	email: string;
+	username: string;
+	isActive: boolean;
+	createdAt: string;
+	updatedAt: string;
 }
