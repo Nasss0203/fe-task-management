@@ -11,23 +11,39 @@ type ProjectSelectionStore = {
 };
 
 export const useProjectSelectionStore = create<ProjectSelectionStore>(
-	(set) => ({
+	(set, get) => ({
 		currentWorkspaceId: null,
 		currentProjectId: null,
 		currentBoardId: null,
 
-		setCurrentWorkspaceId: (id) =>
+		setCurrentWorkspaceId: (id) => {
+			const currentWorkspaceId = get().currentWorkspaceId;
+
+			if (currentWorkspaceId === id) {
+				set({ currentWorkspaceId: id });
+				return;
+			}
+
 			set({
 				currentWorkspaceId: id,
 				currentProjectId: null,
 				currentBoardId: null,
-			}),
+			});
+		},
 
-		setCurrentProjectId: (id) =>
+		setCurrentProjectId: (id) => {
+			const currentProjectId = get().currentProjectId;
+
+			if (currentProjectId === id) {
+				set({ currentProjectId: id });
+				return;
+			}
+
 			set({
 				currentProjectId: id,
 				currentBoardId: null,
-			}),
+			});
+		},
 
 		setCurrentBoardId: (id) =>
 			set({

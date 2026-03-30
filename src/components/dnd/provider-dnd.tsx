@@ -1,7 +1,6 @@
 "use client";
 
 import { findAllTask } from "@/services/task/task.service";
-import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { move } from "@dnd-kit/helpers";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useQuery } from "@tanstack/react-query";
@@ -22,30 +21,27 @@ type DndColumns = {
 	done: string[];
 };
 
+type ProviderDragDropProps = {
+	workspaceId: string;
+	projectId: string;
+	boardId: string;
+};
+
 const emptyColumns: DndColumns = {
 	todo: [],
 	inProgress: [],
 	done: [],
 };
 
-const ProviderDragDrop = () => {
-	const { currentWorkspaceId, currentProjectId, currentBoardId } =
-		useProjectSelectionStore();
-
+const ProviderDragDrop = ({
+	workspaceId,
+	projectId,
+	boardId,
+}: ProviderDragDropProps) => {
 	const taskQuery = useQuery({
-		queryKey: [
-			"tasks",
-			currentWorkspaceId,
-			currentProjectId,
-			currentBoardId,
-		],
-		queryFn: () =>
-			findAllTask(
-				currentWorkspaceId!,
-				currentProjectId!,
-				currentBoardId!,
-			),
-		enabled: !!currentWorkspaceId && !!currentProjectId && !!currentBoardId,
+		queryKey: ["tasks", workspaceId, projectId, boardId],
+		queryFn: () => findAllTask(workspaceId, projectId, boardId),
+		enabled: !!workspaceId && !!projectId && !!boardId,
 	});
 
 	const taskList: TaskItem[] | undefined = taskQuery.data?.data;
@@ -100,7 +96,7 @@ const ProviderDragDrop = () => {
 				setItems((prev) => move(prev, event));
 			}}
 		>
-			<div className='inline-flex flex-row gap-3 w-full'>
+			<div className='inline-flex w-full flex-row gap-3'>
 				{Object.entries(items).map(([column, columnItems]) => (
 					<ColumnDnd key={column} id={column} isEmpty status={column}>
 						{columnItems.map((id, index) => {

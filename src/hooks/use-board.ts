@@ -16,7 +16,7 @@ export const useBoardDetail = () => {
 	const { currentBoardId } = useProjectSelectionStore();
 
 	return useQuery({
-		queryKey: ["board-detail", currentBoardId],
+		queryKey: ["board", currentBoardId],
 		queryFn: () => findBoardById(currentBoardId!),
 		enabled: !!currentBoardId,
 	});

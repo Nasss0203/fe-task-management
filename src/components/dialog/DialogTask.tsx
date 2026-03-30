@@ -1,3 +1,5 @@
+"use client";
+import { useWorkspace } from "@/hooks/use-workspace";
 import { Ellipsis, Plus } from "lucide-react";
 import { FaRegStar, FaStar } from "react-icons/fa";
 import {
@@ -10,6 +12,8 @@ import {
 } from "./dialog-custom";
 
 const DialogTask = () => {
+	const { mutate } = useWorkspace();
+
 	return (
 		<DialogV2>
 			<DialogTriggerV2 asChild>
@@ -24,9 +28,13 @@ const DialogTask = () => {
 									<div className='font-normal text-lg text-neutral-500'>
 										Add to
 									</div>
-									<div className='text-lg'>
-										Project task management
-									</div>
+									<input
+										type='text'
+										defaultValue={"Project task management"}
+										name=''
+										id=''
+										className='text-lg outline border-none flex-1'
+									/>
 								</div>
 							</div>
 							<div>
