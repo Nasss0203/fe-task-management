@@ -258,4 +258,40 @@
 	.sx__ripple::after {
 		all: unset !important;
 	}
+	.integration-marquee {
+		position: relative;
+		overflow: hidden;
+		width: 100%;
+	}
+
+	.integration-track {
+		display: flex;
+		gap: 20px;
+		width: max-content;
+		animation: integration-scroll-right 28s linear infinite;
+		will-change: transform;
+	}
+
+	.integration-marquee {
+		position: relative;
+		overflow: hidden;
+		width: 100%;
+	}
+
+	.integration-track {
+		display: flex;
+		gap: 20px;
+		width: max-content;
+		animation: integration-scroll-right 28s linear infinite;
+		will-change: transform;
+	}
+
+	@keyframes integration-scroll-right {
+		from {
+			transform: translateX(-50%);
+		}
+		to {
+			transform: translateX(0);
+		}
+	}
 }
