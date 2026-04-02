@@ -5,25 +5,32 @@ import ProjectBlock, {
 	BoardViewType,
 } from "@/components/block/ProjectBlock";
 import { findAllBoard } from "@/services/board/board.service";
-import { ProjectItems } from "@/services/project/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useQuery } from "@tanstack/react-query";
 import { CalendarDays, LayoutList } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 type Props = {
-	project: ProjectItems;
+	projectId: string;
 	workspaceId: string;
+	initialBoardId?: string | null;
+	initialView?: BoardViewType;
+	isOpen?: boolean;
+	title?: string;
 };
 
-const ProjectBlockContainer = ({ project, workspaceId }: Props) => {
+const ProjectBlockContainer = ({
+	projectId,
+	workspaceId,
+	initialBoardId,
+	initialView = BoardViewType.BOARD,
+	isOpen = true,
+	title,
+}: Props) => {
 	const { setCurrentProjectId, setCurrentBoardId } =
 		useProjectSelectionStore();
 
-	const [activeTab, setActiveTab] = useState<BoardViewType>("TABLE");
-
-	const projectId = project.id;
-	if (!projectId) return null;
+	const [activeTab, setActiveTab] = useState<BoardViewType>(initialView);
 
 	const boardQuery = useQuery({
 		queryKey: ["boards", workspaceId, projectId],
@@ -33,24 +40,24 @@ const ProjectBlockContainer = ({ project, workspaceId }: Props) => {
 
 	const boards: BoardItem[] = boardQuery.data?.data ?? [];
 
-	const tableBoard = useMemo(
-		() => boards.find((b) => b.viewType === "TABLE"),
+	const boardBoard = useMemo(
+		() => boards.find((b) => b.viewType === BoardViewType.BOARD),
 		[boards],
 	);
 
 	const calendarBoard = useMemo(
-		() => boards.find((b) => b.viewType === "CALENDAR"),
+		() => boards.find((b) => b.viewType === BoardViewType.CALENDAR),
 		[boards],
 	);
 
 	const availableTabs = useMemo(() => {
 		const tabs = [];
 
-		if (tableBoard) {
+		if (boardBoard) {
 			tabs.push({
 				icon: LayoutList,
-				type: "Table",
-				value: "TABLE" as BoardViewType,
+				type: "Board",
+				value: BoardViewType.BOARD,
 			});
 		}
 
@@ -58,43 +65,56 @@ const ProjectBlockContainer = ({ project, workspaceId }: Props) => {
 			tabs.push({
 				icon: CalendarDays,
 				type: "Calendar",
-				value: "CALENDAR" as BoardViewType,
+				value: BoardViewType.CALENDAR,
 			});
 		}
 
 		return tabs;
-	}, [tableBoard, calendarBoard]);
+	}, [boardBoard, calendarBoard]);
 
 	useEffect(() => {
-		if (!availableTabs.length) return;
+		if (!boards.length) return;
+
+		if (initialBoardId) {
+			const matchedBoard = boards.find((b) => b.id === initialBoardId);
+			if (matchedBoard) {
+				setActiveTab(matchedBoard.viewType);
+				return;
+			}
+		}
 
 		const isActiveTabValid = availableTabs.some(
 			(tab) => tab.value === activeTab,
 		);
 
-		if (!isActiveTabValid) {
+		if (!isActiveTabValid && availableTabs.length > 0) {
 			setActiveTab(availableTabs[0].value);
 		}
-	}, [availableTabs, activeTab]);
+	}, [boards, initialBoardId, availableTabs, activeTab]);
 
-	const activeBoard = activeTab === "TABLE" ? tableBoard : calendarBoard;
+	const activeBoard = useMemo(() => {
+		if (activeTab === BoardViewType.CALENDAR) return calendarBoard;
+		return boardBoard;
+	}, [activeTab, boardBoard, calendarBoard]);
 
 	useEffect(() => {
+		if (!activeBoard) return;
+
 		setCurrentProjectId(projectId);
-		setCurrentBoardId(activeBoard?.id ?? null);
-	}, [projectId, activeBoard?.id, setCurrentProjectId, setCurrentBoardId]);
+		setCurrentBoardId(activeBoard.id);
+	}, [projectId, activeBoard, setCurrentProjectId, setCurrentBoardId]);
 
 	return (
 		<ProjectBlock
-			isOpen
+			title={title}
+			isOpen={isOpen}
 			projectId={projectId}
 			workspaceId={workspaceId}
 			boards={boards}
 			activeTab={activeTab}
 			availableTabs={availableTabs}
-			tableBoard={tableBoard}
+			boardBoard={boardBoard}
 			calendarBoard={calendarBoard}
-			setCurrentBoardId={setCurrentBoardId}
 			setActiveTab={setActiveTab}
 		/>
 	);

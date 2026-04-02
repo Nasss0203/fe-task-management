@@ -6,21 +6,11 @@ import {
 	WorkspaceDto,
 } from "./type";
 
-export const createWorkspaceMultiServiceApi = async (
-	data: WorkspaceDto,
-): Promise<CreateWorkspaceResponse> => {
-	const response = await instance.post<CreateWorkspaceResponse>(
-		"/workspaces",
-		data,
-	);
-	return response.data;
-};
-
 export const createWorkspaceApi = async (
 	data: WorkspaceDto,
 ): Promise<CreateWorkspaceResponse> => {
 	const response = await instance.post<CreateWorkspaceResponse>(
-		"/workspaces/v2",
+		"/workspaces",
 		data,
 	);
 	return response.data;

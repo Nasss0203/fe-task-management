@@ -5,14 +5,15 @@ import {
 	CollapsibleContent,
 	CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { useWorkspace } from "@/hooks/use-workspace";
 import { findProjectByWorkspaceIdApi } from "@/services/project/project.service";
 import { PROJECT_KEY } from "@/services/project/type";
-import { WORKSPACE_KEY } from "@/services/workspace/type";
-import { findAllWorkspaceApi } from "@/services/workspace/workspace.service";
+import { WorkspaceDto } from "@/services/workspace/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { ChevronRight, Ellipsis, Plus } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { DialogTask } from "../dialog";
 import {
 	PopoverContentV2,
@@ -53,13 +54,14 @@ type ProjectItem = {
 export function NavMain() {
 	const { setCurrentWorkspaceId, setCurrentProjectId } =
 		useProjectSelectionStore();
+	const router = useRouter();
 
-	const workspaceQuery = useQuery({
-		queryKey: [WORKSPACE_KEY.WORKSPACE],
-		queryFn: findAllWorkspaceApi,
-	});
+	const {
+		createWorkspace: { mutate },
+		workspaceFindAll: { data: workspaceQuery },
+	} = useWorkspace();
 
-	const workspaces: WorkspaceItem[] = workspaceQuery.data?.data ?? [];
+	const workspaces: WorkspaceItem[] = workspaceQuery?.data ?? [];
 
 	const projectQueries = useQueries({
 		queries: workspaces.map((workspace) => ({
@@ -89,13 +91,26 @@ export function NavMain() {
 		}
 	};
 
+	const handleCreateWorkspace = (data: WorkspaceDto) => {
+		mutate(data, {
+			onSuccess: (res) => {
+				const newWorkspace = res?.data;
+
+				if (!newWorkspace?.id || !newWorkspace?.slug) return;
+
+				// setCurrentWorkspaceId(newWorkspace.id);
+
+				// router.push(`/dashboard/${newWorkspace.slug}`);
+			},
+		});
+	};
+
 	return (
 		<SidebarGroupV2>
 			<SidebarGroupLabelV2>Platform</SidebarGroupLabelV2>
-
 			<SidebarMenuV2>
 				{workspaces.map((workspace, index) => {
-					const projects: ProjectItem[] =
+					const projects: any =
 						projectQueries[index]?.data?.data ?? [];
 					return (
 						<ContextMenu key={workspace.id}>
@@ -165,31 +180,33 @@ export function NavMain() {
 
 										<CollapsibleContent>
 											<SidebarMenuSubV2>
-												{projects.map((project) => (
-													<SidebarMenuSubItemV2
-														key={project.id}
-													>
-														<SidebarMenuSubButtonV2
-															asChild
+												{projects.map(
+													(project: any) => (
+														<SidebarMenuSubItemV2
+															key={project.id}
 														>
-															<Link
-																href={`/dashboard/${workspace.slug}/${project.name}`}
-																onClick={() =>
-																	handleSelectProject(
-																		workspace.id,
-																		project.id,
-																	)
-																}
+															<SidebarMenuSubButtonV2
+																asChild
 															>
-																<span>
-																	{
-																		project.name
+																<Link
+																	href={`/dashboard/${workspace.slug}/${project.name}`}
+																	onClick={() =>
+																		handleSelectProject(
+																			workspace.id,
+																			project.id,
+																		)
 																	}
-																</span>
-															</Link>
-														</SidebarMenuSubButtonV2>
-													</SidebarMenuSubItemV2>
-												))}
+																>
+																	<span>
+																		{
+																			project.name
+																		}
+																	</span>
+																</Link>
+															</SidebarMenuSubButtonV2>
+														</SidebarMenuSubItemV2>
+													),
+												)}
 											</SidebarMenuSubV2>
 										</CollapsibleContent>
 									</SidebarMenuItemV2>
@@ -206,7 +223,7 @@ export function NavMain() {
 				})}
 				<SidebarMenuSubButtonV2
 					className='flex items-center h-8 justify-start gap-2 text-[13px] bg-sidebar-accent cursor-pointer '
-					onClick={(e) => {}}
+					onClick={() => handleCreateWorkspace({ name: "default2" })}
 				>
 					<Plus size={12}></Plus>
 					Thêm mới
