@@ -4,7 +4,10 @@ import { ProviderDragDrop } from "../dnd";
 import { TabsListCustom, TabsTriggerCustom } from "../tabs";
 import { Tabs, TabsContent } from "../ui/tabs";
 
-export type BoardViewType = "TABLE" | "CALENDAR";
+export enum BoardViewType {
+	BOARD = "BOARD",
+	CALENDAR = "CALENDAR",
+}
 
 export type BoardItem = {
 	id: string;
@@ -21,23 +24,24 @@ type AvailableTabItem = {
 };
 
 type ProjectBlockProps = {
+	title?: string;
 	projectId: string;
 	workspaceId: string;
 	boards: BoardItem[];
 	activeTab: BoardViewType;
 	availableTabs: AvailableTabItem[];
-	tableBoard?: BoardItem;
+	boardBoard?: BoardItem;
 	isOpen?: boolean;
 	calendarBoard?: BoardItem;
-	setCurrentBoardId: (id: string | null) => void;
 	setActiveTab: (value: BoardViewType) => void;
 };
 
 const ProjectBlock = ({
+	title,
 	boards,
 	activeTab,
 	availableTabs,
-	tableBoard,
+	boardBoard,
 	calendarBoard,
 	isOpen,
 	projectId,
@@ -52,7 +56,7 @@ const ProjectBlock = ({
 						<div>
 							<input
 								type='text'
-								defaultValue='Workspace'
+								defaultValue={title ?? "Workspace"}
 								placeholder='Workspace'
 								className='text-2xl font-bold outline-none'
 							/>
@@ -91,18 +95,17 @@ const ProjectBlock = ({
 					</div>
 				</div>
 
-				{tableBoard && (
-					<TabsContent value='TABLE'>
+				{boardBoard && (
+					<TabsContent value={BoardViewType.BOARD}>
 						<ProviderDragDrop
 							workspaceId={workspaceId}
 							projectId={projectId}
-							boardId={tableBoard.id}
 						/>
 					</TabsContent>
 				)}
 
 				{calendarBoard && (
-					<TabsContent value='CALENDAR'>
+					<TabsContent value={BoardViewType.CALENDAR}>
 						<CalendarApp />
 					</TabsContent>
 				)}

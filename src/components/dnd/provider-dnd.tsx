@@ -24,7 +24,6 @@ type DndColumns = {
 type ProviderDragDropProps = {
 	workspaceId: string;
 	projectId: string;
-	boardId: string;
 };
 
 const emptyColumns: DndColumns = {
@@ -36,12 +35,11 @@ const emptyColumns: DndColumns = {
 const ProviderDragDrop = ({
 	workspaceId,
 	projectId,
-	boardId,
 }: ProviderDragDropProps) => {
 	const taskQuery = useQuery({
-		queryKey: ["tasks", workspaceId, projectId, boardId],
-		queryFn: () => findAllTask(workspaceId, projectId, boardId),
-		enabled: !!workspaceId && !!projectId && !!boardId,
+		queryKey: ["tasks", workspaceId, projectId],
+		queryFn: () => findAllTask(workspaceId, projectId),
+		enabled: !!workspaceId && !!projectId,
 	});
 
 	const taskList: TaskItem[] | undefined = taskQuery.data?.data;

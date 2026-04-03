@@ -1,6 +1,7 @@
 "use client";
 
 import { ProjectBlockContainer } from "@/components/block";
+import { BoardViewType } from "@/components/block/ProjectBlock";
 import {
 	DropdownMenuContentV2,
 	DropdownMenuGroupV2,
@@ -9,60 +10,67 @@ import {
 	DropdownMenuTriggerV2,
 	DropdownMenuV2,
 } from "@/components/dropdown/dropdown-custom";
-import { findProjectByWorkspaceIdApi } from "@/services/project/project.service";
-import { PROJECT_KEY, ProjectItems } from "@/services/project/type";
-import { findOneByWorkspaceIdApi } from "@/services/workspace/workspace.service";
-import { useProjectSelectionStore } from "@/stores/use-project-selection";
-import { useQuery } from "@tanstack/react-query";
+import { usePage } from "@/hooks/use-page";
+import { usePageBlock } from "@/hooks/use-pageBlock";
+import { PageBlockItems, PageBlockViewType } from "@/services/page/type";
 import { GripVertical, Plus, RefreshCw } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useRef } from "react";
 
 const SlugPage = () => {
-	const { currentWorkspaceId } = useProjectSelectionStore();
-	const [openedProjectIds, setOpenedProjectIds] = useState<string[]>([]);
+	const {
+		pages: { data, isLoading },
+	} = usePage();
+	const {
+		updatePageBlock: { mutate },
+	} = usePageBlock();
 
-	const query = useQuery({
-		queryKey: ["workspace", currentWorkspaceId],
-		queryFn: () => findOneByWorkspaceIdApi(currentWorkspaceId as string),
-		enabled: !!currentWorkspaceId,
-	});
+	const page = data?.data;
+	const blocks: PageBlockItems[] = page?.blocks ?? [];
 
-	const dataWorkspace = query.data?.data;
+	const initializedRef = useRef(false);
 
-	const project = useQuery({
-		queryKey: [PROJECT_KEY.PROJECT, currentWorkspaceId],
-		queryFn: () =>
-			findProjectByWorkspaceIdApi(currentWorkspaceId as string),
-		enabled: !!currentWorkspaceId,
-	});
+	useEffect(() => {
+		if (!blocks.length || initializedRef.current) return;
 
-	const resProject = project.data?.data;
+		initializedRef.current = true;
+	}, [blocks]);
 
-	const handleConvertProject = (project: ProjectItems) => {
-		if (!project.id) return;
+	const mapInitialView = (
+		view?: PageBlockViewType | string,
+	): BoardViewType => {
+		if (view === BoardViewType.CALENDAR) return BoardViewType.CALENDAR;
+		return BoardViewType.BOARD;
+	};
 
-		const projectId = project.id;
+	if (isLoading) {
+		return <div>Loading...</div>;
+	}
 
-		setOpenedProjectIds((prev) =>
-			prev.includes(projectId)
-				? prev.filter((id) => id !== projectId)
-				: [...prev, projectId],
-		);
+	const handleUpdateDataConfigPageblock = (block: PageBlockItems) => {
+		mutate({
+			...block,
+			id: block.id,
+			data_config: {
+				...(block.data_config ?? {}),
+				is_open: !block.data_config?.is_open,
+			},
+		});
 	};
 
 	return (
 		<div className='flex h-screen flex-col gap-5'>
 			<div className='relative w-full'>
 				<div className='sticky top-0 z-20 h-20 w-full rounded-lg bg-sidebar-accent'>
-					<div className='flex items-center justify-center flex-1 h-full'>
-						<div className='text-white text-2xl'>Image</div>
+					<div className='flex h-full flex-1 items-center justify-center'>
+						<div className='text-2xl text-white'>Image</div>
 					</div>
 				</div>
 			</div>
+
 			<div className='flex flex-col gap-3 px-20'>
 				<div className='w-full'>
 					<textarea
-						defaultValue={dataWorkspace?.name}
+						defaultValue={page?.title}
 						placeholder='New page'
 						rows={1}
 						onInput={(e) => {
@@ -76,51 +84,83 @@ const SlugPage = () => {
 
 				<div className='flex flex-col gap-3'>
 					<ul className='flex flex-col gap-2'>
-						{resProject?.map((items: ProjectItems) => {
-							if (!items.id) return null;
+						{blocks
+							.sort(
+								(a, b) =>
+									(a.order_index ?? 0) - (b.order_index ?? 0),
+							)
+							.map((block) => {
+								if (!block.id) return null;
 
-							const isOpen = openedProjectIds.includes(items.id);
+								const projectId = block.data_config?.project_id;
+								const workspaceId =
+									block.data_config?.workspace_id ??
+									page?.workspace_id;
 
-							return (
-								<li key={items.id} className='rounded-md'>
-									<div className='group relative cursor-pointer rounded-md pl-2 py-1 hover:bg-accent-foreground/10'>
-										<div className='absolute -left-16 top-0 h-full w-16' />
-										<span>{items.name}</span>
+								if (!projectId || !workspaceId) return null;
 
-										<div className='invisible pointer-events-none absolute -left-16 top-1/2 -translate-y-1/2 opacity-0 transition-all duration-200 group-hover:visible group-hover:pointer-events-auto group-hover:opacity-100'>
-											<div className='flex items-center gap-2'>
-												<div className='rounded-md p-1 hover:bg-neutral-700'>
-													<Plus size={16} />
+								const isOpen = block.data_config?.is_open;
+								console.log("🚀 ~ isOpen~", isOpen);
+
+								return (
+									<li key={block.id} className='rounded-md'>
+										<div className='group relative cursor-pointer rounded-md py-1 pl-2 hover:bg-accent-foreground/10'>
+											<div className='absolute -left-16 top-0 h-full w-16' />
+
+											<span>
+												{block.title ??
+													"Untitled project"}
+											</span>
+
+											<div className='invisible pointer-events-none absolute -left-16 top-1/2 -translate-y-1/2 opacity-0 transition-all duration-200 group-hover:visible group-hover:pointer-events-auto group-hover:opacity-100'>
+												<div className='flex items-center gap-2'>
+													<button
+														type='button'
+														className='rounded-md p-1 hover:bg-neutral-700'
+													>
+														<Plus size={16} />
+													</button>
+
+													<DropdownMenuDemo
+														onConvert={() =>
+															handleUpdateDataConfigPageblock(
+																block,
+															)
+														}
+													>
+														<button
+															type='button'
+															className='rounded-md p-1 hover:bg-neutral-700'
+														>
+															<GripVertical
+																size={16}
+															/>
+														</button>
+													</DropdownMenuDemo>
 												</div>
-
-												<DropdownMenuDemo
-													onConvert={() =>
-														handleConvertProject(
-															items,
-														)
-													}
-												>
-													<div className='rounded-md p-1 hover:bg-neutral-700'>
-														<GripVertical
-															size={16}
-														/>
-													</div>
-												</DropdownMenuDemo>
 											</div>
 										</div>
-									</div>
 
-									{isOpen && (
-										<ProjectBlockContainer
-											project={items}
-											workspaceId={
-												currentWorkspaceId as string
-											}
-										/>
-									)}
-								</li>
-							);
-						})}
+										{isOpen && (
+											<div className='mt-2'>
+												<ProjectBlockContainer
+													projectId={projectId}
+													workspaceId={workspaceId}
+													initialBoardId={
+														block.data_config
+															?.board_id ?? null
+													}
+													initialView={mapInitialView(
+														block.data_config?.view,
+													)}
+													isOpen
+													title={block.title ?? ""}
+												/>
+											</div>
+										)}
+									</li>
+								);
+							})}
 					</ul>
 				</div>
 			</div>
@@ -135,7 +175,7 @@ export function DropdownMenuDemo({
 	onConvert,
 }: {
 	children: React.ReactNode;
-	onConvert: () => void;
+	onConvert?: () => void;
 }) {
 	return (
 		<DropdownMenuV2>
