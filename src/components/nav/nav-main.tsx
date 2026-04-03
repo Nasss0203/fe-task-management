@@ -33,12 +33,6 @@ import {
 	SidebarMenuSubV2,
 	SidebarMenuV2,
 } from "../sidebar/sidebar-custom";
-import {
-	ContextMenu,
-	ContextMenuContent,
-	ContextMenuItem,
-	ContextMenuTrigger,
-} from "../ui/context-menu";
 
 type WorkspaceItem = {
 	id: string;
@@ -113,112 +107,95 @@ export function NavMain() {
 					const projects: any =
 						projectQueries[index]?.data?.data ?? [];
 					return (
-						<ContextMenu key={workspace.id}>
-							<ContextMenuTrigger>
-								<Collapsible
-									asChild
-									className='group/collapsible'
+						<Collapsible
+							asChild
+							className='group/collapsible'
+							key={workspace.id}
+						>
+							<SidebarMenuItemV2>
+								<SidebarMenuButtonV2
+									tooltip={workspace.name}
+									variant='default'
 								>
-									<SidebarMenuItemV2>
-										<SidebarMenuButtonV2
-											tooltip={workspace.name}
-											variant='default'
+									<CollapsibleTrigger
+										asChild
+										className='hover:bg-neutral-700 rounded-xs mr-1'
+										onClick={() =>
+											handleSelectWorkspace(workspace.id)
+										}
+									>
+										<ChevronRight className='transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+									</CollapsibleTrigger>
+
+									<Link
+										href={`/dashboard/${workspace.slug}`}
+										onClick={() =>
+											handleSelectWorkspace(workspace.id)
+										}
+										className='flex-1 min-w-0'
+									>
+										<span className='line-clamp-1'>
+											{workspace.name}
+										</span>
+									</Link>
+
+									<PopoverV2>
+										<PopoverTriggerV2
+											asChild
+											className='hover:bg-neutral-700 rounded-xs ml-auto'
 										>
-											<CollapsibleTrigger
-												asChild
-												className='hover:bg-neutral-700 rounded-xs mr-1'
-												onClick={() =>
-													handleSelectWorkspace(
-														workspace.id,
-													)
-												}
+											<Ellipsis size={12} />
+										</PopoverTriggerV2>
+
+										<PopoverContentV2
+											align='start'
+											side='right'
+											sideOffset={15}
+										>
+											<PopoverHeaderV2>
+												<PopoverTitleV2>
+													Trang
+												</PopoverTitleV2>
+												<PopoverDescriptionV2>
+													Description text here.
+												</PopoverDescriptionV2>
+											</PopoverHeaderV2>
+										</PopoverContentV2>
+									</PopoverV2>
+
+									<DialogTask
+										workspaceId={workspace.id}
+										workspaceName={workspace.name}
+									/>
+								</SidebarMenuButtonV2>
+
+								<CollapsibleContent>
+									<SidebarMenuSubV2>
+										{projects.map((project: any) => (
+											<SidebarMenuSubItemV2
+												key={project.id}
 											>
-												<ChevronRight className='transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
-											</CollapsibleTrigger>
-
-											<Link
-												href={`/dashboard/${workspace.slug}`}
-												onClick={() =>
-													handleSelectWorkspace(
-														workspace.id,
-													)
-												}
-												className='flex-1 min-w-0'
-											>
-												<span className='line-clamp-1'>
-													{workspace.name}
-												</span>
-											</Link>
-
-											<PopoverV2>
-												<PopoverTriggerV2
-													asChild
-													className='hover:bg-neutral-700 rounded-xs ml-auto'
-												>
-													<Ellipsis size={12} />
-												</PopoverTriggerV2>
-
-												<PopoverContentV2
-													align='start'
-													side='right'
-													sideOffset={15}
-												>
-													<PopoverHeaderV2>
-														<PopoverTitleV2>
-															Trang
-														</PopoverTitleV2>
-														<PopoverDescriptionV2>
-															Description text
-															here.
-														</PopoverDescriptionV2>
-													</PopoverHeaderV2>
-												</PopoverContentV2>
-											</PopoverV2>
-
-											<DialogTask />
-										</SidebarMenuButtonV2>
-
-										<CollapsibleContent>
-											<SidebarMenuSubV2>
-												{projects.map(
-													(project: any) => (
-														<SidebarMenuSubItemV2
-															key={project.id}
-														>
-															<SidebarMenuSubButtonV2
-																asChild
-															>
-																<Link
-																	href={`/dashboard/${workspace.slug}/${project.name}`}
-																	onClick={() =>
-																		handleSelectProject(
-																			workspace.id,
-																			project.id,
-																		)
-																	}
-																>
-																	<span>
-																		{
-																			project.name
-																		}
-																	</span>
-																</Link>
-															</SidebarMenuSubButtonV2>
-														</SidebarMenuSubItemV2>
-													),
-												)}
-											</SidebarMenuSubV2>
-										</CollapsibleContent>
-									</SidebarMenuItemV2>
-								</Collapsible>
-							</ContextMenuTrigger>
-							<ContextMenuContent>
-								<ContextMenuItem>Profile</ContextMenuItem>
-								<ContextMenuItem>Billing</ContextMenuItem>
-								<ContextMenuItem>Team</ContextMenuItem>
-								<ContextMenuItem>Subscription</ContextMenuItem>
-							</ContextMenuContent>
-						</ContextMenu>
+												<SidebarMenuSubButtonV2 asChild>
+													<Link
+														href={`/dashboard/${workspace.slug}/${project.name}`}
+														onClick={() =>
+															handleSelectProject(
+																workspace.id,
+																project.id,
+															)
+														}
+													>
+														<span>
+															{project.name}
+														</span>
+													</Link>
+												</SidebarMenuSubButtonV2>
+											</SidebarMenuSubItemV2>
+										))}
+									</SidebarMenuSubV2>
+								</CollapsibleContent>
+							</SidebarMenuItemV2>
+						</Collapsible>
 					);
 				})}
 				<SidebarMenuSubButtonV2
