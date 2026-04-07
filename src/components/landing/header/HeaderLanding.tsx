@@ -1,11 +1,11 @@
-import { ChevronDown, LayoutGrid } from "lucide-react";
+import { LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../../ui/button";
 const navItems = [
 	{ label: "Features", href: "#" },
 	{ label: "Solutions", href: "#" },
 	{ label: "Resources", href: "#" },
-	{ label: "Enterprise", href: "#" },
+	{ label: "Pricing", href: "/pricing" },
 	{ label: "Templates", href: "/templates" },
 ];
 
@@ -29,16 +29,13 @@ const HeaderLanding = () => {
 						className='flex items-center gap-1 text-sm text-white/70 transition hover:text-white'
 					>
 						<span>{item.label}</span>
-						{item.label !== "Templates" && (
-							<ChevronDown className='h-4 w-4' />
-						)}
 					</Link>
 				))}
 			</nav>
 
 			<div className='flex items-center gap-3'>
 				<Link
-					href='#'
+					href='/contact'
 					className='hidden text-sm text-white/70 transition hover:text-white md:inline-block'
 				>
 					Contact Sales
