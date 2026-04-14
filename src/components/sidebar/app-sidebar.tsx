@@ -76,7 +76,7 @@ const data = {
 		},
 		{
 			name: "Trang chủ",
-			url: "/dashboard/home",
+			url: "/dashboard",
 			icon: Home,
 		},
 		{

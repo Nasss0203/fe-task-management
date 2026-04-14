@@ -54,7 +54,7 @@ const layout = ({
 						</div>
 					</div>
 				</header>
-				<div className='flex flex-1 flex-col gap-4 p-4 pt-0 bg-sidebar '>
+				<div className='flex flex-1 flex-col gap-4 bg-sidebar/30 p-4 pt-0 md:p-6'>
 					{children}
 				</div>
 			</SidebarInset>

@@ -103,7 +103,11 @@ const SlugPage = () => {
 								console.log("🚀 ~ isOpen~", isOpen);
 
 								return (
-									<li key={block.id} className='rounded-md'>
+									<li
+										key={block.id}
+										className='rounded-md'
+										// ref={}
+									>
 										<div className='group relative cursor-pointer rounded-md py-1 pl-2 hover:bg-accent-foreground/10'>
 											<div className='absolute -left-16 top-0 h-full w-16' />
 

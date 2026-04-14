@@ -8,7 +8,6 @@ export const useLogin = () => {
 	return useMutation({
 		mutationFn: async (data: LoginDto) => {
 			const result = await loginApi(data);
-			console.log("🚀 ~ result~", result.data.access_token);
 
 			if (typeof window !== "undefined") {
 				localStorage.setItem("access_token", result.data.access_token);

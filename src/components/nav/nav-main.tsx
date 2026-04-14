@@ -199,10 +199,10 @@ export function NavMain() {
 					);
 				})}
 				<SidebarMenuSubButtonV2
-					className='flex items-center h-8 justify-start gap-2 text-[13px] bg-sidebar-accent cursor-pointer '
+					className='flex items-center h-8 justify-start gap-2 text-[13px] hover:bg-sidebar-accent cursor-pointer font-medium'
 					onClick={() => handleCreateWorkspace({ name: "default2" })}
 				>
-					<Plus size={12}></Plus>
+					<Plus size={12} className='font-semibold'></Plus>
 					Thêm mới
 				</SidebarMenuSubButtonV2>
 			</SidebarMenuV2>

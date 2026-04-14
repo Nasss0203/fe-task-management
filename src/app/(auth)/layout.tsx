@@ -1,3 +1,4 @@
+import { LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
@@ -8,9 +9,14 @@ const layout = ({
 }>) => {
 	return (
 		<div className='bg-sidebar'>
-			<div className='pt-5 block'>
-				<Link href={"/"} className='m-5'>
-					LOGO
+			<div className='pt-5 block pl-5'>
+				<Link href='/' className='flex items-center gap-2'>
+					<div className='flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 ring-1 ring-white/10'>
+						<LayoutGrid className='h-4 w-4 text-white' />
+					</div>
+					<span className='text-sm font-semibold tracking-wide'>
+						Taskmanly
+					</span>
 				</Link>
 			</div>
 

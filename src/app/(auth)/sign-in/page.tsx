@@ -1,5 +1,6 @@
 "use client";
 
+import GoogleLoginButton from "@/components/button/GoogleLoginButton";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -18,12 +19,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useLogin } from "@/hooks/use-auth";
+import { useUser } from "@/hooks/use-user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { FaApple } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
-import { toast } from "sonner";
 import z from "zod";
 
 const formSchema = z.object({
@@ -37,6 +38,8 @@ const formSchema = z.object({
 		.max(100, "Description must be at most 100 characters."),
 });
 const SignIn = () => {
+	const { user, setUser } = useUser();
+	const router = useRouter();
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -45,25 +48,16 @@ const SignIn = () => {
 		},
 	});
 
-	const { mutate } = useLogin();
+	const { mutate, isPending } = useLogin();
 
 	function onSubmit(data: z.infer<typeof formSchema>) {
-		toast("You submitted the following values:", {
-			description: (
-				<pre className='bg-code text-code-foreground mt-2 w-[320px] overflow-x-auto rounded-md p-4'>
-					<code>{JSON.stringify(data, null, 2)}</code>
-				</pre>
-			),
-			position: "bottom-right",
-			classNames: {
-				content: "flex flex-col gap-2",
+		mutate(data, {
+			onSuccess: (res) => {
+				// if (user?.email && user.isActive && user.username) {
+				// 	router.push(`/dashboard`);
+				// }
 			},
-			style: {
-				"--border-radius": "calc(var(--radius)  + 4px)",
-			} as React.CSSProperties,
 		});
-
-		mutate(data);
 	}
 	return (
 		<div className='w-125  flex items-center'>
@@ -145,9 +139,14 @@ const SignIn = () => {
 							<Button
 								type='submit'
 								form='form-rhf-demo'
-								className='w-full'
+								className={`w-full ${isPending ? "disabled:bg-neutral-500" : ""}`}
+								disabled={isPending ? true : false}
 							>
-								Đăng nhập
+								{isPending ? (
+									<div className='h-6 w-6 border-[3px] border-neutral-600 border-t-black rounded-full animate-spin'></div>
+								) : (
+									<span>Đăng nhập</span>
+								)}
 							</Button>
 						</Field>
 					</form>
@@ -172,10 +171,7 @@ const SignIn = () => {
 								<FaApple />
 								Sign in with Apple
 							</Button>
-							<Button className='flex items-center gap-1.5 flex-1 text-xs'>
-								<FcGoogle size={16} />
-								Sign in with Google
-							</Button>
+							<GoogleLoginButton></GoogleLoginButton>
 						</div>
 					</div>
 				</CardFooter>

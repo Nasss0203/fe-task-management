@@ -44,12 +44,14 @@ const HeaderLanding = () => {
 					Contact Sales
 				</Link>
 
-				<Button
-					variant='outline'
-					className='border-white/15 bg-transparent text-white hover:bg-white/10 hover:text-white'
-				>
-					Log In
-				</Button>
+				<Link href={"sign-in"}>
+					<Button
+						variant='outline'
+						className='border-white/15 bg-transparent text-white hover:bg-white/10 hover:text-white'
+					>
+						Log In
+					</Button>
+				</Link>
 
 				<Button className='bg-indigo-500 text-white hover:bg-indigo-400'>
 					Get Started

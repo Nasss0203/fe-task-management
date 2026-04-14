@@ -24,6 +24,7 @@ export interface AuthGetMeResponse {
 		isActive: boolean;
 		createdAt: string;
 		updatedAt: string;
+		// avatarUrl?: string;
 	};
 }
 
@@ -34,4 +35,5 @@ export interface GetMeResponse {
 	isActive: boolean;
 	createdAt: string;
 	updatedAt: string;
+	avatarUrl?: string;
 }
