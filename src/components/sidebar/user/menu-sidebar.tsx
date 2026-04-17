@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { ChevronRight } from "lucide-react";
-import { CollapsibleTrigger } from "../ui/collapsible";
+import { CollapsibleTrigger } from "../../ui/collapsible";
 
 function SidebarMenuItemCustom({
 	className,

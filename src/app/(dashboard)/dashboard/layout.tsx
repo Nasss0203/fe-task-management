@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { AppSidebarUser } from "@/components/sidebar/user/app-sidebar-user";
 import { ToggleMode } from "@/components/toggle";
 import {
 	Breadcrumb,
@@ -23,7 +23,7 @@ const layout = ({
 }>) => {
 	return (
 		<SidebarProvider>
-			<AppSidebar />
+			<AppSidebarUser />
 			<SidebarInset>
 				<header className='flex w-full h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12'>
 					<div className='flex items-center justify-between flex-1'>

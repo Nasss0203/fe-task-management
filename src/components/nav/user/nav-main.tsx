@@ -14,7 +14,7 @@ import { useQueries } from "@tanstack/react-query";
 import { ChevronRight, Ellipsis, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { DialogTask } from "../dialog";
+import { DialogTask } from "../../dialog";
 import {
 	PopoverContentV2,
 	PopoverDescriptionV2,
@@ -22,8 +22,8 @@ import {
 	PopoverTitleV2,
 	PopoverTriggerV2,
 	PopoverV2,
-} from "../popover/popover-custom";
-import { SidebarMenuButtonV2 } from "../sidebar";
+} from "../../popover/popover-custom";
+import SidebarMenuButtonV2 from "../../sidebar/user/button-sidebar";
 import {
 	SidebarGroupLabelV2,
 	SidebarGroupV2,
@@ -32,7 +32,7 @@ import {
 	SidebarMenuSubItemV2,
 	SidebarMenuSubV2,
 	SidebarMenuV2,
-} from "../sidebar/sidebar-custom";
+} from "../../sidebar/user/sidebar-custom";
 
 type WorkspaceItem = {
 	id: string;
