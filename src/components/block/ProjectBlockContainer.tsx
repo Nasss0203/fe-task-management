@@ -1,34 +1,35 @@
 "use client";
 
 import ProjectBlock, {
-	BoardItem,
-	BoardViewType,
+	AvailableTabItem,
 } from "@/components/block/ProjectBlock";
 import { findAllBoard } from "@/services/board/board.service";
+import { PageBlockDataConfig } from "@/services/page/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useQuery } from "@tanstack/react-query";
-import { CalendarDays, LayoutList } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { BoardItem, BoardViewType } from "../board/board.type";
+import { BOARD_VIEW_CONFIG } from "../board/view-board";
 
 type Props = {
 	projectId: string;
 	workspaceId: string;
-	initialBoardId?: string | null;
-	initialView?: BoardViewType;
-	isOpen?: boolean;
+	configs: PageBlockDataConfig[];
 	title?: string;
 };
 
 const ProjectBlockContainer = ({
 	projectId,
 	workspaceId,
-	initialBoardId,
-	initialView = BoardViewType.BOARD,
-	isOpen = true,
+	configs,
 	title,
 }: Props) => {
 	const { setCurrentProjectId, setCurrentBoardId } =
 		useProjectSelectionStore();
+
+	const initialView =
+		(configs.find((item) => item.is_open)?.view as BoardViewType) ??
+		BoardViewType.BOARD;
 
 	const [activeTab, setActiveTab] = useState<BoardViewType>(initialView);
 
@@ -40,62 +41,44 @@ const ProjectBlockContainer = ({
 
 	const boards: BoardItem[] = boardQuery.data?.data ?? [];
 
-	const boardBoard = useMemo(
-		() => boards.find((b) => b.viewType === BoardViewType.BOARD),
-		[boards],
-	);
+	const availableTabs = useMemo<AvailableTabItem[]>(() => {
+		return configs.reduce<AvailableTabItem[]>((acc, item) => {
+			if (!item.is_open) return acc;
 
-	const calendarBoard = useMemo(
-		() => boards.find((b) => b.viewType === BoardViewType.CALENDAR),
-		[boards],
-	);
+			const viewType = item.view as BoardViewType;
+			const config = BOARD_VIEW_CONFIG[viewType];
 
-	const availableTabs = useMemo(() => {
-		const tabs = [];
+			if (!config?.enabled) return acc;
 
-		if (boardBoard) {
-			tabs.push({
-				icon: LayoutList,
-				type: "Board",
-				value: BoardViewType.BOARD,
+			acc.push({
+				icon: config.icon,
+				type: config.label,
+				value: viewType,
+				boardId: item.board_id,
 			});
-		}
 
-		if (calendarBoard) {
-			tabs.push({
-				icon: CalendarDays,
-				type: "Calendar",
-				value: BoardViewType.CALENDAR,
-			});
-		}
+			return acc;
+		}, []);
+	}, [configs]);
 
-		return tabs;
-	}, [boardBoard, calendarBoard]);
-
-	useEffect(() => {
-		if (!boards.length) return;
-
-		if (initialBoardId) {
-			const matchedBoard = boards.find((b) => b.id === initialBoardId);
-			if (matchedBoard) {
-				setActiveTab(matchedBoard.viewType);
-				return;
-			}
-		}
-
-		const isActiveTabValid = availableTabs.some(
-			(tab) => tab.value === activeTab,
-		);
-
-		if (!isActiveTabValid && availableTabs.length > 0) {
-			setActiveTab(availableTabs[0].value);
-		}
-	}, [boards, initialBoardId, availableTabs, activeTab]);
+	const activeConfig = useMemo(() => {
+		return configs.find((item) => item.view === activeTab);
+	}, [configs, activeTab]);
 
 	const activeBoard = useMemo(() => {
-		if (activeTab === BoardViewType.CALENDAR) return calendarBoard;
-		return boardBoard;
-	}, [activeTab, boardBoard, calendarBoard]);
+		if (!activeConfig?.board_id) return undefined;
+		return boards.find((b) => b.id === activeConfig.board_id);
+	}, [boards, activeConfig]);
+
+	useEffect(() => {
+		if (!availableTabs.length) return;
+
+		const isValid = availableTabs.some((tab) => tab.value === activeTab);
+
+		if (!isValid) {
+			setActiveTab(availableTabs[0].value);
+		}
+	}, [availableTabs, activeTab]);
 
 	useEffect(() => {
 		if (!activeBoard) return;
@@ -107,14 +90,13 @@ const ProjectBlockContainer = ({
 	return (
 		<ProjectBlock
 			title={title}
-			isOpen={isOpen}
+			isOpen={true}
+			boards={boards}
 			projectId={projectId}
 			workspaceId={workspaceId}
-			boards={boards}
 			activeTab={activeTab}
 			availableTabs={availableTabs}
-			boardBoard={boardBoard}
-			calendarBoard={calendarBoard}
+			activeBoard={activeBoard}
 			setActiveTab={setActiveTab}
 		/>
 	);

@@ -1,13 +1,12 @@
-import { PAGE_KEY, PageBlockItems } from "@/services/page/type";
+import { PAGE_KEY, PageBlockItem } from "@/services/page/type";
 import { updatePageBlockApi } from "@/services/page_block/page_block.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const usePageBlock = () => {
 	const queryClient = useQueryClient();
 	const updatePageBlock = useMutation({
-		mutationFn: async (data: PageBlockItems) => {
+		mutationFn: async (data: PageBlockItem) => {
 			const result = await updatePageBlockApi(data);
-			console.log("🚀 ~ result~", result);
 
 			return result;
 		},

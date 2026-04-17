@@ -1,17 +1,10 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Plus } from "lucide-react";
 import * as React from "react";
 import { AvaGroup } from "../avatar";
+import { DrawerItemView } from "../drawer/DrawerItemView";
 import { Separator } from "../ui/separator";
-
-type ItemViewProps = React.HTMLAttributes<HTMLDivElement> & {
-	id: string;
-	isOverlay?: boolean;
-	status: string;
-	name: string;
-};
 
 const STATUS_STYLE = {
 	todo: {
@@ -25,8 +18,29 @@ const STATUS_STYLE = {
 	},
 } as const;
 
+type ItemViewProps = React.HTMLAttributes<HTMLDivElement> & {
+	id: string;
+	isOverlay?: boolean;
+	status: string;
+	name: string;
+	description?: string;
+	onUpdateName?: (id: string, newName: string) => void;
+};
+
 export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
-	({ id, isOverlay, status, name, className, ...props }, ref) => {
+	(
+		{
+			id,
+			isOverlay,
+			status,
+			name,
+			className,
+			description,
+			onUpdateName,
+			...props
+		},
+		ref,
+	) => {
 		const normalizedStatus = status
 			.trim()
 			.toLowerCase()
@@ -40,6 +54,25 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 					: "todo";
 
 		const s = STATUS_STYLE[statusKey];
+
+		const [localName, setLocalName] = React.useState(name);
+
+		React.useEffect(() => {
+			setLocalName(name);
+		}, [name]);
+
+		React.useEffect(() => {
+			const trimmed = localName.trim();
+			const original = name.trim();
+
+			if (!trimmed || trimmed === original) return;
+
+			const timer = setTimeout(() => {
+				onUpdateName?.(id, trimmed);
+			}, 500);
+
+			return () => clearTimeout(timer);
+		}, [localName, name, id, onUpdateName]);
 
 		return (
 			<div
@@ -55,30 +88,24 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 			>
 				<div className='flex flex-col gap-1'>
 					<div className='flex items-center gap-1'>
-						<Plus size={14} />
-						<div>{name}</div>
+						<input
+							type='text'
+							value={localName}
+							onChange={(e) => setLocalName(e.target.value)}
+							onClick={(e) => e.stopPropagation()}
+							onPointerDown={(e) => e.stopPropagation()}
+							className='w-full resize-none overflow-hidden border-none bg-transparent text-sm font-extrabold outline-none ring-0 placeholder:font-bold focus:outline-none focus:ring-0'
+						/>
+						<DrawerItemView name={localName} />
 					</div>
 
 					<div className='text-sm font-medium line-clamp-2 mb-2'>
-						Lorem ipsum dolor sit amet consectetur adipisicing elit.
-						Nisi sunt necessitatibus odio sed, perferendis dicta
-						voluptatem animi voluptatum consequuntur, obcaecati
-						fugit aspernatur. Autem unde voluptatem nostrum
-						voluptatibus quaerat, soluta alias.
+						{description}
 					</div>
 
 					<div className='flex items-center gap-1 flex-wrap'>
 						<div className='text-[10px] px-1.5 py-1 bg-blue-500 rounded-sm inline-block'>
 							Trung bình
-						</div>
-						<div className='text-[10px] px-1.5 py-1 bg-blue-500 rounded-sm inline-block'>
-							Trung bình
-						</div>
-						<div className='text-[10px] px-1.5 py-1 bg-blue-500 rounded-sm inline-block'>
-							Trung bình
-						</div>
-						<div className='text-[10px] px-1.5 py-1 bg-green-500 rounded-sm inline-block'>
-							Ai biết gì đâu
 						</div>
 					</div>
 

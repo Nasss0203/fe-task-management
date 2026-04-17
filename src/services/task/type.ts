@@ -55,6 +55,7 @@ export interface CreateTaskDto {
 }
 
 export type UpdateTaskDto = {
+	id: string;
 	title?: string;
 	description?: string | null;
 	statusId?: string;

@@ -38,8 +38,7 @@ export const useTask = (workspaceId: string, projectId: string) => {
 	});
 
 	const updateTask = useMutation({
-		mutationFn: ({ id, ...body }: UpdateTaskInput) =>
-			updateTaskApi(id, body),
+		mutationFn: ({ id, ...body }: any) => updateTaskApi(id, body),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
 				queryKey: ["tasks", workspaceId, projectId],

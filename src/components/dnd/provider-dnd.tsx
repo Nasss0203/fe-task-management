@@ -210,11 +210,16 @@ const ProviderDragDrop = ({
 									<ItemsDnd
 										key={id}
 										id={id}
+										column={status.id}
 										index={index}
-										statusId={status.id}
 										status={status.name}
-										title={task?.title ?? id}
 										name={task?.title ?? ""}
+										onUpdateName={(taskId, newName) => {
+											updateTaskMutate({
+												id: taskId,
+												title: newName,
+											});
+										}}
 									/>
 								);
 							})}

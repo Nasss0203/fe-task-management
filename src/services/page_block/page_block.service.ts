@@ -1,10 +1,10 @@
 import instance from "../axios";
-import { PageBlockItems } from "../page/type";
+import { PageBlockItem } from "../page/type";
 
 export const updatePageBlockApi = async (
-	data: PageBlockItems,
-): Promise<PageBlockItems> => {
-	const response = await instance.patch<PageBlockItems>(
+	data: PageBlockItem,
+): Promise<PageBlockItem> => {
+	const response = await instance.patch<PageBlockItem>(
 		`/pageBlock/${data.id}`,
 		data,
 	);

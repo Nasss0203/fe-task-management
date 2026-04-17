@@ -1,7 +1,6 @@
 "use client";
 
 import { ProjectBlockContainer } from "@/components/block";
-import { BoardViewType } from "@/components/block/ProjectBlock";
 import {
 	DropdownMenuContentV2,
 	DropdownMenuGroupV2,
@@ -12,7 +11,8 @@ import {
 } from "@/components/dropdown/dropdown-custom";
 import { usePage } from "@/hooks/use-page";
 import { usePageBlock } from "@/hooks/use-pageBlock";
-import { PageBlockItems, PageBlockViewType } from "@/services/page/type";
+import { PageBlockItem } from "@/services/page/type";
+
 import { GripVertical, Plus, RefreshCw } from "lucide-react";
 import React, { useEffect, useRef } from "react";
 
@@ -25,7 +25,7 @@ const SlugPage = () => {
 	} = usePageBlock();
 
 	const page = data?.data;
-	const blocks: PageBlockItems[] = page?.blocks ?? [];
+	const blocks: PageBlockItem[] = page?.blocks ?? [];
 
 	const initializedRef = useRef(false);
 
@@ -35,25 +35,24 @@ const SlugPage = () => {
 		initializedRef.current = true;
 	}, [blocks]);
 
-	const mapInitialView = (
-		view?: PageBlockViewType | string,
-	): BoardViewType => {
-		if (view === BoardViewType.CALENDAR) return BoardViewType.CALENDAR;
-		return BoardViewType.BOARD;
-	};
-
 	if (isLoading) {
 		return <div>Loading...</div>;
 	}
 
-	const handleUpdateDataConfigPageblock = (block: PageBlockItems) => {
+	const handleUpdateDataConfigPageblock = (block: PageBlockItem) => {
+		const currentConfig = block.data_config?.[0];
+
+		if (!block.id || !currentConfig) return;
+
 		mutate({
 			...block,
 			id: block.id,
-			data_config: {
-				...(block.data_config ?? {}),
-				is_open: !block.data_config?.is_open,
-			},
+			data_config: [
+				{
+					...currentConfig,
+					is_open: !currentConfig.is_open,
+				},
+			],
 		});
 	};
 
@@ -92,15 +91,13 @@ const SlugPage = () => {
 							.map((block) => {
 								if (!block.id) return null;
 
-								const projectId = block.data_config?.project_id;
+								const config = block.data_config?.[0];
+								const projectId = config?.project_id;
 								const workspaceId =
-									block.data_config?.workspace_id ??
-									page?.workspace_id;
+									config?.workspace_id ?? page?.workspace_id;
+								const isOpen = config?.is_open ?? false;
 
 								if (!projectId || !workspaceId) return null;
-
-								const isOpen = block.data_config?.is_open;
-								console.log("🚀 ~ isOpen~", isOpen);
 
 								return (
 									<li
@@ -150,14 +147,9 @@ const SlugPage = () => {
 												<ProjectBlockContainer
 													projectId={projectId}
 													workspaceId={workspaceId}
-													initialBoardId={
-														block.data_config
-															?.board_id ?? null
+													configs={
+														block.data_config ?? []
 													}
-													initialView={mapInitialView(
-														block.data_config?.view,
-													)}
-													isOpen
 													title={block.title ?? ""}
 												/>
 											</div>

@@ -33,7 +33,6 @@ export const updateTaskApi = async (
 		`/tasks/${id}`,
 		data,
 	);
-	console.log("🚀 ~ response~", response);
 
 	return response.data;
 };

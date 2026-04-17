@@ -1,6 +1,6 @@
 import { Database } from "lucide-react";
 import { useState } from "react";
-import { BoardViewType } from "../block/ProjectBlock";
+import { BoardViewType } from "../board/board.type";
 import DatabaseEmpty from "../board/DatabaseEmpty";
 import DatabaseRecommend from "../board/DatabaseRecommend";
 import { Button } from "../ui/button";

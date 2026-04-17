@@ -1,26 +1,15 @@
-import { Plus, type LucideIcon } from "lucide-react";
-import CalendarApp from "../calendar/calendar";
-import { ProviderDragDrop } from "../dnd";
+import { type LucideIcon } from "lucide-react";
+import AddBoard from "../board/AddBoard";
+import { BoardItem, BoardViewType } from "../board/board.type";
+import { BOARD_VIEW_CONFIG } from "../board/view-board";
 import { TabsListCustom, TabsTriggerCustom } from "../tabs";
-import { Tabs, TabsContent } from "../ui/tabs";
+import { Tabs } from "../ui/tabs";
 
-export enum BoardViewType {
-	BOARD = "BOARD",
-	CALENDAR = "CALENDAR",
-}
-
-export type BoardItem = {
-	id: string;
-	name: string;
-	viewType: BoardViewType;
-	projectId: string;
-	workspaceId: string;
-};
-
-type AvailableTabItem = {
+export type AvailableTabItem = {
 	icon: LucideIcon;
 	type: string;
 	value: BoardViewType;
+	boardId?: string | null;
 };
 
 type ProjectBlockProps = {
@@ -29,10 +18,9 @@ type ProjectBlockProps = {
 	workspaceId: string;
 	boards: BoardItem[];
 	activeTab: BoardViewType;
+	activeBoard?: BoardItem;
 	availableTabs: AvailableTabItem[];
-	boardBoard?: BoardItem;
 	isOpen?: boolean;
-	calendarBoard?: BoardItem;
 	setActiveTab: (value: BoardViewType) => void;
 };
 
@@ -40,14 +28,15 @@ const ProjectBlock = ({
 	title,
 	boards,
 	activeTab,
+	activeBoard,
 	availableTabs,
-	boardBoard,
-	calendarBoard,
 	isOpen,
-	projectId,
-	workspaceId,
 	setActiveTab,
 }: ProjectBlockProps) => {
+	const ActiveViewComponent = activeBoard
+		? BOARD_VIEW_CONFIG[activeBoard.viewType]?.component
+		: null;
+
 	return (
 		<div className='flex flex-col gap-2'>
 			{!isOpen ? (
@@ -88,27 +77,23 @@ const ProjectBlock = ({
 						</TabsListCustom>
 
 						{boards.length > 0 && (
-							<button className='flex h-6 w-6 items-center justify-center rounded-full bg-neutral-300'>
-								<Plus className='size-4' />
-							</button>
+							<AddBoard
+								onSelect={(viewType) => {
+									console.log(
+										"create board with view:",
+										viewType,
+									);
+								}}
+							/>
 						)}
 					</div>
 				</div>
 
-				{boardBoard && (
-					<TabsContent value={BoardViewType.BOARD}>
-						<ProviderDragDrop
-							workspaceId={workspaceId}
-							projectId={projectId}
-						/>
-					</TabsContent>
-				)}
-
-				{calendarBoard && (
-					<TabsContent value={BoardViewType.CALENDAR}>
-						<CalendarApp />
-					</TabsContent>
-				)}
+				<div className='mt-2'>
+					{activeBoard && ActiveViewComponent ? (
+						<ActiveViewComponent board={activeBoard} />
+					) : null}
+				</div>
 			</Tabs>
 		</div>
 	);
