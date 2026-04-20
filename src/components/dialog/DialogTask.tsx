@@ -5,7 +5,8 @@ import { ProjectDto } from "@/services/project/type";
 import { Ellipsis, Plus } from "lucide-react";
 import { useRef, useState } from "react";
 import { FaRegStar, FaStar } from "react-icons/fa";
-import { BoardViewType } from "../board/board.type";
+
+import { BoardViewType } from "@/services/board/type";
 import {
 	DialogContentV2,
 	DialogFooterV2,

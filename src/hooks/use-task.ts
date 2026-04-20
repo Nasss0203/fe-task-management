@@ -41,7 +41,7 @@ export const useTask = (workspaceId: string, projectId: string) => {
 		mutationFn: ({ id, ...body }: any) => updateTaskApi(id, body),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: ["tasks", workspaceId, projectId],
+				queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
 			});
 		},
 	});
@@ -56,6 +56,14 @@ export const useTask = (workspaceId: string, projectId: string) => {
 export const useTaskStatus = (workspaceId?: string, projectId?: string) => {
 	return useQuery<TaskStatusResponse>({
 		queryKey: ["task-status", workspaceId, projectId],
+		queryFn: () => findAllTaskApiStatusApi(workspaceId!, projectId!),
+		enabled: !!workspaceId && !!projectId,
+	});
+};
+
+export const useTaskPriority = (workspaceId?: string, projectId?: string) => {
+	return useQuery<TaskStatusResponse>({
+		queryKey: ["task-priority", workspaceId, projectId],
 		queryFn: () => findAllTaskApiStatusApi(workspaceId!, projectId!),
 		enabled: !!workspaceId && !!projectId,
 	});

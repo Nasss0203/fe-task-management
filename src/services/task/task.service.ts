@@ -2,6 +2,7 @@ import instance from "../axios";
 import {
 	CreateTaskDto,
 	CreateTaskResponse,
+	FindAllTaskResponse,
 	UpdateTaskDto,
 	UpdateTaskResponse,
 } from "./type";
@@ -9,8 +10,8 @@ import {
 export const findAllTaskApi = async (
 	workspaceId: string,
 	projectId: string,
-): Promise<any> => {
-	const response = await instance.get(
+): Promise<FindAllTaskResponse> => {
+	const response = await instance.get<FindAllTaskResponse>(
 		`/tasks/workspace/${workspaceId}/project/${projectId}`,
 	);
 

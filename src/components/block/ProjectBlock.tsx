@@ -1,6 +1,7 @@
+import { BoardItem, BoardViewType } from "@/services/board/type";
+import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { type LucideIcon } from "lucide-react";
 import AddBoard from "../board/AddBoard";
-import { BoardItem, BoardViewType } from "../board/board.type";
 import { BOARD_VIEW_CONFIG } from "../board/view-board";
 import { TabsListCustom, TabsTriggerCustom } from "../tabs";
 import { Tabs } from "../ui/tabs";
@@ -36,6 +37,7 @@ const ProjectBlock = ({
 	const ActiveViewComponent = activeBoard
 		? BOARD_VIEW_CONFIG[activeBoard.viewType]?.component
 		: null;
+	const { currentWorkspaceId, currentProjectId } = useProjectSelectionStore();
 
 	return (
 		<div className='flex flex-col gap-2'>
@@ -61,29 +63,27 @@ const ProjectBlock = ({
 				<div className='flex items-center justify-between'>
 					<div className='flex items-center gap-1'>
 						<TabsListCustom variant='none'>
-							{availableTabs.map((item) => (
-								<TabsTriggerCustom
-									value={item.value}
-									key={item.value}
-								>
-									<div className='flex items-center gap-1'>
-										<item.icon />
-										<div className='text-sm font-medium'>
-											{item.type}
+							{availableTabs.map((item) => {
+								return (
+									<TabsTriggerCustom
+										value={item.value}
+										key={item.value}
+									>
+										<div className='flex items-center gap-1'>
+											<item.icon />
+											<div className='text-sm font-medium'>
+												{item.type}
+											</div>
 										</div>
-									</div>
-								</TabsTriggerCustom>
-							))}
+									</TabsTriggerCustom>
+								);
+							})}
 						</TabsListCustom>
 
 						{boards.length > 0 && (
 							<AddBoard
-								onSelect={(viewType) => {
-									console.log(
-										"create board with view:",
-										viewType,
-									);
-								}}
+								projectId={currentProjectId as string}
+								workspaceId={currentWorkspaceId as string}
 							/>
 						)}
 					</div>

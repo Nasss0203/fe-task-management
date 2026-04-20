@@ -63,7 +63,7 @@ const ProviderDragDrop = ({
 
 	const taskStatusQuery = useTaskStatus(workspaceId, projectId);
 
-	const taskList: TaskItem[] = useMemo(() => {
+	const taskList = useMemo(() => {
 		return taskQuery.data?.data ?? [];
 	}, [taskQuery.data?.data]);
 

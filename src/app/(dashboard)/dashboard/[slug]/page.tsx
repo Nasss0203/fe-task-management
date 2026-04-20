@@ -11,7 +11,7 @@ import {
 } from "@/components/dropdown/dropdown-custom";
 import { usePage } from "@/hooks/use-page";
 import { usePageBlock } from "@/hooks/use-pageBlock";
-import { PageBlockItem } from "@/services/page/type";
+import { PageBlockItem } from "@/services/page_block/type";
 
 import { GripVertical, Plus, RefreshCw } from "lucide-react";
 import React, { useEffect, useRef } from "react";
@@ -25,6 +25,8 @@ const SlugPage = () => {
 	} = usePageBlock();
 
 	const page = data?.data;
+	console.log("🚀 ~ page~", page);
+
 	const blocks: PageBlockItem[] = page?.blocks ?? [];
 
 	const initializedRef = useRef(false);
@@ -40,19 +42,12 @@ const SlugPage = () => {
 	}
 
 	const handleUpdateDataConfigPageblock = (block: PageBlockItem) => {
-		const currentConfig = block.data_config?.[0];
-
-		if (!block.id || !currentConfig) return;
+		if (!block.id) return;
 
 		mutate({
 			...block,
 			id: block.id,
-			data_config: [
-				{
-					...currentConfig,
-					is_open: !currentConfig.is_open,
-				},
-			],
+			is_open: !block.is_open,
 		});
 	};
 
@@ -95,7 +90,7 @@ const SlugPage = () => {
 								const projectId = config?.project_id;
 								const workspaceId =
 									config?.workspace_id ?? page?.workspace_id;
-								const isOpen = config?.is_open ?? false;
+								const isOpen = block.is_open ?? false;
 
 								if (!projectId || !workspaceId) return null;
 
@@ -147,6 +142,7 @@ const SlugPage = () => {
 												<ProjectBlockContainer
 													projectId={projectId}
 													workspaceId={workspaceId}
+													isOpen={block.is_open}
 													configs={
 														block.data_config ?? []
 													}

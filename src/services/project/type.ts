@@ -1,4 +1,4 @@
-import { BoardViewType } from "@/components/block/ProjectBlock";
+import { BoardViewType } from "../board/type";
 
 export enum PROJECT_KEY {
 	PROJECT = "project",

@@ -1,5 +1,5 @@
 import instance from "../axios";
-import { PageBlockItem } from "../page/type";
+import { PageBlockItem } from "./type";
 
 export const updatePageBlockApi = async (
 	data: PageBlockItem,

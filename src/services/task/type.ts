@@ -68,12 +68,12 @@ export interface CreateTaskResponse {
 	data: TaskItem;
 }
 
-export interface findAllTaskApiResponse {
-	data: TaskItem[];
-}
-
 export interface FindOneTaskResponse {
 	data: TaskItem;
+}
+
+export interface FindAllTaskResponse {
+	data: TaskItem[];
 }
 
 export interface UpdateTaskResponse {

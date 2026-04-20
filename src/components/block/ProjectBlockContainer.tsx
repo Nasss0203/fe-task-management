@@ -3,12 +3,12 @@
 import ProjectBlock, {
 	AvailableTabItem,
 } from "@/components/block/ProjectBlock";
-import { findAllBoard } from "@/services/board/board.service";
-import { PageBlockDataConfig } from "@/services/page/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
-import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { BoardItem, BoardViewType } from "../board/board.type";
+
+import { useBoards } from "@/hooks/use-board";
+import { BoardItem, BoardViewType } from "@/services/board/type";
+import { PageBlockDataConfig } from "@/services/page_block/type";
 import { BOARD_VIEW_CONFIG } from "../board/view-board";
 
 type Props = {
@@ -16,6 +16,7 @@ type Props = {
 	workspaceId: string;
 	configs: PageBlockDataConfig[];
 	title?: string;
+	isOpen?: boolean;
 };
 
 const ProjectBlockContainer = ({
@@ -23,29 +24,27 @@ const ProjectBlockContainer = ({
 	workspaceId,
 	configs,
 	title,
+	isOpen,
 }: Props) => {
 	const { setCurrentProjectId, setCurrentBoardId } =
 		useProjectSelectionStore();
 
 	const initialView =
-		(configs.find((item) => item.is_open)?.view as BoardViewType) ??
+		(configs[0]?.view_type as BoardViewType | undefined) ??
 		BoardViewType.BOARD;
 
 	const [activeTab, setActiveTab] = useState<BoardViewType>(initialView);
 
-	const boardQuery = useQuery({
-		queryKey: ["boards", workspaceId, projectId],
-		queryFn: () => findAllBoard(workspaceId, projectId),
-		enabled: !!workspaceId && !!projectId,
+	const { findBoard } = useBoards({
+		workspaceId,
+		projectId,
 	});
 
-	const boards: BoardItem[] = boardQuery.data?.data ?? [];
+	const boards: BoardItem[] = findBoard.data?.data ?? [];
 
 	const availableTabs = useMemo<AvailableTabItem[]>(() => {
 		return configs.reduce<AvailableTabItem[]>((acc, item) => {
-			if (!item.is_open) return acc;
-
-			const viewType = item.view as BoardViewType;
+			const viewType = item.view_type as BoardViewType;
 			const config = BOARD_VIEW_CONFIG[viewType];
 
 			if (!config?.enabled) return acc;
@@ -62,7 +61,7 @@ const ProjectBlockContainer = ({
 	}, [configs]);
 
 	const activeConfig = useMemo(() => {
-		return configs.find((item) => item.view === activeTab);
+		return configs.find((item) => item.view_type === activeTab);
 	}, [configs, activeTab]);
 
 	const activeBoard = useMemo(() => {
@@ -90,7 +89,7 @@ const ProjectBlockContainer = ({
 	return (
 		<ProjectBlock
 			title={title}
-			isOpen={true}
+			isOpen={isOpen}
 			boards={boards}
 			projectId={projectId}
 			workspaceId={workspaceId}

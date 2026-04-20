@@ -1,31 +1,24 @@
 "use client";
 
 import { ProjectBlock } from "@/components/block";
-import { BoardItem, BoardViewType } from "@/components/board/board.type";
 import { BOARD_VIEW_CONFIG } from "@/components/board/view-board";
-import { findAllBoard } from "@/services/board/board.service";
+import { useBoards } from "@/hooks/use-board";
+import { BoardItem, BoardViewType } from "@/services/board/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
-import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 
 const RestPage = () => {
 	const { currentWorkspaceId, currentProjectId, setCurrentBoardId } =
 		useProjectSelectionStore();
 
-	const workspaceId = currentWorkspaceId;
-	const projectId = currentProjectId;
-
 	const [activeTab, setActiveTab] = useState<BoardViewType>(
 		BoardViewType.BOARD,
 	);
 
-	const allBoard = useQuery({
-		queryKey: ["boards", workspaceId, projectId],
-		queryFn: () => findAllBoard(workspaceId!, projectId!),
-		enabled: !!workspaceId && !!projectId,
-	});
+	const { findBoard } = useBoards();
 
-	const boards: BoardItem[] = allBoard.data?.data ?? [];
+	const boards: BoardItem[] = findBoard.data?.data ?? [];
+	console.log("🚀 ~ boards~", boards);
 
 	const availableTabs = useMemo(() => {
 		return boards
@@ -65,13 +58,13 @@ const RestPage = () => {
 		setCurrentBoardId(activeBoard.id);
 	}, [activeBoard?.id, setCurrentBoardId]);
 
-	if (!workspaceId || !projectId) return null;
+	if (!currentWorkspaceId || !currentProjectId) return null;
 
 	return (
 		<div className='px-20'>
 			<ProjectBlock
-				projectId={projectId}
-				workspaceId={workspaceId}
+				projectId={currentProjectId}
+				workspaceId={currentWorkspaceId}
 				activeTab={activeTab}
 				availableTabs={availableTabs}
 				boards={boards}
