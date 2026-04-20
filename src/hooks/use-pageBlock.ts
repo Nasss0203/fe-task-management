@@ -1,5 +1,6 @@
-import { PAGE_KEY, PageBlockItem } from "@/services/page/type";
+import { PAGE_KEY } from "@/services/page/type";
 import { updatePageBlockApi } from "@/services/page_block/page_block.service";
+import { PageBlockItem } from "@/services/page_block/type";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const usePageBlock = () => {

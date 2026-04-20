@@ -1,3 +1,4 @@
+import { BoardViewType } from "@/services/board/type";
 import { GripVertical, Plus, RefreshCw } from "lucide-react";
 import {
 	DropdownMenuContentV2,
@@ -7,7 +8,6 @@ import {
 	DropdownMenuTriggerV2,
 	DropdownMenuV2,
 } from "../dropdown/dropdown-custom";
-import { BoardViewType } from "./ProjectBlock";
 import ProjectBlockContainer from "./ProjectBlockContainer";
 
 interface BlockItemsProps {
@@ -16,7 +16,7 @@ interface BlockItemsProps {
 	handleUpdateDataConfigPageblock: (block: any) => void;
 	projectId: string;
 	workspaceId: string;
-	boardId: string;
+	boardId: any;
 	view: BoardViewType;
 }
 
@@ -67,9 +67,7 @@ const BlockItems = ({
 					<ProjectBlockContainer
 						projectId={projectId}
 						workspaceId={workspaceId}
-						initialBoardId={boardId ?? null}
-						initialView={view}
-						isOpen
+						configs={boardId}
 						title={title ?? ""}
 					/>
 				</div>

@@ -8,6 +8,7 @@ type ItemsDndProps = {
 	column: string;
 	index: number;
 	status: string;
+	priority?: string;
 	name: string;
 	onUpdateName?: (id: string, newName: string) => void;
 };
@@ -17,6 +18,7 @@ const ItemsDnd = ({
 	column,
 	index,
 	status,
+	priority,
 	name,
 	onUpdateName,
 }: ItemsDndProps) => {
@@ -34,6 +36,7 @@ const ItemsDnd = ({
 				id={id}
 				status={status}
 				name={name}
+				priority={priority}
 				onUpdateName={onUpdateName}
 			/>
 		</div>

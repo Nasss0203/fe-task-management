@@ -1,12 +1,13 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import * as React from "react";
 import { AvaGroup } from "../avatar";
 import { DrawerItemView } from "../drawer/DrawerItemView";
 import { Separator } from "../ui/separator";
 
-const STATUS_STYLE = {
+export const STATUS_STYLE = {
 	todo: {
 		background: "bg-neutral-600/60",
 	},
@@ -23,6 +24,7 @@ type ItemViewProps = React.HTMLAttributes<HTMLDivElement> & {
 	isOverlay?: boolean;
 	status: string;
 	name: string;
+	priority?: string;
 	description?: string;
 	onUpdateName?: (id: string, newName: string) => void;
 };
@@ -36,11 +38,15 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 			name,
 			className,
 			description,
+			priority,
 			onUpdateName,
 			...props
 		},
 		ref,
 	) => {
+		const { currentWorkspaceId, currentProjectId, setCurrentBoardId } =
+			useProjectSelectionStore();
+
 		const normalizedStatus = status
 			.trim()
 			.toLowerCase()
@@ -96,19 +102,28 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 							onPointerDown={(e) => e.stopPropagation()}
 							className='w-full resize-none overflow-hidden border-none bg-transparent text-sm font-extrabold outline-none ring-0 placeholder:font-bold focus:outline-none focus:ring-0'
 						/>
-						<DrawerItemView name={localName} />
+						<DrawerItemView
+							name={localName}
+							projectId={currentProjectId as string}
+							workspaceId={currentWorkspaceId as string}
+							statusName={status}
+							taskId={id}
+						/>
 					</div>
 
 					<div className='text-sm font-medium line-clamp-2 mb-2'>
 						{description}
 					</div>
 
-					<div className='flex items-center gap-1 flex-wrap'>
-						<div className='text-[10px] px-1.5 py-1 bg-blue-500 rounded-sm inline-block'>
-							Trung bình
+					{priority ? (
+						<div className='flex items-center gap-1 flex-wrap'>
+							<div className='text-[10px] px-1.5 py-1 bg-blue-500 rounded-sm inline-block'>
+								{priority}
+							</div>
 						</div>
-					</div>
-
+					) : (
+						<></>
+					)}
 					<Separator className='my-1.5' />
 
 					<div className='flex items-center justify-between'>

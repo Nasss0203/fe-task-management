@@ -13,10 +13,10 @@ import {
 	Table2,
 } from "lucide-react";
 
+import { BoardItem, BoardViewType } from "@/services/board/type";
 import CalendarApp from "../calendar/calendar";
 import { ProviderDragDrop } from "../dnd";
-import { BoardItem, BoardViewType } from "./board.type";
-import BoardTable from "./BoardTable";
+import BoardTable from "../table/BoardTable";
 
 type BoardViewProps = {
 	board: BoardItem;
@@ -31,12 +31,20 @@ const BoardView = ({ board }: BoardViewProps) => (
 
 const CalendarView = () => <CalendarApp />;
 
-const TableView = ({ board }: BoardViewProps) => <BoardTable></BoardTable>;
+const TableView = ({ board }: BoardViewProps) => (
+	<BoardTable
+		projectId={board.projectId}
+		workspaceId={board.workspaceId}
+	></BoardTable>
+);
 
 const ListView = ({ board }: BoardViewProps) => (
 	<div>List view - {board.name}</div>
 );
 
+const Timeline = ({ board }: BoardViewProps) => (
+	<div>Tiimeline - {board.name}</div>
+);
 const UnsupportedView = ({ board }: BoardViewProps) => (
 	<div>View {board.viewType} chưa được hỗ trợ</div>
 );
@@ -78,7 +86,7 @@ export const BOARD_VIEW_CONFIG: Partial<
 	TIMELINE: {
 		label: "Timeline",
 		icon: GanttChart,
-		component: UnsupportedView,
+		component: Timeline,
 		enabled: false,
 	},
 	GALLERY: {
