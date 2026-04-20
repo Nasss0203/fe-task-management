@@ -38,7 +38,7 @@ const HeaderLanding = () => {
 
 			<div className='flex items-center gap-3'>
 				<Link
-					href='#'
+					href='/contact'
 					className='hidden text-sm text-white/70 transition hover:text-white md:inline-block'
 				>
 					Contact Sales
