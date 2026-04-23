@@ -1,5 +1,6 @@
 "use client";
 
+import DialogAddWorkspace from "@/components/dialog/DialogAddWorkspace";
 import {
 	Collapsible,
 	CollapsibleContent,
@@ -11,7 +12,7 @@ import { PROJECT_KEY } from "@/services/project/type";
 import { WorkspaceDto } from "@/services/workspace/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useQueries } from "@tanstack/react-query";
-import { ChevronRight, Ellipsis, Plus } from "lucide-react";
+import { ChevronRight, Ellipsis } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { DialogTask } from "../../dialog";
@@ -126,7 +127,6 @@ export function NavMain() {
 									>
 										<ChevronRight className='transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
 									</CollapsibleTrigger>
-
 									<Link
 										href={`/dashboard/${workspace.slug}`}
 										onClick={() =>
@@ -199,11 +199,10 @@ export function NavMain() {
 					);
 				})}
 				<SidebarMenuSubButtonV2
-					className='flex items-center h-8 justify-start gap-2 text-[13px] hover:bg-sidebar-accent cursor-pointer font-medium'
-					onClick={() => handleCreateWorkspace({ name: "default2" })}
+					className=''
+					// onClick={() => handleCreateWorkspace({ name: "default2" })}
 				>
-					<Plus size={12} className='font-semibold'></Plus>
-					Thêm mới
+					<DialogAddWorkspace></DialogAddWorkspace>
 				</SidebarMenuSubButtonV2>
 			</SidebarMenuV2>
 		</SidebarGroupV2>

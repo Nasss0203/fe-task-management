@@ -10,8 +10,15 @@ export interface WorkspaceItem {
 	updatedAt: string;
 }
 
+export type WorkspaceTemplateType =
+	| "BLANK_PAGE"
+	| "BLANK_DATABASE"
+	| "TASK_TRACKER"
+	| "PROJECT";
+
 export interface WorkspaceDto {
 	name: string;
+	template: WorkspaceTemplateType;
 }
 
 export interface CreateWorkspaceResponse {

@@ -9,6 +9,7 @@ if (!baseURL) {
 const instance = axios.create({
 	baseURL,
 	timeout: 1000,
+	withCredentials: true,
 });
 
 instance.interceptors.request.use(

@@ -18,7 +18,6 @@ const RestPage = () => {
 	const { findBoard } = useBoards();
 
 	const boards: BoardItem[] = findBoard.data?.data ?? [];
-	console.log("🚀 ~ boards~", boards);
 
 	const availableTabs = useMemo(() => {
 		return boards

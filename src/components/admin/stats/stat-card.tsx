@@ -1,5 +1,5 @@
 import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
-import type { StatItem } from "./types";
+import { StatItem } from "../shared/types";
 
 type Props = {
 	item: StatItem;

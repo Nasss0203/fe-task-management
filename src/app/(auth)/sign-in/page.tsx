@@ -43,8 +43,8 @@ const SignIn = () => {
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			email: "",
-			password: "",
+			email: "user11@gmail.com",
+			password: "1234567890",
 		},
 	});
 
@@ -116,6 +116,7 @@ const SignIn = () => {
 											aria-invalid={fieldState.invalid}
 											placeholder='Login button not working on mobile'
 											autoComplete='off'
+											type='password'
 										/>
 										{fieldState.invalid && (
 											<FieldError
