@@ -13,7 +13,7 @@ export const stats: StatItem[] = [
 		value: "12",
 		description: "+2 trong tuần này",
 		icon: FolderKanban,
-		url: "projects",
+		url: "project",
 	},
 	{
 		title: "Open Tasks",

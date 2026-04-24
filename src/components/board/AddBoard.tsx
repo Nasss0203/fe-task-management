@@ -16,7 +16,8 @@ import {
 } from "lucide-react";
 
 import { useBoards } from "@/hooks/use-board";
-import { BoardViewType } from "@/services/board/type";
+import { BoardItem, BoardViewType } from "@/services/board/type";
+import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import {
 	PopoverContentV2,
 	PopoverHeaderV2,
@@ -28,6 +29,7 @@ import {
 type AddBoardProps = {
 	projectId: string;
 	workspaceId: string;
+	boards: BoardItem[];
 };
 
 const BOARD_VIEW_ITEMS: {
@@ -48,7 +50,6 @@ const BOARD_VIEW_ITEMS: {
 		icon: LayoutGrid,
 		enabled: true,
 	},
-
 	{
 		label: "Danh sách",
 		value: BoardViewType.LIST,
@@ -79,11 +80,18 @@ const BOARD_VIEW_ITEMS: {
 		icon: LayoutDashboard,
 		enabled: true,
 	},
-
-	{ label: "Bảng tin", value: BoardViewType.FEED, icon: Rss, enabled: true },
-
-	{ label: "Bản đồ", value: BoardViewType.MAP, icon: Map, enabled: true },
-
+	{
+		label: "Bảng tin",
+		value: BoardViewType.FEED,
+		icon: Rss,
+		enabled: true,
+	},
+	{
+		label: "Bản đồ",
+		value: BoardViewType.MAP,
+		icon: Map,
+		enabled: true,
+	},
 	{
 		label: "Biểu mẫu",
 		value: BoardViewType.FORM,
@@ -98,28 +106,55 @@ const BOARD_VIEW_ITEMS: {
 	},
 ];
 
-export default function AddBoard({ projectId, workspaceId }: AddBoardProps) {
+export default function AddBoard({
+	projectId,
+	workspaceId,
+	boards,
+}: AddBoardProps) {
+	const { setCurrentWorkspaceId, setCurrentProjectId, setCurrentBoardId } =
+		useProjectSelectionStore();
+
 	const { createBoard, findBoard } = useBoards();
+
+	const existingViewTypes = new Set(boards.map((board) => board.viewType));
 
 	const handleSubmit = async (viewType: BoardViewType, label: string) => {
 		if (!viewType) return;
 
-		const labelConvert = label.toLowerCase();
+		const isExists = existingViewTypes.has(viewType);
 
-		await createBoard.mutateAsync({
-			name: labelConvert,
-			viewType,
-			projectId,
-			workspaceId,
-		});
+		if (isExists) return;
 
-		await findBoard.refetch();
+		const name = label.toLowerCase();
+
+		try {
+			await createBoard.mutateAsync({
+				name,
+				viewType,
+				projectId,
+				workspaceId,
+			});
+
+			await findBoard.refetch();
+		} catch (error) {
+			console.error("createBoard failed", error);
+		}
+	};
+
+	const handleOpenAddBoard = () => {
+		setCurrentWorkspaceId(workspaceId);
+		setCurrentProjectId(projectId);
+		setCurrentBoardId(null);
 	};
 
 	return (
 		<PopoverV2>
 			<PopoverTriggerV2 asChild>
-				<button className='flex h-7 w-7 items-center justify-center rounded-full bg-neutral-700 text-white transition hover:bg-neutral-600 cursor-pointer'>
+				<button
+					type='button'
+					onClick={handleOpenAddBoard}
+					className='flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-neutral-700 text-white transition hover:bg-neutral-600'
+				>
 					<Plus className='size-4' />
 				</button>
 			</PopoverTriggerV2>
@@ -135,20 +170,28 @@ export default function AddBoard({ projectId, workspaceId }: AddBoardProps) {
 					</PopoverTitleV2>
 				</PopoverHeaderV2>
 
-				<div className='grid grid-cols-4'>
+				<div className='grid grid-cols-4 p-3'>
 					{BOARD_VIEW_ITEMS.filter((item) => item.enabled).map(
 						(item) => {
 							const Icon = item.icon;
+							const isExists = existingViewTypes.has(item.value);
+
 							return (
 								<button
 									key={item.value}
 									type='button'
+									disabled={isExists}
+									title={
+										isExists
+											? "Chế độ xem này đã tồn tại"
+											: item.label
+									}
 									onClick={() =>
 										handleSubmit(item.value, item.label)
 									}
-									className='group flex flex-col items-center justify-start gap-2 rounded-xl p-2 text-center transition  cursor-pointer'
+									className='group flex cursor-pointer flex-col items-center justify-start gap-2 rounded-xl p-2 text-center transition hover:bg-neutral-900 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent'
 								>
-									<div className='flex h-11 w-11 items-center justify-center rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-100 transition group-hover:border-neutral-700 group-hover:bg-neutral-800'>
+									<div className='flex h-11 w-11 items-center justify-center rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-100 transition group-hover:border-neutral-700 group-hover:bg-neutral-800 group-disabled:border-neutral-800 group-disabled:bg-neutral-900'>
 										<Icon className='size-5' />
 									</div>
 

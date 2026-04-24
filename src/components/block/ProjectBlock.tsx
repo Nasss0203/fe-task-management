@@ -1,5 +1,4 @@
 import { BoardItem, BoardViewType } from "@/services/board/type";
-import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { type LucideIcon } from "lucide-react";
 import AddBoard from "../board/AddBoard";
 import { BOARD_VIEW_CONFIG } from "../board/view-board";
@@ -28,6 +27,8 @@ type ProjectBlockProps = {
 const ProjectBlock = ({
 	title,
 	boards,
+	projectId,
+	workspaceId,
 	activeTab,
 	activeBoard,
 	availableTabs,
@@ -37,7 +38,6 @@ const ProjectBlock = ({
 	const ActiveViewComponent = activeBoard
 		? BOARD_VIEW_CONFIG[activeBoard.viewType]?.component
 		: null;
-	const { currentWorkspaceId, currentProjectId } = useProjectSelectionStore();
 
 	return (
 		<div className='flex flex-col gap-2'>
@@ -67,7 +67,7 @@ const ProjectBlock = ({
 								return (
 									<TabsTriggerCustom
 										value={item.value}
-										key={item.value}
+										key={item.boardId}
 									>
 										<div className='flex items-center gap-1'>
 											<item.icon />
@@ -82,8 +82,9 @@ const ProjectBlock = ({
 
 						{boards.length > 0 && (
 							<AddBoard
-								projectId={currentProjectId as string}
-								workspaceId={currentWorkspaceId as string}
+								boards={boards}
+								projectId={projectId as string}
+								workspaceId={workspaceId as string}
 							/>
 						)}
 					</div>
