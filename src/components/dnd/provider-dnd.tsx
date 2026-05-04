@@ -1,5 +1,6 @@
 "use client";
 
+import { useSprints } from "@/hooks/use-sprint";
 import { useTask, useTaskStatus } from "@/hooks/use-task";
 import { move } from "@dnd-kit/helpers";
 import { DragDropProvider } from "@dnd-kit/react";
@@ -7,18 +8,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import ColumnDnd from "./column-dnd";
 import ItemsDnd from "./items-dnd";
 
-type TaskItem = {
-	id: string;
-	title: string;
-	statusId?: string;
-	statusName?: string;
-};
-
 type DndColumns = Record<string, string[]>;
 
 type ProviderDragDropProps = {
 	workspaceId: string;
 	projectId: string;
+	className?: string;
+	sprintId?: string;
 };
 
 function cloneItems(items: DndColumns): DndColumns {
@@ -54,12 +50,20 @@ function findPositionInColumn(
 const ProviderDragDrop = ({
 	workspaceId,
 	projectId,
+	sprintId,
+	className,
 }: ProviderDragDropProps) => {
 	const {
 		taskQuery,
 		createTask: { mutate: createTaskMutate },
 		updateTask: { mutate: updateTaskMutate },
 	} = useTask(workspaceId, projectId);
+
+	const { sprintsTaskQuery } = useSprints({
+		workspaceId,
+		projectId,
+		sprintId,
+	});
 
 	const taskStatusQuery = useTaskStatus(workspaceId, projectId);
 
@@ -202,6 +206,7 @@ const ProviderDragDrop = ({
 							statusColor={status.color}
 							isDone={status.isDone}
 							onAddTask={() => handleAddTask(status.id)}
+							className={className}
 						>
 							{columnItems.map((id, index) => {
 								const task = taskMap[id];

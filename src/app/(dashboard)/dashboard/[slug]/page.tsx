@@ -45,20 +45,22 @@ const SlugPage = () => {
 	};
 
 	return (
-		<Tabs defaultValue='dashboard'>
+		<Tabs defaultValue='overview'>
 			<TabsListCustom variant='default'>
-				<TabsTriggerCustom value='dashboard'>
-					Dashboard
+				<TabsTriggerCustom value='overview' className='w-20'>
+					Overview
 				</TabsTriggerCustom>
-				<TabsTriggerCustom value='overview'>Overview</TabsTriggerCustom>
+				<TabsTriggerCustom value='page' className='w-20'>
+					Page
+				</TabsTriggerCustom>
 			</TabsListCustom>
-			<TabsContent value='dashboard'>
+			<TabsContent value='overview'>
 				<DashboarWorkspace
 					workspaceName={page?.title}
 					workspaceSlug={page?.slug as string}
 				></DashboarWorkspace>
 			</TabsContent>
-			<TabsContent value='overview'>
+			<TabsContent value='page'>
 				<div className='flex h-screen flex-col gap-5'>
 					<div className='flex flex-col gap-3 px-20'>
 						<div className='w-full'>

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { BoardItem, BoardViewType } from "@/services/board/type";
+import BacklogBoard from "../backlog/BacklogBoard";
 import CalendarApp from "../calendar/calendar";
 import { ProviderDragDrop } from "../dnd";
 import BoardTable from "../table/BoardTable";
@@ -45,6 +46,11 @@ const ListView = ({ board }: BoardViewProps) => (
 const Timeline = ({ board }: BoardViewProps) => (
 	<div>Tiimeline - {board.name}</div>
 );
+
+const Backlog = ({ board }: BoardViewProps) => (
+	<BacklogBoard board={board}></BacklogBoard>
+);
+
 const UnsupportedView = ({ board }: BoardViewProps) => (
 	<div>View {board.viewType} chưa được hỗ trợ</div>
 );
@@ -83,12 +89,19 @@ export const BOARD_VIEW_CONFIG: Partial<
 		component: CalendarView,
 		enabled: true,
 	},
+	BACKLOG: {
+		label: "Backlog",
+		icon: GanttChart,
+		component: Backlog,
+		enabled: true,
+	},
 	TIMELINE: {
 		label: "Timeline",
 		icon: GanttChart,
 		component: Timeline,
-		enabled: false,
+		enabled: true,
 	},
+
 	GALLERY: {
 		label: "Gallery",
 		icon: Image,

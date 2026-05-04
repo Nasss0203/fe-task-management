@@ -3,6 +3,7 @@ import { type LucideIcon } from "lucide-react";
 import AddBoard from "../board/AddBoard";
 import { BOARD_VIEW_CONFIG } from "../board/view-board";
 import { TabsListCustom, TabsTriggerCustom } from "../tabs";
+import { Separator } from "../ui/separator";
 import { Tabs } from "../ui/tabs";
 
 export type AvailableTabItem = {
@@ -13,6 +14,7 @@ export type AvailableTabItem = {
 };
 
 type ProjectBlockProps = {
+	blockId: string;
 	title?: string;
 	projectId: string;
 	workspaceId: string;
@@ -26,6 +28,7 @@ type ProjectBlockProps = {
 
 const ProjectBlock = ({
 	title,
+	blockId,
 	boards,
 	projectId,
 	workspaceId,
@@ -61,13 +64,13 @@ const ProjectBlock = ({
 				onValueChange={(value) => setActiveTab(value as BoardViewType)}
 			>
 				<div className='flex items-center justify-between'>
-					<div className='flex items-center gap-1'>
+					<div className='flex items-center gap-1  '>
 						<TabsListCustom variant='none'>
 							{availableTabs.map((item) => {
 								return (
 									<TabsTriggerCustom
 										value={item.value}
-										key={item.boardId}
+										key={item.value}
 									>
 										<div className='flex items-center gap-1'>
 											<item.icon />
@@ -82,13 +85,15 @@ const ProjectBlock = ({
 
 						{boards.length > 0 && (
 							<AddBoard
+								blockId={blockId}
 								boards={boards}
-								projectId={projectId as string}
-								workspaceId={workspaceId as string}
+								projectId={projectId}
+								workspaceId={workspaceId}
 							/>
 						)}
 					</div>
 				</div>
+				<Separator />
 
 				<div className='mt-2'>
 					{activeBoard && ActiveViewComponent ? (

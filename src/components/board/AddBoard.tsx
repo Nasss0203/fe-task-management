@@ -4,6 +4,7 @@ import {
 	BarChart3,
 	CalendarDays,
 	FileText,
+	GalleryVerticalEnd,
 	GanttChart,
 	Image,
 	LayoutDashboard,
@@ -27,6 +28,7 @@ import {
 } from "../popover/popover-custom";
 
 type AddBoardProps = {
+	blockId: string;
 	projectId: string;
 	workspaceId: string;
 	boards: BoardItem[];
@@ -104,12 +106,19 @@ const BOARD_VIEW_ITEMS: {
 		icon: Image,
 		enabled: true,
 	},
+	{
+		label: "Back Log",
+		value: BoardViewType.BACKLOG,
+		icon: GalleryVerticalEnd,
+		enabled: true,
+	},
 ];
 
 export default function AddBoard({
 	projectId,
 	workspaceId,
 	boards,
+	blockId,
 }: AddBoardProps) {
 	const { setCurrentWorkspaceId, setCurrentProjectId, setCurrentBoardId } =
 		useProjectSelectionStore();
@@ -133,6 +142,7 @@ export default function AddBoard({
 				viewType,
 				projectId,
 				workspaceId,
+				blockId,
 			});
 
 			await findBoard.refetch();

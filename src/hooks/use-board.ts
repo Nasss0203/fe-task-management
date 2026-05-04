@@ -44,7 +44,7 @@ export const useBoards = ({
 			});
 
 			await queryClient.invalidateQueries({
-				queryKey: [PAGE_KEY.PAGE, variables.workspaceId],
+				queryKey: [PAGE_KEY.PAGE],
 			});
 		},
 		onError: (err) => {

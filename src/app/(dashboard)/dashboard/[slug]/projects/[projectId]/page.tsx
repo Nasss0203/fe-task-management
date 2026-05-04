@@ -3,19 +3,49 @@
 import { ProjectBlock } from "@/components/block";
 import { BOARD_VIEW_CONFIG } from "@/components/board/view-board";
 import { useBoards } from "@/hooks/use-board";
+import { usePage } from "@/hooks/use-page";
 import { BoardItem, BoardViewType } from "@/services/board/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
+import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 const RestPage = () => {
-	const { currentWorkspaceId, currentProjectId, setCurrentBoardId } =
-		useProjectSelectionStore();
+	const params = useParams<{
+		slug: string;
+		projectId: string;
+	}>();
+
+	const projectId = params.projectId;
+
+	const {
+		pages: { data: pageData },
+	} = usePage();
+
+	const page = pageData?.data;
+	const workspaceId = page?.workspace_id;
+
+	const blockId = useMemo(() => {
+		if (!page?.blocks?.length || !projectId) return undefined;
+
+		const block = page.blocks.find((block: any) =>
+			block.data_config?.some(
+				(config: any) => config.project_id === projectId,
+			),
+		);
+
+		return block?.id;
+	}, [page?.blocks, projectId]);
+
+	const { setCurrentBoardId } = useProjectSelectionStore();
 
 	const [activeTab, setActiveTab] = useState<BoardViewType>(
 		BoardViewType.BOARD,
 	);
 
-	const { findBoard } = useBoards();
+	const { findBoard } = useBoards({
+		workspaceId,
+		projectId,
+	});
 
 	const boards: BoardItem[] = findBoard.data?.data ?? [];
 
@@ -57,13 +87,14 @@ const RestPage = () => {
 		setCurrentBoardId(activeBoard.id);
 	}, [activeBoard?.id, setCurrentBoardId]);
 
-	if (!currentWorkspaceId || !currentProjectId) return null;
+	if (!workspaceId || !projectId || !blockId) return null;
 
 	return (
 		<div className='px-20'>
 			<ProjectBlock
-				projectId={currentProjectId}
-				workspaceId={currentWorkspaceId}
+				blockId={blockId}
+				projectId={projectId}
+				workspaceId={workspaceId}
 				activeTab={activeTab}
 				availableTabs={availableTabs}
 				boards={boards}

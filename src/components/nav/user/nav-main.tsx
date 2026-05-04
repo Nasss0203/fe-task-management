@@ -6,10 +6,11 @@ import {
 	CollapsibleContent,
 	CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+
+import ProjectSidebarItem from "@/components/sidebar/user/ProjectSidebarItem";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { findProjectByWorkspaceIdApi } from "@/services/project/project.service";
 import { PROJECT_KEY } from "@/services/project/type";
-import { WorkspaceDto } from "@/services/workspace/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useQueries } from "@tanstack/react-query";
 import { ChevronRight, Ellipsis } from "lucide-react";
@@ -30,7 +31,6 @@ import {
 	SidebarGroupV2,
 	SidebarMenuItemV2,
 	SidebarMenuSubButtonV2,
-	SidebarMenuSubItemV2,
 	SidebarMenuSubV2,
 	SidebarMenuV2,
 } from "../../sidebar/user/sidebar-custom";
@@ -86,27 +86,14 @@ export function NavMain() {
 		}
 	};
 
-	const handleCreateWorkspace = (data: WorkspaceDto) => {
-		mutate(data, {
-			onSuccess: (res) => {
-				const newWorkspace = res?.data;
-
-				if (!newWorkspace?.id || !newWorkspace?.slug) return;
-
-				// setCurrentWorkspaceId(newWorkspace.id);
-
-				// router.push(`/dashboard/${newWorkspace.slug}`);
-			},
-		});
-	};
-
 	return (
 		<SidebarGroupV2>
-			<SidebarGroupLabelV2>Platform</SidebarGroupLabelV2>
+			<SidebarGroupLabelV2>Workspace</SidebarGroupLabelV2>
 			<SidebarMenuV2>
 				{workspaces.map((workspace, index) => {
 					const projects: any =
 						projectQueries[index]?.data?.data ?? [];
+
 					return (
 						<Collapsible
 							asChild
@@ -172,25 +159,14 @@ export function NavMain() {
 								<CollapsibleContent>
 									<SidebarMenuSubV2>
 										{projects.map((project: any) => (
-											<SidebarMenuSubItemV2
+											<ProjectSidebarItem
 												key={project.id}
-											>
-												<SidebarMenuSubButtonV2 asChild>
-													<Link
-														href={`/dashboard/${workspace.slug}/${project.name}`}
-														onClick={() =>
-															handleSelectProject(
-																workspace.id,
-																project.id,
-															)
-														}
-													>
-														<span>
-															{project.name}
-														</span>
-													</Link>
-												</SidebarMenuSubButtonV2>
-											</SidebarMenuSubItemV2>
+												project={project}
+												workspace={workspace}
+												handleSelectProject={
+													handleSelectProject
+												}
+											/>
 										))}
 									</SidebarMenuSubV2>
 								</CollapsibleContent>
@@ -198,10 +174,7 @@ export function NavMain() {
 						</Collapsible>
 					);
 				})}
-				<SidebarMenuSubButtonV2
-					className=''
-					// onClick={() => handleCreateWorkspace({ name: "default2" })}
-				>
+				<SidebarMenuSubButtonV2>
 					<DialogAddWorkspace></DialogAddWorkspace>
 				</SidebarMenuSubButtonV2>
 			</SidebarMenuV2>

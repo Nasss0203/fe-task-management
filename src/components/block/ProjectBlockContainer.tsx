@@ -12,6 +12,7 @@ import { PageBlockDataConfig } from "@/services/page_block/type";
 import { BOARD_VIEW_CONFIG } from "../board/view-board";
 
 type Props = {
+	blockId: string;
 	projectId: string;
 	workspaceId: string;
 	configs: PageBlockDataConfig[];
@@ -21,6 +22,7 @@ type Props = {
 
 const ProjectBlockContainer = ({
 	projectId,
+	blockId,
 	workspaceId,
 	configs,
 	title,
@@ -88,6 +90,7 @@ const ProjectBlockContainer = ({
 
 	return (
 		<ProjectBlock
+			blockId={blockId}
 			title={title}
 			isOpen={isOpen}
 			boards={boards}

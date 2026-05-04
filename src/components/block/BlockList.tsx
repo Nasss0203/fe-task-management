@@ -25,8 +25,8 @@ const BlockList = ({ blocks, page }: BlockListProps) => {
 		});
 	};
 	return (
-		<div className='flex flex-col gap-3'>
-			<ul className='flex flex-col gap-2'>
+		<div className='flex flex-col gap-10'>
+			<ul className='flex flex-col gap-10'>
 				{blocks
 					.sort(
 						(a: any, b: any) =>
@@ -86,6 +86,7 @@ const BlockList = ({ blocks, page }: BlockListProps) => {
 								{isOpen && (
 									<div className='mt-2'>
 										<ProjectBlockContainer
+											blockId={block.id}
 											projectId={projectId}
 											workspaceId={workspaceId}
 											isOpen={block.is_open}

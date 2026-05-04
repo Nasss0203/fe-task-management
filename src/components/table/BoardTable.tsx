@@ -50,17 +50,6 @@ type TaskItem = {
 	estimateMinutes: number | null;
 };
 
-function getStatusClass(status: string) {
-	switch (status?.toLowerCase()) {
-		case "done":
-			return "bg-emerald-500/15 text-emerald-600 border-emerald-500/20";
-		case "in progress":
-			return "bg-blue-500/15 text-blue-600 border-blue-500/20";
-		default:
-			return "bg-slate-500/15 text-slate-600 border-slate-500/20";
-	}
-}
-
 function getPriorityClass(priority: string | null) {
 	switch (priority?.toLowerCase()) {
 		case "high":
