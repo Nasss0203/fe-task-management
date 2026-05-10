@@ -2,6 +2,7 @@
 
 import { useSprints } from "@/hooks/use-sprint";
 import { useTask, useTaskStatus } from "@/hooks/use-task";
+import { useUser } from "@/hooks/use-user";
 import { move } from "@dnd-kit/helpers";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -55,9 +56,10 @@ const ProviderDragDrop = ({
 }: ProviderDragDropProps) => {
 	const {
 		taskQuery,
-		createTask: { mutate: createTaskMutate },
+		createTask,
 		updateTask: { mutate: updateTaskMutate },
 	} = useTask(workspaceId, projectId);
+	const { user } = useUser();
 
 	const { sprintsTaskQuery } = useSprints({
 		workspaceId,
@@ -124,11 +126,12 @@ const ProviderDragDrop = ({
 	}
 
 	const handleAddTask = (statusId: string) => {
-		createTaskMutate({
+		createTask({
 			workspaceId,
 			projectId,
 			title: "Test update task hoàn tất",
 			statusId,
+			createdBy: user?.id as string,
 		});
 	};
 

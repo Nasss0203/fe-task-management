@@ -9,7 +9,10 @@ import {
 	CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
+import DialogAddTask from "@/components/dialog/DialogAddTask";
+import ProjectDropdown from "@/components/project/ProjectDropdown";
 import { useSprints } from "@/hooks/use-sprint";
+import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import {
 	SidebarMenuSubButtonV2,
 	SidebarMenuSubItemV2,
@@ -27,6 +30,7 @@ const ProjectSidebarItem = ({
 	workspace,
 	handleSelectProject,
 }: ProjectSidebarItemProps) => {
+	const { setCurrentProjectId } = useProjectSelectionStore();
 	const { sprintsQuery } = useSprints({
 		projectId: project.id,
 		workspaceId: workspace.id,
@@ -39,12 +43,13 @@ const ProjectSidebarItem = ({
 	return (
 		<Collapsible asChild className='group/project'>
 			<SidebarMenuSubItemV2>
-				<div className='flex items-center gap-1 rounded-md px-1 py-0.5 hover:bg-neutral-800/80'>
+				<div className='group/project-item relative flex items-center gap-1 rounded-md px-1 py-0.5 hover:bg-neutral-800/80'>
 					{sprints.length > 0 ? (
 						<CollapsibleTrigger asChild>
 							<button
 								type='button'
-								className='flex size-5 shrink-0 items-center justify-center rounded-sm hover:bg-neutral-700'
+								className='z-10 flex size-5 shrink-0 items-center justify-center rounded-sm text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100'
+								onClick={() => setCurrentProjectId(project.id)}
 							>
 								<ChevronRight className='size-3 transition-transform duration-200 group-data-[state=open]/project:rotate-90' />
 							</button>
@@ -55,7 +60,7 @@ const ProjectSidebarItem = ({
 
 					<SidebarMenuSubButtonV2
 						asChild
-						className='h-7 flex-1 justify-start px-1 text-sm font-medium text-neutral-100 hover:bg-transparent'
+						className='h-7 flex-1 justify-start px-1 pr-14 text-sm font-medium text-neutral-100 hover:bg-transparent'
 					>
 						<Link
 							href={projectHref}
@@ -67,10 +72,16 @@ const ProjectSidebarItem = ({
 							<span className='line-clamp-1'>{project.name}</span>
 						</Link>
 					</SidebarMenuSubButtonV2>
+
+					<div className='pointer-events-none absolute right-1 top-1/2 z-20 flex -translate-y-1/2 items-center gap-0.5 opacity-0 transition-opacity group-hover/project-item:pointer-events-auto group-hover/project-item:opacity-100 group-focus-within/project-item:pointer-events-auto group-focus-within/project-item:opacity-100'>
+						<ProjectDropdown></ProjectDropdown>
+
+						<DialogAddTask></DialogAddTask>
+					</div>
 				</div>
 
 				<CollapsibleContent>
-					<SidebarMenuSubV2 className='mt-1 border-l border-neutral-700/80 pl-3'>
+					<SidebarMenuSubV2 className='mt-1 border-l border-neutral-700/80 pl-3 mr-0'>
 						{sprints.map((sprint: any) => {
 							const sprintHref = `/dashboard/${workspace.slug}/projects/${project.id}/sprints/${sprint.id}`;
 

@@ -1,4 +1,4 @@
-import { findAllTaskApiStatusApi } from "@/services/task-status/task-status.service";
+import { findAllTaskStatusApi } from "@/services/task-status/task-status.service";
 import { TaskStatusResponse } from "@/services/task-status/type";
 import {
 	createTaskApi,
@@ -21,7 +21,7 @@ export const useTask = (workspaceId: string, projectId: string) => {
 		enabled: !!workspaceId && !!projectId,
 	});
 
-	const createTask = useMutation({
+	const { mutateAsync: createTask } = useMutation({
 		mutationFn: createTaskApi,
 		onSuccess: (_, variables) => {
 			queryClient.invalidateQueries({
@@ -56,7 +56,7 @@ export const useTask = (workspaceId: string, projectId: string) => {
 export const useTaskStatus = (workspaceId?: string, projectId?: string) => {
 	return useQuery<TaskStatusResponse>({
 		queryKey: ["task-status", workspaceId, projectId],
-		queryFn: () => findAllTaskApiStatusApi(workspaceId!, projectId!),
+		queryFn: () => findAllTaskStatusApi(workspaceId!, projectId!),
 		enabled: !!workspaceId && !!projectId,
 	});
 };
@@ -64,7 +64,7 @@ export const useTaskStatus = (workspaceId?: string, projectId?: string) => {
 export const useTaskPriority = (workspaceId?: string, projectId?: string) => {
 	return useQuery<TaskStatusResponse>({
 		queryKey: ["task-priority", workspaceId, projectId],
-		queryFn: () => findAllTaskApiStatusApi(workspaceId!, projectId!),
+		queryFn: () => findAllTaskStatusApi(workspaceId!, projectId!),
 		enabled: !!workspaceId && !!projectId,
 	});
 };

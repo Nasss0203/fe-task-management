@@ -7,7 +7,6 @@ export const findAllSprintApi = async (
 	const response = await instance.get<any>(
 		`/sprints/workspaces/${workspaceId}/projects/${projectId}`,
 	);
-	console.log("🚀 ~ response~", response);
 	return response.data;
 };
 
@@ -19,6 +18,5 @@ export const findTasksBySprintApi = async (
 	const response = await instance.get<any>(
 		`/sprints/workspaces/${workspaceId}/projects/${projectId}/sprints/${sprintId}/tasks`,
 	);
-	console.log("🚀 ~ response~", response);
 	return response.data;
 };

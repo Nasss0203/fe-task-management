@@ -95,7 +95,7 @@ const ProjectBlock = ({
 				</div>
 				<Separator />
 
-				<div className='mt-2'>
+				<div className={`mt-2 ${isOpen ? "mb-10" : ""}`}>
 					{activeBoard && ActiveViewComponent ? (
 						<ActiveViewComponent board={activeBoard} />
 					) : null}

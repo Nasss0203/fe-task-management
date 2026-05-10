@@ -8,23 +8,16 @@ import {
 } from "@/components/ui/collapsible";
 
 import ProjectSidebarItem from "@/components/sidebar/user/ProjectSidebarItem";
+import WorkspaceDropdown from "@/components/workspaces/DropdownWorkspace";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { findProjectByWorkspaceIdApi } from "@/services/project/project.service";
 import { PROJECT_KEY } from "@/services/project/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useQueries } from "@tanstack/react-query";
-import { ChevronRight, Ellipsis } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { DialogTask } from "../../dialog";
-import {
-	PopoverContentV2,
-	PopoverDescriptionV2,
-	PopoverHeaderV2,
-	PopoverTitleV2,
-	PopoverTriggerV2,
-	PopoverV2,
-} from "../../popover/popover-custom";
 import SidebarMenuButtonV2 from "../../sidebar/user/button-sidebar";
 import {
 	SidebarGroupLabelV2,
@@ -104,60 +97,50 @@ export function NavMain() {
 								<SidebarMenuButtonV2
 									tooltip={workspace.name}
 									variant='default'
+									className='group/workspace-item relative pr-14'
 								>
-									<CollapsibleTrigger
-										asChild
-										className='hover:bg-neutral-700 rounded-xs mr-1'
-										onClick={() =>
-											handleSelectWorkspace(workspace.id)
-										}
-									>
-										<ChevronRight className='transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+									<CollapsibleTrigger asChild>
+										<button
+											type='button'
+											className='mr-1 flex size-5 shrink-0 items-center justify-center rounded-sm text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100'
+											onClick={(e) => {
+												e.stopPropagation();
+												handleSelectWorkspace(
+													workspace.id,
+												);
+												setCurrentWorkspaceId(
+													workspace.id,
+												);
+											}}
+										>
+											<ChevronRight className='size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+										</button>
 									</CollapsibleTrigger>
+
 									<Link
 										href={`/dashboard/${workspace.slug}`}
 										onClick={() =>
 											handleSelectWorkspace(workspace.id)
 										}
-										className='flex-1 min-w-0'
+										className='min-w-0 flex-1'
 									>
 										<span className='line-clamp-1'>
 											{workspace.name}
 										</span>
 									</Link>
 
-									<PopoverV2>
-										<PopoverTriggerV2
-											asChild
-											className='hover:bg-neutral-700 rounded-xs ml-auto'
-										>
-											<Ellipsis size={12} />
-										</PopoverTriggerV2>
+									<div className='pointer-events-none absolute right-1 top-1/2 z-20 flex -translate-y-1/2 items-center gap-1 opacity-0 transition-opacity group-hover/workspace-item:pointer-events-auto group-hover/workspace-item:opacity-100 group-focus-within/workspace-item:pointer-events-auto group-focus-within/workspace-item:opacity-100'>
+										<WorkspaceDropdown></WorkspaceDropdown>
 
-										<PopoverContentV2
-											align='start'
-											side='right'
-											sideOffset={15}
-										>
-											<PopoverHeaderV2>
-												<PopoverTitleV2>
-													Trang
-												</PopoverTitleV2>
-												<PopoverDescriptionV2>
-													Description text here.
-												</PopoverDescriptionV2>
-											</PopoverHeaderV2>
-										</PopoverContentV2>
-									</PopoverV2>
-
-									<DialogTask
-										workspaceId={workspace.id}
-										workspaceName={workspace.name}
-									/>
+										<DialogTask
+											workspaceId={workspace.id}
+											workspaceName={workspace.name}
+										/>
+									</div>
 								</SidebarMenuButtonV2>
 
 								<CollapsibleContent>
-									<SidebarMenuSubV2>
+									<SidebarMenuSubV2 className=' w-full  pr-4'>
 										{projects.map((project: any) => (
 											<ProjectSidebarItem
 												key={project.id}

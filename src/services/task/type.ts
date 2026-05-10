@@ -52,6 +52,12 @@ export interface CreateTaskDto {
 	dueAt?: string | null;
 
 	estimateMinutes?: number | null;
+
+	createdBy: string;
+
+	assigneeIds?: string[];
+
+	initialComment?: string | null;
 }
 
 export type UpdateTaskDto = {

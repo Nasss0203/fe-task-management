@@ -1,0 +1,25 @@
+{
+	"files.watcherExclude": {
+		"**/node_modules/**": true,
+		"**/.next/**": true,
+		"**/dist/**": true,
+		"**/build/**": true,
+		"**/coverage/**": true,
+		"**/.turbo/**": true,
+		"**/.git/objects/**": true,
+		"**/.git/subtree-cache/**": true
+	},
+	"search.exclude": {
+		"**/node_modules": true,
+		"**/.next": true,
+		"**/dist": true,
+		"**/build": true,
+		"**/coverage": true,
+		"**/.turbo": true
+	},
+	"files.exclude": {
+		"**/.next": true,
+		"**/dist": true,
+		"**/coverage": true
+	}
+}

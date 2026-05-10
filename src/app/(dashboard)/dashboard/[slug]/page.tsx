@@ -1,85 +1,73 @@
 "use client";
 
 import { BlockList } from "@/components/block";
-import DashboarWorkspace from "@/components/dashboard/DashboardWorkspace";
 import { TabsListCustom, TabsTriggerCustom } from "@/components/tabs";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { WorkspaceTopHeader } from "@/components/workspaces/WorkspaceHeader";
+import WorkspaceOverview from "@/components/workspaces/WorkspaceOverview";
 import { usePage } from "@/hooks/use-page";
 import { usePageBlock } from "@/hooks/use-pageBlock";
 import { PageBlockItem } from "@/services/page_block/type";
-
+import { BarChart3, List } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 const SlugPage = () => {
 	const {
 		pages: { data, isLoading },
 	} = usePage();
+
 	const {
 		updatePageBlock: { mutate },
 	} = usePageBlock();
 
 	const page = data?.data;
-
 	const blocks: PageBlockItem[] = page?.blocks ?? [];
 
 	const initializedRef = useRef(false);
 
 	useEffect(() => {
 		if (!blocks.length || initializedRef.current) return;
-
 		initializedRef.current = true;
 	}, [blocks]);
 
 	if (isLoading) {
-		return <div>Loading...</div>;
+		return (
+			<div className='flex h-full items-center justify-center text-sm text-muted-foreground'>
+				Loading...
+			</div>
+		);
 	}
 
-	const handleUpdateDataConfigPageblock = (block: PageBlockItem) => {
-		if (!block.id) return;
-
-		mutate({
-			...block,
-			id: block.id,
-			is_open: !block.is_open,
-		});
-	};
-
 	return (
-		<Tabs defaultValue='overview'>
-			<TabsListCustom variant='default'>
-				<TabsTriggerCustom value='overview' className='w-20'>
-					Overview
-				</TabsTriggerCustom>
-				<TabsTriggerCustom value='page' className='w-20'>
-					Page
-				</TabsTriggerCustom>
-			</TabsListCustom>
-			<TabsContent value='overview'>
-				<DashboarWorkspace
-					workspaceName={page?.title}
-					workspaceSlug={page?.slug as string}
-				></DashboarWorkspace>
-			</TabsContent>
-			<TabsContent value='page'>
-				<div className='flex h-screen flex-col gap-5'>
-					<div className='flex flex-col gap-3 px-20'>
-						<div className='w-full'>
-							<textarea
-								defaultValue={page?.title}
-								placeholder='New page'
-								rows={1}
-								onInput={(e) => {
-									const target = e.currentTarget;
-									target.style.height = "auto";
-									target.style.height = `${target.scrollHeight}px`;
-								}}
-								className='w-full resize-none overflow-hidden border-none bg-transparent text-3xl font-extrabold outline-none ring-0 placeholder:text-2xl placeholder:font-bold focus:outline-none focus:ring-0'
-							/>
-						</div>
-						<BlockList blocks={blocks} page={page}></BlockList>
-					</div>
-				</div>
-			</TabsContent>
+		<Tabs defaultValue='summary' className='flex min-h-screen flex-col'>
+			<WorkspaceTopHeader workspaceName={page?.title} />
+
+			<div className='border-b border-border'>
+				<TabsListCustom
+					variant='line'
+					className='h-10 bg-transparent p-0'
+				>
+					<TabsTriggerCustom value='summary'>
+						<BarChart3 size={15} />
+						Summary
+					</TabsTriggerCustom>
+
+					<TabsTriggerCustom value='pages'>
+						<List size={15} />
+						Pages
+					</TabsTriggerCustom>
+				</TabsListCustom>
+			</div>
+
+			<div className='flex-1 px-10 py-3'>
+				<TabsContent value='summary' className='mt-0'>
+					<WorkspaceOverview workspaceSlug={page?.slug as string} />
+				</TabsContent>
+
+				<TabsContent value='pages' className='mt-0'>
+					<BlockList blocks={blocks} page={page} />
+				</TabsContent>
+			</div>
 		</Tabs>
 	);
 };

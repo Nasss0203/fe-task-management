@@ -22,6 +22,7 @@ export const createTaskApi = async (
 	data: CreateTaskDto,
 ): Promise<CreateTaskResponse> => {
 	const response = await instance.post<CreateTaskResponse>(`/tasks`, data);
+	console.log("🚀 ~ response~", response);
 
 	return response.data;
 };
