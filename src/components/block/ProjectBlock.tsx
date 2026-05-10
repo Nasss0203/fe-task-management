@@ -12,7 +12,6 @@ export type AvailableTabItem = {
 	value: BoardViewType;
 	boardId?: string | null;
 };
-
 type ProjectBlockProps = {
 	blockId: string;
 	title?: string;
@@ -23,9 +22,9 @@ type ProjectBlockProps = {
 	activeBoard?: BoardItem;
 	availableTabs: AvailableTabItem[];
 	isOpen?: boolean;
+	context?: "project" | "workspace";
 	setActiveTab: (value: BoardViewType) => void;
 };
-
 const ProjectBlock = ({
 	title,
 	blockId,
@@ -36,6 +35,7 @@ const ProjectBlock = ({
 	activeBoard,
 	availableTabs,
 	isOpen,
+	context = "workspace",
 	setActiveTab,
 }: ProjectBlockProps) => {
 	const ActiveViewComponent = activeBoard
@@ -97,7 +97,10 @@ const ProjectBlock = ({
 
 				<div className={`mt-2 ${isOpen ? "mb-10" : ""}`}>
 					{activeBoard && ActiveViewComponent ? (
-						<ActiveViewComponent board={activeBoard} />
+						<ActiveViewComponent
+							board={activeBoard}
+							context={context}
+						/>
 					) : null}
 				</div>
 			</Tabs>

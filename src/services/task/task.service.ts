@@ -2,6 +2,7 @@ import instance from "../axios";
 import {
 	CreateTaskDto,
 	CreateTaskResponse,
+	FindAllTaskBacklogResponse,
 	FindAllTaskResponse,
 	UpdateTaskDto,
 	UpdateTaskResponse,
@@ -14,6 +15,7 @@ export const findAllTaskApi = async (
 	const response = await instance.get<FindAllTaskResponse>(
 		`/tasks/workspace/${workspaceId}/project/${projectId}`,
 	);
+	console.log("🚀 ~ response~findAllTaskApi", response);
 
 	return response.data;
 };
@@ -34,6 +36,17 @@ export const updateTaskApi = async (
 	const response = await instance.patch<UpdateTaskResponse>(
 		`/tasks/${id}`,
 		data,
+	);
+
+	return response.data;
+};
+
+export const findAllBacklogTaskApi = async (
+	workspaceId: string,
+	projectId: string,
+): Promise<FindAllTaskBacklogResponse> => {
+	const response = await instance.get<FindAllTaskBacklogResponse>(
+		`/tasks/workspace/${workspaceId}/project/${projectId}/backlog`,
 	);
 
 	return response.data;

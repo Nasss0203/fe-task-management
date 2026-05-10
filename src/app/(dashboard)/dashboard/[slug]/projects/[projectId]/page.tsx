@@ -90,8 +90,9 @@ const RestPage = () => {
 	if (!workspaceId || !projectId || !blockId) return null;
 
 	return (
-		<div className='px-20'>
+		<div className=' min-h-screen px-10 pb-10'>
 			<ProjectBlock
+				context='project'
 				blockId={blockId}
 				projectId={projectId}
 				workspaceId={workspaceId}

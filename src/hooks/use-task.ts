@@ -2,6 +2,7 @@ import { findAllTaskStatusApi } from "@/services/task-status/task-status.service
 import { TaskStatusResponse } from "@/services/task-status/type";
 import {
 	createTaskApi,
+	findAllBacklogTaskApi,
 	findAllTaskApi,
 	updateTaskApi,
 } from "@/services/task/task.service";
@@ -46,10 +47,17 @@ export const useTask = (workspaceId: string, projectId: string) => {
 		},
 	});
 
+	const findTaskBacklog = useQuery({
+		queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
+		queryFn: () => findAllBacklogTaskApi(workspaceId, projectId),
+		enabled: !!workspaceId && !!projectId,
+	});
+
 	return {
 		taskQuery,
 		createTask,
 		updateTask,
+		findTaskBacklog,
 	};
 };
 

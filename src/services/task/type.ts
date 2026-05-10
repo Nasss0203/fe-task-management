@@ -1,6 +1,14 @@
-export enum TASK_KEY {
-	TASK = "task",
-	TASKS = "tasks",
+export const TASK_KEY = {
+	TASK: "task",
+	TASKS: "tasks",
+	TASK_BACKLOG: "task-backlog",
+};
+
+export interface TaskAssigneeItem {
+	userId: string;
+	username: string | null;
+	fullName?: string | null;
+	avatarUrl?: string | null;
 }
 
 export interface TaskItem {
@@ -8,8 +16,9 @@ export interface TaskItem {
 	workspaceId: string;
 	projectId: string;
 	sprintId: string | null;
+	sprintName?: string | null;
 
-	projectSeq: number;
+	projectSeq: number | null;
 	title: string;
 	description: string | null;
 
@@ -19,10 +28,13 @@ export interface TaskItem {
 	priorityId: string | null;
 	priorityName: string | null;
 
-	reporterId: string;
-
-	assigneeId: string | null;
-	assigneeName: string | null;
+	createdBy: string;
+	assignees: {
+		userId: string;
+		username: string | null;
+		fullName?: string | null;
+		avatarUrl?: string | null;
+	}[];
 
 	startAt: string | null;
 	dueAt: string | null;
@@ -30,10 +42,13 @@ export interface TaskItem {
 
 	estimateMinutes: number | null;
 
-	createdAt: string;
-	updatedAt: string;
+	createdAt?: string;
+	updatedAt?: string;
 	deletedAt?: string | null;
+	deletedBy?: string | null;
 }
+
+export type TaskBacklogItem = TaskItem;
 
 export interface CreateTaskDto {
 	workspaceId: string;
@@ -45,8 +60,6 @@ export interface CreateTaskDto {
 
 	statusId: string;
 	priorityId?: string | null;
-
-	assigneeId?: string | null;
 
 	startAt?: string | null;
 	dueAt?: string | null;
@@ -66,8 +79,10 @@ export type UpdateTaskDto = {
 	description?: string | null;
 	statusId?: string;
 	priorityId?: string | null;
-	assigneeId?: string | null;
 	position?: number;
+	startAt?: string | null;
+	dueAt?: string | null;
+	estimateMinutes?: number | null;
 };
 
 export interface CreateTaskResponse {
@@ -88,4 +103,8 @@ export interface UpdateTaskResponse {
 
 export interface DeleteTaskResponse {
 	data: TaskItem;
+}
+
+export interface FindAllTaskBacklogResponse {
+	data: TaskItem[];
 }

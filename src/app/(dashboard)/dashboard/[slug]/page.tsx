@@ -39,7 +39,10 @@ const SlugPage = () => {
 	}
 
 	return (
-		<Tabs defaultValue='summary' className='flex min-h-screen flex-col'>
+		<Tabs
+			defaultValue='summary'
+			className='flex min-h-screen flex-col pb-10'
+		>
 			<WorkspaceTopHeader workspaceName={page?.title} />
 
 			<div className='border-b border-border'>

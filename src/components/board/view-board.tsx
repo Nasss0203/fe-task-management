@@ -15,12 +15,14 @@ import {
 
 import { BoardItem, BoardViewType } from "@/services/board/type";
 import BacklogBoard from "../backlog/BacklogBoard";
+import { BacklogRenderContext } from "../backlog/types";
 import CalendarApp from "../calendar/calendar";
 import { ProviderDragDrop } from "../dnd";
 import BoardTable from "../table/BoardTable";
 
 type BoardViewProps = {
 	board: BoardItem;
+	context?: BacklogRenderContext;
 };
 
 const BoardView = ({ board }: BoardViewProps) => (
@@ -47,8 +49,8 @@ const Timeline = ({ board }: BoardViewProps) => (
 	<div>Tiimeline - {board.name}</div>
 );
 
-const Backlog = ({ board }: BoardViewProps) => (
-	<BacklogBoard board={board}></BacklogBoard>
+const Backlog = ({ board, context = "workspace" }: BoardViewProps) => (
+	<BacklogBoard context={context} />
 );
 
 const UnsupportedView = ({ board }: BoardViewProps) => (

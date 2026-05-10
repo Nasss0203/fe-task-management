@@ -1,98 +1,102 @@
-import { ChevronDown, Ellipsis, MoreHorizontal, Plus } from "lucide-react";
-import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Checkbox } from "../ui/checkbox";
-import { NativeSelect, NativeSelectOption } from "../ui/native-select";
+"use client";
 
-const BacklogSection = () => {
+import { ChevronDown, MoreHorizontal, Plus } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import { useTask } from "@/hooks/use-task";
+import TaskTable from "../task/TaskTable";
+import type { BacklogRenderContext } from "./types";
+
+type BacklogSectionProps = {
+	context?: BacklogRenderContext;
+	workspaceId: string;
+	projectId: string;
+};
+
+const BacklogSection = ({
+	context = "project",
+	projectId,
+	workspaceId,
+}: BacklogSectionProps) => {
+	const isProjectContext = context === "project";
+	const { findTaskBacklog } = useTask(workspaceId, projectId);
+	const taskBacklog = findTaskBacklog.data?.data ?? [];
+
 	return (
-		<div className='overflow-hidden rounded-md border border-[#2b2e36] bg-[#191b20]'>
-			<div className='flex items-center justify-between gap-4 border-b border-[#2f323a] bg-[#15171b] p-3'>
-				<div className='flex items-center gap-3 text-sm px-4'>
+		<Card className='overflow-hidden py-0! flex flex-col gap-1 rounded-none'>
+			<div className='flex items-center justify-between gap-4 border-b bg-muted/30 px-3 py-3'>
+				<div className='flex items-center gap-3'>
 					<Checkbox />
-					<ChevronDown size={16} className='text-[#9ca3af]' />
 
-					<div className='flex items-center gap-2 text-[#e5e7eb]'>
-						<span className='font-semibold'>Backlog</span>
-						<span className='text-[#a1a1aa]'>(2 work items)</span>
+					<Button variant='ghost' size='icon' className='size-7'>
+						<ChevronDown className='size-4 text-muted-foreground' />
+					</Button>
+
+					<div className='flex flex-col gap-1'>
+						<div className='flex items-center gap-2'>
+							<span className='text-sm font-semibold'>
+								Backlog
+							</span>
+							<span className='text-sm text-muted-foreground'>
+								({taskBacklog?.length} work items)
+							</span>
+						</div>
+
+						<p className='text-xs text-muted-foreground'>
+							Task chưa được đưa vào sprint nào
+						</p>
 					</div>
 				</div>
 
-				<div className='flex items-center gap-3'>
-					<button className='rounded-md border border-[#3b3f48] bg-[#1b1d22] px-4 py-1.5 text-sm font-medium text-[#d4d4d8] hover:bg-[#23262d]'>
-						Create sprint
-					</button>
+				<div className='flex items-center gap-2'>
+					{isProjectContext && (
+						<Button variant='outline' size='sm'>
+							Create sprint
+						</Button>
+					)}
 
-					<button className='text-[#a1a1aa] hover:text-white'>
-						<MoreHorizontal size={18} />
-					</button>
-				</div>
-			</div>
-
-			<div className='p-3 flex flex-col gap-y-2'>
-				<div className='flex flex-col'>
-					{/* <div className='min-h-24 rounded-sm border border-dashed border-[#3b3f48] bg-[#23252c]' /> */}
-					{Array(4)
-						.fill(0)
-						.map((item, index) => (
-							<div
-								className='flex flex-col px-4 py-1 border-[#3b3f48] bg-[#23252c] border '
-								key={index}
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button
+								variant='ghost'
+								size='icon'
+								className='size-8'
 							>
-								<div className='flex items-center justify-between'>
-									<div className='flex items-center gap-2'>
-										<Checkbox></Checkbox>
-										<div className='text-sm'>Title</div>
-									</div>
-									<div className='flex items-center gap-10'>
-										<div className='flex items-center gap-2'>
-											<NativeSelect>
-												<NativeSelectOption value='apple'>
-													Todo
-												</NativeSelectOption>
-												<NativeSelectOption value='banana'>
-													In progress
-												</NativeSelectOption>
-												<NativeSelectOption value='blueberry'>
-													Done
-												</NativeSelectOption>
-											</NativeSelect>
-											<NativeSelect>
-												<NativeSelectOption value='apple'>
-													Todo
-												</NativeSelectOption>
-												<NativeSelectOption value='banana'>
-													In progress
-												</NativeSelectOption>
-												<NativeSelectOption value='blueberry'>
-													Done
-												</NativeSelectOption>
-											</NativeSelect>
-										</div>
-										<div className='flex items-center gap-2'>
-											<Avatar>
-												<AvatarImage
-													src='https://github.com/shadcn.png'
-													alt='@shadcn'
-												/>
-												<AvatarFallback>
-													CN
-												</AvatarFallback>
-												<AvatarBadge className='bg-green-600 dark:bg-green-800' />
-											</Avatar>
+								<MoreHorizontal className='size-4' />
+							</Button>
+						</DropdownMenuTrigger>
 
-											<Ellipsis />
-										</div>
-									</div>
-								</div>
-							</div>
-						))}
-				</div>
-				<div className='p-2 flex items-center gap-2 hover:bg-accent rounded-md cursor-pointer'>
-					<Plus size={14}></Plus>
-					<div>Create</div>
+						<DropdownMenuContent align='end'>
+							<DropdownMenuItem>Collapse</DropdownMenuItem>
+							<DropdownMenuItem>Export tasks</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 			</div>
-		</div>
+
+			<div className='overflow-x-auto px-1'>
+				<TaskTable tasks={taskBacklog} />
+
+				{isProjectContext && (
+					<Button
+						variant='ghost'
+						className='w-full justify-start gap-2 py-5 my-2'
+					>
+						<Plus className='size-4' />
+						Create task
+					</Button>
+				)}
+			</div>
+		</Card>
 	);
 };
 

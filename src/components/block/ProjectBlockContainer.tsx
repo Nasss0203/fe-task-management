@@ -9,6 +9,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useBoards } from "@/hooks/use-board";
 import { BoardItem, BoardViewType } from "@/services/board/type";
 import { PageBlockDataConfig } from "@/services/page_block/type";
+import { BacklogRenderContext } from "../backlog/types";
 import { BOARD_VIEW_CONFIG } from "../board/view-board";
 
 type Props = {
@@ -18,6 +19,7 @@ type Props = {
 	configs: PageBlockDataConfig[];
 	title?: string;
 	isOpen?: boolean;
+	context?: BacklogRenderContext;
 };
 
 const ProjectBlockContainer = ({
@@ -27,6 +29,7 @@ const ProjectBlockContainer = ({
 	configs,
 	title,
 	isOpen,
+	context = "workspace",
 }: Props) => {
 	const { setCurrentProjectId, setCurrentBoardId } =
 		useProjectSelectionStore();
@@ -100,6 +103,7 @@ const ProjectBlockContainer = ({
 			availableTabs={availableTabs}
 			activeBoard={activeBoard}
 			setActiveTab={setActiveTab}
+			context={context}
 		/>
 	);
 };
