@@ -1,10 +1,9 @@
 "use client";
 
-import { ChevronDown, MoreHorizontal, Plus } from "lucide-react";
+import { ChevronDown, MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -13,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { useTask } from "@/hooks/use-task";
-import TaskTable from "../task/TaskTable";
+import TaskTable from "../task/TaskTableBacklog";
 import type { BacklogRenderContext } from "./types";
 
 type BacklogSectionProps = {
@@ -35,8 +34,6 @@ const BacklogSection = ({
 		<Card className='overflow-hidden py-0! flex flex-col gap-1 rounded-none'>
 			<div className='flex items-center justify-between gap-4 border-b bg-muted/30 px-3 py-3'>
 				<div className='flex items-center gap-3'>
-					<Checkbox />
-
 					<Button variant='ghost' size='icon' className='size-7'>
 						<ChevronDown className='size-4 text-muted-foreground' />
 					</Button>
@@ -50,10 +47,6 @@ const BacklogSection = ({
 								({taskBacklog?.length} work items)
 							</span>
 						</div>
-
-						<p className='text-xs text-muted-foreground'>
-							Task chưa được đưa vào sprint nào
-						</p>
 					</div>
 				</div>
 
@@ -86,7 +79,7 @@ const BacklogSection = ({
 			<div className='overflow-x-auto px-1'>
 				<TaskTable tasks={taskBacklog} />
 
-				{isProjectContext && (
+				{/* {isProjectContext && (
 					<Button
 						variant='ghost'
 						className='w-full justify-start gap-2 py-5 my-2'
@@ -94,7 +87,7 @@ const BacklogSection = ({
 						<Plus className='size-4' />
 						Create task
 					</Button>
-				)}
+				)} */}
 			</div>
 		</Card>
 	);

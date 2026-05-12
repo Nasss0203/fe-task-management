@@ -1,4 +1,4 @@
-import { TaskItem } from "../task/type";
+import { FindAllTaskResponse, TaskItem } from "../task/type";
 
 export const SPRINT_KEY = {
 	SPRINTS: "sprints",
@@ -26,3 +26,17 @@ export interface SprintItem {
 }
 
 export type FindAllSprintResponse = SprintItem;
+
+export interface CreateSprintDto {
+	workspaceId: string;
+	projectId: string;
+	name: string;
+
+	goal?: string;
+
+	startAt?: string | null;
+
+	endAt?: string | null;
+
+	tasks?: FindAllTaskResponse;
+}

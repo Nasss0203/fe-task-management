@@ -45,7 +45,7 @@ const SprintPage = () => {
 	if (!workspaceId || !projectId || !sprintId) return null;
 
 	return (
-		<div className='flex h-screen flex-col overflow-hidden'>
+		<div className='flex h-screen flex-col overflow-hidden pb-5'>
 			<div className='mb-6 flex shrink-0 flex-col gap-1'>
 				<h2 className='text-2xl font-bold tracking-tight text-white'>
 					Sprint Planning

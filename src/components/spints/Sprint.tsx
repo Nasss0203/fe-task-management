@@ -1,10 +1,5 @@
 import { BoardItem } from "@/services/board/type";
-import {
-	CalendarDays,
-	CheckCircle2,
-	ChevronDown,
-	Settings2,
-} from "lucide-react";
+import { CalendarDays, ChevronDown, Settings2 } from "lucide-react";
 import { ProviderDragDrop } from "../dnd";
 import {
 	Combobox,
@@ -149,37 +144,6 @@ const Sprint = ({ boards, projectId, workspaceId, sprintId }: SprintProps) => {
 
 export default Sprint;
 
-function MiniTaskCard({ task, done }: { task: Task; done?: boolean }) {
-	return (
-		<div className='rounded-xl border border-[#2a2a2a] bg-[#101010] p-3 shadow-sm transition hover:border-blue-500/40 hover:bg-[#141414]'>
-			<div className='flex items-start justify-between gap-2'>
-				<div>
-					<div className='text-[10px] font-bold text-slate-500'>
-						{task.key}
-					</div>
-					<div className='mt-1 line-clamp-2 text-[11px] font-bold leading-snug text-slate-200'>
-						{task.title}
-					</div>
-				</div>
-
-				{done && (
-					<CheckCircle2
-						size={14}
-						className='shrink-0 text-emerald-400'
-					/>
-				)}
-			</div>
-
-			<div className='mt-3 flex items-center justify-between'>
-				<Avatar name={task.assignee} small />
-				<span className='rounded-md border border-violet-500/20 bg-violet-500/10 px-2 py-1 text-[10px] font-bold text-violet-300'>
-					{task.sp}
-				</span>
-			</div>
-		</div>
-	);
-}
-
 function StatCard({
 	value,
 	label,
@@ -195,25 +159,6 @@ function StatCard({
 			<div className='mt-1 text-[11px] font-semibold text-slate-500'>
 				{label}
 			</div>
-		</div>
-	);
-}
-
-function Avatar({ name, small }: { name: string; small?: boolean }) {
-	const initials = name
-		.split(" ")
-		.map((word) => word[0])
-		.join("")
-		.slice(0, 2)
-		.toUpperCase();
-
-	return (
-		<div
-			className={`flex shrink-0 items-center justify-center rounded-full border border-[#333333] bg-[#263244] font-bold text-slate-200 ${
-				small ? "h-5 w-5 text-[9px]" : "h-6 w-6 text-[10px]"
-			}`}
-		>
-			{initials}
 		</div>
 	);
 }

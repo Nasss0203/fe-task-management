@@ -1,6 +1,6 @@
 import instance from "../axios";
 import { ApiResponse } from "../types";
-import { FindAllSprintResponse } from "./type";
+import { CreateSprintDto, FindAllSprintResponse } from "./type";
 
 export const findAllSprintApi = async (
 	workspaceId: string,
@@ -19,6 +19,13 @@ export const findTasksBySprintApi = async (
 ) => {
 	const response = await instance.get<any>(
 		`/sprints/workspaces/${workspaceId}/projects/${projectId}/sprints/${sprintId}/tasks`,
+	);
+	return response.data;
+};
+
+export const createSprintApi = async (data: CreateSprintDto) => {
+	const response = await instance.post<any>(
+		`/sprints/workspaces/${data.workspaceId}/projects/${data.projectId}`,
 	);
 	return response.data;
 };

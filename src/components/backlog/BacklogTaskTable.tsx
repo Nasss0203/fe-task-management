@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { useTask } from "@/hooks/use-task";
-import TaskTable from "../task/TaskTable";
+import TaskTable from "../task/TaskTableBacklog";
 import type { TaskItem } from "./types";
 
 const mockBacklogTasks: TaskItem[] = [
