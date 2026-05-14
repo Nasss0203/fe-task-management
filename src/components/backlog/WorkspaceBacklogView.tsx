@@ -6,20 +6,25 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+import { useTask } from "@/hooks/use-task";
 import SprintFilter from "../spints/SprintFilter";
-import SprintTaskTable from "../spints/SprintTaskTable";
-import BacklogTaskTable from "./BacklogTaskTable";
+import SprintWorkspaceSection from "../spints/SprintWorkspaceSection";
 
-type BacklogWorkspaceViewProps = {
+type WorkspaceBacklogViewProps = {
 	workspaceId?: string;
 	projectId?: string;
 };
 
-const BacklogWorkspaceView = ({
+const WorkspaceBacklogView = ({
 	workspaceId,
 	projectId,
-}: BacklogWorkspaceViewProps) => {
+}: WorkspaceBacklogViewProps) => {
 	const [selectedSprintId, setSelectedSprintId] = useState<string>("all");
+	const { findTaskBacklog } = useTask(
+		workspaceId as string,
+		projectId as string,
+	);
+	const taskBacklog = findTaskBacklog.data?.data ?? [];
 
 	return (
 		<div className='flex flex-col gap-5'>
@@ -44,17 +49,16 @@ const BacklogWorkspaceView = ({
 				/>
 			</div>
 
-			<SprintTaskTable
+			<SprintWorkspaceSection
 				projectId={projectId as string}
 				workspaceId={workspaceId as string}
 			/>
 
-			<BacklogTaskTable
-				projectId={projectId as string}
-				workspaceId={workspaceId as string}
-			/>
+			{/* <div className='overflow-x-auto px-1'>
+				<TableBacklog tasks={taskBacklog} />
+			</div> */}
 		</div>
 	);
 };
 
-export default BacklogWorkspaceView;
+export default WorkspaceBacklogView;

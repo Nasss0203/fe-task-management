@@ -109,12 +109,9 @@ const DialogTask = ({ workspaceId, workspaceName }: Props) => {
 	return (
 		<DialogV2 open={open} onOpenChange={handleOpenChange}>
 			<DialogTriggerV2 asChild>
-				<button
-					type='button'
-					className='flex size-5 items-center justify-center rounded-sm text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100'
-				>
+				<div className='flex size-5 items-center justify-center rounded-sm text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100'>
 					<Plus size={14} />
-				</button>
+				</div>
 			</DialogTriggerV2>
 
 			<DialogContentV2

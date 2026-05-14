@@ -1,5 +1,6 @@
 "use client";
 
+import { useDroppable } from "@dnd-kit/react";
 import {
 	ColumnDef,
 	PaginationState,
@@ -30,14 +31,17 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 
 import type { TaskItem } from "@/services/task/type";
+import TableRowDnd from "../dnd/backlog-sprint/TableRowSprintDnd";
 import PanigationTable from "../panigation/PanigationTable";
-import TaskAssignees from "./TaskAssignees";
-import { TaskBulkActionBar } from "./TaskBulkActionBar";
+import TaskAssignees from "../task/TaskAssignees";
+import { TaskBulkActionBar } from "../task/TaskBulkActionBar";
 
-type TaskTableProps = {
+type TableBacklogProps = {
 	tasks: TaskItem[];
+	containerId: string;
 	showSprint?: boolean;
 };
 
@@ -107,17 +111,22 @@ const getColumnsBacklog = (showSprint: boolean): ColumnDef<TaskItem>[] => [
 		header: "Status",
 		cell: ({ row }) => {
 			const task = row.original;
+			const value = task.statusId ?? "none";
 
 			return (
-				<Select value={task.statusId}>
+				<Select value={value}>
 					<SelectTrigger className='h-8 w-32.5'>
 						<SelectValue placeholder='No status' />
 					</SelectTrigger>
 
 					<SelectContent>
-						<SelectItem value={task.statusId}>
-							{task.statusName ?? "No status"}
-						</SelectItem>
+						{task.statusId ? (
+							<SelectItem value={task.statusId}>
+								{task.statusName ?? "No status"}
+							</SelectItem>
+						) : (
+							<SelectItem value='none'>No status</SelectItem>
+						)}
 					</SelectContent>
 				</Select>
 			);
@@ -153,7 +162,9 @@ const getColumnsBacklog = (showSprint: boolean): ColumnDef<TaskItem>[] => [
 		accessorKey: "assignees",
 		size: 160,
 		header: "Assignee",
-		cell: ({ row }) => <TaskAssignees assignees={row.original.assignees} />,
+		cell: ({ row }) => (
+			<TaskAssignees assignees={row.original.assignees ?? []} />
+		),
 	},
 	{
 		id: "actions",
@@ -169,7 +180,11 @@ const getColumnsBacklog = (showSprint: boolean): ColumnDef<TaskItem>[] => [
 	},
 ];
 
-const TaskTableBacklog = ({ tasks, showSprint = false }: TaskTableProps) => {
+const TableBacklog = ({
+	tasks,
+	containerId,
+	showSprint = false,
+}: TableBacklogProps) => {
 	const [pagination, setPagination] = useState<PaginationState>({
 		pageIndex: 0,
 		pageSize: 10,
@@ -204,18 +219,24 @@ const TaskTableBacklog = ({ tasks, showSprint = false }: TaskTableProps) => {
 	const selectedTasks = selectedRows.map((row) => row.original);
 	const selectedCount = selectedRows.length;
 
-	if (!tasks.length) {
-		return (
-			<div className='rounded-md border px-4 py-8 text-center text-sm text-muted-foreground'>
-				Không có task.
-			</div>
-		);
-	}
+	const { ref, isDropTarget } = useDroppable({
+		id: containerId,
+		type: "task-table",
+		accept: ["item"],
+		data: {
+			containerId,
+		},
+	});
 
 	return (
 		<>
-			<div className='rounded-md border'>
-				<div className='relative max-h-[600px] overflow-auto rounded-md'>
+			<div
+				className={cn(
+					"rounded-md border",
+					isDropTarget && "ring-1 ring-sky-400/60",
+				)}
+			>
+				<div className='relative max-h-150 overflow-auto rounded-md'>
 					<table className='w-full caption-bottom text-sm'>
 						<TableHeader>
 							{table.getHeaderGroups().map((headerGroup) => (
@@ -245,25 +266,34 @@ const TaskTableBacklog = ({ tasks, showSprint = false }: TaskTableProps) => {
 							))}
 						</TableHeader>
 
-						<TableBody>
-							{table.getRowModel().rows.map((row) => (
-								<TableRow
-									key={row.id}
-									className='h-14'
-									data-state={
-										row.getIsSelected() && "selected"
-									}
-								>
-									{row.getVisibleCells().map((cell) => (
-										<TableCell key={cell.id}>
-											{flexRender(
-												cell.column.columnDef.cell,
-												cell.getContext(),
-											)}
-										</TableCell>
-									))}
+						<TableBody
+							ref={ref}
+							className={cn(
+								"min-h-20",
+								isDropTarget && "bg-sky-500/5",
+							)}
+						>
+							{table.getRowModel().rows.length ? (
+								table
+									.getRowModel()
+									.rows.map((row, index) => (
+										<TableRowDnd
+											key={row.id}
+											row={row}
+											index={index}
+											containerId={containerId}
+										/>
+									))
+							) : (
+								<TableRow>
+									<TableCell
+										colSpan={columns.length}
+										className='h-20 text-center text-sm text-muted-foreground'
+									>
+										Thả task vào đây
+									</TableCell>
 								</TableRow>
-							))}
+							)}
 						</TableBody>
 					</table>
 				</div>
@@ -297,4 +327,4 @@ const TaskTableBacklog = ({ tasks, showSprint = false }: TaskTableProps) => {
 	);
 };
 
-export default TaskTableBacklog;
+export default TableBacklog;

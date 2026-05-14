@@ -14,11 +14,11 @@ import {
 } from "lucide-react";
 
 import { BoardItem, BoardViewType } from "@/services/board/type";
-import BacklogBoard from "../backlog/BacklogBoard";
 import { BacklogRenderContext } from "../backlog/types";
 import CalendarApp from "../calendar/calendar";
 import { ProviderDragDrop } from "../dnd";
 import BoardTable from "../table/BoardTable";
+import BoardBacklog from "./BoardBacklog";
 
 type BoardViewProps = {
 	board: BoardItem;
@@ -50,7 +50,7 @@ const Timeline = ({ board }: BoardViewProps) => (
 );
 
 const Backlog = ({ board, context = "workspace" }: BoardViewProps) => (
-	<BacklogBoard context={context} />
+	<BoardBacklog context={context} />
 );
 
 const UnsupportedView = ({ board }: BoardViewProps) => (

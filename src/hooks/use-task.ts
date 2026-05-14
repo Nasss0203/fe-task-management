@@ -1,9 +1,12 @@
+import { SPRINT_KEY } from "@/services/sprint/type";
 import { findAllTaskStatusApi } from "@/services/task-status/task-status.service";
 import { TaskStatusResponse } from "@/services/task-status/type";
 import {
 	createTaskApi,
 	findAllBacklogTaskApi,
 	findAllTaskApi,
+	moveTaskToSprintApi,
+	removeTaskFormSprintApi,
 	updateTaskApi,
 } from "@/services/task/task.service";
 import { TASK_KEY } from "@/services/task/type";
@@ -75,4 +78,67 @@ export const useTaskPriority = (workspaceId?: string, projectId?: string) => {
 		queryFn: () => findAllTaskStatusApi(workspaceId!, projectId!),
 		enabled: !!workspaceId && !!projectId,
 	});
+};
+
+export const useTaskMoveSprint = ({
+	workspaceId,
+	projectId,
+}: {
+	workspaceId?: string;
+	projectId?: string;
+}) => {
+	const queryClient = useQueryClient();
+
+	const refreshBacklogAndSprints = async () => {
+		await Promise.all([
+			queryClient.invalidateQueries({
+				queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
+				refetchType: "active",
+			}),
+
+			queryClient.invalidateQueries({
+				queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
+				refetchType: "active",
+			}),
+
+			queryClient.invalidateQueries({
+				queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
+				refetchType: "active",
+			}),
+		]);
+	};
+
+	const taskMoveSprint = useMutation({
+		mutationFn: ({
+			taskId,
+			sprintId,
+		}: {
+			taskId: string;
+			sprintId: string | null;
+		}) => moveTaskToSprintApi({ taskId, sprintId }),
+
+		onSuccess: async () => {
+			await refreshBacklogAndSprints();
+		},
+
+		onSettled: async () => {
+			await refreshBacklogAndSprints();
+		},
+	});
+
+	const removeTaskSprint = useMutation({
+		mutationFn: ({ taskId }: { taskId: string }) =>
+			removeTaskFormSprintApi({ taskId }),
+		onSuccess: async () => {
+			await refreshBacklogAndSprints();
+		},
+		onSettled: async () => {
+			await refreshBacklogAndSprints();
+		},
+	});
+
+	return {
+		taskMoveSprint,
+		removeTaskSprint,
+	};
 };

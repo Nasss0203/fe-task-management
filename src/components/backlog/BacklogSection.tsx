@@ -11,24 +11,44 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { useSprints } from "@/hooks/use-sprint";
 import { useTask } from "@/hooks/use-task";
-import TaskTable from "../task/TaskTableBacklog";
+import TableBacklog from "../table/TableBacklog";
 import type { BacklogRenderContext } from "./types";
 
 type BacklogSectionProps = {
 	context?: BacklogRenderContext;
 	workspaceId: string;
 	projectId: string;
+	containerId: string;
 };
 
 const BacklogSection = ({
 	context = "project",
 	projectId,
 	workspaceId,
+	containerId,
 }: BacklogSectionProps) => {
 	const isProjectContext = context === "project";
 	const { findTaskBacklog } = useTask(workspaceId, projectId);
 	const taskBacklog = findTaskBacklog.data?.data ?? [];
+
+	const { createSprint, sprintsQuery } = useSprints({
+		projectId,
+		workspaceId,
+	});
+
+	const lengSprint = sprintsQuery.data?.data.length ?? 0;
+
+	const handleCreateSprint = () => {
+		if (!workspaceId || !projectId) return;
+
+		createSprint.mutate({
+			workspaceId,
+			projectId,
+			name: `Sprint ${lengSprint + 1}`,
+		});
+	};
 
 	return (
 		<Card className='overflow-hidden py-0! flex flex-col gap-1 rounded-none'>
@@ -44,7 +64,7 @@ const BacklogSection = ({
 								Backlog
 							</span>
 							<span className='text-sm text-muted-foreground'>
-								({taskBacklog?.length} work items)
+								({taskBacklog.length} work items)
 							</span>
 						</div>
 					</div>
@@ -52,8 +72,14 @@ const BacklogSection = ({
 
 				<div className='flex items-center gap-2'>
 					{isProjectContext && (
-						<Button variant='outline' size='sm'>
-							Create sprint
+						<Button
+							variant='outline'
+							size='sm'
+							onClick={handleCreateSprint}
+						>
+							{createSprint.isPending
+								? "Creating..."
+								: "Create sprint"}
 						</Button>
 					)}
 
@@ -77,20 +103,9 @@ const BacklogSection = ({
 			</div>
 
 			<div className='overflow-x-auto px-1'>
-				<TaskTable tasks={taskBacklog} />
-
-				{/* {isProjectContext && (
-					<Button
-						variant='ghost'
-						className='w-full justify-start gap-2 py-5 my-2'
-					>
-						<Plus className='size-4' />
-						Create task
-					</Button>
-				)} */}
+				<TableBacklog tasks={taskBacklog} containerId={containerId} />
 			</div>
 		</Card>
 	);
 };
-
 export default BacklogSection;

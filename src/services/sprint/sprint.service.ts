@@ -24,8 +24,15 @@ export const findTasksBySprintApi = async (
 };
 
 export const createSprintApi = async (data: CreateSprintDto) => {
+	const { workspaceId, projectId, name } = data;
+
 	const response = await instance.post<any>(
-		`/sprints/workspaces/${data.workspaceId}/projects/${data.projectId}`,
+		`/sprints/workspaces/${workspaceId}/projects/${projectId}`,
+		{
+			...(name?.trim() && { name: name.trim() }),
+		},
 	);
+
+	console.log("🚀 ~ response~", response);
 	return response.data;
 };

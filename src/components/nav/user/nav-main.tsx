@@ -100,9 +100,8 @@ export function NavMain() {
 									className='group/workspace-item relative pr-14'
 								>
 									<CollapsibleTrigger asChild>
-										<button
-											type='button'
-											className='mr-1 flex size-5 shrink-0 items-center justify-center rounded-sm text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100'
+										<div
+											className='mr-1 cursor-pointer flex size-5 shrink-0 items-center justify-center rounded-sm text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100'
 											onClick={(e) => {
 												e.stopPropagation();
 												handleSelectWorkspace(
@@ -114,7 +113,7 @@ export function NavMain() {
 											}}
 										>
 											<ChevronRight className='size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
-										</button>
+										</div>
 									</CollapsibleTrigger>
 
 									<Link

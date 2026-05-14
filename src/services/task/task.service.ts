@@ -15,7 +15,6 @@ export const findAllTaskApi = async (
 	const response = await instance.get<FindAllTaskResponse>(
 		`/tasks/workspace/${workspaceId}/project/${projectId}`,
 	);
-	console.log("🚀 ~ response~findAllTaskApi", response);
 
 	return response.data;
 };
@@ -24,7 +23,6 @@ export const createTaskApi = async (
 	data: CreateTaskDto,
 ): Promise<CreateTaskResponse> => {
 	const response = await instance.post<CreateTaskResponse>(`/tasks`, data);
-	console.log("🚀 ~ response~", response);
 
 	return response.data;
 };
@@ -49,5 +47,29 @@ export const findAllBacklogTaskApi = async (
 		`/tasks/workspace/${workspaceId}/project/${projectId}/backlog`,
 	);
 
+	return response.data;
+};
+
+export const moveTaskToSprintApi = async ({
+	sprintId,
+	taskId,
+}: {
+	taskId: string;
+	sprintId: string | null;
+}) => {
+	const response = await instance.patch(`/tasks/${taskId}/move-sprint`, {
+		sprintId,
+	});
+	console.log("🚀 ~ response~moveTaskToSprintApi", response);
+	return response.data;
+};
+
+export const removeTaskFormSprintApi = async ({
+	taskId,
+}: {
+	taskId: string;
+}) => {
+	const response = await instance.patch(`/tasks/${taskId}/remove-sprint`);
+	console.log("🚀 ~ response~removeTaskFormSprintApi", response);
 	return response.data;
 };

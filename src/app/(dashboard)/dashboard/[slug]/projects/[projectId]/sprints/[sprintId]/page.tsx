@@ -45,7 +45,7 @@ const SprintPage = () => {
 	if (!workspaceId || !projectId || !sprintId) return null;
 
 	return (
-		<div className='flex h-screen flex-col overflow-hidden pb-5'>
+		<div className='flex h-full flex-col overflow-hidden pb-5'>
 			<div className='mb-6 flex shrink-0 flex-col gap-1'>
 				<h2 className='text-2xl font-bold tracking-tight text-white'>
 					Sprint Planning
@@ -56,15 +56,19 @@ const SprintPage = () => {
 				</p>
 			</div>
 
-			<div className='grid min-h-0 flex-1 grid-cols-12 gap-5'>
-				<BacklogSprint />
+			<div className='flex min-h-0 flex-1 flex-col gap-5 lg:grid lg:grid-cols-12 h-auto'>
+				<div className=' xl:col-span-12 2xl:col-span-6'>
+					<BacklogSprint />
+				</div>
 
-				<Sprint
-					boards={boards}
-					projectId={projectId}
-					workspaceId={workspaceId}
-					sprintId={sprintId}
-				/>
+				<div className='xl:col-span-12 2xl:col-span-6'>
+					<Sprint
+						boards={boards}
+						projectId={projectId}
+						workspaceId={workspaceId}
+						sprintId={sprintId}
+					/>
+				</div>
 			</div>
 		</div>
 	);

@@ -20,12 +20,9 @@ const WorkspaceDropdown = () => {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<button
-					type='button'
-					className='flex size-5 items-center justify-center rounded-sm text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100'
-				>
+				<div className='flex cursor-pointer size-5 items-center justify-center rounded-sm text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100'>
 					<Ellipsis size={14} />
-				</button>
+				</div>
 			</DropdownMenuTrigger>
 
 			<DropdownMenuContent
