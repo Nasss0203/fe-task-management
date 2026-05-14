@@ -13,8 +13,8 @@ import SprintProjectSection from "../spints/SprintProjectSection";
 import BacklogSection from "./BacklogSection";
 
 type ProjectBacklogViewProps = {
-	workspaceId?: string;
-	projectId?: string;
+	workspaceId: string;
+	projectId: string;
 };
 
 const ProjectBacklogView = ({
@@ -23,11 +23,22 @@ const ProjectBacklogView = ({
 }: ProjectBacklogViewProps) => {
 	const { sprintsQuery } = useSprints({ workspaceId, projectId });
 	const sprints = sprintsQuery.data?.data ?? [];
+	console.log("🚀 ~ sprints~", sprints);
 
-	const { taskMoveSprint, removeTaskSprint } = useTaskMoveSprint({
-		workspaceId,
-		projectId,
-	});
+	const { taskMoveSprint, removeTaskSprint, taskSprintToSprint } =
+		useTaskMoveSprint({
+			workspaceId,
+			projectId,
+		});
+
+	const SPRINT_PREFIX = "sprint:";
+	const BACKLOG_ID = "backlog";
+
+	const getSprintId = (containerId: string) => {
+		if (!containerId.startsWith(SPRINT_PREFIX)) return null;
+
+		return containerId.replace(SPRINT_PREFIX, "");
+	};
 
 	const handleTaskMove = ({
 		taskId,
@@ -40,23 +51,34 @@ const ProjectBacklogView = ({
 	}) => {
 		if (fromContainerId === toContainerId) return;
 
-		const isMoveToBacklog = toContainerId === "backlog";
-		const isMoveFromSprint = fromContainerId.startsWith("sprint:");
-		const isMoveToSprint = toContainerId.startsWith("sprint:");
+		const sourceSprintId = getSprintId(fromContainerId);
+		const targetSprintId = getSprintId(toContainerId);
 
-		if (isMoveToBacklog && isMoveFromSprint) {
+		const isMoveToBacklog = toContainerId === BACKLOG_ID;
+		const isMoveFromBacklog = fromContainerId === BACKLOG_ID;
+
+		// sprint -> backlog
+		if (sourceSprintId && isMoveToBacklog) {
 			removeTaskSprint.mutate({ taskId });
 			return;
 		}
 
-		if (isMoveToSprint) {
-			const sprintId = toContainerId.replace("sprint:", "");
-
+		// backlog -> sprint
+		if (isMoveFromBacklog && targetSprintId) {
 			taskMoveSprint.mutate({
 				taskId,
-				sprintId,
+				sprintId: targetSprintId,
 			});
+			return;
+		}
 
+		// sprint -> sprint
+		if (sourceSprintId && targetSprintId) {
+			taskSprintToSprint.mutate({
+				taskId,
+				sourceSprintId,
+				targetSprintId,
+			});
 			return;
 		}
 	};

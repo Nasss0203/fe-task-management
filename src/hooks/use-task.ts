@@ -5,6 +5,7 @@ import {
 	createTaskApi,
 	findAllBacklogTaskApi,
 	findAllTaskApi,
+	moveTaskSprintToSprintApi,
 	moveTaskToSprintApi,
 	removeTaskFormSprintApi,
 	updateTaskApi,
@@ -84,8 +85,8 @@ export const useTaskMoveSprint = ({
 	workspaceId,
 	projectId,
 }: {
-	workspaceId?: string;
-	projectId?: string;
+	workspaceId: string;
+	projectId: string;
 }) => {
 	const queryClient = useQueryClient();
 
@@ -117,28 +118,40 @@ export const useTaskMoveSprint = ({
 			sprintId: string | null;
 		}) => moveTaskToSprintApi({ taskId, sprintId }),
 
-		onSuccess: async () => {
-			await refreshBacklogAndSprints();
-		},
-
-		onSettled: async () => {
-			await refreshBacklogAndSprints();
-		},
+		onSuccess: refreshBacklogAndSprints,
 	});
 
 	const removeTaskSprint = useMutation({
 		mutationFn: ({ taskId }: { taskId: string }) =>
 			removeTaskFormSprintApi({ taskId }),
-		onSuccess: async () => {
-			await refreshBacklogAndSprints();
-		},
-		onSettled: async () => {
-			await refreshBacklogAndSprints();
-		},
+
+		onSuccess: refreshBacklogAndSprints,
+	});
+
+	const taskSprintToSprint = useMutation({
+		mutationFn: ({
+			taskId,
+			sourceSprintId,
+			targetSprintId,
+		}: {
+			taskId: string;
+			sourceSprintId: string;
+			targetSprintId: string;
+		}) =>
+			moveTaskSprintToSprintApi({
+				taskId,
+				projectId,
+				workspaceId,
+				sourceSprintId,
+				targetSprintId,
+			}),
+
+		onSuccess: refreshBacklogAndSprints,
 	});
 
 	return {
 		taskMoveSprint,
 		removeTaskSprint,
+		taskSprintToSprint,
 	};
 };

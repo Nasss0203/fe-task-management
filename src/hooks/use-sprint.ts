@@ -36,7 +36,6 @@ export const useSprints = ({
 	const createSprint = useMutation({
 		mutationFn: async (data: CreateSprintDto) => {
 			const result = await createSprintApi(data);
-			console.log("🚀 ~ result~", result);
 
 			return result;
 		},

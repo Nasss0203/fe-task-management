@@ -46,7 +46,7 @@ const BacklogSection = ({
 		createSprint.mutate({
 			workspaceId,
 			projectId,
-			name: `Sprint ${lengSprint + 1}`,
+			name: `Sprints ${lengSprint + 1}`,
 		});
 	};
 
