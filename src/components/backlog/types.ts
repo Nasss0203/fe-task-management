@@ -1,7 +1,5 @@
 export type BacklogRenderContext = "project" | "workspace";
 
-export type SprintStatus = "planned" | "active" | "completed";
-
 export type TaskItem = {
 	id: string;
 	code: string;

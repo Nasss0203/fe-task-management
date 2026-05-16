@@ -13,6 +13,7 @@ import {
 
 import { useSprints } from "@/hooks/use-sprint";
 import { useTask } from "@/hooks/use-task";
+import { useState } from "react";
 import TableBacklog from "../table/TableBacklog";
 import type { BacklogRenderContext } from "./types";
 
@@ -29,6 +30,7 @@ const BacklogSection = ({
 	workspaceId,
 	containerId,
 }: BacklogSectionProps) => {
+	const [open, setOpen] = useState<boolean>(true);
 	const isProjectContext = context === "project";
 	const { findTaskBacklog } = useTask(workspaceId, projectId);
 	const taskBacklog = findTaskBacklog.data?.data ?? [];
@@ -50,11 +52,20 @@ const BacklogSection = ({
 		});
 	};
 
+	const handleOpenTable = () => {
+		setOpen(!open);
+	};
+
 	return (
 		<Card className='overflow-hidden py-0! flex flex-col gap-1 rounded-none'>
 			<div className='flex items-center justify-between gap-4 border-b bg-muted/30 px-3 py-3'>
 				<div className='flex items-center gap-3'>
-					<Button variant='ghost' size='icon' className='size-7'>
+					<Button
+						variant='ghost'
+						size='icon'
+						className='size-7'
+						onClick={handleOpenTable}
+					>
 						<ChevronDown className='size-4 text-muted-foreground' />
 					</Button>
 
@@ -102,9 +113,14 @@ const BacklogSection = ({
 				</div>
 			</div>
 
-			<div className='overflow-x-auto px-1'>
-				<TableBacklog tasks={taskBacklog} containerId={containerId} />
-			</div>
+			{open ? (
+				<div className='overflow-x-auto px-1'>
+					<TableBacklog
+						tasks={taskBacklog}
+						containerId={containerId}
+					/>
+				</div>
+			) : null}
 		</Card>
 	);
 };

@@ -5,7 +5,12 @@ export const SPRINT_KEY = {
 	SPRINT: "sprint",
 } as const;
 
-export type SprintStatus = "PLANNED" | "ACTIVE" | "COMPLETED" | "CANCELLED";
+enum SprintStatus {
+	PLANNED = "PLANNED",
+	ACTIVE = "ACTIVE",
+	COMPLETED = "COMPLETED",
+	CANCELLED = "CANCELLED",
+}
 
 export interface SprintItem {
 	id: string;
@@ -31,4 +36,18 @@ export interface CreateSprintDto {
 	workspaceId: string;
 	projectId: string;
 	name?: string;
+}
+
+export interface StartSprintDto {
+	name?: string;
+	goal?: string;
+	startAt?: string;
+	endAt?: string;
+}
+
+export interface StartSprintParams {
+	workspaceId: string;
+	projectId: string;
+	sprintId: string;
+	data?: StartSprintDto;
 }

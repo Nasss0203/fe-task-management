@@ -60,7 +60,6 @@ export const moveTaskToSprintApi = async ({
 	const response = await instance.patch(`/tasks/${taskId}/move-sprint`, {
 		sprintId,
 	});
-	console.log("🚀 ~ response~moveTaskToSprintApi", response.data);
 	return response.data;
 };
 
@@ -70,7 +69,6 @@ export const removeTaskFormSprintApi = async ({
 	taskId: string;
 }) => {
 	const response = await instance.patch(`/tasks/${taskId}/remove-sprint`);
-	console.log("🚀 ~ response~removeTaskFormSprintApi", response.data);
 	return response.data;
 };
 
@@ -93,6 +91,5 @@ export const moveTaskSprintToSprintApi = async ({
 			targetSprintId,
 		},
 	);
-	console.log("🚀 ~ response~moveTaskSprintToSprintApi", response.data);
 	return response.data;
 };

@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/select";
 
 import { SprintItem } from "@/services/sprint/type";
+import { useState } from "react";
+import { StartSprintDialog } from "../dialog/DialogStartSprint";
 import TableBacklog from "../table/TableBacklog";
 import TaskAssignees from "../task/TaskAssignees";
 
@@ -155,22 +157,43 @@ const getSprintTaskColumns = (): ColumnDef<SprintTaskItem>[] => [
 	},
 ];
 
+enum SprintStatus {
+	PLANNED = "PLANNED",
+	ACTIVE = "ACTIVE",
+	COMPLETED = "COMPLETED",
+	CANCELLED = "CANCELLED",
+}
+
 type SprintProjectSectionProps = {
-	sprint: any;
+	sprint: SprintItem;
 	containerId: string;
+	status: SprintStatus;
+	projectId: string;
+	workspaceId: string;
 };
 
 const SprintProjectSection = ({
 	sprint,
 	containerId,
+	status,
+	projectId,
+	workspaceId,
 }: SprintProjectSectionProps) => {
 	const tasks = sprint.tasks ?? [];
-
+	const [open, setOpen] = useState<boolean>(true);
+	const handleOpenTable = () => {
+		setOpen(!open);
+	};
 	return (
 		<Card className='overflow-hidden py-0! flex flex-col gap-1 rounded-none'>
 			<div className='flex items-center justify-between gap-4 border-b bg-muted/30 px-3 py-3'>
 				<div className='flex items-center gap-3'>
-					<Button variant='ghost' size='icon' className='size-7'>
+					<Button
+						variant='ghost'
+						size='icon'
+						className='size-7'
+						onClick={handleOpenTable}
+					>
 						<ChevronDown className='size-4 text-muted-foreground' />
 					</Button>
 
@@ -185,11 +208,27 @@ const SprintProjectSection = ({
 						</div>
 					</div>
 				</div>
+
+				{status === SprintStatus.PLANNED ? (
+					<StartSprintDialog
+						defaultSprintName={sprint.name}
+						projectId={projectId}
+						sprintId={sprint.id}
+						workspaceId={workspaceId}
+						workItemCount={tasks?.length ?? 0}
+					></StartSprintDialog>
+				) : status === SprintStatus.ACTIVE ? (
+					<Button className='' variant={"outline"}>
+						Complete
+					</Button>
+				) : null}
 			</div>
 
-			<div className='overflow-x-auto px-1'>
-				<TableBacklog tasks={tasks} containerId={containerId} />
-			</div>
+			{open ? (
+				<div className='overflow-x-auto px-1'>
+					<TableBacklog tasks={tasks} containerId={containerId} />
+				</div>
+			) : null}
 		</Card>
 	);
 };

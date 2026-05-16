@@ -34,8 +34,8 @@ import {
 import { cn } from "@/lib/utils";
 
 import type { TaskItem } from "@/services/task/type";
+import { useTableDnd } from "../dnd/backlog-sprint/ProviderSprintDnd";
 import TableRowDnd from "../dnd/backlog-sprint/TableRowSprintDnd";
-import PanigationTable from "../panigation/PanigationTable";
 import TaskAssignees from "../task/TaskAssignees";
 import { TaskBulkActionBar } from "../task/TaskBulkActionBar";
 
@@ -189,6 +189,8 @@ const TableBacklog = ({
 		pageIndex: 0,
 		pageSize: 10,
 	});
+	const { items } = useTableDnd();
+	const taskIds = items[containerId] ?? [];
 
 	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
@@ -274,16 +276,19 @@ const TableBacklog = ({
 							)}
 						>
 							{table.getRowModel().rows.length ? (
-								table
-									.getRowModel()
-									.rows.map((row, index) => (
+								table.getRowModel().rows.map((row) => {
+									const index = taskIds.indexOf(
+										row.original.id,
+									);
+									return (
 										<TableRowDnd
 											key={row.id}
 											row={row}
-											index={index}
+											index={index >= 0 ? index : 0}
 											containerId={containerId}
 										/>
-									))
+									);
+								})
 							) : (
 								<TableRow>
 									<TableCell
@@ -297,8 +302,6 @@ const TableBacklog = ({
 						</TableBody>
 					</table>
 				</div>
-
-				<PanigationTable table={table} />
 			</div>
 
 			<TaskBulkActionBar

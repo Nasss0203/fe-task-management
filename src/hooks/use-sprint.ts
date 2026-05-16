@@ -3,8 +3,13 @@ import {
 	createSprintApi,
 	findAllSprintApi,
 	findTasksBySprintApi,
+	startSprintApi,
 } from "@/services/sprint/sprint.service";
-import { CreateSprintDto, SPRINT_KEY } from "@/services/sprint/type";
+import {
+	CreateSprintDto,
+	SPRINT_KEY,
+	StartSprintParams,
+} from "@/services/sprint/type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 type UseSprintsParams = {
@@ -49,9 +54,26 @@ export const useSprints = ({
 		},
 	});
 
+	const startSprint = useMutation({
+		mutationFn: async (data: StartSprintParams) => {
+			const result = await startSprintApi(data);
+
+			return result;
+		},
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: [SPRINT_KEY.SPRINTS],
+			});
+		},
+		onError: (err) => {
+			console.error("startSprint failed", err);
+		},
+	});
+
 	return {
 		sprintsQuery,
 		sprintsTaskQuery,
 		createSprint,
+		startSprint,
 	};
 };

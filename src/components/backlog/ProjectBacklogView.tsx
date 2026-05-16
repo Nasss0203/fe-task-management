@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { useSprints } from "@/hooks/use-sprint";
-import { useTaskMoveSprint } from "@/hooks/use-task";
+import { useTask, useTaskMoveSprint } from "@/hooks/use-task";
 
-import { ProviderTableDnd } from "../dnd/backlog-sprint/ProviderTableDnd";
+import { useMemo } from "react";
+import { ProviderSprintDnd } from "../dnd/backlog-sprint/ProviderSprintDnd";
 import SprintProjectSection from "../spints/SprintProjectSection";
 import BacklogSection from "./BacklogSection";
 
@@ -23,7 +24,32 @@ const ProjectBacklogView = ({
 }: ProjectBacklogViewProps) => {
 	const { sprintsQuery } = useSprints({ workspaceId, projectId });
 	const sprints = sprintsQuery.data?.data ?? [];
-	console.log("🚀 ~ sprints~", sprints);
+
+	const { taskQuery } = useTask(workspaceId, projectId);
+	const allTasks = taskQuery.data?.data ?? [];
+
+	const initialItems = useMemo(() => {
+		const items: Record<string, string[]> = { backlog: [] };
+
+		// Khởi tạo từng sprint container
+		for (const sprint of sprints) {
+			items[`sprint:${sprint.id}`] = [];
+		}
+
+		// Phân loại task vào đúng container
+		for (const task of allTasks) {
+			if (task.sprintId) {
+				const key = `sprint:${task.sprintId}`;
+				if (items[key]) {
+					items[key].push(task.id);
+				}
+			} else {
+				items["backlog"].push(task.id);
+			}
+		}
+
+		return items;
+	}, [allTasks, sprints]);
 
 	const { taskMoveSprint, removeTaskSprint, taskSprintToSprint } =
 		useTaskMoveSprint({
@@ -100,12 +126,18 @@ const ProjectBacklogView = ({
 				</div>
 			</div>
 
-			<ProviderTableDnd onTaskMove={handleTaskMove}>
+			<ProviderSprintDnd
+				onTaskMove={handleTaskMove}
+				initialItems={initialItems}
+			>
 				<div className='flex flex-col gap-5'>
 					{sprints.map((sprint) => (
 						<SprintProjectSection
 							key={sprint.id}
 							sprint={sprint}
+							projectId={projectId as string}
+							workspaceId={workspaceId as string}
+							status={sprint.status}
 							containerId={`sprint:${sprint.id}`}
 						/>
 					))}
@@ -117,7 +149,7 @@ const ProjectBacklogView = ({
 						workspaceId={workspaceId as string}
 					/>
 				</div>
-			</ProviderTableDnd>
+			</ProviderSprintDnd>
 		</div>
 	);
 };

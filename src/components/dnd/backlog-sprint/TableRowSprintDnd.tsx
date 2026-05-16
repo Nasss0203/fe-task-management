@@ -1,10 +1,9 @@
 "use client";
 
-import { useDraggable } from "@dnd-kit/react"; // 👈 đổi import
-import { flexRender, type Row } from "@tanstack/react-table";
-
 import { TableCell, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { useSortable } from "@dnd-kit/react/sortable";
+import { flexRender, type Row } from "@tanstack/react-table";
 
 type TableRowDndProps<TData extends { id: string }> = {
 	row: Row<TData>;
@@ -17,10 +16,12 @@ const TableRowDnd = <TData extends { id: string }>({
 	index,
 	containerId,
 }: TableRowDndProps<TData>) => {
-	const { ref, isDragging } = useDraggable({
-		// 👈 đổi hook
+	const { ref, isDragging } = useSortable({
 		id: row.original.id,
+		index,
+		group: containerId,
 		type: "item",
+		accept: ["item"],
 		data: {
 			taskId: row.original.id,
 			containerId,
@@ -30,7 +31,7 @@ const TableRowDnd = <TData extends { id: string }>({
 	return (
 		<TableRow
 			ref={ref}
-			className={cn("h-14 cursor-grab", isDragging && "opacity-40")}
+			className={cn("h-14 cursor-pointer", isDragging && "opacity-40")}
 			data-state={row.getIsSelected() && "selected"}
 			style={{ touchAction: "none" }}
 		>
