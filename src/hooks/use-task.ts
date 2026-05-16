@@ -1,7 +1,9 @@
 import { SPRINT_KEY } from "@/services/sprint/type";
+import { findAllTaskPriorityApi } from "@/services/task-priority/task-priority.serivce";
 import { findAllTaskStatusApi } from "@/services/task-status/task-status.service";
 import { TaskStatusResponse } from "@/services/task-status/type";
 import {
+	bulkUpdateTasksApi,
 	createTaskApi,
 	findAllBacklogTaskApi,
 	findAllTaskApi,
@@ -10,7 +12,7 @@ import {
 	removeTaskFormSprintApi,
 	updateTaskApi,
 } from "@/services/task/task.service";
-import { TASK_KEY } from "@/services/task/type";
+import { BulkUpdateTasksDto, TASK_KEY } from "@/services/task/type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 type UpdateTaskInput = {
 	id: string;
@@ -44,9 +46,16 @@ export const useTask = (workspaceId: string, projectId: string) => {
 
 	const updateTask = useMutation({
 		mutationFn: ({ id, ...body }: any) => updateTaskApi(id, body),
-		onSuccess: () => {
-			queryClient.invalidateQueries({
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
 				queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
+			});
+			await queryClient.invalidateQueries({
+				queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
+			});
+
+			await queryClient.invalidateQueries({
+				queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
 			});
 		},
 	});
@@ -57,11 +66,36 @@ export const useTask = (workspaceId: string, projectId: string) => {
 		enabled: !!workspaceId && !!projectId,
 	});
 
+	const bulkUpdateTasks = useMutation({
+		mutationFn: (body: BulkUpdateTasksDto) => {
+			if (!workspaceId || !projectId) {
+				throw new Error("Missing workspaceId or projectId");
+			}
+
+			return bulkUpdateTasksApi({
+				workspaceId,
+				projectId,
+				body,
+			});
+		},
+
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId], // ← đổi thành TASK_BACKLOG
+			});
+
+			await queryClient.invalidateQueries({
+				queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId], // giữ nguyên cho sprint tasks
+			});
+		},
+	});
+
 	return {
 		taskQuery,
 		createTask,
 		updateTask,
 		findTaskBacklog,
+		bulkUpdateTasks,
 	};
 };
 
@@ -76,7 +110,7 @@ export const useTaskStatus = (workspaceId?: string, projectId?: string) => {
 export const useTaskPriority = (workspaceId?: string, projectId?: string) => {
 	return useQuery<TaskStatusResponse>({
 		queryKey: ["task-priority", workspaceId, projectId],
-		queryFn: () => findAllTaskStatusApi(workspaceId!, projectId!),
+		queryFn: () => findAllTaskPriorityApi(workspaceId!, projectId!),
 		enabled: !!workspaceId && !!projectId,
 	});
 };

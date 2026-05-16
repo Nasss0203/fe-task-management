@@ -3,6 +3,11 @@ export const TASK_KEY = {
 	TASKS: "tasks",
 	TASK_BACKLOG: "task-backlog",
 };
+export type BulkUpdateTasksDto = {
+	taskIds: string[];
+	statusId?: string;
+	sendNotification?: boolean;
+};
 
 export interface TaskAssigneeItem {
 	userId: string;

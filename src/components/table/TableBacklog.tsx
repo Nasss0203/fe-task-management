@@ -33,7 +33,9 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
+import { useTask, useTaskPriority, useTaskStatus } from "@/hooks/use-task";
 import type { TaskItem } from "@/services/task/type";
+import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useTableDnd } from "../dnd/backlog-sprint/ProviderSprintDnd";
 import TableRowDnd from "../dnd/backlog-sprint/TableRowSprintDnd";
 import TaskAssignees from "../task/TaskAssignees";
@@ -45,7 +47,27 @@ type TableBacklogProps = {
 	showSprint?: boolean;
 };
 
-const getColumnsBacklog = (showSprint: boolean): ColumnDef<TaskItem>[] => [
+type getColumnsBacklogProps = {
+	showSprint: boolean;
+	taskStatus: {
+		id: string;
+		name: string;
+	}[];
+	taskPriority: {
+		id: string;
+		name: string;
+	}[];
+	onChangeStatus: (taskId: string, statusId: string) => void;
+	onChangePriority: (taskId: string, priorityId: string | null) => void;
+};
+
+const getColumnsBacklog = ({
+	showSprint,
+	taskPriority,
+	taskStatus,
+	onChangePriority,
+	onChangeStatus,
+}: getColumnsBacklogProps): ColumnDef<TaskItem>[] => [
 	{
 		id: "select",
 		size: 48,
@@ -111,22 +133,30 @@ const getColumnsBacklog = (showSprint: boolean): ColumnDef<TaskItem>[] => [
 		header: "Status",
 		cell: ({ row }) => {
 			const task = row.original;
-			const value = task.statusId ?? "none";
+			const value = task.statusId;
 
 			return (
-				<Select value={value}>
-					<SelectTrigger className='h-8 w-32.5'>
+				<Select
+					value={value}
+					onValueChange={(statusId) => {
+						if (statusId === task.statusId) return;
+						onChangeStatus(task.id, statusId);
+					}}
+				>
+					<SelectTrigger
+						className='h-8 w-32.5'
+						onPointerDown={(e) => e.stopPropagation()}
+						onClick={(e) => e.stopPropagation()}
+					>
 						<SelectValue placeholder='No status' />
 					</SelectTrigger>
 
 					<SelectContent>
-						{task.statusId ? (
-							<SelectItem value={task.statusId}>
-								{task.statusName ?? "No status"}
+						{taskStatus.map((item) => (
+							<SelectItem value={item.id} key={item.id}>
+								{item.name}
 							</SelectItem>
-						) : (
-							<SelectItem value='none'>No status</SelectItem>
-						)}
+						))}
 					</SelectContent>
 				</Select>
 			);
@@ -138,21 +168,36 @@ const getColumnsBacklog = (showSprint: boolean): ColumnDef<TaskItem>[] => [
 		header: "Priority",
 		cell: ({ row }) => {
 			const task = row.original;
+			const value = task.priorityId ?? "none";
 
 			return (
-				<Select value={task.priorityId ?? "none"}>
-					<SelectTrigger className='h-8 w-32.5'>
+				<Select
+					value={value}
+					onValueChange={(priorityId) => {
+						const nextPriorityId =
+							priorityId === "none" ? null : priorityId;
+
+						if (nextPriorityId === task.priorityId) return;
+
+						onChangePriority(task.id, nextPriorityId);
+					}}
+				>
+					<SelectTrigger
+						className='h-8 w-32.5'
+						onPointerDown={(e) => e.stopPropagation()}
+						onClick={(e) => e.stopPropagation()}
+					>
 						<SelectValue placeholder='No priority' />
 					</SelectTrigger>
 
 					<SelectContent>
 						<SelectItem value='none'>No priority</SelectItem>
 
-						{task.priorityId && (
-							<SelectItem value={task.priorityId}>
-								{task.priorityName ?? "No priority"}
+						{taskPriority.map((item) => (
+							<SelectItem value={item.id} key={item.id}>
+								{item.name}
 							</SelectItem>
-						)}
+						))}
 					</SelectContent>
 				</Select>
 			);
@@ -185,17 +230,57 @@ const TableBacklog = ({
 	containerId,
 	showSprint = false,
 }: TableBacklogProps) => {
+	const { currentProjectId, currentWorkspaceId } = useProjectSelectionStore();
+	const workspaceId = currentWorkspaceId as string;
+	const projectId = currentProjectId as string;
+
 	const [pagination, setPagination] = useState<PaginationState>({
 		pageIndex: 0,
 		pageSize: 10,
 	});
-	const { items } = useTableDnd();
-	const taskIds = items[containerId] ?? [];
-
 	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-	const columns = useMemo(() => getColumnsBacklog(showSprint), [showSprint]);
+	const { items } = useTableDnd();
+	const { bulkUpdateTasks, updateTask } = useTask(workspaceId, projectId);
+	const { data: taskStatusData } = useTaskStatus(workspaceId, projectId);
+	const { data: taskPriorityData } = useTaskPriority(workspaceId, projectId);
 
+	const taskIds = items[containerId] ?? [];
+	const taskStatus = taskStatusData?.data ?? [];
+	const taskPriority = taskPriorityData?.data ?? [];
+
+	const columns = useMemo(
+		() =>
+			getColumnsBacklog({
+				showSprint,
+				taskStatus,
+				taskPriority,
+				onChangeStatus: async (taskId, statusId) => {
+					await updateTask.mutateAsync({
+						id: taskId,
+						workspaceId,
+						projectId,
+						statusId,
+					});
+				},
+				onChangePriority: async (taskId, priorityId) => {
+					await updateTask.mutateAsync({
+						id: taskId,
+						workspaceId,
+						projectId,
+						priorityId,
+					});
+				},
+			}),
+		[
+			showSprint,
+			taskStatus,
+			taskPriority,
+			updateTask,
+			workspaceId,
+			projectId,
+		],
+	);
 	const table = useReactTable({
 		data: tasks,
 		columns,
@@ -217,9 +302,13 @@ const TableBacklog = ({
 		},
 	});
 
-	const selectedRows = table.getSelectedRowModel().rows;
-	const selectedTasks = selectedRows.map((row) => row.original);
-	const selectedCount = selectedRows.length;
+	const selectedTasks = table
+		.getSelectedRowModel()
+		.rows.map((row) => row.original);
+
+	const selectedTaskIds = selectedTasks.map((task) => task.id);
+
+	const selectedCount = selectedTaskIds.length;
 
 	const { ref, isDropTarget } = useDroppable({
 		id: containerId,
@@ -307,23 +396,32 @@ const TableBacklog = ({
 			<TaskBulkActionBar
 				selectedCount={selectedCount}
 				totalCount={tasks.length}
+				selectedTaskIds={selectedTaskIds}
+				taskStatus={taskStatus}
+				isChangeStatusPending={bulkUpdateTasks.isPending}
 				onSelectAll={() => table.toggleAllRowsSelected(true)}
 				onClear={() => table.resetRowSelection()}
 				onMoveToSprint={() => {
-					const taskIds = selectedTasks.map((task) => task.id);
-					console.log("move to sprint", taskIds);
+					console.log("move to sprint", selectedTaskIds);
 				}}
 				onAssign={() => {
-					const taskIds = selectedTasks.map((task) => task.id);
-					console.log("assign", taskIds);
+					console.log("assign", selectedTaskIds);
 				}}
-				onChangeStatus={() => {
-					const taskIds = selectedTasks.map((task) => task.id);
-					console.log("change status", taskIds);
+				onSubmitChangeStatus={async ({
+					taskIds,
+					statusId,
+					sendNotification,
+				}) => {
+					await bulkUpdateTasks.mutateAsync({
+						taskIds,
+						statusId,
+						sendNotification,
+					});
+
+					table.resetRowSelection();
 				}}
 				onDelete={() => {
-					const taskIds = selectedTasks.map((task) => task.id);
-					console.log("delete", taskIds);
+					console.log("delete", selectedTaskIds);
 				}}
 			/>
 		</>

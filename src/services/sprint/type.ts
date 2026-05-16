@@ -51,3 +51,9 @@ export interface StartSprintParams {
 	sprintId: string;
 	data?: StartSprintDto;
 }
+
+export type CompleteSprintParams = {
+	workspaceId?: string;
+	projectId?: string;
+	sprintId: string;
+};

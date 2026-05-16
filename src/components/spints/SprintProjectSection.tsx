@@ -16,6 +16,7 @@ import {
 
 import { SprintItem } from "@/services/sprint/type";
 import { useState } from "react";
+import { CompleteSprintDialog } from "../dialog/CompleteSprintDialog";
 import { StartSprintDialog } from "../dialog/DialogStartSprint";
 import TableBacklog from "../table/TableBacklog";
 import TaskAssignees from "../task/TaskAssignees";
@@ -218,9 +219,22 @@ const SprintProjectSection = ({
 						workItemCount={tasks?.length ?? 0}
 					></StartSprintDialog>
 				) : status === SprintStatus.ACTIVE ? (
-					<Button className='' variant={"outline"}>
-						Complete
-					</Button>
+					<CompleteSprintDialog
+						defaultSprintName={sprint.name}
+						projectId={projectId}
+						sprintId={sprint.id}
+						workspaceId={workspaceId}
+						completedWorkItemCount={
+							tasks?.filter(
+								(task: any) => task.status?.isDone === true,
+							).length ?? 0
+						}
+						openWorkItemCount={
+							tasks?.filter(
+								(task: any) => task.status?.isDone !== true,
+							).length ?? 0
+						}
+					/>
 				) : null}
 			</div>
 

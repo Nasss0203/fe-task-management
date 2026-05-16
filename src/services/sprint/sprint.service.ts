@@ -1,6 +1,7 @@
 import instance from "../axios";
 import { ApiResponse } from "../types";
 import {
+	CompleteSprintParams,
 	CreateSprintDto,
 	FindAllSprintResponse,
 	StartSprintParams,
@@ -48,6 +49,16 @@ export const startSprintApi = async (params: StartSprintParams) => {
 		data ?? {},
 	);
 	console.log("🚀 ~ response~startSprintApi", response.data);
+
+	return response.data;
+};
+
+export const completeSprintApi = async (params: CompleteSprintParams) => {
+	const { workspaceId, projectId, sprintId } = params;
+
+	const response = await instance.patch<any>(
+		`/sprints/workspaces/${workspaceId}/projects/${projectId}/sprints/${sprintId}/complete`,
+	);
 
 	return response.data;
 };

@@ -1,5 +1,6 @@
 import instance from "../axios";
 import {
+	BulkUpdateTasksDto,
 	CreateTaskDto,
 	CreateTaskResponse,
 	FindAllTaskBacklogResponse,
@@ -92,4 +93,22 @@ export const moveTaskSprintToSprintApi = async ({
 		},
 	);
 	return response.data;
+};
+
+export const bulkUpdateTasksApi = async ({
+	workspaceId,
+	projectId,
+	body,
+}: {
+	workspaceId: string;
+	projectId: string;
+	body: BulkUpdateTasksDto;
+}) => {
+	const res = await instance.patch(
+		`/tasks/workspaces/${workspaceId}/projects/${projectId}/bulk-update`,
+		body,
+	);
+	console.log("🚀 ~ res~", res.data);
+
+	return res.data;
 };

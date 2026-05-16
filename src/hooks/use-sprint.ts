@@ -1,15 +1,18 @@
 "use client";
 import {
+	completeSprintApi,
 	createSprintApi,
 	findAllSprintApi,
 	findTasksBySprintApi,
 	startSprintApi,
 } from "@/services/sprint/sprint.service";
 import {
+	CompleteSprintParams,
 	CreateSprintDto,
 	SPRINT_KEY,
 	StartSprintParams,
 } from "@/services/sprint/type";
+import { TASK_KEY } from "@/services/task/type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 type UseSprintsParams = {
@@ -70,10 +73,30 @@ export const useSprints = ({
 		},
 	});
 
+	const completed = useMutation({
+		mutationFn: async (data: CompleteSprintParams) => {
+			const result = await completeSprintApi(data);
+
+			return result;
+		},
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: [SPRINT_KEY.SPRINTS],
+			});
+			await queryClient.invalidateQueries({
+				queryKey: [TASK_KEY.TASK_BACKLOG],
+			});
+		},
+		onError: (err) => {
+			console.error("startSprint failed", err);
+		},
+	});
+
 	return {
 		sprintsQuery,
 		sprintsTaskQuery,
 		createSprint,
 		startSprint,
+		completed,
 	};
 };

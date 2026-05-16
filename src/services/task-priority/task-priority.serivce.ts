@@ -1,11 +1,11 @@
 import instance from "../axios";
 
-export const findAllTaskPriorityStatusApi = async (
+export const findAllTaskPriorityApi = async (
 	workspaceId: string,
 	projectId: string,
 ): Promise<any> => {
 	const response = await instance.get(
-		`/task-status/workspace/${workspaceId}/project/${projectId}`,
+		`/task-priority/workspaces/${workspaceId}/projects/${projectId}`,
 	);
 
 	return response.data;
