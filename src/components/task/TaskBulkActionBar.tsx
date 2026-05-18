@@ -1,12 +1,10 @@
 "use client";
 
 import {
-	ArrowRight,
 	CheckCircle2,
 	CircleAlert,
 	CircleCheck,
 	Trash2,
-	UserPlus,
 	X,
 } from "lucide-react";
 import { useState } from "react";
@@ -125,26 +123,6 @@ export function TaskBulkActionBar({
 						>
 							<CircleCheck className='size-4' />
 							Chọn tất cả
-						</Button>
-
-						<Button
-							type='button'
-							variant='outline'
-							size='sm'
-							onClick={onMoveToSprint}
-						>
-							<ArrowRight className='size-4' />
-							Move sprint
-						</Button>
-
-						<Button
-							type='button'
-							variant='outline'
-							size='sm'
-							onClick={onAssign}
-						>
-							<UserPlus className='size-4' />
-							Assign
 						</Button>
 
 						<Button

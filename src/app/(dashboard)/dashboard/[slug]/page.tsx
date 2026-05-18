@@ -8,10 +8,13 @@ import WorkspaceOverview from "@/components/workspaces/WorkspaceOverview";
 import { usePage } from "@/hooks/use-page";
 import { usePageBlock } from "@/hooks/use-pageBlock";
 import { PageBlockItem } from "@/services/page_block/type";
+import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { BarChart3, List } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 const SlugPage = () => {
+	const { currentWorkspaceId } = useProjectSelectionStore();
+	const workspaceId = currentWorkspaceId as string;
 	const {
 		pages: { data, isLoading },
 	} = usePage();
@@ -43,7 +46,10 @@ const SlugPage = () => {
 			defaultValue='summary'
 			className='flex min-h-screen flex-col pb-10'
 		>
-			<WorkspaceTopHeader workspaceName={page?.title} />
+			<WorkspaceTopHeader
+				workspaceName={page?.title}
+				workspaceId={workspaceId}
+			/>
 
 			<div className='border-b border-border'>
 				<TabsListCustom

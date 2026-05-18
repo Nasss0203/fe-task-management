@@ -1,13 +1,16 @@
 "use client";
 
-import { Plus, Share2, Zap } from "lucide-react";
+import { Share2, Zap } from "lucide-react";
+import { WorkspaceMenu } from "./WorkspaceMenu";
 
 type WorkspaceTopHeaderProps = {
 	workspaceName?: string;
+	workspaceId: string;
 };
 
 export const WorkspaceTopHeader = ({
 	workspaceName = "Task management",
+	workspaceId,
 }: WorkspaceTopHeaderProps) => {
 	return (
 		<div className=' pt-4'>
@@ -26,9 +29,9 @@ export const WorkspaceTopHeader = ({
 							{workspaceName}
 						</h1>
 
-						<button className='rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground'>
-							<Plus size={16} />
-						</button>
+						<WorkspaceMenu
+							workspaceId={workspaceId}
+						></WorkspaceMenu>
 					</div>
 				</div>
 
