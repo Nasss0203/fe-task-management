@@ -1,5 +1,6 @@
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/config/theme-provider";
+import { RealtimeProviderWrapper } from "@/providers/RealtimeProviderWrapper";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import Providers from "../config/providers";
@@ -30,8 +31,13 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					<Providers>{children}</Providers>
-					<Toaster />
+					<Providers>
+						<RealtimeProviderWrapper>
+							{children}
+						</RealtimeProviderWrapper>
+					</Providers>
+
+					<Toaster richColors position='top-right' />
 				</ThemeProvider>
 			</body>
 		</html>

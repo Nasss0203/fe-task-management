@@ -2,6 +2,7 @@
 
 import { Copy, UsersRound, X } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -97,12 +98,21 @@ export function AddPeopleDialog({
 				role_name: role,
 				recipients: selectedRecipients,
 			},
+
 			{
 				onSuccess: () => {
+					toast.success(
+						selectedRecipients.length > 1
+							? `Sent ${selectedRecipients.length} invitations`
+							: "Invitation sent",
+					);
 					setQuery("");
 					setRole(RoleName.MEMBER);
 					setSelectedRecipients([]);
 					onOpenChange(false);
+				},
+				onError: () => {
+					toast.error("Failed to send invitation");
 				},
 			},
 		);

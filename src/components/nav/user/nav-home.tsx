@@ -1,6 +1,7 @@
 "use client";
 
 import { type LucideIcon } from "lucide-react";
+import Link from "next/link";
 
 import {
 	SidebarGroup,
@@ -9,33 +10,65 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "@/components/ui/sidebar";
-import Link from "next/link";
 
-const NavHome = ({
-	home,
-}: {
-	home: {
-		name: string;
-		url?: string | any;
-		icon: LucideIcon;
-	}[];
-}) => {
+import { InboxPopover } from "@/components/popover/InboxPopover";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
+
+export type NavHomeItem = {
+	name: string;
+	url?: string;
+	icon: LucideIcon;
+	type?: "link" | "inbox";
+};
+
+const NavHome = ({ home }: { home: NavHomeItem[] }) => {
 	const { isMobile } = useSidebar();
 
 	return (
-		<SidebarGroup className='group-data-[collapsible=icon]:hidden p-0'>
-			{/* <SidebarGroupLabel>Projects</SidebarGroupLabel> */}
+		<SidebarGroup className='p-0'>
 			<SidebarMenu>
-				{home.map((item) => (
-					<SidebarMenuItem key={item.name}>
-						<SidebarMenuButton asChild>
-							<Link href={item.url}>
-								<item.icon />
-								<span>{item.name}</span>
-							</Link>
-						</SidebarMenuButton>
-					</SidebarMenuItem>
-				))}
+				{home.map((item) => {
+					const Icon = item.icon;
+
+					if (item.type === "inbox") {
+						return (
+							<SidebarMenuItem key={item.name}>
+								<Popover>
+									<PopoverTrigger asChild>
+										<SidebarMenuButton>
+											<Icon />
+											<span>{item.name}</span>
+										</SidebarMenuButton>
+									</PopoverTrigger>
+
+									<PopoverContent
+										side={isMobile ? "bottom" : "right"}
+										align='start'
+										sideOffset={8}
+										className='w-auto border-none bg-transparent p-0 shadow-none'
+									>
+										<InboxPopover />
+									</PopoverContent>
+								</Popover>
+							</SidebarMenuItem>
+						);
+					}
+
+					return (
+						<SidebarMenuItem key={item.name}>
+							<SidebarMenuButton asChild>
+								<Link href={item.url ?? "#"}>
+									<Icon />
+									<span>{item.name}</span>
+								</Link>
+							</SidebarMenuButton>
+						</SidebarMenuItem>
+					);
+				})}
 			</SidebarMenu>
 		</SidebarGroup>
 	);

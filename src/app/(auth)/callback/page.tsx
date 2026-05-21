@@ -1,5 +1,6 @@
 "use client";
 
+import { setStoredAccessToken } from "@/lib/auth-storage";
 import { getMeApi } from "@/services/auth/auth.service";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
@@ -17,7 +18,7 @@ export default function AuthCallbackPage() {
 				return;
 			}
 
-			localStorage.setItem("access_token", accessToken);
+			setStoredAccessToken(accessToken);
 
 			const me = await getMeApi();
 
