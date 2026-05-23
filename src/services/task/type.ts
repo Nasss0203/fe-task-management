@@ -84,6 +84,7 @@ export type UpdateTaskDto = {
 	description?: string | null;
 	statusId?: string;
 	priorityId?: string | null;
+	assigneeIds?: string[];
 	position?: number;
 	startAt?: string | null;
 	dueAt?: string | null;

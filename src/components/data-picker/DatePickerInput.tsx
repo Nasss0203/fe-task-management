@@ -48,6 +48,11 @@ function parseDateString(value?: string) {
 
 export function DatePickerInput({ value, onChange }: DatePickerInputProps) {
 	const initialDate = React.useMemo(() => parseDateString(value), [value]);
+	const today = React.useMemo(() => {
+		const nextDate = new Date();
+		nextDate.setHours(0, 0, 0, 0);
+		return nextDate;
+	}, []);
 
 	const [open, setOpen] = React.useState(false);
 	const [date, setDate] = React.useState<Date | undefined>(initialDate);
@@ -107,6 +112,7 @@ export function DatePickerInput({ value, onChange }: DatePickerInputProps) {
 							mode='single'
 							selected={date}
 							month={month}
+							disabled={{ before: today }}
 							onMonthChange={setMonth}
 							onSelect={(selectedDate) => {
 								setDate(selectedDate);

@@ -41,13 +41,6 @@ export function CreateSprintDialog({
 		try {
 			setIsSubmitting(true);
 
-			console.log("create sprint", {
-				workspaceId,
-				projectId,
-				name,
-				selectedTaskIds,
-			});
-
 			// 1. gọi API create sprint
 			// const sprint = await createSprintApi(...)
 

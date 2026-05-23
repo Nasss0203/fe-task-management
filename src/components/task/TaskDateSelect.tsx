@@ -20,6 +20,8 @@ type TaskDateSelectProps = {
 
 export const TaskDateSelect = ({ value, onChange }: TaskDateSelectProps) => {
 	const [open, setOpen] = useState(false);
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
 
 	const label = value?.from
 		? value.to
@@ -71,6 +73,7 @@ export const TaskDateSelect = ({ value, onChange }: TaskDateSelectProps) => {
 					<Calendar
 						mode='range'
 						selected={value}
+						disabled={{ before: today }}
 						onSelect={onChange}
 						defaultMonth={value?.from}
 						numberOfMonths={1}

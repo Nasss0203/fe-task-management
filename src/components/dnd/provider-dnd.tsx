@@ -5,7 +5,8 @@ import { useTask, useTaskStatus } from "@/hooks/use-task";
 import { useUser } from "@/hooks/use-user";
 import { move } from "@dnd-kit/helpers";
 import { DragDropProvider } from "@dnd-kit/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
+import { DrawerItemView } from "../drawer/DrawerItemView";
 import ColumnDnd from "./column-dnd";
 import ItemsDnd from "./items-dnd";
 
@@ -61,7 +62,7 @@ const ProviderDragDrop = ({
 	} = useTask(workspaceId, projectId);
 	const { user } = useUser();
 
-	const { sprintsTaskQuery } = useSprints({
+	useSprints({
 		workspaceId,
 		projectId,
 		sprintId,
@@ -106,16 +107,27 @@ const ProviderDragDrop = ({
 	const [items, setItems] = useState<DndColumns>({});
 	const itemsRef = useRef<DndColumns>({});
 	const snapshotRef = useRef<DndColumns>({});
+	const [activeDrawerTaskId, setActiveDrawerTaskId] = useState<string | null>(
+		null,
+	);
 
 	const syncItems = (next: DndColumns) => {
 		itemsRef.current = next;
 		setItems(next);
 	};
 
+	const syncMappedItems = useEffectEvent((next: DndColumns) => {
+		itemsRef.current = next;
+		setItems(next);
+	});
+
 	useEffect(() => {
-		itemsRef.current = mappedItems;
-		setItems(mappedItems);
+		syncMappedItems(mappedItems);
 	}, [mappedItems]);
+
+	const activeDrawerTask = activeDrawerTaskId
+		? taskMap[activeDrawerTaskId]
+		: null;
 
 	if (taskQuery.isLoading || taskStatusQuery.isLoading) {
 		return <div>Loading...</div>;
@@ -136,106 +148,133 @@ const ProviderDragDrop = ({
 	};
 
 	return (
-		<DragDropProvider
-			onDragStart={() => {
-				snapshotRef.current = cloneItems(itemsRef.current);
-			}}
-			onDragOver={(event) => {
-				const { source } = event.operation;
+		<>
+			<DragDropProvider
+				onDragStart={() => {
+					snapshotRef.current = cloneItems(itemsRef.current);
+				}}
+				onDragOver={(event) => {
+					const { source } = event.operation;
 
-				if (!source || source.type === "column") {
-					return;
-				}
+					if (!source || source.type === "column") {
+						return;
+					}
 
-				const nextItems = move(itemsRef.current, event);
-				syncItems(nextItems);
-			}}
-			onDragEnd={(event) => {
-				const { source } = event.operation;
+					const nextItems = move(itemsRef.current, event);
+					syncItems(nextItems);
+				}}
+				onDragEnd={(event) => {
+					const { source } = event.operation;
 
-				if (!source || source.type === "column") {
-					return;
-				}
+					if (!source || source.type === "column") {
+						return;
+					}
 
-				if (event.canceled) {
-					syncItems(snapshotRef.current);
-					return;
-				}
+					if (event.canceled) {
+						syncItems(snapshotRef.current);
+						return;
+					}
 
-				const taskId = String(source.id);
-				const nextItems = itemsRef.current;
-				const nextStatusId = findStatusIdByTaskId(nextItems, taskId);
-
-				if (!nextStatusId) {
-					syncItems(snapshotRef.current);
-					return;
-				}
-
-				const nextPosition = findPositionInColumn(
-					nextItems,
-					nextStatusId,
-					taskId,
-				);
-
-				if (nextPosition == null) {
-					syncItems(snapshotRef.current);
-					return;
-				}
-
-				updateTaskMutate(
-					{
-						id: taskId,
-						statusId: nextStatusId,
-						position: nextPosition,
-					},
-					{
-						onError: () => {
-							syncItems(snapshotRef.current);
-						},
-					},
-				);
-			}}
-		>
-			<div className='inline-flex w-full flex-row gap-3'>
-				{statusList.map((status) => {
-					const columnItems = items[status.id] ?? [];
-
-					return (
-						<ColumnDnd
-							key={status.id}
-							id={status.id}
-							statusId={status.id}
-							statusName={status.name}
-							statusColor={status.color}
-							isDone={status.isDone}
-							onAddTask={() => handleAddTask(status.id)}
-							className={className}
-						>
-							{columnItems.map((id, index) => {
-								const task = taskMap[id];
-
-								return (
-									<ItemsDnd
-										key={id}
-										id={id}
-										column={status.id}
-										index={index}
-										status={status.name}
-										name={task?.title ?? ""}
-										onUpdateName={(taskId, newName) => {
-											updateTaskMutate({
-												id: taskId,
-												title: newName,
-											});
-										}}
-									/>
-								);
-							})}
-						</ColumnDnd>
+					const taskId = String(source.id);
+					const nextItems = itemsRef.current;
+					const nextStatusId = findStatusIdByTaskId(
+						nextItems,
+						taskId,
 					);
-				})}
-			</div>
-		</DragDropProvider>
+
+					if (!nextStatusId) {
+						syncItems(snapshotRef.current);
+						return;
+					}
+
+					const nextPosition = findPositionInColumn(
+						nextItems,
+						nextStatusId,
+						taskId,
+					);
+
+					if (nextPosition == null) {
+						syncItems(snapshotRef.current);
+						return;
+					}
+
+					updateTaskMutate(
+						{
+							id: taskId,
+							statusId: nextStatusId,
+							position: nextPosition,
+						},
+						{
+							onError: () => {
+								syncItems(snapshotRef.current);
+							},
+						},
+					);
+				}}
+			>
+				<div className='inline-flex w-full flex-row gap-3'>
+					{statusList.map((status) => {
+						const columnItems = items[status.id] ?? [];
+
+						return (
+							<ColumnDnd
+								key={status.id}
+								id={status.id}
+								statusId={status.id}
+								statusName={status.name}
+								statusColor={status.color}
+								isDone={status.isDone}
+								onAddTask={() => handleAddTask(status.id)}
+								className={className}
+							>
+								{columnItems.map((id, index) => {
+									const task = taskMap[id];
+
+									return (
+										<ItemsDnd
+											key={id}
+											id={id}
+											column={status.id}
+											index={index}
+											status={status.name}
+											name={task?.title ?? ""}
+											description={
+												task?.description ?? undefined
+											}
+											priority={
+												task?.priorityName ?? undefined
+											}
+											assignees={task?.assignees ?? []}
+											startAt={task?.startAt}
+											dueAt={task?.dueAt}
+											onOpenDetail={setActiveDrawerTaskId}
+											onUpdateName={(taskId, newName) => {
+												updateTaskMutate({
+													id: taskId,
+													title: newName,
+												});
+											}}
+										/>
+									);
+								})}
+							</ColumnDnd>
+						);
+					})}
+				</div>
+			</DragDropProvider>
+
+			{activeDrawerTask ? (
+				<DrawerItemView
+					open={!!activeDrawerTask}
+					onOpenChange={(open) => {
+						if (!open) {
+							setActiveDrawerTaskId(null);
+						}
+					}}
+					task={activeDrawerTask}
+				/>
+			) : null}
+		</>
 	);
 };
 
