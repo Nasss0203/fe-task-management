@@ -1,8 +1,9 @@
 "use client";
 
+import { setStoredAccessToken } from "@/lib/auth-storage";
 import { getMeApi } from "@/services/auth/auth.service";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 
 export default function AuthCallbackPage() {
 	const router = useRouter();
@@ -17,7 +18,7 @@ export default function AuthCallbackPage() {
 				return;
 			}
 
-			localStorage.setItem("access_token", accessToken);
+			setStoredAccessToken(accessToken);
 
 			const me = await getMeApi();
 
@@ -31,5 +32,9 @@ export default function AuthCallbackPage() {
 		handleAuth();
 	}, [searchParams, router]);
 
-	return <div>Đang đăng nhập...</div>;
+	return (
+		<Suspense fallback={<div>Đang xử lý đăng nhập...</div>}>
+			<div>Đang đăng nhập...</div>;
+		</Suspense>
+	);
 }

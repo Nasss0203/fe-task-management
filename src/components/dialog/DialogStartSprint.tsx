@@ -1,0 +1,371 @@
+"use client";
+
+import { useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useSprints } from "@/hooks/use-sprint";
+import { cn } from "@/lib/utils";
+
+type StartSprintDialogProps = {
+	defaultSprintName?: string;
+	workspaceId: string;
+	projectId: string;
+	sprintId: string;
+	workItemCount?: number;
+};
+
+const CUSTOM_DURATION = "custom";
+
+const durationOptions = [
+	{ label: "1 week", value: "1" },
+	{ label: "2 weeks", value: "2" },
+	{ label: "3 weeks", value: "3" },
+	{ label: "4 weeks", value: "4" },
+	{ label: "Custom", value: CUSTOM_DURATION },
+];
+
+const formatDateInput = (date: Date) => {
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, "0");
+	const day = String(date.getDate()).padStart(2, "0");
+
+	return `${year}-${month}-${day}`;
+};
+
+const addWeeksToDate = (date: string, weeks: number) => {
+	if (!date) return "";
+
+	const current = new Date(`${date}T00:00:00`);
+	current.setDate(current.getDate() + weeks * 7);
+
+	return formatDateInput(current);
+};
+
+const toISOStringDateTime = (date: string, time: string) => {
+	return new Date(`${date}T${time}:00`).toISOString();
+};
+
+export function StartSprintDialog({
+	defaultSprintName = "Sprint",
+	workspaceId,
+	projectId,
+	sprintId,
+	workItemCount = 0,
+}: StartSprintDialogProps) {
+	const { startSprint } = useSprints({
+		workspaceId,
+		projectId,
+	});
+
+	const today = formatDateInput(new Date());
+
+	const [open, setOpen] = useState(false);
+	const [name, setName] = useState(defaultSprintName);
+	const [duration, setDuration] = useState("1");
+	const [startDate, setStartDate] = useState(today);
+	const [startTime, setStartTime] = useState("09:00");
+	const [endDate, setEndDate] = useState(addWeeksToDate(today, 1));
+	const [goal, setGoal] = useState("");
+
+	const isCustomDuration = duration === CUSTOM_DURATION;
+
+	const isInvalidDateRange =
+		!!startDate &&
+		!!endDate &&
+		!!startTime &&
+		new Date(`${startDate}T${startTime}:00`) >=
+			new Date(`${endDate}T${startTime}:00`);
+
+	const handleDurationChange = (value: string) => {
+		setDuration(value);
+
+		if (value !== CUSTOM_DURATION) {
+			setEndDate(addWeeksToDate(startDate, Number(value)));
+		}
+	};
+
+	const handleStartDateChange = (value: string) => {
+		setStartDate(value);
+
+		if (duration !== CUSTOM_DURATION) {
+			setEndDate(addWeeksToDate(value, Number(duration)));
+		}
+	};
+
+	const handleStart = () => {
+		if (
+			!name.trim() ||
+			!startDate ||
+			!startTime ||
+			!endDate ||
+			isInvalidDateRange
+		) {
+			return;
+		}
+
+		startSprint.mutate(
+			{
+				workspaceId,
+				projectId,
+				sprintId,
+				data: {
+					name: name.trim(),
+					goal: goal.trim() || undefined,
+					startAt: toISOStringDateTime(startDate, startTime),
+					endAt: toISOStringDateTime(endDate, startTime),
+				},
+			},
+			{
+				onSuccess: () => {
+					setOpen(false);
+				},
+			},
+		);
+	};
+
+	return (
+		<Dialog open={open} onOpenChange={setOpen}>
+			<DialogTrigger asChild>
+				<Button
+					type='button'
+					variant='outline'
+					size='sm'
+					className={cn(
+						"h-8 rounded-md border border-neutral-700 bg-[#1c1c1c] px-4 text-xs font-semibold text-white",
+						"hover:border-neutral-500 hover:bg-[#252525] hover:text-white",
+					)}
+				>
+					Start sprint
+				</Button>
+			</DialogTrigger>
+
+			<DialogContent
+				className={cn(
+					"max-w-140 border border-neutral-800 bg-[#171717] p-0 text-white shadow-2xl",
+					"sm:max-w-140",
+				)}
+			>
+				<div className='border-b border-neutral-800 px-6 py-4'>
+					<DialogHeader>
+						<DialogTitle className='text-base font-semibold text-white'>
+							Start sprint
+						</DialogTitle>
+					</DialogHeader>
+				</div>
+
+				<div className='px-6 py-5'>
+					<div className='space-y-4'>
+						<p className='text-sm text-neutral-300'>
+							<span className='font-semibold text-white'>
+								{workItemCount}
+							</span>{" "}
+							work item{workItemCount > 1 ? "s" : ""} will be
+							included in this sprint.
+						</p>
+
+						<p className='text-xs font-medium text-neutral-500'>
+							Required fields are marked with an asterisk{" "}
+							<span className='text-red-400'>*</span>
+						</p>
+
+						<div className='space-y-1.5'>
+							<Label className='text-xs font-semibold text-neutral-300'>
+								Sprint name{" "}
+								<span className='text-red-400'>*</span>
+							</Label>
+
+							<Input
+								value={name}
+								onChange={(e) => setName(e.target.value)}
+								className={cn(
+									"h-9 rounded-md border-neutral-700 bg-[#101010] text-sm text-white",
+									"placeholder:text-neutral-600",
+									"focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500",
+								)}
+							/>
+						</div>
+
+						<div className='space-y-1.5'>
+							<Label className='text-xs font-semibold text-neutral-300'>
+								Duration <span className='text-red-400'>*</span>
+							</Label>
+
+							<Select
+								value={duration}
+								onValueChange={handleDurationChange}
+							>
+								<SelectTrigger
+									className={cn(
+										"h-9 rounded-md border-neutral-700 bg-[#101010] text-sm text-white",
+										"focus:border-blue-500 focus:ring-1 focus:ring-blue-500",
+									)}
+								>
+									<SelectValue placeholder='Select duration' />
+								</SelectTrigger>
+
+								<SelectContent className='border-neutral-800 bg-[#171717] text-white'>
+									{durationOptions.map((item) => (
+										<SelectItem
+											key={item.value}
+											value={item.value}
+											className='focus:bg-[#252525] focus:text-white'
+										>
+											{item.label}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</div>
+
+						<div className='grid grid-cols-2 gap-3'>
+							<div className='space-y-1.5'>
+								<Label className='text-xs font-semibold text-neutral-300'>
+									Start date{" "}
+									<span className='text-red-400'>*</span>
+								</Label>
+
+								<Input
+									type='date'
+									value={startDate}
+									onChange={(e) =>
+										handleStartDateChange(e.target.value)
+									}
+									className={cn(
+										"h-9 rounded-md border-neutral-700 bg-[#101010] text-sm text-white",
+										"focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500",
+									)}
+								/>
+							</div>
+
+							<div className='space-y-1.5'>
+								<Label className='text-xs font-semibold text-neutral-300'>
+									Start time{" "}
+									<span className='text-red-400'>*</span>
+								</Label>
+
+								<Input
+									type='time'
+									value={startTime}
+									onChange={(e) =>
+										setStartTime(e.target.value)
+									}
+									className={cn(
+										"h-9 rounded-md border-neutral-700 bg-[#101010] text-sm text-white",
+										"focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500",
+									)}
+								/>
+							</div>
+						</div>
+
+						<div className='grid grid-cols-2 gap-3'>
+							<div className='space-y-1.5'>
+								<Label className='text-xs font-semibold text-neutral-300'>
+									End date{" "}
+									<span className='text-red-400'>*</span>
+								</Label>
+
+								<Input
+									type='date'
+									value={endDate}
+									min={startDate}
+									disabled={!isCustomDuration}
+									onChange={(e) => setEndDate(e.target.value)}
+									className={cn(
+										"h-9 rounded-md text-sm",
+										isCustomDuration
+											? "border-neutral-700 bg-[#101010] text-white focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500"
+											: "border-neutral-800 bg-[#202020] text-neutral-500 disabled:cursor-not-allowed disabled:opacity-100",
+									)}
+								/>
+
+								{isInvalidDateRange && (
+									<p className='text-xs text-red-400'>
+										End date must be after start date.
+									</p>
+								)}
+							</div>
+
+							<div className='space-y-1.5'>
+								<Label className='text-xs font-semibold text-neutral-300'>
+									End time{" "}
+									<span className='text-red-400'>*</span>
+								</Label>
+
+								<Input
+									type='time'
+									value={startTime}
+									disabled
+									className={cn(
+										"h-9 rounded-md border-neutral-800 bg-[#202020] text-sm text-neutral-500",
+										"disabled:cursor-not-allowed disabled:opacity-100",
+									)}
+								/>
+							</div>
+						</div>
+
+						<div className='space-y-1.5'>
+							<Label className='text-xs font-semibold text-neutral-300'>
+								Sprint goal
+							</Label>
+
+							<Textarea
+								value={goal}
+								onChange={(e) => setGoal(e.target.value)}
+								placeholder='What should this sprint accomplish?'
+								className={cn(
+									"min-h-27.5 resize-none rounded-md border-neutral-700 bg-[#101010] text-sm text-white",
+									"placeholder:text-neutral-600",
+									"focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500",
+								)}
+							/>
+						</div>
+					</div>
+
+					<div className='mt-6 flex justify-end gap-2 border-t border-neutral-800 pt-4'>
+						<Button
+							type='button'
+							variant='ghost'
+							onClick={() => setOpen(false)}
+							className='h-8 rounded-md px-4 text-xs font-semibold text-neutral-400 hover:bg-[#252525] hover:text-white'
+						>
+							Cancel
+						</Button>
+
+						<Button
+							type='button'
+							onClick={handleStart}
+							disabled={
+								!name.trim() ||
+								!startDate ||
+								!startTime ||
+								!endDate ||
+								isInvalidDateRange ||
+								startSprint.isPending
+							}
+							className='h-8 rounded-md bg-blue-600 px-4 text-xs font-semibold text-white hover:bg-blue-500 disabled:opacity-50'
+						>
+							{startSprint.isPending ? "Starting..." : "Start"}
+						</Button>
+					</div>
+				</div>
+			</DialogContent>
+		</Dialog>
+	);
+}

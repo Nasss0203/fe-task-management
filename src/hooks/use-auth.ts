@@ -1,5 +1,6 @@
 "use client";
 
+import { setStoredAccessToken } from "@/lib/auth-storage";
 import { getMeApi, loginApi, registerApi } from "@/services/auth/auth.service";
 import { LoginDto, RegisterDto } from "@/services/auth/type";
 import { useMutation } from "@tanstack/react-query";
@@ -10,7 +11,7 @@ export const useLogin = () => {
 			const result = await loginApi(data);
 
 			if (typeof window !== "undefined") {
-				localStorage.setItem("access_token", result.data.access_token);
+				setStoredAccessToken(result.data.access_token);
 
 				if (result.data.refresh_token) {
 					localStorage.setItem(
@@ -44,7 +45,7 @@ export const useRegister = () => {
 			const result = await registerApi(data);
 
 			if (typeof window !== "undefined") {
-				localStorage.setItem("access_token", result.data.access_token);
+				setStoredAccessToken(result.data.access_token);
 
 				if (result.data.refresh_token) {
 					localStorage.setItem(

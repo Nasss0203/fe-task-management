@@ -1,0 +1,47 @@
+{
+	"files.watcherExclude": {
+		"**/node_modules/**": true,
+		"**/.next/**": true,
+		"**/dist/**": true,
+		"**/build/**": true,
+		"**/coverage/**": true,
+		"**/.turbo/**": true,
+		"**/.vercel/**": true,
+		"**/.cache/**": true,
+		"**/.git/objects/**": true,
+		"**/.git/subtree-cache/**": true
+	},
+
+	"search.exclude": {
+		"**/node_modules": true,
+		"**/.next": true,
+		"**/dist": true,
+		"**/build": true,
+		"**/coverage": true,
+		"**/.turbo": true,
+		"**/.vercel": true,
+		"**/.cache": true
+	},
+
+	"files.exclude": {
+		"**/.next": true,
+		"**/dist": true,
+		"**/coverage": true
+	},
+
+	"editor.formatOnSave": true,
+	"editor.codeActionsOnSave": {},
+
+	"[json]": {
+		"editor.formatOnSave": false
+	},
+
+	"[jsonc]": {
+		"editor.formatOnSave": false
+	},
+
+	"json.schemaDownload.enable": false,
+
+	"git.autorefresh": false,
+	"git.autoRepositoryDetection": false
+}

@@ -10,6 +10,7 @@ export enum BoardViewType {
 	FORM = "FORM",
 	MAP = "MAP",
 	FEED = "FEED",
+	BACKLOG = "BACKLOG",
 }
 
 export type BoardItem = {
@@ -29,4 +30,5 @@ export type CreateBoarDto = {
 	viewType: BoardViewType;
 	projectId: string;
 	workspaceId: string;
+	blockId: string;
 };

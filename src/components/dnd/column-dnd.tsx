@@ -45,6 +45,7 @@ type Props = {
 	statusColor?: string;
 	isDone?: boolean;
 	onAddTask?: (statusId: string) => void;
+	className?: string;
 };
 
 export default function ColumnDnd({
@@ -55,6 +56,7 @@ export default function ColumnDnd({
 	statusColor,
 	isDone,
 	onAddTask,
+	className,
 }: Props) {
 	const { ref, isDropTarget } = useDroppable({
 		id,
@@ -84,6 +86,7 @@ export default function ColumnDnd({
 					"w-80 rounded-md p-4 flex flex-col gap-y-3 group",
 					s.background,
 					isDropTarget && cn("ring-2", s.ring),
+					className,
 				)}
 			>
 				<div className='flex items-center justify-between'>

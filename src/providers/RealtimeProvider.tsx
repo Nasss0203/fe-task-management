@@ -1,0 +1,66 @@
+"use client";
+
+import { NOTIFICATION_KEY } from "@/constants/query-key";
+import type { FindNotificationResponse, NotificationItem } from "@/services/notification/type";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { toast } from "sonner";
+import { connectRealtimeSocket, disconnectRealtimeSocket } from "./realtime-socket";
+
+type Props = {
+	accessToken: string | null;
+	children: React.ReactNode;
+};
+
+export function NotificationRealtimeProvider({ accessToken, children }: Props) {
+	const queryClient = useQueryClient();
+
+	useEffect(() => {
+		if (!accessToken) {
+			disconnectRealtimeSocket();
+			return;
+		}
+
+		const socket = connectRealtimeSocket(accessToken);
+
+		const handleNotificationCreated = (notification: NotificationItem) => {
+			toast.info(notification.title || "New notification", {
+				description: notification.message ?? undefined,
+			});
+
+			queryClient.setQueriesData<FindNotificationResponse>(
+				{
+					queryKey: [NOTIFICATION_KEY.MY_NOTIFICATIONS],
+				},
+				(old) => {
+					if (!old) return old;
+
+					const current = old.data ?? [];
+
+					const existed = current.some(
+						(item) => item.id === notification.id,
+					);
+
+					if (existed) return old;
+
+					return {
+						...old,
+						data: [notification, ...current],
+					};
+				},
+			);
+
+			queryClient.invalidateQueries({
+				queryKey: [NOTIFICATION_KEY.UNREAD_COUNT],
+			});
+		};
+
+		socket.on("notification.created", handleNotificationCreated);
+
+		return () => {
+			socket.off("notification.created", handleNotificationCreated);
+		};
+	}, [accessToken, queryClient]);
+
+	return <>{children}</>;
+}

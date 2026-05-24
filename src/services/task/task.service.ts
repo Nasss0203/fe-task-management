@@ -1,7 +1,9 @@
 import instance from "../axios";
 import {
+	BulkUpdateTasksDto,
 	CreateTaskDto,
 	CreateTaskResponse,
+	FindAllTaskBacklogResponse,
 	FindAllTaskResponse,
 	UpdateTaskDto,
 	UpdateTaskResponse,
@@ -36,4 +38,77 @@ export const updateTaskApi = async (
 	);
 
 	return response.data;
+};
+
+export const findAllBacklogTaskApi = async (
+	workspaceId: string,
+	projectId: string,
+): Promise<FindAllTaskBacklogResponse> => {
+	const response = await instance.get<FindAllTaskBacklogResponse>(
+		`/tasks/workspace/${workspaceId}/project/${projectId}/backlog`,
+	);
+
+	return response.data;
+};
+
+export const moveTaskToSprintApi = async ({
+	sprintId,
+	taskId,
+}: {
+	taskId: string;
+	sprintId: string | null;
+}) => {
+	const response = await instance.patch(`/tasks/${taskId}/move-sprint`, {
+		sprintId,
+	});
+	return response.data;
+};
+
+export const removeTaskFormSprintApi = async ({
+	taskId,
+}: {
+	taskId: string;
+}) => {
+	const response = await instance.patch(`/tasks/${taskId}/remove-sprint`);
+	return response.data;
+};
+
+export const moveTaskSprintToSprintApi = async ({
+	taskId,
+	workspaceId,
+	projectId,
+	sourceSprintId,
+	targetSprintId,
+}: {
+	taskId: string;
+	targetSprintId: string;
+	workspaceId: string;
+	projectId: string;
+	sourceSprintId: string;
+}) => {
+	const response = await instance.patch(
+		`/tasks/workspaces/${workspaceId}/projects/${projectId}/sprints/${sourceSprintId}/tasks/${taskId}/move-to-sprint`,
+		{
+			targetSprintId,
+		},
+	);
+	return response.data;
+};
+
+export const bulkUpdateTasksApi = async ({
+	workspaceId,
+	projectId,
+	body,
+}: {
+	workspaceId: string;
+	projectId: string;
+	body: BulkUpdateTasksDto;
+}) => {
+	const res = await instance.patch(
+		`/tasks/workspaces/${workspaceId}/projects/${projectId}/bulk-update`,
+		body,
+	);
+	console.log("🚀 ~ res~", res.data);
+
+	return res.data;
 };

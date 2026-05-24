@@ -1,9 +1,9 @@
 import { BoardItem, BoardViewType } from "@/services/board/type";
-import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { type LucideIcon } from "lucide-react";
 import AddBoard from "../board/AddBoard";
 import { BOARD_VIEW_CONFIG } from "../board/view-board";
 import { TabsListCustom, TabsTriggerCustom } from "../tabs";
+import { Separator } from "../ui/separator";
 import { Tabs } from "../ui/tabs";
 
 export type AvailableTabItem = {
@@ -12,8 +12,8 @@ export type AvailableTabItem = {
 	value: BoardViewType;
 	boardId?: string | null;
 };
-
 type ProjectBlockProps = {
+	blockId: string;
 	title?: string;
 	projectId: string;
 	workspaceId: string;
@@ -22,22 +22,25 @@ type ProjectBlockProps = {
 	activeBoard?: BoardItem;
 	availableTabs: AvailableTabItem[];
 	isOpen?: boolean;
+	context?: "project" | "workspace";
 	setActiveTab: (value: BoardViewType) => void;
 };
-
 const ProjectBlock = ({
 	title,
+	blockId,
 	boards,
+	projectId,
+	workspaceId,
 	activeTab,
 	activeBoard,
 	availableTabs,
 	isOpen,
+	context = "workspace",
 	setActiveTab,
 }: ProjectBlockProps) => {
 	const ActiveViewComponent = activeBoard
 		? BOARD_VIEW_CONFIG[activeBoard.viewType]?.component
 		: null;
-	const { currentWorkspaceId, currentProjectId } = useProjectSelectionStore();
 
 	return (
 		<div className='flex flex-col gap-2'>
@@ -61,7 +64,7 @@ const ProjectBlock = ({
 				onValueChange={(value) => setActiveTab(value as BoardViewType)}
 			>
 				<div className='flex items-center justify-between'>
-					<div className='flex items-center gap-1'>
+					<div className='flex items-center gap-1  '>
 						<TabsListCustom variant='none'>
 							{availableTabs.map((item) => {
 								return (
@@ -82,16 +85,22 @@ const ProjectBlock = ({
 
 						{boards.length > 0 && (
 							<AddBoard
-								projectId={currentProjectId as string}
-								workspaceId={currentWorkspaceId as string}
+								blockId={blockId}
+								boards={boards}
+								projectId={projectId}
+								workspaceId={workspaceId}
 							/>
 						)}
 					</div>
 				</div>
+				<Separator />
 
-				<div className='mt-2'>
+				<div className={`mt-2 ${isOpen ? "mb-10" : ""}`}>
 					{activeBoard && ActiveViewComponent ? (
-						<ActiveViewComponent board={activeBoard} />
+						<ActiveViewComponent
+							board={activeBoard}
+							context={context}
+						/>
 					) : null}
 				</div>
 			</Tabs>

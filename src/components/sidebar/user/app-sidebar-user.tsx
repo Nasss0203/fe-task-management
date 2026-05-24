@@ -2,7 +2,6 @@
 
 import {
 	AudioWaveform,
-	Bell,
 	Command,
 	Frame,
 	GalleryVerticalEnd,
@@ -25,7 +24,25 @@ import {
 	SidebarHeader,
 	SidebarRail,
 } from "@/components/ui/sidebar";
-import NavHome from "../../nav/user/nav-home";
+import NavHome, { type NavHomeItem } from "../../nav/user/nav-home";
+
+const homeItems: NavHomeItem[] = [
+	{
+		name: "Tìm kiếm",
+		url: "#",
+		icon: Search,
+	},
+	{
+		name: "Trang chủ",
+		url: "/dashboard",
+		icon: Home,
+	},
+	{
+		name: "Hộp thư đến",
+		icon: Mail,
+		type: "inbox",
+	},
+];
 
 // This is sample data.
 const data = {
@@ -68,28 +85,7 @@ const data = {
 			icon: Map,
 		},
 	],
-	home: [
-		{
-			name: "Tìm kiếm",
-			url: "#",
-			icon: Search,
-		},
-		{
-			name: "Trang chủ",
-			url: "/dashboard",
-			icon: Home,
-		},
-		{
-			name: "Hộp thư đến",
-			url: "#",
-			icon: Mail,
-		},
-		{
-			name: "Thông báo",
-			url: "#",
-			icon: Bell,
-		},
-	],
+	home: homeItems,
 };
 
 export function AppSidebarUser({
@@ -99,15 +95,18 @@ export function AppSidebarUser({
 		<Sidebar collapsible='icon' {...props}>
 			<SidebarHeader>
 				<TeamSwitcher teams={data.teams} />
-				<NavHome home={data.home}></NavHome>
+				<NavHome home={data.home} />
 			</SidebarHeader>
+
 			<SidebarContent>
 				<NavMain />
 				<NavProjects projects={data.projects} />
 			</SidebarContent>
+
 			<SidebarFooter>
 				<NavUser />
 			</SidebarFooter>
+
 			<SidebarRail />
 		</Sidebar>
 	);
