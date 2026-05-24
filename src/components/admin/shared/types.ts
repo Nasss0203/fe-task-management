@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 
 export type StatItem = {
 	title: string;
-	value: string;
+	value: number;
 	change: string;
 	description: string;
 	icon: LucideIcon;

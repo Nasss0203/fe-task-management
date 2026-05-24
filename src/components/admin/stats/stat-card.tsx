@@ -1,5 +1,5 @@
 import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
-import type { StatItem } from "./types";
+import type { StatItem } from "../shared/types";
 
 type Props = {
 	item: StatItem;
@@ -40,6 +40,7 @@ export function StatCard({ item }: Props) {
 					) : (
 						<ArrowUpRight className='h-4 w-4' />
 					)}
+
 					{item.change}
 				</span>
 

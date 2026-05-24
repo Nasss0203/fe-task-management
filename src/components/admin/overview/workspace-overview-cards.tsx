@@ -1,17 +1,17 @@
-import { ArchiveX, Building2, Lock, ShieldCheck } from "lucide-react";
-import { AdminWorkspace } from "../shared/workspace-admin.types";
+import { ArchiveX, Building2, Crown, ShieldCheck } from "lucide-react";
+import type { WorkspaceItem } from "@/services/admin/workspace/type";
 
 type Props = {
-	workspaces: AdminWorkspace[];
+	workspaces: WorkspaceItem[];
 };
 
 export function WorkspaceOverviewCards({ workspaces }: Props) {
 	const total = workspaces.length;
 	const active = workspaces.filter((item) => item.status === "ACTIVE").length;
-	const locked = workspaces.filter((item) => item.status === "LOCKED").length;
 	const deleted = workspaces.filter(
 		(item) => item.status === "DELETED",
 	).length;
+	const pro = workspaces.filter((item) => item.plan === "pro").length;
 
 	const totalProjects = workspaces.reduce(
 		(sum, item) => sum + item.projectsCount,
@@ -23,10 +23,6 @@ export function WorkspaceOverviewCards({ workspaces }: Props) {
 	);
 	const totalTasks = workspaces.reduce(
 		(sum, item) => sum + item.tasksCount,
-		0,
-	);
-	const totalStorageUsed = workspaces.reduce(
-		(sum, item) => sum + item.storageUsedGb,
 		0,
 	);
 
@@ -45,10 +41,10 @@ export function WorkspaceOverviewCards({ workspaces }: Props) {
 				"bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
 		},
 		{
-			title: "Đang bị khóa",
-			value: locked,
-			icon: Lock,
-			iconClass: "bg-rose-500/10 text-rose-400 border border-rose-500/20",
+			title: "Workspace Pro",
+			value: pro,
+			icon: Crown,
+			iconClass: "bg-sky-500/10 text-sky-400 border border-sky-500/20",
 		},
 		{
 			title: "Đã xóa mềm",
@@ -63,10 +59,7 @@ export function WorkspaceOverviewCards({ workspaces }: Props) {
 		{ label: "Tổng project", value: totalProjects },
 		{ label: "Tổng board", value: totalBoards },
 		{ label: "Tổng task", value: totalTasks },
-		{
-			label: "Dung lượng đang dùng",
-			value: `${totalStorageUsed.toFixed(1)} GB`,
-		},
+		{ label: "Gói Pro", value: pro },
 	];
 
 	return (

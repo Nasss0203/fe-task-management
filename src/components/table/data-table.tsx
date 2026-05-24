@@ -31,36 +31,51 @@ export function DataTable<TData, TValue>({
 	});
 
 	return (
-		<div className='overflow-hidden rounded-md'>
-			<Table>
+		<div className='overflow-x-auto'>
+			<Table className='w-full min-w-205 border-separate border-spacing-y-2 text-sm'>
 				<TableHeader>
 					{table.getHeaderGroups().map((headerGroup) => (
-						<TableRow key={headerGroup.id}>
-							{headerGroup.headers.map((header) => {
-								return (
-									<TableHead key={header.id}>
-										{header.isPlaceholder
-											? null
-											: flexRender(
-													header.column.columnDef
-														.header,
-													header.getContext(),
-												)}
-									</TableHead>
-								);
-							})}
+						<TableRow
+							key={headerGroup.id}
+							className='border-none hover:bg-transparent'
+						>
+							{headerGroup.headers.map((header) => (
+								<TableHead
+									key={header.id}
+									className='h-auto pb-2 text-left font-medium text-neutral-500'
+								>
+									{header.isPlaceholder
+										? null
+										: flexRender(
+												header.column.columnDef.header,
+												header.getContext(),
+											)}
+								</TableHead>
+							))}
 						</TableRow>
 					))}
 				</TableHeader>
+
 				<TableBody>
 					{table.getRowModel().rows?.length ? (
 						table.getRowModel().rows.map((row) => (
 							<TableRow
 								key={row.id}
 								data-state={row.getIsSelected() && "selected"}
+								className='border-none bg-neutral-900/60 text-neutral-200 hover:bg-neutral-900/80'
 							>
-								{row.getVisibleCells().map((cell) => (
-									<TableCell key={cell.id}>
+								{row.getVisibleCells().map((cell, index) => (
+									<TableCell
+										key={cell.id}
+										className={`px-4 py-4 ${
+											index === 0 ? "rounded-l-xl" : ""
+										} ${
+											index ===
+											row.getVisibleCells().length - 1
+												? "rounded-r-xl"
+												: ""
+										}`}
+									>
 										{flexRender(
 											cell.column.columnDef.cell,
 											cell.getContext(),
@@ -70,10 +85,10 @@ export function DataTable<TData, TValue>({
 							</TableRow>
 						))
 					) : (
-						<TableRow>
+						<TableRow className='border-none'>
 							<TableCell
 								colSpan={columns.length}
-								className='h-24 text-center'
+								className='h-24 text-center text-neutral-400'
 							>
 								No results.
 							</TableCell>

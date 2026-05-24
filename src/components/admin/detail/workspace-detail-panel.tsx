@@ -9,42 +9,107 @@ import {
 	DrawerHeader,
 	DrawerTitle,
 } from "@/components/ui/drawer";
-import { useEffect, useRef, useState } from "react";
 import type {
-	AdminWorkspace,
-	WorkspacePlan,
-} from "../shared/workspace-admin.types";
+	PlanTypeWorkspace,
+	WorkspaceItem,
+} from "@/services/admin/workspace/type";
 import {
-	formatDate,
-	formatStorage,
-	getWorkspaceMemberRoleClass,
-	getWorkspacePlanClass,
-	getWorkspacePlanLabel,
-	getWorkspaceStatusClass,
-	getWorkspaceStatusLabel,
-} from "../shared/workspace-admin.utils";
+	ArchiveX,
+	CalendarDays,
+	Clock3,
+	Copy,
+	Crown,
+	FolderKanban,
+	LayoutDashboard,
+	ListChecks,
+	ShieldCheck,
+	Users,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 type Props = {
-	workspace: AdminWorkspace | null;
+	workspace: WorkspaceItem | null;
 	onClose: () => void;
-	onAssignOwner: (workspaceId: string, ownerId: string) => void;
-	onChangePlan: (workspaceId: string, plan: WorkspacePlan) => void;
+	onChangePlan: (workspaceId: string, plan: PlanTypeWorkspace) => void;
+};
+
+const formatDate = (value?: string | null) => {
+	if (!value) return "Chưa có dữ liệu";
+
+	const date = new Date(value);
+
+	if (Number.isNaN(date.getTime())) {
+		return "Không hợp lệ";
+	}
+
+	return date.toLocaleDateString("vi-VN", {
+		day: "2-digit",
+		month: "2-digit",
+		year: "numeric",
+	});
+};
+
+const formatDateTime = (value?: string | null) => {
+	if (!value) return "Chưa có dữ liệu";
+
+	const date = new Date(value);
+
+	if (Number.isNaN(date.getTime())) {
+		return "Không hợp lệ";
+	}
+
+	return date.toLocaleString("vi-VN", {
+		day: "2-digit",
+		month: "2-digit",
+		year: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
+	});
+};
+
+const getWorkspaceStatusClass = (status: WorkspaceItem["status"]) => {
+	if (status === "ACTIVE") {
+		return "border-emerald-500/20 bg-emerald-500/10 text-emerald-400";
+	}
+
+	return "border-amber-500/20 bg-amber-500/10 text-amber-400";
+};
+
+const getWorkspaceStatusLabel = (status: WorkspaceItem["status"]) => {
+	if (status === "ACTIVE") return "Đang hoạt động";
+	return "Đã xóa mềm";
+};
+
+const getWorkspacePlanClass = (plan: WorkspaceItem["plan"]) => {
+	if (plan === "pro") {
+		return "border-sky-500/20 bg-sky-500/10 text-sky-400";
+	}
+
+	return "border-white/10 bg-white/5 text-neutral-300";
+};
+
+const getWorkspacePlanLabel = (plan: WorkspaceItem["plan"]) => {
+	if (plan === "pro") return "Pro";
+	return "Free";
 };
 
 export function WorkspaceDetailPanel({
 	workspace,
 	onClose,
-	onAssignOwner,
 	onChangePlan,
 }: Props) {
 	const [open, setOpen] = useState(Boolean(workspace));
-	const [selectedOwnerId, setSelectedOwnerId] = useState(
-		workspace?.ownerId ?? "",
-	);
-	const [selectedPlan, setSelectedPlan] = useState<WorkspacePlan>(
-		workspace?.plan ?? "FREE",
-	);
+	const [selectedPlan, setSelectedPlan] = useState<PlanTypeWorkspace>("free");
+
 	const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	useEffect(() => {
+		setOpen(Boolean(workspace));
+
+		if (workspace) {
+			setSelectedPlan(workspace.plan);
+		}
+	}, [workspace]);
 
 	useEffect(() => {
 		return () => {
@@ -75,7 +140,22 @@ export function WorkspaceDetailPanel({
 		setOpen(true);
 	};
 
+	const handleCopyWorkspaceId = async () => {
+		if (!workspace) return;
+
+		await navigator.clipboard.writeText(workspace.id);
+	};
+
+	const handleSavePlan = () => {
+		if (!workspace) return;
+
+		onChangePlan(workspace.id, selectedPlan);
+	};
+
 	if (!workspace) return null;
+
+	const isDeleted = workspace.status === "DELETED";
+	const isPlanChanged = selectedPlan !== workspace.plan;
 
 	return (
 		<Drawer direction='right' open={open} onOpenChange={handleOpenChange}>
@@ -87,8 +167,8 @@ export function WorkspaceDetailPanel({
 								Chi tiết workspace
 							</DrawerTitle>
 							<DrawerDescription className='mt-1 text-sm text-neutral-400'>
-								Theo dõi thống kê, chuyển gói và gán owner mới
-								cho workspace.
+								Xem thông tin, owner, gói dịch vụ và thống kê sử
+								dụng của workspace.
 							</DrawerDescription>
 						</div>
 
@@ -129,13 +209,34 @@ export function WorkspaceDetailPanel({
 
 								<div>
 									<p className='text-neutral-500'>
+										Workspace ID
+									</p>
+
+									<div className='mt-1 flex items-start justify-between gap-3'>
+										<p className='break-all text-white'>
+											{workspace.id}
+										</p>
+
+										<Button
+											type='button'
+											variant='ghost'
+											onClick={handleCopyWorkspaceId}
+											className='h-8 shrink-0 rounded-xl border border-white/10 px-2 text-neutral-300 hover:bg-white/5 hover:text-white'
+										>
+											<Copy className='h-4 w-4' />
+										</Button>
+									</div>
+								</div>
+
+								<div>
+									<p className='text-neutral-500'>
 										Owner hiện tại
 									</p>
 									<p className='text-white'>
-										{workspace.ownerName}
+										{workspace.ownerName ?? "Chưa có owner"}
 									</p>
 									<p className='text-xs text-neutral-500'>
-										{workspace.ownerEmail}
+										{workspace.ownerEmail ?? "—"}
 									</p>
 								</div>
 
@@ -164,20 +265,41 @@ export function WorkspaceDetailPanel({
 										<p className='text-neutral-500'>
 											Ngày tạo
 										</p>
-										<p className='text-white'>
+										<div className='mt-1 flex items-center gap-2 text-white'>
+											<CalendarDays className='h-4 w-4 text-neutral-500' />
 											{formatDate(workspace.createdAt)}
-										</p>
+										</div>
 									</div>
 
 									<div>
 										<p className='text-neutral-500'>
-											Hoạt động gần nhất
+											Cập nhật gần nhất
 										</p>
-										<p className='text-white'>
-											{formatDate(workspace.lastActive)}
-										</p>
+										<div className='mt-1 flex items-center gap-2 text-white'>
+											<Clock3 className='h-4 w-4 text-neutral-500' />
+											{formatDateTime(
+												workspace.updatedAt,
+											)}
+										</div>
 									</div>
 								</div>
+
+								{workspace.deletedAt && (
+									<div className='rounded-xl border border-amber-500/20 bg-amber-500/10 p-3'>
+										<div className='flex items-center gap-2 text-amber-400'>
+											<ArchiveX className='h-4 w-4' />
+											<p className='text-sm font-medium'>
+												Workspace đã xóa mềm
+											</p>
+										</div>
+										<p className='mt-1 text-xs text-amber-300/80'>
+											Thời gian xóa:{" "}
+											{formatDateTime(
+												workspace.deletedAt,
+											)}
+										</p>
+									</div>
+								)}
 							</div>
 						</div>
 
@@ -188,52 +310,44 @@ export function WorkspaceDetailPanel({
 
 							<div className='grid grid-cols-2 gap-3'>
 								<div className='rounded-xl border border-white/10 bg-[#0b0b0b] p-3'>
-									<p className='text-xs text-neutral-500'>
-										Thành viên
-									</p>
+									<div className='flex items-center gap-2 text-neutral-500'>
+										<Users className='h-4 w-4' />
+										<p className='text-xs'>Thành viên</p>
+									</div>
 									<p className='mt-1 text-lg font-semibold text-white'>
 										{workspace.membersCount}
 									</p>
 								</div>
 
 								<div className='rounded-xl border border-white/10 bg-[#0b0b0b] p-3'>
-									<p className='text-xs text-neutral-500'>
-										Project
-									</p>
+									<div className='flex items-center gap-2 text-neutral-500'>
+										<FolderKanban className='h-4 w-4' />
+										<p className='text-xs'>Project</p>
+									</div>
 									<p className='mt-1 text-lg font-semibold text-white'>
 										{workspace.projectsCount}
 									</p>
 								</div>
 
 								<div className='rounded-xl border border-white/10 bg-[#0b0b0b] p-3'>
-									<p className='text-xs text-neutral-500'>
-										Board
-									</p>
+									<div className='flex items-center gap-2 text-neutral-500'>
+										<LayoutDashboard className='h-4 w-4' />
+										<p className='text-xs'>Board</p>
+									</div>
 									<p className='mt-1 text-lg font-semibold text-white'>
 										{workspace.boardsCount}
 									</p>
 								</div>
 
 								<div className='rounded-xl border border-white/10 bg-[#0b0b0b] p-3'>
-									<p className='text-xs text-neutral-500'>
-										Task
-									</p>
+									<div className='flex items-center gap-2 text-neutral-500'>
+										<ListChecks className='h-4 w-4' />
+										<p className='text-xs'>Task</p>
+									</div>
 									<p className='mt-1 text-lg font-semibold text-white'>
 										{workspace.tasksCount}
 									</p>
 								</div>
-							</div>
-
-							<div className='mt-3 rounded-xl border border-white/10 bg-[#0b0b0b] p-3'>
-								<p className='text-xs text-neutral-500'>
-									Dung lượng sử dụng
-								</p>
-								<p className='mt-1 text-lg font-semibold text-white'>
-									{formatStorage(
-										workspace.storageUsedGb,
-										workspace.storageLimitGb,
-									)}
-								</p>
 							</div>
 						</div>
 
@@ -245,135 +359,35 @@ export function WorkspaceDetailPanel({
 							<div className='flex flex-col gap-2 sm:flex-row'>
 								<select
 									value={selectedPlan}
+									disabled={isDeleted}
 									onChange={(e) =>
 										setSelectedPlan(
-											e.target.value as WorkspacePlan,
+											e.target.value as PlanTypeWorkspace,
 										)
 									}
-									className='h-11 min-w-0 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none focus:border-white/20 sm:flex-1'
+									className='h-11 min-w-0 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none focus:border-white/20 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-1'
 								>
-									<option value='FREE'>Free</option>
-									<option value='PRO'>Pro</option>
-									<option value='ENTERPRISE'>
-										Enterprise
-									</option>
+									<option value='free'>Free</option>
+									<option value='pro'>Pro</option>
 								</select>
 
 								<Button
 									type='button'
-									onClick={() =>
-										onChangePlan(workspace.id, selectedPlan)
-									}
-									className='h-11 w-full shrink-0 rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-white hover:bg-white/10 sm:w-auto'
+									disabled={isDeleted || !isPlanChanged}
+									onClick={handleSavePlan}
+									className='h-11 w-full shrink-0 rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto'
 								>
+									<Crown className='mr-2 h-4 w-4' />
 									Lưu gói
 								</Button>
 							</div>
-						</div>
 
-						<div className='rounded-2xl border border-white/10 bg-[#111111] p-4'>
-							<h3 className='mb-4 text-sm font-semibold uppercase tracking-wide text-neutral-500'>
-								Gán owner mới
-							</h3>
-
-							<div className='flex flex-col gap-2 sm:flex-row'>
-								<select
-									value={selectedOwnerId}
-									onChange={(e) =>
-										setSelectedOwnerId(e.target.value)
-									}
-									className='h-11 min-w-0 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none focus:border-white/20 sm:flex-1'
-								>
-									{workspace.members.map((member) => (
-										<option
-											key={member.id}
-											value={member.id}
-										>
-											{member.name} - {member.email}
-										</option>
-									))}
-								</select>
-
-								<Button
-									type='button'
-									onClick={() =>
-										onAssignOwner(
-											workspace.id,
-											selectedOwnerId,
-										)
-									}
-									className='h-11 w-full shrink-0 rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-white hover:bg-white/10 sm:w-auto'
-								>
-									Gán owner
-								</Button>
-							</div>
-						</div>
-
-						<div className='rounded-2xl border border-white/10 bg-[#111111] p-4'>
-							<h3 className='mb-4 text-sm font-semibold uppercase tracking-wide text-neutral-500'>
-								Thành viên chính
-							</h3>
-
-							<div className='space-y-3'>
-								{workspace.members.map((member) => (
-									<div
-										key={member.id}
-										className='rounded-xl border border-white/10 bg-[#0b0b0b] px-4 py-3'
-									>
-										<div className='flex items-center justify-between gap-4'>
-											<div className='min-w-0'>
-												<p className='truncate text-sm font-medium text-white'>
-													{member.name}
-												</p>
-												<p className='truncate text-xs text-neutral-500'>
-													{member.email}
-												</p>
-											</div>
-
-											<span
-												className={`shrink-0 rounded-full border px-2.5 py-1 text-xs ${getWorkspaceMemberRoleClass(
-													member.role,
-												)}`}
-											>
-												{member.role}
-											</span>
-										</div>
-									</div>
-								))}
-							</div>
-						</div>
-
-						<div className='rounded-2xl border border-white/10 bg-[#111111] p-4'>
-							<h3 className='mb-4 text-sm font-semibold uppercase tracking-wide text-neutral-500'>
-								Lịch sử hoạt động
-							</h3>
-
-							<div className='space-y-4'>
-								{workspace.activities.map((activity, index) => (
-									<div
-										key={activity.id}
-										className='flex gap-3'
-									>
-										<div className='flex flex-col items-center'>
-											<div className='mt-1 h-2.5 w-2.5 rounded-full bg-white' />
-											{index !==
-												workspace.activities.length -
-													1 && (
-												<div className='mt-2 h-full w-px bg-white/10' />
-											)}
-										</div>
-
-										<div className='pb-2'>
-											<p className='text-sm font-medium text-white'>
-												{activity.action}
-											</p>
-											<p className='mt-1 text-xs text-neutral-500'>
-												{formatDate(activity.time)}
-											</p>
-										</div>
-									</div>
-								))}
-							</div>
+							{isDeleted && (
+								<p className='mt-2 text-xs text-amber-400'>
+									Workspace đã xóa mềm nên chưa thể chuyển
+									gói.
+								</p>
+							)}
 						</div>
 					</div>
 				</div>

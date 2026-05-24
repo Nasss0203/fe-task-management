@@ -7,13 +7,12 @@ import {
 } from "@/components/ui/collapsible";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { findProjectByWorkspaceIdApi } from "@/services/project/project.service";
-import { PROJECT_KEY } from "@/services/project/type";
+import { PROJECT_KEY, type ProjectItems } from "@/services/project/type";
 import { WorkspaceDto } from "@/services/workspace/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useQueries } from "@tanstack/react-query";
 import { ChevronRight, Ellipsis, Plus } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { DialogTask } from "../../dialog";
 import {
 	PopoverContentV2,
@@ -40,15 +39,9 @@ type WorkspaceItem = {
 	slug: string;
 };
 
-type ProjectItem = {
-	id: string;
-	name: string;
-};
-
 export function NavMain() {
 	const { setCurrentWorkspaceId, setCurrentProjectId } =
 		useProjectSelectionStore();
-	const router = useRouter();
 
 	const {
 		createWorkspace: { mutate },
@@ -104,7 +97,7 @@ export function NavMain() {
 			<SidebarGroupLabelV2>Platform</SidebarGroupLabelV2>
 			<SidebarMenuV2>
 				{workspaces.map((workspace, index) => {
-					const projects: any =
+					const projects: ProjectItems[] =
 						projectQueries[index]?.data?.data ?? [];
 					return (
 						<Collapsible
@@ -171,27 +164,36 @@ export function NavMain() {
 
 								<CollapsibleContent>
 									<SidebarMenuSubV2>
-										{projects.map((project: any) => (
+										{projects.map((project) => {
+											if (!project.id || !project.name) {
+												return null;
+											}
+
+											const projectId = project.id;
+											const projectName = project.name;
+
+											return (
 											<SidebarMenuSubItemV2
-												key={project.id}
+												key={projectId}
 											>
 												<SidebarMenuSubButtonV2 asChild>
 													<Link
-														href={`/dashboard/${workspace.slug}/${project.name}`}
+														href={`/dashboard/${workspace.slug}/${projectName}`}
 														onClick={() =>
 															handleSelectProject(
 																workspace.id,
-																project.id,
+																projectId,
 															)
 														}
 													>
 														<span>
-															{project.name}
+															{projectName}
 														</span>
 													</Link>
 												</SidebarMenuSubButtonV2>
 											</SidebarMenuSubItemV2>
-										))}
+											);
+										})}
 									</SidebarMenuSubV2>
 								</CollapsibleContent>
 							</SidebarMenuItemV2>
