@@ -5,7 +5,6 @@ import {
 	AtSign,
 	Check,
 	Link2,
-	ListTodo,
 	MessageSquareText,
 	Paperclip,
 } from "lucide-react";
@@ -13,16 +12,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
 import { Button } from "../../ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
 import { Textarea } from "../../ui/textarea";
-import type {
-	ActivityEntry,
-	LocalComment,
-	LocalSubtask,
-} from "./task-detail-types";
-import { getInitials, hexToRgba } from "./task-detail-utils";
+import type { LocalComment, LocalSubtask } from "./task-detail-types";
+import { getInitials } from "./task-detail-utils";
 
 type TaskDetailTabsProps = {
-	subtasks: LocalSubtask[];
-	completedSubtasks: number;
 	comments: LocalComment[];
 	currentUsername: string;
 	currentUserAvatar?: string | null;
@@ -32,8 +25,6 @@ type TaskDetailTabsProps = {
 	onCommentDraftChange: (value: string) => void;
 	onCancelComment: () => void;
 	onSaveComment: () => void;
-	activityItems: ActivityEntry[];
-	currentStatusColor: string;
 };
 
 function SubtaskCard({ item }: { item: LocalSubtask }) {
@@ -69,8 +60,6 @@ function SubtaskCard({ item }: { item: LocalSubtask }) {
 }
 
 export function TaskDetailTabs({
-	subtasks,
-	completedSubtasks,
 	comments,
 	currentUsername,
 	currentUserAvatar,
@@ -80,8 +69,6 @@ export function TaskDetailTabs({
 	onCommentDraftChange,
 	onCancelComment,
 	onSaveComment,
-	activityItems,
-	currentStatusColor,
 }: TaskDetailTabsProps) {
 	return (
 		<Tabs defaultValue='subtasks' className='gap-0'>
@@ -112,30 +99,7 @@ export function TaskDetailTabs({
 				</TabsTrigger>
 			</TabsList>
 
-			<TabsContent value='subtasks' className='pt-6'>
-				<div className='space-y-4'>
-					<div className='flex items-center justify-between gap-4'>
-						<div>
-							<div className='text-2xl font-bold tracking-tight text-foreground'>
-								Our Design Process
-							</div>
-							<div className='mt-1 text-sm text-muted-foreground'>
-								Fallback checklist preview for this task detail
-								drawer.
-							</div>
-						</div>
-						<div className='inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium text-muted-foreground shadow-xs'>
-							<ListTodo className='size-4 text-muted-foreground' />
-							{completedSubtasks}/{subtasks.length}
-						</div>
-					</div>
-					<div className='space-y-3'>
-						{subtasks.map((item) => (
-							<SubtaskCard key={item.id} item={item} />
-						))}
-					</div>
-				</div>
-			</TabsContent>
+			<TabsContent value='subtasks' className='pt-6'></TabsContent>
 
 			<TabsContent value='comments' className='pt-6'>
 				<div className='space-y-5'>
@@ -275,44 +239,7 @@ export function TaskDetailTabs({
 				</div>
 			</TabsContent>
 
-			<TabsContent value='activities' className='pt-6'>
-				<div className='space-y-5'>
-					<div className='text-2xl font-bold tracking-tight text-foreground'>
-						Activities
-					</div>
-					<div className='space-y-3'>
-						{activityItems.map((item) => (
-							<div
-								key={item.id}
-								className='rounded-2xl border border-border bg-card px-4 py-4 shadow-xs'
-							>
-								<div className='flex flex-wrap items-start justify-between gap-3'>
-									<div>
-										<div className='text-sm font-semibold text-foreground'>
-											{item.label}
-										</div>
-										<div className='mt-1 text-sm leading-6 text-muted-foreground'>
-											{item.description}
-										</div>
-									</div>
-									<div
-										className='rounded-full px-3 py-1 text-xs font-semibold'
-										style={{
-											backgroundColor: hexToRgba(
-												currentStatusColor,
-												0.12,
-											),
-											color: currentStatusColor,
-										}}
-									>
-										{item.time}
-									</div>
-								</div>
-							</div>
-						))}
-					</div>
-				</div>
-			</TabsContent>
+			<TabsContent value='activities' className='pt-6'></TabsContent>
 		</Tabs>
 	);
 }

@@ -70,7 +70,7 @@ const ProjectBlock = ({
 								return (
 									<TabsTriggerCustom
 										value={item.value}
-										key={item.value}
+										key={item.boardId}
 									>
 										<div className='flex items-center gap-1'>
 											<item.icon />
