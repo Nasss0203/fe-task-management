@@ -3,6 +3,19 @@ export const TASK_KEY = {
 	TASKS: "tasks",
 	TASK_BACKLOG: "task-backlog",
 };
+
+export type TaskFilterValue = string | string[];
+export type PaginationQueryValue = number | string;
+
+export type FindBacklogTasksFilters = {
+	search?: string;
+	assigneeId?: TaskFilterValue;
+	statusId?: TaskFilterValue;
+	priorityId?: TaskFilterValue;
+	page?: PaginationQueryValue;
+	pageSize?: PaginationQueryValue;
+};
+
 export type BulkUpdateTasksDto = {
 	taskIds: string[];
 	statusId?: string;
@@ -113,4 +126,8 @@ export interface DeleteTaskResponse {
 
 export interface FindAllTaskBacklogResponse {
 	data: TaskItem[];
+	total: number;
+	page: number;
+	pageSize: number;
+	totalPages: number;
 }

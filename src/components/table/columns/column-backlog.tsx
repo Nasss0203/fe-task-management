@@ -1,8 +1,99 @@
 "use client";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+import type { TaskItem } from "@/services/task/type";
 import { ColumnDef } from "@tanstack/react-table";
 import { GripVertical, MoreHorizontal } from "lucide-react";
+
+const priorityClassName = (priorityName?: string | null) => {
+	const priority = priorityName?.trim().toLowerCase();
+
+	if (priority === "high" || priority === "cao") {
+		return "border-red-500/20 bg-red-500/10 text-red-400";
+	}
+
+	if (
+		priority === "medium" ||
+		priority === "normal" ||
+		priority === "trung bình"
+	) {
+		return "border-orange-500/20 bg-orange-500/10 text-orange-400";
+	}
+
+	if (priority === "low" || priority === "thấp") {
+		return "border-emerald-500/20 bg-emerald-500/10 text-emerald-400";
+	}
+
+	return "border-slate-500/20 bg-slate-500/10 text-slate-300";
+};
+
+const statusClassName = (statusName?: string | null) => {
+	const status = statusName?.trim().toLowerCase();
+
+	if (status === "done" || status === "hoàn tất") {
+		return "border-emerald-500/20 bg-emerald-500/10 text-emerald-400";
+	}
+
+	if (
+		status === "in progress" ||
+		status === "progress" ||
+		status === "đang thực hiện"
+	) {
+		return "border-sky-500/20 bg-sky-500/10 text-sky-400";
+	}
+
+	if (status === "todo" || status === "to do" || status === "chưa bắt đầu") {
+		return "border-slate-500/20 bg-slate-500/10 text-slate-300";
+	}
+
+	return "border-zinc-500/20 bg-zinc-500/10 text-zinc-300";
+};
+
+const getAssigneeName = (assignee: TaskItem["assignees"][number]) => {
+	return (
+		assignee.fullName?.trim() ||
+		assignee.username?.trim() ||
+		"Chưa đặt tên"
+	);
+};
+
+const getInitials = (name: string) => {
+	return name
+		.split(" ")
+		.filter(Boolean)
+		.map((word) => word[0])
+		.join("")
+		.slice(0, 2)
+		.toUpperCase();
+};
+
+const formatEstimate = (minutes?: number | null) => {
+	if (!minutes) return "-";
+
+	if (minutes < 60) {
+		return `${minutes}m`;
+	}
+
+	const hours = minutes / 60;
+
+	return Number.isInteger(hours) ? `${hours}h` : `${hours.toFixed(1)}h`;
+};
+
+const formatDate = (value?: string | null) => {
+	if (!value) return "-";
+
+	const date = new Date(value);
+
+	if (Number.isNaN(date.getTime())) {
+		return "-";
+	}
+
+	return new Intl.DateTimeFormat("vi-VN", {
+		day: "2-digit",
+		month: "2-digit",
+	}).format(date);
+};
 
 export const columnsBacklog: ColumnDef<TaskItem>[] = [
 	{
@@ -15,6 +106,8 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 				className='cursor-grab text-muted-foreground'
 			/>
 		),
+		enableSorting: false,
+		enableHiding: false,
 	},
 	{
 		id: "select",
@@ -28,96 +121,135 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 				onCheckedChange={(value) =>
 					table.toggleAllPageRowsSelected(!!value)
 				}
+				aria-label='Chọn tất cả'
 			/>
 		),
 		cell: ({ row }) => (
 			<Checkbox
 				checked={row.getIsSelected()}
 				onCheckedChange={(value) => row.toggleSelected(!!value)}
+				aria-label='Chọn công việc'
 			/>
 		),
+		enableSorting: false,
+		enableHiding: false,
 	},
 	{
-		accessorKey: "key",
-		size: 90,
+		accessorKey: "projectSeq",
+		size: 80,
 		header: "ID",
 		cell: ({ row }) => (
 			<span className='text-sm font-medium text-muted-foreground'>
-				{row.original.key}
+				{row.original.projectSeq ? `#${row.original.projectSeq}` : "-"}
 			</span>
 		),
 	},
 	{
 		accessorKey: "title",
-		size: 300,
+		size: 320,
 		header: "Công việc",
 		cell: ({ row }) => (
-			<div className='font-medium text-foreground'>
-				{row.original.title}
+			<div className='flex min-w-0 flex-col'>
+				<span className='truncate font-medium text-foreground'>
+					{row.original.title}
+				</span>
+				{row.original.description ? (
+					<span className='truncate text-xs text-muted-foreground'>
+						{row.original.description}
+					</span>
+				) : null}
 			</div>
 		),
 	},
 	{
 		accessorKey: "priorityName",
-		size: 140,
+		size: 120,
 		header: "Ưu tiên",
 		cell: ({ row }) => (
 			<span
 				className={cn(
 					"inline-flex rounded-md border px-2 py-0.5 text-xs font-medium",
-					row.original.priorityName === "Cao" &&
-						"border-red-500/20 bg-red-500/10 text-red-400",
-					row.original.priorityName === "Trung bình" &&
-						"border-orange-500/20 bg-orange-500/10 text-orange-400",
-					row.original.priorityName === "Thấp" &&
-						"border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+					priorityClassName(row.original.priorityName),
 				)}
 			>
-				{row.original.priorityName}
+				{row.original.priorityName ?? "None"}
 			</span>
 		),
 	},
 	{
-		accessorKey: "assigneeName",
+		accessorKey: "statusName",
+		size: 130,
+		header: "Trạng thái",
+		cell: ({ row }) => (
+			<span
+				className={cn(
+					"inline-flex rounded-md border px-2 py-0.5 text-xs font-medium",
+					statusClassName(row.original.statusName),
+				)}
+			>
+				{row.original.statusName ?? "None"}
+			</span>
+		),
+	},
+	{
+		accessorKey: "assignees",
 		size: 190,
 		header: "Người phụ trách",
-		cell: ({ row }) => (
-			<div className='flex items-center gap-2'>
-				<div className='flex size-7 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground'>
-					{row.original.assigneeName.charAt(0)}
-				</div>
+		cell: ({ row }) => {
+			const assignees = row.original.assignees ?? [];
 
-				<span className='text-sm'>
-					{row.original.assigneeName || "Chưa giao"}
-				</span>
-			</div>
-		),
+			if (!assignees.length) {
+				return (
+					<span className='text-sm text-muted-foreground'>
+						Chưa giao
+					</span>
+				);
+			}
+
+			return (
+				<div className='flex items-center gap-2'>
+					<div className='flex -space-x-2'>
+						{assignees.slice(0, 3).map((assignee) => {
+							const name = getAssigneeName(assignee);
+
+							return (
+								<div
+									key={assignee.userId}
+									className='flex size-7 items-center justify-center rounded-full border border-[#171717] bg-muted text-[11px] font-semibold text-muted-foreground'
+									title={name}
+								>
+									{getInitials(name)}
+								</div>
+							);
+						})}
+					</div>
+
+					<span className='max-w-28 truncate text-sm'>
+						{getAssigneeName(assignees[0])}
+						{assignees.length > 1 ? ` +${assignees.length - 1}` : ""}
+					</span>
+				</div>
+			);
+		},
 	},
 	{
-		accessorKey: "storyPoint",
-		size: 70,
-		header: "SP",
+		accessorKey: "estimateMinutes",
+		size: 90,
+		header: "Ước tính",
 		cell: ({ row }) => (
 			<span className='font-medium'>
-				{row.original.storyPoint ?? "-"}
+				{formatEstimate(row.original.estimateMinutes)}
 			</span>
 		),
 	},
 	{
-		accessorKey: "labels",
-		size: 180,
-		header: "Nhãn",
+		accessorKey: "dueAt",
+		size: 110,
+		header: "Hạn",
 		cell: ({ row }) => (
-			<div className='flex flex-wrap gap-1'>
-				{row.original.labels.map((label) => (
-					<span
-						key={label}
-						className='rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary'
-					>
-						{label}
-					</span>
-				))}
-			</div>
+			<span className='text-sm text-muted-foreground'>
+				{formatDate(row.original.dueAt)}
+			</span>
 		),
 	},
 	{
@@ -129,242 +261,7 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 				<MoreHorizontal size={16} />
 			</button>
 		),
-	},
-];
-export type TaskItem = {
-	id: string;
-	key: string;
-	title: string;
-	priorityName: "Cao" | "Trung bình" | "Thấp";
-	assigneeName: string;
-	storyPoint: number;
-	labels: string[];
-};
-
-export const fakeBacklogTasks: TaskItem[] = [
-	{
-		id: "1",
-		key: "WEB-101",
-		title: "Thiết kế màn hình đăng nhập",
-		priorityName: "Cao",
-		assigneeName: "Nguyễn A",
-		storyPoint: 5,
-		labels: ["ui"],
-	},
-	{
-		id: "2",
-		key: "WEB-102",
-		title: "Tạo API phân quyền",
-		priorityName: "Cao",
-		assigneeName: "Trần B",
-		storyPoint: 8,
-		labels: ["backend", "api"],
-	},
-	{
-		id: "3",
-		key: "WEB-103",
-		title: "Cập nhật board kéo thả",
-		priorityName: "Trung bình",
-		assigneeName: "Lê C",
-		storyPoint: 3,
-		labels: ["ui"],
-	},
-	{
-		id: "4",
-		key: "WEB-104",
-		title: "Tối ưu dashboard thống kê",
-		priorityName: "Trung bình",
-		assigneeName: "Phạm D",
-		storyPoint: 5,
-		labels: ["dashboard"],
-	},
-	{
-		id: "5",
-		key: "WEB-105",
-		title: "Viết unit test cho API",
-		priorityName: "Thấp",
-		assigneeName: "Trần B",
-		storyPoint: 3,
-		labels: ["backend", "test"],
-	},
-	{
-		id: "6",
-		key: "WEB-106",
-		title: "Thiết lập CI/CD pipeline",
-		priorityName: "Trung bình",
-		assigneeName: "Hoàng E",
-		storyPoint: 5,
-		labels: ["devops"],
-	},
-	{
-		id: "7",
-		key: "WEB-107",
-		title: "Cải thiện hiệu năng trang chủ",
-		priorityName: "Thấp",
-		assigneeName: "Nguyễn A",
-		storyPoint: 2,
-		labels: ["frontend"],
-	},
-	{
-		id: "8",
-		key: "WEB-108",
-		title: "Tích hợp thanh toán VNPAY",
-		priorityName: "Cao",
-		assigneeName: "Lê C",
-		storyPoint: 8,
-		labels: ["api", "payment"],
-	},
-	{
-		id: "9",
-		key: "WEB-109",
-		title: "Tạo màn hình danh sách sprint",
-		priorityName: "Trung bình",
-		assigneeName: "Phạm D",
-		storyPoint: 5,
-		labels: ["sprint", "ui"],
-	},
-	{
-		id: "10",
-		key: "WEB-110",
-		title: "Tạo chức năng tạo sprint mới",
-		priorityName: "Cao",
-		assigneeName: "Trần B",
-		storyPoint: 8,
-		labels: ["backend", "sprint"],
-	},
-	{
-		id: "11",
-		key: "WEB-111",
-		title: "Move task từ backlog vào sprint",
-		priorityName: "Cao",
-		assigneeName: "Lê C",
-		storyPoint: 8,
-		labels: ["sprint", "drag-drop"],
-	},
-	{
-		id: "12",
-		key: "WEB-112",
-		title: "Validate task đã nằm trong sprint khác",
-		priorityName: "Trung bình",
-		assigneeName: "Hoàng E",
-		storyPoint: 3,
-		labels: ["backend"],
-	},
-	{
-		id: "13",
-		key: "WEB-113",
-		title: "Tạo API start sprint",
-		priorityName: "Cao",
-		assigneeName: "Trần B",
-		storyPoint: 5,
-		labels: ["api", "sprint"],
-	},
-	{
-		id: "14",
-		key: "WEB-114",
-		title: "Tạo API complete sprint",
-		priorityName: "Cao",
-		assigneeName: "Trần B",
-		storyPoint: 5,
-		labels: ["api", "sprint"],
-	},
-	{
-		id: "15",
-		key: "WEB-115",
-		title: "Thiết kế empty state cho backlog",
-		priorityName: "Thấp",
-		assigneeName: "Nguyễn A",
-		storyPoint: 2,
-		labels: ["ui"],
-	},
-	{
-		id: "16",
-		key: "WEB-116",
-		title: "Thêm loading skeleton cho bảng task",
-		priorityName: "Thấp",
-		assigneeName: "Phạm D",
-		storyPoint: 2,
-		labels: ["ui", "ux"],
-	},
-	{
-		id: "17",
-		key: "WEB-117",
-		title: "Tối ưu query danh sách task theo project",
-		priorityName: "Trung bình",
-		assigneeName: "Hoàng E",
-		storyPoint: 5,
-		labels: ["backend", "performance"],
-	},
-	{
-		id: "18",
-		key: "WEB-118",
-		title: "Thêm filter theo priority",
-		priorityName: "Trung bình",
-		assigneeName: "Lê C",
-		storyPoint: 3,
-		labels: ["filter", "ui"],
-	},
-	{
-		id: "19",
-		key: "WEB-119",
-		title: "Thêm search task theo title",
-		priorityName: "Trung bình",
-		assigneeName: "Nguyễn A",
-		storyPoint: 3,
-		labels: ["search"],
-	},
-	{
-		id: "20",
-		key: "WEB-120",
-		title: "Thêm sort theo story point",
-		priorityName: "Thấp",
-		assigneeName: "Phạm D",
-		storyPoint: 2,
-		labels: ["table"],
-	},
-	{
-		id: "21",
-		key: "WEB-121",
-		title: "Gắn permission cho sprint planning",
-		priorityName: "Cao",
-		assigneeName: "Trần B",
-		storyPoint: 8,
-		labels: ["rbac", "backend"],
-	},
-	{
-		id: "22",
-		key: "WEB-122",
-		title: "Tạo lịch sử thay đổi sprint",
-		priorityName: "Trung bình",
-		assigneeName: "Hoàng E",
-		storyPoint: 5,
-		labels: ["audit-log"],
-	},
-	{
-		id: "23",
-		key: "WEB-123",
-		title: "Cập nhật responsive cho sprint page",
-		priorityName: "Thấp",
-		assigneeName: "Nguyễn A",
-		storyPoint: 3,
-		labels: ["responsive", "ui"],
-	},
-	{
-		id: "24",
-		key: "WEB-124",
-		title: "Refactor hook useSprint",
-		priorityName: "Trung bình",
-		assigneeName: "Lê C",
-		storyPoint: 5,
-		labels: ["frontend", "refactor"],
-	},
-	{
-		id: "25",
-		key: "WEB-125",
-		title: "Viết tài liệu luồng sprint planning",
-		priorityName: "Thấp",
-		assigneeName: "Phạm D",
-		storyPoint: 2,
-		labels: ["docs"],
+		enableSorting: false,
+		enableHiding: false,
 	},
 ];

@@ -1,27 +1,8 @@
 import { BoardItem } from "@/services/board/type";
+import { useSprints } from "@/hooks/use-sprint";
 import { CalendarDays, ChevronDown, Settings2 } from "lucide-react";
 import { ProviderDragDrop } from "../dnd";
-import {
-	Combobox,
-	ComboboxContent,
-	ComboboxEmpty,
-	ComboboxInput,
-	ComboboxItem,
-	ComboboxList,
-} from "../ui/combobox";
 import { Progress } from "../ui/progress";
-type Priority = "Cao" | "Trung bình" | "Thấp";
-type TaskStatus = "todo" | "progress" | "done";
-
-type Task = {
-	key: string;
-	title: string;
-	priority: Priority;
-	assignee: string;
-	sp: number;
-	labels: string[];
-	status?: TaskStatus;
-};
 
 type SprintProps = {
 	boards: BoardItem[];
@@ -30,40 +11,29 @@ type SprintProps = {
 	sprintId: string;
 };
 
-const frameworks = ["Sprint 1", "Sprint 2", "Sprint 3", "Sprint 4", "Sprint 5"];
+const Sprint = ({ projectId, workspaceId, sprintId }: SprintProps) => {
+	const { sprintsQuery } = useSprints({ workspaceId, projectId, sprintId });
+	const currentSprint = sprintsQuery.data?.data.find(
+		(sprint) => sprint.id === sprintId,
+	);
+	const statusMeta = getStatusMeta(currentSprint?.status);
+	const startAt = formatDate(currentSprint?.startAt);
+	const endAt = formatDate(currentSprint?.endAt);
+	const remainingDays = getRemainingDays(currentSprint?.endAt);
 
-const Sprint = ({ boards, projectId, workspaceId, sprintId }: SprintProps) => {
 	return (
-		<section className='col-span-12 overflow-hidden rounded-xl border border-[#2a2a2a] bg-[#171717] shadow-sm xl:col-span-6'>
-			<div className='border-b border-[#2a2a2a] p-5'>
+		<section className='flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-[#2a2a2a] bg-[#171717] shadow-sm'>
+			<div className='shrink-0 border-b border-[#2a2a2a] p-4'>
 				<div className='flex items-start justify-between gap-3'>
-					<div>
-						<div className='flex items-center gap-2'>
-							<Combobox items={frameworks}>
-								<ComboboxInput
-									value={frameworks[0]}
-									readOnly
-									className='cursor-pointer caret-transparent select-none'
-									onMouseDown={(e) => e.preventDefault()}
-								/>
-								<ComboboxContent>
-									<ComboboxEmpty>
-										No items found.
-									</ComboboxEmpty>
-									<ComboboxList>
-										{(item) => (
-											<ComboboxItem
-												key={item}
-												value={item}
-											>
-												{item}
-											</ComboboxItem>
-										)}
-									</ComboboxList>
-								</ComboboxContent>
-							</Combobox>
-							<span className='rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-300'>
-								Đang diễn ra
+					<div className='min-w-0'>
+						<div className='flex flex-wrap items-center gap-2'>
+							<h3 className='truncate text-base font-bold text-white'>
+								{currentSprint?.name ?? "Sprint hiện tại"}
+							</h3>
+							<span
+								className={`inline-flex h-6 items-center rounded-full border px-2 text-[11px] font-bold ${statusMeta.className}`}
+							>
+								{statusMeta.label}
 							</span>
 						</div>
 
@@ -71,25 +41,25 @@ const Sprint = ({ boards, projectId, workspaceId, sprintId }: SprintProps) => {
 							Mục tiêu sprint
 						</p>
 						<p className='mt-1 text-xs font-medium text-slate-400'>
-							Hoàn thiện phân quyền và cải thiện trải nghiệm quản
-							trị
+							{currentSprint?.goal ||
+								"Chưa có mục tiêu cho sprint này"}
 						</p>
 					</div>
 				</div>
 
-				<div className='mt-5 flex items-center justify-between text-xs font-medium text-slate-400'>
+				<div className='mt-4 flex items-center justify-between text-xs font-medium text-slate-400'>
 					<div className='flex items-center gap-1'>
 						<CalendarDays size={14} />
-						13/05/2024 - 26/05/2024
+						{startAt} - {endAt}
 					</div>
-					<span>6 ngày còn lại</span>
+					<span>{remainingDays}</span>
 				</div>
 
 				<div className='mt-3'>
 					<Progress value={67} />
 				</div>
 
-				<div className='mt-5 grid grid-cols-4 gap-2'>
+				<div className='mt-4 grid grid-cols-4 gap-2'>
 					<StatCard value='18' label='Công việc' />
 					<StatCard
 						value='11'
@@ -105,15 +75,16 @@ const Sprint = ({ boards, projectId, workspaceId, sprintId }: SprintProps) => {
 				</div>
 			</div>
 
-			<div className='h-100 p-5 overflow-auto'>
+			<div className='min-h-0 flex-1 overflow-auto p-4'>
 				<ProviderDragDrop
 					workspaceId={workspaceId}
 					projectId={projectId}
+					sprintId={sprintId}
 					className='w-auto'
 				/>
 			</div>
 
-			<div className='border-t border-[#2a2a2a] p-5'>
+			<div className='shrink-0 border-t border-[#2a2a2a] p-4'>
 				<div className='mb-4'>
 					<div className='flex justify-between text-xs font-semibold text-slate-300'>
 						<span>Tổng SP đã lên kế hoạch</span>
@@ -161,4 +132,67 @@ function StatCard({
 			</div>
 		</div>
 	);
+}
+
+function getStatusMeta(status?: string) {
+	switch (status) {
+		case "ACTIVE":
+			return {
+				label: "Đang diễn ra",
+				className:
+					"border-emerald-500/25 bg-emerald-500/10 text-emerald-300",
+			};
+		case "COMPLETED":
+			return {
+				label: "Đã hoàn thành",
+				className: "border-sky-500/25 bg-sky-500/10 text-sky-300",
+			};
+		case "CANCELLED":
+			return {
+				label: "Đã hủy",
+				className: "border-red-500/25 bg-red-500/10 text-red-300",
+			};
+		default:
+			return {
+				label: "Đã lên kế hoạch",
+				className: "border-amber-500/25 bg-amber-500/10 text-amber-300",
+			};
+	}
+}
+
+function formatDate(value?: Date | string | null) {
+	if (!value) return "--/--/----";
+
+	const date = new Date(value);
+
+	if (Number.isNaN(date.getTime())) {
+		return "--/--/----";
+	}
+
+	return new Intl.DateTimeFormat("vi-VN", {
+		day: "2-digit",
+		month: "2-digit",
+		year: "numeric",
+	}).format(date);
+}
+
+function getRemainingDays(value?: Date | string | null) {
+	if (!value) return "Chưa đặt hạn";
+
+	const endDate = new Date(value);
+
+	if (Number.isNaN(endDate.getTime())) {
+		return "Chưa đặt hạn";
+	}
+
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
+	endDate.setHours(0, 0, 0, 0);
+
+	const days = Math.max(
+		0,
+		Math.ceil((endDate.getTime() - today.getTime()) / 86_400_000),
+	);
+
+	return days === 0 ? "Hết hạn hôm nay" : `${days} ngày còn lại`;
 }

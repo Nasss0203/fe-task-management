@@ -60,7 +60,7 @@ const DialogAddTask = () => {
 	const projectId = currentProjectId as string;
 	const workspaceId = currentWorkspaceId as string;
 
-	const { createTask } = useTask(projectId, workspaceId);
+	const { createTask } = useTask(workspaceId, projectId);
 	const { findAllMember } = useMember({ workspaceId });
 	const { data: taskStatusResponse } = useTaskStatus(workspaceId, projectId);
 	const { user } = useUser();

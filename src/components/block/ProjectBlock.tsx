@@ -66,11 +66,11 @@ const ProjectBlock = ({
 				<div className='flex items-center justify-between'>
 					<div className='flex items-center gap-1  '>
 						<TabsListCustom variant='none'>
-							{availableTabs.map((item) => {
+							{availableTabs.map((item, index) => {
 								return (
 									<TabsTriggerCustom
 										value={item.value}
-										key={item.boardId}
+										key={`${item.value}-${item.boardId ?? "tab"}-${index}`}
 									>
 										<div className='flex items-center gap-1'>
 											<item.icon />

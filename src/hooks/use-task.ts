@@ -12,15 +12,32 @@ import {
 	removeTaskFormSprintApi,
 	updateTaskApi,
 } from "@/services/task/task.service";
-import { BulkUpdateTasksDto, TASK_KEY } from "@/services/task/type";
+import {
+	BulkUpdateTasksDto,
+	FindAllTaskBacklogResponse,
+	FindAllTaskResponse,
+	FindBacklogTasksFilters,
+	TASK_KEY,
+	UpdateTaskDto,
+} from "@/services/task/type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-type UpdateTaskInput = {
+
+type UpdateTaskInput = Omit<UpdateTaskDto, "id"> & {
 	id: string;
-	statusId?: string;
-	position?: number;
+	workspaceId?: string;
+	projectId?: string;
 };
 
-export const useTask = (workspaceId: string, projectId: string) => {
+type TaskCacheSnapshot = {
+	previousTasks: FindAllTaskResponse | undefined;
+	previousBacklog: FindAllTaskBacklogResponse | undefined;
+};
+
+export const useTask = (
+	workspaceId: string,
+	projectId: string,
+	backlogFilters?: FindBacklogTasksFilters,
+) => {
 	const queryClient = useQueryClient();
 	const taskQuery = useQuery({
 		queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
@@ -45,7 +62,17 @@ export const useTask = (workspaceId: string, projectId: string) => {
 	});
 
 	const updateTask = useMutation({
-		mutationFn: ({ id, ...body }: any) => updateTaskApi(id, body),
+		mutationFn: ({
+			id,
+			workspaceId: inputWorkspaceId,
+			projectId: inputProjectId,
+			...body
+		}: UpdateTaskInput) => {
+			void inputWorkspaceId;
+			void inputProjectId;
+
+			return updateTaskApi(id, body);
+		},
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({
 				queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
@@ -61,8 +88,14 @@ export const useTask = (workspaceId: string, projectId: string) => {
 	});
 
 	const findTaskBacklog = useQuery({
-		queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
-		queryFn: () => findAllBacklogTaskApi(workspaceId, projectId),
+		queryKey: [
+			TASK_KEY.TASK_BACKLOG,
+			workspaceId,
+			projectId,
+			backlogFilters,
+		],
+		queryFn: () =>
+			findAllBacklogTaskApi(workspaceId, projectId, backlogFilters),
 		enabled: !!workspaceId && !!projectId,
 	});
 
@@ -157,7 +190,7 @@ export const useTaskMoveSprint = ({
 	};
 
 	// Helper: rollback khi lỗi
-	const rollback = (ctx: any) => {
+	const rollback = (ctx?: TaskCacheSnapshot) => {
 		if (ctx?.previousTasks)
 			queryClient.setQueryData(taskKey, ctx.previousTasks);
 		if (ctx?.previousBacklog)
@@ -177,12 +210,18 @@ export const useTaskMoveSprint = ({
 			const ctx = await cancelAndSnapshot();
 
 			// Cập nhật cache ngay → initialItems không bị stale → không snap back
-			queryClient.setQueryData(taskKey, (old: any) => ({
-				...old,
-				data: old?.data?.map((task: any) =>
-					task.id === taskId ? { ...task, sprintId } : task,
-				),
-			}));
+			queryClient.setQueryData<FindAllTaskResponse>(taskKey, (old) =>
+				old
+					? {
+							...old,
+							data: old.data.map((task) =>
+								task.id === taskId
+									? { ...task, sprintId }
+									: task,
+							),
+						}
+					: old,
+			);
 
 			return ctx;
 		},
@@ -197,12 +236,18 @@ export const useTaskMoveSprint = ({
 		onMutate: async ({ taskId }) => {
 			const ctx = await cancelAndSnapshot();
 
-			queryClient.setQueryData(taskKey, (old: any) => ({
-				...old,
-				data: old?.data?.map((task: any) =>
-					task.id === taskId ? { ...task, sprintId: null } : task,
-				),
-			}));
+			queryClient.setQueryData<FindAllTaskResponse>(taskKey, (old) =>
+				old
+					? {
+							...old,
+							data: old.data.map((task) =>
+								task.id === taskId
+									? { ...task, sprintId: null }
+									: task,
+							),
+						}
+					: old,
+			);
 
 			return ctx;
 		},
@@ -231,14 +276,18 @@ export const useTaskMoveSprint = ({
 		onMutate: async ({ taskId, targetSprintId }) => {
 			const ctx = await cancelAndSnapshot();
 
-			queryClient.setQueryData(taskKey, (old: any) => ({
-				...old,
-				data: old?.data?.map((task: any) =>
-					task.id === taskId
-						? { ...task, sprintId: targetSprintId }
-						: task,
-				),
-			}));
+			queryClient.setQueryData<FindAllTaskResponse>(taskKey, (old) =>
+				old
+					? {
+							...old,
+							data: old.data.map((task) =>
+								task.id === taskId
+									? { ...task, sprintId: targetSprintId }
+									: task,
+							),
+						}
+					: old,
+			);
 
 			return ctx;
 		},

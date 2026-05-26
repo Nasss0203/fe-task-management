@@ -5,9 +5,62 @@ import {
 	CreateTaskResponse,
 	FindAllTaskBacklogResponse,
 	FindAllTaskResponse,
+	FindBacklogTasksFilters,
 	UpdateTaskDto,
 	UpdateTaskResponse,
 } from "./type";
+
+type BacklogApiResponse =
+	| FindAllTaskBacklogResponse
+	| { data: FindAllTaskBacklogResponse };
+
+const isBacklogPage = (
+	payload: BacklogApiResponse,
+): payload is FindAllTaskBacklogResponse => Array.isArray(payload.data);
+
+const normalizeBacklogResponse = (
+	payload: BacklogApiResponse,
+): FindAllTaskBacklogResponse => {
+	const page = isBacklogPage(payload) ? payload : payload.data;
+	const data = Array.isArray(page.data) ? page.data : [];
+
+	return {
+		data,
+		total: page.total ?? data.length,
+		page: page.page ?? 1,
+		pageSize: page.pageSize ?? data.length,
+		totalPages: page.totalPages ?? 1,
+	};
+};
+
+const serializeBacklogFilters = (filters?: FindBacklogTasksFilters) => {
+	if (!filters) return undefined;
+
+	const params: Record<string, string> = {};
+
+	for (const key of ["assigneeId", "statusId", "priorityId"] as const) {
+		const value = filters[key];
+		const values = Array.isArray(value) ? value : value ? [value] : [];
+
+		if (values.length > 0) {
+			params[key] = values.join(",");
+		}
+	}
+
+	if (filters.search?.trim()) {
+		params.search = filters.search.trim();
+	}
+
+	if (filters.page) {
+		params.page = String(filters.page);
+	}
+
+	if (filters.pageSize) {
+		params.pageSize = String(filters.pageSize);
+	}
+
+	return Object.keys(params).length ? params : undefined;
+};
 
 export const findAllTaskApi = async (
 	workspaceId: string,
@@ -30,7 +83,7 @@ export const createTaskApi = async (
 
 export const updateTaskApi = async (
 	id: string,
-	data: UpdateTaskDto,
+	data: Omit<UpdateTaskDto, "id">,
 ): Promise<UpdateTaskResponse> => {
 	const response = await instance.patch<UpdateTaskResponse>(
 		`/tasks/${id}`,
@@ -43,12 +96,16 @@ export const updateTaskApi = async (
 export const findAllBacklogTaskApi = async (
 	workspaceId: string,
 	projectId: string,
+	filters?: FindBacklogTasksFilters,
 ): Promise<FindAllTaskBacklogResponse> => {
-	const response = await instance.get<FindAllTaskBacklogResponse>(
+	const response = await instance.get<BacklogApiResponse>(
 		`/tasks/workspace/${workspaceId}/project/${projectId}/backlog`,
+		{
+			params: serializeBacklogFilters(filters),
+		},
 	);
 
-	return response.data;
+	return normalizeBacklogResponse(response.data);
 };
 
 export const moveTaskToSprintApi = async ({
