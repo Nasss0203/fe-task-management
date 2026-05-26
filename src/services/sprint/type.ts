@@ -38,6 +38,12 @@ export interface CreateSprintDto {
 	name?: string;
 }
 
+export interface SprintParams {
+	workspaceId: string;
+	projectId: string;
+	sprintId: string;
+}
+
 export interface StartSprintDto {
 	name?: string;
 	goal?: string;
@@ -45,15 +51,8 @@ export interface StartSprintDto {
 	endAt?: string;
 }
 
-export interface StartSprintParams {
-	workspaceId: string;
-	projectId: string;
-	sprintId: string;
+export interface StartSprintParams extends SprintParams {
 	data?: StartSprintDto;
 }
 
-export type CompleteSprintParams = {
-	workspaceId?: string;
-	projectId?: string;
-	sprintId: string;
-};
+export interface CompleteSprintParams extends SprintParams {}

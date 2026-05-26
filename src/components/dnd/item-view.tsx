@@ -1,5 +1,6 @@
 "use client";
 
+import { getTaskStatusBackgroundClass } from "@/lib/task-status-style";
 import { cn } from "@/lib/utils";
 import type { TaskItem } from "@/services/task/type";
 import { CalendarDays, Ellipsis, ExternalLink, Pencil } from "lucide-react";
@@ -15,18 +16,6 @@ import {
 } from "../ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Separator } from "../ui/separator";
-
-export const STATUS_STYLE = {
-	todo: {
-		background: "bg-neutral-600/60",
-	},
-	inprogress: {
-		background: "bg-blue-500/20",
-	},
-	done: {
-		background: "bg-emerald-500/30",
-	},
-} as const;
 
 function getPriorityBadgeClass(priority?: string) {
 	const normalizedPriority = priority
@@ -120,19 +109,6 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 		},
 		ref,
 	) => {
-		const normalizedStatus = status
-			.trim()
-			.toLowerCase()
-			.replace(/[\s_-]+/g, "");
-
-		const statusKey: keyof typeof STATUS_STYLE =
-			normalizedStatus === "inprogress"
-				? "inprogress"
-				: normalizedStatus === "done"
-					? "done"
-					: "todo";
-
-		const s = STATUS_STYLE[statusKey];
 		const scheduleLabel = formatScheduleLabel(startAt, dueAt);
 		const hasFooterMeta =
 			Boolean(scheduleLabel) || Boolean(assignees?.length);
@@ -196,7 +172,7 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 				className={cn(
 					"w-full border border-neutral-400 px-4 py-2 rounded-lg bg-stone-100 dark:border-none cursor-pointer hover:opacity-70 transition-opacity",
 					"select-none touch-none",
-					s.background,
+					getTaskStatusBackgroundClass(status),
 					isOverlay && "shadow-lg",
 					className,
 				)}

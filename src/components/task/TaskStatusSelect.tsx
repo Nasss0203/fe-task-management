@@ -1,5 +1,7 @@
 "use client";
 
+import { getTaskStatusStyle } from "@/lib/task-status-style";
+import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
 
 type TaskStatusOption = {
@@ -16,18 +18,6 @@ type TaskStatusSelectProps = {
 	onChange?: (value: string) => void;
 };
 
-const getColor = (color?: string | null) => {
-	return color || "#737373";
-};
-
-const withAlpha = (color: string, alpha: string) => {
-	if (color.startsWith("#") && color.length === 7) {
-		return `${color}${alpha}`;
-	}
-
-	return color;
-};
-
 const TaskStatusSelect = ({
 	statuses,
 	value,
@@ -36,6 +26,10 @@ const TaskStatusSelect = ({
 	const safeStatuses = Array.isArray(statuses) ? statuses : [];
 
 	const selected = safeStatuses.find((item) => item.id === value);
+	const selectedStyle = getTaskStatusStyle(
+		selected?.name,
+		selected?.isDone,
+	);
 
 	return (
 		<div
@@ -44,22 +38,17 @@ const TaskStatusSelect = ({
 		>
 			<Select value={value} onValueChange={onChange}>
 				<SelectTrigger
-					className='h-8 w-fit min-w-37.5 rounded-full border px-3 py-1 text-sm font-semibold shadow-none focus:ring-0'
-					style={{
-						backgroundColor: withAlpha(
-							getColor(selected?.color),
-							"26",
-						),
-						borderColor: withAlpha(getColor(selected?.color), "55"),
-						color: selected?.color || "#e5e5e5",
-					}}
+					className={cn(
+						"h-8 w-fit min-w-37.5 rounded-full border px-3 py-1 text-sm font-semibold shadow-none focus:ring-0",
+						selectedStyle.badge,
+					)}
 				>
 					<div className='flex items-center gap-2'>
 						<span
-							className='size-2 rounded-full'
-							style={{
-								backgroundColor: getColor(selected?.color),
-							}}
+							className={cn(
+								"size-2 rounded-full",
+								selectedStyle.dot,
+							)}
 						/>
 
 						<span>{selected?.name || "Chọn trạng thái"}</span>
@@ -72,7 +61,10 @@ const TaskStatusSelect = ({
 					className='z-[9999] min-w-45 rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-xl'
 				>
 					{safeStatuses.map((status) => {
-						const color = getColor(status.color);
+						const style = getTaskStatusStyle(
+							status.name,
+							status.isDone,
+						);
 
 						return (
 							<SelectItem
@@ -82,10 +74,10 @@ const TaskStatusSelect = ({
 							>
 								<div className='flex items-center gap-2'>
 									<span
-										className='size-2 rounded-full'
-										style={{
-											backgroundColor: color,
-										}}
+										className={cn(
+											"size-2 rounded-full",
+											style.dot,
+										)}
 									/>
 
 									<span>{status.name}</span>

@@ -1,6 +1,7 @@
 "use client";
 
 import { ProjectBlock } from "@/components/block";
+import type { AvailableTabItem } from "@/components/block/ProjectBlock";
 import { BOARD_VIEW_CONFIG } from "@/components/board/view-board";
 import { useBoards } from "@/hooks/use-board";
 import { usePage } from "@/hooks/use-page";
@@ -24,17 +25,9 @@ const RestPage = () => {
 	const page = pageData?.data;
 	const workspaceId = page?.workspace_id;
 
-	const blockId = useMemo(() => {
-		if (!page?.blocks?.length || !projectId) return undefined;
-
-		const block = page.blocks.find((block: any) =>
-			block.data_config?.some(
-				(config: any) => config.project_id === projectId,
-			),
-		);
-
-		return block?.id;
-	}, [page?.blocks, projectId]);
+	const blockId = page?.blocks?.find((block) =>
+		block.data_config?.some((config) => config.project_id === projectId),
+	)?.id;
 
 	const { setCurrentBoardId } = useProjectSelectionStore();
 
@@ -47,9 +40,12 @@ const RestPage = () => {
 		projectId,
 	});
 
-	const boards: BoardItem[] = findBoard.data?.data ?? [];
+	const boards = useMemo<BoardItem[]>(
+		() => findBoard.data?.data ?? [],
+		[findBoard.data?.data],
+	);
 
-	const availableTabs = useMemo(() => {
+	const availableTabs = useMemo<AvailableTabItem[]>(() => {
 		return boards
 			.filter((board) => {
 				const config = BOARD_VIEW_CONFIG[board.viewType];
@@ -62,25 +58,18 @@ const RestPage = () => {
 					icon: config.icon,
 					type: config.label,
 					value: board.viewType,
+					boardId: board.id,
 				};
 			});
 	}, [boards]);
 
-	useEffect(() => {
-		if (!availableTabs.length) return;
-
-		const isActiveTabValid = availableTabs.some(
-			(tab) => tab.value === activeTab,
-		);
-
-		if (!isActiveTabValid) {
-			setActiveTab(availableTabs[0].value);
-		}
-	}, [availableTabs, activeTab]);
+	const activeTabValue = availableTabs.some((tab) => tab.value === activeTab)
+		? activeTab
+		: (availableTabs[0]?.value ?? activeTab);
 
 	const activeBoard = useMemo(() => {
-		return boards.find((board) => board.viewType === activeTab);
-	}, [boards, activeTab]);
+		return boards.find((board) => board.viewType === activeTabValue);
+	}, [boards, activeTabValue]);
 
 	useEffect(() => {
 		if (!activeBoard?.id) return;
@@ -90,13 +79,13 @@ const RestPage = () => {
 	if (!workspaceId || !projectId || !blockId) return null;
 
 	return (
-		<div className=' min-h-screen px-10 pb-10'>
+		<div className='min-h-0 flex-1 overflow-y-auto px-10 pb-10'>
 			<ProjectBlock
 				context='project'
 				blockId={blockId}
 				projectId={projectId}
 				workspaceId={workspaceId}
-				activeTab={activeTab}
+				activeTab={activeTabValue}
 				availableTabs={availableTabs}
 				boards={boards}
 				activeBoard={activeBoard}

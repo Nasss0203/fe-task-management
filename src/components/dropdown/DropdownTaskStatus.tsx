@@ -1,4 +1,8 @@
-import { useTask, useTaskStatus } from "@/hooks/use-task";
+import {
+	getTaskStatusStyle,
+	normalizeTaskStatusName,
+} from "@/lib/task-status-style";
+import { cn } from "@/lib/utils";
 import { Fragment, useMemo } from "react";
 import {
 	DropdownMenuContentV2,
@@ -9,6 +13,7 @@ import {
 	DropdownMenuTriggerV2,
 	DropdownMenuV2,
 } from "./dropdown-custom";
+import { useTask, useTaskStatus } from "@/hooks/use-task";
 
 type DropdownTaskStatusProps = {
 	workspaceId: string;
@@ -17,25 +22,26 @@ type DropdownTaskStatusProps = {
 	taskId: string;
 };
 
-const normalizeStatusName = (value: string) =>
-	value
-		.trim()
-		.toLowerCase()
-		.replace(/[\s_-]+/g, "");
-
-const hexToRgba = (hex: string, alpha = 0.2) => {
-	const cleanHex = hex.replace("#", "");
-
-	if (cleanHex.length !== 6) {
-		return `rgba(148, 163, 184, ${alpha})`;
-	}
-
-	const r = parseInt(cleanHex.slice(0, 2), 16);
-	const g = parseInt(cleanHex.slice(2, 4), 16);
-	const b = parseInt(cleanHex.slice(4, 6), 16);
-
-	return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+type TaskStatusPillProps = {
+	name: string;
+	isDone?: boolean;
 };
+
+function TaskStatusPill({ name, isDone }: TaskStatusPillProps) {
+	const style = getTaskStatusStyle(name, isDone);
+
+	return (
+		<div
+			className={cn(
+				"inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium",
+				style.badge,
+			)}
+		>
+			<span className={cn("size-2 rounded-full", style.dot)} />
+			<span>{name || style.label}</span>
+		</div>
+	);
+}
 
 const DropdownTaskStatus = ({
 	projectId,
@@ -48,17 +54,18 @@ const DropdownTaskStatus = ({
 		updateTask: { mutateAsync },
 	} = useTask(workspaceId, projectId);
 
-	const statuses = taskStatusQuery.data?.data ?? [];
+	const statuses = useMemo(
+		() => taskStatusQuery.data?.data ?? [],
+		[taskStatusQuery.data?.data],
+	);
 
 	const currentStatus = useMemo(() => {
 		return statuses.find(
 			(item) =>
-				normalizeStatusName(item.name) ===
-				normalizeStatusName(statusName),
+				normalizeTaskStatusName(item.name) ===
+				normalizeTaskStatusName(statusName),
 		);
 	}, [statuses, statusName]);
-
-	const currentColor = currentStatus?.color ?? "#94A3B8";
 
 	const handleUpdateTask = async (nextStatusId: string) => {
 		if (!taskId) return;
@@ -78,29 +85,19 @@ const DropdownTaskStatus = ({
 	return (
 		<DropdownMenuV2>
 			<DropdownMenuTriggerV2 className='cursor-pointer'>
-				<span
-					className='rounded-full px-3 py-1 text-sm font-medium'
-					style={{
-						backgroundColor: hexToRgba(currentColor, 0.2),
-						color: currentColor,
-					}}
-				>
-					{statusName}
-				</span>
+				<TaskStatusPill
+					name={currentStatus?.name ?? statusName}
+					isDone={currentStatus?.isDone}
+				/>
 			</DropdownMenuTriggerV2>
 
 			<DropdownMenuContentV2 className='w-64'>
 				<DropdownMenuGroupV2>
 					<DropdownMenuItemV2>
-						<div
-							className='rounded-full px-3 py-1 text-sm font-medium'
-							style={{
-								backgroundColor: hexToRgba(currentColor, 0.2),
-								color: currentColor,
-							}}
-						>
-							{statusName}
-						</div>
+						<TaskStatusPill
+							name={currentStatus?.name ?? statusName}
+							isDone={currentStatus?.isDone}
+						/>
 					</DropdownMenuItemV2>
 				</DropdownMenuGroupV2>
 
@@ -118,18 +115,10 @@ const DropdownTaskStatus = ({
 							<DropdownMenuItemV2
 								onClick={() => handleUpdateTask(status.id)}
 							>
-								<div
-									className='rounded-full px-3 py-1 text-sm font-medium'
-									style={{
-										backgroundColor: hexToRgba(
-											status.color,
-											0.2,
-										),
-										color: status.color,
-									}}
-								>
-									{status.name}
-								</div>
+								<TaskStatusPill
+									name={status.name}
+									isDone={status.isDone}
+								/>
 							</DropdownMenuItemV2>
 						</Fragment>
 					))}

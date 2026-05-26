@@ -6,11 +6,9 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { WorkspaceTopHeader } from "@/components/workspaces/WorkspaceHeader";
 import WorkspaceOverview from "@/components/workspaces/WorkspaceOverview";
 import { usePage } from "@/hooks/use-page";
-import { usePageBlock } from "@/hooks/use-pageBlock";
 import { PageBlockItem } from "@/services/page_block/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { BarChart3, List } from "lucide-react";
-import { useEffect, useRef } from "react";
 
 const SlugPage = () => {
 	const { currentWorkspaceId } = useProjectSelectionStore();
@@ -19,19 +17,8 @@ const SlugPage = () => {
 		pages: { data, isLoading },
 	} = usePage();
 
-	const {
-		updatePageBlock: { mutate },
-	} = usePageBlock();
-
 	const page = data?.data;
 	const blocks: PageBlockItem[] = page?.blocks ?? [];
-
-	const initializedRef = useRef(false);
-
-	useEffect(() => {
-		if (!blocks.length || initializedRef.current) return;
-		initializedRef.current = true;
-	}, [blocks]);
 
 	if (isLoading) {
 		return (
@@ -44,14 +31,14 @@ const SlugPage = () => {
 	return (
 		<Tabs
 			defaultValue='summary'
-			className='flex min-h-screen flex-col pb-10'
+			className='flex min-h-0 flex-1 flex-col overflow-hidden'
 		>
 			<WorkspaceTopHeader
 				workspaceName={page?.title}
 				workspaceId={workspaceId}
 			/>
 
-			<div className='border-b border-border'>
+			<div className='shrink-0 border-b border-border'>
 				<TabsListCustom
 					variant='line'
 					className='h-10 bg-transparent p-0'
@@ -68,7 +55,7 @@ const SlugPage = () => {
 				</TabsListCustom>
 			</div>
 
-			<div className='flex-1 px-10 py-3'>
+			<div className='min-h-0 flex-1 overflow-y-auto px-10 py-3 pb-10'>
 				<TabsContent value='summary' className='mt-0'>
 					<WorkspaceOverview workspaceSlug={page?.slug as string} />
 				</TabsContent>

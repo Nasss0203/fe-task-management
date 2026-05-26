@@ -53,9 +53,6 @@ export function DrawerItemView({
 						<div className='space-y-6'>
 							<div className='space-y-5'>
 								<TaskStatusField
-									currentStatusColor={
-										detail.display.currentStatusColor
-									}
 									currentStatusName={
 										detail.display.currentStatusName
 									}

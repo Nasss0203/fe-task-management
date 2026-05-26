@@ -1,6 +1,7 @@
 "use client";
 
 import { Checkbox } from "@/components/ui/checkbox";
+import { getTaskStatusBadgeClass } from "@/lib/task-status-style";
 import { cn } from "@/lib/utils";
 import type { TaskItem } from "@/services/task/type";
 import { ColumnDef } from "@tanstack/react-table";
@@ -30,9 +31,10 @@ const priorityClassName = (priorityName?: string | null) => {
 
 const statusClassName = (statusName?: string | null) => {
 	const status = statusName?.trim().toLowerCase();
+	const sharedClassName = getTaskStatusBadgeClass(statusName);
 
 	if (status === "done" || status === "hoàn tất") {
-		return "border-emerald-500/20 bg-emerald-500/10 text-emerald-400";
+		return sharedClassName;
 	}
 
 	if (
@@ -40,14 +42,14 @@ const statusClassName = (statusName?: string | null) => {
 		status === "progress" ||
 		status === "đang thực hiện"
 	) {
-		return "border-sky-500/20 bg-sky-500/10 text-sky-400";
+		return sharedClassName;
 	}
 
 	if (status === "todo" || status === "to do" || status === "chưa bắt đầu") {
-		return "border-slate-500/20 bg-slate-500/10 text-slate-300";
+		return sharedClassName;
 	}
 
-	return "border-zinc-500/20 bg-zinc-500/10 text-zinc-300";
+	return sharedClassName;
 };
 
 const getAssigneeName = (assignee: TaskItem["assignees"][number]) => {

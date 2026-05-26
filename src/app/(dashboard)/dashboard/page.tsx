@@ -182,7 +182,7 @@ function SectionCard({
 
 export default function Home() {
 	return (
-		<main className='flex flex-1 flex-col gap-6'>
+		<main className='flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pb-10'>
 			<section className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
 				<div>
 					<h1 className='text-3xl font-semibold tracking-tight'>

@@ -15,6 +15,8 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { getTaskStatusStyle } from "@/lib/task-status-style";
+import { cn } from "@/lib/utils";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -66,7 +68,10 @@ const SprintWorkspaceSection = ({
 	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
 	const { sprintsQuery } = useSprints({ workspaceId, projectId });
-	const sprints = sprintsQuery.data?.data ?? [];
+	const sprints = useMemo(
+		() => sprintsQuery.data?.data ?? [],
+		[sprintsQuery.data?.data],
+	);
 
 	const tasks = useMemo<SprintWorkspaceTask[]>(() => {
 		return sprints.flatMap((sprint) =>
@@ -130,14 +135,20 @@ const SprintWorkspaceSection = ({
 				header: "Status",
 				cell: ({ row }) => {
 					const status = row.original.status;
+					const statusStyle = getTaskStatusStyle(status?.name);
 
 					return (
-						<span className='inline-flex w-fit items-center gap-1.5 rounded-full border bg-muted/40 px-2.5 py-1 text-xs font-medium'>
+						<span
+							className={cn(
+								"inline-flex w-fit items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
+								statusStyle.badge,
+							)}
+						>
 							<span
-								className='size-2 rounded-full bg-muted-foreground'
-								style={{
-									backgroundColor: status?.color ?? undefined,
-								}}
+								className={cn(
+									"size-2 rounded-full",
+									statusStyle.dot,
+								)}
 							/>
 							{status?.name ?? "No status"}
 						</span>

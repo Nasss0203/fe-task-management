@@ -222,7 +222,6 @@ const ProviderDragDrop = ({
 								id={status.id}
 								statusId={status.id}
 								statusName={status.name}
-								statusColor={status.color}
 								isDone={status.isDone}
 								onAddTask={() => handleAddTask(status.id)}
 								className={className}

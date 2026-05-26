@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { getTaskStatusStyle } from "@/lib/task-status-style";
 import type { TaskStatusItem } from "@/services/task-status/type";
 import {
 	CalendarDays,
@@ -20,7 +21,7 @@ import { Calendar } from "../../ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
 import { Textarea } from "../../ui/textarea";
 import { DetailRow } from "./task-detail-row";
-import type { LocalAttachment, MemberOption } from "./task-detail-types";
+import type { LocalAttachment } from "./task-detail-types";
 import {
 	formatDateLabel,
 	getPriorityBadgeClass,
@@ -28,7 +29,6 @@ import {
 } from "./task-detail-utils";
 
 type TaskStatusFieldProps = {
-	currentStatusColor: string;
 	currentStatusName: string;
 	isUpdatingTask: boolean;
 	open: boolean;
@@ -64,16 +64,6 @@ type TaskScheduleFieldProps = {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	onSelect: (selectedDate?: DateRange) => Promise<void> | void;
-};
-
-type TaskAssigneeFieldProps = {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
-	isUpdatingTask: boolean;
-	selectedMembers: MemberOption[];
-	members: MemberOption[];
-	selectedAssigneeIds: string[];
-	onToggleAssignee: (memberId: string) => Promise<void> | void;
 };
 
 type TaskTagsFieldProps = {
@@ -138,7 +128,6 @@ function AttachmentCard({ attachment }: { attachment: LocalAttachment }) {
 }
 
 export function TaskStatusField({
-	currentStatusColor,
 	currentStatusName,
 	isUpdatingTask,
 	open,
@@ -147,6 +136,16 @@ export function TaskStatusField({
 	selectedStatusId,
 	onSelect,
 }: TaskStatusFieldProps) {
+	const currentStatus = statuses.find(
+		(status) =>
+			status.id === selectedStatusId ||
+			normalizeText(status.name) === normalizeText(currentStatusName),
+	);
+	const currentStatusStyle = getTaskStatusStyle(
+		currentStatus?.name ?? currentStatusName,
+		currentStatus?.isDone,
+	);
+
 	return (
 		<DetailRow icon={Circle} label='Status'>
 			<Popover open={open} onOpenChange={onOpenChange}>
@@ -156,12 +155,11 @@ export function TaskStatusField({
 						disabled={isUpdatingTask}
 						className='inline-flex items-center gap-2 rounded-full border border-transparent px-0 py-1 text-left text-[15px] font-semibold text-foreground transition-colors hover:text-foreground/80 disabled:opacity-60 cursor-pointer'
 					>
-						<Circle
-							className='size-3.5'
-							style={{
-								color: currentStatusColor,
-							}}
-							strokeWidth={2.6}
+						<span
+							className={cn(
+								"size-2.5 rounded-full",
+								currentStatusStyle.dot,
+							)}
 						/>
 						<span>{currentStatusName}</span>
 						<ChevronDown className='size-4 text-muted-foreground' />
@@ -177,6 +175,10 @@ export function TaskStatusField({
 					</div>
 					<div className='space-y-1'>
 						{statuses.map((status) => {
+							const statusStyle = getTaskStatusStyle(
+								status.name,
+								status.isDone,
+							);
 							const active =
 								status.id === selectedStatusId ||
 								normalizeText(status.name) ===
@@ -195,12 +197,11 @@ export function TaskStatusField({
 											"bg-accent text-accent-foreground",
 									)}
 								>
-									<Circle
-										className='size-3.5 shrink-0'
-										style={{
-											color: status.color,
-										}}
-										strokeWidth={2.6}
+									<span
+										className={cn(
+											"size-2.5 shrink-0 rounded-full",
+											statusStyle.dot,
+										)}
 									/>
 									<div className='flex-1 font-medium text-foreground'>
 										{status.name}

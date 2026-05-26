@@ -1,48 +1,15 @@
 "use client";
 
+import { getTaskStatusStyle } from "@/lib/task-status-style";
 import { cn } from "@/lib/utils";
 import { useDroppable } from "@dnd-kit/react";
 import { Ellipsis, Plus } from "lucide-react";
-
-const STATUS_STYLE: Record<
-	string,
-	{
-		dot: string;
-		badge: string;
-		label: string;
-		background: string;
-		ring?: string;
-	}
-> = {
-	todo: {
-		dot: "bg-[#6B778C]",
-		badge: "bg-neutral-700/60 text-neutral-100",
-		label: "Chưa bắt đầu",
-		background: "bg-neutral-600/30",
-		ring: "ring-neutral-400/40",
-	},
-	inProgress: {
-		dot: "bg-sky-400",
-		badge: "bg-sky-500/20 text-sky-100",
-		label: "Đang thực hiện",
-		background: "bg-blue-500/20",
-		ring: "ring-sky-400/40",
-	},
-	done: {
-		dot: "bg-emerald-400",
-		badge: "bg-emerald-500/15 text-emerald-100",
-		label: "Hoàn tất",
-		background: "bg-emerald-500/20",
-		ring: "ring-emerald-400/40",
-	},
-};
 
 type Props = {
 	id: string;
 	children: React.ReactNode;
 	statusId: string;
 	statusName: string;
-	statusColor?: string;
 	isDone?: boolean;
 	onAddTask?: (statusId: string) => void;
 	className?: string;
@@ -53,7 +20,6 @@ export default function ColumnDnd({
 	children,
 	statusId,
 	statusName,
-	statusColor,
 	isDone,
 	onAddTask,
 	className,
@@ -64,19 +30,7 @@ export default function ColumnDnd({
 		accept: ["item"],
 	});
 
-	const normalizedStatus = statusName
-		.trim()
-		.toLowerCase()
-		.replace(/[\s_-]+/g, "");
-
-	const statusKey: keyof typeof STATUS_STYLE =
-		normalizedStatus === "inprogress"
-			? "inProgress"
-			: normalizedStatus === "done"
-				? "done"
-				: "todo";
-
-	const s = STATUS_STYLE[statusKey];
+	const s = getTaskStatusStyle(statusName, isDone);
 
 	return (
 		<div className='flex flex-col'>
@@ -84,7 +38,7 @@ export default function ColumnDnd({
 				ref={ref}
 				className={cn(
 					"w-80 rounded-md p-4 flex flex-col gap-y-3 group",
-					s.background,
+					s.columnBackground,
 					isDropTarget && cn("ring-2", s.ring),
 					className,
 				)}
@@ -96,17 +50,10 @@ export default function ColumnDnd({
 							s.badge,
 						)}
 					>
-						<div
-							className={cn("w-2 h-2 rounded-full", s.dot)}
-							style={
-								statusColor
-									? { backgroundColor: statusColor }
-									: undefined
-							}
-						/>
+						<div className={cn("w-2 h-2 rounded-full", s.dot)} />
 						<div className='text-xs'>
-							{s.label}
-							{isDone ? " • Done" : ""}
+							{statusName || s.label}
+							{isDone ? " - Done" : ""}
 						</div>
 					</div>
 

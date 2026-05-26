@@ -4,6 +4,8 @@ import {
 	CompleteSprintParams,
 	CreateSprintDto,
 	FindAllSprintResponse,
+	SprintItem,
+	SprintParams,
 	StartSprintParams,
 } from "./type";
 
@@ -48,7 +50,6 @@ export const startSprintApi = async (params: StartSprintParams) => {
 		`/sprints/workspaces/${workspaceId}/projects/${projectId}/sprints/${sprintId}/start`,
 		data ?? {},
 	);
-	console.log("🚀 ~ response~startSprintApi", response.data);
 
 	return response.data;
 };
@@ -61,4 +62,18 @@ export const completeSprintApi = async (params: CompleteSprintParams) => {
 	);
 
 	return response.data;
+};
+
+export const findSprint = {
+	findSprintDetail: async (
+		param: SprintParams,
+	): Promise<ApiResponse<SprintItem>> => {
+		const { projectId, sprintId, workspaceId } = param;
+		const { data } = await instance.get<ApiResponse<SprintItem>>(
+			`/sprints/workspaces/${workspaceId}/projects/${projectId}/sprint/${sprintId}/detail`,
+		);
+		console.log("🚀 ~ sprint~", data);
+
+		return data;
+	},
 };

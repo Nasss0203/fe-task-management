@@ -16,7 +16,6 @@ export function useTaskDetail(task: TaskItem) {
 
 	const currentStatusName =
 		fields.status.current?.name ?? task.statusName ?? "No status";
-	const currentStatusColor = fields.status.current?.color ?? "#6366F1";
 	const priorityName =
 		fields.priority.current?.name ?? task.priorityName ?? "No priority";
 	const currentPriorityColor = fields.priority.current?.color ?? "#71717A";
@@ -40,7 +39,6 @@ export function useTaskDetail(task: TaskItem) {
 		isUpdatingTask: fields.isUpdatingTask,
 		display: {
 			currentStatusName,
-			currentStatusColor,
 			priorityName,
 			currentPriorityColor,
 		},

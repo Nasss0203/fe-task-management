@@ -13,7 +13,7 @@ export const WorkspaceTopHeader = ({
 	workspaceId,
 }: WorkspaceTopHeaderProps) => {
 	return (
-		<div className=' pt-4'>
+		<div className='shrink-0 pt-4'>
 			<div className='mb-3 flex items-center justify-between'>
 				<div className='flex flex-col gap-2'>
 					<div className='text-sm text-muted-foreground'>

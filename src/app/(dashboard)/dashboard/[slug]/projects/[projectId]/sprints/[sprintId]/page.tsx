@@ -2,6 +2,7 @@
 
 import BacklogSprint from "@/components/backlog/BacklogSprint";
 import Sprint from "@/components/spints/Sprint";
+import { useSprints } from "@/features/sprint/hooks/useSprints";
 import { useBoards } from "@/hooks/use-board";
 import { usePage } from "@/hooks/use-page";
 import { BoardItem } from "@/services/board/type";
@@ -23,7 +24,7 @@ const SprintPage = () => {
 		pages: { data: pageData },
 	} = usePage();
 
-	const workspaceId = pageData?.data?.workspace_id;
+	const workspaceId = pageData?.data?.workspace_id as string;
 
 	const { setCurrentWorkspaceId, setCurrentProjectId } =
 		useProjectSelectionStore();
@@ -32,6 +33,9 @@ const SprintPage = () => {
 		workspaceId,
 		projectId,
 	});
+	const { sprint } = useSprints({ projectId, sprintId, workspaceId });
+
+	const sprintItem = sprint?.data;
 
 	const boards: BoardItem[] = findBoard.data?.data ?? [];
 
@@ -45,10 +49,10 @@ const SprintPage = () => {
 	if (!workspaceId || !projectId || !sprintId) return null;
 
 	return (
-		<div className='flex h-[calc(100dvh-6.5rem)] min-h-0 flex-col overflow-hidden pb-4'>
+		<div className='flex min-h-0 flex-1 flex-col overflow-hidden pb-4'>
 			<div className='mb-4 flex shrink-0 flex-col gap-1'>
 				<h2 className='text-2xl font-bold tracking-tight text-white'>
-					Sprint Planning
+					{sprintItem?.name}
 				</h2>
 				<p className='text-sm font-medium text-slate-400'>
 					Lập kế hoạch sprint từ backlog và theo dõi tiến độ sprint
