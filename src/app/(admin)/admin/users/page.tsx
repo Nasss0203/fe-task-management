@@ -5,7 +5,7 @@ import { UserFilterBar } from "@/components/admin/filters/user-filter-bar";
 import { UserAdminHeader } from "@/components/admin/header/user-admin-header";
 import { UsersOverview } from "@/components/admin/overview/user-overview-cards";
 import { UserTable } from "@/components/admin/table/user-table";
-import { useAdminUsers } from "@/hooks/admin/use-admin-users";
+import { useAdminUsers } from "@/features/admin/modules/users/hooks/useAdminUsers";
 import type {
 	AdminFindAllUserQuery,
 	AdminSystemRole,

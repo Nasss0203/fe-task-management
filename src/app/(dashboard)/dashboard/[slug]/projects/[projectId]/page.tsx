@@ -3,8 +3,8 @@
 import { ProjectBlock } from "@/components/block";
 import type { AvailableTabItem } from "@/components/block/ProjectBlock";
 import { BOARD_VIEW_CONFIG } from "@/components/board/view-board";
-import { useBoards } from "@/hooks/use-board";
-import { usePage } from "@/hooks/use-page";
+import { useBoards } from "@/features/board/hooks/useBoards";
+import { usePage } from "@/features/page/hooks/usePage";
 import { BoardItem, BoardViewType } from "@/services/board/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useParams } from "next/navigation";

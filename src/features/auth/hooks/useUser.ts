@@ -1,6 +1,6 @@
 "use client";
 import { GetMeResponse } from "@/services/auth/type";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export type User = {
 	id: string;
@@ -12,16 +12,16 @@ export type User = {
 };
 
 export const useUser = () => {
-	const [user, setUser] = useState<GetMeResponse>();
-
-	useEffect(() => {
+	const [user, setUser] = useState<GetMeResponse | undefined>(() => {
 		if (typeof window !== "undefined") {
 			const rawUser = localStorage.getItem("user");
 			if (rawUser) {
-				setUser(JSON.parse(rawUser));
+				return JSON.parse(rawUser);
 			}
 		}
-	}, []);
+
+		return undefined;
+	});
 
 	return { user, setUser };
 };

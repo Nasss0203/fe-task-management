@@ -3,7 +3,7 @@
 import { getAssigneeName } from "@/components/drawer/task-detail/task-detail-utils";
 import { useAssign } from "@/features/assign/hooks/useAssign";
 import type { MemberOption } from "@/features/assign/types/type";
-import { useMember } from "@/hooks/use-member";
+import { useMember } from "@/features/member/hooks/useMember";
 import type { GetMeResponse } from "@/services/auth/type";
 import type { TaskItem } from "@/services/task/type";
 import * as React from "react";

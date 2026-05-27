@@ -31,7 +31,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 
-import { useSprints } from "@/hooks/use-sprint";
+import { useSprints } from "@/features/sprint/hooks/useSprint";
 
 type SprintTaskTableProps = {
 	workspaceId?: string;

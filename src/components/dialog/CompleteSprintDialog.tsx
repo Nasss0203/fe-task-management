@@ -18,7 +18,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { useSprints } from "@/hooks/use-sprint";
+import { useSprints } from "@/features/sprint/hooks/useSprint";
 import { cn } from "@/lib/utils";
 
 type CompleteSprintDialogProps = {

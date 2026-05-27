@@ -14,7 +14,7 @@ import {
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { useNotifications } from "@/hooks/use-notification";
+import { useNotifications } from "@/features/notification/hooks/useNotifications";
 import { NotificationType } from "@/services/notification/type";
 
 const getNotificationIcon = (type: NotificationType) => {

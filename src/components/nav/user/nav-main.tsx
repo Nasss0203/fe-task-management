@@ -9,7 +9,7 @@ import {
 
 import ProjectSidebarItem from "@/components/sidebar/user/ProjectSidebarItem";
 import WorkspaceDropdown from "@/components/workspaces/DropdownWorkspace";
-import { useWorkspace } from "@/hooks/use-workspace";
+import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";
 import { findProjectByWorkspaceIdApi } from "@/services/project/project.service";
 
 import { PROJECT_KEY, type ProjectItems } from "@/services/project/type";

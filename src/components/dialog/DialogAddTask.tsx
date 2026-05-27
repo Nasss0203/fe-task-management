@@ -21,9 +21,9 @@ import {
 	DialogV2,
 } from "./dialog-custom";
 
-import { useMember } from "@/hooks/use-member";
-import { useTask, useTaskStatus } from "@/hooks/use-task";
-import { useUser } from "@/hooks/use-user";
+import { useMember } from "@/features/member/hooks/useMember";
+import { useTask, useTaskStatus } from "@/features/task/hooks/useTask";
+import { useUser } from "@/features/auth/hooks/useUser";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useEffect, useRef, useState } from "react";
 import { DateRange } from "react-day-picker";

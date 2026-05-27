@@ -1,5 +1,5 @@
 "use client";
-import { usePageBlock } from "@/hooks/use-pageBlock";
+import { usePageBlock } from "@/features/page-block/hooks/usePageBlock";
 import { PageBlockItem } from "@/services/page_block/type";
 import { GripVertical, Plus } from "lucide-react";
 import DropdownMenu from "../dropdown/DropdownMenu";

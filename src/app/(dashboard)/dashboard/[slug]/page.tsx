@@ -5,7 +5,7 @@ import { TabsListCustom, TabsTriggerCustom } from "@/components/tabs";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { WorkspaceTopHeader } from "@/components/workspaces/WorkspaceHeader";
 import WorkspaceOverview from "@/components/workspaces/WorkspaceOverview";
-import { usePage } from "@/hooks/use-page";
+import { usePage } from "@/features/page/hooks/usePage";
 import { PageBlockItem } from "@/services/page_block/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { BarChart3, List } from "lucide-react";

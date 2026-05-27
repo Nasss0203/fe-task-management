@@ -1,7 +1,7 @@
 "use client";
 
 import { buildAttachmentFallback } from "@/components/drawer/task-detail/task-detail-utils";
-import { useUser } from "@/hooks/use-user";
+import { useUser } from "@/features/auth/hooks/useUser";
 import type { TaskItem } from "@/services/task/type";
 import * as React from "react";
 import { useTaskDetailAssignees } from "./useTaskDetailAssignees";

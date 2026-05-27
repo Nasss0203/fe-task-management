@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
-import { useTask, useTaskPriority, useTaskStatus } from "@/hooks/use-task";
+import { useTask, useTaskPriority, useTaskStatus } from "@/features/task/hooks/useTask";
 import type { TaskItem } from "@/services/task/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useTableDnd } from "../dnd/backlog-sprint/ProviderSprintDnd";

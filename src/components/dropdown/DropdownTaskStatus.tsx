@@ -13,7 +13,7 @@ import {
 	DropdownMenuTriggerV2,
 	DropdownMenuV2,
 } from "./dropdown-custom";
-import { useTask, useTaskStatus } from "@/hooks/use-task";
+import { useTask, useTaskStatus } from "@/features/task/hooks/useTask";
 
 type DropdownTaskStatusProps = {
 	workspaceId: string;

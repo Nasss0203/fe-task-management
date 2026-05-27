@@ -178,14 +178,15 @@ export const useTaskMoveSprint = ({
 	};
 
 	// Helper: cancel inflight queries + lấy snapshot
-	const cancelAndSnapshot = async () => {
+	const cancelAndSnapshot = async (): Promise<TaskCacheSnapshot> => {
 		await Promise.all([
 			queryClient.cancelQueries({ queryKey: taskKey }),
 			queryClient.cancelQueries({ queryKey: backlogKey }),
 		]);
 		return {
-			previousTasks: queryClient.getQueryData(taskKey),
-			previousBacklog: queryClient.getQueryData(backlogKey),
+			previousTasks: queryClient.getQueryData<FindAllTaskResponse>(taskKey),
+			previousBacklog:
+				queryClient.getQueryData<FindAllTaskBacklogResponse>(backlogKey),
 		};
 	};
 

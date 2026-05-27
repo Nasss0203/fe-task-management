@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { useTask } from "@/hooks/use-task";
+import { useTask } from "@/features/task/hooks/useTask";
 import SprintFilter from "../spints/SprintFilter";
 import SprintWorkspaceSection from "../spints/SprintWorkspaceSection";
 

@@ -12,7 +12,7 @@ import { Combobox } from "../ui/combobox";
 import {
 	useInviteWorkspaceMembers,
 	useSearchInviteUsers,
-} from "@/hooks/use-workspace-invite";
+} from "@/features/workspace/hooks/useWorkspaceInvite";
 import {
 	InviteRecipient,
 	InviteRecipientType,

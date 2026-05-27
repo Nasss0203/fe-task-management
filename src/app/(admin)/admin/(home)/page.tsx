@@ -10,7 +10,7 @@ import { RetentionCard } from "@/components/admin/retention/retention-card";
 import { StatItem } from "@/components/admin/shared/types";
 import { StatsGrid } from "@/components/admin/stats/stats-grid";
 import { RecentWorkspacesTable } from "@/components/admin/table/recent-workspaces-table";
-import { useAdminDashboard } from "@/hooks/admin/use-admin-dashboard";
+import { useAdminDashboard } from "@/features/admin/modules/dashboard/hooks/useAdminDashboard";
 import type {
 	UserGrowthPeriod,
 	WorkspaceGrowthPeriod,

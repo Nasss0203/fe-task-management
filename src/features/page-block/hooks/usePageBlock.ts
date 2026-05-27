@@ -11,9 +11,9 @@ export const usePageBlock = () => {
 
 			return result;
 		},
-		onSuccess: async (res) => {
+		onSuccess: async () => {
 			await queryClient.invalidateQueries({
-				queryKey: [PAGE_KEY.PAGE], // sửa thành queryKey thật trong usePage
+				queryKey: [PAGE_KEY.PAGE],
 			});
 		},
 		onError: (err) => {

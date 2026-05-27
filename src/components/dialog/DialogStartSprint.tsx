@@ -20,7 +20,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useSprints } from "@/hooks/use-sprint";
+import { useSprints } from "@/features/sprint/hooks/useSprint";
 import { cn } from "@/lib/utils";
 
 type StartSprintDialogProps = {

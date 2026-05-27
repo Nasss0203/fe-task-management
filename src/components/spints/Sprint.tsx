@@ -1,5 +1,5 @@
 import { BoardItem } from "@/services/board/type";
-import { useSprints } from "@/hooks/use-sprint";
+import { useSprints } from "@/features/sprint/hooks/useSprint";
 import { CalendarDays, ChevronDown, Settings2 } from "lucide-react";
 import { ProviderDragDrop } from "../dnd";
 import { Progress } from "../ui/progress";

@@ -18,8 +18,8 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { useLogin } from "@/hooks/use-auth";
-import { useUser } from "@/hooks/use-user";
+import { useLogin } from "@/features/auth/hooks/useAuth";
+import { useUser } from "@/features/auth/hooks/useUser";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

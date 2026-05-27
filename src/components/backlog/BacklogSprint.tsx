@@ -1,7 +1,11 @@
 "use client";
-import { useMember } from "@/hooks/use-member";
-import { useTask, useTaskPriority, useTaskStatus } from "@/hooks/use-task";
-import { useDebouncedValue } from "@/hooks/useDebounce";
+import { useMember } from "@/features/member/hooks/useMember";
+import {
+	useTask,
+	useTaskPriority,
+	useTaskStatus,
+} from "@/features/task/hooks/useTask";
+import { useDebounced } from "@/hooks/useDebounce";
 import type { TaskItem } from "@/services/task/type";
 import {
 	getCoreRowModel,
@@ -50,7 +54,7 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 		pageSize: 10,
 	});
 	const [search, setSearch] = useState("");
-	const debouncedSearch = useDebouncedValue(search, 400);
+	const debouncedSearch = useDebounced(search, 400);
 	const [statusFilter, setStatusFilter] = useState(ALL_FILTER_VALUE);
 	const [priorityFilter, setPriorityFilter] = useState(ALL_FILTER_VALUE);
 	const [assigneeFilter, setAssigneeFilter] = useState(ALL_FILTER_VALUE);

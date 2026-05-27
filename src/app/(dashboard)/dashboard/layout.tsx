@@ -24,7 +24,7 @@ const layout = ({
 	return (
 		<SidebarProvider className='h-svh overflow-hidden'>
 			<AppSidebarUser />
-			<SidebarInset className='h-svh min-h-0 overflow-hidden'>
+			<SidebarInset className='h-svh min-h-0 min-w-0 w-svw max-w-svw overflow-hidden md:w-full md:max-w-full'>
 				<header className='flex w-full h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12'>
 					<div className='flex items-center justify-between flex-1'>
 						<div className='flex items-center gap-2 px-4'>
@@ -37,13 +37,13 @@ const layout = ({
 								<BreadcrumbList>
 									<BreadcrumbItem className='hidden md:block'>
 										<BreadcrumbLink href='#'>
-											Build Your Application
+											Task management
 										</BreadcrumbLink>
 									</BreadcrumbItem>
 									<BreadcrumbSeparator className='hidden md:block' />
 									<BreadcrumbItem>
 										<BreadcrumbPage>
-											Data Fetching
+											Dashboard
 										</BreadcrumbPage>
 									</BreadcrumbItem>
 								</BreadcrumbList>
@@ -54,7 +54,7 @@ const layout = ({
 						</div>
 					</div>
 				</header>
-				<div className='flex min-h-0 flex-1 flex-col gap-4 overflow-hidden px-10 pt-3'>
+				<div className='flex min-h-0 min-w-0 max-w-full flex-1 flex-col gap-4 overflow-hidden px-4 pt-3 md:px-6 xl:px-10'>
 					{children}
 				</div>
 			</SidebarInset>

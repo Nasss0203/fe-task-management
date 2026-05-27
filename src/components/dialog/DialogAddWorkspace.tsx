@@ -3,7 +3,7 @@
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { useWorkspace } from "@/hooks/use-workspace";
+import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";
 import TemplateGrid from "../templates/TemplateGrid";
 import TemplateRecommendation, {
 	type WorkspaceTemplateType,

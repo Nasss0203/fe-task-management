@@ -11,8 +11,8 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { useSprints } from "@/hooks/use-sprint";
-import { useTask } from "@/hooks/use-task";
+import { useSprints } from "@/features/sprint/hooks/useSprint";
+import { useTask } from "@/features/task/hooks/useTask";
 import { useState } from "react";
 import TableBacklog from "../table/TableBacklog";
 import type { BacklogRenderContext } from "./types";
@@ -48,7 +48,6 @@ const BacklogSection = ({
 		createSprint.mutate({
 			workspaceId,
 			projectId,
-			name: `Sprintss ${lengSprint + 1}`,
 		});
 	};
 

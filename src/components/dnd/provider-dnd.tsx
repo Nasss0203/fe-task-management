@@ -1,8 +1,8 @@
 "use client";
 
-import { useSprints } from "@/hooks/use-sprint";
-import { useTask, useTaskStatus } from "@/hooks/use-task";
-import { useUser } from "@/hooks/use-user";
+import { useSprints } from "@/features/sprint/hooks/useSprint";
+import { useTask, useTaskStatus } from "@/features/task/hooks/useTask";
+import { useUser } from "@/features/auth/hooks/useUser";
 import { move } from "@dnd-kit/helpers";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";

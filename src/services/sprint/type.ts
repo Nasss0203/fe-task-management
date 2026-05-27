@@ -35,7 +35,6 @@ export type FindAllSprintResponse = SprintItem;
 export interface CreateSprintDto {
 	workspaceId: string;
 	projectId: string;
-	name?: string;
 }
 
 export interface SprintParams {

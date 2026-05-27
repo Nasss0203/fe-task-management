@@ -1,6 +1,6 @@
 "use client";
 
-import { useProject } from "@/hooks/use-project";
+import { useProject } from "@/features/project/hooks/useProject";
 import { ProjectDto } from "@/services/project/type";
 import { Ellipsis, Plus } from "lucide-react";
 import { useRef, useState } from "react";

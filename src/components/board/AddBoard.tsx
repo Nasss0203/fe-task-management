@@ -16,7 +16,7 @@ import {
 	Table2,
 } from "lucide-react";
 
-import { useBoards } from "@/hooks/use-board";
+import { useBoards } from "@/features/board/hooks/useBoards";
 import { BoardItem, BoardViewType } from "@/services/board/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import {

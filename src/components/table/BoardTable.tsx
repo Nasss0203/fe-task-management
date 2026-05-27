@@ -32,7 +32,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-import { useTask } from "@/hooks/use-task";
+import { useTask } from "@/features/task/hooks/useTask";
 import { cn } from "@/lib/utils";
 import PanigationTable from "../panigation/PanigationTable";
 import {

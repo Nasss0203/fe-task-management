@@ -1,7 +1,7 @@
 "use client";
 
 import { normalizeText, parseDate } from "@/components/drawer/task-detail/task-detail-utils";
-import { useTask, useTaskPriority, useTaskStatus } from "@/hooks/use-task";
+import { useTask, useTaskPriority, useTaskStatus } from "@/features/task/hooks/useTask";
 import type { TaskStatusItem } from "@/services/task-status/type";
 import type { TaskItem } from "@/services/task/type";
 import * as React from "react";

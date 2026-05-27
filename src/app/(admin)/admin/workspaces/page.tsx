@@ -5,7 +5,7 @@ import { WorkspaceFilterBar } from "@/components/admin/filters/workspace-filter-
 import { WorkspaceAdminHeader } from "@/components/admin/header/workspace-admin-header";
 import { WorkspaceOverviewCards } from "@/components/admin/overview/workspace-overview-cards";
 import { WorkspaceManagementTable } from "@/components/admin/table/workspace-management-table";
-import { useAdminWorkspaces } from "@/hooks/admin/use-admin-workspaces";
+import { useAdminWorkspaces } from "@/features/admin/modules/workspaces/hooks/useAdminWorkspaces";
 import type {
 	AdminFindAllWorkspaceQuery,
 	PlanTypeWorkspace,

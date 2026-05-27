@@ -5,8 +5,8 @@ import { Filter, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { useSprints } from "@/hooks/use-sprint";
-import { useTask, useTaskMoveSprint } from "@/hooks/use-task";
+import { useSprints } from "@/features/sprint/hooks/useSprint";
+import { useTask, useTaskMoveSprint } from "@/features/task/hooks/useTask";
 
 import { useMemo } from "react";
 import { ProviderSprintDnd } from "../dnd/backlog-sprint/ProviderSprintDnd";

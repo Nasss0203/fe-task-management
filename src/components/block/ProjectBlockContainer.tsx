@@ -6,7 +6,7 @@ import ProjectBlock, {
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useEffect, useMemo, useState } from "react";
 
-import { useBoards } from "@/hooks/use-board";
+import { useBoards } from "@/features/board/hooks/useBoards";
 import { BoardItem, BoardViewType } from "@/services/board/type";
 import { PageBlockDataConfig } from "@/services/page_block/type";
 import { BacklogRenderContext } from "../backlog/types";

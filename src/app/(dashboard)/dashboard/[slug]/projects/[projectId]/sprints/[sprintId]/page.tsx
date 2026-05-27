@@ -3,8 +3,8 @@
 import BacklogSprint from "@/components/backlog/BacklogSprint";
 import Sprint from "@/components/spints/Sprint";
 import { useSprints } from "@/features/sprint/hooks/useSprints";
-import { useBoards } from "@/hooks/use-board";
-import { usePage } from "@/hooks/use-page";
+import { useBoards } from "@/features/board/hooks/useBoards";
+import { usePage } from "@/features/page/hooks/usePage";
 import { BoardItem } from "@/services/board/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useParams } from "next/navigation";

@@ -11,7 +11,7 @@ import {
 
 import DialogAddTask from "@/components/dialog/DialogAddTask";
 import ProjectDropdown from "@/components/project/ProjectDropdown";
-import { useSprints } from "@/hooks/use-sprint";
+import { useSprints } from "@/features/sprint/hooks/useSprint";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import {
 	SidebarMenuSubButtonV2,
