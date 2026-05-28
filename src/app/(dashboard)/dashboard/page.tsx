@@ -2,9 +2,22 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+	Card,
+	CardAction,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { useUser } from "@/features/auth/hooks/useUser";
-import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useDashboard } from "@/features/dashboard/hooks/useDashboard";
+import { cn } from "@/lib/utils";
+import type {
+	DashboardActivityResponseDto,
+	DashboardTaskResponseDto,
+} from "@/services/dashboard/type";
 import {
 	Activity,
 	AlertTriangle,
@@ -15,305 +28,365 @@ import {
 	Clock3,
 	FolderKanban,
 	ListTodo,
-	Plus,
+	RefreshCw,
 	Target,
 	TimerReset,
+	TrendingDown,
 	TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { ComponentType, ReactNode } from "react";
 import { useMemo } from "react";
 
-const stats = [
-	{
-		title: "Việc của tôi",
-		value: "24",
-		description: "6 việc cần ưu tiên",
-		change: "+4 hôm nay",
-		icon: ListTodo,
-		tone: "text-sky-600 bg-sky-500/10 border-sky-500/20",
-	},
-	{
-		title: "Sắp đến hạn",
-		value: "6",
-		description: "Trong 3 ngày tới",
-		change: "2 việc hôm nay",
-		icon: Clock3,
-		tone: "text-amber-600 bg-amber-500/10 border-amber-500/20",
-	},
-	{
-		title: "Quá hạn",
-		value: "2",
-		description: "Cần xử lý trước 17:00",
-		change: "-1 so với hôm qua",
-		icon: AlertTriangle,
-		tone: "text-rose-600 bg-rose-500/10 border-rose-500/20",
-	},
-	{
-		title: "Hoàn thành",
-		value: "18",
-		description: "Tuần này",
-		change: "72% mục tiêu",
-		icon: CheckCircle2,
-		tone: "text-emerald-600 bg-emerald-500/10 border-emerald-500/20",
-	},
-];
-
-const todayTasks = [
-	{
-		title: "Fix login API",
-		workspace: "Task management",
-		project: "Auth",
-		due: "Hôm nay, 18:00",
-		priority: "Cao",
-		status: "Đang thực hiện",
-		progress: 65,
-	},
-	{
-		title: "Update landing page block",
-		workspace: "Task management",
-		project: "Task management project",
-		due: "Hôm nay, 20:00",
-		priority: "Trung bình",
-		status: "Chưa bắt đầu",
-		progress: 20,
-	},
-	{
-		title: "Review workspace flow",
-		workspace: "Design Engineering",
-		project: "Dashboard",
-		due: "Ngày mai, 09:00",
-		priority: "Cao",
-		status: "Đang thực hiện",
-		progress: 48,
-	},
-	{
-		title: "Refactor page block UI",
-		workspace: "Task management",
-		project: "Task management project",
-		due: "Ngày mai, 15:00",
-		priority: "Thấp",
-		status: "Chưa bắt đầu",
-		progress: 12,
-	},
-];
-
-const fallbackWorkspaces = [
-	{
-		id: "task-management",
-		name: "Task management",
-		slug: "task-management",
-		projects: 2,
-		openTasks: 12,
-	},
-	{
-		id: "design-engineering",
-		name: "Design Engineering",
-		slug: "design-engineering",
-		projects: 4,
-		openTasks: 8,
-	},
-	{
-		id: "sales-marketing",
-		name: "Sales & Marketing",
-		slug: "sales-marketing",
-		projects: 3,
-		openTasks: 5,
-	},
-];
-
-const recentActivities = [
-	{
-		title: 'Bạn đã hoàn thành task "Setup auth service"',
-		time: "10 phút trước",
-		tone: "bg-emerald-500",
-	},
-	{
-		title: 'Task "Create landing page" được gán cho bạn',
-		time: "35 phút trước",
-		tone: "bg-sky-500",
-	},
-	{
-		title: 'Workspace "Task management" có 3 cập nhật mới',
-		time: "1 giờ trước",
-		tone: "bg-violet-500",
-	},
-	{
-		title: 'Project "Auth" vừa tạo thêm 2 task mới',
-		time: "2 giờ trước",
-		tone: "bg-amber-500",
-	},
-];
-
-const focusBlocks = [
-	{
-		label: "Deep work",
-		value: "2h 40m",
-		description: "Còn 1 block trống sau 15:00",
-		icon: Target,
-	},
-	{
-		label: "Review",
-		value: "5 task",
-		description: "Ưu tiên các task quá hạn",
-		icon: TimerReset,
-	},
-	{
-		label: "Momentum",
-		value: "+12%",
-		description: "Tốt hơn trung bình tuần trước",
-		icon: TrendingUp,
-	},
-];
-
-const focusPlan = [
-	{
-		time: "09:30",
-		title: "Fix login API",
-		description: "Chốt lỗi quá hạn trước standup",
-	},
-	{
-		time: "14:00",
-		title: "Review workspace flow",
-		description: "Kiểm tra luồng quyền và sidebar",
-	},
-	{
-		time: "16:30",
-		title: "Dọn backlog",
-		description: "Đóng task đã merge, cập nhật owner",
-	},
-];
-
-const upcomingDeadlines = [
-	{
-		title: "Fix login API",
-		project: "Auth",
-		timeLeft: "Còn 4 giờ",
-	},
-	{
-		title: "Update page block",
-		project: "Task management project",
-		timeLeft: "Còn 8 giờ",
-	},
-	{
-		title: "Review permission flow",
-		project: "Dashboard",
-		timeLeft: "Ngày mai",
-	},
-];
-
-type WorkspacePreview = {
-	id: string;
-	name: string;
-	slug: string;
-	projects?: number;
-	openTasks?: number;
+type StatCardItem = {
+	title: string;
+	value: number;
+	description: string;
+	change: string;
+	icon: ComponentType<{ className?: string }>;
+	tone: string;
 };
 
-function getPriorityClass(priority: string) {
-	switch (priority) {
-		case "Cao":
-			return "border-rose-500/20 bg-rose-500/10 text-rose-600 dark:text-rose-400";
-		case "Trung bình":
-			return "border-sky-500/20 bg-sky-500/10 text-sky-600 dark:text-sky-400";
-		default:
-			return "border-zinc-500/20 bg-zinc-500/10 text-zinc-600 dark:text-zinc-400";
+const toLocalDateInputValue = () => {
+	const date = new Date();
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, "0");
+	const day = String(date.getDate()).padStart(2, "0");
+
+	return `${year}-${month}-${day}`;
+};
+
+const getClientTimezone = () => {
+	if (typeof Intl === "undefined") return undefined;
+
+	return Intl.DateTimeFormat().resolvedOptions().timeZone;
+};
+
+const clampPercent = (value?: number | null) => {
+	if (typeof value !== "number" || Number.isNaN(value)) return 0;
+
+	return Math.min(100, Math.max(0, value));
+};
+
+const formatDashboardDate = (dateValue?: string) => {
+	if (!dateValue) return "";
+
+	const [year, month, day] = dateValue.split("-").map(Number);
+
+	if (!year || !month || !day) return dateValue;
+
+	return new Intl.DateTimeFormat("vi-VN", {
+		weekday: "long",
+		day: "2-digit",
+		month: "2-digit",
+		year: "numeric",
+		timeZone: "UTC",
+	}).format(new Date(Date.UTC(year, month - 1, day)));
+};
+
+const formatDateTime = (dateValue?: string | null) => {
+	if (!dateValue) return "Chưa đặt hạn";
+
+	const date = new Date(dateValue);
+
+	if (Number.isNaN(date.getTime())) return "Chưa đặt hạn";
+
+	return new Intl.DateTimeFormat("vi-VN", {
+		day: "2-digit",
+		month: "2-digit",
+		year: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
+	}).format(date);
+};
+
+const formatMinutes = (minutes: number) => {
+	if (minutes < 60) return `${minutes} phút`;
+
+	const hours = Math.floor(minutes / 60);
+	const rest = minutes % 60;
+
+	return rest ? `${hours}h ${rest}m` : `${hours}h`;
+};
+
+const formatRelativeTime = (dateValue: string) => {
+	const date = new Date(dateValue);
+
+	if (Number.isNaN(date.getTime())) return "Vừa xong";
+
+	const diffMinutes = Math.max(
+		0,
+		Math.floor((Date.now() - date.getTime()) / 60000),
+	);
+
+	if (diffMinutes < 1) return "Vừa xong";
+	if (diffMinutes < 60) return `${diffMinutes} phút trước`;
+
+	const diffHours = Math.floor(diffMinutes / 60);
+
+	if (diffHours < 24) return `${diffHours} giờ trước`;
+
+	const diffDays = Math.floor(diffHours / 24);
+
+	return `${diffDays} ngày trước`;
+};
+
+const getPriorityClass = (priorityLevel?: number | null) => {
+	if (!priorityLevel) {
+		return "border-border bg-muted text-muted-foreground";
 	}
+
+	if (priorityLevel >= 3) {
+		return "border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-300";
+	}
+
+	if (priorityLevel === 2) {
+		return "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-300";
+	}
+
+	return "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300";
+};
+
+const getStatusClass = (statusName?: string | null) => {
+	const normalized = (statusName ?? "").trim().toLowerCase();
+
+	if (normalized.includes("progress")) {
+		return "border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-300";
+	}
+
+	if (normalized.includes("done") || normalized.includes("complete")) {
+		return "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300";
+	}
+
+	return "border-border bg-muted text-muted-foreground";
+};
+
+const getActivityTone = (action: string) => {
+	if (action.includes("START")) return "bg-emerald-500";
+	if (action.includes("TASK")) return "bg-blue-500";
+	if (action.includes("SPRINT")) return "bg-amber-500";
+
+	return "bg-muted-foreground";
+};
+
+function EmptyState({ children }: { children: ReactNode }) {
+	return (
+		<div className='rounded-lg border border-dashed bg-muted/20 p-6 text-center text-sm text-muted-foreground'>
+			{children}
+		</div>
+	);
 }
 
-function getStatusClass(status: string) {
-	switch (status) {
-		case "Đang thực hiện":
-			return "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400";
-		case "Chưa bắt đầu":
-			return "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400";
-		default:
-			return "border-zinc-500/20 bg-zinc-500/10 text-zinc-600 dark:text-zinc-400";
-	}
+function LoadingDashboard() {
+	return (
+		<main
+			className='flex min-h-0 min-w-0 w-full flex-1 flex-col gap-5 overflow-x-hidden overflow-y-auto pb-10 sm:max-w-full'
+			style={{ maxWidth: "calc(100dvw - 2rem)" }}
+		>
+			<Skeleton className='h-36 w-full rounded-xl' />
+			<div className='grid gap-4 xl:grid-cols-12'>
+				<Skeleton className='h-80 rounded-xl xl:col-span-8' />
+				<Skeleton className='h-80 rounded-xl xl:col-span-4' />
+			</div>
+			<div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-4'>
+				{Array.from({ length: 4 }).map((_, index) => (
+					<Skeleton key={index} className='h-40 rounded-xl' />
+				))}
+			</div>
+			<div className='grid gap-4 xl:grid-cols-12'>
+				<Skeleton className='h-96 rounded-xl xl:col-span-8' />
+				<Skeleton className='h-96 rounded-xl xl:col-span-4' />
+			</div>
+		</main>
+	);
 }
 
-function SectionPanel({
-	title,
-	description,
-	action,
-	children,
+function TaskItem({ task }: { task: DashboardTaskResponseDto }) {
+	const progress = clampPercent(task.progressPercent);
+
+	return (
+		<div className='rounded-lg border bg-background p-4 transition hover:border-primary/30 hover:bg-muted/30'>
+			<div className='grid gap-4 lg:grid-cols-[minmax(0,1fr)_170px] lg:items-start'>
+				<div className='min-w-0'>
+					<div className='flex flex-wrap items-center gap-2'>
+						<h3 className='min-w-0 truncate text-sm font-semibold md:text-base'>
+							{task.title}
+						</h3>
+						<Badge
+							variant='outline'
+							className={getPriorityClass(task.priorityLevel)}
+						>
+							{task.priorityName ?? "No priority"}
+						</Badge>
+						<Badge
+							variant='outline'
+							className={getStatusClass(task.statusName)}
+						>
+							{task.statusName ?? "No status"}
+						</Badge>
+					</div>
+					<p className='mt-2 truncate text-sm text-muted-foreground'>
+						{task.workspaceName} / {task.projectName}
+					</p>
+				</div>
+
+				<div className='text-left lg:text-right'>
+					<p className='text-sm font-medium'>
+						{formatDateTime(task.dueAt)}
+					</p>
+					<p className='mt-1 text-xs text-muted-foreground'>
+						{progress}% hoàn thành
+					</p>
+				</div>
+			</div>
+			<Progress value={progress} className='mt-4 h-1.5 bg-muted' />
+		</div>
+	);
+}
+
+function ActivityItem({
+	activity,
+	isLast,
 }: {
-	title: string;
-	description?: string;
-	action?: ReactNode;
-	children: ReactNode;
+	activity: DashboardActivityResponseDto;
+	isLast: boolean;
 }) {
 	return (
-		<section className='h-full rounded-xl border border-border/70 bg-card p-5 shadow-sm'>
-			<div className='mb-5 flex items-start justify-between gap-3'>
-				<div className='min-w-0'>
-					<h2 className='text-base font-semibold tracking-tight'>
-						{title}
-					</h2>
-					{description ? (
-						<p className='mt-1 text-sm text-muted-foreground'>
-							{description}
-						</p>
-					) : null}
-				</div>
-				{action}
+		<div className='flex gap-3'>
+			<div className='flex flex-col items-center'>
+				<div
+					className={cn(
+						"mt-1 size-2.5 rounded-full",
+						getActivityTone(activity.action),
+					)}
+				/>
+				{isLast ? null : <div className='mt-2 h-full w-px bg-border' />}
 			</div>
-			{children}
-		</section>
+			<div className='min-w-0 pb-4'>
+				<p className='text-sm font-medium leading-6'>
+					{activity.message}
+				</p>
+				<p className='text-xs text-muted-foreground'>
+					{formatRelativeTime(activity.createdAt)}
+				</p>
+			</div>
+		</div>
 	);
 }
 
 export default function DashboardPage() {
-	const { user } = useUser();
+	const query = useMemo(
+		() => ({
+			date: toLocalDateInputValue(),
+			timezone: getClientTimezone(),
+			limit: 5,
+		}),
+		[],
+	);
 	const {
-		workspaceFindAll: { data: workspaceQuery, isLoading },
-	} = useWorkspace();
+		myDashboard: { data: dashboardQuery, isLoading, isError, refetch },
+	} = useDashboard(query);
+	const dashboard = dashboardQuery?.data;
 
-	const workspaces = useMemo<WorkspacePreview[]>(() => {
-		const items = workspaceQuery?.data;
+	const stats = useMemo<StatCardItem[]>(() => {
+		if (!dashboard) return [];
 
-		if (!items?.length) {
-			return fallbackWorkspaces;
-		}
+		return [
+			{
+				title: "Việc của tôi",
+				value: dashboard.stats.myTasks,
+				description: `${dashboard.stats.priorityToday} việc ưu tiên hôm nay`,
+				change: "Tổng task đang theo dõi",
+				icon: ListTodo,
+				tone: "border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-300",
+			},
+			{
+				title: "Sắp đến hạn",
+				value: dashboard.stats.upcoming,
+				description: `Trong ${dashboard.stats.upcomingWindowDays} ngày tới`,
+				change: "Cần giữ nhịp",
+				icon: Clock3,
+				tone: "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-300",
+			},
+			{
+				title: "Quá hạn",
+				value: dashboard.stats.overdue,
+				description: "Cần xử lý trước",
+				change: dashboard.stats.overdue ? "Đang có rủi ro" : "Đang ổn",
+				icon: AlertTriangle,
+				tone: "border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-300",
+			},
+			{
+				title: "Hoàn thành",
+				value: dashboard.stats.completedThisWeek,
+				description: "Tuần này",
+				change: `${clampPercent(dashboard.stats.weeklyGoalPercent)}% mục tiêu`,
+				icon: CheckCircle2,
+				tone: "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300",
+			},
+		];
+	}, [dashboard]);
 
-		return items.slice(0, 3).map((workspace: WorkspacePreview) => ({
-			id: workspace.id,
-			name: workspace.name,
-			slug: workspace.slug,
-			projects: workspace.projects ?? 0,
-			openTasks: workspace.openTasks ?? 0,
-		}));
-	}, [workspaceQuery?.data]);
+	if (isLoading) {
+		return <LoadingDashboard />;
+	}
 
-	const primaryWorkspace = workspaces[0];
-	const displayName = user?.username || user?.email?.split("@")[0] || "bạn";
+	if (isError || !dashboard) {
+		return (
+			<main
+				className='flex min-h-0 min-w-0 w-full flex-1 flex-col gap-5 overflow-x-hidden overflow-y-auto pb-10 sm:max-w-full'
+				style={{ maxWidth: "calc(100dvw - 2rem)" }}
+			>
+				<Card>
+					<CardHeader>
+						<CardTitle>Không tải được dashboard</CardTitle>
+						<CardDescription>
+							Vui lòng thử lại để lấy dữ liệu mới nhất từ hệ
+							thống.
+						</CardDescription>
+						<CardAction>
+							<Button variant='outline' onClick={() => refetch()}>
+								<RefreshCw />
+								Tải lại
+							</Button>
+						</CardAction>
+					</CardHeader>
+				</Card>
+			</main>
+		);
+	}
+
+	const focus = dashboard.focus;
+	const dayProgress = clampPercent(focus.dayProgressPercent);
+	const weeklyGoal = clampPercent(dashboard.stats.weeklyGoalPercent);
+	const MomentumIcon = focus.momentumPercent >= 0 ? TrendingUp : TrendingDown;
+	const primaryWorkspace = dashboard.recentWorkspaces[0];
 
 	return (
 		<main
 			className='flex min-h-0 min-w-0 w-full flex-1 flex-col gap-5 overflow-x-hidden overflow-y-auto pb-10 sm:max-w-full'
 			style={{ maxWidth: "calc(100dvw - 2rem)" }}
 		>
-			<section className='min-w-0 rounded-xl border border-border/70 bg-card p-5 shadow-sm'>
-				<div className='flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between'>
-					<div className='min-w-0 space-y-2'>
-						<p className='text-sm font-medium text-muted-foreground'>
+			<Card>
+				<CardHeader className='gap-5 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center'>
+					<div className='min-w-0'>
+						<CardDescription>
 							Bảng điều khiển cá nhân
+						</CardDescription>
+						<CardTitle className='mt-2 text-2xl md:text-3xl'>
+							Chào bạn, {dashboard.greeting.displayName}
+						</CardTitle>
+						<p className='mt-3 max-w-3xl text-sm leading-6 text-muted-foreground'>
+							Bạn có {dashboard.greeting.todayPriorityCount} việc
+							ưu tiên hôm nay. Dashboard đang gom deadline, nhịp
+							làm việc, workspace gần đây và hoạt động mới nhất
+							vào một màn hình.
 						</p>
-						<div className='space-y-1'>
-							<h1 className='text-2xl font-semibold tracking-tight md:text-3xl'>
-								Chào buổi sáng, {displayName}
-							</h1>
-							<p className='max-w-2xl text-sm text-muted-foreground'>
-								Bạn có 6 việc cần ưu tiên hôm nay. Mình đã gom
-								các deadline, workspace gần đây và nhịp làm
-								việc vào một màn hình để bạn bắt đầu nhanh hơn.
-							</p>
-						</div>
 					</div>
 
-					<div className='flex flex-wrap items-center gap-2'>
-						<div className='rounded-md border border-border/70 px-3 py-2 text-sm text-muted-foreground'>
-							Thứ tư, 27/05/2026
+					<CardAction className='static col-auto row-auto flex flex-wrap items-center gap-2 self-auto justify-self-start xl:justify-self-end'>
+						<div className='rounded-md border px-3 py-2 text-sm text-muted-foreground'>
+							{formatDashboardDate(dashboard.greeting.date)}
 						</div>
 						<Button asChild variant='outline'>
 							<Link href='/dashboard'>
@@ -321,176 +394,214 @@ export default function DashboardPage() {
 								Xem task
 							</Link>
 						</Button>
-						<Button asChild>
-							<Link
-								href={
-									primaryWorkspace
-										? `/dashboard/${primaryWorkspace.slug}`
-										: "/dashboard"
-								}
-							>
-								<Plus />
+						{primaryWorkspace ? (
+							<Button asChild>
+								<Link
+									href={`/dashboard/${primaryWorkspace.slug}`}
+								>
+									<FolderKanban />
+									Mở workspace
+								</Link>
+							</Button>
+						) : (
+							<Button disabled>
+								<FolderKanban />
 								Mở workspace
-							</Link>
-						</Button>
-					</div>
-				</div>
-			</section>
+							</Button>
+						)}
+					</CardAction>
+				</CardHeader>
+			</Card>
 
 			<section className='grid min-w-0 gap-4 xl:grid-cols-12'>
-				<div className='rounded-xl border border-border/70 bg-card p-5 shadow-sm xl:col-span-8'>
-					<div className='grid gap-5 lg:grid-cols-[1fr_230px]'>
-						<div className='space-y-5'>
-							<div>
-								<h2 className='text-lg font-semibold tracking-tight'>
-									Trọng tâm hôm nay
-								</h2>
-								<p className='mt-1 max-w-2xl text-sm text-muted-foreground'>
-									Hoàn thành 2 task quá hạn trước, sau đó dành
-									block chiều cho review workspace flow.
-								</p>
-							</div>
-
+				<Card className='xl:col-span-8'>
+					<CardHeader>
+						<CardTitle>{focus.title}</CardTitle>
+						<CardDescription>{focus.message}</CardDescription>
+					</CardHeader>
+					<CardContent className='grid gap-5 lg:grid-cols-[minmax(0,1fr)_240px]'>
+						<div className='flex flex-col gap-5'>
 							<div className='grid gap-3 md:grid-cols-3'>
-								{focusBlocks.map((item) => {
-									const Icon = item.icon;
+								<div className='rounded-lg border bg-muted/35 p-4'>
+									<div className='mb-3 flex items-center justify-between gap-3'>
+										<Target className='text-muted-foreground' />
+										<span className='text-xs font-medium text-muted-foreground'>
+											Deep work
+										</span>
+									</div>
+									<p className='text-xl font-semibold'>
+										{formatMinutes(focus.deepWorkMinutes)}
+									</p>
+									<p className='mt-1 text-xs leading-5 text-muted-foreground'>
+										Thời lượng tập trung hôm nay
+									</p>
+								</div>
 
-									return (
-										<div
-											key={item.label}
-											className='rounded-lg border border-border/60 bg-muted/35 p-4'
-										>
-											<div className='mb-3 flex items-center justify-between gap-3'>
-												<Icon className='h-4 w-4 text-muted-foreground' />
-												<span className='text-xs font-medium text-muted-foreground'>
-													{item.label}
-												</span>
-											</div>
-											<p className='text-xl font-semibold'>
-												{item.value}
-											</p>
-											<p className='mt-1 text-xs leading-5 text-muted-foreground'>
-												{item.description}
-											</p>
-										</div>
-									);
-								})}
+								<div className='rounded-lg border bg-muted/35 p-4'>
+									<div className='mb-3 flex items-center justify-between gap-3'>
+										<TimerReset className='text-muted-foreground' />
+										<span className='text-xs font-medium text-muted-foreground'>
+											Review
+										</span>
+									</div>
+									<p className='text-xl font-semibold'>
+										{focus.reviewTaskCount} task
+									</p>
+									<p className='mt-1 text-xs leading-5 text-muted-foreground'>
+										Việc cần xem lại trong ngày
+									</p>
+								</div>
+
+								<div className='rounded-lg border bg-muted/35 p-4'>
+									<div className='mb-3 flex items-center justify-between gap-3'>
+										<MomentumIcon className='text-muted-foreground' />
+										<span className='text-xs font-medium text-muted-foreground'>
+											Momentum
+										</span>
+									</div>
+									<p
+										className={cn(
+											"text-xl font-semibold",
+											focus.momentumPercent < 0
+												? "text-red-600 dark:text-red-300"
+												: "text-emerald-600 dark:text-emerald-300",
+										)}
+									>
+										{focus.momentumPercent > 0 ? "+" : ""}
+										{focus.momentumPercent}%
+									</p>
+									<p className='mt-1 text-xs leading-5 text-muted-foreground'>
+										Đà hoàn thành so với nhịp mục tiêu
+									</p>
+								</div>
 							</div>
 
-							<div className='rounded-lg border border-border/60 bg-muted/30 p-4'>
+							<div className='rounded-lg border bg-muted/30 p-4'>
 								<div className='mb-3 flex items-center justify-between gap-3'>
 									<div>
 										<p className='text-sm font-semibold'>
 											Nhịp làm việc đề xuất
 										</p>
 										<p className='mt-1 text-xs text-muted-foreground'>
-											Gom các việc quan trọng vào những
-											block dễ bắt đầu nhất.
+											Các block được ưu tiên theo task
+											đang chạy.
 										</p>
 									</div>
-									<TimerReset className='h-4 w-4 shrink-0 text-muted-foreground' />
+									<CalendarClock className='shrink-0 text-muted-foreground' />
 								</div>
 
-								<div className='grid gap-2 md:grid-cols-3'>
-									{focusPlan.map((item) => (
-										<div
-											key={item.time}
-											className='rounded-md border border-border/50 bg-background/70 p-3'
-										>
-											<p className='text-xs font-medium text-muted-foreground'>
-												{item.time}
-											</p>
-											<p className='mt-1 truncate text-sm font-semibold'>
-												{item.title}
-											</p>
-											<p className='mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground'>
-												{item.description}
-											</p>
-										</div>
-									))}
-								</div>
+								{dashboard.rhythmBlocks.length ? (
+									<div className='grid gap-2 md:grid-cols-2'>
+										{dashboard.rhythmBlocks.map((item) => (
+											<div
+												key={`${item.taskId}-${item.time}`}
+												className='rounded-md border bg-background/70 p-3'
+											>
+												<p className='text-xs font-medium text-muted-foreground'>
+													{item.time}
+												</p>
+												<p className='mt-1 truncate text-sm font-semibold'>
+													{item.title}
+												</p>
+												<p className='mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground'>
+													{item.subtitle}
+												</p>
+											</div>
+										))}
+									</div>
+								) : (
+									<EmptyState>
+										Chưa có block làm việc đề xuất.
+									</EmptyState>
+								)}
 							</div>
 						</div>
 
-						<div className='h-full rounded-lg border border-border/70 bg-background p-4'>
+						<div className='h-full rounded-lg border bg-background p-4'>
 							<div className='flex items-center justify-between'>
 								<div>
 									<p className='text-sm font-medium text-muted-foreground'>
 										Tiến độ ngày
 									</p>
 									<p className='mt-1 text-3xl font-semibold'>
-										72%
+										{dayProgress}%
 									</p>
 								</div>
-								<div className='flex h-14 w-14 items-center justify-center rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-600'>
-									<TrendingUp className='h-6 w-6' />
+								<div className='flex size-14 items-center justify-center rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-600'>
+									<TrendingUp />
 								</div>
 							</div>
 
-							<div className='mt-6 space-y-2'>
+							<div className='mt-6 flex flex-col gap-2'>
 								<div className='flex items-center justify-between rounded-md bg-muted/40 px-3 py-2'>
 									<span className='text-xs text-muted-foreground'>
 										Còn lại
 									</span>
 									<span className='text-xs font-semibold'>
-										7 task
+										{focus.remainingTasks} task
 									</span>
 								</div>
 								<div className='flex items-center justify-between rounded-md bg-muted/40 px-3 py-2'>
 									<span className='text-xs text-muted-foreground'>
-										Rủi ro
+										Quá hạn
 									</span>
-									<span className='text-xs font-semibold text-amber-600 dark:text-amber-400'>
-										2 quá hạn
+									<span className='text-xs font-semibold text-amber-600 dark:text-amber-300'>
+										{focus.overdueTasks} task
 									</span>
 								</div>
 							</div>
 
-							<Progress value={72} className='mt-5 h-2' />
+							<Progress
+								value={dayProgress}
+								className='mt-5 h-2'
+							/>
 							<p className='mt-3 text-xs leading-5 text-muted-foreground'>
-								18/25 task hoàn thành trong mục tiêu tuần này.
+								{focus.completedThisWeek}/{focus.targetThisWeek}{" "}
+								task hoàn thành trong mục tiêu tuần này.
 							</p>
 						</div>
-					</div>
-				</div>
+					</CardContent>
+				</Card>
 
-				<div className='rounded-xl border border-border/70 bg-card p-5 shadow-sm xl:col-span-4'>
-					<div className='flex items-center justify-between gap-3'>
-						<div>
-							<h2 className='text-base font-semibold tracking-tight'>
-								Lịch gần nhất
-							</h2>
-							<p className='mt-1 text-sm text-muted-foreground'>
-								Các mốc nên xử lý trước
-							</p>
-						</div>
-						<CalendarClock className='h-5 w-5 text-muted-foreground' />
-					</div>
-
-					<div className='mt-5 space-y-3'>
-						{upcomingDeadlines.map((item) => (
-							<div
-								key={item.title}
-								className='flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-muted/35 p-3'
-							>
-								<div className='min-w-0'>
-									<p className='truncate text-sm font-medium'>
-										{item.title}
-									</p>
-									<p className='mt-1 truncate text-xs text-muted-foreground'>
-										{item.project}
-									</p>
-								</div>
-								<Badge
-									variant='outline'
-									className='shrink-0 border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400'
+				<Card className='xl:col-span-4'>
+					<CardHeader>
+						<CardTitle>Lịch gần nhất</CardTitle>
+						<CardDescription>
+							Các mốc nên xử lý trước
+						</CardDescription>
+						<CardAction>
+							<CalendarClock className='text-muted-foreground' />
+						</CardAction>
+					</CardHeader>
+					<CardContent className='flex flex-col gap-3'>
+						{dashboard.recentDeadlines.length ? (
+							dashboard.recentDeadlines.map((item) => (
+								<div
+									key={item.id}
+									className='flex items-center justify-between gap-3 rounded-lg border bg-muted/35 p-3'
 								>
-									{item.timeLeft}
-								</Badge>
-							</div>
-						))}
-					</div>
-				</div>
+									<div className='min-w-0'>
+										<p className='truncate text-sm font-medium'>
+											{item.title}
+										</p>
+										<p className='mt-1 truncate text-xs text-muted-foreground'>
+											{item.workspaceName} /{" "}
+											{item.projectName}
+										</p>
+									</div>
+									<Badge
+										variant='outline'
+										className='shrink-0 border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-300'
+									>
+										{item.remainingLabel}
+									</Badge>
+								</div>
+							))
+						) : (
+							<EmptyState>Không có deadline gần.</EmptyState>
+						)}
+					</CardContent>
+				</Card>
 			</section>
 
 			<section className='grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4'>
@@ -498,199 +609,176 @@ export default function DashboardPage() {
 					const Icon = item.icon;
 
 					return (
-						<div
+						<Card
 							key={item.title}
-							className='rounded-xl border border-border/70 bg-card p-5 shadow-sm transition hover:border-primary/30'
+							className='transition hover:border-primary/30'
 						>
-							<div className='mb-5 flex items-start justify-between gap-3'>
-								<div
-									className={`rounded-lg border p-2.5 ${item.tone}`}
-								>
-									<Icon className='h-5 w-5' />
+							<CardContent className='flex flex-col gap-5'>
+								<div className='flex items-start justify-between gap-3'>
+									<div
+										className={cn(
+											"rounded-lg border p-2.5",
+											item.tone,
+										)}
+									>
+										<Icon />
+									</div>
+									<span className='text-xs font-medium text-muted-foreground'>
+										{item.change}
+									</span>
 								</div>
-								<span className='text-xs font-medium text-muted-foreground'>
-									{item.change}
-								</span>
-							</div>
-							<div className='space-y-1'>
-								<p className='text-sm text-muted-foreground'>
-									{item.title}
-								</p>
-								<p className='text-3xl font-semibold'>
-									{item.value}
-								</p>
-								<p className='text-xs text-muted-foreground'>
-									{item.description}
-								</p>
-							</div>
-						</div>
+								<div className='flex flex-col gap-1'>
+									<p className='text-sm text-muted-foreground'>
+										{item.title}
+									</p>
+									<p className='text-3xl font-semibold'>
+										{item.value}
+									</p>
+									<p className='text-xs text-muted-foreground'>
+										{item.description}
+									</p>
+								</div>
+							</CardContent>
+						</Card>
 					);
 				})}
 			</section>
 
 			<section className='grid min-w-0 grid-cols-1 gap-4 xl:grid-cols-12'>
-				<div className='xl:col-span-8'>
-					<SectionPanel
-						title='Ưu tiên hôm nay'
-						description='Các task có deadline gần hoặc đang ảnh hưởng đến tiến độ của bạn'
-						action={
+				<Card className='xl:col-span-8'>
+					<CardHeader>
+						<CardTitle>Ưu tiên hôm nay</CardTitle>
+						<CardDescription>
+							Các task quan trọng nhất đang cần bạn giữ nhịp.
+						</CardDescription>
+						<CardAction>
 							<Button variant='ghost' size='sm' asChild>
 								<Link href='/dashboard'>
 									Xem tất cả
-									<ArrowRight className='h-4 w-4' />
+									<ArrowRight />
 								</Link>
 							</Button>
-						}
-					>
-						<div className='space-y-3'>
-							{todayTasks.map((task) => (
-								<div
-									key={task.title}
-									className='rounded-lg border border-border/60 bg-background p-4 transition hover:border-primary/30 hover:bg-muted/30'
-								>
-									<div className='grid gap-4 lg:grid-cols-[1fr_150px] lg:items-start'>
-										<div className='min-w-0'>
-											<div className='flex flex-wrap items-center gap-2'>
-												<h3 className='min-w-0 truncate text-sm font-semibold md:text-base'>
-													{task.title}
-												</h3>
-												<Badge
-													variant='outline'
-													className={getPriorityClass(
-														task.priority,
-													)}
-												>
-													{task.priority}
-												</Badge>
-												<Badge
-													variant='outline'
-													className={getStatusClass(
-														task.status,
-													)}
-												>
-													{task.status}
-												</Badge>
-											</div>
-											<p className='mt-2 truncate text-sm text-muted-foreground'>
-												{task.workspace} / {task.project}
-											</p>
-										</div>
+						</CardAction>
+					</CardHeader>
+					<CardContent className='flex flex-col gap-3'>
+						{dashboard.priorityTasks.length ? (
+							dashboard.priorityTasks.map((task) => (
+								<TaskItem key={task.id} task={task} />
+							))
+						) : (
+							<EmptyState>
+								Chưa có task ưu tiên hôm nay.
+							</EmptyState>
+						)}
+					</CardContent>
+				</Card>
 
-										<div className='text-left lg:text-right'>
-											<p className='text-sm font-medium'>
-												{task.due}
-											</p>
-											<p className='mt-1 text-xs text-muted-foreground'>
-												{task.progress}% hoàn thành
-											</p>
-										</div>
-									</div>
-									<Progress
-										value={task.progress}
-										className='mt-4 h-1.5 bg-muted'
-									/>
-								</div>
-							))}
-						</div>
-					</SectionPanel>
-				</div>
-
-				<div className='xl:col-span-4'>
-					<SectionPanel
-						title='Workspace gần đây'
-						description={
-							isLoading
-								? "Đang tải workspace của bạn"
-								: "Không gian bạn vừa làm việc"
-						}
-					>
-						<div className='space-y-3'>
-							{workspaces.map((workspace) => (
+				<Card className='xl:col-span-4'>
+					<CardHeader>
+						<CardTitle>Workspace gần đây</CardTitle>
+						<CardDescription>
+							Không gian bạn vừa làm việc
+						</CardDescription>
+					</CardHeader>
+					<CardContent className='flex flex-col gap-3'>
+						{dashboard.recentWorkspaces.length ? (
+							dashboard.recentWorkspaces.map((workspace) => (
 								<Link
 									key={workspace.id}
 									href={`/dashboard/${workspace.slug}`}
-									className='group flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-background p-4 transition hover:border-primary/30 hover:bg-muted/30'
+									className='group flex items-center justify-between gap-3 rounded-lg border bg-background p-4 transition hover:border-primary/30 hover:bg-muted/30'
 								>
 									<div className='flex min-w-0 items-center gap-3'>
-										<div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border/60 bg-muted/45'>
-											<FolderKanban className='h-5 w-5 text-muted-foreground' />
+										<div className='flex size-10 shrink-0 items-center justify-center rounded-lg border bg-muted/45'>
+											<FolderKanban className='text-muted-foreground' />
 										</div>
 										<div className='min-w-0'>
 											<p className='truncate text-sm font-semibold'>
 												{workspace.name}
 											</p>
 											<p className='mt-1 truncate text-xs text-muted-foreground'>
-												{workspace.projects ?? 0} dự án
-												/ {workspace.openTasks ?? 0} task
+												{workspace.projectCount} dự án /{" "}
+												{workspace.openTaskCount} task
 												mở
 											</p>
 										</div>
 									</div>
-									<ChevronRight className='h-4 w-4 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground' />
+									<ChevronRight className='shrink-0 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground' />
 								</Link>
-							))}
-						</div>
-					</SectionPanel>
-				</div>
+							))
+						) : (
+							<EmptyState>Chưa có workspace gần đây.</EmptyState>
+						)}
+					</CardContent>
+				</Card>
 			</section>
 
 			<section className='grid min-w-0 gap-4 xl:grid-cols-12'>
-				<div className='xl:col-span-8'>
-					<SectionPanel
-						title='Hoạt động gần đây'
-						description='Các thay đổi mới nhất có liên quan trực tiếp đến bạn'
-					>
-						<div className='space-y-4'>
-							{recentActivities.map((activityItem, index) => (
-								<div
-									key={activityItem.title}
-									className='flex gap-3'
-								>
-									<div className='flex flex-col items-center'>
-										<div
-											className={`mt-1 h-2.5 w-2.5 rounded-full ${activityItem.tone}`}
+				<Card className='xl:col-span-8'>
+					<CardHeader>
+						<CardTitle>Hoạt động gần đây</CardTitle>
+						<CardDescription>
+							Các thay đổi mới nhất có liên quan trực tiếp đến
+							bạn.
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						{dashboard.recentActivities.length ? (
+							<div className='flex flex-col'>
+								{dashboard.recentActivities.map(
+									(activity, index) => (
+										<ActivityItem
+											key={activity.id}
+											activity={activity}
+											isLast={
+												index ===
+												dashboard.recentActivities
+													.length -
+													1
+											}
 										/>
-										{index !==
-										recentActivities.length - 1 ? (
-											<div className='mt-2 h-full w-px bg-border' />
-										) : null}
-									</div>
-									<div className='min-w-0 pb-4'>
-										<p className='text-sm font-medium leading-6'>
-											{activityItem.title}
-										</p>
-										<p className='text-xs text-muted-foreground'>
-											{activityItem.time}
-										</p>
-									</div>
-								</div>
-							))}
-						</div>
-					</SectionPanel>
-				</div>
+									),
+								)}
+							</div>
+						) : (
+							<EmptyState>Chưa có hoạt động gần đây.</EmptyState>
+						)}
+					</CardContent>
+				</Card>
 
-				<div className='xl:col-span-4'>
-					<SectionPanel
-						title='Gợi ý hành động'
-						description='Những việc nhỏ giúp bảng của bạn gọn hơn'
-					>
-						<div className='space-y-3'>
-							{[
-								"Chốt owner cho 5 task chưa assign.",
-								"Dời deadline các task review sang sprint hiện tại.",
-								"Đóng 2 task đã merge để giảm nhiễu backlog.",
-							].map((item) => (
+				<Card className='xl:col-span-4'>
+					<CardHeader>
+						<CardTitle>Gợi ý hành động</CardTitle>
+						<CardDescription>
+							Những việc nhỏ giúp bảng của bạn gọn hơn.
+						</CardDescription>
+					</CardHeader>
+					<CardContent className='flex flex-col gap-3'>
+						{dashboard.suggestions.length ? (
+							dashboard.suggestions.map((suggestion) => (
 								<div
-									key={item}
-									className='flex items-start gap-3 rounded-lg border border-border/60 bg-background p-3'
+									key={`${suggestion.type}-${suggestion.message}`}
+									className='flex items-start gap-3 rounded-lg border bg-background p-3'
 								>
-									<Activity className='mt-0.5 h-4 w-4 shrink-0 text-muted-foreground' />
-									<p className='text-sm leading-6'>{item}</p>
+									<Activity className='mt-0.5 shrink-0 text-muted-foreground' />
+									<p className='text-sm leading-6'>
+										{suggestion.message}
+									</p>
 								</div>
-							))}
+							))
+						) : (
+							<EmptyState>Không có gợi ý mới.</EmptyState>
+						)}
+
+						<div className='rounded-lg border bg-muted/25 p-4'>
+							<div className='mb-2 flex items-center justify-between text-xs text-muted-foreground'>
+								<span>Mục tiêu tuần</span>
+								<span>{weeklyGoal}%</span>
+							</div>
+							<Progress value={weeklyGoal} className='h-2' />
 						</div>
-					</SectionPanel>
-				</div>
+					</CardContent>
+				</Card>
 			</section>
 		</main>
 	);

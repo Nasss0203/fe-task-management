@@ -2,7 +2,6 @@
 
 import {
 	BadgeCheck,
-	Bell,
 	ChevronsUpDown,
 	CreditCard,
 	LogOut,
@@ -26,13 +25,17 @@ import {
 	useSidebar,
 } from "@/components/ui/sidebar";
 import { useUser } from "@/features/auth/hooks/useUser";
-import { useEffect } from "react";
+import { usePlan } from "@/features/billing/hooks/usePlan";
+import { PlanName } from "@/services/billing/type";
+import { useRouter } from "next/navigation";
 
 export function NavUser() {
 	const { isMobile } = useSidebar();
 	const { user } = useUser();
+	const router = useRouter();
 
-	useEffect(() => {}, []);
+	const { planInfo } = usePlan();
+	const dataPlan = planInfo.data;
 
 	return (
 		<SidebarMenu>
@@ -91,13 +94,23 @@ export function NavUser() {
 							</div>
 						</DropdownMenuLabel>
 						<DropdownMenuSeparator />
-						<DropdownMenuGroup>
-							<DropdownMenuItem>
-								<Sparkles />
-								Upgrade to Pro
-							</DropdownMenuItem>
-						</DropdownMenuGroup>
-						<DropdownMenuSeparator />
+						{dataPlan?.data.plan.name === PlanName.FREE ? (
+							<>
+								<DropdownMenuGroup>
+									<DropdownMenuItem
+										onSelect={() =>
+											router.push(
+												"/dashboard/billing/upgrade",
+											)
+										}
+									>
+										<Sparkles />
+										Upgrade to Pro
+									</DropdownMenuItem>
+								</DropdownMenuGroup>
+								<DropdownMenuSeparator />
+							</>
+						) : null}
 						<DropdownMenuGroup>
 							<DropdownMenuItem>
 								<BadgeCheck />
@@ -106,10 +119,6 @@ export function NavUser() {
 							<DropdownMenuItem>
 								<CreditCard />
 								Billing
-							</DropdownMenuItem>
-							<DropdownMenuItem>
-								<Bell />
-								Notifications
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />

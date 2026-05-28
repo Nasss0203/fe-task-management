@@ -1,27 +1,28 @@
 "use client";
 import { GetMeResponse } from "@/services/auth/type";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
-export type User = {
-	id: string;
-	email: string;
-	username: string;
-	isActive: boolean;
-	createdAt: string;
-	updatedAt: string;
-};
+const USER_KEY = "user";
 
 export const useUser = () => {
-	const [user, setUser] = useState<GetMeResponse | undefined>(() => {
-		if (typeof window !== "undefined") {
-			const rawUser = localStorage.getItem("user");
-			if (rawUser) {
-				return JSON.parse(rawUser);
-			}
+	const [user, setUserState] = useState<GetMeResponse | undefined>(() => {
+		if (typeof window === "undefined") return undefined;
+		try {
+			const raw = localStorage.getItem(USER_KEY);
+			return raw ? JSON.parse(raw) : undefined;
+		} catch {
+			return undefined;
 		}
-
-		return undefined;
 	});
+
+	const setUser = useCallback((value: GetMeResponse | undefined) => {
+		setUserState(value);
+		if (value) {
+			localStorage.setItem(USER_KEY, JSON.stringify(value));
+		} else {
+			localStorage.removeItem(USER_KEY);
+		}
+	}, []);
 
 	return { user, setUser };
 };
