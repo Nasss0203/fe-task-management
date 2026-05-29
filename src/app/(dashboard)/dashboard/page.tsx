@@ -389,24 +389,29 @@ export default function DashboardPage() {
 							{formatDashboardDate(dashboard.greeting.date)}
 						</div>
 						<Button asChild variant='outline'>
-							<Link href='/dashboard'>
+							<Link href='/dashboard/my-tasks'>
 								<ListTodo />
-								Xem task
+								<span>
+									Xem {dashboard.priorityTasks.length} task ưu
+									tiên
+								</span>
 							</Link>
 						</Button>
 						{primaryWorkspace ? (
-							<Button asChild>
+							<Button asChild className='max-w-[240px]'>
 								<Link
 									href={`/dashboard/${primaryWorkspace.slug}`}
 								>
 									<FolderKanban />
-									Mở workspace
+									<span className='truncate'>
+										Mở {primaryWorkspace.name}
+									</span>
 								</Link>
 							</Button>
 						) : (
 							<Button disabled>
 								<FolderKanban />
-								Mở workspace
+								Chưa có workspace
 							</Button>
 						)}
 					</CardAction>
@@ -645,7 +650,7 @@ export default function DashboardPage() {
 			</section>
 
 			<section className='grid min-w-0 grid-cols-1 gap-4 xl:grid-cols-12'>
-				<Card className='xl:col-span-8'>
+				<Card id='priority-today' className='scroll-mt-4 xl:col-span-8'>
 					<CardHeader>
 						<CardTitle>Ưu tiên hôm nay</CardTitle>
 						<CardDescription>
@@ -653,8 +658,8 @@ export default function DashboardPage() {
 						</CardDescription>
 						<CardAction>
 							<Button variant='ghost' size='sm' asChild>
-								<Link href='/dashboard'>
-									Xem tất cả
+								<Link href='#priority-today'>
+									Xem danh sách này
 									<ArrowRight />
 								</Link>
 							</Button>

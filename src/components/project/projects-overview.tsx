@@ -13,14 +13,20 @@ type Props = {
 	items: ProjectItem[];
 };
 
+const projectStatusLabel: Record<string, string> = {
+	"On Track": "Đúng tiến độ",
+	"At Risk": "Có rủi ro",
+	"Almost Done": "Gần hoàn tất",
+};
+
 export function ProjectsOverview({ items }: Props) {
 	return (
-		<Card className='shadow-sm'>
+		<Card className='border-border/80 bg-card/80 shadow-sm'>
 			<CardHeader className='flex flex-row items-center justify-between space-y-0'>
 				<div>
-					<CardTitle>Projects Overview</CardTitle>
+					<CardTitle>Tổng quan dự án</CardTitle>
 					<p className='mt-1 text-sm text-muted-foreground'>
-						Các project chính trong workspace
+						Các dự án chính trong workspace
 					</p>
 				</div>
 
@@ -34,7 +40,7 @@ export function ProjectsOverview({ items }: Props) {
 				{items.map((project) => (
 					<div
 						key={project.id}
-						className='rounded-2xl border bg-background p-4 transition hover:shadow-sm'
+						className='rounded-xl border border-border/80 bg-background/60 p-4 transition hover:border-primary/30 hover:bg-background/90 hover:shadow-sm'
 					>
 						<div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
 							<div className='min-w-0 flex-1 space-y-3'>
@@ -50,7 +56,8 @@ export function ProjectsOverview({ items }: Props) {
 											project.status,
 										)}
 									>
-										{project.status}
+										{projectStatusLabel[project.status] ??
+											project.status}
 									</Badge>
 								</div>
 
@@ -70,8 +77,8 @@ export function ProjectsOverview({ items }: Props) {
 								</div>
 
 								<div className='flex flex-wrap gap-4 text-sm text-muted-foreground'>
-									<span>Open: {project.openTasks}</span>
-									<span>Done: {project.doneTasks}</span>
+									<span>Đang mở: {project.openTasks}</span>
+									<span>Hoàn thành: {project.doneTasks}</span>
 									<span>Deadline: {project.deadline}</span>
 								</div>
 							</div>
@@ -92,7 +99,7 @@ export function ProjectsOverview({ items }: Props) {
 								</div>
 
 								<Button variant='outline' size='sm'>
-									Mở project
+									Mở dự án
 								</Button>
 							</div>
 						</div>

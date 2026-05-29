@@ -1,9 +1,21 @@
 "use client";
 
-import { setStoredAccessToken } from "@/lib/auth-storage";
-import { getMeApi, loginApi, registerApi } from "@/services/auth/auth.service";
+import {
+	clearStoredAuth,
+	getStoredRefreshToken,
+	setStoredAccessToken,
+	setStoredRefreshToken,
+	setStoredUser,
+} from "@/lib/auth-storage";
+import {
+	getMeApi,
+	loginApi,
+	logoutApi,
+	registerApi,
+} from "@/services/auth/auth.service";
 import { LoginDto, RegisterDto } from "@/services/auth/type";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 export const useLogin = () => {
 	return useMutation({
@@ -14,10 +26,7 @@ export const useLogin = () => {
 				setStoredAccessToken(result.data.access_token);
 
 				if (result.data.refresh_token) {
-					localStorage.setItem(
-						"refresh_token",
-						result.data.refresh_token,
-					);
+					setStoredRefreshToken(result.data.refresh_token);
 				}
 			}
 
@@ -27,9 +36,7 @@ export const useLogin = () => {
 			const me = await getMeApi();
 
 			const data = me.data;
-			if (typeof window !== "undefined") {
-				localStorage.setItem("user", JSON.stringify(data));
-			}
+			setStoredUser(data);
 
 			return data;
 		},
@@ -48,14 +55,25 @@ export const useRegister = () => {
 				setStoredAccessToken(result.data.access_token);
 
 				if (result.data.refresh_token) {
-					localStorage.setItem(
-						"refresh_token",
-						result.data.refresh_token,
-					);
+					setStoredRefreshToken(result.data.refresh_token);
 				}
 			}
 
 			return result;
+		},
+	});
+};
+
+export const useLogout = () => {
+	const router = useRouter();
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: () => logoutApi(getStoredRefreshToken()),
+		onSettled: () => {
+			clearStoredAuth();
+			queryClient.clear();
+			router.replace("/");
 		},
 	});
 };

@@ -1,3 +1,4 @@
+import axios from "axios";
 import instance from "../axios";
 import {
 	CreateWorkspaceResponse,
@@ -9,11 +10,23 @@ import {
 export const createWorkspaceApi = async (
 	data: WorkspaceDto,
 ): Promise<CreateWorkspaceResponse> => {
-	const response = await instance.post<CreateWorkspaceResponse>(
-		"/workspaces",
-		data,
-	);
-	return response.data;
+	try {
+		const response = await instance.post<CreateWorkspaceResponse>(
+			"/workspaces",
+			data,
+		);
+		return response.data;
+	} catch (error) {
+		if (axios.isAxiosError(error)) {
+			const apiCode = error.response?.data?.code;
+
+			if (apiCode === "WORKSPACE_LIMIT_EXCEEDED") {
+				throw error;
+			}
+		}
+
+		throw error;
+	}
 };
 
 export const findAllWorkspaceApi =

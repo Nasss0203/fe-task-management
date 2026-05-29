@@ -11,20 +11,20 @@ type Props = {
 
 export function RecentActivity({ items }: Props) {
 	return (
-		<Card className='shadow-sm'>
+		<Card className='border-border/80 bg-card/80 shadow-sm'>
 			<CardHeader>
-				<CardTitle>Recent Activity</CardTitle>
+				<CardTitle>Hoạt động gần đây</CardTitle>
 				<p className='text-sm text-muted-foreground'>
 					Hoạt động gần đây trong workspace
 				</p>
 			</CardHeader>
 
-			<CardContent className='space-y-4'>
+			<CardContent className='space-y-0'>
 				{items.map((activity, index) => (
 					<div key={activity.id}>
-						<div className='flex items-start gap-3'>
-							<Avatar className='h-9 w-9'>
-								<AvatarFallback>
+						<div className='flex items-start gap-3 py-1'>
+							<Avatar className='h-8 w-8 border border-border'>
+								<AvatarFallback className='text-xs'>
 									{activity.user.slice(0, 2).toUpperCase()}
 								</AvatarFallback>
 							</Avatar>
@@ -48,7 +48,7 @@ export function RecentActivity({ items }: Props) {
 						</div>
 
 						{index !== items.length - 1 && (
-							<Separator className='mt-4' />
+							<Separator className='my-3' />
 						)}
 					</div>
 				))}

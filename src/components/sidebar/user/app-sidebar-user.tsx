@@ -6,6 +6,7 @@ import {
 	Frame,
 	GalleryVerticalEnd,
 	Home,
+	ListTodo,
 	Mail,
 	Map,
 	PieChart,
@@ -36,6 +37,11 @@ const homeItems: NavHomeItem[] = [
 		name: "Trang chủ",
 		url: "/dashboard",
 		icon: Home,
+	},
+	{
+		name: "Công việc của tôi",
+		url: "/dashboard/my-tasks",
+		icon: ListTodo,
 	},
 	{
 		name: "Hộp thư đến",

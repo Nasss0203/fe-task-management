@@ -1,26 +1,50 @@
 "use client";
+import {
+	clearStoredUser,
+	setStoredUser,
+	USER_STORAGE_CHANGED_EVENT,
+	USER_STORAGE_KEY,
+} from "@/lib/auth-storage";
 import { GetMeResponse } from "@/services/auth/type";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
 
-const USER_KEY = "user";
+const getUserSnapshot = () => {
+	if (typeof window === "undefined") return null;
+
+	return localStorage.getItem(USER_STORAGE_KEY);
+};
+
+const subscribeToUserStorage = (callback: () => void) => {
+	window.addEventListener(USER_STORAGE_CHANGED_EVENT, callback);
+	window.addEventListener("storage", callback);
+
+	return () => {
+		window.removeEventListener(USER_STORAGE_CHANGED_EVENT, callback);
+		window.removeEventListener("storage", callback);
+	};
+};
 
 export const useUser = () => {
-	const [user, setUserState] = useState<GetMeResponse | undefined>(() => {
-		if (typeof window === "undefined") return undefined;
+	const rawUser = useSyncExternalStore(
+		subscribeToUserStorage,
+		getUserSnapshot,
+		() => null,
+	);
+	const user = useMemo(() => {
+		if (!rawUser) return undefined;
+
 		try {
-			const raw = localStorage.getItem(USER_KEY);
-			return raw ? JSON.parse(raw) : undefined;
+			return JSON.parse(rawUser) as GetMeResponse;
 		} catch {
 			return undefined;
 		}
-	});
+	}, [rawUser]);
 
 	const setUser = useCallback((value: GetMeResponse | undefined) => {
-		setUserState(value);
 		if (value) {
-			localStorage.setItem(USER_KEY, JSON.stringify(value));
+			setStoredUser(value);
 		} else {
-			localStorage.removeItem(USER_KEY);
+			clearStoredUser();
 		}
 	}, []);
 

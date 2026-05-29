@@ -16,6 +16,13 @@ export interface AuthResponse {
 	};
 }
 
+export interface LogoutResponse {
+	data?: {
+		success: boolean;
+	};
+	success?: boolean;
+}
+
 export interface AuthGetMeResponse {
 	data: {
 		id: string;
@@ -36,4 +43,6 @@ export interface GetMeResponse {
 	createdAt: string;
 	updatedAt: string;
 	avatarUrl?: string;
+	googleId?: string;
+	systemRole: string;
 }

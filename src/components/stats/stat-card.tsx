@@ -14,7 +14,7 @@ export function StatCard({ item, workspaceSlug }: Props) {
 
 	return (
 		<Link href={`/dashboard/${workspaceSlug}/${item.url}`}>
-			<Card className='shadow-sm transition hover:border-primary/40 hover:shadow-md'>
+			<Card className='h-full border-border/80 bg-card/80 shadow-sm transition hover:border-primary/40 hover:bg-card hover:shadow-md'>
 				<CardContent className='p-5'>
 					<div className='flex items-start justify-between'>
 						<div className='space-y-1'>
@@ -27,7 +27,7 @@ export function StatCard({ item, workspaceSlug }: Props) {
 							</p>
 						</div>
 
-						<div className='rounded-xl bg-primary/10 p-2 text-primary'>
+						<div className='rounded-lg border border-primary/15 bg-primary/10 p-2 text-primary'>
 							<Icon className='h-5 w-5' />
 						</div>
 					</div>

@@ -19,7 +19,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useLogin } from "@/features/auth/hooks/useAuth";
-import { useUser } from "@/features/auth/hooks/useUser";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -38,7 +37,6 @@ const formSchema = z.object({
 		.max(100, "Description must be at most 100 characters."),
 });
 const SignIn = () => {
-	const { user, setUser } = useUser();
 	const router = useRouter();
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -52,10 +50,8 @@ const SignIn = () => {
 
 	function onSubmit(data: z.infer<typeof formSchema>) {
 		mutate(data, {
-			onSuccess: (res) => {
-				// if (user?.email && user.isActive && user.username) {
-				// 	router.push(`/dashboard`);
-				// }
+			onSuccess: () => {
+				router.push("/dashboard");
 			},
 		});
 	}

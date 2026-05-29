@@ -4,22 +4,22 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 const taskStatusData = [
 	{
-		name: "Todo",
+		name: "Cần làm",
 		value: 32,
 		color: "#64748B",
 	},
 	{
-		name: "In Progress",
+		name: "Đang làm",
 		value: 18,
 		color: "#3B82F6",
 	},
 	{
-		name: "Done",
+		name: "Hoàn thành",
 		value: 54,
-		color: "#22C55E",
+		color: "#34D399",
 	},
 	{
-		name: "Overdue",
+		name: "Quá hạn",
 		value: 9,
 		color: "#EF4444",
 	},
@@ -29,19 +29,19 @@ export const TaskStatusChart = () => {
 	const total = taskStatusData.reduce((sum, item) => sum + item.value, 0);
 
 	return (
-		<div className='rounded-xl border border-border bg-card p-5'>
+		<div className='rounded-xl border border-border/80 bg-card/80 p-5 shadow-sm'>
 			<div className='mb-4 flex items-start justify-between'>
 				<div>
 					<h3 className='text-sm font-semibold text-foreground'>
-						Task status
+						Trạng thái task
 					</h3>
 					<p className='text-xs text-muted-foreground'>
-						Tổng quan trạng thái công việc
+						Tổng quan tiến độ trong workspace
 					</p>
 				</div>
 
 				<div className='rounded-full border border-border px-2 py-1 text-xs text-muted-foreground'>
-					{total} tasks
+					4 trạng thái
 				</div>
 			</div>
 
@@ -82,7 +82,7 @@ export const TaskStatusChart = () => {
 						{total}
 					</div>
 					<div className='text-xs text-muted-foreground'>
-						Total tasks
+						Tổng task
 					</div>
 				</div>
 			</div>
@@ -91,7 +91,7 @@ export const TaskStatusChart = () => {
 				{taskStatusData.map((item) => (
 					<div
 						key={item.name}
-						className='flex items-center gap-2 rounded-lg border border-border bg-background/40 px-3 py-2'
+						className='flex items-center gap-2 rounded-lg border border-border/80 bg-background/50 px-3 py-2'
 					>
 						<div
 							className='size-2 rounded-full'
@@ -104,6 +104,9 @@ export const TaskStatusChart = () => {
 
 						<span className='ml-auto text-xs font-semibold text-foreground'>
 							{item.value}
+							<span className='ml-1 font-normal text-muted-foreground'>
+								{Math.round((item.value / total) * 100)}%
+							</span>
 						</span>
 					</div>
 				))}

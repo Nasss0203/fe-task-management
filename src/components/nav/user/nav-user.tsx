@@ -24,6 +24,7 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "@/components/ui/sidebar";
+import { useLogout } from "@/features/auth/hooks/useAuth";
 import { useUser } from "@/features/auth/hooks/useUser";
 import { usePlan } from "@/features/billing/hooks/usePlan";
 import { PlanName } from "@/services/billing/type";
@@ -33,6 +34,7 @@ export function NavUser() {
 	const { isMobile } = useSidebar();
 	const { user } = useUser();
 	const router = useRouter();
+	const logout = useLogout();
 
 	const { planInfo } = usePlan();
 	const dataPlan = planInfo.data;
@@ -122,7 +124,10 @@ export function NavUser() {
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem>
+						<DropdownMenuItem
+							disabled={logout.isPending}
+							onSelect={() => logout.mutate()}
+						>
 							<LogOut />
 							Log out
 						</DropdownMenuItem>

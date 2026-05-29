@@ -1,6 +1,9 @@
+"use client";
+import { useUser } from "@/features/auth/hooks/useUser";
 import { ChevronDown, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../../ui/button";
+
 const navItems = [
 	{ label: "Features", href: "#" },
 	{ label: "Solutions", href: "#" },
@@ -10,6 +13,7 @@ const navItems = [
 ];
 
 const HeaderLanding = () => {
+	const { user } = useUser();
 	return (
 		<header className='mx-auto flex max-w-6xl items-center justify-between rounded-full border border-white/10 bg-white/5 px-5 py-3 backdrop-blur-md'>
 			<Link href='/' className='flex items-center gap-2'>
@@ -44,18 +48,33 @@ const HeaderLanding = () => {
 					Contact Sales
 				</Link>
 
-				<Link href={"sign-in"}>
-					<Button
-						variant='outline'
-						className='border-white/15 bg-transparent text-white hover:bg-white/10 hover:text-white'
-					>
-						Log In
-					</Button>
-				</Link>
+				{user ? (
+					<Link href={"dashboard"}>
+						<Button className='bg-indigo-500 text-white hover:bg-indigo-400'>
+							Get Started
+						</Button>
+					</Link>
+				) : (
+					<>
+						<Link href={"sign-in"}>
+							<Button
+								variant='outline'
+								className='border-white/15 bg-transparent text-white hover:bg-white/10 hover:text-white'
+							>
+								Log In
+							</Button>
+						</Link>
 
-				<Button className='bg-indigo-500 text-white hover:bg-indigo-400'>
-					Get Started
-				</Button>
+						<Link href={"sign-up"}>
+							<Button
+								variant='outline'
+								className='border-white/15 bg-transparent text-white hover:bg-white/10 hover:text-white'
+							>
+								Register
+							</Button>
+						</Link>
+					</>
+				)}
 			</div>
 		</header>
 	);
