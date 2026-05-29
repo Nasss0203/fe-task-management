@@ -1,3 +1,5 @@
+import { WorkspaceInviteStatus } from "../workspace-invite/type";
+
 export enum NotificationSenderType {
 	SYSTEM = "SYSTEM",
 	USER = "USER",
@@ -46,7 +48,9 @@ export type NotificationMetadata = {
 	taskTitle?: string;
 	inviteId?: string;
 	inviteToken?: string;
-	[key: string]: any;
+	inviteStatus?: WorkspaceInviteStatus;
+	status?: WorkspaceInviteStatus;
+	[key: string]: unknown;
 };
 
 export type NotificationItem = {

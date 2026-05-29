@@ -22,6 +22,7 @@ export type CreateWorkspaceInviteDto = {
 export enum WorkspaceInviteStatus {
 	PENDING = "PENDING",
 	ACCEPTED = "ACCEPTED",
+	REJECTED = "REJECTED",
 	EXPIRED = "EXPIRED",
 	REVOKED = "REVOKED",
 }
@@ -42,6 +43,7 @@ export type WorkspaceInviteResponse = {
 	token: string;
 	status: WorkspaceInviteStatus;
 	accepted_at: string | null;
+	rejected_at?: string | null;
 	expires_at: string;
 	max_uses: number | null;
 	used_count: number;

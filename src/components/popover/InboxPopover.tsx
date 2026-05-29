@@ -12,10 +12,14 @@ import {
 	UserPlus,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { useNotifications } from "@/features/notification/hooks/useNotifications";
+import { useAcceptWorkspaceInvite } from "@/features/workspace/hooks/useWorkspaceInvite";
 import { NotificationType } from "@/services/notification/type";
+import { WorkspaceInviteStatus } from "@/services/workspace-invite/type";
 
 const getNotificationIcon = (type: NotificationType) => {
 	switch (type) {
@@ -52,12 +56,42 @@ const getNotificationIcon = (type: NotificationType) => {
 
 export function InboxPopover() {
 	const router = useRouter();
+	const acceptInvite = useAcceptWorkspaceInvite();
+	const [inviteStatuses, setInviteStatuses] = useState<
+		Record<string, WorkspaceInviteStatus>
+	>({});
 
 	const { myNotificationsQuery } = useNotifications({
 		limit: 10,
 	});
 
 	const notifications = myNotificationsQuery.data?.data ?? [];
+	console.log("🚀 ~ notifications~", notifications);
+
+	const handleAcceptInvite = (inviteToken: string | undefined) => {
+		if (!inviteToken) {
+			toast.error("Invite token not found");
+			return;
+		}
+
+		acceptInvite.mutate(inviteToken, {
+			onSuccess: (response) => {
+				const nextStatus =
+					response.data.status ?? WorkspaceInviteStatus.ACCEPTED;
+
+				setInviteStatuses((prev) => ({
+					...prev,
+					[inviteToken]: nextStatus,
+				}));
+
+				toast.success("Workspace invite accepted");
+				router.push("/dashboard");
+			},
+			onError: () => {
+				toast.error("Failed to accept workspace invite");
+			},
+		});
+	};
 
 	return (
 		<div className='w-[420px] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md'>
@@ -88,6 +122,19 @@ export function InboxPopover() {
 						const isWorkspaceInvite =
 							notification.type ===
 							NotificationType.WORKSPACE_INVITE;
+
+						const inviteToken = notification.metadata?.inviteToken;
+						const inviteStatus =
+							(inviteToken
+								? inviteStatuses[inviteToken]
+								: undefined) ??
+							notification.metadata?.inviteStatus ??
+							notification.metadata?.status;
+						const isPendingInvite =
+							isWorkspaceInvite &&
+							!!inviteToken &&
+							(!inviteStatus ||
+								inviteStatus === WorkspaceInviteStatus.PENDING);
 
 						const isTaskAction =
 							notification.type ===
@@ -132,22 +179,18 @@ export function InboxPopover() {
 										)}
 									</div>
 
-									{isWorkspaceInvite && (
+									{isPendingInvite && (
 										<div className='mt-3 flex items-center gap-2'>
 											<Button
 												size='sm'
 												className='h-8 px-3 text-xs'
+												disabled={
+													acceptInvite.isPending
+												}
 												onClick={() => {
-													const inviteId =
-														notification.metadata
-															?.inviteId;
-
-													if (!inviteId) return;
-
-													// acceptInvite.mutate({
-													// 	inviteId,
-													// 	notificationId: notification.id,
-													// });
+													handleAcceptInvite(
+														inviteToken,
+													);
 												}}
 											>
 												Chấp nhận

@@ -32,7 +32,16 @@ export const searchInviteUsersApi = async ({
 			q,
 		},
 	});
-	console.log("🚀 ~ response~searchInviteUsersApi", response);
 
 	return response.data.data;
+};
+
+export const acceptWorkspaceInviteApi = async (
+	token: string,
+): Promise<ApiResponse<WorkspaceInviteResponse>> => {
+	const response = await instance.post<ApiResponse<WorkspaceInviteResponse>>(
+		`/workspace-invites/${encodeURIComponent(token)}/accept`,
+	);
+
+	return response.data;
 };

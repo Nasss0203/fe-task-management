@@ -1,9 +1,12 @@
 import { CreateWorkspaceInviteDto } from "@/services/workspace-invite/type";
 import {
+	acceptWorkspaceInviteApi,
 	inviteWorkspaceMembersApi,
 	searchInviteUsersApi,
 } from "@/services/workspace-invite/workspace-invite.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { NOTIFICATION_KEY } from "@/constants/query-key";
+import { WORKSPACE_KEY } from "@/services/workspace/type";
 
 export const WORKSPACE_INVITE_KEY = {
 	SEARCH_INVITE_USERS: "SEARCH_INVITE_USERS",
@@ -32,6 +35,27 @@ export const useInviteWorkspaceMembers = (workspaceId: string) => {
 			await queryClient.invalidateQueries({
 				queryKey: [WORKSPACE_INVITE_KEY.WORKSPACE_MEMBERS, workspaceId],
 			});
+		},
+	});
+};
+
+export const useAcceptWorkspaceInvite = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (token: string) => acceptWorkspaceInviteApi(token),
+		onSuccess: async () => {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: [WORKSPACE_KEY.WORKSPACE],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [NOTIFICATION_KEY.MY_NOTIFICATIONS],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [NOTIFICATION_KEY.UNREAD_COUNT],
+				}),
+			]);
 		},
 	});
 };
