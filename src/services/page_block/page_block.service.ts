@@ -1,6 +1,7 @@
 import instance from "../axios";
 import {
 	CreatePageBlockPayload,
+	DeletePageBlockPayload,
 	FindPageBlocksByPageResponse,
 	PageBlockItem,
 } from "./type";
@@ -78,4 +79,15 @@ export const updatePageBlockApi = async (
 	);
 
 	return unwrapPageBlock(response.data);
+};
+
+export const deletePageBlockApi = async ({
+	blockId,
+	workspaceId,
+}: DeletePageBlockPayload) => {
+	await instance.delete(`/pageBlock/${blockId}`, {
+		params: {
+			workspaceId,
+		},
+	});
 };

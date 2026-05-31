@@ -31,7 +31,8 @@ const RestPage = () => {
 		return config?.project_id === projectId;
 	})?.id;
 
-	const { setCurrentBoardId } = useProjectSelectionStore();
+	const { setCurrentProjectId, setCurrentBoardId } =
+		useProjectSelectionStore();
 
 	const [activeTab, setActiveTab] = useState<BoardViewType>(
 		BoardViewType.BOARD,
@@ -75,24 +76,28 @@ const RestPage = () => {
 
 	useEffect(() => {
 		if (!activeBoard?.id) return;
+		setCurrentProjectId(projectId);
 		setCurrentBoardId(activeBoard.id);
-	}, [activeBoard?.id, setCurrentBoardId]);
+	}, [activeBoard?.id, projectId, setCurrentBoardId, setCurrentProjectId]);
 
-	if (!workspaceId || !projectId || !blockId) return null;
+	if (!workspaceId || !projectId) return null;
 
 	return (
-		<div className='min-h-0 flex-1 overflow-y-auto px-10 pb-10'>
-			<ProjectBlock
-				context='project'
-				blockId={blockId}
-				projectId={projectId}
-				workspaceId={workspaceId}
-				activeTab={activeTabValue}
-				availableTabs={availableTabs}
-				boards={boards}
-				activeBoard={activeBoard}
-				setActiveTab={setActiveTab}
-			/>
+		<div className='flex flex-col gap-5'>
+			<div className='text-2xl font-medium'>{page.title}</div>
+			<div className='min-h-0 flex-1 overflow-y-auto px-10 pb-10'>
+				<ProjectBlock
+					context='project'
+					blockId={blockId}
+					projectId={projectId}
+					workspaceId={workspaceId}
+					activeTab={activeTabValue}
+					availableTabs={availableTabs}
+					boards={boards}
+					activeBoard={activeBoard}
+					setActiveTab={setActiveTab}
+				/>
+			</div>
 		</div>
 	);
 };

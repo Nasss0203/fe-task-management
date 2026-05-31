@@ -13,7 +13,7 @@ import { BacklogRenderContext } from "../backlog/types";
 import { BOARD_VIEW_CONFIG } from "../board/view-board";
 
 type Props = {
-	blockId: string;
+	blockId?: string;
 	projectId: string;
 	workspaceId: string;
 	config: PageBlockDataConfig;

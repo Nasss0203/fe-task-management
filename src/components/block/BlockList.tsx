@@ -1,7 +1,7 @@
 "use client";
 
-import { usePageBlock } from "@/features/page-block/hooks/usePageBlock";
 import SimplePageBlockRenderer from "@/features/page-block/components/SimplePageBlockRenderer";
+import { usePageBlock } from "@/features/page-block/hooks/usePageBlock";
 import {
 	normalizeDatabaseViewConfig,
 	PageBlockItem,
@@ -21,6 +21,7 @@ const BlockList = ({ blocks, page }: BlockListProps) => {
 	const {
 		createPageBlock: { mutate: createBlock },
 		updatePageBlock: { mutate },
+		deletePageBlock: { mutate: deleteBlock },
 	} = usePageBlock();
 
 	const handleUpdateDataConfigPageblock = (block: PageBlockItem) => {
@@ -67,6 +68,18 @@ const BlockList = ({ blocks, page }: BlockListProps) => {
 		});
 	};
 
+	const handleDeleteBlock = (block: PageBlockItem) => {
+		const workspaceId = page?.workspace_id;
+
+		if (!block.id || !block.page_id || !workspaceId) return;
+
+		deleteBlock({
+			blockId: block.id,
+			pageId: block.page_id,
+			workspaceId,
+		});
+	};
+
 	const sortedBlocks = [...(Array.isArray(blocks) ? blocks : [])].sort(
 		(a, b) => (a.order_index ?? 0) - (b.order_index ?? 0),
 	);
@@ -92,7 +105,11 @@ const BlockList = ({ blocks, page }: BlockListProps) => {
 									{block.title ?? "Untitled project"}
 								</span>
 							) : (
-								<SimplePageBlockRenderer block={block} />
+								<SimplePageBlockRenderer
+									block={block}
+									onUpdate={(nextBlock) => mutate(nextBlock)}
+									onCreateAfter={handleCreateBlockAfter}
+								/>
 							)}
 
 							<div className='invisible pointer-events-none absolute left-1 top-1/2 flex -translate-y-1/2 items-center gap-1 opacity-0 transition-all duration-200 group-hover:visible group-hover:pointer-events-auto group-hover:opacity-100'>
@@ -112,6 +129,9 @@ const BlockList = ({ blocks, page }: BlockListProps) => {
 								<DropdownMenu
 									onConvert={() =>
 										handleUpdateDataConfigPageblock(block)
+									}
+									onRemoveFromPage={() =>
+										handleDeleteBlock(block)
 									}
 								>
 									<button

@@ -74,7 +74,10 @@ const ProjectSidebarItem = ({
 					</SidebarMenuSubButtonV2>
 
 					<div className='pointer-events-none absolute right-1 top-1/2 z-20 flex -translate-y-1/2 items-center gap-0.5 opacity-0 transition-opacity group-hover/project-item:pointer-events-auto group-hover/project-item:opacity-100 group-focus-within/project-item:pointer-events-auto group-focus-within/project-item:opacity-100'>
-						<ProjectDropdown></ProjectDropdown>
+						<ProjectDropdown
+							project={project}
+							workspace={workspace}
+						/>
 
 						<DialogAddTask></DialogAddTask>
 					</div>

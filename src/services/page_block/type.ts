@@ -87,6 +87,12 @@ export interface CreatePageBlockPayload {
 	is_open?: boolean;
 }
 
+export interface DeletePageBlockPayload {
+	blockId: string;
+	pageId: string;
+	workspaceId: string;
+}
+
 export interface CreatePageBlockResponse {
 	data: PageBlockItem;
 }

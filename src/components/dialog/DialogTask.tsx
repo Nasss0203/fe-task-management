@@ -2,9 +2,11 @@
 
 import { useProject } from "@/features/project/hooks/useProject";
 import { ProjectDto } from "@/services/project/type";
+import axios from "axios";
 import { Ellipsis, Plus } from "lucide-react";
 import { useRef, useState } from "react";
 import { FaRegStar, FaStar } from "react-icons/fa";
+import { toast } from "sonner";
 
 import { BoardViewType } from "@/services/board/type";
 import {
@@ -20,6 +22,32 @@ import DialogSelectBoard from "./DialogSelectBoard";
 type Props = {
 	workspaceId: string;
 	workspaceName: string;
+};
+
+type ApiErrorResponse = {
+	message?: string | string[] | { message?: string };
+};
+
+const getCreateProjectErrorMessage = (error: unknown) => {
+	if (!axios.isAxiosError<ApiErrorResponse>(error)) {
+		return "Create project failed. Please try again.";
+	}
+
+	const message = error.response?.data?.message;
+
+	if (Array.isArray(message)) {
+		return message.join(", ");
+	}
+
+	if (typeof message === "object" && message?.message) {
+		return message.message;
+	}
+
+	if (typeof message === "string") {
+		return message;
+	}
+
+	return "Create project failed. Please try again.";
 };
 
 const DialogTask = ({ workspaceId, workspaceName }: Props) => {
@@ -55,9 +83,14 @@ const DialogTask = ({ workspaceId, workspaceName }: Props) => {
 			default_board_view_type: viewType,
 		};
 
-		await mutateAsync(data);
-		resetState();
-		setOpen(false);
+		try {
+			await mutateAsync(data);
+			resetState();
+			setOpen(false);
+		} catch (error) {
+			createdByBoardRef.current = false;
+			toast.error(getCreateProjectErrorMessage(error));
+		}
 	};
 
 	const handleOpenChange = async (nextOpen: boolean) => {

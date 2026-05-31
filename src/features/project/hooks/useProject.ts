@@ -16,7 +16,7 @@ export const useProject = () => {
 			});
 		},
 		onError: (err) => {
-			console.error("createWorkspaceApi failed", err);
+			console.error("createProject failed", err);
 		},
 	});
 

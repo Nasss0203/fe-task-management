@@ -13,37 +13,55 @@ import UnsupportedBlock from "./simple-blocks/UnsupportedBlock";
 
 type SimplePageBlockRendererProps = {
 	block: PageBlockItem;
+	onUpdate: (block: PageBlockItem) => void;
+	onCreateAfter: (block: PageBlockItem, type: PageBlockType) => void;
 };
 
-const SimplePageBlockRenderer = ({ block }: SimplePageBlockRendererProps) => {
+const SimplePageBlockRenderer = ({
+	block,
+	onUpdate,
+	onCreateAfter,
+}: SimplePageBlockRendererProps) => {
 	const text = getContentText(block);
 
 	switch (block.type) {
 		case PageBlockType.HEADER:
-			return <HeaderBlock text={text} title={block.title} />;
+			return (
+				<HeaderBlock
+					block={block}
+					text={text}
+					title={block.title}
+					onUpdate={onUpdate}
+				/>
+			);
 
 		case PageBlockType.TEXT:
-			return <TextBlock text={text} />;
+			return <TextBlock block={block} text={text} onUpdate={onUpdate} />;
 
 		case PageBlockType.TODO: {
 			const content = getContentRecord(block);
-			const checked = content.checked === true;
 
-			return <TodoBlock checked={checked} text={text} />;
+			return (
+				<TodoBlock
+					block={block}
+					content={content}
+					onUpdate={onUpdate}
+					onCreateAfter={onCreateAfter}
+				/>
+			);
 		}
 
 		case PageBlockType.QUOTE:
-			return <QuoteBlock text={text} />;
+			return <QuoteBlock block={block} text={text} onUpdate={onUpdate} />;
 
 		case PageBlockType.DIVIDER:
 			return <DividerBlock />;
 
 		case PageBlockType.CODE: {
 			const content = getContentRecord(block);
-			const code =
-				typeof content.code === "string" ? content.code : "";
+			const code = typeof content.code === "string" ? content.code : "";
 
-			return <CodeBlock code={code} />;
+			return <CodeBlock block={block} code={code} onUpdate={onUpdate} />;
 		}
 
 		default:

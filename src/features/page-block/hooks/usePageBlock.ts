@@ -1,10 +1,12 @@
 import {
 	createPageBlockApi,
+	deletePageBlockApi,
 	findPageBlocksByPageApi,
 	updatePageBlockApi,
 } from "@/services/page_block/page_block.service";
 import {
 	CreatePageBlockPayload,
+	DeletePageBlockPayload,
 	FindPageBlocksByPageResponse,
 	PAGE_BLOCK_KEY,
 	PageBlockItem,
@@ -43,6 +45,27 @@ export const usePageBlock = ({ pageId }: UsePageBlockParams = {}) => {
 			{
 				...previous,
 				data: nextBlocks,
+			},
+		);
+
+		return true;
+	};
+
+	const removePageBlockCache = ({
+		blockId,
+		pageId,
+	}: DeletePageBlockPayload) => {
+		const previous = queryClient.getQueryData<FindPageBlocksByPageResponse>(
+			[PAGE_BLOCK_KEY.PAGE_BLOCKS, pageId],
+		);
+
+		if (!previous?.data) return false;
+
+		queryClient.setQueryData<FindPageBlocksByPageResponse>(
+			[PAGE_BLOCK_KEY.PAGE_BLOCKS, pageId],
+			{
+				...previous,
+				data: previous.data.filter((block) => block.id !== blockId),
 			},
 		);
 
@@ -105,9 +128,34 @@ export const usePageBlock = ({ pageId }: UsePageBlockParams = {}) => {
 		},
 	});
 
+	const deletePageBlock = useMutation({
+		mutationFn: async (data: DeletePageBlockPayload) => {
+			await deletePageBlockApi(data);
+
+			return data;
+		},
+		onSuccess: (data) => {
+			const hasUpdatedCache = removePageBlockCache(data);
+
+			if (!hasUpdatedCache) {
+				void refetchPageBlocks(data.pageId);
+				return;
+			}
+
+			void refetchPageBlocks(data.pageId);
+		},
+		onSettled: (_, error, variables) => {
+			if (error) void refetchPageBlocks(variables?.pageId);
+		},
+		onError: (err) => {
+			console.error("deletePageBlock failed", err);
+		},
+	});
+
 	return {
 		pageBlocks,
 		createPageBlock,
 		updatePageBlock,
+		deletePageBlock,
 	};
 };

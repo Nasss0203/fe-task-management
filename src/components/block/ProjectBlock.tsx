@@ -13,7 +13,7 @@ export type AvailableTabItem = {
 	boardId?: string | null;
 };
 type ProjectBlockProps = {
-	blockId: string;
+	blockId?: string;
 	title?: string;
 	projectId: string;
 	workspaceId: string;
@@ -43,22 +43,7 @@ const ProjectBlock = ({
 		: null;
 
 	return (
-		<div className='flex flex-col gap-2'>
-			{!isOpen ? (
-				<>
-					{boards.length > 0 && (
-						<div>
-							<input
-								type='text'
-								defaultValue={title ?? "Workspace"}
-								placeholder='Workspace'
-								className='text-2xl font-bold outline-none'
-							/>
-						</div>
-					)}
-				</>
-			) : null}
-
+		<div className='flex flex-col gap-2 ml-16 mt-2'>
 			<Tabs
 				value={activeTab}
 				onValueChange={(value) => setActiveTab(value as BoardViewType)}
@@ -83,7 +68,7 @@ const ProjectBlock = ({
 							})}
 						</TabsListCustom>
 
-						{boards.length > 0 && (
+						{boards.length > 0 && blockId && (
 							<AddBoard
 								blockId={blockId}
 								boards={boards}
