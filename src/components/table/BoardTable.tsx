@@ -146,7 +146,24 @@ const BoardTable = ({
 	});
 
 	const { taskQuery } = useTask(workspaceId, projectId);
-	const dataTask = taskQuery?.data?.data;
+	const rawTasks = Array.isArray(taskQuery?.data?.data)
+		? taskQuery.data.data
+		: [];
+	const dataTask = React.useMemo<TaskItem[]>(
+		() =>
+			rawTasks.map((task) => ({
+				id: task.id,
+				title: task.title,
+				assigneeName:
+					task.assignees?.[0]?.fullName ??
+					task.assignees?.[0]?.username ??
+					null,
+				priorityName: task.priorityName,
+				statusName: task.statusName ?? "",
+				estimateMinutes: task.estimateMinutes,
+			})),
+		[rawTasks],
+	);
 
 	const [columnOrder, setColumnOrder] = React.useState<string[]>(() =>
 		columns.map((c) => c.id!),
@@ -185,7 +202,7 @@ const BoardTable = ({
 	});
 
 	const table = useReactTable({
-		data: dataTask as any,
+		data: dataTask,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
@@ -197,6 +214,9 @@ const BoardTable = ({
 			columnOrder,
 		},
 	});
+
+	const rows = table.getRowModel()?.rows ?? [];
+	const columnCount = Math.max(columnOrder.length, columns.length, 1);
 
 	return (
 		<section className='col-span-12 flex h-full min-h-0 flex-col overflow-hidden border border-[#2a2a2a] bg-[#171717] shadow-sm xl:col-span-6'>
@@ -247,8 +267,8 @@ const BoardTable = ({
 							</TableHeader>
 
 							<TableBody>
-								{table?.getRowModel().rows.length ? (
-									table?.getRowModel().rows.map((row) => (
+								{rows.length ? (
+									rows.map((row) => (
 										<TableRow
 											key={row.id}
 											className='h-11 border-b border-neutral-800 bg-[#1b1b1b] transition-colors last:border-b-0 hover:bg-[#242424]'
@@ -273,7 +293,7 @@ const BoardTable = ({
 								) : (
 									<TableRow>
 										<TableCell
-											colSpan={columnOrder.length}
+											colSpan={columnCount}
 											className='h-28 text-center text-sm text-neutral-500'
 										>
 											No results.

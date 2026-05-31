@@ -11,16 +11,18 @@ import {
 import ProjectBlockContainer from "./ProjectBlockContainer";
 
 interface BlockItemsProps {
+	blockId?: string;
 	title: string;
 	isOpen: boolean;
 	handleUpdateDataConfigPageblock: (block: any) => void;
 	projectId: string;
 	workspaceId: string;
-	boardId: any;
+	boardId: string | null;
 	view: BoardViewType;
 }
 
 const BlockItems = ({
+	blockId,
 	title,
 	isOpen,
 	projectId,
@@ -65,9 +67,15 @@ const BlockItems = ({
 			{isOpen && (
 				<div className='mt-2'>
 					<ProjectBlockContainer
+						blockId={blockId ?? ""}
 						projectId={projectId}
 						workspaceId={workspaceId}
-						configs={boardId}
+						config={{
+							workspace_id: workspaceId,
+							project_id: projectId,
+							default_board_id: boardId,
+							default_view_type: view,
+						}}
 						title={title ?? ""}
 					/>
 				</div>

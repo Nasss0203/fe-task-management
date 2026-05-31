@@ -5,7 +5,7 @@ import { getMeApi } from "@/services/auth/auth.service";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
 
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
@@ -32,9 +32,13 @@ export default function AuthCallbackPage() {
 		handleAuth();
 	}, [searchParams, router]);
 
+	return <div>Dang dang nhap...</div>;
+}
+
+export default function AuthCallbackPage() {
 	return (
-		<Suspense fallback={<div>Đang xử lý đăng nhập...</div>}>
-			<div>Đang đăng nhập...</div>;
+		<Suspense fallback={<div>Dang xu ly dang nhap...</div>}>
+			<AuthCallbackContent />
 		</Suspense>
 	);
 }

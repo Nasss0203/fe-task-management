@@ -54,7 +54,7 @@ const layout = ({
 						</div>
 					</div>
 				</header>
-				<div className='flex min-h-0 min-w-0 max-w-full flex-1 flex-col gap-4 overflow-hidden px-4 pt-3 md:px-6 xl:px-10'>
+				<div className='flex min-h-0 min-w-0 max-w-full flex-1 flex-col gap-4 overflow-x-visible overflow-y-auto px-4 pt-3 md:px-6 xl:px-10'>
 					{children}
 				</div>
 			</SidebarInset>

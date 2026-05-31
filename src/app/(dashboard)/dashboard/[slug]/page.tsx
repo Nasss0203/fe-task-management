@@ -5,6 +5,7 @@ import { TabsListCustom, TabsTriggerCustom } from "@/components/tabs";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { WorkspaceTopHeader } from "@/components/workspaces/WorkspaceHeader";
 import WorkspaceOverview from "@/components/workspaces/WorkspaceOverview";
+import { usePageBlock } from "@/features/page-block/hooks/usePageBlock";
 import { usePage } from "@/features/page/hooks/usePage";
 import { PageBlockItem } from "@/services/page_block/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
@@ -18,9 +19,13 @@ const SlugPage = () => {
 	} = usePage();
 
 	const page = data?.data;
-	const blocks: PageBlockItem[] = page?.blocks ?? [];
+	const {
+		pageBlocks: { data: pageBlocksData, isPending: isPageBlocksPending },
+	} = usePageBlock({ pageId: page?.id });
+	const blocks: PageBlockItem[] =
+		pageBlocksData?.data ?? page?.blocks ?? [];
 
-	if (isLoading) {
+	if (isLoading || isPageBlocksPending) {
 		return (
 			<div className='flex h-full items-center justify-center text-sm text-muted-foreground'>
 				Loading...

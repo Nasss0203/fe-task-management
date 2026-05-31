@@ -6,6 +6,7 @@ import { BOARD_VIEW_CONFIG } from "@/components/board/view-board";
 import { useBoards } from "@/features/board/hooks/useBoards";
 import { usePage } from "@/features/page/hooks/usePage";
 import { BoardItem, BoardViewType } from "@/services/board/type";
+import { normalizeDatabaseViewConfig } from "@/services/page_block/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -25,9 +26,10 @@ const RestPage = () => {
 	const page = pageData?.data;
 	const workspaceId = page?.workspace_id;
 
-	const blockId = page?.blocks?.find((block) =>
-		block.data_config?.some((config) => config.project_id === projectId),
-	)?.id;
+	const blockId = page?.blocks?.find((block) => {
+		const config = normalizeDatabaseViewConfig(block.data_config);
+		return config?.project_id === projectId;
+	})?.id;
 
 	const { setCurrentBoardId } = useProjectSelectionStore();
 

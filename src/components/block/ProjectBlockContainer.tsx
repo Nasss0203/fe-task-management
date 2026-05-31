@@ -16,7 +16,7 @@ type Props = {
 	blockId: string;
 	projectId: string;
 	workspaceId: string;
-	configs: PageBlockDataConfig[];
+	config: PageBlockDataConfig;
 	title?: string;
 	isOpen?: boolean;
 	context?: BacklogRenderContext;
@@ -26,7 +26,7 @@ const ProjectBlockContainer = ({
 	projectId,
 	blockId,
 	workspaceId,
-	configs,
+	config,
 	title,
 	isOpen,
 	context = "workspace",
@@ -34,11 +34,9 @@ const ProjectBlockContainer = ({
 	const { setCurrentProjectId, setCurrentBoardId } =
 		useProjectSelectionStore();
 
-	const initialView =
-		(configs[0]?.view_type as BoardViewType | undefined) ??
-		BoardViewType.BOARD;
-
-	const [activeTab, setActiveTab] = useState<BoardViewType>(initialView);
+	const [activeTab, setActiveTab] = useState<BoardViewType>(
+		config.default_view_type ?? BoardViewType.BOARD,
+	);
 
 	const { findBoard } = useBoards({
 		workspaceId,
@@ -48,31 +46,40 @@ const ProjectBlockContainer = ({
 	const boards: BoardItem[] = findBoard.data?.data ?? [];
 
 	const availableTabs = useMemo<AvailableTabItem[]>(() => {
-		return configs.reduce<AvailableTabItem[]>((acc, item) => {
-			const viewType = item.view_type as BoardViewType;
-			const config = BOARD_VIEW_CONFIG[viewType];
+		return boards.reduce<AvailableTabItem[]>((acc, board) => {
+			const viewConfig = BOARD_VIEW_CONFIG[board.viewType];
 
-			if (!config?.enabled) return acc;
+			if (!viewConfig?.enabled) return acc;
 
 			acc.push({
-				icon: config.icon,
-				type: config.label,
-				value: viewType,
-				boardId: item.board_id,
+				icon: viewConfig.icon,
+				type: viewConfig.label,
+				value: board.viewType,
+				boardId: board.id,
 			});
 
 			return acc;
 		}, []);
-	}, [configs]);
-
-	const activeConfig = useMemo(() => {
-		return configs.find((item) => item.view_type === activeTab);
-	}, [configs, activeTab]);
+	}, [boards]);
 
 	const activeBoard = useMemo(() => {
-		if (!activeConfig?.board_id) return undefined;
-		return boards.find((b) => b.id === activeConfig.board_id);
-	}, [boards, activeConfig]);
+		return boards.find((board) => board.viewType === activeTab);
+	}, [boards, activeTab]);
+
+	useEffect(() => {
+		if (!config.default_board_id) return;
+
+		const defaultBoard = boards.find(
+			(board) => board.id === config.default_board_id,
+		);
+
+		if (defaultBoard) {
+			setActiveTab(defaultBoard.viewType);
+			return;
+		}
+
+		setActiveTab(config.default_view_type ?? BoardViewType.BOARD);
+	}, [boards, config.default_board_id, config.default_view_type]);
 
 	useEffect(() => {
 		if (!availableTabs.length) return;

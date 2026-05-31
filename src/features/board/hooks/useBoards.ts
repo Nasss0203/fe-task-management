@@ -6,7 +6,6 @@ import {
 	findBoardById,
 } from "@/services/board/board.service";
 import { BOARD_KEY, CreateBoarDto } from "@/services/board/type";
-import { PAGE_KEY } from "@/services/page/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -41,10 +40,6 @@ export const useBoards = ({
 					variables.workspaceId,
 					variables.projectId,
 				],
-			});
-
-			await queryClient.invalidateQueries({
-				queryKey: [PAGE_KEY.PAGE],
 			});
 		},
 		onError: (err) => {
