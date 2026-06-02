@@ -1,22 +1,16 @@
 "use client";
 
 import {
-	BarChart3,
 	CalendarDays,
-	FileText,
 	GalleryVerticalEnd,
-	GanttChart,
-	Image,
-	LayoutDashboard,
 	LayoutGrid,
 	List,
-	Map,
 	Plus,
-	Rss,
 	Table2,
 } from "lucide-react";
 
 import { useBoards } from "@/features/board/hooks/useBoards";
+import { useWorkspaceFeatures } from "@/features/workspace-feature/hooks/useWorkspaceFeatures";
 import { BoardItem, BoardViewType } from "@/services/board/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import {
@@ -65,49 +59,7 @@ const BOARD_VIEW_ITEMS: {
 		enabled: true,
 	},
 	{
-		label: "Dòng thời gian",
-		value: BoardViewType.TIMELINE,
-		icon: GanttChart,
-		enabled: true,
-	},
-	{
-		label: "Biểu đồ",
-		value: BoardViewType.CHART,
-		icon: BarChart3,
-		enabled: true,
-	},
-	{
-		label: "Bảng điều khiển",
-		value: BoardViewType.DASHBOARD,
-		icon: LayoutDashboard,
-		enabled: true,
-	},
-	{
-		label: "Bảng tin",
-		value: BoardViewType.FEED,
-		icon: Rss,
-		enabled: true,
-	},
-	{
-		label: "Bản đồ",
-		value: BoardViewType.MAP,
-		icon: Map,
-		enabled: true,
-	},
-	{
-		label: "Biểu mẫu",
-		value: BoardViewType.FORM,
-		icon: FileText,
-		enabled: true,
-	},
-	{
-		label: "Thư viện",
-		value: BoardViewType.GALLERY,
-		icon: Image,
-		enabled: true,
-	},
-	{
-		label: "Back Log",
+		label: "Backlog",
 		value: BoardViewType.BACKLOG,
 		icon: GalleryVerticalEnd,
 		enabled: true,
@@ -124,8 +76,17 @@ export default function AddBoard({
 		useProjectSelectionStore();
 
 	const { createBoard, findBoard } = useBoards();
+	const { canUseSprint } = useWorkspaceFeatures(workspaceId);
 
 	const existingViewTypes = new Set(boards.map((board) => board.viewType));
+	const boardViewItems = BOARD_VIEW_ITEMS.filter((item) => {
+		if (!item.enabled) return false;
+		if (item.value === BoardViewType.BACKLOG && !canUseSprint) {
+			return false;
+		}
+
+		return true;
+	});
 
 	const handleSubmit = async (viewType: BoardViewType, label: string) => {
 		if (!viewType) return;
@@ -172,7 +133,7 @@ export default function AddBoard({
 			<PopoverContentV2
 				align='start'
 				sideOffset={10}
-				className='w-90 rounded-2xl border border-neutral-800 bg-neutral-950 p-0 text-white shadow-2xl'
+				className='w-[420px] rounded-2xl border border-neutral-800 bg-neutral-950 p-0 text-white shadow-2xl'
 			>
 				<PopoverHeaderV2 className='border-b border-neutral-800 px-5 py-4'>
 					<PopoverTitleV2 className='text-base font-semibold text-neutral-100'>
@@ -180,38 +141,37 @@ export default function AddBoard({
 					</PopoverTitleV2>
 				</PopoverHeaderV2>
 
-				<div className='grid grid-cols-4 p-3'>
-					{BOARD_VIEW_ITEMS.filter((item) => item.enabled).map(
-						(item) => {
-							const Icon = item.icon;
-							const isExists = existingViewTypes.has(item.value);
+				<div className='grid grid-cols-5 p-3'>
+					{boardViewItems.map((item) => {
+						const Icon = item.icon;
+						const isExists = existingViewTypes.has(item.value);
+						const isDisabled = isExists;
 
-							return (
-								<button
-									key={item.value}
-									type='button'
-									disabled={isExists}
-									title={
-										isExists
-											? "Chế độ xem này đã tồn tại"
-											: item.label
-									}
-									onClick={() =>
-										handleSubmit(item.value, item.label)
-									}
-									className='group flex cursor-pointer flex-col items-center justify-start gap-2 rounded-xl p-2 text-center transition hover:bg-neutral-900 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent'
-								>
-									<div className='flex h-11 w-11 items-center justify-center rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-100 transition group-hover:border-neutral-700 group-hover:bg-neutral-800 group-disabled:border-neutral-800 group-disabled:bg-neutral-900'>
-										<Icon className='size-5' />
-									</div>
+						return (
+							<button
+								key={item.value}
+								type='button'
+								disabled={isDisabled}
+								title={
+									isExists
+										? "Chế độ xem này đã tồn tại"
+										: item.label
+								}
+								onClick={() =>
+									handleSubmit(item.value, item.label)
+								}
+								className='group flex cursor-pointer flex-col items-center justify-start gap-2 rounded-xl p-2 text-center transition hover:bg-neutral-900 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent'
+							>
+								<div className='flex h-11 w-11 items-center justify-center rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-100 transition group-hover:border-neutral-700 group-hover:bg-neutral-800 group-disabled:border-neutral-800 group-disabled:bg-neutral-900'>
+									<Icon className='size-5' />
+								</div>
 
-									<span className='line-clamp-2 text-xs font-medium leading-5 text-neutral-100'>
-										{item.label}
-									</span>
-								</button>
-							);
-						},
-					)}
+								<span className='line-clamp-2 text-xs font-medium leading-5 text-neutral-100'>
+									{item.label}
+								</span>
+							</button>
+						);
+					})}
 				</div>
 			</PopoverContentV2>
 		</PopoverV2>

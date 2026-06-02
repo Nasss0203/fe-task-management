@@ -19,26 +19,28 @@ type UseSprintsParams = {
 	workspaceId?: string;
 	projectId?: string;
 	sprintId?: string;
+	enabled?: boolean;
 };
 
 export const useSprints = ({
 	workspaceId,
 	projectId,
 	sprintId,
+	enabled = true,
 }: UseSprintsParams) => {
 	const queryClient = useQueryClient();
 
 	const sprintsQuery = useQuery({
 		queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
 		queryFn: () => findAllSprintApi(workspaceId!, projectId!),
-		enabled: Boolean(workspaceId && projectId),
+		enabled: Boolean(enabled && workspaceId && projectId),
 	});
 
 	const sprintsTaskQuery = useQuery({
 		queryKey: [SPRINT_KEY.SPRINT, workspaceId, projectId, sprintId],
 		queryFn: () =>
 			findTasksBySprintApi(workspaceId!, projectId!, sprintId!),
-		enabled: Boolean(workspaceId && projectId && sprintId),
+		enabled: Boolean(enabled && workspaceId && projectId && sprintId),
 	});
 
 	const createSprint = useMutation({

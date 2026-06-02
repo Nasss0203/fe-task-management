@@ -8,11 +8,13 @@ import {
 } from "@/components/ui/collapsible";
 
 import ProjectSidebarItem from "@/components/sidebar/user/ProjectSidebarItem";
+import { useWorkspaceFeatures } from "@/features/workspace-feature/hooks/useWorkspaceFeatures";
 import WorkspaceDropdown from "@/components/workspaces/DropdownWorkspace";
 import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";
 import { findProjectByWorkspaceIdApi } from "@/services/project/project.service";
 
 import { PROJECT_KEY, type ProjectItems } from "@/services/project/type";
+import type { WorkspaceItem } from "@/services/workspace/type";
 
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useQueries } from "@tanstack/react-query";
@@ -29,10 +31,32 @@ import {
 	SidebarMenuV2,
 } from "../../sidebar/user/sidebar-custom";
 
-type WorkspaceItem = {
-	id: string;
-	name: string;
-	slug: string;
+type WorkspaceProjectsSubmenuProps = {
+	workspace: WorkspaceItem;
+	projects: ProjectItems[];
+	handleSelectProject: (workspaceId: string, projectId: string) => void;
+};
+
+const WorkspaceProjectsSubmenu = ({
+	workspace,
+	projects,
+	handleSelectProject,
+}: WorkspaceProjectsSubmenuProps) => {
+	const { canUseSprint } = useWorkspaceFeatures(workspace.id);
+
+	return (
+		<SidebarMenuSubV2 className=' w-full  pr-4'>
+			{projects.map((project) => (
+				<ProjectSidebarItem
+					key={project.id}
+					project={project}
+					workspace={workspace}
+					canUseSprint={canUseSprint}
+					handleSelectProject={handleSelectProject}
+				/>
+			))}
+		</SidebarMenuSubV2>
+	);
 };
 
 export function NavMain() {
@@ -40,7 +64,6 @@ export function NavMain() {
 		useProjectSelectionStore();
 
 	const {
-		createWorkspace: { mutate },
 		workspaceFindAll: { data: workspaceQuery },
 	} = useWorkspace();
 
@@ -124,7 +147,9 @@ export function NavMain() {
 									</Link>
 
 									<div className='pointer-events-none absolute right-1 top-1/2 z-20 flex -translate-y-1/2 items-center gap-1 opacity-0 transition-opacity group-hover/workspace-item:pointer-events-auto group-hover/workspace-item:opacity-100 group-focus-within/workspace-item:pointer-events-auto group-focus-within/workspace-item:opacity-100'>
-										<WorkspaceDropdown></WorkspaceDropdown>
+										<WorkspaceDropdown
+											workspace={workspace}
+										/>
 
 										<DialogTask
 											workspaceId={workspace.id}
@@ -134,18 +159,13 @@ export function NavMain() {
 								</SidebarMenuButtonV2>
 
 								<CollapsibleContent>
-									<SidebarMenuSubV2 className=' w-full  pr-4'>
-										{projects.map((project: any) => (
-											<ProjectSidebarItem
-												key={project.id}
-												project={project}
-												workspace={workspace}
-												handleSelectProject={
-													handleSelectProject
-												}
-											/>
-										))}
-									</SidebarMenuSubV2>
+									<WorkspaceProjectsSubmenu
+										workspace={workspace}
+										projects={projects}
+										handleSelectProject={
+											handleSelectProject
+										}
+									/>
 								</CollapsibleContent>
 							</SidebarMenuItemV2>
 						</Collapsible>

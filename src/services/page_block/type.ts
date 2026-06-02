@@ -93,6 +93,14 @@ export interface DeletePageBlockPayload {
 	workspaceId: string;
 }
 
+export interface ReorderPageBlockPayload {
+	page_id: string;
+	items: {
+		id: string;
+		order_index: number;
+	}[];
+}
+
 export interface CreatePageBlockResponse {
 	data: PageBlockItem;
 }

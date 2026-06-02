@@ -4,9 +4,10 @@ import ProjectBlock, {
 	AvailableTabItem,
 } from "@/components/block/ProjectBlock";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useBoards } from "@/features/board/hooks/useBoards";
+import { useWorkspaceFeatures } from "@/features/workspace-feature/hooks/useWorkspaceFeatures";
 import { BoardItem, BoardViewType } from "@/services/board/type";
 import { PageBlockDataConfig } from "@/services/page_block/type";
 import { BacklogRenderContext } from "../backlog/types";
@@ -34,22 +35,36 @@ const ProjectBlockContainer = ({
 	const { setCurrentProjectId, setCurrentBoardId } =
 		useProjectSelectionStore();
 
-	const [activeTab, setActiveTab] = useState<BoardViewType>(
-		config.default_view_type ?? BoardViewType.BOARD,
-	);
+	const [selectedTabState, setSelectedTabState] = useState<{
+		projectId: string;
+		value: BoardViewType | null;
+	}>(() => ({
+		projectId,
+		value: null,
+	}));
 
 	const { findBoard } = useBoards({
 		workspaceId,
 		projectId,
 	});
+	const { canUseSprint } = useWorkspaceFeatures(workspaceId);
 
-	const boards: BoardItem[] = findBoard.data?.data ?? [];
+	const boards = useMemo<BoardItem[]>(
+		() => findBoard.data?.data ?? [],
+		[findBoard.data?.data],
+	);
 
 	const availableTabs = useMemo<AvailableTabItem[]>(() => {
 		return boards.reduce<AvailableTabItem[]>((acc, board) => {
 			const viewConfig = BOARD_VIEW_CONFIG[board.viewType];
 
 			if (!viewConfig?.enabled) return acc;
+			if (
+				board.viewType === BoardViewType.BACKLOG &&
+				!canUseSprint
+			) {
+				return acc;
+			}
 
 			acc.push({
 				icon: viewConfig.icon,
@@ -60,36 +75,53 @@ const ProjectBlockContainer = ({
 
 			return acc;
 		}, []);
-	}, [boards]);
+	}, [boards, canUseSprint]);
 
-	const activeBoard = useMemo(() => {
-		return boards.find((board) => board.viewType === activeTab);
-	}, [boards, activeTab]);
+	const defaultTab = useMemo(() => {
+		const defaultBoard = config.default_board_id
+			? boards.find((board) => board.id === config.default_board_id)
+			: null;
 
-	useEffect(() => {
-		if (!config.default_board_id) return;
-
-		const defaultBoard = boards.find(
-			(board) => board.id === config.default_board_id,
+		return (
+			defaultBoard?.viewType ??
+			config.default_view_type ??
+			BoardViewType.BOARD
 		);
-
-		if (defaultBoard) {
-			setActiveTab(defaultBoard.viewType);
-			return;
-		}
-
-		setActiveTab(config.default_view_type ?? BoardViewType.BOARD);
 	}, [boards, config.default_board_id, config.default_view_type]);
 
-	useEffect(() => {
-		if (!availableTabs.length) return;
+	const requestedTab =
+		selectedTabState.projectId === projectId
+			? selectedTabState.value
+			: null;
 
-		const isValid = availableTabs.some((tab) => tab.value === activeTab);
+	const activeTab = useMemo(() => {
+		const preferredTab = requestedTab ?? defaultTab;
+		const isAvailable = availableTabs.some(
+			(tab) => tab.value === preferredTab,
+		);
 
-		if (!isValid) {
-			setActiveTab(availableTabs[0].value);
+		if (isAvailable) return preferredTab;
+
+		return availableTabs[0]?.value ?? preferredTab;
+	}, [availableTabs, defaultTab, requestedTab]);
+
+	const activeBoard = useMemo(() => {
+		if (activeTab === BoardViewType.BACKLOG && !canUseSprint) {
+			return undefined;
 		}
-	}, [availableTabs, activeTab]);
+
+		return boards.find((board) => board.viewType === activeTab);
+	}, [boards, activeTab, canUseSprint]);
+
+	const handleSetActiveTab = useCallback(
+		(value: BoardViewType) => {
+			setSelectedTabState({
+				projectId,
+				value,
+			});
+		},
+		[projectId],
+	);
 
 	useEffect(() => {
 		if (!activeBoard) return;
@@ -109,7 +141,7 @@ const ProjectBlockContainer = ({
 			activeTab={activeTab}
 			availableTabs={availableTabs}
 			activeBoard={activeBoard}
-			setActiveTab={setActiveTab}
+			setActiveTab={handleSetActiveTab}
 			context={context}
 		/>
 	);

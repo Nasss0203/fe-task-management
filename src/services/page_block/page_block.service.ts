@@ -4,6 +4,7 @@ import {
 	DeletePageBlockPayload,
 	FindPageBlocksByPageResponse,
 	PageBlockItem,
+	ReorderPageBlockPayload,
 } from "./type";
 
 type ApiEnvelope<T> = {
@@ -16,6 +17,11 @@ type PageBlockMutationResponse =
 	| PageBlockItem
 	| ApiEnvelope<PageBlockItem>
 	| ApiEnvelope<ApiEnvelope<PageBlockItem>>;
+
+type PageBlockListMutationResponse =
+	| PageBlockItem[]
+	| ApiEnvelope<PageBlockItem[]>
+	| ApiEnvelope<ApiEnvelope<PageBlockItem[]>>;
 
 const isPageBlockItem = (value: unknown): value is PageBlockItem => {
 	return (
@@ -48,6 +54,30 @@ const unwrapPageBlock = (
 	}
 
 	throw new Error("Invalid page block response");
+};
+
+const unwrapPageBlocks = (
+	response: PageBlockListMutationResponse,
+): PageBlockItem[] => {
+	if (Array.isArray(response)) {
+		return response;
+	}
+
+	if ("data" in response && Array.isArray(response.data)) {
+		return response.data;
+	}
+
+	if (
+		"data" in response &&
+		typeof response.data === "object" &&
+		response.data !== null &&
+		"data" in response.data &&
+		Array.isArray(response.data.data)
+	) {
+		return response.data.data;
+	}
+
+	throw new Error("Invalid page block list response");
 };
 
 export const findPageBlocksByPageApi = async (
@@ -90,4 +120,15 @@ export const deletePageBlockApi = async ({
 			workspaceId,
 		},
 	});
+};
+
+export const reorderPageBlocksApi = async (
+	data: ReorderPageBlockPayload,
+): Promise<PageBlockItem[]> => {
+	const response = await instance.patch<PageBlockListMutationResponse>(
+		"/pageBlock/reorder",
+		data,
+	);
+
+	return unwrapPageBlocks(response.data);
 };

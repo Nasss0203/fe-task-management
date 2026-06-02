@@ -1,3 +1,5 @@
+"use client";
+
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -7,16 +9,30 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { WorkspaceItem } from "@/services/workspace/type";
+import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import {
 	Ellipsis,
 	ExternalLink,
 	Link2,
 	Pencil,
+	Settings,
 	Trash2,
 	Users,
 } from "lucide-react";
+import Link from "next/link";
 
-const WorkspaceDropdown = () => {
+type WorkspaceDropdownProps = {
+	workspace: WorkspaceItem;
+};
+
+const WorkspaceDropdown = ({ workspace }: WorkspaceDropdownProps) => {
+	const { setCurrentWorkspaceId } = useProjectSelectionStore();
+
+	const handleSelectWorkspace = () => {
+		setCurrentWorkspaceId(workspace.id);
+	};
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -46,9 +62,15 @@ const WorkspaceDropdown = () => {
 						<span>Sao chép liên kết</span>
 					</DropdownMenuItem>
 
-					<DropdownMenuItem className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'>
-						<ExternalLink size={15} />
-						<span>Mở trong tab mới</span>
+					<DropdownMenuItem asChild>
+						<Link
+							href={`/dashboard/${workspace.slug}`}
+							target='_blank'
+							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'
+						>
+							<ExternalLink size={15} />
+							<span>Mở trong tab mới</span>
+						</Link>
 					</DropdownMenuItem>
 				</DropdownMenuGroup>
 
@@ -58,6 +80,17 @@ const WorkspaceDropdown = () => {
 					<DropdownMenuItem className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'>
 						<Users size={15} />
 						<span>Quản lý thành viên</span>
+					</DropdownMenuItem>
+
+					<DropdownMenuItem asChild>
+						<Link
+							href={`/dashboard/${workspace.slug}/settings`}
+							onClick={handleSelectWorkspace}
+							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'
+						>
+							<Settings size={15} />
+							<span>Cài đặt workspace</span>
+						</Link>
 					</DropdownMenuItem>
 				</DropdownMenuGroup>
 

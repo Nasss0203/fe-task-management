@@ -12,6 +12,9 @@ import {
 import DialogAddTask from "@/components/dialog/DialogAddTask";
 import ProjectDropdown from "@/components/project/ProjectDropdown";
 import { useSprints } from "@/features/sprint/hooks/useSprint";
+import type { ProjectItems } from "@/services/project/type";
+import type { SprintItem } from "@/services/sprint/type";
+import type { WorkspaceItem } from "@/services/workspace/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import {
 	SidebarMenuSubButtonV2,
@@ -20,25 +23,35 @@ import {
 } from "./sidebar-custom";
 
 type ProjectSidebarItemProps = {
-	project: any;
-	workspace: any;
+	project: ProjectItems;
+	workspace: WorkspaceItem;
+	canUseSprint?: boolean;
 	handleSelectProject: (workspaceId: string, projectId: string) => void;
 };
 
 const ProjectSidebarItem = ({
 	project,
 	workspace,
+	canUseSprint = false,
 	handleSelectProject,
 }: ProjectSidebarItemProps) => {
 	const { setCurrentProjectId } = useProjectSelectionStore();
+	const projectId = project.id ?? "";
+	const projectName = project.name ?? "Untitled project";
+	const canFetchSprints = canUseSprint && Boolean(projectId);
 	const { sprintsQuery } = useSprints({
-		projectId: project.id,
+		projectId,
 		workspaceId: workspace.id,
+		enabled: canFetchSprints,
 	});
 
-	const sprints = sprintsQuery.data?.data ?? [];
+	const sprints: SprintItem[] = canFetchSprints
+		? (sprintsQuery.data?.data ?? [])
+		: [];
 
-	const projectHref = `/dashboard/${workspace.slug}/projects/${project.id}`;
+	const projectHref = projectId
+		? `/dashboard/${workspace.slug}/projects/${projectId}`
+		: `/dashboard/${workspace.slug}`;
 
 	return (
 		<Collapsible asChild className='group/project'>
@@ -49,7 +62,7 @@ const ProjectSidebarItem = ({
 							<button
 								type='button'
 								className='z-10 flex size-5 shrink-0 items-center justify-center rounded-sm text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100'
-								onClick={() => setCurrentProjectId(project.id)}
+								onClick={() => setCurrentProjectId(projectId)}
 							>
 								<ChevronRight className='size-3 transition-transform duration-200 group-data-[state=open]/project:rotate-90' />
 							</button>
@@ -65,11 +78,15 @@ const ProjectSidebarItem = ({
 						<Link
 							href={projectHref}
 							className='min-w-0'
-							onClick={() =>
-								handleSelectProject(workspace.id, project.id)
-							}
+							onClick={() => {
+								if (!projectId) return;
+
+								handleSelectProject(workspace.id, projectId);
+							}}
 						>
-							<span className='line-clamp-1'>{project.name}</span>
+							<span className='line-clamp-1'>
+								{projectName}
+							</span>
 						</Link>
 					</SidebarMenuSubButtonV2>
 
@@ -83,36 +100,38 @@ const ProjectSidebarItem = ({
 					</div>
 				</div>
 
-				<CollapsibleContent>
-					<SidebarMenuSubV2 className='mt-1 border-l border-neutral-700/80 pl-3 mr-0'>
-						{sprints.map((sprint: any) => {
-							const sprintHref = `/dashboard/${workspace.slug}/projects/${project.id}/sprints/${sprint.id}`;
+				{canUseSprint ? (
+					<CollapsibleContent>
+						<SidebarMenuSubV2 className='mt-1 border-l border-neutral-700/80 pl-3 mr-0'>
+							{sprints.map((sprint) => {
+								const sprintHref = `/dashboard/${workspace.slug}/projects/${projectId}/sprints/${sprint.id}`;
 
-							return (
-								<SidebarMenuSubItemV2 key={sprint.id}>
-									<SidebarMenuSubButtonV2
-										asChild
-										className='h-7 text-sm text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100'
-									>
-										<Link
-											href={sprintHref}
-											onClick={() =>
-												handleSelectProject(
-													workspace.id,
-													project.id,
-												)
-											}
+								return (
+									<SidebarMenuSubItemV2 key={sprint.id}>
+										<SidebarMenuSubButtonV2
+											asChild
+											className='h-7 text-sm text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100'
 										>
-											<span className='line-clamp-1'>
-												{sprint.name}
-											</span>
-										</Link>
-									</SidebarMenuSubButtonV2>
-								</SidebarMenuSubItemV2>
-							);
-						})}
-					</SidebarMenuSubV2>
-				</CollapsibleContent>
+											<Link
+												href={sprintHref}
+												onClick={() =>
+													handleSelectProject(
+														workspace.id,
+														projectId,
+													)
+												}
+											>
+												<span className='line-clamp-1'>
+													{sprint.name}
+												</span>
+											</Link>
+										</SidebarMenuSubButtonV2>
+									</SidebarMenuSubItemV2>
+								);
+							})}
+						</SidebarMenuSubV2>
+					</CollapsibleContent>
+				) : null}
 			</SidebarMenuSubItemV2>
 		</Collapsible>
 	);

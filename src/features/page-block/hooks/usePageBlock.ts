@@ -2,6 +2,7 @@ import {
 	createPageBlockApi,
 	deletePageBlockApi,
 	findPageBlocksByPageApi,
+	reorderPageBlocksApi,
 	updatePageBlockApi,
 } from "@/services/page_block/page_block.service";
 import {
@@ -10,6 +11,7 @@ import {
 	FindPageBlocksByPageResponse,
 	PAGE_BLOCK_KEY,
 	PageBlockItem,
+	ReorderPageBlockPayload,
 } from "@/services/page_block/type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -66,6 +68,31 @@ export const usePageBlock = ({ pageId }: UsePageBlockParams = {}) => {
 			{
 				...previous,
 				data: previous.data.filter((block) => block.id !== blockId),
+			},
+		);
+
+		return true;
+	};
+
+	const replacePageBlocksCache = (
+		pageId: string,
+		blocks: PageBlockItem[],
+	) => {
+		const previous = queryClient.getQueryData<FindPageBlocksByPageResponse>(
+			[PAGE_BLOCK_KEY.PAGE_BLOCKS, pageId],
+		);
+
+		if (!previous?.data) return false;
+
+		const nextBlocks = [...blocks].sort(
+			(a, b) => (a.order_index ?? 0) - (b.order_index ?? 0),
+		);
+
+		queryClient.setQueryData<FindPageBlocksByPageResponse>(
+			[PAGE_BLOCK_KEY.PAGE_BLOCKS, pageId],
+			{
+				...previous,
+				data: nextBlocks,
 			},
 		);
 
@@ -152,10 +179,35 @@ export const usePageBlock = ({ pageId }: UsePageBlockParams = {}) => {
 		},
 	});
 
+	const reorderPageBlocks = useMutation({
+		mutationFn: async (data: ReorderPageBlockPayload) => {
+			const result = await reorderPageBlocksApi(data);
+
+			return result;
+		},
+		onSuccess: (blocks, variables) => {
+			const hasUpdatedCache = replacePageBlocksCache(
+				variables.page_id,
+				blocks,
+			);
+
+			if (!hasUpdatedCache) {
+				void refetchPageBlocks(variables.page_id);
+			}
+		},
+		onSettled: (_, error, variables) => {
+			if (error) void refetchPageBlocks(variables?.page_id);
+		},
+		onError: (err) => {
+			console.error("reorderPageBlocks failed", err);
+		},
+	});
+
 	return {
 		pageBlocks,
 		createPageBlock,
 		updatePageBlock,
 		deletePageBlock,
+		reorderPageBlocks,
 	};
 };

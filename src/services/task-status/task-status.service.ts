@@ -7,7 +7,6 @@ export const findAllTaskStatusApi = async (
 	const response = await instance.get(
 		`/task-status/workspace/${workspaceId}/project/${projectId}`,
 	);
-	console.log("🚀 ~ response~", response);
 
 	return response.data;
 };

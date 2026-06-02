@@ -26,7 +26,6 @@ type ProjectBlockProps = {
 	setActiveTab: (value: BoardViewType) => void;
 };
 const ProjectBlock = ({
-	title,
 	blockId,
 	boards,
 	projectId,
