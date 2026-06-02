@@ -27,12 +27,14 @@ export const billingService = {
 	createPayment: async ({
 		planId,
 		provider,
+		targetWorkspaceId,
 	}: CreatePaymentPayload): Promise<ApiResponse<CreatePayment>> => {
 		const { data } = await instance.post<ApiResponse<CreatePayment>>(
 			"/billing/payments",
 			{
 				planId,
 				provider,
+				targetWorkspaceId,
 			},
 		);
 

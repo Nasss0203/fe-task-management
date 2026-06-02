@@ -1,5 +1,6 @@
 "use client";
 
+import GoogleLoginButton from "@/components/button/GoogleLoginButton";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -22,7 +23,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { FaApple } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -193,10 +193,7 @@ const SignUp = () => {
 								<FaApple />
 								Sign up with Apple
 							</Button>
-							<Button className='flex items-center gap-1.5 flex-1 text-xs'>
-								<FcGoogle size={16} />
-								Sign up with Google
-							</Button>
+							<GoogleLoginButton></GoogleLoginButton>
 						</div>
 					</div>
 				</CardFooter>

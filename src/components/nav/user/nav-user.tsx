@@ -28,6 +28,7 @@ import { useLogout } from "@/features/auth/hooks/useAuth";
 import { useUser } from "@/features/auth/hooks/useUser";
 import { usePlan } from "@/features/billing/hooks/usePlan";
 import { PlanName } from "@/services/billing/type";
+import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useRouter } from "next/navigation";
 
 export function NavUser() {
@@ -35,9 +36,13 @@ export function NavUser() {
 	const { user } = useUser();
 	const router = useRouter();
 	const logout = useLogout();
+	const { currentWorkspaceId } = useProjectSelectionStore();
 
 	const { planInfo } = usePlan();
 	const dataPlan = planInfo.data;
+	const upgradeHref = currentWorkspaceId
+		? `/dashboard/billing/upgrade?workspaceId=${currentWorkspaceId}`
+		: "/dashboard/billing/upgrade";
 
 	return (
 		<SidebarMenu>
@@ -100,11 +105,7 @@ export function NavUser() {
 							<>
 								<DropdownMenuGroup>
 									<DropdownMenuItem
-										onSelect={() =>
-											router.push(
-												"/dashboard/billing/upgrade",
-											)
-										}
+										onSelect={() => router.push(upgradeHref)}
 									>
 										<Sparkles />
 										Upgrade to Pro

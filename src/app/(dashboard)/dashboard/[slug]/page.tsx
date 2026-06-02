@@ -1,31 +1,35 @@
 "use client";
 
-import { BlockList } from "@/components/block";
-import { TabsListCustom, TabsTriggerCustom } from "@/components/tabs";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { WorkspaceTopHeader } from "@/components/workspaces/WorkspaceHeader";
-import WorkspaceOverview from "@/components/workspaces/WorkspaceOverview";
+import { WorkspacePageShell } from "@/components/workspaces/workspace-page";
 import { usePageBlock } from "@/features/page-block/hooks/usePageBlock";
 import { usePage } from "@/features/page/hooks/usePage";
+import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";
 import { PageBlockItem } from "@/services/page_block/type";
+import { WorkspaceItem } from "@/services/workspace/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
-import { BarChart3, List } from "lucide-react";
+import { useParams } from "next/navigation";
 
 const SlugPage = () => {
+	const params = useParams<{ slug: string }>();
 	const { currentWorkspaceId } = useProjectSelectionStore();
 	const workspaceId = currentWorkspaceId as string;
 	const {
 		pages: { data, isLoading },
 	} = usePage();
+	const {
+		workspaceFindAll: { data: workspaceQuery, isLoading: isWorkspaceLoading },
+	} = useWorkspace();
 
 	const page = data?.data;
+	const workspaces: WorkspaceItem[] = workspaceQuery?.data ?? [];
+	const workspace = workspaces.find((item) => item.slug === params.slug);
 	const {
 		pageBlocks: { data: pageBlocksData, isPending: isPageBlocksPending },
 	} = usePageBlock({ pageId: page?.id });
 	const blocks: PageBlockItem[] =
 		pageBlocksData?.data ?? page?.blocks ?? [];
 
-	if (isLoading || isPageBlocksPending) {
+	if (isLoading || isPageBlocksPending || isWorkspaceLoading) {
 		return (
 			<div className='flex h-full items-center justify-center text-sm text-muted-foreground'>
 				Loading...
@@ -34,42 +38,12 @@ const SlugPage = () => {
 	}
 
 	return (
-		<Tabs
-			defaultValue='summary'
-			className='flex min-h-0 flex-1 flex-col overflow-hidden'
-		>
-			<WorkspaceTopHeader
-				workspaceName={page?.title}
-				workspaceId={workspaceId}
-			/>
-
-			<div className='shrink-0 border-b border-border'>
-				<TabsListCustom
-					variant='line'
-					className='h-10 bg-transparent p-0'
-				>
-					<TabsTriggerCustom value='summary'>
-						<BarChart3 size={15} />
-						Summary
-					</TabsTriggerCustom>
-
-					<TabsTriggerCustom value='pages'>
-						<List size={15} />
-						Pages
-					</TabsTriggerCustom>
-				</TabsListCustom>
-			</div>
-
-			<div className='min-h-0 flex-1 overflow-y-auto px-10 py-3 pb-10'>
-				<TabsContent value='summary' className='mt-0'>
-					<WorkspaceOverview workspaceSlug={page?.slug as string} />
-				</TabsContent>
-
-				<TabsContent value='pages' className='mt-0'>
-					<BlockList blocks={blocks} page={page} />
-				</TabsContent>
-			</div>
-		</Tabs>
+		<WorkspacePageShell
+			workspaceId={workspaceId}
+			page={page}
+			blocks={blocks}
+			layoutMode={workspace?.layoutMode}
+		/>
 	);
 };
 

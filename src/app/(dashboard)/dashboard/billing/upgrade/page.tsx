@@ -22,6 +22,7 @@ import {
 	type BillingInterval,
 	PlanName,
 } from "@/services/billing/type";
+import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import type { LucideIcon } from "lucide-react";
 import {
 	ArrowLeft,
@@ -35,6 +36,7 @@ import {
 	WalletCards,
 } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -88,6 +90,10 @@ export default function UpgradeBillingPage() {
 	);
 	const { planList } = useBillingPlans();
 	const { createBillingPayment } = useCreateBillingPayment();
+	const { currentWorkspaceId } = useProjectSelectionStore();
+	const searchParams = useSearchParams();
+	const targetWorkspaceId =
+		searchParams.get("workspaceId") || currentWorkspaceId || undefined;
 
 	const plans = useMemo(() => planList.data?.data ?? [], [planList.data]);
 	const proPlans = useMemo(
@@ -118,10 +124,16 @@ export default function UpgradeBillingPage() {
 			return;
 		}
 
+		if (!targetWorkspaceId) {
+			toast.error("Vui long chon workspace truoc khi tao thanh toan.");
+			return;
+		}
+
 		try {
 			const response = await createBillingPayment.mutateAsync({
 				planId: selectedPlan.id,
 				provider: selectedProvider,
+				targetWorkspaceId,
 			});
 			const paymentUrl = response.data.paymentUrl;
 

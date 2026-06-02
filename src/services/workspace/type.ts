@@ -1,11 +1,18 @@
 export enum WORKSPACE_KEY {
 	WORKSPACE = "workspace",
 }
+
+export enum WorkspaceLayoutMode {
+	TABS = "tabs",
+	BLOCKS = "blocks",
+}
+
 export interface WorkspaceItem {
 	id: string;
 	name: string;
 	slug: string;
 	planType: string;
+	layoutMode: WorkspaceLayoutMode;
 	createdAt: string;
 	updatedAt: string;
 }
@@ -31,4 +38,8 @@ export interface FindAllWorkspaceResponse {
 
 export interface FindOneWorkspaceResponse {
 	data: WorkspaceItem;
+}
+
+export interface UpdateWorkspaceLayoutModeDto {
+	layoutMode: WorkspaceLayoutMode;
 }

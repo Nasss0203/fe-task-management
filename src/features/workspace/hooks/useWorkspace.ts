@@ -4,6 +4,7 @@ import { WORKSPACE_KEY, WorkspaceDto } from "@/services/workspace/type";
 import {
 	createWorkspaceApi,
 	findAllWorkspaceApi,
+	updateWorkspaceLayoutModeApi,
 } from "@/services/workspace/workspace.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -38,8 +39,21 @@ export const useWorkspace = () => {
 		queryFn: findAllWorkspaceApi,
 	});
 
+	const updateWorkspaceLayoutMode = useMutation({
+		mutationFn: updateWorkspaceLayoutModeApi,
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: [WORKSPACE_KEY.WORKSPACE],
+			});
+		},
+		onError: (err) => {
+			console.error("updateWorkspaceLayoutModeApi failed", err);
+		},
+	});
+
 	return {
 		createWorkspace,
 		workspaceFindAll,
+		updateWorkspaceLayoutMode,
 	};
 };

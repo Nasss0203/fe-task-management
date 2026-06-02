@@ -13,6 +13,13 @@ import {
 import { useParams } from "next/navigation";
 import { useState } from "react";
 
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { usePlan } from "@/features/billing/hooks/usePlan";
 import { useWorkspaceFeatures } from "@/features/workspace-feature/hooks/useWorkspaceFeatures";
@@ -21,7 +28,10 @@ import {
 	FeatureKey,
 	WorkspaceFeatureItem,
 } from "@/services/workspace-feature/type";
-import type { WorkspaceItem } from "@/services/workspace/type";
+import {
+	type WorkspaceItem,
+	WorkspaceLayoutMode,
+} from "@/services/workspace/type";
 
 type SettingsSection = "details" | "access" | "features" | "board" | "danger";
 
@@ -57,6 +67,7 @@ const WorkspaceSettingsPage = () => {
 
 	const {
 		workspaceFindAll: { data: workspaceQuery, isLoading },
+		updateWorkspaceLayoutMode,
 	} = useWorkspace();
 	const { planInfo } = usePlan();
 
@@ -75,6 +86,7 @@ const WorkspaceSettingsPage = () => {
 		workspace?.planType;
 	const isFeatureLoading = workspaceFeaturesQuery.isPending;
 	const isUpdatingFeature = updateWorkspaceFeature.isPending;
+	const isUpdatingLayout = updateWorkspaceLayoutMode.isPending;
 
 	const handleToggleSprint = (enabled: boolean) => {
 		if (!workspace?.id) return;
@@ -83,6 +95,17 @@ const WorkspaceSettingsPage = () => {
 			workspaceId: workspace.id,
 			featureCode: FeatureKey.SPRINT_ENABLED,
 			enabled,
+		});
+	};
+
+	const handleUpdateLayoutMode = (layoutMode: string) => {
+		if (!workspace?.id) return;
+
+		updateWorkspaceLayoutMode.mutate({
+			workspaceId: workspace.id,
+			data: {
+				layoutMode: layoutMode as WorkspaceLayoutMode,
+			},
 		});
 	};
 
@@ -308,15 +331,55 @@ const WorkspaceSettingsPage = () => {
 					{activeSection === "board" ? (
 						<div className='max-w-3xl space-y-4'>
 							<div className='rounded-md border border-neutral-800 bg-neutral-900/30 p-5'>
-								<div className='flex items-center gap-3'>
-									<LayoutList className='size-5 text-neutral-500' />
-									<div>
+								<div className='flex items-start gap-3'>
+									<LayoutList className='mt-0.5 size-5 text-neutral-500' />
+									<div className='min-w-0 flex-1'>
 										<div className='text-sm font-semibold'>
-											Board settings
+											Workspace layout
 										</div>
 										<div className='mt-1 text-sm text-neutral-500'>
-											Board defaults and view policies can
-											be configured here later.
+											Choose whether this workspace opens
+											in a Jira-style tab layout or a
+											Notion-style block page.
+										</div>
+
+										<div className='mt-4 max-w-xs'>
+											<Select
+												value={
+													workspace.layoutMode ??
+													WorkspaceLayoutMode.TABS
+												}
+												onValueChange={
+													handleUpdateLayoutMode
+												}
+												disabled={isUpdatingLayout}
+											>
+												<SelectTrigger className='w-full border-neutral-800 bg-neutral-950 text-neutral-100'>
+													<SelectValue placeholder='Select layout' />
+												</SelectTrigger>
+												<SelectContent className='border-neutral-800 bg-neutral-950 text-neutral-100'>
+													<SelectItem
+														value={
+															WorkspaceLayoutMode.TABS
+														}
+													>
+														Tabs
+													</SelectItem>
+													<SelectItem
+														value={
+															WorkspaceLayoutMode.BLOCKS
+														}
+													>
+														Blocks
+													</SelectItem>
+												</SelectContent>
+											</Select>
+										</div>
+
+										<div className='mt-3 text-xs text-neutral-500'>
+											Tabs shows Summary and Pages. Blocks
+											opens straight into the page block
+											list.
 										</div>
 									</div>
 								</div>

@@ -52,6 +52,7 @@ export interface CreatePayment {
 export interface CreatePaymentPayload {
 	planId: string;
 	provider: BillingProvider;
+	targetWorkspaceId?: string;
 }
 
 export interface PaymentReturnResult {
