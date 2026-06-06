@@ -30,9 +30,45 @@ const getBadgeClassName = (level: RetentionMetricItem["level"]) => {
 };
 
 const getBadgeLabel = (level: RetentionMetricItem["level"]) => {
-	if (level === "success") return "Healthy";
-	if (level === "warning") return "Watch";
-	return "Risk";
+	if (level === "success") return "Ổn định";
+	if (level === "warning") return "Theo dõi";
+	return "Rủi ro";
+};
+
+const getMetricLabel = (label: string) => {
+	const normalizedLabel = label.toLowerCase();
+
+	if (normalizedLabel.includes("30-day retention")) {
+		return "Giữ chân 30 ngày";
+	}
+
+	if (normalizedLabel.includes("monthly churn")) {
+		return "Churn hằng tháng";
+	}
+
+	return label;
+};
+
+const getMetricDescription = (description: string) => {
+	const normalizedDescription = description.toLowerCase();
+
+	if (
+		normalizedDescription.includes(
+			"not enough users older than 30 days to calculate retention",
+		)
+	) {
+		return "Chưa đủ người dùng có tuổi đời trên 30 ngày để tính retention.";
+	}
+
+	if (
+		normalizedDescription.includes(
+			"no pro workspaces available to calculate churn",
+		)
+	) {
+		return "Chưa có workspace Pro để tính churn.";
+	}
+
+	return description;
 };
 
 export function RetentionCard({ items }: Props) {
@@ -51,7 +87,7 @@ export function RetentionCard({ items }: Props) {
 							Retention & Churn
 						</CardTitle>
 						<CardDescription className='text-sm text-neutral-400'>
-							Key business health metrics for billing and usage.
+							Chỉ số giữ chân, churn và sức khỏe sử dụng.
 						</CardDescription>
 					</div>
 
@@ -67,7 +103,7 @@ export function RetentionCard({ items }: Props) {
 			<CardContent className='space-y-6'>
 				{items.length === 0 ? (
 					<div className='flex h-[180px] items-center justify-center rounded-xl border border-dashed border-neutral-800 text-sm text-neutral-500'>
-						No retention data
+						Chưa có dữ liệu retention
 					</div>
 				) : (
 					items.map((item, index) => (
@@ -75,7 +111,7 @@ export function RetentionCard({ items }: Props) {
 							<div className='space-y-2'>
 								<div className='flex items-center justify-between'>
 									<span className='text-sm font-medium text-neutral-300'>
-										{item.label}
+										{getMetricLabel(item.label)}
 									</span>
 
 									<span className='text-xl font-semibold text-white'>
@@ -87,7 +123,7 @@ export function RetentionCard({ items }: Props) {
 								<Progress value={item.value} />
 
 								<p className='text-sm text-neutral-500'>
-									{item.description}
+									{getMetricDescription(item.description)}
 								</p>
 							</div>
 

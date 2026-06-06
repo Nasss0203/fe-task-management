@@ -9,6 +9,8 @@ export type AdminFindAllWorkspaceQuery = {
 	createdFrom?: string;
 	createdTo?: string;
 	createdAt?: string;
+	page?: number;
+	pageSize?: number;
 };
 
 export type WorkspaceItem = {
@@ -30,4 +32,12 @@ export type WorkspaceItem = {
 	projectsCount: number;
 	boardsCount: number;
 	tasksCount: number;
+};
+
+export type WorkspacePaginationResponse = {
+	data: WorkspaceItem[];
+	total: number;
+	page: number;
+	pageSize: number;
+	totalPages: number;
 };

@@ -8,14 +8,20 @@ import {
 
 type PanigationTableProps<TData> = {
 	table: TanStackTable<TData>;
+	totalRows?: number;
+	itemLabel?: string;
 };
 
-const PanigationTable = <TData,>({ table }: PanigationTableProps<TData>) => {
+const PanigationTable = <TData,>({
+	table,
+	totalRows: totalRowsProp,
+	itemLabel = "công việc",
+}: PanigationTableProps<TData>) => {
 	const pageIndex = table.getState().pagination.pageIndex;
 	const pageSize = table.getState().pagination.pageSize;
 	const pageCount = Math.max(table.getPageCount(), 1);
 
-	const totalRows = table.getFilteredRowModel().rows.length;
+	const totalRows = totalRowsProp ?? table.getFilteredRowModel().rows.length;
 	const from = totalRows === 0 ? 0 : pageIndex * pageSize + 1;
 	const to = Math.min((pageIndex + 1) * pageSize, totalRows);
 
@@ -30,7 +36,7 @@ const PanigationTable = <TData,>({ table }: PanigationTableProps<TData>) => {
 				<span className='font-semibold text-slate-200'>
 					{totalRows}
 				</span>{" "}
-				công việc
+				{itemLabel}
 			</div>
 
 			<div className='flex flex-wrap items-center gap-2'>

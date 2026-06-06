@@ -56,10 +56,10 @@ export function WorkspacePlanChart({ data }: Props) {
 		<Card className='rounded-2xl border border-neutral-800 bg-neutral-950/80 p-0 text-white'>
 			<CardHeader className='pb-0'>
 				<CardTitle className='text-lg font-semibold text-white'>
-					Free vs Pro Workspaces
+					Workspace Free / Pro
 				</CardTitle>
 				<CardDescription className='text-sm text-neutral-400'>
-					Distribution of workspace subscription plans.
+					Phân bổ workspace theo gói dịch vụ.
 				</CardDescription>
 			</CardHeader>
 
@@ -67,7 +67,7 @@ export function WorkspacePlanChart({ data }: Props) {
 				<div className='h-[280px]'>
 					{chartData.length === 0 ? (
 						<div className='flex h-full items-center justify-center rounded-xl border border-dashed border-neutral-800 text-sm text-neutral-500'>
-							No workspace plan data
+							Chưa có dữ liệu gói workspace
 						</div>
 					) : (
 						<ChartContainer

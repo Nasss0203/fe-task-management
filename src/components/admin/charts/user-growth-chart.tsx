@@ -26,10 +26,10 @@ export function UserGrowthChart({ data, period, onPeriodChange }: Props) {
 			<div className='mb-4 flex items-center justify-between gap-4'>
 				<div>
 					<h2 className='text-lg font-semibold text-white'>
-						User Growth
+						Tăng trưởng người dùng
 					</h2>
 					<p className='text-sm text-neutral-400'>
-						User registration trend.
+						Xu hướng đăng ký tài khoản mới.
 					</p>
 				</div>
 
@@ -40,17 +40,17 @@ export function UserGrowthChart({ data, period, onPeriodChange }: Props) {
 					}
 					className='rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-white outline-none'
 				>
-					<option value='7d'>7 days</option>
-					<option value='30d'>30 days</option>
-					<option value='60d'>60 days</option>
-					<option value='1y'>1 year</option>
+					<option value='7d'>7 ngày</option>
+					<option value='30d'>30 ngày</option>
+					<option value='60d'>60 ngày</option>
+					<option value='1y'>1 năm</option>
 				</select>
 			</div>
 
 			<div className='h-70'>
 				{data.length === 0 ? (
 					<div className='flex h-full items-center justify-center rounded-xl border border-dashed border-neutral-800 text-sm text-neutral-500'>
-						No user growth data
+						Chưa có dữ liệu tăng trưởng người dùng
 					</div>
 				) : (
 					<ResponsiveContainer width='100%' height='100%'>

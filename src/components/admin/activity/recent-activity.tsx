@@ -47,10 +47,10 @@ export function RecentActivity({ items }: Props) {
 				<div className='flex items-start justify-between gap-4'>
 					<div>
 						<CardTitle className='text-lg font-semibold text-white'>
-							Recent Activity
+							Hoạt động gần đây
 						</CardTitle>
 						<CardDescription className='text-sm text-neutral-400'>
-							Latest system events across workspaces.
+							Sự kiện mới nhất trên toàn hệ thống.
 						</CardDescription>
 					</div>
 
@@ -59,7 +59,7 @@ export function RecentActivity({ items }: Props) {
 						size='sm'
 						className='border-neutral-800 bg-neutral-950 text-neutral-300 hover:bg-neutral-900 hover:text-white'
 					>
-						View all
+						Xem tất cả
 					</Button>
 				</div>
 			</CardHeader>
@@ -67,7 +67,7 @@ export function RecentActivity({ items }: Props) {
 			<CardContent>
 				{items.length === 0 ? (
 					<div className='flex h-40 items-center justify-center rounded-xl border border-dashed border-neutral-800 text-sm text-neutral-500'>
-						No recent activity
+						Chưa có hoạt động gần đây
 					</div>
 				) : (
 					<ScrollArea className='h-[280px] pr-3'>

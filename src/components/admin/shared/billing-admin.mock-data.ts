@@ -88,6 +88,7 @@ export const adminBillingPlans: BillingPlan[] = [
 
 export const adminSubscriptions: WorkspaceSubscription[] = [
 	{
+		rowId: "sub_1:ws_1:ENTERPRISE",
 		id: "sub_1",
 		workspaceId: "ws_1",
 		workspaceName: "Acme Inc.",
@@ -113,6 +114,7 @@ export const adminSubscriptions: WorkspaceSubscription[] = [
 		],
 	},
 	{
+		rowId: "sub_2:ws_2:PRO",
 		id: "sub_2",
 		workspaceId: "ws_2",
 		workspaceName: "Nova Team",
@@ -145,6 +147,7 @@ export const adminSubscriptions: WorkspaceSubscription[] = [
 		],
 	},
 	{
+		rowId: "sub_3:ws_3:PRO",
 		id: "sub_3",
 		workspaceId: "ws_3",
 		workspaceName: "Pixel Studio",
@@ -163,6 +166,7 @@ export const adminSubscriptions: WorkspaceSubscription[] = [
 		paymentHistory: [],
 	},
 	{
+		rowId: "sub_4:ws_4:LEGACY",
 		id: "sub_4",
 		workspaceId: "ws_4",
 		workspaceName: "Moon Labs",
@@ -188,6 +192,7 @@ export const adminSubscriptions: WorkspaceSubscription[] = [
 		],
 	},
 	{
+		rowId: "sub_5:ws_5:FREE",
 		id: "sub_5",
 		workspaceId: "ws_5",
 		workspaceName: "Task Core",
@@ -205,6 +210,7 @@ export const adminSubscriptions: WorkspaceSubscription[] = [
 		paymentHistory: [],
 	},
 	{
+		rowId: "sub_6:ws_6:ENTERPRISE",
 		id: "sub_6",
 		workspaceId: "ws_6",
 		workspaceName: "Growth Lab",

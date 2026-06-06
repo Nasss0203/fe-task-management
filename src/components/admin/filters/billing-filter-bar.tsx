@@ -17,8 +17,8 @@ type Props = {
 };
 
 const SECTION_ITEMS: { value: BillingSection; label: string }[] = [
-	{ value: "PLANS", label: "Gói dịch vụ" },
 	{ value: "SUBSCRIPTIONS", label: "Subscriptions" },
+	{ value: "PLANS", label: "Gói dịch vụ" },
 	{ value: "COUPONS", label: "Coupons" },
 ];
 
@@ -87,13 +87,13 @@ export function BillingFilterBar({
 				: "Loại coupon";
 
 	return (
-		<div className='space-y-3 rounded-[26px] border border-white/10 bg-[#0b0b0b] p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]'>
+		<div className='space-y-4 rounded-2xl border border-white/10 bg-[#0b0b0b] p-4 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset]'>
 			<div className='flex flex-wrap gap-2'>
 				{SECTION_ITEMS.map((item) => (
 					<button
 						key={item.value}
 						onClick={() => onSectionChange(item.value)}
-						className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${
+						className={`rounded-xl px-4 py-2 text-sm font-medium transition ${
 							section === item.value
 								? "border border-white/10 bg-white/10 text-white"
 								: "border border-white/10 bg-[#111111] text-neutral-400 hover:bg-white/5 hover:text-white"
@@ -106,7 +106,7 @@ export function BillingFilterBar({
 
 			<div className='grid grid-cols-1 gap-4 lg:grid-cols-12 lg:items-end'>
 				<div className='lg:col-span-4'>
-					<label className='mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-500'>
+					<label className='mb-2 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-500'>
 						Tìm kiếm
 					</label>
 
@@ -116,19 +116,19 @@ export function BillingFilterBar({
 							value={search}
 							onChange={(e) => onSearchChange(e.target.value)}
 							placeholder={getBillingSearchPlaceholder(section)}
-							className='h-11 w-full rounded-2xl border border-white/10 bg-[#111111] pl-10 pr-4 text-sm text-white outline-none placeholder:text-neutral-500 focus:border-white/20'
+							className='h-10 w-full rounded-xl border border-white/10 bg-[#111111] pl-10 pr-4 text-sm text-white outline-none placeholder:text-neutral-500 focus:border-sky-500/50'
 						/>
 					</div>
 				</div>
 
 				<div className='lg:col-span-2'>
-					<label className='mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-500'>
+					<label className='mb-2 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-500'>
 						Trạng thái
 					</label>
 					<select
 						value={status}
 						onChange={(e) => onStatusChange(e.target.value)}
-						className='h-11 w-full rounded-2xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-white/20'
+						className='h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-sky-500/50'
 					>
 						{statusOptions.map((item) => (
 							<option key={item.value} value={item.value}>
@@ -139,13 +139,13 @@ export function BillingFilterBar({
 				</div>
 
 				<div className='lg:col-span-2'>
-					<label className='mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-500'>
+					<label className='mb-2 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-500'>
 						{kindLabel}
 					</label>
 					<select
 						value={kind}
 						onChange={(e) => onKindChange(e.target.value)}
-						className='h-11 w-full rounded-2xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-white/20'
+						className='h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-sky-500/50'
 					>
 						{kindOptions.map((item) => (
 							<option key={item.value} value={item.value}>
@@ -156,13 +156,13 @@ export function BillingFilterBar({
 				</div>
 
 				<div className='lg:col-span-2'>
-					<label className='mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-500'>
+					<label className='mb-2 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-500'>
 						Thời gian
 					</label>
 					<select
 						value={createdAt}
 						onChange={(e) => onCreatedAtChange(e.target.value)}
-						className='h-11 w-full rounded-2xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-white/20'
+						className='h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-sky-500/50'
 					>
 						<option value='all'>Tất cả</option>
 						<option value='7d'>7 ngày gần đây</option>
@@ -174,7 +174,7 @@ export function BillingFilterBar({
 				<div className='lg:col-span-2'>
 					<button
 						onClick={onReset}
-						className='inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-[#111111] px-4 text-sm font-medium text-white transition hover:bg-white/5'
+						className='inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-[#111111] px-4 text-sm font-medium text-white transition hover:bg-white/5'
 					>
 						<RotateCcw className='h-4 w-4' />
 						Đặt lại

@@ -4,6 +4,7 @@ import type {
 	AdminFindAllUserQuery,
 	AdminSystemRole,
 	AdminUser,
+	AdminUserPaginationResponse,
 	AdminUserOverviewResponseDto,
 } from "./type";
 
@@ -19,15 +20,30 @@ export const getAdminUserOverviewApi = async (): Promise<
 
 export const findAllAdminUsersApi = async (
 	query?: AdminFindAllUserQuery,
-): Promise<ApiResponse<AdminUser[]>> => {
-	const response = await instance.get<ApiResponse<AdminUser[]>>(
+): Promise<ApiResponse<AdminUserPaginationResponse>> => {
+	const response = await instance.get<
+		ApiResponse<AdminUser[] | AdminUserPaginationResponse>
+	>(
 		"/admin/users",
 		{
 			params: query,
 		},
 	);
 
-	return response.data;
+	if (Array.isArray(response.data.data)) {
+		return {
+			...response.data,
+			data: {
+				data: response.data.data,
+				total: response.data.data.length,
+				page: query?.page ?? 1,
+				pageSize: query?.pageSize ?? response.data.data.length,
+				totalPages: 1,
+			},
+		};
+	}
+
+	return response.data as ApiResponse<AdminUserPaginationResponse>;
 };
 
 export const lockAdminUserApi = async (

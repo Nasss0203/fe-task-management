@@ -80,10 +80,10 @@ export function WorkspaceGrowthChart({ data, period, onPeriodChange }: Props) {
 			<div className='mb-4 flex items-center justify-between gap-4'>
 				<div>
 					<h2 className='text-lg font-semibold text-white'>
-						New Workspaces
+						Workspace mới
 					</h2>
 					<p className='text-sm text-neutral-400'>
-						Workspace creation trend.
+						Xu hướng tạo workspace mới.
 					</p>
 				</div>
 
@@ -94,17 +94,17 @@ export function WorkspaceGrowthChart({ data, period, onPeriodChange }: Props) {
 					}
 					className='rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-white outline-none'
 				>
-					<option value='7d'>7 days</option>
-					<option value='30d'>1 month</option>
-					<option value='60d'>2 months</option>
-					<option value='1y'>1 year</option>
+					<option value='7d'>7 ngày</option>
+					<option value='30d'>1 tháng</option>
+					<option value='60d'>2 tháng</option>
+					<option value='1y'>1 năm</option>
 				</select>
 			</div>
 
 			<div className='h-[280px]'>
 				{data.length === 0 ? (
 					<div className='flex h-full items-center justify-center rounded-xl border border-dashed border-neutral-800 text-sm text-neutral-500'>
-						No workspace growth data
+						Chưa có dữ liệu tăng trưởng workspace
 					</div>
 				) : (
 					<ChartContainer

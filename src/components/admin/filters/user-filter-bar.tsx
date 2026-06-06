@@ -57,7 +57,7 @@ export function UserFilterBar({
 
 	return (
 		<div className='flex items-center gap-3'>
-			<InputGroup className='h-11 w-full max-w-xl rounded-2xl border-white/10 bg-[#111111] text-white'>
+			<InputGroup className='h-10 w-full max-w-xl rounded-xl border-white/10 bg-[#111111] text-white'>
 				<InputGroupAddon>
 					<Search className='h-4 w-4 text-neutral-500' />
 				</InputGroupAddon>
@@ -75,7 +75,7 @@ export function UserFilterBar({
 					<Button
 						type='button'
 						variant='outline'
-						className={`h-11 rounded-2xl border-white/10 bg-[#111111] px-4 text-white hover:bg-white/5 ${
+						className={`h-10 rounded-xl border-white/10 bg-[#111111] px-4 text-white hover:bg-white/5 ${
 							hasActiveFilter
 								? "border-sky-500/40 text-sky-400"
 								: ""
@@ -101,14 +101,14 @@ export function UserFilterBar({
 						</div>
 
 						<div className='space-y-2'>
-							<label className='text-xs font-medium uppercase tracking-[0.18em] text-neutral-500'>
+							<label className='text-xs font-medium uppercase tracking-[0.14em] text-neutral-500'>
 								Trạng thái
 							</label>
 
 							<select
 								value={status}
 								onChange={(e) => onStatusChange(e.target.value)}
-								className='h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-white/20'
+								className='h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-sky-500/50'
 							>
 								<option value='all'>Tất cả</option>
 								<option value='ACTIVE'>Hoạt động</option>
@@ -117,14 +117,14 @@ export function UserFilterBar({
 						</div>
 
 						<div className='space-y-2'>
-							<label className='text-xs font-medium uppercase tracking-[0.18em] text-neutral-500'>
+							<label className='text-xs font-medium uppercase tracking-[0.14em] text-neutral-500'>
 								Vai trò hệ thống
 							</label>
 
 							<select
 								value={role}
 								onChange={(e) => onRoleChange(e.target.value)}
-								className='h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-white/20'
+								className='h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-sky-500/50'
 							>
 								<option value='all'>Tất cả</option>
 								<option value='SUPER_ADMIN'>Super Admin</option>
@@ -136,7 +136,7 @@ export function UserFilterBar({
 						</div>
 
 						<div className='space-y-2'>
-							<label className='text-xs font-medium uppercase tracking-[0.18em] text-neutral-500'>
+							<label className='text-xs font-medium uppercase tracking-[0.14em] text-neutral-500'>
 								Ngày tạo
 							</label>
 

@@ -1,5 +1,6 @@
 "use client";
 
+import PanigationTable from "@/components/panigation/PanigationTable";
 import { DataTable } from "@/components/table/data-table";
 import { recentWorkspacesColumns } from "@/components/table/recent-workspaces-columns";
 import type {
@@ -7,25 +8,52 @@ import type {
 	PlanTypeWorkspace,
 	WorkspaceItem,
 } from "@/services/admin/dashboard/type";
+import type { OnChangeFn, PaginationState } from "@tanstack/react-table";
+import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { Search, X } from "lucide-react";
 import { useState } from "react";
 
 type Props = {
 	items: WorkspaceItem[];
 	query: AdminFindAllWorkspaceQuery;
+	pagination: PaginationState;
+	pageCount: number;
+	totalRows: number;
+	onPaginationChange: OnChangeFn<PaginationState>;
 	onQueryChange: (query: AdminFindAllWorkspaceQuery) => void;
 };
 
-export function RecentWorkspacesTable({ items, query, onQueryChange }: Props) {
+export function RecentWorkspacesTable({
+	items,
+	query,
+	pagination,
+	pageCount,
+	totalRows,
+	onPaginationChange,
+	onQueryChange,
+}: Props) {
 	const [search, setSearch] = useState(query.search ?? "");
 	const [plan, setPlan] = useState<PlanTypeWorkspace | "">(query.plan ?? "");
 	const [createdAt, setCreatedAt] = useState(query.createdAt ?? "");
+	const table = useReactTable({
+		data: items,
+		columns: recentWorkspacesColumns,
+		getCoreRowModel: getCoreRowModel(),
+		manualPagination: true,
+		onPaginationChange,
+		pageCount,
+		state: {
+			pagination,
+		},
+	});
 
 	const handleApplyFilter = () => {
 		onQueryChange({
 			search: search.trim() || undefined,
 			plan: plan || undefined,
 			createdAt: createdAt || undefined,
+			page: 1,
+			pageSize: pagination.pageSize,
 		});
 	};
 
@@ -33,7 +61,10 @@ export function RecentWorkspacesTable({ items, query, onQueryChange }: Props) {
 		setSearch("");
 		setPlan("");
 		setCreatedAt("");
-		onQueryChange({});
+		onQueryChange({
+			page: 1,
+			pageSize: pagination.pageSize,
+		});
 	};
 
 	return (
@@ -41,10 +72,10 @@ export function RecentWorkspacesTable({ items, query, onQueryChange }: Props) {
 			<div className='mb-4 flex items-start justify-between gap-4'>
 				<div>
 					<h2 className='text-lg font-semibold text-white'>
-						Recent Workspaces
+						Workspace gần đây
 					</h2>
 					<p className='text-sm text-neutral-400'>
-						New or recently updated workspaces.
+						Workspace mới tạo hoặc vừa cập nhật.
 					</p>
 				</div>
 			</div>
@@ -55,7 +86,7 @@ export function RecentWorkspacesTable({ items, query, onQueryChange }: Props) {
 					<input
 						value={search}
 						onChange={(event) => setSearch(event.target.value)}
-						placeholder='Search workspace or slug...'
+						placeholder='Tìm workspace hoặc slug...'
 						className='h-10 w-full bg-transparent text-sm text-white outline-none placeholder:text-neutral-500'
 						onKeyDown={(event) => {
 							if (event.key === "Enter") {
@@ -72,7 +103,7 @@ export function RecentWorkspacesTable({ items, query, onQueryChange }: Props) {
 					}
 					className='h-10 rounded-xl border border-neutral-800 bg-neutral-900/70 px-3 text-sm text-white outline-none'
 				>
-					<option value=''>All plans</option>
+					<option value=''>Tất cả gói</option>
 					<option value='free'>Free</option>
 					<option value='pro'>Pro</option>
 				</select>
@@ -89,7 +120,7 @@ export function RecentWorkspacesTable({ items, query, onQueryChange }: Props) {
 					onClick={handleApplyFilter}
 					className='h-10 rounded-xl bg-white px-4 text-sm font-medium text-black hover:bg-neutral-200'
 				>
-					Filter
+					Lọc
 				</button>
 
 				<button
@@ -98,11 +129,17 @@ export function RecentWorkspacesTable({ items, query, onQueryChange }: Props) {
 					className='flex h-10 items-center justify-center gap-2 rounded-xl border border-neutral-800 px-4 text-sm text-neutral-300 hover:bg-neutral-900 hover:text-white'
 				>
 					<X className='h-4 w-4' />
-					Reset
+					Đặt lại
 				</button>
 			</div>
 
 			<DataTable columns={recentWorkspacesColumns} data={items} />
+
+			<PanigationTable
+				table={table}
+				totalRows={totalRows}
+				itemLabel='workspace'
+			/>
 		</div>
 	);
 }
