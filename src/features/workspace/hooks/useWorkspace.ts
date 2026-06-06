@@ -1,12 +1,17 @@
 "use client";
 
-import { WORKSPACE_KEY, WorkspaceDto } from "@/services/workspace/type";
+import {
+	FindAllWorkspaceResponse,
+	WORKSPACE_KEY,
+	WorkspaceDto,
+} from "@/services/workspace/type";
 import {
 	createWorkspaceApi,
 	findDeletedWorkspacesApi,
 	findAllWorkspaceApi,
 	restoreWorkspaceApi,
 	softDeleteWorkspaceApi,
+	updateWorkspaceApi,
 	updateWorkspaceLayoutModeApi,
 } from "@/services/workspace/workspace.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -54,6 +59,39 @@ export const useWorkspace = () => {
 		},
 	});
 
+	const updateWorkspace = useMutation({
+		mutationFn: updateWorkspaceApi,
+		onSuccess: async (response) => {
+			const updatedWorkspace = response.data;
+
+			queryClient.setQueryData<FindAllWorkspaceResponse>(
+				[WORKSPACE_KEY.WORKSPACE],
+				(previous) => {
+					if (!previous) return previous;
+
+					return {
+						...previous,
+						data: previous.data.map((workspace) =>
+							workspace.id === updatedWorkspace.id
+								? {
+										...workspace,
+										...updatedWorkspace,
+									}
+								: workspace,
+						),
+					};
+				},
+			);
+
+			await queryClient.invalidateQueries({
+				queryKey: [WORKSPACE_KEY.WORKSPACE],
+			});
+		},
+		onError: (err) => {
+			console.error("updateWorkspaceApi failed", err);
+		},
+	});
+
 	const workspaceTrash = useQuery({
 		queryKey: [WORKSPACE_KEY.WORKSPACE_TRASH],
 		queryFn: findDeletedWorkspacesApi,
@@ -96,6 +134,7 @@ export const useWorkspace = () => {
 	return {
 		createWorkspace,
 		workspaceFindAll,
+		updateWorkspace,
 		updateWorkspaceLayoutMode,
 		workspaceTrash,
 		softDeleteWorkspace,

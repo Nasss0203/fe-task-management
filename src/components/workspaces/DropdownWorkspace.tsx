@@ -28,9 +28,13 @@ import { toast } from "sonner";
 
 type WorkspaceDropdownProps = {
 	workspace: WorkspaceItem;
+	onStartRename?: () => void;
 };
 
-const WorkspaceDropdown = ({ workspace }: WorkspaceDropdownProps) => {
+const WorkspaceDropdown = ({
+	workspace,
+	onStartRename,
+}: WorkspaceDropdownProps) => {
 	const [openSettingsDialog, setOpenSettingsDialog] = useState(false);
 	const [openTrashDialog, setOpenTrashDialog] = useState(false);
 	const { setCurrentWorkspaceId } = useProjectSelectionStore();
@@ -72,11 +76,11 @@ const WorkspaceDropdown = ({ workspace }: WorkspaceDropdownProps) => {
 						</DropdownMenuLabel>
 
 						<DropdownMenuItem
-							onSelect={() =>
-								toast.info(
-									"Rename workspace se duoc noi tiep khi backend update metadata san sang.",
-								)
-							}
+							onSelect={() => {
+								window.setTimeout(() => {
+									onStartRename?.();
+								}, 150);
+							}}
 							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'
 						>
 							<Pencil size={15} />

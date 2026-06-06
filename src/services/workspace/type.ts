@@ -31,6 +31,10 @@ export interface WorkspaceDto {
 	template: WorkspaceTemplateType;
 }
 
+export interface UpdateWorkspaceDto {
+	name?: string;
+}
+
 export interface CreateWorkspaceResponse {
 	data: WorkspaceItem;
 }

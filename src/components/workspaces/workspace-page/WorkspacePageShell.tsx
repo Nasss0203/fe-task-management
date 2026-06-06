@@ -11,6 +11,7 @@ import WorkspacePageTabs from "./WorkspacePageTabs";
 
 type WorkspacePageShellProps = {
 	workspaceId: string;
+	workspaceName?: string;
 	page?: PageItem;
 	blocks: PageBlockItem[];
 	layoutMode?: WorkspaceLayoutMode;
@@ -18,6 +19,7 @@ type WorkspacePageShellProps = {
 
 const WorkspacePageShell = ({
 	workspaceId,
+	workspaceName,
 	page,
 	blocks,
 	layoutMode,
@@ -29,7 +31,7 @@ const WorkspacePageShell = ({
 		return (
 			<div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
 				<WorkspaceTopHeader
-					workspaceName={page?.title}
+					workspaceName={workspaceName}
 					workspaceId={workspaceId}
 				/>
 
@@ -44,7 +46,7 @@ const WorkspacePageShell = ({
 			className='flex min-h-0 flex-1 flex-col overflow-hidden'
 		>
 			<WorkspaceTopHeader
-				workspaceName={page?.title}
+				workspaceName={workspaceName}
 				workspaceId={workspaceId}
 			/>
 

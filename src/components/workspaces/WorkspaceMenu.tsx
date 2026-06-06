@@ -4,6 +4,7 @@ import {
 	Archive,
 	Cog,
 	LayoutTemplate,
+	Pencil,
 	Star,
 	Trash2,
 	UserPlus,
@@ -28,6 +29,7 @@ type WorkspaceMenuProps = {
 	inviteLink?: string;
 
 	onAddPeople?: () => void;
+	onStartRename?: () => void;
 	onOpenSettings?: () => void;
 	onArchive?: () => void;
 	onDelete?: () => void;
@@ -39,6 +41,7 @@ export function WorkspaceMenu({
 	workspaceName = "Task tracking",
 	inviteLink,
 	onAddPeople,
+	onStartRename,
 	onOpenSettings,
 	onArchive,
 	onDelete,
@@ -65,6 +68,18 @@ export function WorkspaceMenu({
 					className='w-64 rounded-md border bg-popover p-1 shadow-lg'
 				>
 					<DropdownMenuGroup>
+						<DropdownMenuItem
+							onSelect={() => {
+								window.setTimeout(() => {
+									onStartRename?.();
+								}, 150);
+							}}
+							className='gap-3'
+						>
+							<Pencil className='h-4 w-4' />
+							<span>Rename workspace</span>
+						</DropdownMenuItem>
+
 						<DropdownMenuItem onClick={onStar} className='gap-3'>
 							<Star className='h-4 w-4' />
 							<span>Add to starred</span>

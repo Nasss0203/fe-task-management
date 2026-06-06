@@ -23,6 +23,7 @@ const SlugPage = () => {
 	const page = data?.data;
 	const workspaces: WorkspaceItem[] = workspaceQuery?.data ?? [];
 	const workspace = workspaces.find((item) => item.slug === params.slug);
+	const resolvedWorkspaceId = workspace?.id ?? workspaceId;
 	const {
 		pageBlocks: { data: pageBlocksData, isPending: isPageBlocksPending },
 	} = usePageBlock({ pageId: page?.id });
@@ -39,7 +40,8 @@ const SlugPage = () => {
 
 	return (
 		<WorkspacePageShell
-			workspaceId={workspaceId}
+			workspaceId={resolvedWorkspaceId}
+			workspaceName={workspace?.name}
 			page={page}
 			blocks={blocks}
 			layoutMode={workspace?.layoutMode}

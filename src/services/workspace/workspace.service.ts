@@ -5,6 +5,7 @@ import {
 	FindDeletedWorkspaceResponse,
 	FindAllWorkspaceResponse,
 	FindOneWorkspaceResponse,
+	UpdateWorkspaceDto,
 	UpdateWorkspaceLayoutModeDto,
 	WorkspaceDto,
 } from "./type";
@@ -65,6 +66,21 @@ export const updateWorkspaceLayoutModeApi = async ({
 }): Promise<FindOneWorkspaceResponse> => {
 	const response = await instance.patch<FindOneWorkspaceResponse>(
 		`/workspaces/${workspaceId}/layout-mode`,
+		data,
+	);
+
+	return response.data;
+};
+
+export const updateWorkspaceApi = async ({
+	workspaceId,
+	data,
+}: {
+	workspaceId: string;
+	data: UpdateWorkspaceDto;
+}): Promise<FindOneWorkspaceResponse> => {
+	const response = await instance.patch<FindOneWorkspaceResponse>(
+		`/workspaces/${workspaceId}`,
 		data,
 	);
 
