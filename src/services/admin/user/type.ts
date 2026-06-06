@@ -35,6 +35,16 @@ export type AdminFindAllUserQuery = {
 	status?: AdminUserStatus;
 	role?: AdminSystemRole;
 	createdAt?: string;
+	page?: number;
+	pageSize?: number;
+};
+
+export type AdminUserPaginationResponse = {
+	data: AdminUser[];
+	total: number;
+	page: number;
+	pageSize: number;
+	totalPages: number;
 };
 
 export type AdminUserOverviewResponseDto = {

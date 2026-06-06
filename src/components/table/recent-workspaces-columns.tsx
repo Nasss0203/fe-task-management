@@ -31,15 +31,31 @@ export const recentWorkspacesColumns: ColumnDef<WorkspaceItem>[] = [
 	{
 		accessorKey: "owner",
 		header: "Owner",
-		cell: ({ row }) => (
-			<span className='text-neutral-400'>
-				{row.original.owner ?? "-"}
-			</span>
-		),
+		cell: ({ row }) => {
+			const ownerName = row.original.ownerName ?? row.original.owner;
+			const ownerEmail = row.original.ownerEmail;
+
+			if (!ownerName && !ownerEmail) {
+				return <span className='text-neutral-500'>Chưa có owner</span>;
+			}
+
+			return (
+				<div className='space-y-1'>
+					<p className='font-medium text-neutral-200'>
+						{ownerName ?? "Chưa có owner"}
+					</p>
+					{ownerEmail && (
+						<p className='text-xs text-neutral-500'>
+							{ownerEmail}
+						</p>
+					)}
+				</div>
+			);
+		},
 	},
 	{
 		accessorKey: "membersCount",
-		header: "Members",
+		header: "Thành viên",
 		cell: ({ row }) => (
 			<span className='text-neutral-200'>
 				{row.original.membersCount}
@@ -48,7 +64,7 @@ export const recentWorkspacesColumns: ColumnDef<WorkspaceItem>[] = [
 	},
 	{
 		accessorKey: "projectsCount",
-		header: "Projects",
+		header: "Project",
 		cell: ({ row }) => (
 			<span className='text-neutral-200'>
 				{row.original.projectsCount}
@@ -57,14 +73,14 @@ export const recentWorkspacesColumns: ColumnDef<WorkspaceItem>[] = [
 	},
 	{
 		accessorKey: "tasksCount",
-		header: "Tasks",
+		header: "Task",
 		cell: ({ row }) => (
 			<span className='text-neutral-200'>{row.original.tasksCount}</span>
 		),
 	},
 	{
 		accessorKey: "plan",
-		header: "Plan",
+		header: "Gói",
 		cell: ({ row }) => (
 			<span className='rounded-full border border-neutral-700 bg-neutral-900 px-2.5 py-1 text-xs font-medium uppercase text-neutral-200'>
 				{row.original.plan}
@@ -73,7 +89,7 @@ export const recentWorkspacesColumns: ColumnDef<WorkspaceItem>[] = [
 	},
 	{
 		accessorKey: "createdAt",
-		header: "Created",
+		header: "Ngày tạo",
 		cell: ({ row }) => (
 			<span className='text-neutral-400'>
 				{formatDate(row.original.createdAt)}

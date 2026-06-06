@@ -1,5 +1,6 @@
 "use client";
 
+import PanigationTable from "@/components/panigation/PanigationTable";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -8,6 +9,8 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { AdminUser } from "@/services/admin/user/type";
+import type { OnChangeFn, PaginationState } from "@tanstack/react-table";
+import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import {
 	Clock3,
 	Ellipsis,
@@ -30,6 +33,10 @@ import {
 
 type Props = {
 	users: AdminUser[];
+	pagination: PaginationState;
+	pageCount: number;
+	totalRows: number;
+	onPaginationChange: OnChangeFn<PaginationState>;
 	onView: (user: AdminUser) => void;
 	onToggleLock: (userId: string) => void;
 	onToggleAdmin: (userId: string) => void;
@@ -38,11 +45,27 @@ type Props = {
 
 export function UserTable({
 	users,
+	pagination,
+	pageCount,
+	totalRows,
+	onPaginationChange,
 	onView,
 	onToggleLock,
 	onToggleAdmin,
 	onResetStatus,
 }: Props) {
+	const table = useReactTable({
+		data: users,
+		columns: [],
+		getCoreRowModel: getCoreRowModel(),
+		manualPagination: true,
+		onPaginationChange,
+		pageCount,
+		state: {
+			pagination,
+		},
+	});
+
 	if (!users.length) {
 		return (
 			<div className='rounded-3xl border border-white/10 bg-[#101010] p-10 text-center'>
@@ -54,6 +77,7 @@ export function UserTable({
 	}
 
 	return (
+		<>
 		<div className='overflow-x-auto'>
 			<table className='w-full min-w-295 border-separate border-spacing-y-3'>
 				<thead>
@@ -78,7 +102,8 @@ export function UserTable({
 				</thead>
 
 				<tbody>
-					{users.map((user) => {
+					{table.getRowModel().rows.map((row) => {
+						const user = row.original;
 						const isSuperAdmin = user.systemRole === "SUPER_ADMIN";
 						const isSystemAdmin =
 							user.systemRole === "SYSTEM_ADMIN";
@@ -284,5 +309,11 @@ export function UserTable({
 				</tbody>
 			</table>
 		</div>
+		<PanigationTable
+			table={table}
+			totalRows={totalRows}
+			itemLabel='người dùng'
+		/>
+		</>
 	);
 }

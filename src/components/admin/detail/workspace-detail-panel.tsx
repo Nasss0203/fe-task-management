@@ -22,10 +22,8 @@ import {
 	FolderKanban,
 	LayoutDashboard,
 	ListChecks,
-	ShieldCheck,
 	Users,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 
 type Props = {
 	workspace: WorkspaceItem | null;
@@ -98,46 +96,10 @@ export function WorkspaceDetailPanel({
 	onClose,
 	onChangePlan,
 }: Props) {
-	const [open, setOpen] = useState(Boolean(workspace));
-	const [selectedPlan, setSelectedPlan] = useState<PlanTypeWorkspace>("free");
-
-	const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-	useEffect(() => {
-		setOpen(Boolean(workspace));
-
-		if (workspace) {
-			setSelectedPlan(workspace.plan);
-		}
-	}, [workspace]);
-
-	useEffect(() => {
-		return () => {
-			if (closeTimerRef.current) {
-				clearTimeout(closeTimerRef.current);
-			}
-		};
-	}, []);
-
-	const handleRequestClose = () => {
-		if (closeTimerRef.current) {
-			clearTimeout(closeTimerRef.current);
-		}
-
-		setOpen(false);
-
-		closeTimerRef.current = setTimeout(() => {
-			onClose();
-		}, 300);
-	};
-
 	const handleOpenChange = (nextOpen: boolean) => {
 		if (!nextOpen) {
-			handleRequestClose();
-			return;
+			onClose();
 		}
-
-		setOpen(true);
 	};
 
 	const handleCopyWorkspaceId = async () => {
@@ -149,16 +111,20 @@ export function WorkspaceDetailPanel({
 	const handleSavePlan = () => {
 		if (!workspace) return;
 
-		onChangePlan(workspace.id, selectedPlan);
+		onChangePlan(workspace.id, workspace.plan === "pro" ? "free" : "pro");
 	};
 
 	if (!workspace) return null;
 
 	const isDeleted = workspace.status === "DELETED";
-	const isPlanChanged = selectedPlan !== workspace.plan;
+	const nextPlanLabel = workspace.plan === "pro" ? "Chuyển về Free" : "Nâng lên Pro";
 
 	return (
-		<Drawer direction='right' open={open} onOpenChange={handleOpenChange}>
+		<Drawer
+			direction='right'
+			open={Boolean(workspace)}
+			onOpenChange={handleOpenChange}
+		>
 			<DrawerContent className='left-auto right-0 mt-0 flex h-screen w-full max-w-130 overflow-hidden rounded-none border-l border-white/10 bg-[#0b0b0b] text-white'>
 				<DrawerHeader className='border-b border-white/10 px-6 py-5 text-left'>
 					<div className='flex items-start justify-between gap-4'>
@@ -175,7 +141,7 @@ export function WorkspaceDetailPanel({
 						<Button
 							type='button'
 							variant='ghost'
-							onClick={handleRequestClose}
+							onClick={onClose}
 							className='h-9 rounded-xl border border-white/10 px-3 text-sm text-neutral-300 hover:bg-white/5 hover:text-white'
 						>
 							Close
@@ -236,7 +202,7 @@ export function WorkspaceDetailPanel({
 										{workspace.ownerName ?? "Chưa có owner"}
 									</p>
 									<p className='text-xs text-neutral-500'>
-										{workspace.ownerEmail ?? "—"}
+										{workspace.ownerEmail ?? "-"}
 									</p>
 								</div>
 
@@ -357,28 +323,14 @@ export function WorkspaceDetailPanel({
 							</h3>
 
 							<div className='flex flex-col gap-2 sm:flex-row'>
-								<select
-									value={selectedPlan}
-									disabled={isDeleted}
-									onChange={(e) =>
-										setSelectedPlan(
-											e.target.value as PlanTypeWorkspace,
-										)
-									}
-									className='h-11 min-w-0 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none focus:border-white/20 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-1'
-								>
-									<option value='free'>Free</option>
-									<option value='pro'>Pro</option>
-								</select>
-
 								<Button
 									type='button'
-									disabled={isDeleted || !isPlanChanged}
+									disabled={isDeleted}
 									onClick={handleSavePlan}
 									className='h-11 w-full shrink-0 rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto'
 								>
 									<Crown className='mr-2 h-4 w-4' />
-									Lưu gói
+									{nextPlanLabel}
 								</Button>
 							</div>
 
@@ -395,7 +347,7 @@ export function WorkspaceDetailPanel({
 				<DrawerFooter className='border-t border-white/10 px-6 py-4'>
 					<Button
 						variant='outline'
-						onClick={handleRequestClose}
+						onClick={onClose}
 						className='h-11 rounded-2xl border-white/10 bg-[#111111] text-white hover:bg-white/5 hover:text-white'
 					>
 						Close

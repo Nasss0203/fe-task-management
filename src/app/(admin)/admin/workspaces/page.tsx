@@ -12,6 +12,7 @@ import type {
 	WorkspaceItem,
 	WorkspaceStatus,
 } from "@/services/admin/workspace/type";
+import type { PaginationState } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 
 const getCreatedFrom = (value: string) => {
@@ -36,6 +37,34 @@ const getCreatedFrom = (value: string) => {
 	return date.toISOString();
 };
 
+const matchesSearch = (workspace: WorkspaceItem, value: string) => {
+	const keyword = value.trim().toLowerCase();
+	if (!keyword) return true;
+
+	return [
+		workspace.name,
+		workspace.slug,
+		workspace.ownerName,
+		workspace.ownerEmail,
+	]
+		.filter(Boolean)
+		.some((item) => item!.toLowerCase().includes(keyword));
+};
+
+const matchesCreatedAt = (workspace: WorkspaceItem, value: string) => {
+	const createdFrom = getCreatedFrom(value);
+	if (!createdFrom) return true;
+
+	const createdAtTime = new Date(workspace.createdAt).getTime();
+	const createdFromTime = new Date(createdFrom).getTime();
+
+	return (
+		!Number.isNaN(createdAtTime) &&
+		!Number.isNaN(createdFromTime) &&
+		createdAtTime >= createdFromTime
+	);
+};
+
 export default function AdminWorkspacesPage() {
 	const [selectedWorkspace, setSelectedWorkspace] =
 		useState<WorkspaceItem | null>(null);
@@ -44,19 +73,71 @@ export default function AdminWorkspacesPage() {
 	const [status, setStatus] = useState("all");
 	const [plan, setPlan] = useState("all");
 	const [createdAt, setCreatedAt] = useState("all");
+	const [pagination, setPagination] = useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: 10,
+	});
 
 	const workspaceQuery = useMemo<AdminFindAllWorkspaceQuery>(() => {
 		return {
-			search: search.trim() || undefined,
-			status: status === "all" ? undefined : (status as WorkspaceStatus),
-			plan: plan === "all" ? undefined : (plan as PlanTypeWorkspace),
-			createdFrom: getCreatedFrom(createdAt),
+			page: pagination.pageIndex + 1,
+			pageSize: pagination.pageSize,
 		};
-	}, [search, status, plan, createdAt]);
+	}, [pagination]);
 
 	const { workspaces, updatePlan } = useAdminWorkspaces(workspaceQuery);
 
-	const workspaceItems = workspaces.data?.data ?? [];
+	const workspacePage = workspaces.data?.data;
+	const workspaceItems = workspacePage?.data ?? [];
+	const filteredWorkspaceItems = useMemo(() => {
+		return workspaceItems.filter((workspace) => {
+			const matchSearch = matchesSearch(workspace, search);
+			const matchStatus =
+				status === "all" ||
+				workspace.status === (status as WorkspaceStatus);
+			const matchPlan =
+				plan === "all" || workspace.plan === (plan as PlanTypeWorkspace);
+			const matchCreatedAt = matchesCreatedAt(workspace, createdAt);
+
+			return matchSearch && matchStatus && matchPlan && matchCreatedAt;
+		});
+	}, [workspaceItems, search, status, plan, createdAt]);
+	const visibleWorkspaceItems = useMemo(() => {
+		const start = pagination.pageIndex * pagination.pageSize;
+		const end = start + pagination.pageSize;
+
+		return filteredWorkspaceItems.slice(start, end);
+	}, [filteredWorkspaceItems, pagination]);
+
+	const hasFilters =
+		Boolean(search.trim()) ||
+		status !== "all" ||
+		plan !== "all" ||
+		createdAt !== "all";
+
+	const resetToFirstPage = () => {
+		setPagination((current) => ({ ...current, pageIndex: 0 }));
+	};
+
+	const handleSearchChange = (value: string) => {
+		resetToFirstPage();
+		setSearch(value);
+	};
+
+	const handleStatusChange = (value: string) => {
+		resetToFirstPage();
+		setStatus(value);
+	};
+
+	const handlePlanChange = (value: string) => {
+		resetToFirstPage();
+		setPlan(value);
+	};
+
+	const handleCreatedAtChange = (value: string) => {
+		resetToFirstPage();
+		setCreatedAt(value);
+	};
 
 	const handleViewWorkspace = (workspace: WorkspaceItem) => {
 		setSelectedWorkspace(workspace);
@@ -77,10 +158,11 @@ export default function AdminWorkspacesPage() {
 		setStatus("all");
 		setPlan("all");
 		setCreatedAt("all");
+		resetToFirstPage();
 	};
 
 	return (
-		<div className='space-y-6 p-6'>
+		<div className='space-y-5 p-4 sm:p-6'>
 			<WorkspaceAdminHeader />
 
 			<WorkspaceOverviewCards workspaces={workspaceItems} />
@@ -90,28 +172,46 @@ export default function AdminWorkspacesPage() {
 				status={status}
 				plan={plan}
 				createdAt={createdAt}
-				onSearchChange={setSearch}
-				onStatusChange={setStatus}
-				onPlanChange={setPlan}
-				onCreatedAtChange={setCreatedAt}
+				onSearchChange={handleSearchChange}
+				onStatusChange={handleStatusChange}
+				onPlanChange={handlePlanChange}
+				onCreatedAtChange={handleCreatedAtChange}
 				onReset={handleResetFilters}
 			/>
 
 			{workspaces.isLoading ? (
-				<div className='rounded-[28px] border border-white/10 bg-[#0b0b0b] p-10 text-center'>
+				<div className='rounded-2xl border border-white/10 bg-[#0b0b0b] p-10 text-center'>
 					<p className='text-sm text-neutral-400'>
 						Đang tải danh sách workspace...
 					</p>
 				</div>
 			) : workspaces.isError ? (
-				<div className='rounded-[28px] border border-red-500/20 bg-red-500/5 p-10 text-center'>
+				<div className='rounded-2xl border border-red-500/20 bg-red-500/5 p-10 text-center'>
 					<p className='text-sm text-red-400'>
 						Không thể tải danh sách workspace.
 					</p>
 				</div>
 			) : (
 				<WorkspaceManagementTable
-					workspaces={workspaceItems}
+					workspaces={visibleWorkspaceItems}
+					pagination={pagination}
+					pageCount={
+						hasFilters
+							? Math.max(
+									Math.ceil(
+										filteredWorkspaceItems.length /
+											pagination.pageSize,
+									),
+									1,
+								)
+							: (workspacePage?.totalPages ?? 1)
+					}
+					totalRows={
+						hasFilters
+							? filteredWorkspaceItems.length
+							: (workspacePage?.total ?? 0)
+					}
+					onPaginationChange={setPagination}
 					onView={handleViewWorkspace}
 					onChangePlan={handleChangePlan}
 				/>

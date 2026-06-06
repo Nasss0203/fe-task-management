@@ -28,9 +28,44 @@ const getBadgeClassName = (level: SystemHealthItem["level"]) => {
 };
 
 const getBadgeLabel = (level: SystemHealthItem["level"]) => {
-	if (level === "success") return "Healthy";
-	if (level === "warning") return "Warning";
-	return "Risk";
+	if (level === "success") return "Ổn định";
+	if (level === "warning") return "Cảnh báo";
+	return "Rủi ro";
+};
+
+const getHealthLabel = (label: string) => {
+	const labelMap: Record<string, string> = {
+		"API Status": "Trạng thái API",
+		"Database Status": "Trạng thái database",
+		"Mail Service": "Dịch vụ email",
+		Environment: "Môi trường",
+	};
+
+	return labelMap[label] ?? label;
+};
+
+const getHealthValue = (value: string) => {
+	const valueMap: Record<string, string> = {
+		Healthy: "Ổn định",
+		"Not Configured": "Chưa cấu hình",
+		development: "development",
+		production: "production",
+	};
+
+	return valueMap[value] ?? value;
+};
+
+const getHealthDescription = (description: string) => {
+	const descriptionMap: Record<string, string> = {
+		"Backend API is reachable.": "Backend API đang phản hồi.",
+		"Database connection is available.": "Kết nối database khả dụng.",
+		"Mail service configuration is missing or incomplete.":
+			"Cấu hình dịch vụ email đang thiếu hoặc chưa hoàn chỉnh.",
+		"Current backend runtime environment.":
+			"Môi trường runtime hiện tại của backend.",
+	};
+
+	return descriptionMap[description] ?? description;
 };
 
 export function SystemHealth({ items }: Props) {
@@ -46,10 +81,10 @@ export function SystemHealth({ items }: Props) {
 				<div className='flex items-start justify-between gap-4'>
 					<div>
 						<CardTitle className='text-lg font-semibold text-white'>
-							System Health
+							Sức khỏe hệ thống
 						</CardTitle>
 						<CardDescription className='text-sm text-neutral-400'>
-							Quick health indicators across services.
+							Chỉ báo nhanh cho các dịch vụ hệ thống.
 						</CardDescription>
 					</div>
 
@@ -65,7 +100,7 @@ export function SystemHealth({ items }: Props) {
 			<CardContent className='space-y-4'>
 				{items.length === 0 ? (
 					<div className='flex h-40 items-center justify-center rounded-xl border border-dashed border-neutral-800 text-sm text-neutral-500'>
-						No system health data
+						Chưa có dữ liệu sức khỏe hệ thống
 					</div>
 				) : (
 					items.map((item, index) => (
@@ -73,16 +108,18 @@ export function SystemHealth({ items }: Props) {
 							<div className='flex items-start justify-between gap-4 rounded-xl border border-neutral-800 bg-neutral-900/40 p-4'>
 								<div className='min-w-0'>
 									<p className='text-sm font-medium text-neutral-100'>
-										{item.label}
+										{getHealthLabel(item.label)}
 									</p>
 									<p className='mt-1 text-xs leading-5 text-neutral-500'>
-										{item.description}
+										{getHealthDescription(
+											item.description,
+										)}
 									</p>
 								</div>
 
 								<div className='flex shrink-0 items-center gap-2'>
 									<span className='text-sm font-semibold text-white'>
-										{item.value}
+										{getHealthValue(item.value)}
 									</span>
 
 									<Badge

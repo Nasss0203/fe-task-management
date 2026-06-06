@@ -39,6 +39,7 @@ export type BillingPayment = {
 };
 
 export type WorkspaceSubscription = {
+	rowId: string;
 	id: string;
 	workspaceId: string;
 	workspaceName: string;

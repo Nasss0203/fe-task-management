@@ -4,6 +4,7 @@ import { getRecentActivitiesApi } from "@/services/admin/dashboard/recent-activi
 import { getRetentionMetricsApi } from "@/services/admin/dashboard/retention-metrics";
 import { getSystemHealthApi } from "@/services/admin/dashboard/system-health";
 import { getUserGrowthApi } from "@/services/admin/dashboard/user-growth";
+import { getAdminUserOverviewApi } from "@/services/admin/user/user-admin.service";
 import { getWorkspaceGrowthApi } from "@/services/admin/dashboard/workspace-growth";
 import { getWorkspacePlanApi } from "@/services/admin/dashboard/workspace-plan";
 import {
@@ -13,7 +14,7 @@ import {
 	type DashboardSummaryResponseDto,
 	type UserGrowthPeriod,
 	type WorkspaceGrowthPeriod,
-	type WorkspaceItem,
+	type WorkspacePaginationResponse,
 } from "@/services/admin/dashboard/type";
 import {
 	findAllWorkspaceAdminApi,
@@ -23,8 +24,10 @@ import { useQuery } from "@tanstack/react-query";
 
 export const ADMIN_DASHBOARD_KEY = {
 	USER_GROWTH: "ADMIN_USER_GROWTH",
+	USER_OVERVIEW: "ADMIN_USER_OVERVIEW",
 	WORKSPACE_GROWTH: "ADMIN_WORKSPACE_GROWTH",
 	WORKSPACE_PLAN: "ADMIN_WORKSPACE_PLAN",
+	ALL_WORKSPACES: "ADMIN_DASHBOARD_ALL_WORKSPACES",
 	RETENTION_METRICS: "ADMIN_RETENTION_METRICS",
 	SYSTEM_HEALTH: "ADMIN_SYSTEM_HEALTH",
 	RECENT_ACTIVITIES: "ADMIN_RECENT_ACTIVITIES",
@@ -44,9 +47,23 @@ export const useAdminDashboard = (
 		},
 	);
 
-	const workspaces = useQuery<ApiResponse<WorkspaceItem[]>>({
+	const workspaces = useQuery<ApiResponse<WorkspacePaginationResponse>>({
 		queryKey: [WORKSPACE_ADMIN_KEY.WORKSPACE_ADMIN_LIST, query],
 		queryFn: () => findAllWorkspaceAdminApi(query),
+		retry: false,
+		refetchOnWindowFocus: false,
+	});
+
+	const allWorkspaces = useQuery<ApiResponse<WorkspacePaginationResponse>>({
+		queryKey: [ADMIN_DASHBOARD_KEY.ALL_WORKSPACES],
+		queryFn: () => findAllWorkspaceAdminApi({ page: 1, pageSize: 100 }),
+		retry: false,
+		refetchOnWindowFocus: false,
+	});
+
+	const userOverview = useQuery({
+		queryKey: [ADMIN_DASHBOARD_KEY.USER_OVERVIEW],
+		queryFn: getAdminUserOverviewApi,
 		retry: false,
 		refetchOnWindowFocus: false,
 	});
@@ -96,6 +113,8 @@ export const useAdminDashboard = (
 	return {
 		dashboardSummary,
 		workspaces,
+		allWorkspaces,
+		userOverview,
 		userGrowth,
 		workspaceGrowth,
 		workspacePlan,

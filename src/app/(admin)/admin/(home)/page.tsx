@@ -7,29 +7,174 @@ import { WorkspacePlanChart } from "@/components/admin/charts/workspace-plan-cha
 import { DashboardHeader } from "@/components/admin/header/dashboard-header";
 import { SystemHealth } from "@/components/admin/health/system-health";
 import { RetentionCard } from "@/components/admin/retention/retention-card";
-import { StatItem } from "@/components/admin/shared/types";
-import { StatsGrid } from "@/components/admin/stats/stats-grid";
 import { RecentWorkspacesTable } from "@/components/admin/table/recent-workspaces-table";
 import { useAdminDashboard } from "@/features/admin/modules/dashboard/hooks/useAdminDashboard";
 import type {
+	AdminFindAllWorkspaceQuery,
 	UserGrowthPeriod,
 	WorkspaceGrowthPeriod,
+	WorkspaceItem,
 } from "@/services/admin/dashboard/type";
-import type { AdminFindAllWorkspaceQuery } from "@/services/admin/dashboard/type";
-
+import type { PaginationState } from "@tanstack/react-table";
+import type { LucideIcon } from "lucide-react";
 import {
+	Activity,
+	AlertTriangle,
 	BriefcaseBusiness,
 	CheckSquare,
 	CreditCard,
-	User,
+	Database,
+	ShieldCheck,
+	TrendingUp,
 	Users,
 	Workflow,
 } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+
+type MetricItem = {
+	title: string;
+	value: number;
+	description: string;
+	icon: LucideIcon;
+	accentClass: string;
+};
+
+type SignalItem = {
+	label: string;
+	value: string;
+	description: string;
+	icon: LucideIcon;
+	tone: "success" | "warning" | "neutral";
+};
+
+const formatRate = (value: number, total: number) => {
+	if (!total) return "0%";
+	return `${Math.round((value / total) * 100)}%`;
+};
+
+const isPaidWorkspace = (plan?: string) => {
+	const normalizedPlan = plan?.toLowerCase();
+	return normalizedPlan === "pro";
+};
+
+const getWorkspaceItems = (value: unknown): WorkspaceItem[] => {
+	if (Array.isArray(value)) {
+		return value;
+	}
+
+	if (
+		typeof value === "object" &&
+		value !== null &&
+		"data" in value &&
+		Array.isArray((value as { data?: unknown }).data)
+	) {
+		return (value as { data: WorkspaceItem[] }).data;
+	}
+
+	return [];
+};
+
+const hasWorkspaceFilters = (query: AdminFindAllWorkspaceQuery) => {
+	return Boolean(query.search?.trim() || query.plan || query.createdAt);
+};
+
+const filterWorkspaces = (
+	workspaces: WorkspaceItem[],
+	query: AdminFindAllWorkspaceQuery,
+) => {
+	const search = query.search?.trim().toLowerCase();
+	const createdAt = query.createdAt;
+
+	return workspaces.filter((workspace) => {
+		const matchesSearch =
+			!search ||
+			[
+				workspace.name,
+				workspace.slug,
+				workspace.owner,
+				workspace.ownerName,
+				workspace.ownerEmail,
+			]
+				.filter(Boolean)
+				.some((value) => value!.toLowerCase().includes(search));
+
+		const matchesPlan = !query.plan || workspace.plan === query.plan;
+		const matchesCreatedAt =
+			!createdAt || workspace.createdAt?.slice(0, 10) === createdAt;
+
+		return matchesSearch && matchesPlan && matchesCreatedAt;
+	});
+};
+
+function MetricTile({ item }: { item: MetricItem }) {
+	const Icon = item.icon;
+
+	return (
+		<div className='rounded-xl border border-white/10 bg-[#101010] p-4 lg:p-3.5'>
+			<div className='flex items-start justify-between gap-4'>
+				<div>
+					<p className='text-sm text-neutral-400'>{item.title}</p>
+					<p className='mt-2 text-2xl font-semibold text-white'>
+						{item.value}
+					</p>
+				</div>
+
+				<div
+					className={`flex h-10 w-10 items-center justify-center rounded-xl border ${item.accentClass}`}
+				>
+					<Icon className='h-5 w-5' />
+				</div>
+			</div>
+
+			<p className='mt-3 text-xs leading-4 text-neutral-500'>
+				{item.description}
+			</p>
+		</div>
+	);
+}
+
+function SignalRow({ item }: { item: SignalItem }) {
+	const Icon = item.icon;
+	const toneClass =
+		item.tone === "success"
+			? "border-emerald-500/20 bg-emerald-500/10 text-emerald-300"
+			: item.tone === "warning"
+				? "border-amber-500/20 bg-amber-500/10 text-amber-300"
+				: "border-white/10 bg-white/5 text-neutral-300";
+
+	return (
+		<div className='flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-[#101010] p-3'>
+			<div className='flex min-w-0 items-center gap-3'>
+				<div
+					className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${toneClass}`}
+				>
+					<Icon className='h-4 w-4' />
+				</div>
+				<div className='min-w-0'>
+					<p className='text-sm font-medium text-white'>
+						{item.label}
+					</p>
+					<p className='mt-0.5 truncate text-xs text-neutral-500'>
+						{item.description}
+					</p>
+				</div>
+			</div>
+
+			<span className='shrink-0 text-sm font-semibold text-white'>
+				{item.value}
+			</span>
+		</div>
+	);
+}
 
 export default function AdminDashboardPage() {
-	const [workspaceQuery, setWorkspaceQuery] =
+	const [workspaceFilters, setWorkspaceFilters] =
 		useState<AdminFindAllWorkspaceQuery>({});
+	const [workspacePagination, setWorkspacePagination] =
+		useState<PaginationState>({
+			pageIndex: 0,
+			pageSize: 10,
+		});
 
 	const [userGrowthPeriod, setUserGrowthPeriod] =
 		useState<UserGrowthPeriod>("7d");
@@ -37,9 +182,19 @@ export default function AdminDashboardPage() {
 	const [workspaceGrowthPeriod, setWorkspaceGrowthPeriod] =
 		useState<WorkspaceGrowthPeriod>("7d");
 
+	const workspaceQuery = useMemo<AdminFindAllWorkspaceQuery>(
+		() => ({
+			page: workspacePagination.pageIndex + 1,
+			pageSize: workspacePagination.pageSize,
+		}),
+		[workspacePagination],
+	);
+
 	const {
 		dashboardSummary,
 		workspaces,
+		allWorkspaces,
+		userOverview,
 		userGrowth,
 		workspaceGrowth,
 		workspacePlan,
@@ -53,7 +208,29 @@ export default function AdminDashboardPage() {
 	);
 
 	const summary = dashboardSummary.data?.data;
-	const workspaceItems = workspaces.data?.data ?? [];
+	const workspacePage = workspaces.data?.data;
+	const workspaceItems = workspacePage?.data ?? [];
+	const allWorkspaceItems = getWorkspaceItems(allWorkspaces.data?.data);
+	const isFilteringWorkspaces = hasWorkspaceFilters(workspaceFilters);
+	const recentWorkspaceItems = useMemo(() => {
+		if (!isFilteringWorkspaces) {
+			return workspaceItems;
+		}
+
+		return filterWorkspaces(allWorkspaceItems, workspaceFilters);
+	}, [
+		allWorkspaceItems,
+		isFilteringWorkspaces,
+		workspaceFilters,
+		workspaceItems,
+	]);
+	const visibleWorkspaceItems = useMemo(() => {
+		const start = workspacePagination.pageIndex * workspacePagination.pageSize;
+		const end = start + workspacePagination.pageSize;
+
+		return recentWorkspaceItems.slice(start, end);
+	}, [recentWorkspaceItems, workspacePagination]);
+	const overview = userOverview.data?.data;
 	const userGrowthItems = userGrowth.data?.data ?? [];
 	const workspaceGrowthItems = workspaceGrowth.data?.data ?? [];
 	const workspacePlanItems = workspacePlan.data?.data ?? [];
@@ -61,60 +238,125 @@ export default function AdminDashboardPage() {
 	const systemHealthItems = systemHealth.data?.data ?? [];
 	const recentActivityItems = recentActivities.data?.data ?? [];
 
-	const stats: StatItem[] = [
+	const paidWorkspacesFromList = allWorkspaceItems.filter((workspace) =>
+		isPaidWorkspace(workspace.plan),
+	).length;
+
+	const totalUsers = summary?.totalUsers ?? overview?.totalUsers ?? 0;
+	const totalWorkspaces =
+		summary?.totalWorkspaces || allWorkspaceItems.length || 0;
+	const totalProjects = summary?.totalProjects ?? 0;
+	const totalTasks = summary?.totalTasks ?? 0;
+
+	const paidWorkspaces =
+		summary?.paidWorkspaces && summary.paidWorkspaces > 0
+			? summary.paidWorkspaces
+			: paidWorkspacesFromList;
+
+	const activeUsers =
+		summary?.activeUsersLast30Days && summary.activeUsersLast30Days > 0
+			? summary.activeUsersLast30Days
+			: (overview?.activeUsers ?? 0);
+
+	const workspacePlanData =
+		workspacePlanItems.some(
+			(item) =>
+				item.name.toLowerCase() === "pro" && Number(item.value) > 0,
+		) || paidWorkspacesFromList === 0
+			? workspacePlanItems
+			: [
+					{
+						name: "Free",
+						value: Math.max(
+							allWorkspaceItems.length - paidWorkspacesFromList,
+							0,
+						),
+					},
+					{ name: "Pro", value: paidWorkspacesFromList },
+				];
+
+	const warningServices = systemHealthItems.filter(
+		(item) => item.level !== "success",
+	).length;
+	const activeUserRate = formatRate(activeUsers, totalUsers);
+	const paidWorkspaceRate = formatRate(paidWorkspaces, totalWorkspaces);
+	const latestUserGrowth =
+		userGrowthItems[userGrowthItems.length - 1]?.users ?? 0;
+	const latestWorkspaceGrowth =
+		workspaceGrowthItems[workspaceGrowthItems.length - 1]?.workspaces ?? 0;
+
+	const metrics: MetricItem[] = [
 		{
-			title: "Total Users",
-			value: summary?.totalUsers ?? 0,
-			change: "Live",
-			description: "registered users",
-			trend: "neutral",
+			title: "Người dùng",
+			value: totalUsers,
+			description: `${activeUsers} tài khoản đang hoạt động`,
 			icon: Users,
+			accentClass: "border-sky-500/20 bg-sky-500/10 text-sky-300",
 		},
 		{
-			title: "Total Workspaces",
-			value: summary?.totalWorkspaces ?? 0,
-			change: "Live",
-			description: "created workspaces",
-			trend: "neutral",
+			title: "Workspace",
+			value: totalWorkspaces,
+			description: `${paidWorkspaces} workspace trả phí`,
 			icon: BriefcaseBusiness,
+			accentClass:
+				"border-emerald-500/20 bg-emerald-500/10 text-emerald-300",
 		},
 		{
-			title: "Total Projects",
-			value: summary?.totalProjects ?? 0,
-			change: "Live",
-			description: "created projects",
-			trend: "neutral",
+			title: "Project",
+			value: totalProjects,
+			description: "Tổng project trên toàn hệ thống",
 			icon: Workflow,
+			accentClass:
+				"border-violet-500/20 bg-violet-500/10 text-violet-300",
 		},
 		{
-			title: "Total Tasks",
-			value: summary?.totalTasks ?? 0,
-			change: "Live",
-			description: "created tasks",
-			trend: "neutral",
+			title: "Task",
+			value: totalTasks,
+			description: "Tổng task đã được tạo",
 			icon: CheckSquare,
+			accentClass: "border-amber-500/20 bg-amber-500/10 text-amber-300",
+		},
+	];
+
+	const signals: SignalItem[] = [
+		{
+			label: "Tỷ lệ user active",
+			value: activeUserRate,
+			description: "Active / tổng người dùng",
+			icon: Activity,
+			tone: activeUsers > 0 ? "success" : "neutral",
 		},
 		{
-			title: "Paid Workspaces",
-			value: summary?.paidWorkspaces ?? 0,
-			change: "Live",
-			description: "paid plan workspaces",
-			trend: "neutral",
+			label: "Tỷ lệ workspace Pro",
+			value: paidWorkspaceRate,
+			description: "Pro / tổng workspace",
 			icon: CreditCard,
+			tone: paidWorkspaces > 0 ? "success" : "neutral",
 		},
 		{
-			title: "Active users",
-			value: summary?.activeUsersLast30Days ?? 0,
-			change: "Live",
-			description: "Active users in the last 30 days",
-			trend: "neutral",
-			icon: User,
+			label: "Dịch vụ cần theo dõi",
+			value: String(warningServices),
+			description: "Warning hoặc risk trong system health",
+			icon: AlertTriangle,
+			tone: warningServices > 0 ? "warning" : "success",
+		},
+		{
+			label: "Tăng trưởng mới nhất",
+			value: `+${latestUserGrowth} user / +${latestWorkspaceGrowth} workspace`,
+			description: "Điểm dữ liệu mới nhất trong chart",
+			icon: TrendingUp,
+			tone:
+				latestUserGrowth > 0 || latestWorkspaceGrowth > 0
+					? "success"
+					: "neutral",
 		},
 	];
 
 	if (
 		dashboardSummary.isLoading ||
 		workspaces.isLoading ||
+		allWorkspaces.isLoading ||
+		userOverview.isLoading ||
 		userGrowth.isLoading ||
 		workspaceGrowth.isLoading ||
 		workspacePlan.isLoading ||
@@ -122,35 +364,55 @@ export default function AdminDashboardPage() {
 		systemHealth.isLoading ||
 		recentActivities.isLoading
 	) {
-		return <div className='text-neutral-400'>Loading dashboard...</div>;
+		return <div className='text-neutral-400'>Đang tải dashboard...</div>;
 	}
 
 	if (dashboardSummary.isError || workspaces.isError) {
-		return <div className='text-red-400'>Failed to load dashboard</div>;
+		return <div className='text-red-400'>Không thể tải dashboard</div>;
 	}
 
 	return (
-		<div className='space-y-6 p-6'>
+		<div className='space-y-3 p-4 sm:p-6'>
 			<DashboardHeader />
 
-			<StatsGrid items={stats} />
+			<section className='rounded-2xl border border-white/10 bg-[#0b0b0b] p-4 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset]'>
+				<div className='mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
+					<div>
+						<div className='flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-neutral-500'>
+							<Database className='h-4 w-4 text-sky-400' />
+							Live overview
+						</div>
+						<h2 className='mt-2 text-lg font-semibold text-white'>
+							Tình hình vận hành
+						</h2>
+					</div>
+					<div className='inline-flex w-fit items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-300'>
+						<ShieldCheck className='h-4 w-4' />
+						Dữ liệu trực tiếp
+					</div>
+				</div>
 
-			<section className='grid gap-4 xl:grid-cols-3'>
-				<div className='xl:col-span-2'>
+				<div className='grid gap-3 md:grid-cols-2 xl:grid-cols-4'>
+					{metrics.map((item) => (
+						<MetricTile key={item.title} item={item} />
+					))}
+				</div>
+
+				<div className='mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-4'>
+					{signals.map((item) => (
+						<SignalRow key={item.label} item={item} />
+					))}
+				</div>
+			</section>
+
+			<section className='grid items-start gap-3 xl:grid-cols-3'>
+				<div className='space-y-3 xl:col-span-2'>
 					<UserGrowthChart
 						data={userGrowth.isError ? [] : userGrowthItems}
 						period={userGrowthPeriod}
 						onPeriodChange={setUserGrowthPeriod}
 					/>
-				</div>
 
-				<WorkspacePlanChart
-					data={workspacePlan.isError ? [] : workspacePlanItems}
-				/>
-			</section>
-
-			<section className='grid gap-4 xl:grid-cols-3'>
-				<div className='xl:col-span-2'>
 					<WorkspaceGrowthChart
 						data={
 							workspaceGrowth.isError ? [] : workspaceGrowthItems
@@ -160,17 +422,56 @@ export default function AdminDashboardPage() {
 					/>
 				</div>
 
-				<RetentionCard
-					items={retentionMetrics.isError ? [] : retentionMetricItems}
-				/>
+				<div className='space-y-3'>
+					<WorkspacePlanChart
+						data={workspacePlan.isError ? [] : workspacePlanData}
+					/>
+
+					<RetentionCard
+						items={retentionMetrics.isError ? [] : retentionMetricItems}
+					/>
+				</div>
 			</section>
 
 			<section className='grid gap-4 xl:grid-cols-3'>
 				<div className='xl:col-span-2'>
 					<RecentWorkspacesTable
-						items={workspaceItems}
-						query={workspaceQuery}
-						onQueryChange={setWorkspaceQuery}
+						items={visibleWorkspaceItems}
+						query={{
+							...workspaceFilters,
+							page: workspacePagination.pageIndex + 1,
+							pageSize: workspacePagination.pageSize,
+						}}
+						pagination={workspacePagination}
+						pageCount={
+							isFilteringWorkspaces
+								? Math.max(
+										Math.ceil(
+											recentWorkspaceItems.length /
+												workspacePagination.pageSize,
+										),
+										1,
+									)
+								: (workspacePage?.totalPages ?? 1)
+						}
+						totalRows={
+							isFilteringWorkspaces
+								? recentWorkspaceItems.length
+								: (workspacePage?.total ?? 0)
+						}
+						onPaginationChange={setWorkspacePagination}
+						onQueryChange={(nextQuery) => {
+							setWorkspacePagination((current) => ({
+								...current,
+								pageIndex: 0,
+								pageSize: nextQuery.pageSize ?? current.pageSize,
+							}));
+							setWorkspaceFilters({
+								search: nextQuery.search,
+								plan: nextQuery.plan,
+								createdAt: nextQuery.createdAt,
+							});
+						}}
 					/>
 				</div>
 
