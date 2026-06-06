@@ -7,6 +7,7 @@ import { ItemView } from "./item-view";
 
 type ItemsDndProps = {
 	id: string;
+	task?: TaskItem;
 	column: string;
 	index: number;
 	status: string;
@@ -22,6 +23,7 @@ type ItemsDndProps = {
 
 const ItemsDnd = ({
 	id,
+	task,
 	column,
 	index,
 	status,
@@ -78,6 +80,7 @@ const ItemsDnd = ({
 		>
 			<ItemView
 				id={id}
+				task={task}
 				status={status}
 				name={name}
 				priority={priority}

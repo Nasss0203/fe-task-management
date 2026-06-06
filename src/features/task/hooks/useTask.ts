@@ -5,11 +5,14 @@ import { TaskStatusResponse } from "@/services/task-status/type";
 import {
 	bulkUpdateTasksApi,
 	createTaskApi,
+	deleteTaskApi,
 	findAllBacklogTaskApi,
+	findDeletedTasksApi,
 	findAllTaskApi,
 	moveTaskSprintToSprintApi,
 	moveTaskToSprintApi,
 	removeTaskFormSprintApi,
+	restoreTaskApi,
 	updateTaskApi,
 } from "@/services/task/task.service";
 import {
@@ -37,8 +40,12 @@ export const useTask = (
 	workspaceId: string,
 	projectId: string,
 	backlogFilters?: FindBacklogTasksFilters,
+	options?: {
+		includeTrash?: boolean;
+	},
 ) => {
 	const queryClient = useQueryClient();
+	const includeTrash = options?.includeTrash === true;
 	const taskQuery = useQuery({
 		queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
 		queryFn: () => findAllTaskApi(workspaceId, projectId),
@@ -99,6 +106,60 @@ export const useTask = (
 		enabled: !!workspaceId && !!projectId,
 	});
 
+	const deletedTasks = useQuery({
+		queryKey: [TASK_KEY.TASK_TRASH, workspaceId, projectId],
+		queryFn: () => findDeletedTasksApi({ workspaceId, projectId }),
+		enabled: !!workspaceId && includeTrash,
+	});
+
+	const deleteTask = useMutation({
+		mutationFn: ({ taskId }: { taskId: string }) =>
+			deleteTaskApi({
+				taskId,
+				workspaceId,
+			}),
+		onSuccess: async () => {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [TASK_KEY.TASK_TRASH, workspaceId, projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
+				}),
+			]);
+		},
+	});
+
+	const restoreTask = useMutation({
+		mutationFn: ({ taskId }: { taskId: string }) =>
+			restoreTaskApi({
+				taskId,
+				workspaceId,
+			}),
+		onSuccess: async () => {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [TASK_KEY.TASK_TRASH, workspaceId, projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
+				}),
+			]);
+		},
+	});
+
 	const bulkUpdateTasks = useMutation({
 		mutationFn: (body: BulkUpdateTasksDto) => {
 			if (!workspaceId || !projectId) {
@@ -128,6 +189,9 @@ export const useTask = (
 		createTask,
 		updateTask,
 		findTaskBacklog,
+		deletedTasks,
+		deleteTask,
+		restoreTask,
 		bulkUpdateTasks,
 	};
 };

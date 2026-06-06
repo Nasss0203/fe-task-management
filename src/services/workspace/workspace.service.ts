@@ -2,6 +2,7 @@ import axios from "axios";
 import instance from "../axios";
 import {
 	CreateWorkspaceResponse,
+	FindDeletedWorkspaceResponse,
 	FindAllWorkspaceResponse,
 	FindOneWorkspaceResponse,
 	UpdateWorkspaceLayoutModeDto,
@@ -46,6 +47,15 @@ export const findOneByWorkspaceIdApi = async (
 	return response.data;
 };
 
+export const findDeletedWorkspacesApi =
+	async (): Promise<FindDeletedWorkspaceResponse> => {
+		const response =
+			await instance.get<FindDeletedWorkspaceResponse>(
+				"/workspaces/trash",
+			);
+		return response.data;
+	};
+
 export const updateWorkspaceLayoutModeApi = async ({
 	workspaceId,
 	data,
@@ -56,6 +66,26 @@ export const updateWorkspaceLayoutModeApi = async ({
 	const response = await instance.patch<FindOneWorkspaceResponse>(
 		`/workspaces/${workspaceId}/layout-mode`,
 		data,
+	);
+
+	return response.data;
+};
+
+export const softDeleteWorkspaceApi = async (
+	workspaceId: string,
+): Promise<FindOneWorkspaceResponse> => {
+	const response = await instance.delete<FindOneWorkspaceResponse>(
+		`/workspaces/${workspaceId}`,
+	);
+
+	return response.data;
+};
+
+export const restoreWorkspaceApi = async (
+	workspaceId: string,
+): Promise<FindOneWorkspaceResponse> => {
+	const response = await instance.patch<FindOneWorkspaceResponse>(
+		`/workspaces/${workspaceId}/restore`,
 	);
 
 	return response.data;

@@ -2,9 +2,13 @@
 
 import { ProjectBlock } from "@/components/block";
 import type { AvailableTabItem } from "@/components/block/ProjectBlock";
-import { BOARD_VIEW_CONFIG } from "@/components/board/view-board";
+import {
+	BOARD_VIEW_CONFIG,
+	isBoardViewEnabled,
+} from "@/components/board/view-board";
 import { useBoards } from "@/features/board/hooks/useBoards";
 import { usePage } from "@/features/page/hooks/usePage";
+import { useWorkspaceFeatures } from "@/features/workspace-feature/hooks/useWorkspaceFeatures";
 import { BoardItem, BoardViewType } from "@/services/board/type";
 import { normalizeDatabaseViewConfig } from "@/services/page_block/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
@@ -42,6 +46,7 @@ const RestPage = () => {
 		workspaceId,
 		projectId,
 	});
+	const { canUseSprint } = useWorkspaceFeatures(workspaceId);
 
 	const boards = useMemo<BoardItem[]>(
 		() => findBoard.data?.data ?? [],
@@ -51,8 +56,9 @@ const RestPage = () => {
 	const availableTabs = useMemo<AvailableTabItem[]>(() => {
 		return boards
 			.filter((board) => {
-				const config = BOARD_VIEW_CONFIG[board.viewType];
-				return config?.enabled;
+				return isBoardViewEnabled(board.viewType, {
+					canUseSprint,
+				});
 			})
 			.map((board) => {
 				const config = BOARD_VIEW_CONFIG[board.viewType]!;
@@ -64,7 +70,7 @@ const RestPage = () => {
 					boardId: board.id,
 				};
 			});
-	}, [boards]);
+	}, [boards, canUseSprint]);
 
 	const activeTabValue = availableTabs.some((tab) => tab.value === activeTab)
 		? activeTab

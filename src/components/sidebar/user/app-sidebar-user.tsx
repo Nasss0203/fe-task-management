@@ -29,28 +29,27 @@ import NavHome, { type NavHomeItem } from "../../nav/user/nav-home";
 
 const homeItems: NavHomeItem[] = [
 	{
-		name: "Tìm kiếm",
+		name: "Tim kiem",
 		url: "#",
 		icon: Search,
 	},
 	{
-		name: "Trang chủ",
+		name: "Trang chu",
 		url: "/dashboard",
 		icon: Home,
 	},
 	{
-		name: "Công việc của tôi",
+		name: "Cong viec cua toi",
 		url: "/dashboard/my-tasks",
 		icon: ListTodo,
 	},
 	{
-		name: "Hộp thư đến",
+		name: "Hop thu den",
 		icon: Mail,
 		type: "inbox",
 	},
 ];
 
-// This is sample data.
 const data = {
 	user: {
 		name: "shadcn",

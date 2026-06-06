@@ -1,3 +1,4 @@
+import ProjectTrashDialog from "@/components/project/ProjectTrashDialog";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -28,6 +29,8 @@ import {
 	PlayCircle,
 	Trash2,
 } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 import { toast } from "sonner";
 
 type WorkspaceSummary = {
@@ -42,6 +45,7 @@ type ProjectDropdownProps = {
 };
 
 const ProjectDropdown = ({ project, workspace }: ProjectDropdownProps) => {
+	const [openTrashDialog, setOpenTrashDialog] = useState(false);
 	const queryClient = useQueryClient();
 	const {
 		createPageBlock: { mutateAsync: createBlock, isPending },
@@ -100,76 +104,116 @@ const ProjectDropdown = ({ project, workspace }: ProjectDropdownProps) => {
 	};
 
 	return (
-		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<button
-					type='button'
-					className='flex size-5 items-center justify-center rounded-sm text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100'
+		<>
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<button
+						type='button'
+						className='flex size-5 items-center justify-center rounded-sm text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100'
+					>
+						<Ellipsis size={14} />
+					</button>
+				</DropdownMenuTrigger>
+
+				<DropdownMenuContent
+					align='start'
+					side='right'
+					sideOffset={12}
+					className='w-64 border-neutral-700 bg-neutral-900 p-1 text-neutral-200 shadow-xl'
 				>
-					<Ellipsis size={14} />
-				</button>
-			</DropdownMenuTrigger>
+					<DropdownMenuGroup>
+						<DropdownMenuLabel className='px-2 py-1.5 text-xs font-medium text-neutral-500'>
+							Project
+						</DropdownMenuLabel>
 
-			<DropdownMenuContent
-				align='start'
-				side='right'
-				sideOffset={12}
-				className='w-64 border-neutral-700 bg-neutral-900 p-1 text-neutral-200 shadow-xl'
-			>
-				<DropdownMenuGroup>
-					<DropdownMenuLabel className='px-2 py-1.5 text-xs font-medium text-neutral-500'>
-						Project
-					</DropdownMenuLabel>
-
-					<DropdownMenuItem className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'>
-						<Pencil size={15} />
-						<span>Doi ten project</span>
-					</DropdownMenuItem>
-
-					<DropdownMenuItem className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'>
-						<Link2 size={15} />
-						<span>Sao chep lien ket</span>
-					</DropdownMenuItem>
-
-					<DropdownMenuItem className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'>
-						<ExternalLink size={15} />
-						<span>Mo trong tab moi</span>
-					</DropdownMenuItem>
-				</DropdownMenuGroup>
-
-				<DropdownMenuSeparator className='my-1 bg-neutral-800' />
-
-				<DropdownMenuGroup>
-					<DropdownMenuItem className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'>
-						<PlayCircle size={15} />
-						<span>Tao sprint moi</span>
-					</DropdownMenuItem>
-
-					<DropdownMenuItem className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'>
-						<Columns3 size={15} />
-						<span>Them board / view</span>
-					</DropdownMenuItem>
-
-					{!isProjectVisibleInPage && (
 						<DropdownMenuItem
-							disabled={!page?.id || isPending}
-							onSelect={handleShowInPage}
+							onSelect={() =>
+								toast.info(
+									"Rename project se duoc noi tiep khi backend update metadata san sang.",
+								)
+							}
 							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'
 						>
-							<Eye size={15} />
-							<span>Thêm vào trang</span>
+							<Pencil size={15} />
+							<span>Doi ten project</span>
 						</DropdownMenuItem>
-					)}
-				</DropdownMenuGroup>
 
-				<DropdownMenuSeparator className='my-1 bg-neutral-800' />
+						<DropdownMenuItem
+							onSelect={async () => {
+								const targetUrl = `${window.location.origin}/dashboard/${workspace.slug}/projects/${project.id}`;
 
-				<DropdownMenuItem className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm text-red-400 focus:bg-red-500/10 focus:text-red-300'>
-					<Trash2 size={15} />
-					<span>Xoa project</span>
-				</DropdownMenuItem>
-			</DropdownMenuContent>
-		</DropdownMenu>
+								try {
+									await navigator.clipboard.writeText(targetUrl);
+									toast.success("Da sao chep lien ket project.");
+								} catch (error) {
+									console.error("copyProjectLink failed", error);
+									toast.error("Khong the sao chep lien ket project.");
+								}
+							}}
+							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'
+						>
+							<Link2 size={15} />
+							<span>Sao chep lien ket</span>
+						</DropdownMenuItem>
+
+						<DropdownMenuItem asChild>
+							<Link
+								href={`/dashboard/${workspace.slug}/projects/${project.id}`}
+								target='_blank'
+								className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'
+							>
+								<ExternalLink size={15} />
+								<span>Mo trong tab moi</span>
+							</Link>
+						</DropdownMenuItem>
+					</DropdownMenuGroup>
+
+					<DropdownMenuSeparator className='my-1 bg-neutral-800' />
+
+					<DropdownMenuGroup>
+						<DropdownMenuItem className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'>
+							<PlayCircle size={15} />
+							<span>Tao sprint moi</span>
+						</DropdownMenuItem>
+
+						<DropdownMenuItem className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'>
+							<Columns3 size={15} />
+							<span>Them board / view</span>
+						</DropdownMenuItem>
+
+						{!isProjectVisibleInPage && (
+							<DropdownMenuItem
+								disabled={!page?.id || isPending}
+								onSelect={handleShowInPage}
+								className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'
+							>
+								<Eye size={15} />
+								<span>Them vao trang</span>
+							</DropdownMenuItem>
+						)}
+					</DropdownMenuGroup>
+
+					<DropdownMenuSeparator className='my-1 bg-neutral-800' />
+
+					<DropdownMenuItem
+						onSelect={() => setOpenTrashDialog(true)}
+						className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm text-red-400 focus:bg-red-500/10 focus:text-red-300'
+					>
+						<Trash2 size={15} />
+						<span>Xoa project</span>
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
+
+			<ProjectTrashDialog
+				project={project}
+				workspace={workspace}
+				open={openTrashDialog}
+				onOpenChange={setOpenTrashDialog}
+				pageId={page?.id}
+				projectBlock={databaseViewBlock ?? null}
+			/>
+		</>
 	);
 };
 

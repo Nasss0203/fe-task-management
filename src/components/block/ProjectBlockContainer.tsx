@@ -11,7 +11,7 @@ import { useWorkspaceFeatures } from "@/features/workspace-feature/hooks/useWork
 import { BoardItem, BoardViewType } from "@/services/board/type";
 import { PageBlockDataConfig } from "@/services/page_block/type";
 import { BacklogRenderContext } from "../backlog/types";
-import { BOARD_VIEW_CONFIG } from "../board/view-board";
+import { BOARD_VIEW_CONFIG, isBoardViewEnabled } from "../board/view-board";
 
 type Props = {
 	blockId?: string;
@@ -58,10 +58,11 @@ const ProjectBlockContainer = ({
 		return boards.reduce<AvailableTabItem[]>((acc, board) => {
 			const viewConfig = BOARD_VIEW_CONFIG[board.viewType];
 
-			if (!viewConfig?.enabled) return acc;
+			if (!viewConfig) return acc;
 			if (
-				board.viewType === BoardViewType.BACKLOG &&
-				!canUseSprint
+				!isBoardViewEnabled(board.viewType, {
+					canUseSprint,
+				})
 			) {
 				return acc;
 			}

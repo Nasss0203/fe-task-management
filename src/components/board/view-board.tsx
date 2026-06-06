@@ -49,7 +49,7 @@ const Timeline = ({ board }: BoardViewProps) => (
 	<div>Tiimeline - {board.name}</div>
 );
 
-const Backlog = ({ board, context = "workspace" }: BoardViewProps) => (
+const Backlog = ({ context = "workspace" }: BoardViewProps) => (
 	<BoardBacklog context={context} />
 );
 
@@ -62,6 +62,21 @@ export type BoardViewConfig = {
 	icon: LucideIcon;
 	component: React.ComponentType<BoardViewProps>;
 	enabled?: boolean;
+	requiresSprint?: boolean;
+};
+
+export const isBoardViewEnabled = (
+	viewType: BoardViewType,
+	options?: {
+		canUseSprint?: boolean;
+	},
+) => {
+	const config = BOARD_VIEW_CONFIG[viewType];
+
+	if (!config?.enabled) return false;
+	if (config.requiresSprint && !options?.canUseSprint) return false;
+
+	return true;
 };
 
 export const BOARD_VIEW_CONFIG: Partial<
@@ -96,6 +111,7 @@ export const BOARD_VIEW_CONFIG: Partial<
 		icon: GanttChart,
 		component: Backlog,
 		enabled: true,
+		requiresSprint: true,
 	},
 	TIMELINE: {
 		label: "Timeline",

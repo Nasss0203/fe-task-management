@@ -2,6 +2,7 @@ import { BoardViewType } from "../board/type";
 
 export enum PROJECT_KEY {
 	PROJECT = "project",
+	PROJECT_TRASH = "project-trash",
 }
 export enum ProjectVisibility {
 	PRIVATE = "PRIVATE",
@@ -11,6 +12,8 @@ export enum ProjectVisibility {
 export interface ProjectItems {
 	created_at?: string;
 	created_by?: string;
+	deleted_at?: string | null;
+	deleted_by?: string | null;
 	id?: string;
 	key?: string;
 	name?: string;
@@ -21,6 +24,10 @@ export interface ProjectItems {
 }
 
 export interface FindAllProjectResponse {
+	data: ProjectItems[];
+}
+
+export interface FindDeletedProjectResponse {
 	data: ProjectItems[];
 }
 
@@ -37,4 +44,8 @@ export interface ProjectDto {
 
 export interface CreateProjectResponse {
 	data: ProjectItems;
+}
+
+export interface DeleteProjectResponse {
+	success: boolean;
 }

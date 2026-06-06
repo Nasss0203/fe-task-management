@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
 	Folder,
 	Forward,
@@ -38,7 +39,7 @@ export function NavProjects({
 
 	return (
 		<SidebarGroup className='group-data-[collapsible=icon]:hidden'>
-			<SidebarGroupLabel>Sprints</SidebarGroupLabel>
+			<SidebarGroupLabel>Projects</SidebarGroupLabel>
 			<SidebarMenu>
 				{projects.map((item) => (
 					<SidebarMenuItem key={item.name}>
@@ -81,6 +82,14 @@ export function NavProjects({
 					<SidebarMenuButton className='text-sidebar-foreground/70'>
 						<MoreHorizontal className='text-sidebar-foreground/70' />
 						<span>More</span>
+					</SidebarMenuButton>
+				</SidebarMenuItem>
+				<SidebarMenuItem>
+					<SidebarMenuButton asChild>
+						<Link href='/dashboard/trash/workspaces'>
+							<Trash2 className='text-sidebar-foreground/70' />
+							<span>Thung rac</span>
+						</Link>
 					</SidebarMenuButton>
 				</SidebarMenuItem>
 			</SidebarMenu>

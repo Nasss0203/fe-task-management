@@ -2,6 +2,7 @@ export const TASK_KEY = {
 	TASK: "task",
 	TASKS: "tasks",
 	TASK_BACKLOG: "task-backlog",
+	TASK_TRASH: "task-trash",
 };
 
 export type TaskFilterValue = string | string[];
@@ -121,7 +122,7 @@ export interface UpdateTaskResponse {
 }
 
 export interface DeleteTaskResponse {
-	data: TaskItem;
+	success: boolean;
 }
 
 export interface FindAllTaskBacklogResponse {
@@ -130,4 +131,8 @@ export interface FindAllTaskBacklogResponse {
 	page: number;
 	pageSize: number;
 	totalPages: number;
+}
+
+export interface FindDeletedTaskResponse {
+	data: TaskItem[];
 }

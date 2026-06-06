@@ -229,10 +229,15 @@ const ProviderDragDrop = ({
 								{columnItems.map((id, index) => {
 									const task = taskMap[id];
 
+									if (!task) {
+										return null;
+									}
+
 									return (
 										<ItemsDnd
 											key={id}
 											id={id}
+											task={task}
 											column={status.id}
 											index={index}
 											status={status.name}

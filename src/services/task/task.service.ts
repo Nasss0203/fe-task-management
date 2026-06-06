@@ -3,7 +3,9 @@ import {
 	BulkUpdateTasksDto,
 	CreateTaskDto,
 	CreateTaskResponse,
+	DeleteTaskResponse,
 	FindAllTaskBacklogResponse,
+	FindDeletedTaskResponse,
 	FindAllTaskResponse,
 	FindBacklogTasksFilters,
 	UpdateTaskDto,
@@ -168,4 +170,53 @@ export const bulkUpdateTasksApi = async ({
 	console.log("🚀 ~ res~", res.data);
 
 	return res.data;
+};
+
+export const deleteTaskApi = async ({
+	taskId,
+	workspaceId,
+}: {
+	taskId: string;
+	workspaceId: string;
+}): Promise<DeleteTaskResponse> => {
+	const response = await instance.delete<DeleteTaskResponse>(`/tasks/${taskId}`, {
+		params: { workspaceId },
+	});
+
+	return response.data;
+};
+
+export const restoreTaskApi = async ({
+	taskId,
+	workspaceId,
+}: {
+	taskId: string;
+	workspaceId: string;
+}): Promise<DeleteTaskResponse> => {
+	const response = await instance.patch<DeleteTaskResponse>(
+		`/tasks/${taskId}/restore`,
+		undefined,
+		{
+			params: { workspaceId },
+		},
+	);
+
+	return response.data;
+};
+
+export const findDeletedTasksApi = async ({
+	workspaceId,
+	projectId,
+}: {
+	workspaceId: string;
+	projectId?: string;
+}): Promise<FindDeletedTaskResponse> => {
+	const response = await instance.get<FindDeletedTaskResponse>("/tasks/trash", {
+		params: {
+			workspaceId,
+			...(projectId ? { projectId } : {}),
+		},
+	});
+
+	return response.data;
 };

@@ -3,7 +3,10 @@
 import { WORKSPACE_KEY, WorkspaceDto } from "@/services/workspace/type";
 import {
 	createWorkspaceApi,
+	findDeletedWorkspacesApi,
 	findAllWorkspaceApi,
+	restoreWorkspaceApi,
+	softDeleteWorkspaceApi,
 	updateWorkspaceLayoutModeApi,
 } from "@/services/workspace/workspace.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -51,9 +54,51 @@ export const useWorkspace = () => {
 		},
 	});
 
+	const workspaceTrash = useQuery({
+		queryKey: [WORKSPACE_KEY.WORKSPACE_TRASH],
+		queryFn: findDeletedWorkspacesApi,
+	});
+
+	const softDeleteWorkspace = useMutation({
+		mutationFn: softDeleteWorkspaceApi,
+		onSuccess: async () => {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: [WORKSPACE_KEY.WORKSPACE],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [WORKSPACE_KEY.WORKSPACE_TRASH],
+				}),
+			]);
+		},
+		onError: (err) => {
+			console.error("softDeleteWorkspaceApi failed", err);
+		},
+	});
+
+	const restoreWorkspace = useMutation({
+		mutationFn: restoreWorkspaceApi,
+		onSuccess: async () => {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: [WORKSPACE_KEY.WORKSPACE],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [WORKSPACE_KEY.WORKSPACE_TRASH],
+				}),
+			]);
+		},
+		onError: (err) => {
+			console.error("restoreWorkspaceApi failed", err);
+		},
+	});
+
 	return {
 		createWorkspace,
 		workspaceFindAll,
 		updateWorkspaceLayoutMode,
+		workspaceTrash,
+		softDeleteWorkspace,
+		restoreWorkspace,
 	};
 };

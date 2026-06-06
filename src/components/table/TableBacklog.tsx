@@ -40,6 +40,7 @@ import { useTableDnd } from "../dnd/backlog-sprint/ProviderSprintDnd";
 import TableRowDnd from "../dnd/backlog-sprint/TableRowSprintDnd";
 import TaskAssignees from "../task/TaskAssignees";
 import { TaskBulkActionBar } from "../task/TaskBulkActionBar";
+import TaskTrashDialog from "../task/TaskTrashDialog";
 
 type TableBacklogProps = {
 	tasks: TaskItem[];
@@ -239,6 +240,7 @@ const TableBacklog = ({
 		pageSize: 10,
 	});
 	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+	const [taskTrashOpen, setTaskTrashOpen] = useState(false);
 
 	const { items } = useTableDnd();
 	const { bulkUpdateTasks, updateTask } = useTask(workspaceId, projectId);
@@ -246,8 +248,14 @@ const TableBacklog = ({
 	const { data: taskPriorityData } = useTaskPriority(workspaceId, projectId);
 
 	const taskIds = items[containerId] ?? [];
-	const taskStatus = taskStatusData?.data ?? [];
-	const taskPriority = taskPriorityData?.data ?? [];
+	const taskStatus = useMemo(
+		() => taskStatusData?.data ?? [],
+		[taskStatusData?.data],
+	);
+	const taskPriority = useMemo(
+		() => taskPriorityData?.data ?? [],
+		[taskPriorityData?.data],
+	);
 
 	const columns = useMemo(
 		() =>
@@ -281,6 +289,7 @@ const TableBacklog = ({
 			projectId,
 		],
 	);
+	// eslint-disable-next-line react-hooks/incompatible-library
 	const table = useReactTable({
 		data: tasks,
 		columns,
@@ -421,7 +430,18 @@ const TableBacklog = ({
 					table.resetRowSelection();
 				}}
 				onDelete={() => {
-					console.log("delete", selectedTaskIds);
+					setTaskTrashOpen(true);
+				}}
+			/>
+
+			<TaskTrashDialog
+				tasks={selectedTasks}
+				workspaceId={workspaceId}
+				projectId={projectId}
+				open={taskTrashOpen}
+				onOpenChange={setTaskTrashOpen}
+				onDeleted={() => {
+					table.resetRowSelection();
 				}}
 			/>
 		</>

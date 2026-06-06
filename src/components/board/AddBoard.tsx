@@ -13,6 +13,7 @@ import { useBoards } from "@/features/board/hooks/useBoards";
 import { useWorkspaceFeatures } from "@/features/workspace-feature/hooks/useWorkspaceFeatures";
 import { BoardItem, BoardViewType } from "@/services/board/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
+import { isBoardViewEnabled } from "./view-board";
 import {
 	PopoverContentV2,
 	PopoverHeaderV2,
@@ -80,8 +81,12 @@ export default function AddBoard({
 
 	const existingViewTypes = new Set(boards.map((board) => board.viewType));
 	const boardViewItems = BOARD_VIEW_ITEMS.filter((item) => {
-		if (!item.enabled) return false;
-		if (item.value === BoardViewType.BACKLOG && !canUseSprint) {
+		if (
+			!item.enabled ||
+			!isBoardViewEnabled(item.value, {
+				canUseSprint,
+			})
+		) {
 			return false;
 		}
 

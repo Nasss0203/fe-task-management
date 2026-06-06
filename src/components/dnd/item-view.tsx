@@ -3,9 +3,16 @@
 import { getTaskStatusBackgroundClass } from "@/lib/task-status-style";
 import { cn } from "@/lib/utils";
 import type { TaskItem } from "@/services/task/type";
-import { CalendarDays, Ellipsis, ExternalLink, Pencil } from "lucide-react";
+import {
+	CalendarDays,
+	Ellipsis,
+	ExternalLink,
+	Pencil,
+	Trash,
+} from "lucide-react";
 import * as React from "react";
 import TaskAssignees from "../task/TaskAssignees";
+import TaskTrashDialog from "../task/TaskTrashDialog";
 import {
 	Command,
 	CommandEmpty,
@@ -78,6 +85,7 @@ function formatScheduleLabel(startAt?: string | null, dueAt?: string | null) {
 
 type ItemViewProps = React.HTMLAttributes<HTMLDivElement> & {
 	id: string;
+	task?: TaskItem;
 	isOverlay?: boolean;
 	status: string;
 	name: string;
@@ -94,6 +102,7 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 	(
 		{
 			id,
+			task,
 			isOverlay,
 			status,
 			name,
@@ -116,6 +125,7 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 		const [localName, setLocalName] = React.useState(name);
 		const [isEditingName, setIsEditingName] = React.useState(false);
 		const [isActionOpen, setIsActionOpen] = React.useState(false);
+		const [taskTrashOpen, setTaskTrashOpen] = React.useState(false);
 		const inputRef = React.useRef<HTMLInputElement>(null);
 		const skipBlurCommitRef = React.useRef(false);
 
@@ -301,6 +311,21 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 													<ExternalLink size={16} />
 													<span>Mở chi tiết</span>
 												</CommandItem>
+
+												<CommandItem
+													value='delete_task'
+													onSelect={() => {
+														setIsActionOpen(false);
+														setTaskTrashOpen(true);
+													}}
+													className='cursor-pointer rounded-lg px-2 py-2 text-red-500'
+												>
+													<Trash
+														size={16}
+														className='text-red-500'
+													/>
+													<span>Xóa task</span>
+												</CommandItem>
 											</CommandGroup>
 										</CommandList>
 									</Command>
@@ -339,6 +364,15 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 						</div>
 					) : null}
 				</div>
+				{task ? (
+					<TaskTrashDialog
+						tasks={[task]}
+						workspaceId={task.workspaceId}
+						projectId={task.projectId}
+						open={taskTrashOpen}
+						onOpenChange={setTaskTrashOpen}
+					/>
+				) : null}
 			</div>
 		);
 	},
