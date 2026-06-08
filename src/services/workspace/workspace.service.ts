@@ -2,8 +2,8 @@ import axios from "axios";
 import instance from "../axios";
 import {
 	CreateWorkspaceResponse,
-	FindDeletedWorkspaceResponse,
 	FindAllWorkspaceResponse,
+	FindDeletedWorkspaceResponse,
 	FindOneWorkspaceResponse,
 	UpdateWorkspaceDto,
 	UpdateWorkspaceLayoutModeDto,
@@ -102,6 +102,16 @@ export const restoreWorkspaceApi = async (
 ): Promise<FindOneWorkspaceResponse> => {
 	const response = await instance.patch<FindOneWorkspaceResponse>(
 		`/workspaces/${workspaceId}/restore`,
+	);
+
+	return response.data;
+};
+
+export const findWorkspaceAccessApi = async (
+	workspaceId: string,
+): Promise<any> => {
+	const response = await instance.get<any>(
+		`/workspaces/${workspaceId}/access`,
 	);
 
 	return response.data;

@@ -1,7 +1,5 @@
 "use client";
 
-import WorkspaceSettingsDialog from "@/components/workspaces/WorkspaceSettingsDialog";
-import WorkspaceTrashDialog from "@/components/workspaces/WorkspaceTrashDialog";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -11,6 +9,10 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import WorkspaceSettingsDialog from "@/components/workspaces/WorkspaceSettingsDialog";
+import WorkspaceTrashDialog from "@/components/workspaces/WorkspaceTrashDialog";
+import { PERMISSIONS } from "@/constants/permissions";
+import { RequirePermission } from "@/features/permission/components/RequirePermission";
 import type { WorkspaceItem } from "@/services/workspace/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import {
@@ -133,15 +135,19 @@ const WorkspaceDropdown = ({
 						</DropdownMenuItem>
 					</DropdownMenuGroup>
 
-					<DropdownMenuSeparator className='my-1 bg-neutral-800' />
-
-					<DropdownMenuItem
-						onSelect={() => setOpenTrashDialog(true)}
-						className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm text-red-400 focus:bg-red-500/10 focus:text-red-300'
+					<RequirePermission
+						workspaceId={workspace.id}
+						code={PERMISSIONS.WORKSPACE_DELETE}
 					>
-						<Trash2 size={15} />
-						<span>Chuyen vao Thung rac</span>
-					</DropdownMenuItem>
+						<DropdownMenuSeparator className='my-1 bg-neutral-800' />
+						<DropdownMenuItem
+							onSelect={() => setOpenTrashDialog(true)}
+							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm text-red-400 focus:bg-red-500/10 focus:text-red-300'
+						>
+							<Trash2 size={15} />
+							<span>Chuyen vao Thung rac</span>
+						</DropdownMenuItem>
+					</RequirePermission>
 				</DropdownMenuContent>
 			</DropdownMenu>
 

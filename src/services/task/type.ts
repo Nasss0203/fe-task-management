@@ -20,6 +20,9 @@ export type FindBacklogTasksFilters = {
 export type BulkUpdateTasksDto = {
 	taskIds: string[];
 	statusId?: string;
+	priorityId?: string | null;
+	startAt?: string | null;
+	dueAt?: string | null;
 	sendNotification?: boolean;
 };
 

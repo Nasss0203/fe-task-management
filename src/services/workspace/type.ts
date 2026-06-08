@@ -1,6 +1,7 @@
 export enum WORKSPACE_KEY {
 	WORKSPACE = "workspace",
 	WORKSPACE_TRASH = "workspace-trash",
+	WORKSPACE_ACCESS = "workspace-access",
 }
 
 export enum WorkspaceLayoutMode {
