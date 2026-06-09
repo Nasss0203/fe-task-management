@@ -215,16 +215,16 @@ const WorkspaceSettingsContent = ({
 
 	const shellClassName =
 		variant === "page"
-			? "-mx-4 -mt-3 flex min-h-[calc(100svh-4rem)] text-neutral-100 md:-mx-6 xl:-mx-10"
-			: "flex h-full min-h-0 text-neutral-100";
+			? "-mx-4 -mt-3 flex min-h-[calc(100svh-4rem)] text-foreground md:-mx-6 xl:-mx-10"
+			: "flex h-full min-h-0 text-foreground";
 
 	const mainClassName =
-		variant === "page" ? "min-w-0 flex-1 overflow-y-auto" : "min-w-0 flex-1 overflow-y-auto bg-[#1b1b1d]";
+		variant === "page" ? "min-w-0 flex-1 overflow-y-auto" : "min-w-0 flex-1 overflow-y-auto bg-background";
 
 	return (
 		<div className={shellClassName}>
-			<aside className='w-64 shrink-0 border-r border-neutral-800 bg-neutral-950/80'>
-				<div className='border-b border-neutral-800 px-5 py-4'>
+			<aside className='w-64 shrink-0 border-r border-border bg-muted/50'>
+				<div className='border-b border-border px-5 py-4'>
 					<div className='text-base font-semibold'>
 						Workspace settings
 					</div>
@@ -236,7 +236,7 @@ const WorkspaceSettingsContent = ({
 							<div className='truncate text-sm font-medium'>
 								{workspace.name}
 							</div>
-							<div className='text-xs text-neutral-500'>
+							<div className='text-xs text-muted-foreground'>
 								Task workspace
 							</div>
 						</div>
@@ -256,7 +256,7 @@ const WorkspaceSettingsContent = ({
 								className={`flex h-9 items-center gap-3 rounded-md px-3 text-left text-sm transition ${
 									isActive
 										? "bg-blue-500/15 text-blue-300"
-										: "text-neutral-300 hover:bg-neutral-900 hover:text-neutral-100"
+										: "text-foreground hover:hover:bg-accent hover:hover:text-foreground"
 								}`}
 							>
 								<Icon className='size-4' />
@@ -268,8 +268,8 @@ const WorkspaceSettingsContent = ({
 			</aside>
 
 			<main className={mainClassName}>
-				<div className='border-b border-neutral-800 px-8 py-5'>
-					<div className='text-sm text-neutral-500'>
+				<div className='border-b border-border px-8 py-5'>
+					<div className='text-sm text-muted-foreground'>
 						Workspaces / {workspace.name} / Settings
 					</div>
 					<h1 className='mt-2 text-2xl font-semibold'>
@@ -281,14 +281,14 @@ const WorkspaceSettingsContent = ({
 				<div className='max-w-5xl px-8 py-6'>
 					{activeSection === "details" ? (
 						<div className='max-w-3xl space-y-4'>
-							<div className='rounded-md border border-neutral-800 bg-neutral-900/30 p-5'>
+							<div className='rounded-md border border-border bg-muted/50 p-5'>
 								<div className='mb-4 text-sm font-semibold'>
 									Workspace details
 								</div>
 
 								<div className='grid gap-4'>
-									<div className='flex items-center justify-between gap-4 border-b border-neutral-800 pb-3'>
-										<span className='text-sm text-neutral-400'>
+									<div className='flex items-center justify-between gap-4 border-b border-border pb-3'>
+										<span className='text-sm text-muted-foreground'>
 											Name
 										</span>
 										<span className='text-sm font-medium'>
@@ -296,8 +296,8 @@ const WorkspaceSettingsContent = ({
 										</span>
 									</div>
 
-									<div className='flex items-center justify-between gap-4 border-b border-neutral-800 pb-3'>
-										<span className='text-sm text-neutral-400'>
+									<div className='flex items-center justify-between gap-4 border-b border-border pb-3'>
+										<span className='text-sm text-muted-foreground'>
 											Slug
 										</span>
 										<span className='text-sm font-medium'>
@@ -306,10 +306,10 @@ const WorkspaceSettingsContent = ({
 									</div>
 
 									<div className='flex items-center justify-between gap-4'>
-										<span className='text-sm text-neutral-400'>
+										<span className='text-sm text-muted-foreground'>
 											Plan
 										</span>
-										<span className='inline-flex items-center rounded-full border border-neutral-700 px-2.5 py-1 text-xs font-semibold'>
+										<span className='inline-flex items-center rounded-full border border-border px-2.5 py-1 text-xs font-semibold'>
 											{formatPlanName(planName)}
 										</span>
 									</div>
@@ -325,7 +325,7 @@ const WorkspaceSettingsContent = ({
 									<div className='text-sm font-semibold'>
 										Current users
 									</div>
-									<div className='mt-1 text-sm text-neutral-500'>
+									<div className='mt-1 text-sm text-muted-foreground'>
 										Manage workspace members and roles.
 									</div>
 								</div>
@@ -340,25 +340,25 @@ const WorkspaceSettingsContent = ({
 								)}
 							</div>
 
-							<div className='rounded-md border border-neutral-800'>
-								<div className='grid grid-cols-[1fr_220px_120px] border-b border-neutral-800 px-4 py-3 text-xs font-semibold uppercase text-neutral-500'>
+							<div className='rounded-md border border-border'>
+								<div className='grid grid-cols-[1fr_220px_120px] border-b border-border px-4 py-3 text-xs font-semibold uppercase text-muted-foreground'>
 									<div>Name</div>
 									<div>Role</div>
 									<div>Action</div>
 								</div>
 								{isMembersLoading ? (
-									<div className='px-4 py-4 text-sm text-neutral-500'>
+									<div className='px-4 py-4 text-sm text-muted-foreground'>
 										Loading members...
 									</div>
 								) : members.length === 0 ? (
-									<div className='px-4 py-4 text-sm text-neutral-500'>
+									<div className='px-4 py-4 text-sm text-muted-foreground'>
 										No members found in this workspace yet.
 									</div>
 								) : (
 									members.map((member) => (
 										<div
 											key={member.id}
-											className='grid grid-cols-[1fr_220px_120px] items-center border-t border-neutral-800 px-4 py-4 text-sm first:border-t-0'
+											className='grid grid-cols-[1fr_220px_120px] items-center border-t border-border px-4 py-4 text-sm first:border-t-0'
 										>
 											<div className='flex min-w-0 items-center gap-3'>
 												<div className='flex size-8 items-center justify-center overflow-hidden rounded-full bg-violet-600 text-xs font-bold uppercase'>
@@ -380,15 +380,15 @@ const WorkspaceSettingsContent = ({
 													<div className='truncate font-medium'>
 														{member.full_name || member.email}
 													</div>
-													<div className='truncate text-xs text-neutral-500'>
+													<div className='truncate text-xs text-muted-foreground'>
 														{member.email}
 													</div>
 												</div>
 											</div>
-											<div className='uppercase text-neutral-200'>
+											<div className='uppercase text-foreground'>
 												{member.role_name}
 											</div>
-											<div className='text-neutral-500'>-</div>
+											<div className='text-muted-foreground'>-</div>
 										</div>
 									))
 								)}
@@ -403,13 +403,13 @@ const WorkspaceSettingsContent = ({
 								use after the plan allows it.
 							</div>
 
-							<div className='rounded-md border border-neutral-800 bg-neutral-900/30'>
-								<div className='flex items-center justify-between gap-4 border-b border-neutral-800 px-5 py-4'>
+							<div className='rounded-md border border-border bg-muted/50'>
+								<div className='flex items-center justify-between gap-4 border-b border-border px-5 py-4'>
 									<div>
 										<div className='text-sm font-semibold'>
 											Sprint
 										</div>
-										<div className='mt-1 text-sm text-neutral-500'>
+										<div className='mt-1 text-sm text-muted-foreground'>
 											Enable sprint planning, backlog
 											views, and sprint task workflows.
 										</div>
@@ -429,7 +429,7 @@ const WorkspaceSettingsContent = ({
 
 								<div className='grid grid-cols-3 gap-4 px-5 py-4 text-sm'>
 									<div>
-										<div className='text-xs uppercase text-neutral-500'>
+										<div className='text-xs uppercase text-muted-foreground'>
 											Plan
 										</div>
 										<div className='mt-1 font-medium'>
@@ -439,7 +439,7 @@ const WorkspaceSettingsContent = ({
 										</div>
 									</div>
 									<div>
-										<div className='text-xs uppercase text-neutral-500'>
+										<div className='text-xs uppercase text-muted-foreground'>
 											Workspace
 										</div>
 										<div className='mt-1 font-medium'>
@@ -450,7 +450,7 @@ const WorkspaceSettingsContent = ({
 										</div>
 									</div>
 									<div>
-										<div className='text-xs uppercase text-neutral-500'>
+										<div className='text-xs uppercase text-muted-foreground'>
 											Result
 										</div>
 										<div className='mt-1 font-medium'>
@@ -466,14 +466,14 @@ const WorkspaceSettingsContent = ({
 
 					{activeSection === "board" ? (
 						<div className='max-w-3xl space-y-4'>
-							<div className='rounded-md border border-neutral-800 bg-neutral-900/30 p-5'>
+							<div className='rounded-md border border-border bg-muted/50 p-5'>
 								<div className='flex items-start gap-3'>
-									<LayoutList className='mt-0.5 size-5 text-neutral-500' />
+									<LayoutList className='mt-0.5 size-5 text-muted-foreground' />
 									<div className='min-w-0 flex-1'>
 										<div className='text-sm font-semibold'>
 											Workspace layout
 										</div>
-										<div className='mt-1 text-sm text-neutral-500'>
+										<div className='mt-1 text-sm text-muted-foreground'>
 											Choose whether this workspace opens
 											in a Jira-style tab layout or a
 											Notion-style block page.
@@ -490,10 +490,10 @@ const WorkspaceSettingsContent = ({
 												}
 												disabled={isUpdatingLayout || !can(PERMISSIONS.WORKSPACE_UPDATE)}
 											>
-												<SelectTrigger className='w-full border-neutral-800 bg-neutral-950 text-neutral-100'>
+												<SelectTrigger className='w-full border-border bg-background text-foreground'>
 													<SelectValue placeholder='Select layout' />
 												</SelectTrigger>
-												<SelectContent className='border-neutral-800 bg-neutral-950 text-neutral-100'>
+												<SelectContent className='border-border bg-popover text-foreground'>
 													<SelectItem
 														value={
 															WorkspaceLayoutMode.TABS
@@ -512,7 +512,7 @@ const WorkspaceSettingsContent = ({
 											</Select>
 										</div>
 
-										<div className='mt-3 text-xs text-neutral-500'>
+										<div className='mt-3 text-xs text-muted-foreground'>
 											Tabs shows Summary and Pages. Blocks
 											opens straight into the page block
 											list.
@@ -552,27 +552,27 @@ const WorkspaceSettingsContent = ({
 								</div>
 							</div>
 
-							<div className='rounded-md border border-neutral-800 bg-neutral-900/30 p-5'>
+							<div className='rounded-md border border-border bg-muted/50 p-5'>
 								<div className='mb-4 flex items-start justify-between gap-4'>
 									<div>
 										<div className='text-sm font-semibold'>
 											Deleted projects
 										</div>
-										<div className='mt-1 text-sm text-neutral-500'>
+										<div className='mt-1 text-sm text-muted-foreground'>
 											Restore projects that were soft-deleted in this workspace.
 										</div>
 									</div>
-									<div className='rounded-full border border-neutral-700 px-2.5 py-1 text-xs text-neutral-400'>
+									<div className='rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground'>
 										{deletedProjectItems.length} items
 									</div>
 								</div>
 
 								{isDeletedProjectsLoading ? (
-									<div className='text-sm text-neutral-500'>
+									<div className='text-sm text-muted-foreground'>
 										Loading deleted projects...
 									</div>
 								) : deletedProjectItems.length === 0 ? (
-									<div className='rounded-md border border-dashed border-neutral-800 px-4 py-6 text-sm text-neutral-500'>
+									<div className='rounded-md border border-dashed border-border px-4 py-6 text-sm text-muted-foreground'>
 										Chua co project nao trong thung rac cua workspace nay.
 									</div>
 								) : (
@@ -580,13 +580,13 @@ const WorkspaceSettingsContent = ({
 										{deletedProjectItems.map((project) => (
 											<div
 												key={project.id}
-												className='flex items-center justify-between gap-4 rounded-md border border-neutral-800 px-4 py-3'
+												className='flex items-center justify-between gap-4 rounded-md border border-border px-4 py-3'
 											>
 												<div className='min-w-0'>
-													<div className='truncate text-sm font-medium text-neutral-100'>
+													<div className='truncate text-sm font-medium text-foreground'>
 														{project.name ?? "Untitled project"}
 													</div>
-													<div className='mt-1 text-xs text-neutral-500'>
+													<div className='mt-1 text-xs text-muted-foreground'>
 														Deleted at {formatDeletedAt(project.deleted_at)}
 													</div>
 												</div>
@@ -597,7 +597,7 @@ const WorkspaceSettingsContent = ({
 														size='sm'
 														onClick={() => handleRestoreProject(project.id)}
 														disabled={restoreProject.isPending}
-														className='border-neutral-700 bg-transparent text-neutral-100 hover:bg-neutral-800'
+														className='border-border bg-transparent text-foreground hover:hover:bg-accent hover:text-accent-foreground'
 													>
 														<RotateCcw className='mr-2 h-4 w-4' />
 														Restore
@@ -609,28 +609,28 @@ const WorkspaceSettingsContent = ({
 								)}
 							</div>
 
-							<div className='rounded-md border border-neutral-800 bg-neutral-900/30 p-5'>
+							<div className='rounded-md border border-border bg-muted/50 p-5'>
 								<div className='mb-4 flex items-start justify-between gap-4'>
 									<div>
 										<div className='text-sm font-semibold'>
 											Deleted tasks
 										</div>
-										<div className='mt-1 text-sm text-neutral-500'>
+										<div className='mt-1 text-sm text-muted-foreground'>
 											Restore tasks that were soft-deleted
 											in this workspace.
 										</div>
 									</div>
-									<div className='rounded-full border border-neutral-700 px-2.5 py-1 text-xs text-neutral-400'>
+									<div className='rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground'>
 										{deletedTaskItems.length} items
 									</div>
 								</div>
 
 								{isDeletedTasksLoading ? (
-									<div className='text-sm text-neutral-500'>
+									<div className='text-sm text-muted-foreground'>
 										Loading deleted tasks...
 									</div>
 								) : deletedTaskItems.length === 0 ? (
-									<div className='rounded-md border border-dashed border-neutral-800 px-4 py-6 text-sm text-neutral-500'>
+									<div className='rounded-md border border-dashed border-border px-4 py-6 text-sm text-muted-foreground'>
 										Chua co task nao trong thung rac cua
 										workspace nay.
 									</div>
@@ -639,14 +639,14 @@ const WorkspaceSettingsContent = ({
 										{deletedTaskItems.map((task) => (
 											<div
 												key={task.id}
-												className='flex items-center justify-between gap-4 rounded-md border border-neutral-800 px-4 py-3'
+												className='flex items-center justify-between gap-4 rounded-md border border-border px-4 py-3'
 											>
 												<div className='min-w-0'>
-													<div className='truncate text-sm font-medium text-neutral-100'>
+													<div className='truncate text-sm font-medium text-foreground'>
 														{task.title ??
 															"Untitled task"}
 													</div>
-													<div className='mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-neutral-500'>
+													<div className='mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground'>
 														<span>
 															{task.projectSeq
 																? `TM-${task.projectSeq}`
@@ -692,7 +692,7 @@ const WorkspaceSettingsContent = ({
 														disabled={
 															restoreTask.isPending
 														}
-														className='border-neutral-700 bg-transparent text-neutral-100 hover:bg-neutral-800'
+														className='border-border bg-transparent text-foreground hover:hover:bg-accent hover:text-accent-foreground'
 													>
 														<RotateCcw className='mr-2 h-4 w-4' />
 														Restore

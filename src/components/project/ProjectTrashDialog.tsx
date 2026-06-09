@@ -91,12 +91,12 @@ const ProjectTrashDialog = ({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className='border-neutral-800 bg-neutral-950 text-neutral-100 sm:max-w-md'>
+			<DialogContent className='border-border bg-popover text-foreground sm:max-w-md'>
 				<DialogHeader>
 					<DialogTitle>Chuyen project vao Thung rac?</DialogTitle>
-					<DialogDescription className='text-neutral-400'>
+					<DialogDescription className='text-muted-foreground'>
 						Project{" "}
-						<span className='font-medium text-neutral-200'>
+						<span className='font-medium text-foreground'>
 							{project.name ?? "Untitled project"}
 						</span>{" "}
 						se bi an khoi workspace. Ban co the khoi phuc no sau tu

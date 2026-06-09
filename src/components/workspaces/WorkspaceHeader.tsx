@@ -132,7 +132,7 @@ export const WorkspaceTopHeader = ({
 										cancelEditingName();
 									}
 								}}
-								className='min-w-0 max-w-[min(560px,60vw)] rounded border border-blue-500/60 bg-neutral-950 px-1 text-2xl font-semibold text-foreground outline-none ring-2 ring-blue-500/20'
+								className='min-w-0 max-w-[min(560px,60vw)] rounded border border-blue-500/60 bg-background px-1 text-2xl font-semibold text-foreground outline-none ring-2 ring-blue-500/20'
 							/>
 						) : (
 							<h1 className='min-w-0 max-w-[min(560px,60vw)] truncate px-1 text-2xl font-semibold text-foreground'>

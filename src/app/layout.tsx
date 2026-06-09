@@ -2,18 +2,20 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/config/theme-provider";
 import { RealtimeProviderWrapper } from "@/providers/RealtimeProviderWrapper";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Outfit, JetBrains_Mono } from "next/font/google";
 import Providers from "../config/providers";
 import "./globals.css";
 
-const geistSans = Geist({
-	variable: "--font-geist-sans",
+const outfitSans = Outfit({
+	variable: "--font-geist-sans", // Keeping variable name same to prevent breakage in tailwind config if hardcoded somewhere, though CSS maps it.
 	subsets: ["latin"],
+	display: "swap",
 });
 
-const geistMono = Geist_Mono({
+const jetbrainsMono = JetBrains_Mono({
 	variable: "--font-geist-mono",
 	subsets: ["latin"],
+	display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -29,7 +31,7 @@ export default function RootLayout({
 	return (
 		<html lang='en' suppressHydrationWarning>
 			<body
-				className={`antialiased ${geistSans.variable} ${geistMono.variable} font-sans`}
+				className={`antialiased ${outfitSans.variable} ${jetbrainsMono.variable} font-sans`}
 			>
 				<ThemeProvider
 					attribute='class'

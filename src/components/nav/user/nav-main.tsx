@@ -203,7 +203,7 @@ export function NavMain() {
 									<div className='group/workspace-item relative flex h-8 w-full items-center gap-1 overflow-hidden rounded-md border border-neutral-200 bg-white p-2 pr-2 text-left text-sm dark:border-none dark:bg-sidebar-accent dark:text-sidebar-accent-foreground'>
 										<CollapsibleTrigger asChild>
 											<div
-												className='mr-1 cursor-pointer flex size-5 shrink-0 items-center justify-center rounded-sm text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100'
+												className='mr-1 cursor-pointer flex size-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground hover:hover:text-foreground'
 												onClick={(e) => {
 													e.stopPropagation();
 													handleSelectWorkspace(
@@ -266,7 +266,7 @@ export function NavMain() {
 														cancelRenameWorkspace();
 													}
 												}}
-												className='h-6 w-full min-w-0 rounded border border-blue-500/60 bg-neutral-950 px-2 text-sm text-neutral-100 outline-none ring-2 ring-blue-500/20'
+												className='h-6 w-full min-w-0 rounded border border-blue-500/60 bg-background px-2 text-sm text-foreground outline-none ring-2 ring-blue-500/20'
 											/>
 										</form>
 									</div>
@@ -280,7 +280,7 @@ export function NavMain() {
 										<div>
 											<CollapsibleTrigger asChild>
 												<div
-													className='mr-1 cursor-pointer flex size-5 shrink-0 items-center justify-center rounded-sm text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100'
+													className='mr-1 cursor-pointer flex size-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground hover:hover:text-foreground'
 													onClick={(e) => {
 														e.stopPropagation();
 														handleSelectWorkspace(

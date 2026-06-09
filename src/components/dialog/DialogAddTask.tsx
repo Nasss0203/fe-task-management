@@ -157,7 +157,7 @@ const DialogAddTask = () => {
 				<button
 					type='button'
 					disabled={!can(PERMISSIONS.TASK_CREATE)}
-					className='flex size-6 items-center justify-center rounded-md text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100 transition-colors disabled:pointer-events-none disabled:opacity-30'
+					className='flex size-6 items-center justify-center rounded-md text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground hover:hover:text-foreground transition-colors disabled:pointer-events-none disabled:opacity-30'
 				>
 					<Plus size={16} />
 				</button>
@@ -165,46 +165,46 @@ const DialogAddTask = () => {
 
 			<DialogContentV2
 				showCloseButton={false}
-				className='flex! overflow-visible! flex-col! lg:max-w-[calc(100%-30%)]! 2xl:max-w-[calc(100%-40%)]! rounded-2xl border-neutral-800 bg-neutral-950 shadow-2xl p-0'
+				className='flex! overflow-hidden! flex-col! lg:max-w-[calc(100%-30%)]! 2xl:max-w-[calc(100%-40%)]! rounded-2xl border-border/50 bg-background/95 backdrop-blur-xl shadow-2xl p-0'
 			>
-				<DialogHeaderV2 className='shrink-0 px-6 py-4 border-b border-neutral-800/50'>
+				<DialogHeaderV2 className='shrink-0 px-6 py-4 bg-muted/20 border-b border-border/50'>
 					<DialogTitleV2 className=''>
 						<div className='flex items-center justify-between'>
 							<DropdownMenu>
 								<DropdownMenuTrigger
 									asChild
-									className='cursor-pointer px-3 py-1.5 rounded-lg hover:bg-neutral-900 transition-colors'
+									className='cursor-pointer px-3 py-1.5 rounded-lg hover:hover:bg-accent transition-colors'
 								>
 									<div className='flex items-center gap-2.5 text-[13px] font-medium'>
-										<div className='text-neutral-500'>
+										<div className='text-muted-foreground'>
 											Add to
 										</div>
-										<div className='flex items-center gap-1.5 text-neutral-200'>
+										<div className='flex items-center gap-1.5 text-foreground'>
 											<div>
 												Auth
 											</div>
-											<ChevronDown size={12} className="text-neutral-400" />
+											<ChevronDown size={12} className="text-muted-foreground" />
 										</div>
 									</div>
 								</DropdownMenuTrigger>
-								<DropdownMenuContent className="rounded-xl border-neutral-800 bg-neutral-950 min-w-[160px]">
+								<DropdownMenuContent className="rounded-xl border-border bg-popover min-w-[160px]">
 									<DropdownMenuGroup>
-										<DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">
+										<DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
 											My Account
 										</DropdownMenuLabel>
-										<DropdownMenuItem className="text-xs focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer text-neutral-300">
+										<DropdownMenuItem className="text-xs focus:focus:bg-accent focus:text-foreground cursor-pointer text-foreground">
 											Profile
 										</DropdownMenuItem>
-										<DropdownMenuItem className="text-xs focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer text-neutral-300">
+										<DropdownMenuItem className="text-xs focus:focus:bg-accent focus:text-foreground cursor-pointer text-foreground">
 											Billing
 										</DropdownMenuItem>
 									</DropdownMenuGroup>
-									<DropdownMenuSeparator className="border-neutral-800 my-1" />
+									<DropdownMenuSeparator className="border-border my-1" />
 									<DropdownMenuGroup>
-										<DropdownMenuItem className="text-xs focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer text-neutral-300">
+										<DropdownMenuItem className="text-xs focus:focus:bg-accent focus:text-foreground cursor-pointer text-foreground">
 											Team
 										</DropdownMenuItem>
-										<DropdownMenuItem className="text-xs focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer text-neutral-300">
+										<DropdownMenuItem className="text-xs focus:focus:bg-accent focus:text-foreground cursor-pointer text-foreground">
 											Subscription
 										</DropdownMenuItem>
 									</DropdownMenuGroup>
@@ -214,8 +214,8 @@ const DialogAddTask = () => {
 					</DialogTitleV2>
 				</DialogHeaderV2>
 
-				<div className='flex-1 overflow-auto px-6 py-6'>
-					<div className='flex flex-col mx-auto max-w-3xl'>
+				<div className='flex-1 overflow-auto px-8 py-8'>
+					<div className='flex flex-col mx-auto max-w-4xl'>
 						<div className='w-full'>
 							<textarea
 								ref={titleRef}
@@ -230,64 +230,66 @@ const DialogAddTask = () => {
 								}}
 								onPointerDown={(e) => e.stopPropagation()}
 								onClick={(e) => e.stopPropagation()}
-								className='w-full resize-none overflow-hidden border-none bg-transparent text-xl font-bold tracking-tight text-neutral-100 outline-none ring-0 placeholder:text-neutral-600 focus:outline-none focus:ring-0'
+								className='w-full resize-none overflow-hidden border-none bg-transparent text-2xl font-extrabold tracking-tight text-foreground outline-none ring-0 placeholder:text-muted-foreground/30 focus:outline-none focus:ring-0 transition-colors'
 							/>
 						</div>
 
-						<div className='mt-8 grid w-full grid-cols-[1fr_1fr_1fr_auto] gap-y-4 text-sm items-start'>
-							<div className='flex flex-col gap-3'>
-								<div className='flex items-center gap-2 text-[12px] font-semibold uppercase tracking-wider text-neutral-500'>
-									<Users size={14} />
-									<span>Assignees</span>
+						<div className='mt-8 rounded-2xl border border-border/50 bg-muted/10 p-6'>
+							<div className='grid w-full grid-cols-[1fr_1fr_1fr_auto] gap-x-8 gap-y-4 text-sm items-start'>
+								<div className='flex flex-col gap-3'>
+									<div className='flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-muted-foreground'>
+										<Users size={14} className="text-muted-foreground/70" />
+										<span>Assignees</span>
+									</div>
+
+									<TaskAssigneeSelect
+										members={
+											members?.map((member: any) => ({
+												id: member.user_id,
+												name: member.full_name,
+												email: member.email,
+												avatarUrl: member.avatar_url,
+												isMe: member.user_id === user?.id,
+											})) ?? []
+										}
+										value={assigneeIds}
+										onChange={setAssigneeIds}
+									/>
 								</div>
 
-								<TaskAssigneeSelect
-									members={
-										members?.map((member: any) => ({
-											id: member.user_id,
-											name: member.full_name,
-											email: member.email,
-											avatarUrl: member.avatar_url,
-											isMe: member.user_id === user?.id,
-										})) ?? []
-									}
-									value={assigneeIds}
-									onChange={setAssigneeIds}
-								/>
-							</div>
+								<div className='flex flex-col gap-3'>
+									<div className='flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-muted-foreground'>
+										<LoaderCircle size={14} className="text-muted-foreground/70" />
+										<span>Status</span>
+									</div>
 
-							<div className='flex flex-col gap-3'>
-								<div className='flex items-center gap-2 text-[12px] font-semibold uppercase tracking-wider text-neutral-500'>
-									<LoaderCircle size={14} />
-									<span>Status</span>
+									<TaskStatusSelect
+										statuses={taskStatuses}
+										value={statusId}
+										onChange={setStatusId}
+									/>
 								</div>
 
-								<TaskStatusSelect
-									statuses={taskStatuses}
-									value={statusId}
-									onChange={setStatusId}
-								/>
-							</div>
+								<div className='flex flex-col gap-3'>
+									<div className='flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-muted-foreground'>
+										<CalendarDays size={14} className="text-muted-foreground/70" />
+										<span>Deadline</span>
+									</div>
 
-							<div className='flex flex-col gap-3'>
-								<div className='flex items-center gap-2 text-[12px] font-semibold uppercase tracking-wider text-neutral-500'>
-									<CalendarDays size={14} />
-									<span>Deadline</span>
+									<TaskDateSelect
+										value={dateRange}
+										onChange={setDateRange}
+									/>
 								</div>
 
-								<TaskDateSelect
-									value={dateRange}
-									onChange={setDateRange}
-								/>
-							</div>
-
-							<div className='flex items-end pb-1 h-full'>
-								<button
-									type='button'
-									className='rounded-lg p-2 text-neutral-500 hover:bg-neutral-800 hover:text-neutral-100 transition-colors mt-auto'
-								>
-									<MoreHorizontal size={18} />
-								</button>
+								<div className='flex items-end pb-1 h-full'>
+									<button
+										type='button'
+										className='rounded-xl p-2.5 text-muted-foreground bg-background border border-border/50 shadow-sm hover:bg-muted hover:text-foreground transition-all duration-200 mt-auto'
+									>
+										<MoreHorizontal size={18} />
+									</button>
+								</div>
 							</div>
 						</div>
 
@@ -295,12 +297,12 @@ const DialogAddTask = () => {
 					</div>
 				</div>
 
-				<DialogFooterV2 className='flex justify-end border-t border-neutral-800/50 bg-neutral-900/20 px-6 py-4 rounded-b-2xl'>
+				<DialogFooterV2 className='flex justify-end border-t border-border/50 bg-muted/20 px-8 py-5'>
 					<Button
 						type='button'
 						disabled={isSubmitting || !title.trim() || !statusId}
 						onClick={handleCreateTask}
-						className="rounded-xl border border-neutral-700 bg-neutral-100 text-neutral-950 font-semibold hover:bg-neutral-300 transition-colors disabled:opacity-50"
+						className="h-10 rounded-xl bg-blue-600 px-6 text-[14px] font-semibold text-white shadow-sm shadow-blue-500/20 hover:bg-blue-700 transition-all focus:ring-4 focus:ring-blue-500/20 disabled:opacity-50 disabled:pointer-events-none"
 					>
 						{isSubmitting ? "Creating..." : "Create Task"}
 					</Button>
@@ -318,21 +320,21 @@ type TaskCommentProps = {
 
 const TaskComment = ({ commentRef }: TaskCommentProps) => {
 	return (
-		<div className='mt-10 w-full'>
-			<div className='mb-4 text-[12px] font-semibold uppercase tracking-wider text-neutral-500'>
+		<div className='mt-8 w-full'>
+			<div className='mb-3 text-[11px] font-bold uppercase tracking-widest text-muted-foreground'>
 				Comments
 			</div>
 
 			<div className='flex gap-4 items-start'>
-				<div className='flex h-full flex-col'>
-					<Avatar className='size-8 border border-neutral-800 bg-neutral-900 shadow-sm'>
-						<AvatarFallback className='bg-transparent text-[11px] font-semibold text-neutral-400'>
+				<div className='flex h-full flex-col mt-1'>
+					<Avatar className='size-9 border border-border/50 bg-background shadow-sm'>
+						<AvatarFallback className='bg-muted/30 text-[12px] font-semibold text-muted-foreground'>
 							N
 						</AvatarFallback>
 					</Avatar>
 				</div>
 
-				<div className="flex-1 flex flex-col gap-3 rounded-xl border border-neutral-800 bg-neutral-900/40 p-4 transition-colors focus-within:border-neutral-700 focus-within:bg-neutral-900/60">
+				<div className="flex-1 flex flex-col gap-3 rounded-2xl border border-border/50 bg-muted/10 p-4 transition-all duration-300 focus-within:border-blue-500/50 focus-within:bg-background focus-within:ring-4 focus-within:ring-blue-500/10 focus-within:shadow-sm">
 					<textarea
 						ref={commentRef}
 						placeholder='Add a comment...'
@@ -342,15 +344,15 @@ const TaskComment = ({ commentRef }: TaskCommentProps) => {
 							target.style.height = "auto";
 							target.style.height = `${target.scrollHeight}px`;
 						}}
-						className='w-full resize-none overflow-hidden border-none bg-transparent text-[14px] font-medium leading-relaxed text-neutral-200 outline-none ring-0 placeholder:text-neutral-600 focus:outline-none focus:ring-0 min-h-[40px]'
+						className='w-full resize-none overflow-hidden border-none bg-transparent text-[14px] font-medium leading-relaxed text-foreground outline-none ring-0 placeholder:text-muted-foreground/50 focus:outline-none focus:ring-0 min-h-[44px]'
 					/>
 
-					<div className='flex items-center justify-end gap-1.5'>
+					<div className='flex items-center justify-end gap-2'>
 						<Button
 							type='button'
 							variant='ghost'
 							size='icon'
-							className='size-8 rounded-lg text-neutral-500 hover:bg-neutral-800 hover:text-neutral-200 transition-colors'
+							className='size-8 rounded-xl text-muted-foreground hover:bg-muted/50 transition-colors'
 						>
 							<Paperclip size={16} />
 						</Button>
@@ -359,7 +361,7 @@ const TaskComment = ({ commentRef }: TaskCommentProps) => {
 							type='button'
 							variant='ghost'
 							size='icon'
-							className='size-8 rounded-lg text-neutral-500 hover:bg-neutral-800 hover:text-neutral-200 transition-colors'
+							className='size-8 rounded-xl text-muted-foreground hover:bg-muted/50 transition-colors'
 						>
 							<AtSign size={16} />
 						</Button>
@@ -367,7 +369,7 @@ const TaskComment = ({ commentRef }: TaskCommentProps) => {
 						<Button
 							type='button'
 							size='icon'
-							className='size-8 rounded-lg bg-neutral-800 text-neutral-300 hover:bg-neutral-700 hover:text-neutral-100 transition-colors'
+							className='size-8 rounded-xl bg-blue-500/10 text-blue-600 hover:bg-blue-500 hover:text-white transition-all duration-300 ml-1'
 						>
 							<ArrowUp size={16} />
 						</Button>

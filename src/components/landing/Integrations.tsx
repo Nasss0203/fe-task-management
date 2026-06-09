@@ -32,7 +32,7 @@ const integrationTools: {
 		name: "Google Sheet",
 		description: "Keep your project data up-to-date with reports.",
 		icon: faTableCellsLarge,
-		iconClassName: "text-emerald-400",
+		iconClassName: "text-emerald-500 dark:text-emerald-400",
 	},
 	{
 		name: "Slack",
@@ -56,10 +56,10 @@ const Integrations = () => {
 		<div className='mx-auto mt-32 max-w-6xl overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200'>
 			<div className='grid gap-12 lg:grid-cols-2 lg:items-end'>
 				<div>
-					<h2 className='text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl'>
+					<h2 className='text-4xl font-semibold leading-tight tracking-tight text-foreground sm:text-5xl'>
 						Connect your tools.
 					</h2>
-					<p className='mt-6 text-lg text-white/50'>
+					<p className='mt-6 text-lg text-muted-foreground'>
 						We have more than 200+ integrations, so you can use your
 						favorite tools to communicate and coordinate.
 					</p>
@@ -68,7 +68,7 @@ const Integrations = () => {
 				<div className='flex justify-start lg:justify-end'>
 					<Button
 						variant='outline'
-						className='h-12 rounded-full border-white/10 bg-white/5 px-8 font-semibold text-white transition-all hover:bg-white/10 active:scale-[0.98]'
+						className='h-12 rounded-full border-border bg-secondary px-8 font-semibold text-foreground transition-all hover:bg-secondary/80 active:scale-[0.98]'
 					>
 						Explore Integrations
 					</Button>
@@ -81,20 +81,20 @@ const Integrations = () => {
 						(tool, index) => (
 							<div
 								key={`${tool.name}-${index}`}
-								className='group w-72 shrink-0 rounded-3xl border border-white/5 bg-[#111214] p-8 transition-all hover:border-indigo-500/30'
+								className='group w-72 shrink-0 rounded-3xl border border-border bg-card p-8 shadow-sm transition-all hover:border-primary/30 hover:shadow-md'
 							>
-								<div className='flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 text-white transition-colors group-hover:bg-indigo-500/10 group-hover:text-indigo-400'>
+								<div className='flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-foreground transition-colors group-hover:bg-primary/10 group-hover:text-primary'>
 									<FontAwesomeIcon
 										icon={tool.icon}
 										className={`text-xl ${tool.iconClassName ?? ""}`}
 									/>
 								</div>
 
-								<h3 className='mt-6 text-xl font-semibold text-white'>
+								<h3 className='mt-6 text-xl font-semibold text-foreground'>
 									{tool.name}
 								</h3>
 
-								<p className='mt-3 text-sm leading-relaxed text-white/40'>
+								<p className='mt-3 text-sm leading-relaxed text-muted-foreground'>
 									{tool.description}
 								</p>
 							</div>

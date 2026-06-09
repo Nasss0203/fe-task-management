@@ -1,9 +1,8 @@
 import {
-	normalizeTaskStatusName,
-} from "@/lib/task-status-style";
+	getUserFacingPriorityStyle,
+} from "@/components/shared/priority-badge";
 import { cn } from "@/lib/utils";
 import { Fragment, useMemo } from "react";
-import { Check, ChevronDown } from "lucide-react";
 import {
 	DropdownMenuContentV2,
 	DropdownMenuGroupV2,
@@ -13,54 +12,52 @@ import {
 	DropdownMenuTriggerV2,
 	DropdownMenuV2,
 } from "./dropdown-custom";
-import { useUpdateTask, useTaskStatus } from "@/features/task/hooks/useTask";
-import { getUserFacingStatusStyle } from "@/components/shared/status-badge";
+import { useUpdateTask, useTaskPriority } from "@/features/task/hooks/useTask";
+import { Check, ChevronDown } from "lucide-react";
 
-type DropdownTaskStatusProps = {
+type DropdownTaskPriorityProps = {
 	workspaceId: string;
 	projectId: string;
-	statusName: string;
+	priorityName: string | null;
 	taskId: string;
 };
 
-const DropdownTaskStatus = ({
+const DropdownTaskPriority = ({
 	projectId,
 	workspaceId,
-	statusName,
+	priorityName,
 	taskId,
-}: DropdownTaskStatusProps) => {
-	const taskStatusQuery = useTaskStatus(workspaceId, projectId);
+}: DropdownTaskPriorityProps) => {
+	const taskPriorityQuery = useTaskPriority(workspaceId, projectId);
 	const { mutateAsync } = useUpdateTask(workspaceId, projectId);
 
-	const statuses = useMemo(
-		() => taskStatusQuery.data?.data ?? [],
-		[taskStatusQuery.data?.data],
+	const priorities = useMemo(
+		() => taskPriorityQuery.data?.data ?? [],
+		[taskPriorityQuery.data?.data],
 	);
 
-	const currentStatus = useMemo(() => {
-		return statuses.find(
-			(item) =>
-				normalizeTaskStatusName(item.name) ===
-				normalizeTaskStatusName(statusName),
+	const currentPriority = useMemo(() => {
+		return priorities.find(
+			(item) => item.name === priorityName
 		);
-	}, [statuses, statusName]);
+	}, [priorities, priorityName]);
 
-	const handleUpdateTask = async (nextStatusId: string) => {
+	const currentStyle = getUserFacingPriorityStyle(currentPriority?.name ?? priorityName);
+
+	const handleUpdateTask = async (nextPriorityId: string | null) => {
 		if (!taskId) return;
 
-		if (currentStatus?.id === nextStatusId) return;
+		if (currentPriority?.id === nextPriorityId) return;
 
 		try {
 			await mutateAsync({
 				id: taskId,
-				statusId: nextStatusId,
+				priorityId: nextPriorityId,
 			});
 		} catch (error) {
-			console.error("Update task status failed:", error);
+			console.error("Update task priority failed:", error);
 		}
 	};
-
-	const currentStyle = getUserFacingStatusStyle(currentStatus?.name ?? statusName, currentStatus?.isDone);
 
 	return (
 		<DropdownMenuV2>
@@ -72,7 +69,7 @@ const DropdownTaskStatus = ({
 							currentStyle.dot,
 						)}
 					/>
-					<span className="text-[13px] font-medium text-foreground">{currentStatus?.name ?? statusName ?? "Status"}</span>
+					<span className="text-[13px] font-medium text-foreground">{currentPriority?.name ?? priorityName ?? "No priority"}</span>
 					<ChevronDown className="h-3 w-3 text-muted-foreground" />
 				</div>
 			</DropdownMenuTriggerV2>
@@ -80,21 +77,21 @@ const DropdownTaskStatus = ({
 			<DropdownMenuContentV2 className='w-56 rounded-2xl border-border bg-popover p-1 shadow-2xl z-[9999]'>
 				<DropdownMenuGroupV2>
 					<DropdownMenuLabelV2 className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-						STATUS
+						PRIORITY
 					</DropdownMenuLabelV2>
 
-					{statuses.map((status) => {
-						const style = getUserFacingStatusStyle(status.name, status.isDone);
-						const isSelected = currentStatus?.id === status.id;
+					{priorities.map((priority) => {
+						const style = getUserFacingPriorityStyle(priority.name);
+						const isSelected = currentPriority?.id === priority.id;
 
 						return (
-							<Fragment key={status.id}>
+							<Fragment key={priority.id}>
 								<DropdownMenuItemV2
 									className={cn(
 										"focus:focus:bg-accent rounded-xl cursor-pointer transition-colors px-3 py-2 mt-1 first:mt-0",
 										isSelected && "bg-muted/50"
 									)}
-									onClick={() => handleUpdateTask(status.id)}
+									onClick={() => handleUpdateTask(priority.id)}
 								>
 									<div className="flex items-center justify-between w-full">
 										<div className="flex items-center gap-3">
@@ -104,7 +101,7 @@ const DropdownTaskStatus = ({
 													style.dot,
 												)}
 											/>
-											<span className="font-semibold text-[13px]">{status.name}</span>
+											<span className="font-semibold text-[13px]">{priority.name}</span>
 										</div>
 										{isSelected && <Check className="h-4 w-4 text-blue-500" />}
 									</div>
@@ -118,4 +115,4 @@ const DropdownTaskStatus = ({
 	);
 };
 
-export default DropdownTaskStatus;
+export default DropdownTaskPriority;

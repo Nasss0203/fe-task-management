@@ -1,63 +1,79 @@
-import { Layers, Zap, Search, Shield } from "lucide-react";
+import { FileText, CheckSquare, Link as LinkIcon, RefreshCw } from "lucide-react";
 
 const productivityCards = [
 	{
-		title: "Effortless Task Creation",
+		title: "Rich Document Editor",
 		description:
-			"Seamlessly create new tasks with ease, whether you're working individually or collaborating with your team.",
-		icon: Layers,
+			"Write specs, meeting notes, and wikis with a powerful block-based editor.",
+		icon: FileText,
 		className: "md:col-span-2",
 		visual: (
-			<div className='flex h-full items-center justify-center'>
-				<div className='relative h-32 w-48 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm'>
-					<div className='mb-3 h-2 w-2/3 rounded-full bg-indigo-500/50' />
-					<div className='h-2 w-1/2 rounded-full bg-white/10' />
-					<div className='absolute -right-4 -top-4 h-12 w-12 rounded-full bg-indigo-500/20 blur-xl' />
+			<div className='flex h-full flex-col gap-3 p-6'>
+				<div className='h-4 w-3/4 rounded-md bg-foreground/20 mb-2' />
+				<div className='h-2 w-full rounded-full bg-muted-foreground/20' />
+				<div className='h-2 w-5/6 rounded-full bg-muted-foreground/20' />
+                <div className='h-16 w-full rounded-xl border border-border bg-background/50 mt-2 p-3'>
+                    <div className='flex items-center gap-2 mb-2'>
+                        <div className='h-3 w-3 rounded-sm bg-primary/40' />
+                        <div className='h-2 w-1/3 rounded-full bg-muted-foreground/30' />
+                    </div>
+                    <div className='h-2 w-full rounded-full bg-muted-foreground/20' />
+                </div>
+			</div>
+		),
+	},
+	{
+		title: "Advanced Kanban & Lists",
+		description: "Manage work states, assignees, and due dates effortlessly.",
+		icon: CheckSquare,
+		className: "md:col-span-1",
+		visual: (
+			<div className='flex h-full gap-3 p-4 overflow-hidden'>
+                {[1, 2].map((col) => (
+                    <div key={col} className='flex-1 flex flex-col gap-2 rounded-xl bg-background/50 p-2'>
+                        <div className='h-2 w-1/2 rounded-full bg-muted-foreground/30 mb-1' />
+                        {[1, 2].map((card) => (
+                            <div key={card} className='h-10 w-full rounded-lg bg-card border border-border shadow-sm' />
+                        ))}
+                    </div>
+                ))}
+			</div>
+		),
+	},
+	{
+		title: "Everything Connected",
+		description: "Tag issues directly inside your documents. They stay synced automatically.",
+		icon: LinkIcon,
+		className: "md:col-span-1",
+		visual: (
+			<div className='flex h-full items-center justify-center p-6'>
+				<div className='relative h-20 w-full rounded-xl border border-border bg-card p-4 shadow-sm'>
+                    <div className='h-2 w-full bg-muted-foreground/20 rounded-full mb-4' />
+                    <div className='inline-flex items-center gap-1.5 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary border border-primary/20'>
+                        <LinkIcon className='h-2.5 w-2.5' /> PROJ-123
+                    </div>
+                    <div className='absolute -bottom-3 -right-3 h-12 w-12 rounded-full bg-primary/10 blur-xl' />
 				</div>
 			</div>
 		),
 	},
 	{
-		title: "List View",
-		description: "Clean and intuitive view that simplifies your workflow.",
-		icon: Search,
-		className: "md:col-span-1",
-		visual: (
-			<div className='flex h-full flex-col gap-2 p-4'>
-				{[1, 2, 3].map((i) => (
-					<div
-						key={i}
-						className='h-2 w-full rounded-full bg-white/5'
-					/>
-				))}
-			</div>
-		),
-	},
-	{
-		title: "Shielded Security",
-		description: "Enterprise-grade protection for your project data.",
-		icon: Shield,
-		className: "md:col-span-1",
-		visual: (
-			<div className='flex h-full items-center justify-center'>
-				<Shield className='h-12 w-12 text-indigo-500/20' />
-			</div>
-		),
-	},
-	{
-		title: "AutoFlow Automation",
+		title: "Real-time Collaboration",
 		description:
-			"Seamlessly automate repetitive tasks, streamline processes, and elevate your productivity to new heights.",
-		icon: Zap,
+			"Work together simultaneously. See cursors, changes, and comments instantly.",
+		icon: RefreshCw,
 		className: "md:col-span-2",
 		visual: (
-			<div className='relative flex h-full items-center justify-center overflow-hidden'>
-				<div className='flex gap-4'>
-					<div className='h-16 w-16 rounded-xl border border-white/10 bg-white/5' />
-					<div className='flex items-center text-indigo-500'>→</div>
-					<div className='h-16 w-16 rounded-xl border border-indigo-500/30 bg-indigo-500/10' />
-				</div>
-				<div className='absolute inset-0 bg-gradient-to-t from-[#18191c] to-transparent' />
+			<div className='relative flex h-full items-center justify-center p-6'>
+				<div className='h-24 w-full rounded-xl border border-border bg-background p-5 flex flex-col gap-3 relative'>
+                    <div className='h-2 w-full bg-muted-foreground/20 rounded-full' />
+                    <div className='h-2 w-3/4 bg-primary/40 rounded-full relative'>
+                        {/* Cursor mockup */}
+                        <div className='absolute right-0 top-1/2 -translate-y-1/2 h-4 w-0.5 bg-primary' />
+                        <div className='absolute -right-2 top-3 rounded bg-primary px-1.5 py-0.5 text-[8px] font-semibold text-primary-foreground'>Alex</div>
+                    </div>
+                    <div className='h-2 w-5/6 bg-muted-foreground/20 rounded-full' />
+                </div>
 			</div>
 		),
 	},
@@ -67,14 +83,13 @@ const FeatureHighlight = () => {
 	return (
 		<div className='mx-auto mt-32 max-w-6xl'>
 			<div className='text-center animate-in fade-in slide-in-from-bottom-4 duration-1000'>
-				<h2 className='text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl'>
-					Focus on what generates revenue.
+				<h2 className='text-4xl font-semibold leading-tight tracking-tight text-foreground sm:text-5xl'>
+					Write, plan, and execute in one place.
 				</h2>
 
-				<p className='mx-auto mt-6 max-w-2xl text-lg text-white/50'>
-					Taskmanly facilitates the coordination of complex tasks,
-					ensuring seamless collaboration for tangible business
-					results.
+				<p className='mx-auto mt-6 max-w-2xl text-lg text-muted-foreground'>
+					Ditch the fragmented tools. Taskmanly brings your team's documents
+					and task tracking together, creating a true single source of truth.
 				</p>
 			</div>
 
@@ -82,19 +97,19 @@ const FeatureHighlight = () => {
 				{productivityCards.map((card, i) => (
 					<div
 						key={card.title}
-						className={`group overflow-hidden rounded-3xl border border-white/10 bg-[#111214] transition-all hover:border-indigo-500/30 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-${i * 100} ${card.className}`}
+						className={`group overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-all hover:border-primary/50 hover:shadow-md animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-${i * 100} ${card.className}`}
 					>
 						<div className='p-8'>
-							<card.icon className='mb-4 h-6 w-6 text-indigo-500' />
-							<h3 className='text-xl font-semibold text-white'>
+							<card.icon className='mb-4 h-6 w-6 text-primary' />
+							<h3 className='text-xl font-semibold text-foreground'>
 								{card.title}
 							</h3>
-							<p className='mt-3 text-sm leading-relaxed text-white/50'>
+							<p className='mt-3 text-sm leading-relaxed text-muted-foreground'>
 								{card.description}
 							</p>
 						</div>
 
-						<div className='h-48 bg-[#18191c]/50 transition-colors group-hover:bg-[#18191c]'>
+						<div className='h-48 bg-muted/50 transition-colors group-hover:bg-muted'>
 							{card.visual}
 						</div>
 					</div>

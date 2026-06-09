@@ -4,17 +4,17 @@ const DatabaseEmpty = () => {
 	return (
 		<button
 			type='button'
-			className='flex h-18 w-full items-center gap-3 rounded-xl border border-neutral-700 bg-neutral-950 px-4 text-left transition-all duration-200 hover:border-neutral-500 hover:bg-neutral-900 cursor-pointer'
+			className='group flex h-20 w-full items-center gap-4 rounded-2xl border border-border/50 bg-muted/10 px-5 text-left transition-all duration-300 hover:-translate-y-0.5 hover:bg-muted/30 hover:border-blue-500/30 hover:shadow-sm hover:shadow-blue-500/5 cursor-pointer'
 		>
-			<div className='flex h-8 w-8 items-center justify-center rounded-md border border-neutral-700 bg-neutral-900 text-neutral-300'>
-				<Table size={14} />
+			<div className='flex h-10 w-10 items-center justify-center rounded-xl border border-border/50 bg-background text-muted-foreground shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white group-hover:border-blue-600'>
+				<Table size={18} />
 			</div>
 
 			<div className='flex flex-col'>
-				<span className='text-sm font-medium text-white'>
+				<span className='text-[15px] font-semibold text-foreground mb-0.5'>
 					Cơ sở dữ liệu trống
 				</span>
-				<span className='text-xs text-neutral-500'>
+				<span className='text-[13px] text-muted-foreground'>
 					Bắt đầu với bảng mới
 				</span>
 			</div>

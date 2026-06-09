@@ -61,7 +61,7 @@ const WorkspaceDropdown = ({
 		<>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<div className='flex size-5 cursor-pointer items-center justify-center rounded-sm text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100'>
+					<div className='flex size-5 cursor-pointer items-center justify-center rounded-sm text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground hover:hover:text-foreground'>
 						<Ellipsis size={14} />
 					</div>
 				</DropdownMenuTrigger>
@@ -70,10 +70,10 @@ const WorkspaceDropdown = ({
 					align='start'
 					side='right'
 					sideOffset={12}
-					className='w-64 border-neutral-700 bg-neutral-900 p-1 text-neutral-200 shadow-xl'
+					className='w-64 border-border bg-background p-1 text-foreground shadow-xl'
 				>
 					<DropdownMenuGroup>
-						<DropdownMenuLabel className='px-2 py-1.5 text-xs font-medium text-neutral-500'>
+						<DropdownMenuLabel className='px-2 py-1.5 text-xs font-medium text-muted-foreground'>
 							Workspace
 						</DropdownMenuLabel>
 
@@ -83,7 +83,7 @@ const WorkspaceDropdown = ({
 									onStartRename?.();
 								}, 150);
 							}}
-							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'
+							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'
 						>
 							<Pencil size={15} />
 							<span>Doi ten workspace</span>
@@ -91,7 +91,7 @@ const WorkspaceDropdown = ({
 
 						<DropdownMenuItem
 							onSelect={handleCopyLink}
-							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'
+							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'
 						>
 							<Link2 size={15} />
 							<span>Sao chep lien ket</span>
@@ -101,7 +101,7 @@ const WorkspaceDropdown = ({
 							<Link
 								href={`/dashboard/${workspace.slug}`}
 								target='_blank'
-								className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'
+								className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'
 							>
 								<ExternalLink size={15} />
 								<span>Mo trong tab moi</span>
@@ -109,14 +109,14 @@ const WorkspaceDropdown = ({
 						</DropdownMenuItem>
 					</DropdownMenuGroup>
 
-					<DropdownMenuSeparator className='my-1 bg-neutral-800' />
+					<DropdownMenuSeparator className='my-1 bg-muted' />
 
 					<DropdownMenuGroup>
 						<DropdownMenuItem asChild>
 							<Link
 								href={`/dashboard/${workspace.slug}/member`}
 								onClick={handleSelectWorkspace}
-								className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'
+								className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'
 							>
 								<Users size={15} />
 								<span>Quan ly thanh vien</span>
@@ -128,7 +128,7 @@ const WorkspaceDropdown = ({
 								handleSelectWorkspace();
 								setOpenSettingsDialog(true);
 							}}
-							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'
+							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'
 						>
 							<Settings size={15} />
 							<span>Cai dat workspace</span>
@@ -139,7 +139,7 @@ const WorkspaceDropdown = ({
 						workspaceId={workspace.id}
 						code={PERMISSIONS.WORKSPACE_DELETE}
 					>
-						<DropdownMenuSeparator className='my-1 bg-neutral-800' />
+						<DropdownMenuSeparator className='my-1 bg-muted' />
 						<DropdownMenuItem
 							onSelect={() => setOpenTrashDialog(true)}
 							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm text-red-400 focus:bg-red-500/10 focus:text-red-300'

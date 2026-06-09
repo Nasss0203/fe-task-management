@@ -15,10 +15,10 @@ const navItems = [
 const HeaderLanding = () => {
 	const { user } = useUser();
 	return (
-		<header className='mx-auto flex max-w-6xl items-center justify-between rounded-full border border-white/10 bg-white/5 px-6 py-3 backdrop-blur-md animate-in fade-in slide-in-from-top-4 duration-1000'>
+		<header className='mx-auto flex max-w-6xl items-center justify-between rounded-full border border-border bg-background/50 px-6 py-3 backdrop-blur-md animate-in fade-in slide-in-from-top-4 duration-1000'>
 			<Link href='/' className='flex items-center gap-2'>
-				<div className='flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/10'>
-					<LayoutGrid className='h-5 w-5 text-white' />
+				<div className='flex h-9 w-9 items-center justify-center rounded-xl bg-secondary ring-1 ring-border'>
+					<LayoutGrid className='h-5 w-5 text-foreground' />
 				</div>
 				<span className='text-base font-semibold tracking-tight'>
 					Taskmanly
@@ -30,7 +30,7 @@ const HeaderLanding = () => {
 					<Link
 						key={item.label}
 						href={item.href}
-						className='flex items-center gap-1 text-sm font-medium text-white/50 transition-colors hover:text-white'
+						className='flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground'
 					>
 						<span>{item.label}</span>
 						{item.label !== "Templates" && (
@@ -43,14 +43,14 @@ const HeaderLanding = () => {
 			<div className='flex items-center gap-4'>
 				<Link
 					href='/contact'
-					className='hidden text-sm font-medium text-white/50 transition-colors hover:text-white md:inline-block'
+					className='hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground md:inline-block'
 				>
 					Contact Sales
 				</Link>
 
 				{user ? (
 					<Link href={"dashboard"}>
-						<Button className='rounded-full bg-indigo-500 px-6 font-semibold text-white hover:bg-indigo-400 active:scale-[0.98]'>
+						<Button className='rounded-full bg-primary px-6 font-semibold text-primary-foreground hover:bg-primary/90 active:scale-[0.98]'>
 							Dashboard
 						</Button>
 					</Link>
@@ -59,14 +59,14 @@ const HeaderLanding = () => {
 						<Link href={"sign-in"}>
 							<Button
 								variant='ghost'
-								className='rounded-full px-5 text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white'
+								className='rounded-full px-5 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground'
 							>
 								Log In
 							</Button>
 						</Link>
 
 						<Link href={"sign-up"}>
-							<Button className='rounded-full bg-white px-6 font-semibold text-black hover:bg-white/90 active:scale-[0.98]'>
+							<Button className='rounded-full bg-foreground px-6 font-semibold text-background hover:bg-foreground/90 active:scale-[0.98]'>
 								Register
 							</Button>
 						</Link>

@@ -87,7 +87,7 @@ const DraggableTableHeader = ({
 			colSpan={header.colSpan}
 			style={style}
 			className={cn(
-				"h-11 px-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground cursor-pointer hover:bg-sidebar-accent",
+				"h-11 px-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground cursor-pointer hover:bg-sidebar-accent",
 				isDragging && "bg-background shadow-sm",
 			)}
 		>
@@ -158,6 +158,7 @@ const BoardTable = ({
 					task.assignees?.[0]?.fullName ??
 					task.assignees?.[0]?.username ??
 					null,
+				assignees: task.assignees,
 				priorityName: task.priorityName,
 				statusName: task.statusName ?? "",
 				estimateMinutes: task.estimateMinutes,
@@ -219,25 +220,21 @@ const BoardTable = ({
 	const columnCount = Math.max(columnOrder.length, columns.length, 1);
 
 	return (
-		<section className='col-span-12 flex h-full min-h-0 flex-col overflow-hidden border border-[#2a2a2a] bg-[#171717] shadow-sm xl:col-span-6'>
+		<section className='col-span-12 flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/80 shadow-sm backdrop-blur-sm xl:col-span-6'>
 			<DndContext
 				collisionDetection={closestCenter}
 				modifiers={[restrictToHorizontalAxis]}
 				onDragEnd={handleDragEnd}
 				sensors={sensors}
 			>
-				<div className='overflow-hidden  border border-neutral-800 bg-[#1b1b1b]'>
+				<div className='overflow-hidden border border-border/60 bg-transparent'>
 					<div className='w-full overflow-x-auto'>
 						<Table
 							className={cn(
-								"w-full min-w-225 border-collapse ",
+								"w-full min-w-225 border-collapse",
 
-								"[&_th]:border-r [&_th]:border-b [&_th]:border-[#2a2a2a]",
-								"[&_th:last-child]:border-r-0",
-
-								"[&_td]:border-r [&_td]:border-b [&_td]:border-[#2a2a2a]",
-								"[&_td:last-child]:border-r-0",
-
+								"[&_th]:border-b [&_th]:border-border/50",
+								"[&_td]:border-b [&_td]:border-border/50",
 								"[&_tr]:border-0",
 							)}
 						>
@@ -245,7 +242,7 @@ const BoardTable = ({
 								{table.getHeaderGroups().map((headerGroup) => (
 									<TableRow
 										key={headerGroup.id}
-										className='h-10 border-b border-neutral-800 bg-[#1f1f1f] hover:bg-[#1f1f1f]'
+										className='h-10 border-b border-border/50 bg-background hover:bg-muted/30 transition-colors'
 									>
 										<SortableContext
 											items={columnOrder}
@@ -271,7 +268,7 @@ const BoardTable = ({
 									rows.map((row) => (
 										<TableRow
 											key={row.id}
-											className='h-11 border-b border-neutral-800 bg-[#1b1b1b] transition-colors last:border-b-0 hover:bg-[#242424]'
+											className='h-11 border-b border-border/50 bg-background transition-colors hover:bg-muted/40 last:border-b-0'
 										>
 											<SortableContext
 												items={columnOrder}
@@ -294,7 +291,7 @@ const BoardTable = ({
 									<TableRow>
 										<TableCell
 											colSpan={columnCount}
-											className='h-28 text-center text-sm text-neutral-500'
+											className='h-28 text-center text-sm text-muted-foreground'
 										>
 											No results.
 										</TableCell>

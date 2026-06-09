@@ -40,40 +40,49 @@ function DialogSelectBoard({
 				</Button>
 			</DialogTriggerV2>
 
-			<DialogContentV2 className='flex! h-[calc(100%-10%)] max-w-[calc(100%-40%)]! flex-col! overflow-hidden p-0'>
-				<DialogHeaderV2 className='shrink-0 mt-5'>
-					<DialogTitleV2 className='pl-10'>
-						Chọn cơ sở dữ liệu
-					</DialogTitleV2>
-				</DialogHeaderV2>
-
-				<div className='flex-1 min-h-0'>
-					<ScrollArea className='h-full'>
-						<div className='mx-auto flex max-w-5xl flex-col gap-8 py-8 px-32 pb-10'>
-							<div className='grid grid-cols-2 gap-4'>
-								<DatabaseEmpty />
-								<DatabaseEmpty />
-							</div>
-
-							<div className='flex flex-col gap-3'>
-								<div className='text-sm font-medium text-neutral-300'>
-									Được đề xuất
+			<DialogContentV2 className='max-w-4xl! overflow-hidden border border-border/50 bg-background/95 backdrop-blur-xl p-0 shadow-2xl sm:rounded-2xl text-foreground'>
+				<div className='flex h-[600px] flex-col'>
+					{/* Header section with gradient background */}
+					<div className='relative overflow-hidden border-b border-border/50 bg-muted/30 px-8 py-8 shrink-0'>
+						<div className='absolute inset-0 bg-gradient-to-r from-blue-500/10 via-amber-500/10 to-transparent' />
+						<div className='relative'>
+							<DialogHeaderV2 className='mb-0 space-y-2'>
+								<DialogTitleV2 className='text-2xl font-bold tracking-tight text-foreground'>
+									Chọn cơ sở dữ liệu
+								</DialogTitleV2>
+								<div className="text-[14px] text-muted-foreground">
+									Khởi tạo dự án của bạn từ một dữ liệu mẫu hoặc bắt đầu từ trang trắng.
 								</div>
-
-								<div className='grid grid-cols-2 gap-4'>
-									<DatabaseRecommend
-										title='Board'
-										onClick={() =>
-											handleSelect(BoardViewType.BOARD)
-										}
-									/>
-								</div>
-							</div>
+							</DialogHeaderV2>
 						</div>
-					</ScrollArea>
-				</div>
+					</div>
 
-				<DialogFooterV2 className='shrink-0 mt-5' />
+					<div className='flex-1 min-h-0'>
+						<ScrollArea className='h-full'>
+							<div className='mx-auto flex max-w-5xl flex-col gap-10 py-10 px-10 pb-12'>
+								<div className='grid grid-cols-2 gap-5'>
+									<DatabaseEmpty />
+									<DatabaseEmpty />
+								</div>
+
+								<div className='flex flex-col gap-4'>
+									<div className='text-[13px] font-semibold text-foreground uppercase tracking-wider'>
+										Được đề xuất
+									</div>
+
+									<div className='grid grid-cols-2 gap-5'>
+										<DatabaseRecommend
+											title='Board'
+											onClick={() =>
+												handleSelect(BoardViewType.BOARD)
+											}
+										/>
+									</div>
+								</div>
+							</div>
+						</ScrollArea>
+					</div>
+				</div>
 			</DialogContentV2>
 		</DialogV2>
 	);

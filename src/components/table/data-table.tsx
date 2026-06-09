@@ -42,7 +42,7 @@ export function DataTable<TData, TValue>({
 							{headerGroup.headers.map((header) => (
 								<TableHead
 									key={header.id}
-									className='h-auto pb-2 text-left font-medium text-neutral-500'
+									className='h-auto pb-2 text-left font-medium text-muted-foreground'
 								>
 									{header.isPlaceholder
 										? null
@@ -62,7 +62,7 @@ export function DataTable<TData, TValue>({
 							<TableRow
 								key={row.id}
 								data-state={row.getIsSelected() && "selected"}
-								className='border-none bg-neutral-900/60 text-neutral-200 hover:bg-neutral-900/80'
+								className='border-none bg-muted/50 text-foreground hover:hover:bg-muted/80'
 							>
 								{row.getVisibleCells().map((cell, index) => (
 									<TableCell
@@ -88,7 +88,7 @@ export function DataTable<TData, TValue>({
 						<TableRow className='border-none'>
 							<TableCell
 								colSpan={columns.length}
-								className='h-24 text-center text-neutral-400'
+								className='h-24 text-center text-muted-foreground'
 							>
 								No results.
 							</TableCell>

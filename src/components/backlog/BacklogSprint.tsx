@@ -220,14 +220,14 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 	});
 
 	return (
-		<section className='flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border border-[#2a2a2a] bg-[#171717] shadow-sm'>
-			<div className='shrink-0 border-b border-[#2a2a2a] p-4'>
+		<section className='flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-background shadow-sm'>
+			<div className='shrink-0 border-b border-border p-4'>
 				<div className='flex items-start justify-between gap-3'>
 					<div className='min-w-0'>
-						<h3 className='text-base font-bold text-white'>
+						<h3 className='text-base font-bold text-foreground'>
 							Backlog
 						</h3>
-						<p className='mt-1 text-xs font-medium text-slate-400'>
+						<p className='mt-1 text-xs font-medium text-muted-foreground'>
 							Chọn công việc để thêm vào sprint
 						</p>
 					</div>
@@ -243,13 +243,13 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 						<div className='relative min-w-[220px] flex-1'>
 							<Search
 								size={15}
-								className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500'
+								className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground'
 							/>
 							<Input
 								value={search}
 								onChange={(e) => updateSearch(e.target.value)}
 								placeholder='Tìm theo ID hoặc tên công việc'
-								className='h-9 border-[#333333] bg-[#101010] pl-9 text-sm text-slate-100 placeholder:text-slate-500'
+								className='h-9 border-border bg-background pl-9 text-sm text-foreground placeholder:text-muted-foreground'
 							/>
 						</div>
 
@@ -281,7 +281,7 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 							<Button
 								variant='outline'
 								size='icon'
-								className='relative h-9 w-10 shrink-0 border-[#333333] bg-[#101010] text-slate-300 hover:bg-[#202020] hover:text-white'
+								className='relative h-9 w-10 shrink-0 border-border bg-background text-muted-foreground hover:hover:bg-accent hover:text-foreground'
 								title='Bộ lọc'
 							>
 								<Filter size={15} />
@@ -312,7 +312,7 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 								type='button'
 								variant='ghost'
 								size='xs'
-								className='text-xs text-slate-400 hover:text-white'
+								className='text-xs text-muted-foreground hover:text-foreground'
 								onClick={resetFilters}
 							>
 								Xóa lọc
@@ -352,13 +352,13 @@ function FilterSelect({
 }) {
 	return (
 		<Select value={value} onValueChange={onChange}>
-			<SelectTrigger className='h-9 w-full min-w-0 border-[#333333] bg-[#101010] text-sm font-medium text-slate-200 shadow-none hover:bg-[#1d1d1d] focus:ring-blue-500/20'>
+			<SelectTrigger className='h-9 w-full min-w-0 border-border bg-background text-sm font-medium text-foreground shadow-none hover:hover:bg-accent focus:ring-blue-500/20'>
 				<SelectValue placeholder={placeholder} />
 			</SelectTrigger>
 
 			<SelectContent
 				position='popper'
-				className='border-[#333333] bg-[#101010] text-slate-100'
+				className='border-border bg-popover text-popover-foreground'
 			>
 				<SelectItem value={ALL_FILTER_VALUE}>{placeholder}</SelectItem>
 				{options.map((option) => {

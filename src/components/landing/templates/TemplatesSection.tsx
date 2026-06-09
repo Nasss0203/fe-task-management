@@ -8,10 +8,10 @@ export default function TemplatesSection() {
 		<section className='py-10 md:py-14'>
 			<div className='mb-8 flex items-center justify-between gap-4'>
 				<div>
-					<h1 className='text-2xl font-semibold tracking-tight text-white md:text-3xl'>
+					<h1 className='text-2xl font-semibold tracking-tight text-foreground md:text-3xl'>
 						Templates
 					</h1>
-					<p className='mt-2 text-sm text-white/60 md:text-base'>
+					<p className='mt-2 text-sm text-muted-foreground md:text-base'>
 						Start faster with ready-made layouts for planning,
 						meetings, and productivity.
 					</p>
@@ -19,7 +19,7 @@ export default function TemplatesSection() {
 
 				<Button
 					variant='outline'
-					className='h-11 rounded-xl border-white/15 bg-black/30 px-4 text-white hover:bg-white hover:text-black'
+					className='h-11 rounded-xl border-border bg-background/50 px-4 text-foreground hover:bg-secondary hover:text-foreground'
 				>
 					<Filter className='mr-2 h-4 w-4' />
 					Filter

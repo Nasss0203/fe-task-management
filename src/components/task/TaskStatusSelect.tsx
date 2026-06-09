@@ -1,6 +1,6 @@
 "use client";
 
-import { getUserFacingStatusStyle } from "@/components/shared/status-badge";
+import { getTaskStatusStyle } from "@/lib/task-status-style";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
 
@@ -28,7 +28,7 @@ const TaskStatusSelect = ({
 	const safeStatuses = Array.isArray(statuses) ? statuses : [];
 
 	const selected = safeStatuses.find((item) => item.id === value);
-	const selectedStyle = getUserFacingStatusStyle(
+	const selectedStyle = getTaskStatusStyle(
 		selected?.name,
 		selected?.isDone,
 	);
@@ -41,7 +41,7 @@ const TaskStatusSelect = ({
 			<Select value={value} onValueChange={onChange}>
 				<SelectTrigger
 					className={cn(
-						"h-8 w-fit min-w-[130px] rounded-md border px-3 py-1 text-xs font-medium shadow-none focus:ring-0 transition-colors",
+						"h-9 w-fit min-w-[130px] rounded-lg border px-3 py-1 text-xs font-semibold shadow-sm focus:ring-0 transition-colors",
 						selectedStyle.badge,
 						className
 					)}
@@ -49,7 +49,7 @@ const TaskStatusSelect = ({
 					<div className='flex items-center gap-2'>
 						<span
 							className={cn(
-								"size-1.5 rounded-full",
+								"size-2 rounded-full",
 								selectedStyle.dot,
 							)}
 						/>
@@ -60,10 +60,10 @@ const TaskStatusSelect = ({
 				<SelectContent
 					align='start'
 					position='popper'
-					className='z-[9999] min-w-[160px] rounded-xl border border-neutral-800 bg-neutral-950 p-1 shadow-2xl'
+					className='z-[9999] min-w-[160px] rounded-xl border border-border bg-background p-1.5 shadow-2xl'
 				>
 					{safeStatuses.map((status) => {
-						const style = getUserFacingStatusStyle(
+						const style = getTaskStatusStyle(
 							status.name,
 							status.isDone,
 						);
@@ -74,18 +74,18 @@ const TaskStatusSelect = ({
 								key={status.id}
 								value={status.id}
 								className={cn(
-									"cursor-pointer rounded-lg px-2.5 py-1.5 text-xs transition-colors focus:bg-neutral-900 focus:text-neutral-100",
-									isSelected ? "bg-neutral-900/50 text-neutral-100" : "text-neutral-300"
+									"cursor-pointer rounded-lg px-2.5 py-2 text-xs font-medium transition-all focus:bg-accent focus:text-foreground mb-0.5 last:mb-0",
+									isSelected ? "bg-muted text-foreground" : "text-foreground"
 								)}
 							>
 								<div className='flex items-center gap-2.5'>
 									<span
 										className={cn(
-											"size-1.5 rounded-full",
+											"size-2 rounded-full",
 											style.dot,
 										)}
 									/>
-									<span className="font-medium">{status.name}</span>
+									<span>{status.name}</span>
 								</div>
 							</SelectItem>
 						);
@@ -97,3 +97,4 @@ const TaskStatusSelect = ({
 };
 
 export default TaskStatusSelect;
+

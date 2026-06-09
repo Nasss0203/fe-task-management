@@ -22,7 +22,7 @@ export const recentWorkspacesColumns: ColumnDef<WorkspaceItem>[] = [
 				<div className='font-medium text-white'>
 					{row.original.name}
 				</div>
-				<div className='mt-1 max-w-75 truncate text-xs text-neutral-500'>
+				<div className='mt-1 max-w-75 truncate text-xs text-muted-foreground'>
 					{row.original.slug}
 				</div>
 			</div>
@@ -32,7 +32,7 @@ export const recentWorkspacesColumns: ColumnDef<WorkspaceItem>[] = [
 		accessorKey: "owner",
 		header: "Owner",
 		cell: ({ row }) => (
-			<span className='text-neutral-400'>
+			<span className='text-muted-foreground'>
 				{row.original.owner ?? "-"}
 			</span>
 		),
@@ -41,7 +41,7 @@ export const recentWorkspacesColumns: ColumnDef<WorkspaceItem>[] = [
 		accessorKey: "membersCount",
 		header: "Members",
 		cell: ({ row }) => (
-			<span className='text-neutral-200'>
+			<span className='text-foreground'>
 				{row.original.membersCount}
 			</span>
 		),
@@ -50,7 +50,7 @@ export const recentWorkspacesColumns: ColumnDef<WorkspaceItem>[] = [
 		accessorKey: "projectsCount",
 		header: "Projects",
 		cell: ({ row }) => (
-			<span className='text-neutral-200'>
+			<span className='text-foreground'>
 				{row.original.projectsCount}
 			</span>
 		),
@@ -59,14 +59,14 @@ export const recentWorkspacesColumns: ColumnDef<WorkspaceItem>[] = [
 		accessorKey: "tasksCount",
 		header: "Tasks",
 		cell: ({ row }) => (
-			<span className='text-neutral-200'>{row.original.tasksCount}</span>
+			<span className='text-foreground'>{row.original.tasksCount}</span>
 		),
 	},
 	{
 		accessorKey: "plan",
 		header: "Plan",
 		cell: ({ row }) => (
-			<span className='rounded-full border border-neutral-700 bg-neutral-900 px-2.5 py-1 text-xs font-medium uppercase text-neutral-200'>
+			<span className='rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium uppercase text-foreground'>
 				{row.original.plan}
 			</span>
 		),
@@ -75,7 +75,7 @@ export const recentWorkspacesColumns: ColumnDef<WorkspaceItem>[] = [
 		accessorKey: "createdAt",
 		header: "Created",
 		cell: ({ row }) => (
-			<span className='text-neutral-400'>
+			<span className='text-muted-foreground'>
 				{formatDate(row.original.createdAt)}
 			</span>
 		),

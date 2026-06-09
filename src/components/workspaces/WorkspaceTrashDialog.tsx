@@ -57,12 +57,12 @@ const WorkspaceTrashDialog = ({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className='border-neutral-800 bg-neutral-950 text-neutral-100 sm:max-w-md'>
+			<DialogContent className='border-border bg-popover text-foreground sm:max-w-md'>
 				<DialogHeader>
 					<DialogTitle>Chuyen workspace vao Thung rac?</DialogTitle>
-					<DialogDescription className='text-neutral-400'>
+					<DialogDescription className='text-muted-foreground'>
 						Workspace{" "}
-						<span className='font-medium text-neutral-200'>
+						<span className='font-medium text-foreground'>
 							{workspace.name}
 						</span>{" "}
 						se bi an khoi danh sach dang hoat dong. Ban van co the

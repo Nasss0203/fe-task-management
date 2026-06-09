@@ -131,7 +131,7 @@ export function AddPeopleDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className='w-[calc(100vw-2rem)] max-w-[420px] gap-0 rounded-sm border border-border bg-[#242528] p-0 shadow-2xl sm:max-w-[420px] [&>button]:right-5 [&>button]:top-5'>
+			<DialogContent className='w-[calc(100vw-2rem)] max-w-[420px] gap-0 rounded-sm border border-border bg-background p-0 shadow-2xl sm:max-w-[420px] [&>button]:right-5 [&>button]:top-5'>
 				<div className='flex items-center justify-between px-5 pb-3 pt-5'>
 					<DialogTitle className='text-lg font-semibold text-foreground'>
 						Add people to {workspaceName}
@@ -187,7 +187,7 @@ export function AddPeopleDialog({
 								</div>
 
 								{query.trim().length >= 2 && (
-									<div className='absolute left-0 right-0 top-full z-50 mt-1 max-h-[252px] overflow-y-auto rounded-sm border border-border bg-[#303134] py-1 shadow-xl'>
+									<div className='absolute left-0 right-0 top-full z-50 mt-1 max-h-[252px] overflow-y-auto rounded-sm border border-border bg-background py-1 shadow-xl'>
 										{searchInviteUsers.isFetching && (
 											<div className='px-3 py-3 text-sm text-muted-foreground'>
 												Searching...
@@ -220,7 +220,7 @@ export function AddPeopleDialog({
 															item,
 														);
 													}}
-													className='flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-[#3a3b3f] disabled:cursor-not-allowed disabled:opacity-50'
+													className='flex w-full items-center gap-3 px-3 py-2 text-left hover:hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50'
 												>
 													<div className='flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted text-muted-foreground'>
 														{item.avatar_url ? (

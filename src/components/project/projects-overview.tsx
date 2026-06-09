@@ -34,16 +34,16 @@ function getProjectStatusStyle(status: string) {
 
 export function ProjectsOverview({ items }: Props) {
 	return (
-		<Card className='rounded-2xl border-neutral-800 bg-neutral-950/20 shadow-sm'>
-			<CardHeader className='flex flex-row items-center justify-between space-y-0 pb-3 border-b border-neutral-800/50 bg-neutral-900/40 rounded-t-2xl px-5'>
+		<Card className='rounded-2xl border-border/60 bg-card/80 shadow-sm backdrop-blur-sm'>
+			<CardHeader className='flex flex-row items-center justify-between space-y-0 pb-3 border-b border-border/50 bg-muted/30 rounded-t-2xl px-5'>
 				<div>
-					<CardTitle className="text-base text-neutral-100">Project Overview</CardTitle>
-					<p className='mt-1 text-[13px] text-neutral-500'>
+					<CardTitle className="text-base text-foreground">Project Overview</CardTitle>
+					<p className='mt-1 text-[13px] text-muted-foreground'>
 						Active projects in this workspace
 					</p>
 				</div>
 
-				<Button variant='ghost' size='sm' className="text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800 transition-colors">
+				<Button variant='ghost' size='sm' className="text-muted-foreground hover:hover:text-foreground hover:hover:bg-accent hover:text-accent-foreground transition-colors">
 					View All
 					<ArrowRight className='ml-2 h-4 w-4' />
 				</Button>
@@ -55,15 +55,15 @@ export function ProjectsOverview({ items }: Props) {
 					return (
 						<div
 							key={project.id}
-							className='rounded-xl border border-neutral-800 bg-neutral-900/40 p-5 transition-all hover:border-neutral-700 hover:bg-neutral-900/60 shadow-sm'
+							className='rounded-xl border border-border/50 bg-background/80 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md'
 						>
 							<div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
 								<div className='min-w-0 flex-1 space-y-4'>
 									<div className='flex flex-wrap items-center gap-2.5'>
-										<h3 className='truncate font-semibold text-[15px] text-neutral-200'>
+										<h3 className='truncate font-semibold text-[15px] text-foreground group-hover:text-primary transition-colors'>
 											{project.name}
 										</h3>
-										<Badge variant='outline' className="bg-neutral-900 border-neutral-800 text-neutral-400 font-medium text-[11px]">
+										<Badge variant='outline' className="bg-background border-border text-muted-foreground font-medium text-[11px]">
 											{project.key}
 										</Badge>
 										<div className={cn("inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[11px] font-medium", statusStyle.badge)}>
@@ -74,23 +74,23 @@ export function ProjectsOverview({ items }: Props) {
 
 									<div className='space-y-2.5 max-w-md'>
 										<div className='flex items-center justify-between text-[13px] font-medium'>
-											<span className='text-neutral-500'>
+											<span className='text-muted-foreground'>
 												Progress
 											</span>
-											<span className='text-neutral-300'>
+											<span className='text-foreground'>
 												{project.progress}%
 											</span>
 										</div>
 										<Progress
 											value={project.progress}
-											className='h-1.5 bg-neutral-800'
+											className='h-1.5 bg-muted'
 										/>
 									</div>
 
-									<div className='flex flex-wrap gap-5 text-[12px] font-medium text-neutral-500'>
-										<span>Open: <span className="text-neutral-300">{project.openTasks}</span></span>
-										<span>Done: <span className="text-neutral-300">{project.doneTasks}</span></span>
-										<span>Deadline: <span className="text-neutral-300">{project.deadline}</span></span>
+									<div className='flex flex-wrap gap-5 text-[12px] font-medium text-muted-foreground'>
+										<span>Open: <span className="text-foreground">{project.openTasks}</span></span>
+										<span>Done: <span className="text-foreground">{project.doneTasks}</span></span>
+										<span>Deadline: <span className="text-foreground">{project.deadline}</span></span>
 									</div>
 								</div>
 
@@ -99,17 +99,17 @@ export function ProjectsOverview({ items }: Props) {
 										{project.members.map((member, index) => (
 											<Avatar
 												key={`${project.id}-${member}-${index}`}
-												className='h-8 w-8 border-2 border-neutral-950 shadow-sm'
+												className='h-8 w-8 border-2 border-border shadow-sm'
 											>
 												<AvatarImage src='' />
-												<AvatarFallback className='text-[10px] font-semibold bg-neutral-800 text-neutral-300'>
+												<AvatarFallback className='text-[10px] font-semibold bg-muted text-foreground'>
 													{member}
 												</AvatarFallback>
 											</Avatar>
 										))}
 									</div>
 
-									<Button variant='outline' size='sm' className="border-neutral-700 bg-neutral-900 text-neutral-300 hover:bg-neutral-800 hover:text-neutral-100 transition-colors rounded-lg">
+									<Button variant='outline' size='sm' className="border-border bg-background text-foreground hover:bg-primary hover:text-primary-foreground transition-all rounded-lg shadow-sm">
 										Open Project
 									</Button>
 								</div>

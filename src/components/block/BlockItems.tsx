@@ -45,7 +45,7 @@ const BlockItems = ({
 					<div className='flex items-center gap-2'>
 						<button
 							type='button'
-							className='rounded-md p-1 hover:bg-neutral-700'
+							className='rounded-md p-1 hover:hover:bg-accent hover:text-accent-foreground'
 						>
 							<Plus size={16} />
 						</button>
@@ -55,7 +55,7 @@ const BlockItems = ({
 						>
 							<button
 								type='button'
-								className='rounded-md p-1 hover:bg-neutral-700'
+								className='rounded-md p-1 hover:hover:bg-accent hover:text-accent-foreground'
 							>
 								<GripVertical size={16} />
 							</button>

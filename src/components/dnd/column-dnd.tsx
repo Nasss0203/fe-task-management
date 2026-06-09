@@ -66,7 +66,7 @@ export default function ColumnDnd({
 					>
 						<button
 							type='button'
-							className='p-1 dark:bg-neutral-800 rounded-sm dark:hover:bg-neutral-700 bg-neutral-400 hover:bg-neutral-500'
+							className='p-1 dark:bg-muted rounded-sm dark:hover:hover:bg-accent hover:text-accent-foreground bg-neutral-400 hover:bg-neutral-500'
 						>
 							<Ellipsis size={16} />
 						</button>
@@ -74,7 +74,7 @@ export default function ColumnDnd({
 						<button
 							type='button'
 							onClick={() => onAddTask?.(statusId)}
-							className='p-1 dark:bg-neutral-800 rounded-sm dark:hover:bg-neutral-700 bg-neutral-400 hover:bg-neutral-500'
+							className='p-1 dark:bg-muted rounded-sm dark:hover:hover:bg-accent hover:text-accent-foreground bg-neutral-400 hover:bg-neutral-500'
 						>
 							<Plus size={16} />
 						</button>
@@ -86,7 +86,7 @@ export default function ColumnDnd({
 				<button
 					type='button'
 					onClick={() => onAddTask?.(statusId)}
-					className='mt-3 h-10 rounded-lg border border-neutral-400/30 bg-white/5 hover:bg-white/20 flex items-center gap-3 px-3 text-sm cursor-pointer shrink-0'
+					className='mt-3 h-10 rounded-lg border border-border bg-background/50 hover:bg-background/80 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10 flex items-center gap-3 px-3 text-sm cursor-pointer shrink-0 text-muted-foreground hover:text-foreground transition-colors'
 				>
 					<Plus size={18} />
 					<span>Thêm mới</span>

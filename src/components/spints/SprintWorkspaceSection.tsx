@@ -95,7 +95,7 @@ const SprintWorkspaceSection = ({
 						checked={row.getIsSelected()}
 						onCheckedChange={(value) => row.toggleSelected(!!value)}
 						aria-label='Select sprint task'
-						className="border-neutral-700 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+						className="border-border data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
 					/>
 				),
 			},
@@ -108,12 +108,12 @@ const SprintWorkspaceSection = ({
 
 					return (
 						<div className='flex min-w-0 flex-col gap-1'>
-							<span className='truncate text-[13px] font-medium text-neutral-200'>
+							<span className='truncate text-[13px] font-medium text-foreground'>
 								{task.title ?? "Untitled task"}
 							</span>
 
 							{task.key && (
-								<span className='text-[11px] text-neutral-500'>
+								<span className='text-[11px] text-muted-foreground'>
 									{task.key}
 								</span>
 							)}
@@ -126,7 +126,7 @@ const SprintWorkspaceSection = ({
 				size: 150,
 				header: "Sprint",
 				cell: ({ row }) => (
-					<span className='line-clamp-1 text-[13px] text-neutral-400'>
+					<span className='line-clamp-1 text-[13px] text-muted-foreground'>
 						{row.original.sprintName}
 					</span>
 				),
@@ -158,14 +158,14 @@ const SprintWorkspaceSection = ({
 
 					if (assignees.length === 0) {
 						return (
-							<span className='text-[13px] text-neutral-500 italic'>
+							<span className='text-[13px] text-muted-foreground italic'>
 								Unassigned
 							</span>
 						);
 					}
 
 					return (
-						<span className='line-clamp-1 text-[13px] text-neutral-300'>
+						<span className='line-clamp-1 text-[13px] text-foreground'>
 							{assignees
 								.map(
 									(assignee) =>
@@ -189,15 +189,15 @@ const SprintWorkspaceSection = ({
 								<Button
 									variant='ghost'
 									size='icon'
-									className='size-8 text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800 transition-colors'
+									className='size-8 text-muted-foreground hover:hover:text-foreground hover:hover:bg-accent hover:text-accent-foreground transition-colors'
 								>
 									<MoreHorizontal className='size-4' />
 								</Button>
 							</DropdownMenuTrigger>
 
-							<DropdownMenuContent align='end' className="bg-neutral-950 border-neutral-800 rounded-xl min-w-[160px]">
-								<DropdownMenuItem className="text-xs text-neutral-300 focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer">View task</DropdownMenuItem>
-								<DropdownMenuItem className="text-xs text-neutral-300 focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer">
+							<DropdownMenuContent align='end' className="bg-popover border-border rounded-xl min-w-[160px]">
+								<DropdownMenuItem className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">View task</DropdownMenuItem>
+								<DropdownMenuItem className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">
 									Move to backlog
 								</DropdownMenuItem>
 							</DropdownMenuContent>
@@ -230,8 +230,8 @@ const SprintWorkspaceSection = ({
 	const selectedCount = table.getSelectedRowModel().rows.length;
 
 	return (
-		<Card className='flex flex-col gap-0 overflow-hidden rounded-2xl border-neutral-800 bg-neutral-950/20 !py-0'>
-			<div className='flex items-center justify-between gap-4 border-b border-neutral-800 bg-neutral-900/40 px-4 py-3'>
+		<Card className='flex flex-col gap-0 overflow-hidden rounded-2xl border-border bg-muted/50 !py-0'>
+			<div className='flex items-center justify-between gap-4 border-b border-border bg-muted/50 px-4 py-3'>
 				<div className='flex items-center gap-3'>
 					<Checkbox
 						checked={
@@ -243,13 +243,13 @@ const SprintWorkspaceSection = ({
 						}
 						disabled={tasks.length === 0}
 						aria-label='Select all sprint tasks'
-						className="border-neutral-700 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+						className="border-border data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
 					/>
 
 					<Button
 						variant='ghost'
 						size='icon'
-						className='size-7 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100 transition-colors'
+						className='size-7 text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground hover:hover:text-foreground transition-colors'
 						onClick={() => setIsOpen((prev) => !prev)}
 					>
 						<ChevronDown
@@ -259,18 +259,18 @@ const SprintWorkspaceSection = ({
 
 					<div className='flex flex-col gap-1'>
 						<div className='flex items-center gap-2'>
-							<span className='text-[14px] font-semibold text-neutral-100'>
+							<span className='text-[14px] font-semibold text-foreground'>
 								Sprint tasks
 							</span>
 
 							{selectedCount > 0 && (
-								<span className='text-[12px] font-medium text-neutral-500'>
+								<span className='text-[12px] font-medium text-muted-foreground'>
 									{selectedCount} selected
 								</span>
 							)}
 						</div>
 
-						<p className='text-[12px] text-neutral-500'>
+						<p className='text-[12px] text-muted-foreground'>
 							{tasks.length} items added to sprint
 						</p>
 					</div>
@@ -282,15 +282,15 @@ const SprintWorkspaceSection = ({
 							<Button
 								variant='ghost'
 								size='icon'
-								className='size-8 text-neutral-400 hover:bg-neutral-800 transition-colors'
+								className='size-8 text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground transition-colors'
 							>
 								<MoreHorizontal className='size-4' />
 							</Button>
 						</DropdownMenuTrigger>
 
-						<DropdownMenuContent align='end' className="bg-neutral-950 border-neutral-800 rounded-xl min-w-[160px]">
-							<DropdownMenuItem className="text-xs text-neutral-300 focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer">Export tasks</DropdownMenuItem>
-							<DropdownMenuItem className="text-xs text-neutral-300 focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer">Move selected</DropdownMenuItem>
+						<DropdownMenuContent align='end' className="bg-popover border-border rounded-xl min-w-[160px]">
+							<DropdownMenuItem className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">Export tasks</DropdownMenuItem>
+							<DropdownMenuItem className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">Move selected</DropdownMenuItem>
 							<DropdownMenuItem className='text-xs text-rose-500 focus:bg-rose-500/10 focus:text-rose-400 cursor-pointer'>
 								Clear selected
 							</DropdownMenuItem>
@@ -302,11 +302,11 @@ const SprintWorkspaceSection = ({
 			{isOpen && (
 				<div className='flex flex-col gap-6 p-4'>
 					{tasks.length === 0 ? (
-						<div className='py-6 text-center text-[13px] font-medium text-neutral-500'>
+						<div className='py-6 text-center text-[13px] font-medium text-muted-foreground'>
 							No tasks in this sprint
 						</div>
 					) : (
-						<div className='relative max-h-[520px] min-w-245 overflow-auto rounded-xl border border-neutral-800/50 bg-neutral-950/30'>
+						<div className='relative max-h-[520px] min-w-245 overflow-auto rounded-xl border border-border/50 bg-muted/50'>
 							<table className='w-full caption-bottom text-sm'>
 								<TableHeader>
 									{table
@@ -314,13 +314,13 @@ const SprintWorkspaceSection = ({
 										.map((headerGroup) => (
 											<TableRow
 												key={headerGroup.id}
-												className='hover:bg-transparent border-neutral-800'
+												className='hover:bg-transparent border-border'
 											>
 												{headerGroup.headers.map(
 													(header) => (
 														<TableHead
 															key={header.id}
-															className='sticky top-0 z-20 h-10 bg-neutral-900/90 text-[11px] font-semibold uppercase tracking-wider text-neutral-500 shadow-[inset_0_-1px_0_rgba(255,255,255,0.05)] backdrop-blur-md'
+															className='sticky top-0 z-20 h-10 bg-muted/50 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground shadow-[inset_0_-1px_0_rgba(255,255,255,0.05)] backdrop-blur-md'
 															style={{
 																width: header.getSize(),
 																minWidth:
@@ -347,7 +347,7 @@ const SprintWorkspaceSection = ({
 									{table.getRowModel().rows.map((row) => (
 										<TableRow
 											key={row.id}
-											className='h-12 border-neutral-800 hover:bg-neutral-900/30 transition-colors'
+											className='h-12 border-border hover:hover:bg-muted/80 transition-colors'
 											data-state={
 												row.getIsSelected() &&
 												"selected"

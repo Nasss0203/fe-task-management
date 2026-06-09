@@ -3,7 +3,7 @@ import { Project } from "@/lib/mock-data";
 import { ProjectRow } from "./ProjectRow";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { EmptyState } from "./EmptyState";
+
 
 interface ProjectOverviewProps {
   projects: Project[];
@@ -25,10 +25,13 @@ export const ProjectOverview = ({ projects, slug }: ProjectOverviewProps) => {
       </CardHeader>
       <CardContent className="px-6 pb-6">
         {projects.length === 0 ? (
-          <EmptyState
-            title="Chưa có dự án nào"
-            description="Hãy bắt đầu bằng cách tạo dự án đầu tiên của bạn."
-          />
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-900 border border-white/5 shadow-sm mb-4">
+              <ArrowRight className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <p className="text-sm font-medium text-foreground">Chưa có dự án nào</p>
+            <p className="text-xs text-muted-foreground mt-1">Hãy bắt đầu bằng cách tạo dự án đầu tiên của bạn.</p>
+          </div>
         ) : (
           <div className="flex flex-col gap-1">
             {projects.slice(0, 5).map((project, i) => (

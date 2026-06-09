@@ -14,8 +14,10 @@ interface TaskStatusChartProps {
 export function TaskStatusChart({ workspaceSlug, total, items }: TaskStatusChartProps) {
   const router = useRouter();
 
-  const handleSegmentClick = (data: { statusId: string }) => {
-    router.push(`/dashboard/${workspaceSlug}/tasks?statusId=${data.statusId}`);
+  const handleSegmentClick = (data: any) => {
+    if (data && data.statusId) {
+      router.push(`/dashboard/${workspaceSlug}/tasks?statusId=${data.statusId}`);
+    }
   };
 
   const chartData = items.map((item, index) => ({
@@ -26,16 +28,16 @@ export function TaskStatusChart({ workspaceSlug, total, items }: TaskStatusChart
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 text-center">
-        <h3 className="mb-4 text-sm font-semibold text-white">Trạng thái Task</h3>
-        <p className="text-sm text-zinc-500 my-auto">Chưa có dữ liệu task</p>
+      <div className="flex flex-col rounded-2xl border border-border/60 bg-card/80 p-6 shadow-sm backdrop-blur-sm text-center">
+        <h3 className="mb-4 text-sm font-semibold text-foreground">Trạng thái Task</h3>
+        <p className="text-sm text-muted-foreground my-auto">Chưa có dữ liệu task</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
-      <h3 className="mb-4 text-sm font-semibold text-white">Trạng thái Task</h3>
+    <div className="flex flex-col rounded-2xl border border-border/60 bg-card/80 p-6 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md">
+      <h3 className="mb-4 text-sm font-semibold text-foreground">Trạng thái Task</h3>
       
       <div className="relative h-[220px] w-full" role="img" aria-label="Biểu đồ trạng thái task trong workspace">
         <ResponsiveContainer width="100%" height="100%">
@@ -56,12 +58,12 @@ export function TaskStatusChart({ workspaceSlug, total, items }: TaskStatusChart
                 <Cell 
                   key={`cell-${index}`} 
                   fill={entry.color} 
-                  className="transition-opacity hover:opacity-80 stroke-zinc-900 stroke-2"
+                  className="transition-opacity hover:opacity-80 stroke-card stroke-2"
                 />
               ))}
             </Pie>
             <Tooltip 
-              contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '8px', fontSize: '12px' }}
+              contentStyle={{ backgroundColor: 'hsl(var(--popover))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }}
               itemStyle={{ color: '#fff' }}
               cursor={{ fill: 'transparent' }}
             />
@@ -70,8 +72,8 @@ export function TaskStatusChart({ workspaceSlug, total, items }: TaskStatusChart
         
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="text-center">
-            <div className="text-2xl font-bold text-white">{total}</div>
-            <div className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">Tổng task</div>
+            <div className="text-2xl font-bold text-foreground">{total}</div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Tổng task</div>
           </div>
         </div>
       </div>
@@ -80,8 +82,8 @@ export function TaskStatusChart({ workspaceSlug, total, items }: TaskStatusChart
         {chartData.map((item) => (
           <div key={item.statusId} className="flex items-center gap-2">
             <div className="h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-            <span className="text-[11px] text-zinc-400 truncate">{item.name}</span>
-            <span className="ml-auto text-[11px] font-bold text-white">
+            <span className="text-[11px] text-muted-foreground truncate">{item.name}</span>
+            <span className="ml-auto text-[11px] font-bold text-foreground">
               {total > 0 ? Math.round((item.value / total) * 100) : 0}%
             </span>
           </div>

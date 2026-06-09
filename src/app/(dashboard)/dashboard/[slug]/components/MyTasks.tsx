@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MyTask } from "@/lib/mock-data";
 import { Calendar, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { EmptyState } from "./EmptyState";
+
 
 interface MyTasksProps {
   tasks: MyTask[];
@@ -37,7 +37,13 @@ export const MyTasks = ({ tasks, slug }: MyTasksProps) => {
       </CardHeader>
       <CardContent className="px-8 pb-8">
         {tasks.length === 0 ? (
-          <EmptyState title="Không có task nào" description="Bạn hiện không có task nào được giao." />
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-900 border border-white/5 shadow-sm mb-4">
+              <Calendar className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <p className="text-sm font-medium text-foreground">Không có task nào</p>
+            <p className="text-xs text-muted-foreground mt-1">Bạn hiện không có task nào được giao.</p>
+          </div>
         ) : (
           <div className="space-y-3">
             {tasks.slice(0, 3).map((task) => (

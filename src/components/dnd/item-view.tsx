@@ -180,7 +180,7 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 				ref={ref}
 				{...props}
 				className={cn(
-					"w-full border border-neutral-400 px-4 py-2 rounded-lg bg-stone-100 dark:border-none cursor-pointer hover:opacity-70 transition-opacity",
+					"w-full border border-border px-4 py-2 rounded-lg dark:border-white/5 cursor-pointer hover:opacity-70 transition-opacity shadow-sm",
 					"select-none touch-none",
 					getTaskStatusBackgroundClass(status),
 					isOverlay && "shadow-lg",

@@ -23,20 +23,20 @@ export function MetricCard({ label, count, subText, icon: Icon, link, tone }: Me
     <Link 
       href={link}
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 transition-all duration-300 hover:bg-zinc-800/80 hover:ring-2 hover:ring-zinc-700/50",
+        "group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md",
         tone === 'red' && "border-red-900/30"
       )}
     >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-zinc-400 group-hover:text-zinc-300">{label}</p>
-          <h3 className="mt-1 text-3xl font-bold tracking-tight text-white">{count}</h3>
+          <p className="text-[13px] font-bold text-muted-foreground uppercase tracking-wider">{label}</p>
+          <h3 className="mt-2 text-3xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">{count}</h3>
         </div>
         <div className={cn("rounded-lg border p-2.5 transition-colors duration-300", toneVariants[tone])}>
           <Icon size={20} />
         </div>
       </div>
-      <p className="mt-4 text-xs font-medium text-zinc-500 group-hover:text-zinc-400">
+      <p className="mt-4 text-[12px] font-medium text-muted-foreground">
         {subText}
       </p>
       

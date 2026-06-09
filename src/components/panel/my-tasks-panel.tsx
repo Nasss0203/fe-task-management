@@ -27,15 +27,15 @@ function isPastDueDate(value: string) {
 
 export function MyTasksPanel({ items }: Props) {
 	return (
-		<Card className='rounded-2xl border-neutral-800 bg-neutral-950/20 shadow-sm'>
-			<CardHeader className='pb-3 border-b border-neutral-800/50 bg-neutral-900/40 rounded-t-2xl px-5'>
-				<CardTitle className='flex items-center gap-2 text-base text-neutral-100'>
-					<span className='flex size-8 items-center justify-center rounded-lg border border-neutral-800 bg-neutral-900 text-neutral-400'>
+		<Card className='rounded-2xl border-border bg-muted/50 shadow-sm'>
+			<CardHeader className='pb-3 border-b border-border/50 bg-muted/50 rounded-t-2xl px-5'>
+				<CardTitle className='flex items-center gap-2 text-base text-foreground'>
+					<span className='flex size-8 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground'>
 						<ListChecks className='h-4 w-4' />
 					</span>
 					My Tasks
 				</CardTitle>
-				<p className='text-sm text-neutral-500'>
+				<p className='text-sm text-muted-foreground'>
 					Tasks requiring your attention
 				</p>
 			</CardHeader>
@@ -47,11 +47,11 @@ export function MyTasksPanel({ items }: Props) {
 					return (
 						<div
 							key={task.id}
-							className={`rounded-xl border border-neutral-800 bg-neutral-900/40 p-4 transition-all hover:bg-neutral-900/60 hover:border-neutral-700 shadow-sm`}
+							className={`rounded-xl border border-border bg-muted/50 p-4 transition-all hover:hover:bg-muted/80 hover:border-border shadow-sm`}
 						>
 							<div className='space-y-3'>
 								<div className='flex items-start justify-between gap-3'>
-									<p className='line-clamp-2 text-[13px] font-medium leading-6 text-neutral-200'>
+									<p className='line-clamp-2 text-[13px] font-medium leading-6 text-foreground'>
 										{task.title}
 									</p>
 
@@ -67,7 +67,7 @@ export function MyTasksPanel({ items }: Props) {
 										</div>
 									) : null}
 
-									<div className='flex items-center gap-1.5 text-[11px] font-medium text-neutral-500'>
+									<div className='flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground'>
 										<CalendarDays className='size-3.5' />
 										{task.due}
 									</div>
@@ -79,7 +79,7 @@ export function MyTasksPanel({ items }: Props) {
 
 				<Button
 					variant='outline'
-					className='w-full border-neutral-800 bg-neutral-900/40 text-neutral-400 hover:bg-neutral-900 hover:text-neutral-100 transition-colors h-10 rounded-xl mt-2'
+					className='w-full border-border bg-muted/50 text-muted-foreground hover:hover:bg-accent hover:hover:text-foreground transition-colors h-10 rounded-xl mt-2'
 				>
 					View All
 				</Button>

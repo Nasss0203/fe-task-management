@@ -34,13 +34,13 @@ export default function WorkspaceOverview({
 					{[...Array(4)].map((_, i) => (
 						<div
 							key={i}
-							className='h-32 w-full animate-pulse rounded-xl bg-zinc-900/50 border border-zinc-800'
+							className='h-32 w-full animate-pulse rounded-xl bg-muted/50 border border-border'
 						/>
 					))}
 				</div>
 				<div className='grid grid-cols-1 gap-6 xl:grid-cols-12'>
-					<div className='xl:col-span-8 h-96 animate-pulse rounded-xl bg-zinc-900/50 border border-zinc-800' />
-					<div className='xl:col-span-4 h-96 animate-pulse rounded-xl bg-zinc-900/50 border border-zinc-800' />
+					<div className='xl:col-span-8 h-96 animate-pulse rounded-xl bg-muted/50 border border-border' />
+					<div className='xl:col-span-4 h-96 animate-pulse rounded-xl bg-muted/50 border border-border' />
 				</div>
 			</div>
 		);
@@ -56,13 +56,13 @@ export default function WorkspaceOverview({
 					<h3 className='text-lg font-semibold text-white'>
 						Đã có lỗi xảy ra
 					</h3>
-					<p className='text-sm text-zinc-500'>
+					<p className='text-sm text-muted-foreground'>
 						Không thể tải dữ liệu tổng quan workspace.
 					</p>
 				</div>
 				<button
 					onClick={() => refetch()}
-					className='rounded-lg bg-zinc-800 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 transition-colors'
+					className='rounded-lg bg-muted px-4 py-2 text-sm font-medium text-white hover:hover:bg-accent hover:text-accent-foreground transition-colors'
 				>
 					Thử lại
 				</button>

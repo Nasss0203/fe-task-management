@@ -4,7 +4,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity } from "@/lib/mock-data";
 import { MessageCircle, Pencil, RefreshCcw, UserPlus } from "lucide-react";
-import { EmptyState } from "./EmptyState";
 
 interface ActivityFeedProps {
   activities: Activity[];
@@ -25,7 +24,13 @@ export const ActivityFeed = ({ activities }: ActivityFeedProps) => {
       </CardHeader>
       <CardContent className="px-8 pb-8">
         {activities.length === 0 ? (
-          <EmptyState title="Chưa có hoạt động" description="Các hoạt động mới nhất sẽ xuất hiện ở đây." />
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-900 border border-white/5 shadow-sm mb-4">
+              <MessageCircle className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <p className="text-sm font-medium text-foreground">Chưa có hoạt động</p>
+            <p className="text-xs text-muted-foreground mt-1">Các hoạt động mới nhất sẽ xuất hiện ở đây.</p>
+          </div>
         ) : (
           <div className="relative space-y-6 before:absolute before:inset-y-0 before:left-[19px] before:w-[1px] before:bg-white/5">
             {activities.map((activity) => {

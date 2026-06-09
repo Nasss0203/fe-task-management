@@ -41,8 +41,13 @@ const TableView = ({ board }: BoardViewProps) => (
 	></BoardTable>
 );
 
+import BoardList from "../list/BoardList";
+
 const ListView = ({ board }: BoardViewProps) => (
-	<div>List view - {board.name}</div>
+	<BoardList
+		projectId={board.projectId}
+		workspaceId={board.workspaceId}
+	/>
 );
 
 const Timeline = ({ board }: BoardViewProps) => (

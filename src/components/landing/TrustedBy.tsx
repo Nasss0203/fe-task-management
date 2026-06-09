@@ -9,7 +9,7 @@ const brandItems = [
 const TrustedBy = () => {
 	return (
 		<div className='mx-auto mt-24 max-w-6xl text-center animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500'>
-			<p className='text-sm font-medium tracking-widest uppercase text-white/40'>
+			<p className='text-sm font-medium tracking-widest uppercase text-muted-foreground'>
 				Trusted by industry leaders
 			</p>
 
@@ -20,11 +20,11 @@ const TrustedBy = () => {
 						className='flex items-center gap-3 transition-transform hover:scale-105'
 					>
 						<img
-							src={`https://cdn.simpleicons.org/${brand.slug}/ffffff`}
+							src={`https://cdn.simpleicons.org/${brand.slug}`}
 							alt={brand.name}
-							className='h-6 w-auto'
+							className='h-6 w-auto dark:invert'
 						/>
-						<span className='text-lg font-semibold tracking-tight text-white'>
+						<span className='text-lg font-semibold tracking-tight text-foreground'>
 							{brand.name}
 						</span>
 					</div>

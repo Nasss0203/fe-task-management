@@ -15,11 +15,11 @@ export function UpcomingDeadlines({
 }: UpcomingDeadlinesProps) {
 	if (items?.length === 0) {
 		return (
-			<div className='rounded-xl border border-zinc-800 bg-zinc-900/50 p-6'>
-				<h3 className='mb-4 text-lg font-semibold text-white'>
+			<div className='rounded-2xl border border-border/60 bg-card/80 p-6 shadow-sm backdrop-blur-sm'>
+				<h3 className='mb-4 text-lg font-semibold text-foreground'>
 					Deadline sắp tới
 				</h3>
-				<p className='text-sm text-zinc-500'>
+				<p className='text-sm text-muted-foreground'>
 					Không có deadline trong 7 ngày tới
 				</p>
 			</div>
@@ -27,8 +27,8 @@ export function UpcomingDeadlines({
 	}
 
 	return (
-		<div className='rounded-xl border border-zinc-800 bg-zinc-900/50 p-6'>
-			<h3 className='mb-4 text-lg font-semibold text-white'>
+		<div className='rounded-2xl border border-border/60 bg-card/80 p-6 shadow-sm backdrop-blur-sm'>
+			<h3 className='mb-4 text-lg font-semibold text-foreground'>
 				Deadline sắp tới
 			</h3>
 			<div className='space-y-4'>
@@ -41,7 +41,7 @@ export function UpcomingDeadlines({
 								: `/dashboard/${workspaceSlug}/tasks`
 						}
 						className={cn(
-							"flex items-center justify-between rounded-lg border border-zinc-800/50 bg-zinc-900/30 p-4 transition-all hover:bg-zinc-800/40",
+							"flex items-center justify-between rounded-xl border border-border/50 bg-background/80 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md",
 							item.isUrgent &&
 								"border-red-500/20 bg-red-500/5 shadow-[0_0_15px_-5px_rgba(239,68,68,0.1)]",
 						)}
@@ -52,7 +52,7 @@ export function UpcomingDeadlines({
 									"flex h-10 w-10 items-center justify-center rounded-lg",
 									item.isUrgent
 										? "bg-red-500/10 text-red-500"
-										: "bg-zinc-800 text-zinc-400",
+										: "bg-muted text-muted-foreground",
 								)}
 							>
 								{item.isUrgent ? (
@@ -62,10 +62,10 @@ export function UpcomingDeadlines({
 								)}
 							</div>
 							<div className='flex flex-col'>
-								<span className='text-sm font-semibold text-white line-clamp-1'>
+								<span className='text-sm font-semibold text-foreground line-clamp-1 group-hover:text-primary transition-colors'>
 									{item.title}
 								</span>
-								<span className='text-[10px] font-bold uppercase tracking-wider text-zinc-500'>
+								<span className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground'>
 									{item.type === "task" ? "Task" : "Sprint"}
 								</span>
 							</div>
@@ -76,15 +76,15 @@ export function UpcomingDeadlines({
 								className={cn(
 									"text-xs font-bold",
 									item.isUrgent
-										? "text-red-400"
-										: "text-zinc-300",
+										? "text-red-500"
+										: "text-foreground",
 								)}
 							>
 								{item.daysRemaining === 0
 									? "Hôm nay"
 									: `Còn ${item.daysRemaining} ngày`}
 							</p>
-							<p className='text-[10px] text-zinc-500'>
+							<p className='text-[10px] text-muted-foreground'>
 								{formatDate(item.deadline)}
 							</p>
 						</div>

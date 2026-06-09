@@ -24,8 +24,8 @@ const layout = ({
 	return (
 		<SidebarProvider className='h-svh overflow-hidden'>
 			<AppSidebarUser />
-			<SidebarInset className='h-svh min-h-0 min-w-0 w-svw max-w-svw overflow-hidden md:w-full md:max-w-full'>
-				<header className='flex w-full h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12'>
+			<SidebarInset className='h-svh min-h-0 min-w-0 w-svw max-w-svw overflow-hidden md:w-full md:max-w-full bg-background'>
+				<header className='flex w-full h-14 shrink-0 items-center gap-2 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 sticky top-0 z-10'>
 					<div className='flex items-center justify-between flex-1'>
 						<div className='flex items-center gap-2 px-4'>
 							<SidebarTrigger className='-ml-1' />

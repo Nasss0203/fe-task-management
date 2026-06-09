@@ -7,6 +7,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import { GripVertical, MoreHorizontal } from "lucide-react";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { PriorityBadge } from "@/components/shared/priority-badge";
+import DropdownTaskStatus from "@/components/dropdown/DropdownTaskStatus";
+import DropdownTaskPriority from "@/components/dropdown/DropdownTaskPriority";
 
 const getAssigneeName = (assignee: TaskItem["assignees"][number]) => {
 	return (
@@ -61,7 +63,7 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 		cell: () => (
 			<GripVertical
 				size={14}
-				className='cursor-grab text-neutral-600 hover:text-neutral-400 transition-colors'
+				className='cursor-grab text-neutral-600 hover:hover:text-muted-foreground transition-colors'
 			/>
 		),
 		enableSorting: false,
@@ -80,7 +82,7 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 					table.toggleAllPageRowsSelected(!!value)
 				}
 				aria-label='Select all'
-				className="border-neutral-700 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+				className="border-border data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
 			/>
 		),
 		cell: ({ row }) => (
@@ -88,7 +90,7 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 				checked={row.getIsSelected()}
 				onCheckedChange={(value) => row.toggleSelected(!!value)}
 				aria-label='Select task'
-				className="border-neutral-700 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+				className="border-border data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
 			/>
 		),
 		enableSorting: false,
@@ -99,7 +101,7 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 		size: 56,
 		header: "ID",
 		cell: ({ row }) => (
-			<span className='text-[13px] font-medium text-neutral-500'>
+			<span className='text-[13px] font-medium text-muted-foreground'>
 				{row.original.projectSeq ? `#${row.original.projectSeq}` : "-"}
 			</span>
 		),
@@ -110,11 +112,11 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 		header: "Task",
 		cell: ({ row }) => (
 			<div className='flex min-w-0 flex-col py-1'>
-				<span className='truncate text-[14px] font-medium text-neutral-200' title={row.original.title}>
+				<span className='truncate text-[14px] font-medium text-foreground' title={row.original.title}>
 					{row.original.title}
 				</span>
 				{row.original.description ? (
-					<span className='truncate text-[12px] text-neutral-500' title={row.original.description}>
+					<span className='truncate text-[12px] text-muted-foreground' title={row.original.description}>
 						{row.original.description}
 					</span>
 				) : null}
@@ -126,7 +128,12 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 		size: 110,
 		header: "Priority",
 		cell: ({ row }) => (
-			<PriorityBadge priorityName={row.original.priorityName} />
+			<DropdownTaskPriority
+				workspaceId={row.original.workspaceId}
+				projectId={row.original.projectId}
+				taskId={row.original.id}
+				priorityName={row.original.priorityName}
+			/>
 		),
 	},
 	{
@@ -134,7 +141,12 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 		size: 110,
 		header: "Status",
 		cell: ({ row }) => (
-			<StatusBadge statusName={row.original.statusName} />
+			<DropdownTaskStatus
+				workspaceId={row.original.workspaceId}
+				projectId={row.original.projectId}
+				taskId={row.original.id}
+				statusName={row.original.statusName ?? ""}
+			/>
 		),
 	},
 	{
@@ -147,7 +159,7 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 
 			if (!assignees.length) {
 				return (
-					<span className='text-[13px] text-neutral-500 italic hidden 2xl:inline'>
+					<span className='text-[13px] text-muted-foreground italic hidden 2xl:inline'>
 						Unassigned
 					</span>
 				);
@@ -162,7 +174,7 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 							return (
 								<div
 									key={assignee.userId}
-									className='flex size-6 items-center justify-center rounded-full border border-neutral-900 bg-neutral-800 text-[10px] font-semibold text-neutral-300 shadow-sm'
+									className='flex size-6 items-center justify-center rounded-full border border-border bg-muted text-[10px] font-semibold text-foreground shadow-sm'
 									title={name}
 								>
 									{getInitials(name)}
@@ -171,7 +183,7 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 						})}
 					</div>
 
-					<span className='truncate text-[13px] text-neutral-300 flex-1 min-w-0'>
+					<span className='truncate text-[13px] text-foreground flex-1 min-w-0'>
 						{getAssigneeName(assignees[0])}
 						{assignees.length > 1 ? ` +${assignees.length - 1}` : ""}
 					</span>
@@ -185,7 +197,7 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 		header: "Est.",
 		meta: { className: "hidden xl:table-cell" },
 		cell: ({ row }) => (
-			<span className='hidden text-[13px] font-medium text-neutral-300 xl:inline'>
+			<span className='hidden text-[13px] font-medium text-foreground xl:inline'>
 				{formatEstimate(row.original.estimateMinutes)}
 			</span>
 		),
@@ -196,7 +208,7 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 		header: "Due",
 		meta: { className: "hidden 2xl:table-cell" },
 		cell: ({ row }) => (
-			<span className='hidden text-[13px] text-neutral-400 2xl:inline'>
+			<span className='hidden text-[13px] text-muted-foreground 2xl:inline'>
 				{formatDate(row.original.dueAt)}
 			</span>
 		),
@@ -206,7 +218,7 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 		size: 44,
 		header: "",
 		cell: () => (
-			<button className='rounded-md p-1.5 text-neutral-500 hover:bg-neutral-800 hover:text-neutral-100 transition-colors'>
+			<button className='rounded-md p-1.5 text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground hover:hover:text-foreground transition-colors'>
 				<MoreHorizontal size={14} />
 			</button>
 		),

@@ -61,11 +61,11 @@ const SprintTaskList = ({
 								className='flex cursor-pointer min-w-0 flex-col py-1'
 								onClick={() => setActiveDrawerTaskId(task.id)}
 							>
-								<span className='truncate text-[14px] font-medium text-neutral-200 hover:text-blue-400 transition-colors'>
+								<span className='truncate text-[14px] font-medium text-foreground hover:text-blue-400 transition-colors'>
 									{task.title}
 								</span>
 								{task.description ? (
-									<span className='truncate text-[12px] text-neutral-500'>
+									<span className='truncate text-[12px] text-muted-foreground'>
 										{task.description}
 									</span>
 								) : null}
@@ -88,7 +88,7 @@ const SprintTaskList = ({
 
 	if (sprintsTaskQuery.isLoading) {
 		return (
-			<div className='flex h-40 items-center justify-center text-sm text-slate-500'>
+			<div className='flex h-40 items-center justify-center text-sm text-muted-foreground'>
 				Đang tải danh sách công việc...
 			</div>
 		);
@@ -101,17 +101,6 @@ const SprintTaskList = ({
 				emptyText='Chưa có công việc nào trong sprint này'
 				className='min-h-0 flex-1 rounded-none border-0 bg-transparent shadow-none'
 			/>
-
-			<div className='mt-2 shrink-0 border-t border-[#2a2a2a] pt-2'>
-				<Button
-					variant='ghost'
-					size='sm'
-					className='h-8 w-full justify-start gap-2 text-xs font-medium text-slate-400 hover:bg-[#202020] hover:text-white'
-				>
-					<Plus size={14} />
-					Thêm công việc
-				</Button>
-			</div>
 
 			{activeDrawerTask ? (
 				<DrawerItemView

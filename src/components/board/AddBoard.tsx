@@ -129,7 +129,7 @@ export default function AddBoard({
 				<button
 					type='button'
 					onClick={handleOpenAddBoard}
-					className='flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-neutral-700 text-white transition hover:bg-neutral-600'
+					className='flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-muted text-white transition hover:bg-neutral-600'
 				>
 					<Plus className='size-4' />
 				</button>
@@ -138,10 +138,10 @@ export default function AddBoard({
 			<PopoverContentV2
 				align='start'
 				sideOffset={10}
-				className='w-[420px] rounded-2xl border border-neutral-800 bg-neutral-950 p-0 text-white shadow-2xl'
+				className='w-[420px] rounded-2xl border border-border bg-background p-0 text-white shadow-2xl'
 			>
-				<PopoverHeaderV2 className='border-b border-neutral-800 px-5 py-4'>
-					<PopoverTitleV2 className='text-base font-semibold text-neutral-100'>
+				<PopoverHeaderV2 className='border-b border-border px-5 py-4'>
+					<PopoverTitleV2 className='text-base font-semibold text-foreground'>
 						Thêm chế độ xem mới
 					</PopoverTitleV2>
 				</PopoverHeaderV2>
@@ -165,13 +165,13 @@ export default function AddBoard({
 								onClick={() =>
 									handleSubmit(item.value, item.label)
 								}
-								className='group flex cursor-pointer flex-col items-center justify-start gap-2 rounded-xl p-2 text-center transition hover:bg-neutral-900 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent'
+								className='group flex cursor-pointer flex-col items-center justify-start gap-2 rounded-xl p-2 text-center transition hover:hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent'
 							>
-								<div className='flex h-11 w-11 items-center justify-center rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-100 transition group-hover:border-neutral-700 group-hover:bg-neutral-800 group-disabled:border-neutral-800 group-disabled:bg-neutral-900'>
+								<div className='flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-background text-foreground transition group-hover:border-border group-hover:hover:bg-accent hover:text-accent-foreground group-disabled:border-border group-disabled:hover:bg-accent'>
 									<Icon className='size-5' />
 								</div>
 
-								<span className='line-clamp-2 text-xs font-medium leading-5 text-neutral-100'>
+								<span className='line-clamp-2 text-xs font-medium leading-5 text-foreground'>
 									{item.label}
 								</span>
 							</button>

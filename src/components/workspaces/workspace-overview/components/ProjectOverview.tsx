@@ -16,21 +16,21 @@ export function ProjectOverview({
 }: ProjectOverviewProps) {
 	if (projects?.length === 0) {
 		return (
-			<div className='rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 text-center'>
-				<p className='text-sm text-zinc-500'>Chưa có project nào</p>
+			<div className='rounded-xl border border-border bg-muted/50 p-6 text-center'>
+				<p className='text-sm text-muted-foreground'>Chưa có project nào</p>
 			</div>
 		);
 	}
 
 	return (
-		<div className='h-full rounded-xl border border-zinc-800 bg-zinc-900/50 p-6'>
+		<div className='h-full rounded-2xl border border-border/60 bg-card/80 p-6 shadow-sm backdrop-blur-sm'>
 			<div className='mb-6 flex items-center justify-between'>
-				<h3 className='text-lg font-semibold text-white'>
+				<h3 className='text-lg font-semibold text-foreground'>
 					Dự án hoạt động
 				</h3>
 				<Link
 					href={`/dashboard/${workspaceSlug}/projects`}
-					className='text-xs font-medium text-zinc-400 hover:text-white transition-colors'
+					className='text-xs font-medium text-muted-foreground hover:text-foreground transition-colors'
 				>
 					Xem tất cả
 				</Link>
@@ -42,15 +42,15 @@ export function ProjectOverview({
 					return (
 						<div
 							key={project.id}
-							className='group flex flex-col gap-4 rounded-lg border border-zinc-800/50 bg-zinc-900/30 p-4 transition-all hover:bg-zinc-800/40'
+							className='group flex flex-col gap-4 rounded-xl border border-border/50 bg-background/80 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md'
 						>
 							<div className='flex items-start justify-between'>
 								<div className='flex items-center gap-3'>
-									<div className='flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-800 font-bold text-zinc-400'>
+									<div className='flex h-10 w-10 items-center justify-center rounded-lg bg-muted font-bold text-muted-foreground shadow-sm'>
 										{project.code}
 									</div>
 									<div>
-										<h4 className='text-sm font-semibold text-white'>
+										<h4 className='text-sm font-semibold text-foreground'>
 											{project.name}
 										</h4>
 										<div className='mt-1 flex items-center gap-2'>
@@ -62,7 +62,7 @@ export function ProjectOverview({
 											>
 												{healthMeta.label}
 											</span>
-											<span className='text-[10px] text-zinc-500'>
+											<span className='text-[10px] text-muted-foreground'>
 												Deadline:{" "}
 												{formatDate(project.deadline)}
 											</span>
@@ -71,7 +71,7 @@ export function ProjectOverview({
 								</div>
 								<Link
 									href={`/dashboard/${workspaceSlug}/projects/${project.id}`}
-									className='rounded-md p-1.5 text-zinc-500 hover:bg-zinc-700/50 hover:text-white transition-all'
+									className='rounded-md p-1.5 text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground transition-all'
 								>
 									<ExternalLink size={16} />
 								</Link>
@@ -79,16 +79,16 @@ export function ProjectOverview({
 
 							<div className='space-y-2'>
 								<div className='flex items-center justify-between text-[11px]'>
-									<span className='text-zinc-400 font-medium'>
+									<span className='text-muted-foreground font-medium'>
 										Tiến độ
 									</span>
-									<span className='text-white font-bold'>
+									<span className='text-foreground font-bold'>
 										{project.progress}%
 									</span>
 								</div>
-								<div className='h-1.5 w-full overflow-hidden rounded-full bg-zinc-800'>
+								<div className='h-1.5 w-full overflow-hidden rounded-full bg-muted'>
 									<div
-										className='h-full bg-gradient-to-r from-blue-600 to-indigo-500 transition-all duration-1000 ease-out'
+										className='h-full bg-gradient-to-r from-primary to-primary/70 transition-all duration-1000 ease-out'
 										style={{
 											width: `${project.progress}%`,
 										}}
@@ -96,21 +96,21 @@ export function ProjectOverview({
 								</div>
 							</div>
 
-							<div className='flex items-center justify-between border-t border-zinc-800/50 pt-3'>
+							<div className='flex items-center justify-between border-t border-border/50 pt-3'>
 								<div className='flex items-center gap-4 text-[11px]'>
 									<div className='flex flex-col'>
-										<span className='text-zinc-500'>
+										<span className='text-muted-foreground'>
 											Đang mở
 										</span>
-										<span className='font-bold text-white'>
+										<span className='font-bold text-foreground'>
 											{project.openTasks}
 										</span>
 									</div>
 									<div className='flex flex-col'>
-										<span className='text-zinc-500'>
+										<span className='text-muted-foreground'>
 											Hoàn thành
 										</span>
-										<span className='font-bold text-white'>
+										<span className='font-bold text-foreground'>
 											{project.doneTasks}
 										</span>
 									</div>
@@ -131,11 +131,11 @@ export function ProjectOverview({
 												}
 												alt={member.name || "Member"}
 												title={member.name || "Member"}
-												className='h-6 w-6 rounded-full border-2 border-zinc-900 object-cover'
+												className='h-6 w-6 rounded-full border-2 border-border object-cover'
 											/>
 										))}
 									{(project.members ?? []).length > 3 && (
-										<div className='flex h-6 w-6 items-center justify-center rounded-full border-2 border-zinc-900 bg-zinc-800 text-[8px] font-bold text-zinc-400'>
+										<div className='flex h-6 w-6 items-center justify-center rounded-full border-2 border-border bg-muted text-[8px] font-bold text-muted-foreground'>
 											+
 											{(project.members ?? []).length - 3}
 										</div>

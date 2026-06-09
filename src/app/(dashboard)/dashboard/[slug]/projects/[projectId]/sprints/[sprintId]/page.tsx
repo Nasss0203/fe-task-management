@@ -51,10 +51,10 @@ const SprintPage = () => {
 	return (
 		<div className='flex h-full min-h-0 flex-1 flex-col overflow-hidden pb-4'>
 			<div className='mb-4 shrink-0 px-1'>
-				<h2 className='text-2xl font-bold tracking-tight text-white truncate'>
+				<h2 className='text-2xl font-bold tracking-tight text-foreground truncate'>
 					{sprintItem?.name}
 				</h2>
-				<p className='text-sm font-medium text-slate-400 truncate'>
+				<p className='text-sm font-medium text-muted-foreground truncate'>
 					Lập kế hoạch sprint từ backlog và theo dõi tiến độ sprint
 					hiện tại
 				</p>

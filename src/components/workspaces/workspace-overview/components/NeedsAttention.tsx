@@ -32,24 +32,24 @@ export function NeedsAttention({ workspaceSlug, items }: NeedsAttentionProps) {
 			case "blue":
 				return "text-blue-400 bg-blue-400/5 hover:bg-blue-400/10 border-blue-400/10";
 			default:
-				return "text-zinc-400 bg-zinc-400/5 hover:bg-zinc-400/10 border-zinc-400/10";
+				return "hover:text-muted-foreground bg-zinc-400/5 hover:bg-zinc-400/10 border-zinc-400/10";
 		}
 	};
 
 	if (items?.length === 0) {
 		return (
-			<div className='rounded-xl border border-zinc-800 bg-zinc-900/50 p-6'>
-				<h3 className='mb-4 text-lg font-semibold text-white'>
+			<div className='rounded-2xl border border-border/60 bg-card/80 p-6 shadow-sm backdrop-blur-sm'>
+				<h3 className='mb-4 text-lg font-semibold text-foreground'>
 					Cần chú ý
 				</h3>
-				<p className='text-sm text-zinc-500'>Không có cảnh báo nào</p>
+				<p className='text-sm text-muted-foreground'>Không có cảnh báo nào</p>
 			</div>
 		);
 	}
 
 	return (
-		<div className='rounded-xl border border-zinc-800 bg-zinc-900/50 p-6'>
-			<h3 className='mb-4 text-lg font-semibold text-white'>Cần chú ý</h3>
+		<div className='rounded-2xl border border-border/60 bg-card/80 p-6 shadow-sm backdrop-blur-sm'>
+			<h3 className='mb-4 text-lg font-semibold text-foreground'>Cần chú ý</h3>
 			<div className='space-y-3'>
 				{items?.map((item) => {
 					const meta = getAttentionMeta(item, workspaceSlug);
@@ -61,7 +61,7 @@ export function NeedsAttention({ workspaceSlug, items }: NeedsAttentionProps) {
 							key={item.id}
 							href={meta.href}
 							className={cn(
-								"flex items-center gap-3 rounded-lg border p-3 transition-all duration-200",
+								"flex items-center gap-3 rounded-xl border p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-md",
 								getToneStyles(meta.tone),
 							)}
 						>
@@ -72,7 +72,7 @@ export function NeedsAttention({ workspaceSlug, items }: NeedsAttentionProps) {
 								<span className='text-[10px] font-bold uppercase tracking-wider opacity-70'>
 									{meta.badge}
 								</span>
-								<span className='text-sm font-medium text-white'>
+								<span className='text-[13px] font-semibold text-foreground'>
 									{meta.buildText(item)}
 								</span>
 							</div>

@@ -1,11 +1,17 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { ChevronDown, Ellipsis } from "lucide-react";
+import { ChevronDown, Ellipsis, MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
 	Select,
 	SelectContent,
@@ -188,13 +194,13 @@ const SprintProjectSection = ({
 		setOpen(!open);
 	};
 	return (
-		<Card className='overflow-hidden py-0! flex flex-col gap-0 rounded-2xl border-neutral-800 bg-neutral-950/20'>
-			<div className='flex items-center justify-between gap-4 border-b border-neutral-800 bg-neutral-900/40 px-4 py-3'>
+		<Card className='overflow-hidden py-0! flex flex-col gap-0 rounded-2xl border-border bg-muted/50'>
+			<div className='flex items-center justify-between gap-4 border-b border-border bg-muted/50 px-4 py-3'>
 				<div className='flex items-center gap-3'>
 					<Button
 						variant='ghost'
 						size='icon'
-						className='size-7 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100 transition-colors'
+						className='size-7 text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground hover:hover:text-foreground transition-colors'
 						onClick={handleOpenTable}
 					>
 						<ChevronDown
@@ -207,57 +213,80 @@ const SprintProjectSection = ({
 
 					<div className='flex flex-col gap-1'>
 						<div className='flex items-center gap-2'>
-							<span className='text-[14px] font-semibold text-neutral-100'>
+							<span className='text-[14px] font-semibold text-foreground'>
 								{sprint.name}
 							</span>
-							<span className='text-[12px] font-medium text-neutral-500'>
+							<span className='text-[12px] font-medium text-muted-foreground'>
 								({tasks.length} work items)
 							</span>
 						</div>
 					</div>
 				</div>
 
-				{status === SprintStatus.PLANNED ? (
-					<RequirePermission
-						workspaceId={workspaceId}
-						code={PERMISSIONS.SPRINT_START}
-					>
-						<StartSprintDialog
-							defaultSprintName={sprint.name}
-							projectId={projectId}
-							sprintId={sprint.id}
+				<div className='flex items-center gap-2'>
+					{status === SprintStatus.PLANNED || String(status).toUpperCase() === "PLANNED" ? (
+						<RequirePermission
 							workspaceId={workspaceId}
-							workItemCount={tasks?.length ?? 0}
-						></StartSprintDialog>
-					</RequirePermission>
-				) : status === SprintStatus.ACTIVE ? (
-					<RequirePermission
-						workspaceId={workspaceId}
-						code={PERMISSIONS.SPRINT_COMPLETE}
-					>
-						<CompleteSprintDialog
-							defaultSprintName={sprint.name}
-							projectId={projectId}
-							sprintId={sprint.id}
+							code={PERMISSIONS.SPRINT_START}
+						>
+							<StartSprintDialog
+								defaultSprintName={sprint.name}
+								projectId={projectId}
+								sprintId={sprint.id}
+								workspaceId={workspaceId}
+								workItemCount={tasks?.length ?? 0}
+							></StartSprintDialog>
+						</RequirePermission>
+					) : status === SprintStatus.ACTIVE || String(status).toUpperCase() === "ACTIVE" ? (
+						<RequirePermission
 							workspaceId={workspaceId}
-							completedWorkItemCount={
-								tasks?.filter(
-									(task: any) => task.status?.isDone === true,
-								).length ?? 0
-							}
-							openWorkItemCount={
-								tasks?.filter(
-									(task: any) => task.status?.isDone !== true,
-								).length ?? 0
-							}
-						/>
-					</RequirePermission>
-				) : null}
+							code={PERMISSIONS.SPRINT_COMPLETE}
+						>
+							<CompleteSprintDialog
+								defaultSprintName={sprint.name}
+								projectId={projectId}
+								sprintId={sprint.id}
+								workspaceId={workspaceId}
+								completedWorkItemCount={
+									tasks?.filter(
+										(task: any) => task.status?.isDone === true,
+									).length ?? 0
+								}
+								openWorkItemCount={
+									tasks?.filter(
+										(task: any) => task.status?.isDone !== true,
+									).length ?? 0
+								}
+							/>
+						</RequirePermission>
+					) : null}
+
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button
+								variant='ghost'
+								size='icon'
+								className='size-8 text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground transition-colors'
+							>
+								<MoreHorizontal className='size-4' />
+							</Button>
+						</DropdownMenuTrigger>
+
+						<DropdownMenuContent align='end' className="bg-popover border-border rounded-xl min-w-[160px]">
+							<DropdownMenuItem className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">
+								Edit sprint
+							</DropdownMenuItem>
+							<DropdownMenuItem className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">
+								Delete sprint
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
 			</div>
 
 			{open ? (
 				<div className='flex flex-col gap-6 p-4'>
-					<div className='overflow-x-auto rounded-xl border border-neutral-800/50 bg-neutral-950/30'>
+					<div className='overflow-x-auto rounded-xl border border-border/50 bg-muted/50'>
 						<TableBacklog tasks={tasks} containerId={containerId} />
 					</div>
 				</div>

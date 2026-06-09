@@ -20,7 +20,9 @@ import {
 	UserRound,
 } from "lucide-react";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { DrawerItemView } from "@/components/drawer/DrawerItemView";
+import type { TaskItem } from "@/services/task/type";
 
 type ViewKey = "worked" | "viewed" | "assigned" | "starred" | "boards";
 
@@ -77,8 +79,8 @@ const getTaskStateLabel = (task: DashboardTaskResponseDto) => {
 const getTaskStateClass = (task: DashboardTaskResponseDto) => {
 	const label = getTaskStateLabel(task);
 
-	if (label === "Overdue") return "text-red-400";
-	if (label === "Due today") return "text-blue-300";
+	if (label === "Overdue") return "text-red-500 dark:text-red-400";
+	if (label === "Due today") return "text-blue-500 dark:text-blue-400";
 
 	return "text-muted-foreground";
 };
@@ -108,10 +110,68 @@ function uniqueTasks(tasks: DashboardTaskResponseDto[]) {
 
 function LoadingForYou() {
 	return (
-		<main className='flex min-h-0 min-w-0 flex-1 flex-col gap-8 overflow-y-auto pb-10'>
-			<Skeleton className='h-12 w-64 rounded-xl border border-neutral-800 bg-neutral-900/40' />
-			<Skeleton className='h-48 w-full rounded-2xl border border-neutral-800 bg-neutral-900/40' />
-			<Skeleton className='h-[600px] w-full rounded-2xl border border-neutral-800 bg-neutral-900/40' />
+		<main className='flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto pb-10 px-2'>
+			<div className='flex w-full min-w-0 flex-col gap-10 max-w-7xl'>
+				<header className='border-b border-border/60 pb-6 pt-4'>
+					<Skeleton className='h-9 w-40 rounded-lg' />
+					<Skeleton className='mt-3 h-5 w-96 rounded-md' />
+				</header>
+
+				<section className='space-y-5'>
+					<div className='flex items-center justify-between gap-4 px-1'>
+						<Skeleton className='h-5 w-32 rounded-md' />
+						<Skeleton className='h-4 w-24 rounded-md' />
+					</div>
+
+					<div className='grid gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]'>
+						{Array.from({ length: 4 }).map((_, index) => (
+							<div key={index} className='flex flex-col h-[220px] rounded-xl border border-border/50 bg-card/60 p-4 shadow-sm'>
+								<div className="flex items-start gap-3">
+									<Skeleton className="size-8 rounded-lg" />
+									<div className="space-y-2 flex-1 mt-0.5">
+										<Skeleton className="h-4 w-3/4 rounded-md" />
+										<Skeleton className="h-3 w-1/2 rounded-md" />
+									</div>
+								</div>
+								<div className="mt-6 flex-1 space-y-3">
+									<Skeleton className="h-3 w-20 rounded-md" />
+									<Skeleton className="h-8 w-full rounded-md" />
+									<Skeleton className="h-8 w-full rounded-md" />
+								</div>
+								<Skeleton className="mt-4 h-4 w-24 rounded-md" />
+							</div>
+						))}
+					</div>
+				</section>
+
+				<section className='min-w-0'>
+					<div className='flex gap-6 border-b border-border/60 pb-3'>
+						{Array.from({ length: 4 }).map((_, index) => (
+							<Skeleton key={index} className='h-6 w-32 rounded-md' />
+						))}
+					</div>
+
+					<div className='pt-6'>
+						<Skeleton className='mb-4 h-4 w-28 rounded-md' />
+
+						<div className='flex flex-col gap-1'>
+							{Array.from({ length: 5 }).map((_, index) => (
+								<div key={index} className='flex items-center justify-between p-3 rounded-xl border border-border/40 bg-card/40'>
+									<div className='flex items-center gap-3'>
+										<Skeleton className='size-4 rounded-sm' />
+										<Skeleton className='h-4 w-64 rounded-md' />
+										<Skeleton className='h-5 w-16 rounded-full' />
+									</div>
+									<div className='flex items-center gap-4'>
+										<Skeleton className='h-4 w-32 rounded-md' />
+										<Skeleton className='h-6 w-20 rounded-full' />
+									</div>
+								</div>
+							))}
+						</div>
+					</div>
+				</section>
+			</div>
 		</main>
 	);
 }
@@ -126,50 +186,50 @@ function RecentSpaceCard({
 	doneCount: number;
 }) {
 	return (
-		<div className='group flex h-full flex-col min-w-0 overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900/40 transition-all duration-200 hover:border-neutral-700 hover:bg-neutral-900/60 shadow-sm'>
+		<div className='group flex h-full flex-col min-w-0 overflow-hidden rounded-xl border border-border bg-card transition-all duration-200 hover:border-primary/30 hover:bg-accent/50 shadow-sm'>
 			<div className='flex h-full'>
 				<div className='w-1.5 shrink-0 bg-blue-500/80 transition-colors group-hover:bg-blue-400' />
 				<div className='flex flex-1 flex-col min-w-0 p-4'>
 					<div className='flex items-start gap-3'>
-						<div className='flex size-8 shrink-0 items-center justify-center rounded-lg border border-blue-500/20 bg-blue-500/10 text-blue-400 shadow-sm'>
+						<div className='flex size-8 shrink-0 items-center justify-center rounded-lg border border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-400 shadow-sm'>
 							<FolderKanban className='size-4' />
 						</div>
 						<div className='min-w-0 flex-1 mt-0.5'>
-							<p className='truncate text-sm font-semibold text-neutral-100'>
+							<p className='truncate text-sm font-semibold text-foreground group-hover:text-primary transition-colors'>
 								{workspace.name}
 							</p>
-							<p className='mt-0.5 truncate text-xs text-neutral-500'>
+							<p className='mt-0.5 truncate text-xs text-muted-foreground'>
 								Team workspace
 							</p>
 						</div>
 					</div>
 
 					<div className='mt-4 flex-1 space-y-2'>
-						<p className='text-[10px] font-semibold uppercase tracking-wide text-neutral-500'>
+						<p className='text-[10px] font-semibold uppercase tracking-wide text-muted-foreground'>
 							Quick links
 						</p>
 						<div className='flex flex-col gap-1.5'>
-							<div className='flex items-center justify-between gap-2 rounded-md p-1 transition-colors hover:bg-neutral-800/50 -mx-1 px-1.5'>
+							<div className='flex items-center justify-between gap-2 rounded-md p-1 transition-colors hover:bg-muted -mx-1 px-1.5'>
 								<Link
 									href='/dashboard/my-tasks'
-									className='truncate text-xs font-medium text-neutral-300 hover:text-neutral-100 transition-colors flex-1'
+									className='truncate text-xs font-medium text-muted-foreground hover:text-foreground transition-colors flex-1'
 								>
 									My open work items
 								</Link>
-								<Badge className='h-5 min-w-[20px] justify-center rounded-md border-neutral-700 bg-neutral-800 px-1.5 text-[11px] font-semibold text-neutral-300 hover:bg-neutral-700'>
+								<Badge variant='secondary' className='h-5 min-w-[20px] justify-center rounded-md border-border bg-muted px-1.5 text-[11px] font-semibold text-foreground hover:bg-muted/80'>
 									{openWorkCount}
 								</Badge>
 							</div>
-							<div className='flex items-center justify-between gap-2 rounded-md p-1 transition-colors hover:bg-neutral-800/50 -mx-1 px-1.5'>
+							<div className='flex items-center justify-between gap-2 rounded-md p-1 transition-colors hover:bg-muted -mx-1 px-1.5'>
 								<Link
 									href='/dashboard/my-tasks'
-									className='truncate text-xs font-medium text-neutral-300 hover:text-neutral-100 transition-colors flex-1'
+									className='truncate text-xs font-medium text-muted-foreground hover:text-foreground transition-colors flex-1'
 								>
 									Done work items
 								</Link>
 								<Badge
 									variant='secondary'
-									className='h-5 min-w-[20px] justify-center rounded-md border-neutral-800 bg-neutral-900 px-1.5 text-[11px] font-semibold text-neutral-500 hover:bg-neutral-800'
+									className='h-5 min-w-[20px] justify-center rounded-md border-border bg-muted px-1.5 text-[11px] font-semibold text-foreground hover:bg-muted/80'
 								>
 									{doneCount}
 								</Badge>
@@ -177,50 +237,101 @@ function RecentSpaceCard({
 						</div>
 					</div>
 
-					<div className='mt-4 flex items-center gap-1.5 border-t border-neutral-800/60 pt-3 text-xs font-medium text-neutral-500'>
+					<div className='mt-4 flex items-center gap-1.5 border-t border-border pt-3 text-xs font-medium text-muted-foreground'>
 						<span>{workspace.projectCount || 1} {workspace.projectCount === 1 ? 'project' : 'projects'}</span>
 					</div>
 				</div>
 			</div>
 		</div>
+
 	);
 }
+
+const mapDashboardTaskToTaskItem = (task: DashboardTaskResponseDto): TaskItem => {
+	return {
+		id: task.id,
+		workspaceId: task.workspaceId,
+		projectId: task.projectId,
+		sprintId: null,
+		sprintName: null,
+		projectSeq: null,
+		title: task.title,
+		description: null,
+		statusId: task.statusName || "",
+		statusName: task.statusName,
+		priorityId: task.priorityLevel ? String(task.priorityLevel) : null,
+		priorityName: task.priorityName,
+		createdBy: "",
+		assignees: [],
+		startAt: task.startAt,
+		dueAt: task.dueAt,
+		completedAt: null,
+		estimateMinutes: task.estimateMinutes,
+		createdAt: new Date().toISOString(),
+		updatedAt: new Date().toISOString(),
+	};
+};
 
 function WorkItemRow({
 	task,
 	index,
 	displayName,
+	onClick,
 }: {
 	task: DashboardTaskResponseDto;
 	index: number;
 	displayName?: string;
+	onClick?: (task: DashboardTaskResponseDto) => void;
 }) {
 	return (
-		<div className='group grid grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-4 rounded-xl px-3 py-3 transition-colors hover:bg-neutral-900/40 -mx-3'>
-			<div className='flex size-9 items-center justify-center rounded-lg border border-neutral-800 bg-neutral-900 text-neutral-400 transition-colors group-hover:bg-neutral-800 group-hover:text-neutral-200'>
+		<div
+			role="button"
+			tabIndex={0}
+			onClick={() => onClick?.(task)}
+			onKeyDown={(e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					onClick?.(task);
+				}
+			}}
+			className='cursor-pointer group grid grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-4 rounded-xl px-3 py-3 transition-colors hover:bg-muted/50 -mx-3'
+		>
+			<div className='flex size-9 items-center justify-center rounded-lg border border-border bg-muted/30 text-muted-foreground transition-colors group-hover:bg-muted group-hover:text-foreground'>
 				<ClipboardList className='size-4' />
 			</div>
 
 			<div className='min-w-0'>
-				<p className='truncate text-[14px] font-semibold text-neutral-200 group-hover:text-neutral-100 transition-colors'>{task.title}</p>
-				<div className='mt-1.5 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-[11px] font-medium text-neutral-500'>
-					<span className="uppercase tracking-wider">{formatTaskKey(task, index)}</span>
-					<span className="text-neutral-700">•</span>
+				<p className='truncate text-[14px] font-semibold text-foreground transition-colors group-hover:text-primary'>{task.title}</p>
+				<div className='mt-1.5 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-[11px] font-medium text-muted-foreground'>
+					<span className="uppercase tracking-wider text-muted-foreground/80">{formatTaskKey(task, index)}</span>
+					<span className="text-muted-foreground/50">•</span>
 					<span className='truncate'>{task.projectName}</span>
-					<span className="text-neutral-700">•</span>
+					<span className="text-muted-foreground/50">•</span>
 					<span className='truncate'>{task.workspaceName}</span>
 				</div>
 			</div>
 
-			<div className='flex min-w-[120px] items-center justify-end gap-4'>
-				<span className={cn("hidden sm:inline text-[12px] font-medium", getTaskStateClass(task))}>
+			<div className='flex min-w-[200px] items-center justify-end gap-4'>
+				<div className='hidden sm:flex items-center gap-2'>
+					{task.priorityName && (
+						<span className="rounded-md border border-border bg-muted/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+							{task.priorityName}
+						</span>
+					)}
+					<span className="rounded-md border border-border bg-muted/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-foreground">
+						{task.statusName || "To do"}
+					</span>
+				</div>
+				<span className={cn("hidden md:inline text-[12px] font-medium min-w-[70px] text-right", getTaskStateClass(task))}>
 					{getTaskStateLabel(task)}
 				</span>
-				<div className='flex size-8 shrink-0 items-center justify-center rounded-full border border-neutral-700 bg-neutral-800 text-[10px] font-bold tracking-wider text-neutral-300 shadow-sm'>
+				<div className='flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-muted text-[10px] font-bold tracking-wider text-foreground shadow-sm'>
 					{getInitials(displayName)}
 				</div>
 			</div>
 		</div>
+
+
 	);
 }
 
@@ -228,19 +339,19 @@ function BoardRow({ workspace }: { workspace: DashboardWorkspaceResponseDto }) {
 	return (
 		<Link
 			href={`/dashboard/${workspace.slug}`}
-			className='group grid grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-4 rounded-xl px-3 py-3 transition-colors hover:bg-neutral-900/40 -mx-3'
+			className='group grid grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-4 rounded-xl px-3 py-3 transition-colors hover:bg-muted/50 -mx-3'
 		>
-			<div className='flex size-9 items-center justify-center rounded-lg border border-neutral-800 bg-neutral-900 text-blue-500/80 transition-colors group-hover:bg-neutral-800 group-hover:text-blue-400'>
+			<div className='flex size-9 items-center justify-center rounded-lg border border-border bg-muted/30 text-blue-600 dark:text-blue-400 transition-colors group-hover:bg-muted group-hover:text-blue-500'>
 				<BriefcaseBusiness className='size-4' />
 			</div>
 			<div className='min-w-0'>
-				<p className='truncate text-[14px] font-semibold text-neutral-200 group-hover:text-neutral-100 transition-colors'>{workspace.name}</p>
-				<p className='mt-1.5 text-[11px] font-medium text-neutral-500'>
-					{workspace.projectCount} {workspace.projectCount === 1 ? 'project' : 'projects'} <span className="text-neutral-700 mx-1">•</span> {workspace.openTaskCount} open
+				<p className='truncate text-[14px] font-semibold text-foreground group-hover:text-primary transition-colors'>{workspace.name}</p>
+				<p className='mt-1.5 text-[11px] font-medium text-muted-foreground'>
+					{workspace.projectCount} {workspace.projectCount === 1 ? 'project' : 'projects'} <span className="text-muted-foreground/50 mx-1">•</span> {workspace.openTaskCount} open
 					tasks
 				</p>
 			</div>
-			<span className='text-[12px] font-semibold text-blue-400 opacity-0 transition-all group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0'>
+			<span className='text-[12px] font-semibold text-blue-600 dark:text-blue-400 opacity-0 transition-all group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0'>
 				Open
 			</span>
 		</Link>
@@ -248,6 +359,12 @@ function BoardRow({ workspace }: { workspace: DashboardWorkspaceResponseDto }) {
 }
 
 export default function MyTasksPage() {
+	const [selectedTask, setSelectedTask] = useState<TaskItem | null>(null);
+
+	const handleTaskClick = (task: DashboardTaskResponseDto) => {
+		setSelectedTask(mapDashboardTaskToTaskItem(task));
+	};
+
 	const query = useMemo(
 		() => ({
 			date: toLocalDateInputValue(),
@@ -275,11 +392,11 @@ export default function MyTasksPage() {
 	if (isError || !dashboard) {
 		return (
 			<main className='flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto pb-10'>
-				<div className='rounded-2xl border border-neutral-800 bg-neutral-950/20 p-8'>
-					<h1 className='text-xl font-bold tracking-tight text-neutral-100'>
+				<div className='rounded-2xl border border-border bg-muted/20 p-8'>
+					<h1 className='text-xl font-bold tracking-tight text-foreground'>
 						Failed to load tasks
 					</h1>
-					<p className='mt-2 text-sm text-neutral-500'>
+					<p className='mt-2 text-sm text-muted-foreground'>
 						Please refresh the page to try again.
 					</p>
 				</div>
@@ -304,56 +421,56 @@ export default function MyTasksPage() {
 		count?: number;
 		icon: typeof ListTodo;
 	}[] = [
-		{
-			key: "worked",
-			label: "Worked on",
-			count: tasks.length,
-			icon: ListTodo,
-		},
-		{
-			key: "viewed",
-			label: "Viewed",
-			count: dashboard.recentDeadlines.length,
-			icon: Eye,
-		},
-		{
-			key: "assigned",
-			label: "Assigned to me",
-			count: tasks.length,
-			icon: UserRound,
-		},
-		{
-			key: "starred",
-			label: "Starred",
-			count: 0,
-			icon: Star,
-		},
-		{
-			key: "boards",
-			label: "Boards",
-			count: dashboard.recentWorkspaces.length,
-			icon: BriefcaseBusiness,
-		},
-	];
+			{
+				key: "worked",
+				label: "Worked on",
+				count: tasks.length,
+				icon: ListTodo,
+			},
+			{
+				key: "viewed",
+				label: "Viewed",
+				count: dashboard.recentDeadlines.length,
+				icon: Eye,
+			},
+			{
+				key: "assigned",
+				label: "Assigned to me",
+				count: tasks.length,
+				icon: UserRound,
+			},
+			{
+				key: "starred",
+				label: "Starred",
+				count: 0,
+				icon: Star,
+			},
+			{
+				key: "boards",
+				label: "Boards",
+				count: dashboard.recentWorkspaces.length,
+				icon: BriefcaseBusiness,
+			},
+		];
 
 	return (
 		<main className='flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto pb-10 px-2'>
 			<div className='flex w-full min-w-0 flex-col gap-10 max-w-7xl'>
-				<header className='border-b border-neutral-800/60 pb-6 pt-4'>
-					<h1 className='text-3xl font-bold tracking-tight text-neutral-100'>
+				<header className='border-b border-border/60 pb-6 pt-4'>
+					<h1 className='text-3xl font-bold tracking-tight text-foreground'>
 						For you
 					</h1>
-					<p className='mt-2 text-[14px] text-neutral-500'>
+					<p className='mt-2 text-[14px] text-muted-foreground'>
 						A quick overview of your active tasks and recent workspaces.
 					</p>
 				</header>
 
 				<section className='space-y-5'>
 					<div className='flex items-center justify-between gap-4 px-1'>
-						<h2 className='text-[15px] font-semibold text-neutral-200'>Recent spaces</h2>
+						<h2 className='text-[15px] font-semibold text-foreground'>Recent spaces</h2>
 						<Link
 							href='/dashboard'
-							className='text-[13px] font-semibold text-neutral-400 hover:text-neutral-100 transition-colors'
+							className='text-[13px] font-semibold text-muted-foreground hover:text-foreground transition-colors'
 						>
 							View all spaces
 						</Link>
@@ -373,7 +490,7 @@ export default function MyTasksPage() {
 							))}
 						</div>
 					) : (
-						<div className='rounded-2xl border border-dashed border-neutral-800 bg-neutral-950/20 p-8 text-center text-[13px] font-medium text-neutral-500'>
+						<div className='rounded-2xl border border-dashed border-border bg-muted/20 p-8 text-center text-[13px] font-medium text-muted-foreground'>
 							No recent workspaces found.
 						</div>
 					)}
@@ -383,7 +500,7 @@ export default function MyTasksPage() {
 					<Tabs defaultValue='worked' className='w-full gap-0'>
 						<TabsList
 							variant='line'
-							className='h-auto w-full justify-start gap-6 border-b border-neutral-800/60 p-0'
+							className='h-auto w-full justify-start gap-6 border-b border-border/60 p-0'
 						>
 							{viewItems.map((item) => {
 								const Icon = item.icon;
@@ -392,12 +509,12 @@ export default function MyTasksPage() {
 									<TabsTrigger
 										key={item.key}
 										value={item.key}
-										className='h-12 flex-none gap-2 rounded-none px-1 text-[14px] font-medium text-neutral-400 hover:text-neutral-200 data-[state=active]:text-neutral-100 data-[state=active]:font-semibold data-[state=active]:shadow-none transition-colors after:bg-neutral-100 data-[state=active]:[&_.tab-count]:bg-neutral-800 data-[state=active]:[&_.tab-count]:text-neutral-200'
+										className='h-12 flex-none gap-2 rounded-none px-1 text-[14px] font-medium text-muted-foreground hover:text-foreground data-[state=active]:text-foreground data-[state=active]:font-semibold data-[state=active]:shadow-none transition-colors after:bg-foreground data-[state=active]:[&_.tab-count]:bg-muted data-[state=active]:[&_.tab-count]:text-foreground'
 									>
 										<Icon className='size-4' />
 										<span>{item.label}</span>
 										{typeof item.count === "number" ? (
-											<span className='tab-count rounded-md bg-neutral-900/60 border border-neutral-800/60 px-2 py-0.5 text-[11px] font-bold text-neutral-500 transition-colors'>
+											<span className='tab-count rounded-md bg-muted/60 border border-border/60 px-2 py-0.5 text-[11px] font-bold text-muted-foreground transition-colors'>
 												{item.count}
 											</span>
 										) : null}
@@ -407,7 +524,7 @@ export default function MyTasksPage() {
 						</TabsList>
 
 						<div className='pt-6'>
-							<p className='mb-4 px-1 text-[11px] font-bold uppercase tracking-wider text-neutral-500'>
+							<p className='mb-4 px-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground'>
 								In the last month
 							</p>
 
@@ -423,10 +540,11 @@ export default function MyTasksPage() {
 													dashboard.greeting
 														.displayName
 												}
+												onClick={handleTaskClick}
 											/>
 										))
 									) : (
-										<div className='rounded-2xl border border-dashed border-neutral-800 bg-neutral-950/20 p-8 text-center text-[13px] font-medium text-neutral-500 mt-2'>
+										<div className='rounded-2xl border border-dashed border-border bg-muted/20 p-8 text-center text-[13px] font-medium text-muted-foreground mt-2'>
 											No matching work items found.
 										</div>
 									)}
@@ -446,11 +564,12 @@ export default function MyTasksPage() {
 														dashboard.greeting
 															.displayName
 													}
+													onClick={handleTaskClick}
 												/>
 											),
 										)
 									) : (
-										<div className='rounded-2xl border border-dashed border-neutral-800 bg-neutral-950/20 p-8 text-center text-[13px] font-medium text-neutral-500 mt-2'>
+										<div className='rounded-2xl border border-dashed border-border bg-muted/20 p-8 text-center text-[13px] font-medium text-muted-foreground mt-2'>
 											No viewed work items found.
 										</div>
 									)}
@@ -469,10 +588,11 @@ export default function MyTasksPage() {
 													dashboard.greeting
 														.displayName
 												}
+												onClick={handleTaskClick}
 											/>
 										))
 									) : (
-										<div className='rounded-2xl border border-dashed border-neutral-800 bg-neutral-950/20 p-8 text-center text-[13px] font-medium text-neutral-500 mt-2'>
+										<div className='rounded-2xl border border-dashed border-border bg-muted/20 p-8 text-center text-[13px] font-medium text-muted-foreground mt-2'>
 											No assigned work items found.
 										</div>
 									)}
@@ -480,7 +600,7 @@ export default function MyTasksPage() {
 							</TabsContent>
 
 							<TabsContent value='starred' className='mt-0'>
-								<div className='rounded-2xl border border-dashed border-neutral-800 bg-neutral-950/20 p-8 text-center text-[13px] font-medium text-neutral-500 mt-2'>
+								<div className='rounded-2xl border border-dashed border-border bg-muted/20 p-8 text-center text-[13px] font-medium text-muted-foreground mt-2'>
 									No starred work items found.
 								</div>
 							</TabsContent>
@@ -501,6 +621,16 @@ export default function MyTasksPage() {
 					</Tabs>
 				</section>
 			</div>
+			{selectedTask && (
+				<DrawerItemView
+					open={!!selectedTask}
+					onOpenChange={(open) => {
+						if (!open) setSelectedTask(null);
+					}}
+					task={selectedTask}
+				/>
+			)}
 		</main>
 	);
 }
+

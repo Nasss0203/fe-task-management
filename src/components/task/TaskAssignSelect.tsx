@@ -88,14 +88,14 @@ export const TaskAssigneeSelect = ({
 										<AvatarImage
 											src={member.avatarUrl ?? undefined}
 										/>
-										<AvatarFallback className='bg-neutral-800 text-[10px] text-neutral-200'>
+										<AvatarFallback className='bg-muted text-[10px] text-foreground'>
 											{getInitials(member.name)}
 										</AvatarFallback>
 									</Avatar>
 								))}
 							</div>
 
-							<span className='max-w-[160px] truncate text-neutral-300'>
+							<span className='max-w-[160px] truncate text-foreground'>
 								{selectedMembers.length === 1
 									? selectedMembers[0].name
 									: `${selectedMembers.length} người được giao`}
@@ -140,7 +140,7 @@ export const TaskAssigneeSelect = ({
 													undefined
 												}
 											/>
-											<AvatarFallback className='bg-neutral-800 text-xs text-neutral-200'>
+											<AvatarFallback className='bg-muted text-xs text-foreground'>
 												{getInitials(member.name)}
 											</AvatarFallback>
 										</Avatar>

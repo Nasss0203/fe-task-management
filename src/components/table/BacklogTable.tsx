@@ -25,11 +25,11 @@ const BacklogTable = <TData, TValue>({
 	return (
 		<div
 			className={cn(
-				"min-h-0 min-w-0 flex-1 overflow-x-auto overflow-y-auto rounded-xl border border-border bg-card shadow-sm",
+				"min-h-0 min-w-0 flex-1 flex flex-col rounded-xl border border-border bg-card shadow-sm",
 				className,
 			)}
 		>
-			<Table className='w-full min-w-[720px] table-fixed'>
+			<Table containerClassName='flex-1 min-h-0 overflow-auto' className='w-full min-w-[720px] table-fixed'>
 				<TableHeader>
 					{table.getHeaderGroups().map((headerGroup) => (
 						<TableRow

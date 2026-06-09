@@ -37,7 +37,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo, useState, Suspense } from "react";
 import { toast } from "sonner";
 
 const PLAN_FEATURES = [
@@ -82,7 +82,7 @@ const formatCurrency = (amount: number, currency = "VND") =>
 		maximumFractionDigits: 0,
 	}).format(amount);
 
-export default function UpgradeBillingPage() {
+function UpgradeBillingContent() {
 	const [billingInterval, setBillingInterval] =
 		useState<BillingInterval>("MONTH");
 	const [selectedProvider, setSelectedProvider] = useState<BillingProvider>(
@@ -412,5 +412,13 @@ export default function UpgradeBillingPage() {
 				</div>
 			</div>
 		</main>
+	);
+}
+
+export default function UpgradeBillingPage() {
+	return (
+		<Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading...</div>}>
+			<UpgradeBillingContent />
+		</Suspense>
 	);
 }

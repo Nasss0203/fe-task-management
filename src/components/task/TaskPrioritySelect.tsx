@@ -58,7 +58,7 @@ const TaskPrioritySelect = ({
 				<SelectContent
 					align='start'
 					position='popper'
-					className='z-[9999] min-w-[160px] rounded-xl border border-neutral-800 bg-neutral-950 p-1 shadow-2xl'
+					className='z-[9999] min-w-[160px] rounded-xl border border-border bg-background p-1 shadow-2xl'
 				>
 					{safePriorities.map((priority) => {
 						const style = getUserFacingPriorityStyle(priority.name);
@@ -70,8 +70,8 @@ const TaskPrioritySelect = ({
 								key={itemValue}
 								value={itemValue}
 								className={cn(
-									"cursor-pointer rounded-lg px-2.5 py-1.5 text-xs transition-colors focus:bg-neutral-900 focus:text-neutral-100",
-									isSelected ? "bg-neutral-900/50 text-neutral-100" : "text-neutral-300"
+									"cursor-pointer rounded-lg px-2.5 py-1.5 text-xs transition-colors focus:focus:bg-accent focus:text-foreground",
+									isSelected ? "bg-muted/50 text-foreground" : "text-foreground"
 								)}
 							>
 								<div className='flex items-center gap-2.5'>

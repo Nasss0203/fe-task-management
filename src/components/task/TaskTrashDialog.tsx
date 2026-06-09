@@ -62,15 +62,15 @@ const TaskTrashDialog = ({
 				data-prevent-open-detail='true'
 				onClick={(event) => event.stopPropagation()}
 				onPointerDown={(event) => event.stopPropagation()}
-				className='border-neutral-800 bg-neutral-950 text-neutral-100 sm:max-w-md'
+				className='border-border bg-background text-foreground sm:max-w-md'
 			>
 				<DialogHeader>
 					<DialogTitle>Chuyen task vao Thung rac?</DialogTitle>
-					<DialogDescription className='text-neutral-400'>
+					<DialogDescription className='text-muted-foreground'>
 						{taskCount === 1 ? (
 							<>
 								Task{" "}
-								<span className='font-medium text-neutral-200'>
+								<span className='font-medium text-foreground'>
 									{firstTaskTitle}
 								</span>{" "}
 								se bi an khoi backlog va board. Ban co the khoi
@@ -78,7 +78,7 @@ const TaskTrashDialog = ({
 							</>
 						) : (
 							<>
-								<span className='font-medium text-neutral-200'>
+								<span className='font-medium text-foreground'>
 									{taskCount} task
 								</span>{" "}
 								se bi an khoi backlog va board. Ban co the khoi

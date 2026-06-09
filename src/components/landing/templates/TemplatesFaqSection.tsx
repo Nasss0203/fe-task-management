@@ -70,8 +70,8 @@ function FaqCard({
 			className={cn(
 				"overflow-hidden rounded-2xl border transition-all duration-300",
 				open
-					? "border-white/20 text-white bg-[rgba(255,255,255,0.08)]"
-					: "border-white/10 text-white bg-[rgba(255,255,255,0.03)] hover:border-white/20 hover:bg-[rgba(255,255,255,0.05)]",
+					? "border-primary text-primary bg-primary/10"
+					: "border-border text-foreground bg-card hover:border-primary/50 hover:bg-muted",
 			)}
 		>
 			<button
@@ -79,14 +79,14 @@ function FaqCard({
 				onClick={onClick}
 				className='flex w-full items-start justify-between gap-4 px-5 py-5 text-left'
 			>
-				<span className='text-[15px] font-semibold leading-8 text-white'>
+				<span className='text-[15px] font-semibold leading-8 text-foreground'>
 					{question}
 				</span>
 
 				<ChevronDown
 					className={cn(
 						"mt-1 h-4 w-4 shrink-0 transition-transform duration-300",
-						open ? "rotate-180 text-white/80" : "text-white/60",
+						open ? "rotate-180 text-primary" : "text-muted-foreground",
 					)}
 				/>
 			</button>
@@ -97,8 +97,8 @@ function FaqCard({
 					open ? "max-h-60 opacity-100" : "max-h-0 opacity-0",
 				)}
 			>
-				<div className='border-t border-white/10 px-5 pb-5 pt-4'>
-					<p className='text-sm leading-8 text-white/70'>{answer}</p>
+				<div className='border-t border-border px-5 pb-5 pt-4'>
+					<p className='text-sm leading-8 text-muted-foreground'>{answer}</p>
 				</div>
 			</div>
 		</div>
@@ -116,7 +116,7 @@ function ToolBubble({
 		<div
 			className={cn(
 				"absolute flex h-[58px] w-[58px] items-center justify-center rounded-full",
-				"border border-white/10 bg-black/75 shadow-[0_0_0_1px_rgba(255,255,255,0.03)]",
+				"border border-border bg-card shadow-sm",
 				className,
 			)}
 		>
@@ -127,45 +127,45 @@ function ToolBubble({
 
 function ToolsMockup() {
 	return (
-		<div className='relative h-[340px] w-[560px] rounded-[18px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.03))]'>
-			<div className='absolute inset-0 rounded-[18px] bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06),transparent_58%)]' />
+		<div className='relative h-[340px] w-[560px] rounded-[18px] border border-border bg-gradient-to-b from-muted to-background'>
+			<div className='absolute inset-0 rounded-[18px] bg-primary/5' />
 
 			<ToolBubble className='left-8 top-8'>
-				<Slack className='h-5 w-5 text-white' />
+				<Slack className='h-5 w-5 text-foreground' />
 			</ToolBubble>
 
 			<ToolBubble className='left-[170px] top-8'>
-				<FolderKanban className='h-5 w-5 text-white' />
+				<FolderKanban className='h-5 w-5 text-foreground' />
 			</ToolBubble>
 
 			<ToolBubble className='right-8 top-8'>
-				<Grid3X3 className='h-5 w-5 text-white' />
+				<Grid3X3 className='h-5 w-5 text-foreground' />
 			</ToolBubble>
 
 			<ToolBubble className='left-8 top-[160px]'>
-				<Github className='h-5 w-5 text-white' />
+				<Github className='h-5 w-5 text-foreground' />
 			</ToolBubble>
 
 			<ToolBubble className='left-[170px] bottom-8'>
-				<div className='h-5 w-5 rounded-full border border-white/20 bg-blue-500' />
+				<div className='h-5 w-5 rounded-full border border-border bg-blue-500' />
 			</ToolBubble>
 
 			<ToolBubble className='left-[290px] bottom-8'>
-				<div className='h-5 w-5 rounded-full border border-white/20 bg-amber-400' />
+				<div className='h-5 w-5 rounded-full border border-border bg-amber-400' />
 			</ToolBubble>
 
 			<ToolBubble className='right-8 bottom-8'>
-				<div className='h-5 w-5 rounded-full border border-white/20 bg-emerald-500' />
+				<div className='h-5 w-5 rounded-full border border-border bg-emerald-500' />
 			</ToolBubble>
 
 			<div className='absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-4'>
 				<div className='h-5 w-5 rotate-45 bg-white' />
-				<span className='text-[32px] font-semibold text-white'>
+				<span className='text-[32px] font-semibold text-foreground'>
 					Taskmanly
 				</span>
 			</div>
 
-			<div className='absolute bottom-5 right-5 h-3 w-3 rounded-full bg-black/70' />
+			<div className='absolute bottom-5 right-5 h-3 w-3 rounded-full bg-foreground/50' />
 		</div>
 	);
 }
@@ -180,7 +180,7 @@ export default function TemplatesFaqSection() {
 	return (
 		<section className='py-16 md:py-20'>
 			<div className='mx-auto max-w-5xl'>
-				<h2 className='mb-10 text-center text-3xl font-semibold tracking-tight text-white md:text-4xl'>
+				<h2 className='mb-10 text-center text-3xl font-semibold tracking-tight text-foreground md:text-4xl'>
 					Frequently Asked Questions
 				</h2>
 
@@ -217,13 +217,13 @@ export default function TemplatesFaqSection() {
 				</div>
 
 				<div className='max-w-[430px] text-center md:text-left'>
-					<h3 className='text-3xl font-semibold leading-[1.12] text-white md:text-[48px]'>
+					<h3 className='text-3xl font-semibold leading-[1.12] text-foreground md:text-[48px]'>
 						Connect Your Tools to
 						<br />
 						Taskmanly
 					</h3>
 
-					<p className='mt-5 text-sm leading-8 text-white/60'>
+					<p className='mt-5 text-sm leading-8 text-muted-foreground'>
 						We have more than 200+ integrations, so you can use your
 						favorite work tools to communicate, collaborate, and
 						coordinate work in one place, from start to finish.
@@ -231,7 +231,7 @@ export default function TemplatesFaqSection() {
 
 					<Button
 						variant='outline'
-						className='mt-6 h-11 rounded-md border-white/15 bg-black px-6 text-sm font-medium text-white hover:bg-white hover:text-black'
+						className='mt-6 h-11 rounded-md border-white/15 bg-black px-6 text-sm font-medium text-foreground hover:bg-white hover:text-black'
 					>
 						Learn More
 					</Button>

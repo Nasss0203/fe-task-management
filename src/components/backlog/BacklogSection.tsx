@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, MoreHorizontal, RotateCcw, Trash2 } from "lucide-react";
+import { ChevronDown, MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -18,18 +18,7 @@ import TableBacklog from "../table/TableBacklog";
 import type { BacklogRenderContext } from "./types";
 import { cn } from "@/lib/utils";
 
-const formatDeletedAt = (value?: string | null) => {
-	if (!value) return "Unknown time";
 
-	const date = new Date(value);
-
-	if (Number.isNaN(date.getTime())) return "Unknown time";
-
-	return new Intl.DateTimeFormat("en-GB", {
-		dateStyle: "medium",
-		timeStyle: "short",
-	}).format(date);
-};
 
 type BacklogSectionProps = {
 	context?: BacklogRenderContext;
@@ -46,16 +35,12 @@ const BacklogSection = ({
 }: BacklogSectionProps) => {
 	const [open, setOpen] = useState<boolean>(true);
 	const isProjectContext = context === "project";
-	const { findTaskBacklog, deletedTasks, restoreTask } = useTask(
+	const { findTaskBacklog } = useTask(
 		workspaceId,
 		projectId,
 		undefined,
-		{
-			includeTrash: true,
-		},
 	);
 	const taskBacklog = findTaskBacklog.data?.data ?? [];
-	const deletedTaskItems = deletedTasks.data?.data ?? [];
 
 	const { createSprint } = useSprints({
 		projectId,
@@ -76,23 +61,23 @@ const BacklogSection = ({
 	};
 
 	return (
-		<Card className='overflow-hidden py-0! flex flex-col gap-0 rounded-2xl border-neutral-800 bg-neutral-950/20'>
-			<div className='flex items-center justify-between gap-4 border-b border-neutral-800 bg-neutral-900/40 px-4 py-3'>
+		<Card className='overflow-hidden py-0! flex flex-col gap-0 rounded-2xl border-border bg-muted/50'>
+			<div className='flex items-center justify-between gap-4 border-b border-border bg-muted/50 px-4 py-3'>
 				<div className='flex items-center gap-3'>
 					<Button
 						variant='ghost'
 						size='icon'
-						className='size-7 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100 transition-colors'
+						className='size-7 text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground hover:hover:text-foreground transition-colors'
 						onClick={handleOpenTable}
 					>
 						<ChevronDown className={cn("size-4 transition-transform duration-300", !open && "-rotate-90")} />
 					</Button>
 
 					<div className='flex items-center gap-2.5'>
-						<span className='text-[14px] font-semibold text-neutral-100'>
+						<span className='text-[14px] font-semibold text-foreground'>
 							Backlog
 						</span>
-						<span className='text-[12px] font-medium text-neutral-500'>
+						<span className='text-[12px] font-medium text-muted-foreground'>
 							{taskBacklog.length} items
 						</span>
 					</div>
@@ -103,7 +88,7 @@ const BacklogSection = ({
 						<Button
 							variant='outline'
 							size='sm'
-							className="h-8 rounded-lg border-neutral-700 bg-neutral-900 text-[12px] font-medium hover:bg-neutral-800 hover:border-neutral-600 transition-all text-neutral-200"
+							className="h-8 rounded-lg border-border bg-background text-[12px] font-medium hover:hover:bg-accent hover:text-accent-foreground hover:border-neutral-600 transition-all hover:text-foreground"
 							onClick={handleCreateSprint}
 						>
 							{createSprint.isPending
@@ -117,15 +102,15 @@ const BacklogSection = ({
 							<Button
 								variant='ghost'
 								size='icon'
-								className='size-8 text-neutral-400 hover:bg-neutral-800 transition-colors'
+								className='size-8 text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground transition-colors'
 							>
 								<MoreHorizontal className='size-4' />
 							</Button>
 						</DropdownMenuTrigger>
 
-						<DropdownMenuContent align='end' className="bg-neutral-950 border-neutral-800 rounded-xl min-w-[160px]">
-							<DropdownMenuItem className="text-xs text-neutral-300 focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer">Collapse</DropdownMenuItem>
-							<DropdownMenuItem className="text-xs text-neutral-300 focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer">Export tasks</DropdownMenuItem>
+						<DropdownMenuContent align='end' className="bg-popover border-border rounded-xl min-w-[160px]">
+							<DropdownMenuItem className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">Collapse</DropdownMenuItem>
+							<DropdownMenuItem className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">Export tasks</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
 				</div>
@@ -133,72 +118,10 @@ const BacklogSection = ({
 
 			{open ? (
 				<div className='flex flex-col gap-6 p-4'>
-					<div className="overflow-x-auto rounded-xl border border-neutral-800/50 bg-neutral-950/30">
+					<div className="overflow-x-auto rounded-xl border border-border/50 bg-muted/50">
 						<TableBacklog tasks={taskBacklog} containerId={containerId} />
 					</div>
 
-					<div className='rounded-2xl border border-dashed border-neutral-800 bg-neutral-900/10 p-5'>
-						<div className='flex items-center justify-between gap-3'>
-							<div className='flex items-center gap-3'>
-								<div className='flex size-8 items-center justify-center rounded-xl border border-neutral-800 bg-neutral-950 text-neutral-500 shadow-sm'>
-									<Trash2 className='size-4' />
-								</div>
-								<div>
-									<div className='text-[14px] font-semibold text-neutral-200'>
-										Recently deleted
-									</div>
-									<div className='text-[12px] text-neutral-500'>
-										Tasks deleted in the last 30 days will appear here.
-									</div>
-								</div>
-							</div>
-							<span className='text-[11px] font-medium text-neutral-500 uppercase tracking-wider'>
-								{deletedTaskItems.length} items
-							</span>
-						</div>
-
-						{deletedTaskItems.length > 0 && (
-							<div className='mt-5 space-y-2'>
-								{deletedTasks.isPending ? (
-									<div className='text-[12px] font-medium text-neutral-500 flex items-center justify-center h-12'>
-										Loading deleted tasks...
-									</div>
-								) : (
-									deletedTaskItems.map((task) => (
-										<div
-											key={task.id}
-											className='flex items-center justify-between gap-3 rounded-xl border border-neutral-800/60 bg-neutral-950/40 px-4 py-3 hover:bg-neutral-900/40 hover:border-neutral-700 transition-all shadow-sm'
-										>
-											<div className='min-w-0'>
-												<div className='truncate text-[13px] font-medium text-neutral-200'>
-													{task.title}
-												</div>
-												<div className='text-[11px] text-neutral-500 mt-0.5'>
-													Deleted on {formatDeletedAt(task.deletedAt)}
-												</div>
-											</div>
-
-											<Button
-												type='button'
-												variant='ghost'
-												size='sm'
-												className='h-8 shrink-0 rounded-lg text-[11px] font-semibold text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100 transition-colors'
-												onClick={() =>
-													restoreTask.mutate({
-														taskId: task.id,
-													})
-												}
-												disabled={restoreTask.isPending}
-											>
-												<RotateCcw className='mr-1.5 size-3.5' />
-												Restore
-											</Button>
-										</div>
-									))
-								)}
-							</div>
-						)}
-					</div>
 				</div>
 			) : null}
 		</Card>

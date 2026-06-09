@@ -68,7 +68,7 @@ export const getProjectHealthMeta = (health: string) => {
       className: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
     },
   };
-  return meta[health] || { label: health, className: 'bg-zinc-500/10 text-zinc-500 border-zinc-500/20' };
+  return meta[health] || { label: health, className: 'bg-zinc-500/10 text-muted-foreground border-zinc-500/20' };
 };
 
 export const getAttentionMeta = (item: WorkspaceOverviewAttentionItem, workspaceSlug: string) => {

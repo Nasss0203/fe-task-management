@@ -25,7 +25,7 @@ const TemplateSimple = () => {
 						type='button'
 						className={`rounded-2xl border p-5 text-left transition cursor-pointer`}
 					>
-						<div className='mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-800'>
+						<div className='mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-muted'>
 							<Icon size={18} />
 						</div>
 
