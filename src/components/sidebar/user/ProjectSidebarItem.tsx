@@ -11,6 +11,8 @@ import {
 
 import DialogAddTask from "@/components/dialog/DialogAddTask";
 import ProjectDropdown from "@/components/project/ProjectDropdown";
+import { PERMISSIONS } from "@/constants/permissions";
+import { RequirePermission } from "@/features/permission/components/RequirePermission";
 import { useSprints } from "@/features/sprint/hooks/useSprint";
 import type { ProjectItems } from "@/services/project/type";
 import type { SprintItem } from "@/services/sprint/type";
@@ -96,7 +98,12 @@ const ProjectSidebarItem = ({
 							workspace={workspace}
 						/>
 
-						<DialogAddTask></DialogAddTask>
+						<RequirePermission
+							workspaceId={workspace.id}
+							code={PERMISSIONS.TASK_CREATE}
+						>
+							<DialogAddTask></DialogAddTask>
+						</RequirePermission>
 					</div>
 				</div>
 

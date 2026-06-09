@@ -8,6 +8,8 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PERMISSIONS } from "@/constants/permissions";
+import { RequirePermission } from "@/features/permission/components/RequirePermission";
 import { useBoards } from "@/features/board/hooks/useBoards";
 import { usePageBlock } from "@/features/page-block/hooks/usePageBlock";
 import { BoardViewType } from "@/services/board/type";
@@ -171,37 +173,57 @@ const ProjectDropdown = ({ project, workspace }: ProjectDropdownProps) => {
 					<DropdownMenuSeparator className='my-1 bg-neutral-800' />
 
 					<DropdownMenuGroup>
-						<DropdownMenuItem className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'>
-							<PlayCircle size={15} />
-							<span>Tao sprint moi</span>
-						</DropdownMenuItem>
+						<RequirePermission
+							workspaceId={workspace.id}
+							code={PERMISSIONS.SPRINT_CREATE}
+						>
+							<DropdownMenuItem className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'>
+								<PlayCircle size={15} />
+								<span>Tao sprint moi</span>
+							</DropdownMenuItem>
+						</RequirePermission>
 
-						<DropdownMenuItem className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'>
-							<Columns3 size={15} />
-							<span>Them board / view</span>
-						</DropdownMenuItem>
+						<RequirePermission
+							workspaceId={workspace.id}
+							code={PERMISSIONS.BOARD_CREATE}
+						>
+							<DropdownMenuItem className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'>
+								<Columns3 size={15} />
+								<span>Them board / view</span>
+							</DropdownMenuItem>
+						</RequirePermission>
 
 						{!isProjectVisibleInPage && (
-							<DropdownMenuItem
-								disabled={!page?.id || isPending}
-								onSelect={handleShowInPage}
-								className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'
+							<RequirePermission
+								workspaceId={workspace.id}
+								code={PERMISSIONS.PAGE_BLOCK_CREATE}
 							>
-								<Eye size={15} />
-								<span>Them vao trang</span>
-							</DropdownMenuItem>
+								<DropdownMenuItem
+									disabled={!page?.id || isPending}
+									onSelect={handleShowInPage}
+									className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:bg-neutral-800 focus:text-neutral-100'
+								>
+									<Eye size={15} />
+									<span>Them vao trang</span>
+								</DropdownMenuItem>
+							</RequirePermission>
 						)}
 					</DropdownMenuGroup>
 
 					<DropdownMenuSeparator className='my-1 bg-neutral-800' />
 
-					<DropdownMenuItem
-						onSelect={() => setOpenTrashDialog(true)}
-						className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm text-red-400 focus:bg-red-500/10 focus:text-red-300'
+					<RequirePermission
+						workspaceId={workspace.id}
+						code={PERMISSIONS.PROJECT_DELETE}
 					>
-						<Trash2 size={15} />
-						<span>Xoa project</span>
-					</DropdownMenuItem>
+						<DropdownMenuItem
+							onSelect={() => setOpenTrashDialog(true)}
+							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm text-red-400 focus:bg-red-500/10 focus:text-red-300'
+						>
+							<Trash2 size={15} />
+							<span>Xoa project</span>
+						</DropdownMenuItem>
+					</RequirePermission>
 				</DropdownMenuContent>
 			</DropdownMenu>
 

@@ -13,7 +13,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-
+import { PERMISSIONS } from "@/constants/permissions";
+import { RequirePermission } from "@/features/permission/components/RequirePermission";
 import { cn } from "@/lib/utils";
 import { SprintItem } from "@/services/sprint/type";
 import { useState } from "react";
@@ -217,30 +218,40 @@ const SprintProjectSection = ({
 				</div>
 
 				{status === SprintStatus.PLANNED ? (
-					<StartSprintDialog
-						defaultSprintName={sprint.name}
-						projectId={projectId}
-						sprintId={sprint.id}
+					<RequirePermission
 						workspaceId={workspaceId}
-						workItemCount={tasks?.length ?? 0}
-					></StartSprintDialog>
+						code={PERMISSIONS.SPRINT_START}
+					>
+						<StartSprintDialog
+							defaultSprintName={sprint.name}
+							projectId={projectId}
+							sprintId={sprint.id}
+							workspaceId={workspaceId}
+							workItemCount={tasks?.length ?? 0}
+						></StartSprintDialog>
+					</RequirePermission>
 				) : status === SprintStatus.ACTIVE ? (
-					<CompleteSprintDialog
-						defaultSprintName={sprint.name}
-						projectId={projectId}
-						sprintId={sprint.id}
+					<RequirePermission
 						workspaceId={workspaceId}
-						completedWorkItemCount={
-							tasks?.filter(
-								(task: any) => task.status?.isDone === true,
-							).length ?? 0
-						}
-						openWorkItemCount={
-							tasks?.filter(
-								(task: any) => task.status?.isDone !== true,
-							).length ?? 0
-						}
-					/>
+						code={PERMISSIONS.SPRINT_COMPLETE}
+					>
+						<CompleteSprintDialog
+							defaultSprintName={sprint.name}
+							projectId={projectId}
+							sprintId={sprint.id}
+							workspaceId={workspaceId}
+							completedWorkItemCount={
+								tasks?.filter(
+									(task: any) => task.status?.isDone === true,
+								).length ?? 0
+							}
+							openWorkItemCount={
+								tasks?.filter(
+									(task: any) => task.status?.isDone !== true,
+								).length ?? 0
+							}
+						/>
+					</RequirePermission>
 				) : null}
 			</div>
 

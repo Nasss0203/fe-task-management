@@ -13,10 +13,12 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { usePlan } from "@/features/billing/hooks/usePlan";
 import { useMember } from "@/features/member/hooks/useMember";
+import { usePermission } from "@/features/permission/hooks/usePermission";
 import { useProject } from "@/features/project/hooks/useProject";
 import { useTask } from "@/features/task/hooks/useTask";
 import { useWorkspaceFeatures } from "@/features/workspace-feature/hooks/useWorkspaceFeatures";
 import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";
+import { PERMISSIONS } from "@/constants/permissions";
 import { WorkspaceMemberItem } from "@/services/member/type";
 import {
 	FeatureKey,
@@ -105,6 +107,11 @@ const WorkspaceSettingsContent = ({
 
 	const workspaces: WorkspaceItem[] = workspaceQuery?.data ?? [];
 	const workspace = workspaces.find((item) => item.slug === workspaceSlug);
+
+	// Permission hooks — phải gọi trước bất kỳ early return nào (Rules of Hooks)
+	const { can } = usePermission(workspace?.id);
+
+
 
 	const { features, updateWorkspaceFeature, workspaceFeaturesQuery } =
 		useWorkspaceFeatures(workspace?.id);
@@ -322,13 +329,15 @@ const WorkspaceSettingsContent = ({
 										Manage workspace members and roles.
 									</div>
 								</div>
-								<button
-									type='button'
-									onClick={() => setOpenAddPeopleDialog(true)}
-									className='rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-400'
-								>
-									Add people
-								</button>
+								{can(PERMISSIONS.WORKSPACE_MEMBER_ADD) && (
+									<button
+										type='button'
+										onClick={() => setOpenAddPeopleDialog(true)}
+										className='rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-400'
+									>
+										Add people
+									</button>
+								)}
 							</div>
 
 							<div className='rounded-md border border-neutral-800'>
@@ -410,7 +419,8 @@ const WorkspaceSettingsContent = ({
 										disabled={
 											isFeatureLoading ||
 											isUpdatingFeature ||
-											!sprintPlanEnabled
+											!sprintPlanEnabled ||
+											!can(PERMISSIONS.WORKSPACE_FEATURE_UPDATE)
 										}
 										onCheckedChange={handleToggleSprint}
 										aria-label='Toggle sprint feature'
@@ -478,7 +488,7 @@ const WorkspaceSettingsContent = ({
 												onValueChange={
 													handleUpdateLayoutMode
 												}
-												disabled={isUpdatingLayout}
+												disabled={isUpdatingLayout || !can(PERMISSIONS.WORKSPACE_UPDATE)}
 											>
 												<SelectTrigger className='w-full border-neutral-800 bg-neutral-950 text-neutral-100'>
 													<SelectValue placeholder='Select layout' />
@@ -528,13 +538,17 @@ const WorkspaceSettingsContent = ({
 											later.
 										</div>
 									</div>
-									<button
-										type='button'
-										onClick={() => setOpenTrashDialog(true)}
-										className='rounded-md border border-red-500/30 px-3 py-2 text-sm font-medium text-red-300 transition hover:bg-red-500/10'
-									>
-										Move to trash
-									</button>
+									{can(PERMISSIONS.WORKSPACE_DELETE) ? (
+										<button
+											type='button'
+											onClick={() => setOpenTrashDialog(true)}
+											className='rounded-md border border-red-500/30 px-3 py-2 text-sm font-medium text-red-300 transition hover:bg-red-500/10'
+										>
+											Move to trash
+										</button>
+									) : (
+										<span className='text-xs text-neutral-600'>Chỉ Owner mới có thể xóa workspace.</span>
+									)}
 								</div>
 							</div>
 
@@ -577,16 +591,18 @@ const WorkspaceSettingsContent = ({
 													</div>
 												</div>
 
-												<Button
-													variant='outline'
-													size='sm'
-													onClick={() => handleRestoreProject(project.id)}
-													disabled={restoreProject.isPending}
-													className='border-neutral-700 bg-transparent text-neutral-100 hover:bg-neutral-800'
-												>
-													<RotateCcw className='mr-2 h-4 w-4' />
-													Restore
-												</Button>
+												{can(PERMISSIONS.PROJECT_DELETE) && (
+													<Button
+														variant='outline'
+														size='sm'
+														onClick={() => handleRestoreProject(project.id)}
+														disabled={restoreProject.isPending}
+														className='border-neutral-700 bg-transparent text-neutral-100 hover:bg-neutral-800'
+													>
+														<RotateCcw className='mr-2 h-4 w-4' />
+														Restore
+													</Button>
+												)}
 											</div>
 										))}
 									</div>
@@ -664,22 +680,24 @@ const WorkspaceSettingsContent = ({
 													</div>
 												</div>
 
-												<Button
-													variant='outline'
-													size='sm'
-													onClick={() =>
-														handleRestoreTask(
-															task.id,
-														)
-													}
-													disabled={
-														restoreTask.isPending
-													}
-													className='border-neutral-700 bg-transparent text-neutral-100 hover:bg-neutral-800'
-												>
-													<RotateCcw className='mr-2 h-4 w-4' />
-													Restore
-												</Button>
+												{can(PERMISSIONS.TASK_DELETE) && (
+													<Button
+														variant='outline'
+														size='sm'
+														onClick={() =>
+															handleRestoreTask(
+																task.id,
+															)
+														}
+														disabled={
+															restoreTask.isPending
+														}
+														className='border-neutral-700 bg-transparent text-neutral-100 hover:bg-neutral-800'
+													>
+														<RotateCcw className='mr-2 h-4 w-4' />
+														Restore
+													</Button>
+												)}
 											</div>
 										))}
 									</div>

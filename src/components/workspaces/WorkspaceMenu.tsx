@@ -1,15 +1,6 @@
 "use client";
 
-import {
-	Archive,
-	Cog,
-	LayoutTemplate,
-	Pencil,
-	Star,
-	Trash2,
-	UserPlus,
-	Users,
-} from "lucide-react";
+import { Archive, Cog, Pencil, Star, Trash2, UserPlus } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -21,6 +12,8 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PERMISSIONS } from "@/constants/permissions";
+import { RequirePermission } from "@/features/permission/components/RequirePermission";
 import { AddPeopleDialog } from "../dialog/AddPeopleDialog";
 
 type WorkspaceMenuProps = {
@@ -68,41 +61,43 @@ export function WorkspaceMenu({
 					className='w-64 rounded-md border bg-popover p-1 shadow-lg'
 				>
 					<DropdownMenuGroup>
-						<DropdownMenuItem
-							onSelect={() => {
-								window.setTimeout(() => {
-									onStartRename?.();
-								}, 150);
-							}}
-							className='gap-3'
+						<RequirePermission
+							workspaceId={workspaceId}
+							code={PERMISSIONS.WORKSPACE_UPDATE}
 						>
-							<Pencil className='h-4 w-4' />
-							<span>Rename workspace</span>
-						</DropdownMenuItem>
+							<DropdownMenuItem
+								onSelect={() => {
+									window.setTimeout(() => {
+										onStartRename?.();
+									}, 150);
+								}}
+								className='gap-3'
+							>
+								<Pencil className='h-4 w-4' />
+								<span>Rename workspace</span>
+							</DropdownMenuItem>
+						</RequirePermission>
 
 						<DropdownMenuItem onClick={onStar} className='gap-3'>
 							<Star className='h-4 w-4' />
 							<span>Add to starred</span>
 						</DropdownMenuItem>
 
-						<DropdownMenuItem
-							className='gap-3'
-							onSelect={() => {
-								onAddPeople?.();
-								setOpenAddPeople(true);
-							}}
+						<RequirePermission
+							workspaceId={workspaceId}
+							code={PERMISSIONS.WORKSPACE_MEMBER_ADD}
 						>
-							<UserPlus className='h-4 w-4' />
-							<span>Add people</span>
-						</DropdownMenuItem>
-
-						<DropdownMenuItem disabled className='gap-3'>
-							<LayoutTemplate className='h-4 w-4' />
-							<span>Save as template</span>
-							<span className='ml-auto rounded border px-1 text-[10px] font-semibold'>
-								ENTERPRISE
-							</span>
-						</DropdownMenuItem>
+							<DropdownMenuItem
+								className='gap-3'
+								onSelect={() => {
+									onAddPeople?.();
+									setOpenAddPeople(true);
+								}}
+							>
+								<UserPlus className='h-4 w-4' />
+								<span>Add people</span>
+							</DropdownMenuItem>
+						</RequirePermission>
 
 						<DropdownMenuItem
 							onClick={onOpenSettings}
@@ -115,30 +110,23 @@ export function WorkspaceMenu({
 
 					<DropdownMenuSeparator />
 
-					<DropdownMenuItem onClick={onArchive} className='gap-3'>
-						<Archive className='h-4 w-4' />
-						<span>Archive space</span>
-					</DropdownMenuItem>
-
-					<DropdownMenuItem
-						onClick={onDelete}
-						className='gap-3 text-red-500 focus:text-red-500'
+					<RequirePermission
+						workspaceId={workspaceId}
+						code={PERMISSIONS.WORKSPACE_DELETE}
 					>
-						<Trash2 className='h-4 w-4' />
-						<span>Delete space</span>
-					</DropdownMenuItem>
+						<DropdownMenuItem onClick={onArchive} className='gap-3'>
+							<Archive className='h-4 w-4' />
+							<span>Archive space</span>
+						</DropdownMenuItem>
 
-					<DropdownMenuSeparator />
-
-					<div className='flex items-start gap-3 px-2 py-2 text-sm'>
-						<Users className='mt-0.5 h-4 w-4 text-blue-500' />
-						<div className='flex flex-col'>
-							<span className='font-medium'>Software space</span>
-							<span className='text-xs text-muted-foreground'>
-								Team-managed
-							</span>
-						</div>
-					</div>
+						<DropdownMenuItem
+							onClick={onDelete}
+							className='gap-3 text-red-500 focus:text-red-500'
+						>
+							<Trash2 className='h-4 w-4' />
+							<span>Delete space</span>
+						</DropdownMenuItem>
+					</RequirePermission>
 				</DropdownMenuContent>
 			</DropdownMenu>
 

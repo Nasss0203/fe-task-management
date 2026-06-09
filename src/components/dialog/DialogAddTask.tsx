@@ -21,6 +21,8 @@ import {
 	DialogV2,
 } from "./dialog-custom";
 
+import { PERMISSIONS } from "@/constants/permissions";
+import { usePermission } from "@/features/permission/hooks/usePermission";
 import { useMember } from "@/features/member/hooks/useMember";
 import { useTask, useTaskStatus } from "@/features/task/hooks/useTask";
 import { useUser } from "@/features/auth/hooks/useUser";
@@ -45,6 +47,8 @@ import { Separator } from "../ui/separator";
 
 const DialogAddTask = () => {
 	const { currentProjectId, currentWorkspaceId } = useProjectSelectionStore();
+
+	const { can } = usePermission(currentWorkspaceId ?? undefined);
 
 	const [assigneeIds, setAssigneeIds] = useState<string[]>([]);
 	const [statusId, setStatusId] = useState<string>("");
@@ -152,7 +156,8 @@ const DialogAddTask = () => {
 			<DialogTriggerV2 asChild>
 				<button
 					type='button'
-					className='flex size-6 items-center justify-center rounded-md text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100 transition-colors'
+					disabled={!can(PERMISSIONS.TASK_CREATE)}
+					className='flex size-6 items-center justify-center rounded-md text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100 transition-colors disabled:pointer-events-none disabled:opacity-30'
 				>
 					<Plus size={16} />
 				</button>
