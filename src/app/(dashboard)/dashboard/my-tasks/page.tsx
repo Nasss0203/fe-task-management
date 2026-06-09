@@ -108,10 +108,10 @@ function uniqueTasks(tasks: DashboardTaskResponseDto[]) {
 
 function LoadingForYou() {
 	return (
-		<main className='flex min-h-0 min-w-0 flex-1 flex-col gap-7 overflow-y-auto pb-10'>
-			<Skeleton className='h-10 w-48 rounded-lg' />
-			<Skeleton className='h-40 w-64 rounded-lg' />
-			<Skeleton className='h-[520px] rounded-lg' />
+		<main className='flex min-h-0 min-w-0 flex-1 flex-col gap-8 overflow-y-auto pb-10'>
+			<Skeleton className='h-12 w-64 rounded-xl border border-neutral-800 bg-neutral-900/40' />
+			<Skeleton className='h-48 w-full rounded-2xl border border-neutral-800 bg-neutral-900/40' />
+			<Skeleton className='h-[600px] w-full rounded-2xl border border-neutral-800 bg-neutral-900/40' />
 		</main>
 	);
 }
@@ -126,58 +126,59 @@ function RecentSpaceCard({
 	doneCount: number;
 }) {
 	return (
-		<div className='min-w-0 overflow-hidden rounded-md border border-border/70 bg-muted/35'>
-			<div className='flex'>
-				<div className='w-5 shrink-0 bg-violet-700' />
-				<div className='min-w-0 flex-1 p-4'>
+		<div className='group flex h-full flex-col min-w-0 overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900/40 transition-all duration-200 hover:border-neutral-700 hover:bg-neutral-900/60 shadow-sm'>
+			<div className='flex h-full'>
+				<div className='w-1.5 shrink-0 bg-blue-500/80 transition-colors group-hover:bg-blue-400' />
+				<div className='flex flex-1 flex-col min-w-0 p-4'>
 					<div className='flex items-start gap-3'>
-						<div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm'>
-							<FolderKanban className='h-5 w-5' />
+						<div className='flex size-8 shrink-0 items-center justify-center rounded-lg border border-blue-500/20 bg-blue-500/10 text-blue-400 shadow-sm'>
+							<FolderKanban className='size-4' />
 						</div>
-						<div className='min-w-0'>
-							<p className='truncate text-sm font-semibold'>
+						<div className='min-w-0 flex-1 mt-0.5'>
+							<p className='truncate text-sm font-semibold text-neutral-100'>
 								{workspace.name}
 							</p>
-							<p className='truncate text-xs text-muted-foreground'>
-								Team-managed software
+							<p className='mt-0.5 truncate text-xs text-neutral-500'>
+								Team workspace
 							</p>
 						</div>
 					</div>
 
-					<div className='mt-4 space-y-2 pl-12'>
-						<p className='text-xs font-medium text-muted-foreground'>
+					<div className='mt-4 flex-1 space-y-2'>
+						<p className='text-[10px] font-semibold uppercase tracking-wide text-neutral-500'>
 							Quick links
 						</p>
-						<div className='flex items-center justify-between gap-3'>
-							<Link
-								href='/dashboard/my-tasks'
-								className='truncate text-xs font-medium underline underline-offset-2 hover:text-primary'
-							>
-								My open work items
-							</Link>
-							<Badge className='h-5 rounded-sm px-2 text-xs'>
-								{openWorkCount}
-							</Badge>
-						</div>
-						<div className='flex items-center justify-between gap-3'>
-							<Link
-								href='/dashboard/my-tasks'
-								className='truncate text-xs font-medium underline underline-offset-2 hover:text-primary'
-							>
-								Done work items
-							</Link>
-							<Badge
-								variant='secondary'
-								className='h-5 rounded-sm px-2 text-xs'
-							>
-								{doneCount}
-							</Badge>
+						<div className='flex flex-col gap-1.5'>
+							<div className='flex items-center justify-between gap-2 rounded-md p-1 transition-colors hover:bg-neutral-800/50 -mx-1 px-1.5'>
+								<Link
+									href='/dashboard/my-tasks'
+									className='truncate text-xs font-medium text-neutral-300 hover:text-neutral-100 transition-colors flex-1'
+								>
+									My open work items
+								</Link>
+								<Badge className='h-5 min-w-[20px] justify-center rounded-md border-neutral-700 bg-neutral-800 px-1.5 text-[11px] font-semibold text-neutral-300 hover:bg-neutral-700'>
+									{openWorkCount}
+								</Badge>
+							</div>
+							<div className='flex items-center justify-between gap-2 rounded-md p-1 transition-colors hover:bg-neutral-800/50 -mx-1 px-1.5'>
+								<Link
+									href='/dashboard/my-tasks'
+									className='truncate text-xs font-medium text-neutral-300 hover:text-neutral-100 transition-colors flex-1'
+								>
+									Done work items
+								</Link>
+								<Badge
+									variant='secondary'
+									className='h-5 min-w-[20px] justify-center rounded-md border-neutral-800 bg-neutral-900 px-1.5 text-[11px] font-semibold text-neutral-500 hover:bg-neutral-800'
+								>
+									{doneCount}
+								</Badge>
+							</div>
 						</div>
 					</div>
 
-					<div className='mt-4 flex items-center gap-1 border-t border-border/70 pt-3 text-xs text-muted-foreground'>
-						<span>{workspace.projectCount || 1} board</span>
-						<ChevronDown className='h-3.5 w-3.5' />
+					<div className='mt-4 flex items-center gap-1.5 border-t border-neutral-800/60 pt-3 text-xs font-medium text-neutral-500'>
+						<span>{workspace.projectCount || 1} {workspace.projectCount === 1 ? 'project' : 'projects'}</span>
 					</div>
 				</div>
 			</div>
@@ -195,27 +196,27 @@ function WorkItemRow({
 	displayName?: string;
 }) {
 	return (
-		<div className='group grid grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-3 rounded-md py-2.5 transition hover:bg-muted/35'>
-			<div className='flex size-7 items-center justify-center rounded-md bg-muted text-lime-500'>
-				<ClipboardList className='h-4 w-4' />
+		<div className='group grid grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-4 rounded-xl px-3 py-3 transition-colors hover:bg-neutral-900/40 -mx-3'>
+			<div className='flex size-9 items-center justify-center rounded-lg border border-neutral-800 bg-neutral-900 text-neutral-400 transition-colors group-hover:bg-neutral-800 group-hover:text-neutral-200'>
+				<ClipboardList className='size-4' />
 			</div>
 
 			<div className='min-w-0'>
-				<p className='truncate text-sm font-medium'>{task.title}</p>
-				<div className='mt-1 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground'>
-					<span>{formatTaskKey(task, index)}</span>
-					<span>·</span>
+				<p className='truncate text-[14px] font-semibold text-neutral-200 group-hover:text-neutral-100 transition-colors'>{task.title}</p>
+				<div className='mt-1.5 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-[11px] font-medium text-neutral-500'>
+					<span className="uppercase tracking-wider">{formatTaskKey(task, index)}</span>
+					<span className="text-neutral-700">•</span>
 					<span className='truncate'>{task.projectName}</span>
-					<span>·</span>
+					<span className="text-neutral-700">•</span>
 					<span className='truncate'>{task.workspaceName}</span>
 				</div>
 			</div>
 
-			<div className='flex min-w-[120px] items-center justify-end gap-3 text-xs'>
-				<span className={cn("hidden sm:inline", getTaskStateClass(task))}>
+			<div className='flex min-w-[120px] items-center justify-end gap-4'>
+				<span className={cn("hidden sm:inline text-[12px] font-medium", getTaskStateClass(task))}>
 					{getTaskStateLabel(task)}
 				</span>
-				<div className='flex size-8 items-center justify-center rounded-full bg-violet-700 text-xs font-semibold text-white'>
+				<div className='flex size-8 shrink-0 items-center justify-center rounded-full border border-neutral-700 bg-neutral-800 text-[10px] font-bold tracking-wider text-neutral-300 shadow-sm'>
 					{getInitials(displayName)}
 				</div>
 			</div>
@@ -227,19 +228,19 @@ function BoardRow({ workspace }: { workspace: DashboardWorkspaceResponseDto }) {
 	return (
 		<Link
 			href={`/dashboard/${workspace.slug}`}
-			className='group grid grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-3 rounded-md py-2.5 transition hover:bg-muted/35'
+			className='group grid grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-4 rounded-xl px-3 py-3 transition-colors hover:bg-neutral-900/40 -mx-3'
 		>
-			<div className='flex size-7 items-center justify-center rounded-md bg-muted text-blue-400'>
-				<BriefcaseBusiness className='h-4 w-4' />
+			<div className='flex size-9 items-center justify-center rounded-lg border border-neutral-800 bg-neutral-900 text-blue-500/80 transition-colors group-hover:bg-neutral-800 group-hover:text-blue-400'>
+				<BriefcaseBusiness className='size-4' />
 			</div>
 			<div className='min-w-0'>
-				<p className='truncate text-sm font-medium'>{workspace.name}</p>
-				<p className='mt-1 text-xs text-muted-foreground'>
-					{workspace.projectCount} project · {workspace.openTaskCount} open
+				<p className='truncate text-[14px] font-semibold text-neutral-200 group-hover:text-neutral-100 transition-colors'>{workspace.name}</p>
+				<p className='mt-1.5 text-[11px] font-medium text-neutral-500'>
+					{workspace.projectCount} {workspace.projectCount === 1 ? 'project' : 'projects'} <span className="text-neutral-700 mx-1">•</span> {workspace.openTaskCount} open
 					tasks
 				</p>
 			</div>
-			<span className='text-xs text-primary opacity-0 transition group-hover:opacity-100'>
+			<span className='text-[12px] font-semibold text-blue-400 opacity-0 transition-all group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0'>
 				Open
 			</span>
 		</Link>
@@ -274,12 +275,12 @@ export default function MyTasksPage() {
 	if (isError || !dashboard) {
 		return (
 			<main className='flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto pb-10'>
-				<div className='rounded-lg border border-border/70 bg-card/80 p-6'>
-					<h1 className='text-xl font-semibold'>
-						Không tải được công việc
+				<div className='rounded-2xl border border-neutral-800 bg-neutral-950/20 p-8'>
+					<h1 className='text-xl font-bold tracking-tight text-neutral-100'>
+						Failed to load tasks
 					</h1>
-					<p className='mt-2 text-sm text-muted-foreground'>
-						Vui lòng thử lại để lấy dữ liệu mới nhất.
+					<p className='mt-2 text-sm text-neutral-500'>
+						Please refresh the page to try again.
 					</p>
 				</div>
 			</main>
@@ -336,27 +337,30 @@ export default function MyTasksPage() {
 	];
 
 	return (
-		<main className='flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto pb-10'>
-			<div className='flex w-full min-w-0 flex-col gap-7'>
-				<header className='border-b border-border/70 pb-5'>
-					<h1 className='text-2xl font-semibold tracking-normal'>
+		<main className='flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto pb-10 px-2'>
+			<div className='flex w-full min-w-0 flex-col gap-10 max-w-7xl'>
+				<header className='border-b border-neutral-800/60 pb-6 pt-4'>
+					<h1 className='text-3xl font-bold tracking-tight text-neutral-100'>
 						For you
 					</h1>
+					<p className='mt-2 text-[14px] text-neutral-500'>
+						A quick overview of your active tasks and recent workspaces.
+					</p>
 				</header>
 
-				<section className='space-y-4'>
-					<div className='flex items-center justify-between gap-4'>
-						<h2 className='text-sm font-semibold'>Recent spaces</h2>
+				<section className='space-y-5'>
+					<div className='flex items-center justify-between gap-4 px-1'>
+						<h2 className='text-[15px] font-semibold text-neutral-200'>Recent spaces</h2>
 						<Link
 							href='/dashboard'
-							className='text-sm font-medium text-primary hover:underline'
+							className='text-[13px] font-semibold text-neutral-400 hover:text-neutral-100 transition-colors'
 						>
 							View all spaces
 						</Link>
 					</div>
 
 					{recentSpaces.length ? (
-						<div className='grid gap-3 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5'>
+						<div className='grid gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]'>
 							{recentSpaces.map((workspace) => (
 								<RecentSpaceCard
 									key={workspace.id}
@@ -369,8 +373,8 @@ export default function MyTasksPage() {
 							))}
 						</div>
 					) : (
-						<div className='rounded-md border border-dashed border-border/70 p-5 text-sm text-muted-foreground'>
-							Chưa có workspace gần đây.
+						<div className='rounded-2xl border border-dashed border-neutral-800 bg-neutral-950/20 p-8 text-center text-[13px] font-medium text-neutral-500'>
+							No recent workspaces found.
 						</div>
 					)}
 				</section>
@@ -379,7 +383,7 @@ export default function MyTasksPage() {
 					<Tabs defaultValue='worked' className='w-full gap-0'>
 						<TabsList
 							variant='line'
-							className='h-auto w-full justify-start gap-4 border-b border-border/70 p-0'
+							className='h-auto w-full justify-start gap-6 border-b border-neutral-800/60 p-0'
 						>
 							{viewItems.map((item) => {
 								const Icon = item.icon;
@@ -388,12 +392,12 @@ export default function MyTasksPage() {
 									<TabsTrigger
 										key={item.key}
 										value={item.key}
-										className='h-10 flex-none gap-2 rounded-none px-0 text-sm data-[state=active]:text-primary after:bg-primary data-[state=active]:[&_.tab-count]:bg-primary data-[state=active]:[&_.tab-count]:text-primary-foreground'
+										className='h-12 flex-none gap-2 rounded-none px-1 text-[14px] font-medium text-neutral-400 hover:text-neutral-200 data-[state=active]:text-neutral-100 data-[state=active]:font-semibold data-[state=active]:shadow-none transition-colors after:bg-neutral-100 data-[state=active]:[&_.tab-count]:bg-neutral-800 data-[state=active]:[&_.tab-count]:text-neutral-200'
 									>
-										<Icon className='h-4 w-4' />
+										<Icon className='size-4' />
 										<span>{item.label}</span>
 										{typeof item.count === "number" ? (
-											<span className='tab-count rounded-sm bg-muted px-1.5 py-0.5 text-xs text-muted-foreground'>
+											<span className='tab-count rounded-md bg-neutral-900/60 border border-neutral-800/60 px-2 py-0.5 text-[11px] font-bold text-neutral-500 transition-colors'>
 												{item.count}
 											</span>
 										) : null}
@@ -402,13 +406,13 @@ export default function MyTasksPage() {
 							})}
 						</TabsList>
 
-						<div className='pt-4'>
-							<p className='mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground'>
+						<div className='pt-6'>
+							<p className='mb-4 px-1 text-[11px] font-bold uppercase tracking-wider text-neutral-500'>
 								In the last month
 							</p>
 
 							<TabsContent value='worked' className='mt-0'>
-								<div className='divide-y divide-border/60'>
+								<div className='flex flex-col gap-1'>
 									{tasks.length ? (
 										tasks.map((task, index) => (
 											<WorkItemRow
@@ -422,15 +426,15 @@ export default function MyTasksPage() {
 											/>
 										))
 									) : (
-										<div className='rounded-md border border-dashed border-border/70 p-8 text-sm text-muted-foreground'>
-											Chưa có work item phù hợp.
+										<div className='rounded-2xl border border-dashed border-neutral-800 bg-neutral-950/20 p-8 text-center text-[13px] font-medium text-neutral-500 mt-2'>
+											No matching work items found.
 										</div>
 									)}
 								</div>
 							</TabsContent>
 
 							<TabsContent value='viewed' className='mt-0'>
-								<div className='divide-y divide-border/60'>
+								<div className='flex flex-col gap-1'>
 									{dashboard.recentDeadlines.length ? (
 										dashboard.recentDeadlines.map(
 											(task, index) => (
@@ -446,15 +450,15 @@ export default function MyTasksPage() {
 											),
 										)
 									) : (
-										<div className='rounded-md border border-dashed border-border/70 p-8 text-sm text-muted-foreground'>
-											Chưa có work item đã xem.
+										<div className='rounded-2xl border border-dashed border-neutral-800 bg-neutral-950/20 p-8 text-center text-[13px] font-medium text-neutral-500 mt-2'>
+											No viewed work items found.
 										</div>
 									)}
 								</div>
 							</TabsContent>
 
 							<TabsContent value='assigned' className='mt-0'>
-								<div className='divide-y divide-border/60'>
+								<div className='flex flex-col gap-1'>
 									{tasks.length ? (
 										tasks.map((task, index) => (
 											<WorkItemRow
@@ -468,21 +472,21 @@ export default function MyTasksPage() {
 											/>
 										))
 									) : (
-										<div className='rounded-md border border-dashed border-border/70 p-8 text-sm text-muted-foreground'>
-											Chưa có work item được assign.
+										<div className='rounded-2xl border border-dashed border-neutral-800 bg-neutral-950/20 p-8 text-center text-[13px] font-medium text-neutral-500 mt-2'>
+											No assigned work items found.
 										</div>
 									)}
 								</div>
 							</TabsContent>
 
 							<TabsContent value='starred' className='mt-0'>
-								<div className='rounded-md border border-dashed border-border/70 p-8 text-sm text-muted-foreground'>
-									Chưa có work item nào được starred.
+								<div className='rounded-2xl border border-dashed border-neutral-800 bg-neutral-950/20 p-8 text-center text-[13px] font-medium text-neutral-500 mt-2'>
+									No starred work items found.
 								</div>
 							</TabsContent>
 
 							<TabsContent value='boards' className='mt-0'>
-								<div className='divide-y divide-border/60'>
+								<div className='flex flex-col gap-1'>
 									{dashboard.recentWorkspaces.map(
 										(workspace) => (
 											<BoardRow

@@ -14,6 +14,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 
+import { cn } from "@/lib/utils";
 import { SprintItem } from "@/services/sprint/type";
 import { useState } from "react";
 import { CompleteSprintDialog } from "../dialog/CompleteSprintDialog";
@@ -186,24 +187,29 @@ const SprintProjectSection = ({
 		setOpen(!open);
 	};
 	return (
-		<Card className='overflow-hidden py-0! flex flex-col gap-1 rounded-none'>
-			<div className='flex items-center justify-between gap-4 border-b bg-muted/30 px-3 py-3'>
+		<Card className='overflow-hidden py-0! flex flex-col gap-0 rounded-2xl border-neutral-800 bg-neutral-950/20'>
+			<div className='flex items-center justify-between gap-4 border-b border-neutral-800 bg-neutral-900/40 px-4 py-3'>
 				<div className='flex items-center gap-3'>
 					<Button
 						variant='ghost'
 						size='icon'
-						className='size-7'
+						className='size-7 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100 transition-colors'
 						onClick={handleOpenTable}
 					>
-						<ChevronDown className='size-4 text-muted-foreground' />
+						<ChevronDown
+							className={cn(
+								"size-4 transition-transform duration-300",
+								!open && "-rotate-90",
+							)}
+						/>
 					</Button>
 
 					<div className='flex flex-col gap-1'>
 						<div className='flex items-center gap-2'>
-							<span className='text-sm font-semibold'>
+							<span className='text-[14px] font-semibold text-neutral-100'>
 								{sprint.name}
 							</span>
-							<span className='text-sm text-muted-foreground'>
+							<span className='text-[12px] font-medium text-neutral-500'>
 								({tasks.length} work items)
 							</span>
 						</div>
@@ -239,8 +245,10 @@ const SprintProjectSection = ({
 			</div>
 
 			{open ? (
-				<div className='overflow-x-auto px-1'>
-					<TableBacklog tasks={tasks} containerId={containerId} />
+				<div className='flex flex-col gap-6 p-4'>
+					<div className='overflow-x-auto rounded-xl border border-neutral-800/50 bg-neutral-950/30'>
+						<TableBacklog tasks={tasks} containerId={containerId} />
+					</div>
 				</div>
 			) : null}
 		</Card>

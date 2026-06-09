@@ -15,7 +15,8 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { getTaskStatusStyle } from "@/lib/task-status-style";
+import { StatusBadge } from "@/components/shared/status-badge";
+import { PriorityBadge } from "@/components/shared/priority-badge";
 import { cn } from "@/lib/utils";
 import {
 	DropdownMenu,
@@ -94,6 +95,7 @@ const SprintWorkspaceSection = ({
 						checked={row.getIsSelected()}
 						onCheckedChange={(value) => row.toggleSelected(!!value)}
 						aria-label='Select sprint task'
+						className="border-neutral-700 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
 					/>
 				),
 			},
@@ -106,12 +108,12 @@ const SprintWorkspaceSection = ({
 
 					return (
 						<div className='flex min-w-0 flex-col gap-1'>
-							<span className='truncate text-sm font-medium'>
+							<span className='truncate text-[13px] font-medium text-neutral-200'>
 								{task.title ?? "Untitled task"}
 							</span>
 
 							{task.key && (
-								<span className='text-xs text-muted-foreground'>
+								<span className='text-[11px] text-neutral-500'>
 									{task.key}
 								</span>
 							)}
@@ -124,7 +126,7 @@ const SprintWorkspaceSection = ({
 				size: 150,
 				header: "Sprint",
 				cell: ({ row }) => (
-					<span className='line-clamp-1 text-sm text-muted-foreground'>
+					<span className='line-clamp-1 text-[13px] text-neutral-400'>
 						{row.original.sprintName}
 					</span>
 				),
@@ -135,24 +137,7 @@ const SprintWorkspaceSection = ({
 				header: "Status",
 				cell: ({ row }) => {
 					const status = row.original.status;
-					const statusStyle = getTaskStatusStyle(status?.name);
-
-					return (
-						<span
-							className={cn(
-								"inline-flex w-fit items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
-								statusStyle.badge,
-							)}
-						>
-							<span
-								className={cn(
-									"size-2 rounded-full",
-									statusStyle.dot,
-								)}
-							/>
-							{status?.name ?? "No status"}
-						</span>
-					);
+					return <StatusBadge statusName={status?.name} />;
 				},
 			},
 			{
@@ -161,19 +146,7 @@ const SprintWorkspaceSection = ({
 				header: "Priority",
 				cell: ({ row }) => {
 					const priority = row.original.priority;
-
-					return (
-						<span className='inline-flex w-fit items-center gap-1.5 text-sm text-muted-foreground'>
-							<span
-								className='size-2 rounded-full bg-muted-foreground'
-								style={{
-									backgroundColor:
-										priority?.color ?? undefined,
-								}}
-							/>
-							{priority?.name ?? "No priority"}
-						</span>
-					);
+					return <PriorityBadge priorityName={priority?.name} />;
 				},
 			},
 			{
@@ -185,14 +158,14 @@ const SprintWorkspaceSection = ({
 
 					if (assignees.length === 0) {
 						return (
-							<span className='text-sm text-muted-foreground'>
+							<span className='text-[13px] text-neutral-500 italic'>
 								Unassigned
 							</span>
 						);
 					}
 
 					return (
-						<span className='line-clamp-1 text-sm text-muted-foreground'>
+						<span className='line-clamp-1 text-[13px] text-neutral-300'>
 							{assignees
 								.map(
 									(assignee) =>
@@ -216,15 +189,15 @@ const SprintWorkspaceSection = ({
 								<Button
 									variant='ghost'
 									size='icon'
-									className='size-8'
+									className='size-8 text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800 transition-colors'
 								>
 									<MoreHorizontal className='size-4' />
 								</Button>
 							</DropdownMenuTrigger>
 
-							<DropdownMenuContent align='end'>
-								<DropdownMenuItem>View task</DropdownMenuItem>
-								<DropdownMenuItem>
+							<DropdownMenuContent align='end' className="bg-neutral-950 border-neutral-800 rounded-xl min-w-[160px]">
+								<DropdownMenuItem className="text-xs text-neutral-300 focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer">View task</DropdownMenuItem>
+								<DropdownMenuItem className="text-xs text-neutral-300 focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer">
 									Move to backlog
 								</DropdownMenuItem>
 							</DropdownMenuContent>
@@ -257,8 +230,8 @@ const SprintWorkspaceSection = ({
 	const selectedCount = table.getSelectedRowModel().rows.length;
 
 	return (
-		<Card className='flex flex-col gap-1 overflow-hidden rounded-none !py-0'>
-			<div className='flex items-center justify-between gap-4 border-b bg-muted/30 px-5 py-3'>
+		<Card className='flex flex-col gap-0 overflow-hidden rounded-2xl border-neutral-800 bg-neutral-950/20 !py-0'>
+			<div className='flex items-center justify-between gap-4 border-b border-neutral-800 bg-neutral-900/40 px-4 py-3'>
 				<div className='flex items-center gap-3'>
 					<Checkbox
 						checked={
@@ -270,36 +243,35 @@ const SprintWorkspaceSection = ({
 						}
 						disabled={tasks.length === 0}
 						aria-label='Select all sprint tasks'
+						className="border-neutral-700 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
 					/>
 
 					<Button
 						variant='ghost'
 						size='icon'
-						className='size-7'
+						className='size-7 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100 transition-colors'
 						onClick={() => setIsOpen((prev) => !prev)}
 					>
 						<ChevronDown
-							className={`size-4 text-muted-foreground transition-transform ${
-								isOpen ? "" : "-rotate-90"
-							}`}
+							className={cn("size-4 transition-transform duration-300", !isOpen && "-rotate-90")}
 						/>
 					</Button>
 
 					<div className='flex flex-col gap-1'>
 						<div className='flex items-center gap-2'>
-							<span className='text-sm font-semibold'>
+							<span className='text-[14px] font-semibold text-neutral-100'>
 								Sprint tasks
 							</span>
 
 							{selectedCount > 0 && (
-								<span className='text-xs text-muted-foreground'>
+								<span className='text-[12px] font-medium text-neutral-500'>
 									{selectedCount} selected
 								</span>
 							)}
 						</div>
 
-						<p className='text-xs text-muted-foreground'>
-							{tasks.length} work items đã được đưa vào sprint
+						<p className='text-[12px] text-neutral-500'>
+							{tasks.length} items added to sprint
 						</p>
 					</div>
 				</div>
@@ -310,16 +282,16 @@ const SprintWorkspaceSection = ({
 							<Button
 								variant='ghost'
 								size='icon'
-								className='size-8'
+								className='size-8 text-neutral-400 hover:bg-neutral-800 transition-colors'
 							>
 								<MoreHorizontal className='size-4' />
 							</Button>
 						</DropdownMenuTrigger>
 
-						<DropdownMenuContent align='end'>
-							<DropdownMenuItem>Export tasks</DropdownMenuItem>
-							<DropdownMenuItem>Move selected</DropdownMenuItem>
-							<DropdownMenuItem className='text-destructive'>
+						<DropdownMenuContent align='end' className="bg-neutral-950 border-neutral-800 rounded-xl min-w-[160px]">
+							<DropdownMenuItem className="text-xs text-neutral-300 focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer">Export tasks</DropdownMenuItem>
+							<DropdownMenuItem className="text-xs text-neutral-300 focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer">Move selected</DropdownMenuItem>
+							<DropdownMenuItem className='text-xs text-rose-500 focus:bg-rose-500/10 focus:text-rose-400 cursor-pointer'>
 								Clear selected
 							</DropdownMenuItem>
 						</DropdownMenuContent>
@@ -328,13 +300,13 @@ const SprintWorkspaceSection = ({
 			</div>
 
 			{isOpen && (
-				<div className='overflow-x-auto p-0 px-1'>
+				<div className='flex flex-col gap-6 p-4'>
 					{tasks.length === 0 ? (
-						<div className='py-3 text-center text-sm font-medium text-muted-foreground'>
-							Chưa có task trong sprint
+						<div className='py-6 text-center text-[13px] font-medium text-neutral-500'>
+							No tasks in this sprint
 						</div>
 					) : (
-						<div className='relative max-h-[520px] min-w-245 overflow-auto border'>
+						<div className='relative max-h-[520px] min-w-245 overflow-auto rounded-xl border border-neutral-800/50 bg-neutral-950/30'>
 							<table className='w-full caption-bottom text-sm'>
 								<TableHeader>
 									{table
@@ -342,13 +314,13 @@ const SprintWorkspaceSection = ({
 										.map((headerGroup) => (
 											<TableRow
 												key={headerGroup.id}
-												className='hover:bg-transparent'
+												className='hover:bg-transparent border-neutral-800'
 											>
 												{headerGroup.headers.map(
 													(header) => (
 														<TableHead
 															key={header.id}
-															className='sticky top-0 z-20 h-10 bg-background text-xs font-medium uppercase tracking-wide text-muted-foreground shadow-[inset_0_-1px_0_hsl(var(--border))]'
+															className='sticky top-0 z-20 h-10 bg-neutral-900/90 text-[11px] font-semibold uppercase tracking-wider text-neutral-500 shadow-[inset_0_-1px_0_rgba(255,255,255,0.05)] backdrop-blur-md'
 															style={{
 																width: header.getSize(),
 																minWidth:
@@ -375,7 +347,7 @@ const SprintWorkspaceSection = ({
 									{table.getRowModel().rows.map((row) => (
 										<TableRow
 											key={row.id}
-											className='h-14'
+											className='h-12 border-neutral-800 hover:bg-neutral-900/30 transition-colors'
 											data-state={
 												row.getIsSelected() &&
 												"selected"
@@ -384,7 +356,7 @@ const SprintWorkspaceSection = ({
 											{row
 												.getVisibleCells()
 												.map((cell) => (
-													<TableCell key={cell.id}>
+													<TableCell key={cell.id} className="py-2">
 														{flexRender(
 															cell.column
 																.columnDef.cell,

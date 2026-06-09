@@ -16,6 +16,7 @@ import { useTask } from "@/features/task/hooks/useTask";
 import { useState } from "react";
 import TableBacklog from "../table/TableBacklog";
 import type { BacklogRenderContext } from "./types";
+import { cn } from "@/lib/utils";
 
 const formatDeletedAt = (value?: string | null) => {
 	if (!value) return "Unknown time";
@@ -24,7 +25,7 @@ const formatDeletedAt = (value?: string | null) => {
 
 	if (Number.isNaN(date.getTime())) return "Unknown time";
 
-	return new Intl.DateTimeFormat("vi-VN", {
+	return new Intl.DateTimeFormat("en-GB", {
 		dateStyle: "medium",
 		timeStyle: "short",
 	}).format(date);
@@ -75,27 +76,25 @@ const BacklogSection = ({
 	};
 
 	return (
-		<Card className='overflow-hidden py-0! flex flex-col gap-1 rounded-none'>
-			<div className='flex items-center justify-between gap-4 border-b bg-muted/30 px-3 py-3'>
+		<Card className='overflow-hidden py-0! flex flex-col gap-0 rounded-2xl border-neutral-800 bg-neutral-950/20'>
+			<div className='flex items-center justify-between gap-4 border-b border-neutral-800 bg-neutral-900/40 px-4 py-3'>
 				<div className='flex items-center gap-3'>
 					<Button
 						variant='ghost'
 						size='icon'
-						className='size-7'
+						className='size-7 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100 transition-colors'
 						onClick={handleOpenTable}
 					>
-						<ChevronDown className='size-4 text-muted-foreground' />
+						<ChevronDown className={cn("size-4 transition-transform duration-300", !open && "-rotate-90")} />
 					</Button>
 
-					<div className='flex flex-col gap-1'>
-						<div className='flex items-center gap-2'>
-							<span className='text-sm font-semibold'>
-								Backlog
-							</span>
-							<span className='text-sm text-muted-foreground'>
-								({taskBacklog.length} work items)
-							</span>
-						</div>
+					<div className='flex items-center gap-2.5'>
+						<span className='text-[14px] font-semibold text-neutral-100'>
+							Backlog
+						</span>
+						<span className='text-[12px] font-medium text-neutral-500'>
+							{taskBacklog.length} items
+						</span>
 					</div>
 				</div>
 
@@ -104,6 +103,7 @@ const BacklogSection = ({
 						<Button
 							variant='outline'
 							size='sm'
+							className="h-8 rounded-lg border-neutral-700 bg-neutral-900 text-[12px] font-medium hover:bg-neutral-800 hover:border-neutral-600 transition-all text-neutral-200"
 							onClick={handleCreateSprint}
 						>
 							{createSprint.isPending
@@ -117,76 +117,72 @@ const BacklogSection = ({
 							<Button
 								variant='ghost'
 								size='icon'
-								className='size-8'
+								className='size-8 text-neutral-400 hover:bg-neutral-800 transition-colors'
 							>
 								<MoreHorizontal className='size-4' />
 							</Button>
 						</DropdownMenuTrigger>
 
-						<DropdownMenuContent align='end'>
-							<DropdownMenuItem>Collapse</DropdownMenuItem>
-							<DropdownMenuItem>Export tasks</DropdownMenuItem>
+						<DropdownMenuContent align='end' className="bg-neutral-950 border-neutral-800 rounded-xl min-w-[160px]">
+							<DropdownMenuItem className="text-xs text-neutral-300 focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer">Collapse</DropdownMenuItem>
+							<DropdownMenuItem className="text-xs text-neutral-300 focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer">Export tasks</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
 				</div>
 			</div>
 
 			{open ? (
-				<div className='flex flex-col gap-4 overflow-x-auto px-1 pb-1'>
-					<TableBacklog tasks={taskBacklog} containerId={containerId} />
+				<div className='flex flex-col gap-6 p-4'>
+					<div className="overflow-x-auto rounded-xl border border-neutral-800/50 bg-neutral-950/30">
+						<TableBacklog tasks={taskBacklog} containerId={containerId} />
+					</div>
 
-					<div className='rounded-xl border border-dashed border-border/80 bg-muted/20 p-4'>
+					<div className='rounded-2xl border border-dashed border-neutral-800 bg-neutral-900/10 p-5'>
 						<div className='flex items-center justify-between gap-3'>
-							<div className='flex items-center gap-2'>
-								<div className='rounded-full border border-border/80 bg-background p-2 text-muted-foreground'>
+							<div className='flex items-center gap-3'>
+								<div className='flex size-8 items-center justify-center rounded-xl border border-neutral-800 bg-neutral-950 text-neutral-500 shadow-sm'>
 									<Trash2 className='size-4' />
 								</div>
 								<div>
-									<div className='text-sm font-semibold'>
-										Deleted tasks
+									<div className='text-[14px] font-semibold text-neutral-200'>
+										Recently deleted
 									</div>
-									<div className='text-xs text-muted-foreground'>
-										Task da xoa mem se hien o day de ban khoi
-										phuc lai.
+									<div className='text-[12px] text-neutral-500'>
+										Tasks deleted in the last 30 days will appear here.
 									</div>
 								</div>
 							</div>
-							<span className='text-xs text-muted-foreground'>
-								{deletedTaskItems.length} item
+							<span className='text-[11px] font-medium text-neutral-500 uppercase tracking-wider'>
+								{deletedTaskItems.length} items
 							</span>
 						</div>
 
-						<div className='mt-4'>
-							{deletedTasks.isPending ? (
-								<div className='text-sm text-muted-foreground'>
-									Dang tai deleted tasks...
-								</div>
-							) : deletedTaskItems.length === 0 ? (
-								<div className='text-sm text-muted-foreground'>
-									Chua co task nao trong thung rac.
-								</div>
-							) : (
-								<div className='space-y-2'>
-									{deletedTaskItems.map((task) => (
+						{deletedTaskItems.length > 0 && (
+							<div className='mt-5 space-y-2'>
+								{deletedTasks.isPending ? (
+									<div className='text-[12px] font-medium text-neutral-500 flex items-center justify-center h-12'>
+										Loading deleted tasks...
+									</div>
+								) : (
+									deletedTaskItems.map((task) => (
 										<div
 											key={task.id}
-											className='flex items-center justify-between gap-3 rounded-lg border border-border/70 bg-background/70 px-3 py-3'
+											className='flex items-center justify-between gap-3 rounded-xl border border-neutral-800/60 bg-neutral-950/40 px-4 py-3 hover:bg-neutral-900/40 hover:border-neutral-700 transition-all shadow-sm'
 										>
 											<div className='min-w-0'>
-												<div className='truncate text-sm font-medium'>
+												<div className='truncate text-[13px] font-medium text-neutral-200'>
 													{task.title}
 												</div>
-												<div className='text-xs text-muted-foreground'>
-													Deleted at{" "}
-													{formatDeletedAt(task.deletedAt)}
+												<div className='text-[11px] text-neutral-500 mt-0.5'>
+													Deleted on {formatDeletedAt(task.deletedAt)}
 												</div>
 											</div>
 
 											<Button
 												type='button'
-												variant='outline'
+												variant='ghost'
 												size='sm'
-												className='shrink-0'
+												className='h-8 shrink-0 rounded-lg text-[11px] font-semibold text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100 transition-colors'
 												onClick={() =>
 													restoreTask.mutate({
 														taskId: task.id,
@@ -194,14 +190,14 @@ const BacklogSection = ({
 												}
 												disabled={restoreTask.isPending}
 											>
-												<RotateCcw className='mr-2 size-4' />
+												<RotateCcw className='mr-1.5 size-3.5' />
 												Restore
 											</Button>
 										</div>
-									))}
-								</div>
-							)}
-						</div>
+									))
+								)}
+							</div>
+						)}
 					</div>
 				</div>
 			) : null}

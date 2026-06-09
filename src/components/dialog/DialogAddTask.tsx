@@ -152,54 +152,54 @@ const DialogAddTask = () => {
 			<DialogTriggerV2 asChild>
 				<button
 					type='button'
-					className='flex size-5 items-center justify-center rounded-sm text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100'
+					className='flex size-6 items-center justify-center rounded-md text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100 transition-colors'
 				>
-					<Plus size={14} />
+					<Plus size={16} />
 				</button>
 			</DialogTriggerV2>
 
 			<DialogContentV2
 				showCloseButton={false}
-				className='flex! overflow-visible! flex-col! lg:max-w-[calc(100%-30%)]! 2xl:max-w-[calc(100%-40%)]!'
+				className='flex! overflow-visible! flex-col! lg:max-w-[calc(100%-30%)]! 2xl:max-w-[calc(100%-40%)]! rounded-2xl border-neutral-800 bg-neutral-950 shadow-2xl p-0'
 			>
-				<DialogHeaderV2 className='shrink-0'>
+				<DialogHeaderV2 className='shrink-0 px-6 py-4 border-b border-neutral-800/50'>
 					<DialogTitleV2 className=''>
 						<div className='flex items-center justify-between'>
 							<DropdownMenu>
 								<DropdownMenuTrigger
 									asChild
-									className='cursor-pointer px-2 py-1 rounded-md hover:bg-neutral-800'
+									className='cursor-pointer px-3 py-1.5 rounded-lg hover:bg-neutral-900 transition-colors'
 								>
-									<div className='flex items-center gap-2 text-sm font-normal'>
-										<div className='text-neutral-400'>
-											Thêm vào
+									<div className='flex items-center gap-2.5 text-[13px] font-medium'>
+										<div className='text-neutral-500'>
+											Add to
 										</div>
-										<div className='flex items-center gap-1'>
-											<div className='font-medium'>
+										<div className='flex items-center gap-1.5 text-neutral-200'>
+											<div>
 												Auth
 											</div>
-											<ChevronDown size={10} />
+											<ChevronDown size={12} className="text-neutral-400" />
 										</div>
 									</div>
 								</DropdownMenuTrigger>
-								<DropdownMenuContent>
+								<DropdownMenuContent className="rounded-xl border-neutral-800 bg-neutral-950 min-w-[160px]">
 									<DropdownMenuGroup>
-										<DropdownMenuLabel>
+										<DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">
 											My Account
 										</DropdownMenuLabel>
-										<DropdownMenuItem>
+										<DropdownMenuItem className="text-xs focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer text-neutral-300">
 											Profile
 										</DropdownMenuItem>
-										<DropdownMenuItem>
+										<DropdownMenuItem className="text-xs focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer text-neutral-300">
 											Billing
 										</DropdownMenuItem>
 									</DropdownMenuGroup>
-									<DropdownMenuSeparator />
+									<DropdownMenuSeparator className="border-neutral-800 my-1" />
 									<DropdownMenuGroup>
-										<DropdownMenuItem>
+										<DropdownMenuItem className="text-xs focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer text-neutral-300">
 											Team
 										</DropdownMenuItem>
-										<DropdownMenuItem>
+										<DropdownMenuItem className="text-xs focus:bg-neutral-900 focus:text-neutral-100 cursor-pointer text-neutral-300">
 											Subscription
 										</DropdownMenuItem>
 									</DropdownMenuGroup>
@@ -209,13 +209,13 @@ const DialogAddTask = () => {
 					</DialogTitleV2>
 				</DialogHeaderV2>
 
-				<div className='flex-1 overflow-auto mt-2'>
-					<div className='flex flex-col px-20'>
+				<div className='flex-1 overflow-auto px-6 py-6'>
+					<div className='flex flex-col mx-auto max-w-3xl'>
 						<div className='w-full'>
 							<textarea
 								ref={titleRef}
 								value={title}
-								placeholder='Thêm công việc'
+								placeholder='Task title'
 								rows={1}
 								onChange={(e) => setTitle(e.target.value)}
 								onInput={(e) => {
@@ -225,15 +225,15 @@ const DialogAddTask = () => {
 								}}
 								onPointerDown={(e) => e.stopPropagation()}
 								onClick={(e) => e.stopPropagation()}
-								className='w-full resize-none overflow-hidden border-none bg-transparent text-xl font-extrabold outline-none ring-0 placeholder:text-neutral-500 focus:outline-none focus:ring-0'
+								className='w-full resize-none overflow-hidden border-none bg-transparent text-xl font-bold tracking-tight text-neutral-100 outline-none ring-0 placeholder:text-neutral-600 focus:outline-none focus:ring-0'
 							/>
 						</div>
 
-						<div className='mt-4 grid w-full  grid-cols-[1fr_1fr_1fr_auto] gap-y-2 text-sm'>
-							<div className='flex flex-col gap-2'>
-								<div className='flex items-center gap-2 text-sm font-medium text-muted-foreground'>
-									<Users size={16} />
-									<span>Người được giao</span>
+						<div className='mt-8 grid w-full grid-cols-[1fr_1fr_1fr_auto] gap-y-4 text-sm items-start'>
+							<div className='flex flex-col gap-3'>
+								<div className='flex items-center gap-2 text-[12px] font-semibold uppercase tracking-wider text-neutral-500'>
+									<Users size={14} />
+									<span>Assignees</span>
 								</div>
 
 								<TaskAssigneeSelect
@@ -251,10 +251,10 @@ const DialogAddTask = () => {
 								/>
 							</div>
 
-							<div className='flex flex-col gap-2'>
-								<div className='flex items-center gap-2 text-sm font-medium text-muted-foreground'>
-									<LoaderCircle size={16} />
-									<span>Trạng thái</span>
+							<div className='flex flex-col gap-3'>
+								<div className='flex items-center gap-2 text-[12px] font-semibold uppercase tracking-wider text-neutral-500'>
+									<LoaderCircle size={14} />
+									<span>Status</span>
 								</div>
 
 								<TaskStatusSelect
@@ -264,10 +264,10 @@ const DialogAddTask = () => {
 								/>
 							</div>
 
-							<div className='flex flex-col gap-2'>
-								<div className='flex items-center gap-2 text-sm font-medium text-muted-foreground'>
-									<CalendarDays size={16} />
-									<span>Hạn chót</span>
+							<div className='flex flex-col gap-3'>
+								<div className='flex items-center gap-2 text-[12px] font-semibold uppercase tracking-wider text-neutral-500'>
+									<CalendarDays size={14} />
+									<span>Deadline</span>
 								</div>
 
 								<TaskDateSelect
@@ -276,10 +276,10 @@ const DialogAddTask = () => {
 								/>
 							</div>
 
-							<div className='flex items-end pb-1'>
+							<div className='flex items-end pb-1 h-full'>
 								<button
 									type='button'
-									className='rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground'
+									className='rounded-lg p-2 text-neutral-500 hover:bg-neutral-800 hover:text-neutral-100 transition-colors mt-auto'
 								>
 									<MoreHorizontal size={18} />
 								</button>
@@ -290,13 +290,14 @@ const DialogAddTask = () => {
 					</div>
 				</div>
 
-				<DialogFooterV2 className='flex justify-end'>
+				<DialogFooterV2 className='flex justify-end border-t border-neutral-800/50 bg-neutral-900/20 px-6 py-4 rounded-b-2xl'>
 					<Button
 						type='button'
 						disabled={isSubmitting || !title.trim() || !statusId}
 						onClick={handleCreateTask}
+						className="rounded-xl border border-neutral-700 bg-neutral-100 text-neutral-950 font-semibold hover:bg-neutral-300 transition-colors disabled:opacity-50"
 					>
-						{isSubmitting ? "Đang tạo..." : "Thêm công việc"}
+						{isSubmitting ? "Creating..." : "Create Task"}
 					</Button>
 				</DialogFooterV2>
 			</DialogContentV2>
@@ -312,64 +313,62 @@ type TaskCommentProps = {
 
 const TaskComment = ({ commentRef }: TaskCommentProps) => {
 	return (
-		<div className='mt-5 w-full max-w-4xl'>
-			<div className='mb-4 text-sm font-semibold text-foreground'>
-				Bình luận
+		<div className='mt-10 w-full'>
+			<div className='mb-4 text-[12px] font-semibold uppercase tracking-wider text-neutral-500'>
+				Comments
 			</div>
 
-			<div className='flex gap-3'>
+			<div className='flex gap-4 items-start'>
 				<div className='flex h-full flex-col'>
-					<Avatar className='size-8 border border-border '>
-						<AvatarFallback className='bg-transparent text-sm text-muted-foreground'>
+					<Avatar className='size-8 border border-neutral-800 bg-neutral-900 shadow-sm'>
+						<AvatarFallback className='bg-transparent text-[11px] font-semibold text-neutral-400'>
 							N
 						</AvatarFallback>
 					</Avatar>
 				</div>
 
-				<textarea
-					ref={commentRef}
-					placeholder='Thêm công việc'
-					rows={1}
-					onInput={(e) => {
-						const target = e.currentTarget;
-						target.style.height = "auto";
-						target.style.height = `${target.scrollHeight}px`;
-					}}
-					className='w-full resize-none overflow-hidden border-none bg-transparent text-sm font-normal outline-none ring-0 focus:outline-none focus:ring-0'
-				/>
+				<div className="flex-1 flex flex-col gap-3 rounded-xl border border-neutral-800 bg-neutral-900/40 p-4 transition-colors focus-within:border-neutral-700 focus-within:bg-neutral-900/60">
+					<textarea
+						ref={commentRef}
+						placeholder='Add a comment...'
+						rows={1}
+						onInput={(e) => {
+							const target = e.currentTarget;
+							target.style.height = "auto";
+							target.style.height = `${target.scrollHeight}px`;
+						}}
+						className='w-full resize-none overflow-hidden border-none bg-transparent text-[14px] font-medium leading-relaxed text-neutral-200 outline-none ring-0 placeholder:text-neutral-600 focus:outline-none focus:ring-0 min-h-[40px]'
+					/>
 
-				<div className='ml-auto '>
-					<div className='flex items-center gap-1'>
+					<div className='flex items-center justify-end gap-1.5'>
 						<Button
 							type='button'
 							variant='ghost'
 							size='icon'
-							className='size-8 rounded-full text-muted-foreground hover:text-foreground'
+							className='size-8 rounded-lg text-neutral-500 hover:bg-neutral-800 hover:text-neutral-200 transition-colors'
 						>
-							<Paperclip size={17} />
+							<Paperclip size={16} />
 						</Button>
 
 						<Button
 							type='button'
 							variant='ghost'
 							size='icon'
-							className='size-8 rounded-full text-muted-foreground hover:text-foreground'
+							className='size-8 rounded-lg text-neutral-500 hover:bg-neutral-800 hover:text-neutral-200 transition-colors'
 						>
-							<AtSign size={17} />
+							<AtSign size={16} />
 						</Button>
 
 						<Button
 							type='button'
 							size='icon'
-							className='size-8 rounded-full'
+							className='size-8 rounded-lg bg-neutral-800 text-neutral-300 hover:bg-neutral-700 hover:text-neutral-100 transition-colors'
 						>
 							<ArrowUp size={16} />
 						</Button>
 					</div>
 				</div>
 			</div>
-
-			<Separator className='mt-4' />
 		</div>
 	);
 };

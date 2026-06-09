@@ -3,30 +3,13 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getPriorityClass, getTaskBadgeClass } from "@/helpers/helpers";
 import { MyTaskItem } from "@/types/type";
 import { CalendarDays, ListChecks } from "lucide-react";
+import { StatusBadge } from "@/components/shared/status-badge";
+import { PriorityBadge } from "@/components/shared/priority-badge";
 
 type Props = {
 	items: MyTaskItem[];
-};
-
-const taskStatusLabel: Record<string, string> = {
-	Todo: "Cần làm",
-	"In Progress": "Đang làm",
-	Review: "Review",
-};
-
-const priorityLabel: Record<string, string> = {
-	High: "Cao",
-	Medium: "Trung bình",
-	Low: "Thấp",
-};
-
-const taskTone: Record<string, string> = {
-	High: "border-l-red-500/80",
-	Medium: "border-l-yellow-500/80",
-	Low: "border-l-emerald-500/80",
 };
 
 function isPastDueDate(value: string) {
@@ -44,72 +27,48 @@ function isPastDueDate(value: string) {
 
 export function MyTasksPanel({ items }: Props) {
 	return (
-		<Card className='border-border/60 bg-card/80 shadow-sm'>
-			<CardHeader className='pb-3'>
-				<CardTitle className='flex items-center gap-2 text-base'>
-					<span className='flex size-8 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary'>
+		<Card className='rounded-2xl border-neutral-800 bg-neutral-950/20 shadow-sm'>
+			<CardHeader className='pb-3 border-b border-neutral-800/50 bg-neutral-900/40 rounded-t-2xl px-5'>
+				<CardTitle className='flex items-center gap-2 text-base text-neutral-100'>
+					<span className='flex size-8 items-center justify-center rounded-lg border border-neutral-800 bg-neutral-900 text-neutral-400'>
 						<ListChecks className='h-4 w-4' />
 					</span>
-					Công việc của tôi
+					My Tasks
 				</CardTitle>
-				<p className='text-sm text-muted-foreground'>
-					Các task cần xử lý trong workspace
+				<p className='text-sm text-neutral-500'>
+					Tasks requiring your attention
 				</p>
 			</CardHeader>
 
-			<CardContent className='space-y-3'>
+			<CardContent className='space-y-3 p-5'>
 				{items.map((task) => {
 					const isOverdue = isPastDueDate(task.due);
 
 					return (
 						<div
 							key={task.id}
-							className={`rounded-xl border border-border/55 border-l-2 bg-background/45 p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] ring-1 ring-transparent transition hover:bg-background/70 hover:ring-border/60 ${
-								isOverdue
-									? "border-l-red-500/80"
-									: taskTone[task.priority] ??
-									  "border-l-border"
-							}`}
+							className={`rounded-xl border border-neutral-800 bg-neutral-900/40 p-4 transition-all hover:bg-neutral-900/60 hover:border-neutral-700 shadow-sm`}
 						>
 							<div className='space-y-3'>
 								<div className='flex items-start justify-between gap-3'>
-									<p className='line-clamp-2 text-sm font-medium leading-6'>
+									<p className='line-clamp-2 text-[13px] font-medium leading-6 text-neutral-200'>
 										{task.title}
 									</p>
 
-									<Badge
-										variant='outline'
-										className={getPriorityClass(
-											task.priority,
-										)}
-									>
-										{priorityLabel[task.priority] ??
-											task.priority}
-									</Badge>
+									<PriorityBadge priorityName={task.priority} />
 								</div>
 
 								<div className='flex flex-wrap items-center gap-2'>
-									<Badge
-										variant='outline'
-										className={getTaskBadgeClass(
-											task.status,
-										)}
-									>
-										{taskStatusLabel[task.status] ??
-											task.status}
-									</Badge>
+									<StatusBadge statusName={task.status} />
 
 									{isOverdue ? (
-										<Badge
-											variant='outline'
-											className='border-red-500/35 bg-red-500/10 text-red-500'
-										>
-											Quá hạn
-										</Badge>
+										<div className='inline-flex items-center gap-1.5 rounded-md border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 text-[11px] font-medium text-rose-400'>
+											Overdue
+										</div>
 									) : null}
 
-									<div className='flex items-center gap-1 text-xs text-muted-foreground'>
-										<CalendarDays className='h-3.5 w-3.5' />
+									<div className='flex items-center gap-1.5 text-[11px] font-medium text-neutral-500'>
+										<CalendarDays className='size-3.5' />
 										{task.due}
 									</div>
 								</div>
@@ -120,9 +79,9 @@ export function MyTasksPanel({ items }: Props) {
 
 				<Button
 					variant='outline'
-					className='w-full border-border/60 bg-background/40 hover:bg-background/70'
+					className='w-full border-neutral-800 bg-neutral-900/40 text-neutral-400 hover:bg-neutral-900 hover:text-neutral-100 transition-colors h-10 rounded-xl mt-2'
 				>
-					Xem tất cả
+					View All
 				</Button>
 			</CardContent>
 		</Card>

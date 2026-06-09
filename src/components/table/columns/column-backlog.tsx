@@ -1,62 +1,18 @@
 "use client";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { getTaskStatusBadgeClass } from "@/lib/task-status-style";
 import { cn } from "@/lib/utils";
 import type { TaskItem } from "@/services/task/type";
 import { ColumnDef } from "@tanstack/react-table";
 import { GripVertical, MoreHorizontal } from "lucide-react";
-
-const priorityClassName = (priorityName?: string | null) => {
-	const priority = priorityName?.trim().toLowerCase();
-
-	if (priority === "high" || priority === "cao") {
-		return "border-red-500/20 bg-red-500/10 text-red-400";
-	}
-
-	if (
-		priority === "medium" ||
-		priority === "normal" ||
-		priority === "trung bình"
-	) {
-		return "border-orange-500/20 bg-orange-500/10 text-orange-400";
-	}
-
-	if (priority === "low" || priority === "thấp") {
-		return "border-emerald-500/20 bg-emerald-500/10 text-emerald-400";
-	}
-
-	return "border-slate-500/20 bg-slate-500/10 text-slate-300";
-};
-
-const statusClassName = (statusName?: string | null) => {
-	const status = statusName?.trim().toLowerCase();
-	const sharedClassName = getTaskStatusBadgeClass(statusName);
-
-	if (status === "done" || status === "hoàn tất") {
-		return sharedClassName;
-	}
-
-	if (
-		status === "in progress" ||
-		status === "progress" ||
-		status === "đang thực hiện"
-	) {
-		return sharedClassName;
-	}
-
-	if (status === "todo" || status === "to do" || status === "chưa bắt đầu") {
-		return sharedClassName;
-	}
-
-	return sharedClassName;
-};
+import { StatusBadge } from "@/components/shared/status-badge";
+import { PriorityBadge } from "@/components/shared/priority-badge";
 
 const getAssigneeName = (assignee: TaskItem["assignees"][number]) => {
 	return (
 		assignee.fullName?.trim() ||
 		assignee.username?.trim() ||
-		"Chưa đặt tên"
+		"Unnamed"
 	);
 };
 
@@ -91,9 +47,9 @@ const formatDate = (value?: string | null) => {
 		return "-";
 	}
 
-	return new Intl.DateTimeFormat("vi-VN", {
+	return new Intl.DateTimeFormat("en-GB", {
 		day: "2-digit",
-		month: "2-digit",
+		month: "short",
 	}).format(date);
 };
 
@@ -104,8 +60,8 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 		header: "",
 		cell: () => (
 			<GripVertical
-				size={15}
-				className='cursor-grab text-muted-foreground'
+				size={14}
+				className='cursor-grab text-neutral-600 hover:text-neutral-400 transition-colors'
 			/>
 		),
 		enableSorting: false,
@@ -123,14 +79,16 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 				onCheckedChange={(value) =>
 					table.toggleAllPageRowsSelected(!!value)
 				}
-				aria-label='Chọn tất cả'
+				aria-label='Select all'
+				className="border-neutral-700 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
 			/>
 		),
 		cell: ({ row }) => (
 			<Checkbox
 				checked={row.getIsSelected()}
 				onCheckedChange={(value) => row.toggleSelected(!!value)}
-				aria-label='Chọn công việc'
+				aria-label='Select task'
+				className="border-neutral-700 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
 			/>
 		),
 		enableSorting: false,
@@ -141,7 +99,7 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 		size: 80,
 		header: "ID",
 		cell: ({ row }) => (
-			<span className='text-sm font-medium text-muted-foreground'>
+			<span className='text-[13px] font-medium text-neutral-500'>
 				{row.original.projectSeq ? `#${row.original.projectSeq}` : "-"}
 			</span>
 		),
@@ -149,14 +107,14 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 	{
 		accessorKey: "title",
 		size: 320,
-		header: "Công việc",
+		header: "Task",
 		cell: ({ row }) => (
-			<div className='flex min-w-0 flex-col'>
-				<span className='truncate font-medium text-foreground'>
+			<div className='flex min-w-0 flex-col py-1'>
+				<span className='truncate text-[14px] font-medium text-neutral-200'>
 					{row.original.title}
 				</span>
 				{row.original.description ? (
-					<span className='truncate text-xs text-muted-foreground'>
+					<span className='truncate text-[12px] text-neutral-500'>
 						{row.original.description}
 					</span>
 				) : null}
@@ -166,58 +124,44 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 	{
 		accessorKey: "priorityName",
 		size: 120,
-		header: "Ưu tiên",
+		header: "Priority",
 		cell: ({ row }) => (
-			<span
-				className={cn(
-					"inline-flex rounded-md border px-2 py-0.5 text-xs font-medium",
-					priorityClassName(row.original.priorityName),
-				)}
-			>
-				{row.original.priorityName ?? "None"}
-			</span>
+			<PriorityBadge priorityName={row.original.priorityName} />
 		),
 	},
 	{
 		accessorKey: "statusName",
 		size: 130,
-		header: "Trạng thái",
+		header: "Status",
 		cell: ({ row }) => (
-			<span
-				className={cn(
-					"inline-flex rounded-md border px-2 py-0.5 text-xs font-medium",
-					statusClassName(row.original.statusName),
-				)}
-			>
-				{row.original.statusName ?? "None"}
-			</span>
+			<StatusBadge statusName={row.original.statusName} />
 		),
 	},
 	{
 		accessorKey: "assignees",
 		size: 190,
-		header: "Người phụ trách",
+		header: "Assignees",
 		cell: ({ row }) => {
 			const assignees = row.original.assignees ?? [];
 
 			if (!assignees.length) {
 				return (
-					<span className='text-sm text-muted-foreground'>
-						Chưa giao
+					<span className='text-[13px] text-neutral-500 italic'>
+						Unassigned
 					</span>
 				);
 			}
 
 			return (
 				<div className='flex items-center gap-2'>
-					<div className='flex -space-x-2'>
+					<div className='flex -space-x-1.5'>
 						{assignees.slice(0, 3).map((assignee) => {
 							const name = getAssigneeName(assignee);
 
 							return (
 								<div
 									key={assignee.userId}
-									className='flex size-7 items-center justify-center rounded-full border border-[#171717] bg-muted text-[11px] font-semibold text-muted-foreground'
+									className='flex size-6 items-center justify-center rounded-full border border-neutral-900 bg-neutral-800 text-[10px] font-semibold text-neutral-300 shadow-sm'
 									title={name}
 								>
 									{getInitials(name)}
@@ -226,7 +170,7 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 						})}
 					</div>
 
-					<span className='max-w-28 truncate text-sm'>
+					<span className='max-w-[100px] truncate text-[13px] text-neutral-300'>
 						{getAssigneeName(assignees[0])}
 						{assignees.length > 1 ? ` +${assignees.length - 1}` : ""}
 					</span>
@@ -237,9 +181,9 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 	{
 		accessorKey: "estimateMinutes",
 		size: 90,
-		header: "Ước tính",
+		header: "Estimate",
 		cell: ({ row }) => (
-			<span className='font-medium'>
+			<span className='text-[13px] font-medium text-neutral-300'>
 				{formatEstimate(row.original.estimateMinutes)}
 			</span>
 		),
@@ -247,9 +191,9 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 	{
 		accessorKey: "dueAt",
 		size: 110,
-		header: "Hạn",
+		header: "Due",
 		cell: ({ row }) => (
-			<span className='text-sm text-muted-foreground'>
+			<span className='text-[13px] text-neutral-400'>
 				{formatDate(row.original.dueAt)}
 			</span>
 		),
@@ -259,8 +203,8 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 		size: 44,
 		header: "",
 		cell: () => (
-			<button className='rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground'>
-				<MoreHorizontal size={16} />
+			<button className='rounded-md p-1.5 text-neutral-500 hover:bg-neutral-800 hover:text-neutral-100 transition-colors'>
+				<MoreHorizontal size={14} />
 			</button>
 		),
 		enableSorting: false,

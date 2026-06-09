@@ -1,44 +1,42 @@
 "use client";
 
-import { getUserFacingStatusStyle } from "@/components/shared/status-badge";
+import { getUserFacingPriorityStyle } from "@/components/shared/priority-badge";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
 
-type TaskStatusOption = {
-	id: string;
+type TaskPriorityOption = {
+	id: string | null;
 	name: string;
 	color?: string | null;
-	isDone?: boolean;
-	position?: number;
 };
 
-type TaskStatusSelectProps = {
-	statuses: TaskStatusOption[];
-	value?: string;
-	onChange?: (value: string) => void;
+type TaskPrioritySelectProps = {
+	priorities: TaskPriorityOption[];
+	value?: string | null;
+	onChange?: (value: string | null) => void;
 	className?: string;
 };
 
-const TaskStatusSelect = ({
-	statuses,
+const TaskPrioritySelect = ({
+	priorities,
 	value,
 	onChange,
 	className,
-}: TaskStatusSelectProps) => {
-	const safeStatuses = Array.isArray(statuses) ? statuses : [];
+}: TaskPrioritySelectProps) => {
+	const safePriorities = Array.isArray(priorities) ? priorities : [];
 
-	const selected = safeStatuses.find((item) => item.id === value);
-	const selectedStyle = getUserFacingStatusStyle(
-		selected?.name,
-		selected?.isDone,
-	);
+	const selected = safePriorities.find((item) => item.id === value);
+	const selectedStyle = getUserFacingPriorityStyle(selected?.name);
 
 	return (
 		<div
 			onPointerDown={(event) => event.stopPropagation()}
 			onClick={(event) => event.stopPropagation()}
 		>
-			<Select value={value} onValueChange={onChange}>
+			<Select 
+				value={value ?? "none"} 
+				onValueChange={(val) => onChange?.(val === "none" ? null : val)}
+			>
 				<SelectTrigger
 					className={cn(
 						"h-8 w-fit min-w-[130px] rounded-md border px-3 py-1 text-xs font-medium shadow-none focus:ring-0 transition-colors",
@@ -53,7 +51,7 @@ const TaskStatusSelect = ({
 								selectedStyle.dot,
 							)}
 						/>
-						<span>{selected?.name || "Status"}</span>
+						<span>{selected?.name || "Priority"}</span>
 					</div>
 				</SelectTrigger>
 
@@ -62,17 +60,15 @@ const TaskStatusSelect = ({
 					position='popper'
 					className='z-[9999] min-w-[160px] rounded-xl border border-neutral-800 bg-neutral-950 p-1 shadow-2xl'
 				>
-					{safeStatuses.map((status) => {
-						const style = getUserFacingStatusStyle(
-							status.name,
-							status.isDone,
-						);
-						const isSelected = status.id === value;
+					{safePriorities.map((priority) => {
+						const style = getUserFacingPriorityStyle(priority.name);
+						const isSelected = priority.id === value;
+						const itemValue = priority.id ?? "none";
 
 						return (
 							<SelectItem
-								key={status.id}
-								value={status.id}
+								key={itemValue}
+								value={itemValue}
 								className={cn(
 									"cursor-pointer rounded-lg px-2.5 py-1.5 text-xs transition-colors focus:bg-neutral-900 focus:text-neutral-100",
 									isSelected ? "bg-neutral-900/50 text-neutral-100" : "text-neutral-300"
@@ -85,7 +81,7 @@ const TaskStatusSelect = ({
 											style.dot,
 										)}
 									/>
-									<span className="font-medium">{status.name}</span>
+									<span className="font-medium">{priority.name}</span>
 								</div>
 							</SelectItem>
 						);
@@ -96,4 +92,4 @@ const TaskStatusSelect = ({
 	);
 };
 
-export default TaskStatusSelect;
+export default TaskPrioritySelect;

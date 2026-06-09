@@ -1,5 +1,4 @@
 import {
-	getTaskStatusStyle,
 	normalizeTaskStatusName,
 } from "@/lib/task-status-style";
 import { cn } from "@/lib/utils";
@@ -14,6 +13,7 @@ import {
 	DropdownMenuV2,
 } from "./dropdown-custom";
 import { useTask, useTaskStatus } from "@/features/task/hooks/useTask";
+import { StatusBadge } from "@/components/shared/status-badge";
 
 type DropdownTaskStatusProps = {
 	workspaceId: string;
@@ -21,27 +21,6 @@ type DropdownTaskStatusProps = {
 	statusName: string;
 	taskId: string;
 };
-
-type TaskStatusPillProps = {
-	name: string;
-	isDone?: boolean;
-};
-
-function TaskStatusPill({ name, isDone }: TaskStatusPillProps) {
-	const style = getTaskStatusStyle(name, isDone);
-
-	return (
-		<div
-			className={cn(
-				"inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium",
-				style.badge,
-			)}
-		>
-			<span className={cn("size-2 rounded-full", style.dot)} />
-			<span>{name || style.label}</span>
-		</div>
-	);
-}
 
 const DropdownTaskStatus = ({
 	projectId,
@@ -84,39 +63,40 @@ const DropdownTaskStatus = ({
 
 	return (
 		<DropdownMenuV2>
-			<DropdownMenuTriggerV2 className='cursor-pointer'>
-				<TaskStatusPill
-					name={currentStatus?.name ?? statusName}
+			<DropdownMenuTriggerV2 className='cursor-pointer outline-none'>
+				<StatusBadge
+					statusName={currentStatus?.name ?? statusName}
 					isDone={currentStatus?.isDone}
 				/>
 			</DropdownMenuTriggerV2>
 
-			<DropdownMenuContentV2 className='w-64'>
+			<DropdownMenuContentV2 className='w-56 rounded-2xl border-neutral-800 bg-neutral-950 p-1 shadow-2xl'>
 				<DropdownMenuGroupV2>
-					<DropdownMenuItemV2>
-						<TaskStatusPill
-							name={currentStatus?.name ?? statusName}
+					<DropdownMenuItemV2 className="focus:bg-neutral-900 rounded-lg cursor-pointer transition-colors">
+						<StatusBadge
+							statusName={currentStatus?.name ?? statusName}
 							isDone={currentStatus?.isDone}
 						/>
 					</DropdownMenuItemV2>
 				</DropdownMenuGroupV2>
 
-				<DropdownMenuSeparatorV2 />
+				<DropdownMenuSeparatorV2 className="border-neutral-800 my-1" />
 
 				<DropdownMenuGroupV2>
-					<DropdownMenuLabelV2>
-						Danh sách trạng thái
+					<DropdownMenuLabelV2 className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
+						Change Status
 					</DropdownMenuLabelV2>
 
 					{statuses.map((status) => (
 						<Fragment key={status.id}>
-							<DropdownMenuSeparatorV2 />
+							<DropdownMenuSeparatorV2 className="border-neutral-800" />
 
 							<DropdownMenuItemV2
+								className="focus:bg-neutral-900 rounded-lg cursor-pointer transition-colors"
 								onClick={() => handleUpdateTask(status.id)}
 							>
-								<TaskStatusPill
-									name={status.name}
+								<StatusBadge
+									statusName={status.name}
 									isDone={status.isDone}
 								/>
 							</DropdownMenuItemV2>
