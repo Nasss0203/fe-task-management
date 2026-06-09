@@ -25,82 +25,92 @@ const BacklogTable = <TData, TValue>({
 	return (
 		<div
 			className={cn(
-				"overflow-hidden rounded-xl border border-border bg-card shadow-sm",
+				"min-h-0 min-w-0 flex-1 overflow-x-auto overflow-y-auto rounded-xl border border-border bg-card shadow-sm",
 				className,
 			)}
 		>
-			<div>
-				<div className='w-full overflow-x-auto'>
-					<Table className='w-auto'>
-						<TableHeader>
-							{table.getHeaderGroups().map((headerGroup) => (
-								<TableRow
-									key={headerGroup.id}
-									className='h-12 border-b border-border bg-muted/30 hover:bg-muted/30'
+			<Table className='w-full min-w-[720px] table-fixed'>
+				<TableHeader>
+					{table.getHeaderGroups().map((headerGroup) => (
+						<TableRow
+							key={headerGroup.id}
+							className='h-12 border-b border-border bg-muted/30 hover:bg-muted/30'
+						>
+							{headerGroup.headers.map((header) => (
+								<TableHead
+									key={header.id}
+									style={{
+										width: header.getSize(),
+									}}
+									className={cn(
+										"whitespace-nowrap px-3 text-xs font-semibold text-muted-foreground",
+										(
+											header.column.columnDef
+												.meta as any
+										)?.className,
+									)}
 								>
-									{headerGroup.headers.map((header) => (
-										<TableHead
-											key={header.id}
-											style={{
-												width: header.getSize(),
-											}}
-											className='whitespace-nowrap px-3 text-xs font-semibold text-muted-foreground'
-										>
-											{header.isPlaceholder
-												? null
-												: flexRender(
-														header.column.columnDef
-															.header,
-														header.getContext(),
-													)}
-										</TableHead>
-									))}
-								</TableRow>
+									{header.isPlaceholder
+										? null
+										: flexRender(
+												header.column.columnDef
+													.header,
+												header.getContext(),
+											)}
+								</TableHead>
 							))}
-						</TableHeader>
+						</TableRow>
+					))}
+				</TableHeader>
 
-						<TableBody>
-							{table.getRowModel().rows.length ? (
-								table.getRowModel().rows.map((row) => (
-									<TableRow
-										key={row.id}
-										data-state={
-											row.getIsSelected() && "selected"
-										}
-										className='h-14 border-b border-border/70 transition-colors hover:bg-muted/35 data-[state=selected]:bg-muted'
-									>
-										{row.getVisibleCells().map((cell) => (
-											<TableCell
-												key={cell.id}
-												style={{
-													width: cell.column.getSize(),
-												}}
-												className='whitespace-nowrap px-3 text-sm text-foreground'
-											>
-												{flexRender(
-													cell.column.columnDef.cell,
-													cell.getContext(),
-												)}
-											</TableCell>
-										))}
-									</TableRow>
-								))
-							) : (
-								<TableRow>
+				<TableBody>
+					{table.getRowModel().rows.length ? (
+						table.getRowModel().rows.map((row) => (
+							<TableRow
+								key={row.id}
+								data-state={
+									row.getIsSelected() && "selected"
+								}
+								className='h-14 border-b border-border/70 transition-colors hover:bg-muted/35 data-[state=selected]:bg-muted'
+							>
+								{row.getVisibleCells().map((cell) => (
 									<TableCell
-										colSpan={
-											table.getVisibleLeafColumns().length
-										}
-										className='h-28 text-center text-sm text-muted-foreground'
+										key={cell.id}
+										style={{
+											width: cell.column.getSize(),
+										}}
+										className={cn(
+											"whitespace-nowrap px-3 text-sm text-foreground",
+											(
+												cell.column.columnDef
+													.meta as any
+											)?.className,
+										)}
 									>
-										{emptyText}
+										{flexRender(
+											cell.column.columnDef.cell,
+											cell.getContext(),
+										)}
 									</TableCell>
-								</TableRow>
-							)}
-						</TableBody>
-					</Table>
-				</div>
-			</div>
+								))}
+							</TableRow>
+						))
+					) : (
+						<TableRow>
+							<TableCell
+								colSpan={
+									table.getVisibleLeafColumns().length
+								}
+								className='p-0 text-center text-muted-foreground'
+							>
+								<div className='flex min-h-[280px] items-center justify-center text-sm'>
+									{emptyText}
+								</div>
+							</TableCell>
+						</TableRow>
+					)}
+				</TableBody>
+			</Table>
 		</div>
 	);
 };

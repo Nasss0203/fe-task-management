@@ -220,7 +220,7 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 	});
 
 	return (
-		<section className='flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-[#2a2a2a] bg-[#171717] shadow-sm'>
+		<section className='flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border border-[#2a2a2a] bg-[#171717] shadow-sm'>
 			<div className='shrink-0 border-b border-[#2a2a2a] p-4'>
 				<div className='flex items-start justify-between gap-3'>
 					<div className='min-w-0'>
@@ -239,8 +239,8 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 				</div>
 
 				<div className='mt-4 flex flex-col gap-3'>
-					<div className='grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-[minmax(220px,1.25fr)_minmax(115px,0.7fr)_minmax(115px,0.7fr)_minmax(150px,0.95fr)_40px]'>
-						<div className='relative min-w-0'>
+					<div className='flex flex-wrap items-center gap-2'>
+						<div className='relative min-w-[220px] flex-1'>
 							<Search
 								size={15}
 								className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500'
@@ -253,37 +253,45 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 							/>
 						</div>
 
-						<FilterSelect
-							value={statusFilter}
-							onChange={updateStatusFilter}
-							placeholder='Trạng thái'
-							options={statusOptions}
-						/>
-						<FilterSelect
-							value={priorityFilter}
-							onChange={updatePriorityFilter}
-							placeholder='Ưu tiên'
-							options={priorityOptions}
-						/>
-						<FilterSelect
-							value={assigneeFilter}
-							onChange={updateAssigneeFilter}
-							placeholder='Người phụ trách'
-							options={assigneeOptions}
-						/>
-						<Button
-							variant='outline'
-							size='icon'
-							className='relative h-9 w-10 border-[#333333] bg-[#101010] text-slate-300 hover:bg-[#202020] hover:text-white'
-							title='Bộ lọc'
-						>
-							<Filter size={15} />
-							{activeFilters.length > 0 && (
-								<span className='absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white'>
-									{activeFilters.length}
-								</span>
-							)}
-						</Button>
+						<div className='flex flex-wrap items-center gap-2'>
+							<div className='w-[140px] shrink-0'>
+								<FilterSelect
+									value={statusFilter}
+									onChange={updateStatusFilter}
+									placeholder='Trạng thái'
+									options={statusOptions}
+								/>
+							</div>
+							<div className='w-[140px] shrink-0'>
+								<FilterSelect
+									value={priorityFilter}
+									onChange={updatePriorityFilter}
+									placeholder='Ưu tiên'
+									options={priorityOptions}
+								/>
+							</div>
+							<div className='w-[160px] shrink-0'>
+								<FilterSelect
+									value={assigneeFilter}
+									onChange={updateAssigneeFilter}
+									placeholder='Người phụ trách'
+									options={assigneeOptions}
+								/>
+							</div>
+							<Button
+								variant='outline'
+								size='icon'
+								className='relative h-9 w-10 shrink-0 border-[#333333] bg-[#101010] text-slate-300 hover:bg-[#202020] hover:text-white'
+								title='Bộ lọc'
+							>
+								<Filter size={15} />
+								{activeFilters.length > 0 && (
+									<span className='absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white'>
+										{activeFilters.length}
+									</span>
+								)}
+							</Button>
+						</div>
 					</div>
 
 					{activeFilters.length > 0 && (
@@ -321,7 +329,7 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 						? "Đang tải backlog..."
 						: "Không có công việc trong backlog."
 				}
-				className='min-h-0 flex-1 rounded-none border-0 overflow-y-auto'
+				className='h-full rounded-none border-0'
 			/>
 
 			<PanigationTable table={table} />

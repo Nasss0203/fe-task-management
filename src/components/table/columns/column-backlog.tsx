@@ -96,7 +96,7 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 	},
 	{
 		accessorKey: "projectSeq",
-		size: 80,
+		size: 56,
 		header: "ID",
 		cell: ({ row }) => (
 			<span className='text-[13px] font-medium text-neutral-500'>
@@ -106,15 +106,15 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 	},
 	{
 		accessorKey: "title",
-		size: 320,
+		size: 280,
 		header: "Task",
 		cell: ({ row }) => (
 			<div className='flex min-w-0 flex-col py-1'>
-				<span className='truncate text-[14px] font-medium text-neutral-200'>
+				<span className='truncate text-[14px] font-medium text-neutral-200' title={row.original.title}>
 					{row.original.title}
 				</span>
 				{row.original.description ? (
-					<span className='truncate text-[12px] text-neutral-500'>
+					<span className='truncate text-[12px] text-neutral-500' title={row.original.description}>
 						{row.original.description}
 					</span>
 				) : null}
@@ -123,7 +123,7 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 	},
 	{
 		accessorKey: "priorityName",
-		size: 120,
+		size: 110,
 		header: "Priority",
 		cell: ({ row }) => (
 			<PriorityBadge priorityName={row.original.priorityName} />
@@ -131,7 +131,7 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 	},
 	{
 		accessorKey: "statusName",
-		size: 130,
+		size: 110,
 		header: "Status",
 		cell: ({ row }) => (
 			<StatusBadge statusName={row.original.statusName} />
@@ -139,22 +139,23 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 	},
 	{
 		accessorKey: "assignees",
-		size: 190,
+		size: 140,
 		header: "Assignees",
+		meta: { className: "hidden 2xl:table-cell" },
 		cell: ({ row }) => {
 			const assignees = row.original.assignees ?? [];
 
 			if (!assignees.length) {
 				return (
-					<span className='text-[13px] text-neutral-500 italic'>
+					<span className='text-[13px] text-neutral-500 italic hidden 2xl:inline'>
 						Unassigned
 					</span>
 				);
 			}
 
 			return (
-				<div className='flex items-center gap-2'>
-					<div className='flex -space-x-1.5'>
+				<div className='hidden items-center gap-2 2xl:flex min-w-0'>
+					<div className='flex -space-x-1.5 shrink-0'>
 						{assignees.slice(0, 3).map((assignee) => {
 							const name = getAssigneeName(assignee);
 
@@ -170,7 +171,7 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 						})}
 					</div>
 
-					<span className='max-w-[100px] truncate text-[13px] text-neutral-300'>
+					<span className='truncate text-[13px] text-neutral-300 flex-1 min-w-0'>
 						{getAssigneeName(assignees[0])}
 						{assignees.length > 1 ? ` +${assignees.length - 1}` : ""}
 					</span>
@@ -180,20 +181,22 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 	},
 	{
 		accessorKey: "estimateMinutes",
-		size: 90,
-		header: "Estimate",
+		size: 80,
+		header: "Est.",
+		meta: { className: "hidden xl:table-cell" },
 		cell: ({ row }) => (
-			<span className='text-[13px] font-medium text-neutral-300'>
+			<span className='hidden text-[13px] font-medium text-neutral-300 xl:inline'>
 				{formatEstimate(row.original.estimateMinutes)}
 			</span>
 		),
 	},
 	{
 		accessorKey: "dueAt",
-		size: 110,
+		size: 80,
 		header: "Due",
+		meta: { className: "hidden 2xl:table-cell" },
 		cell: ({ row }) => (
-			<span className='text-[13px] text-neutral-400'>
+			<span className='hidden text-[13px] text-neutral-400 2xl:inline'>
 				{formatDate(row.original.dueAt)}
 			</span>
 		),

@@ -20,7 +20,7 @@ const PanigationTable = <TData,>({ table }: PanigationTableProps<TData>) => {
 	const to = Math.min((pageIndex + 1) * pageSize, totalRows);
 
 	return (
-		<div className='flex flex-col gap-3 border-t border-[#2a2a2a] bg-[#171717] px-4 py-3 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between'>
+		<div className='flex shrink-0 flex-col gap-3 border-t border-[#2a2a2a] bg-[#171717] px-4 py-3 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between'>
 			<div className='text-xs font-medium'>
 				Hiển thị{" "}
 				<span className='font-semibold text-slate-200'>

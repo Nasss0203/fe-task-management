@@ -1,8 +1,14 @@
 import { BoardItem } from "@/services/board/type";
 import { useSprints } from "@/features/sprint/hooks/useSprint";
-import { CalendarDays, ChevronDown, Settings2 } from "lucide-react";
-import { ProviderDragDrop } from "../dnd";
-import { Progress } from "../ui/progress";
+import { CalendarDays, MoreHorizontal, Settings2, PlayCircle, CheckCircle } from "lucide-react";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+	DropdownMenuSeparator,
+} from "../ui/dropdown-menu";
+import SprintTaskList from "./SprintTaskList";
 
 type SprintProps = {
 	boards: BoardItem[];
@@ -12,54 +18,85 @@ type SprintProps = {
 };
 
 const Sprint = ({ projectId, workspaceId, sprintId }: SprintProps) => {
-	const { sprintsQuery } = useSprints({ workspaceId, projectId, sprintId });
+	const { sprintsQuery, startSprint, completed } = useSprints({ workspaceId, projectId, sprintId });
 	const currentSprint = sprintsQuery.data?.data.find(
 		(sprint) => sprint.id === sprintId,
 	);
 	const statusMeta = getStatusMeta(currentSprint?.status);
-	const startAt = formatDate(currentSprint?.startAt);
-	const endAt = formatDate(currentSprint?.endAt);
-	const remainingDays = getRemainingDays(currentSprint?.endAt);
+	
+	const hasDates = currentSprint?.startAt && currentSprint?.endAt;
+	const dateDisplay = hasDates 
+		? `${formatDate(currentSprint.startAt)} → ${formatDate(currentSprint.endAt)}`
+		: "Chưa lên lịch";
 
 	return (
 		<section className='flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-[#2a2a2a] bg-[#171717] shadow-sm'>
 			<div className='shrink-0 border-b border-[#2a2a2a] p-4'>
 				<div className='flex items-start justify-between gap-3'>
-					<div className='min-w-0'>
-						<div className='flex flex-wrap items-center gap-2'>
-							<h3 className='truncate text-base font-bold text-white'>
-								{currentSprint?.name ?? "Sprint hiện tại"}
-							</h3>
-							<span
-								className={`inline-flex h-6 items-center rounded-full border px-2 text-[11px] font-bold ${statusMeta.className}`}
-							>
-								{statusMeta.label}
-							</span>
+					<div className='min-w-0 flex-1'>
+						<div className='flex items-center justify-between'>
+							<div className='flex flex-wrap items-center gap-x-3 gap-y-1.5'>
+								<h3 className='truncate text-base font-bold text-white'>
+									{currentSprint?.name ?? "Sprint hiện tại"}
+								</h3>
+								<div className='flex items-center gap-2'>
+									<span
+										className={`inline-flex h-6 items-center rounded-full border px-2 text-[11px] font-bold ${statusMeta.className}`}
+									>
+										{statusMeta.label}
+									</span>
+									<span className='text-slate-600'>·</span>
+									<span className={`text-xs font-medium ${hasDates ? 'text-slate-400' : 'text-slate-500 italic'}`}>
+										{dateDisplay}
+									</span>
+								</div>
+							</div>
+
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<button className='flex h-8 w-8 items-center justify-center rounded-md text-slate-400 transition hover:bg-[#2a2a2a] hover:text-white'>
+										<MoreHorizontal size={16} />
+									</button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align='end' className='w-48 border-[#2a2a2a] bg-[#171717] text-slate-200'>
+									<DropdownMenuItem className='gap-2 focus:bg-[#2a2a2a] focus:text-white'>
+										<PlayCircle size={14} />
+										<span>Lập kế hoạch</span>
+									</DropdownMenuItem>
+									<DropdownMenuItem className='gap-2 focus:bg-[#2a2a2a] focus:text-white'>
+										<Settings2 size={14} />
+										<span>Cấu hình sprint</span>
+									</DropdownMenuItem>
+									<DropdownMenuSeparator className='bg-[#2a2a2a]' />
+									<DropdownMenuItem 
+										className='gap-2 text-emerald-400 focus:bg-[#2a2a2a] focus:text-emerald-300'
+										onClick={() => {
+											if (confirm("Hoàn thành sprint này?")) {
+												completed.mutate({ workspaceId, projectId, sprintId });
+											}
+										}}
+									>
+										<CheckCircle size={14} />
+										<span>Hoàn thành sprint</span>
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
 						</div>
 
-						<p className='mt-4 text-xs font-bold text-slate-200'>
-							Mục tiêu sprint
-						</p>
-						<p className='mt-1 text-xs font-medium text-slate-400'>
-							{currentSprint?.goal ||
-								"Chưa có mục tiêu cho sprint này"}
-						</p>
+						{currentSprint?.goal && (
+							<div className='mt-3'>
+								<p className='text-xs font-bold text-slate-200'>
+									Mục tiêu sprint
+								</p>
+								<p className='mt-1 text-xs font-medium text-slate-400'>
+									{currentSprint.goal}
+								</p>
+							</div>
+						)}
 					</div>
 				</div>
 
-				<div className='mt-4 flex items-center justify-between text-xs font-medium text-slate-400'>
-					<div className='flex items-center gap-1'>
-						<CalendarDays size={14} />
-						{startAt} - {endAt}
-					</div>
-					<span>{remainingDays}</span>
-				</div>
-
-				<div className='mt-3'>
-					<Progress value={67} />
-				</div>
-
-				<div className='mt-4 grid grid-cols-4 gap-2'>
+				<div className='mt-3 grid grid-cols-4 gap-2'>
 					<StatCard value='18' label='Công việc' />
 					<StatCard
 						value='11'
@@ -75,39 +112,12 @@ const Sprint = ({ projectId, workspaceId, sprintId }: SprintProps) => {
 				</div>
 			</div>
 
-			<div className='min-h-0 flex-1 overflow-auto p-4'>
-				<ProviderDragDrop
+			<div className='flex min-h-0 flex-1 flex-col p-0'>
+				<SprintTaskList
 					workspaceId={workspaceId}
 					projectId={projectId}
 					sprintId={sprintId}
-					className='w-auto'
 				/>
-			</div>
-
-			<div className='shrink-0 border-t border-[#2a2a2a] p-4'>
-				<div className='mb-4'>
-					<div className='flex justify-between text-xs font-semibold text-slate-300'>
-						<span>Tổng SP đã lên kế hoạch</span>
-					</div>
-					<div className='mt-1 text-xs font-bold text-slate-200'>
-						29 / 36 SP
-					</div>
-					<div className='mt-2 h-2 overflow-hidden rounded-full bg-[#2a2a2a]'>
-						<Progress value={67} />
-					</div>
-				</div>
-
-				<div className='flex gap-2'>
-					<button className='flex-1 rounded-lg bg-blue-600 py-2.5 text-xs font-bold text-white shadow-lg shadow-blue-950/30 transition hover:bg-blue-500'>
-						Lập kế hoạch
-					</button>
-					<button className='rounded-lg border border-[#333333] bg-[#101010] px-3 text-slate-400 transition hover:bg-[#202020] hover:text-white'>
-						<Settings2 size={15} />
-					</button>
-					<button className='rounded-lg border border-[#333333] bg-[#101010] px-3 text-slate-400 transition hover:bg-[#202020] hover:text-white'>
-						<ChevronDown size={15} />
-					</button>
-				</div>
 			</div>
 		</section>
 	);
