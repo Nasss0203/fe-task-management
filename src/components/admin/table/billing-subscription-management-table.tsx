@@ -28,6 +28,7 @@ type Props = {
 	onManualRenew: (subscriptionId: string) => void;
 	onGrantTrial: (subscriptionId: string) => void;
 	onToggleStatus: (subscriptionId: string) => void;
+	isUpdatingSubscription?: boolean;
 };
 
 export function BillingSubscriptionManagementTable({
@@ -36,6 +37,7 @@ export function BillingSubscriptionManagementTable({
 	onManualRenew,
 	onGrantTrial,
 	onToggleStatus,
+	isUpdatingSubscription = false,
 }: Props) {
 	if (!subscriptions.length) {
 		return (
@@ -209,6 +211,9 @@ export function BillingSubscriptionManagementTable({
 														onToggleStatus(
 															subscription.id,
 														)
+													}
+													disabled={
+														isUpdatingSubscription
 													}
 													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-white/5 focus:text-white'
 												>

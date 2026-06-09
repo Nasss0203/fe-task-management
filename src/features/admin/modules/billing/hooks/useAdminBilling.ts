@@ -1,11 +1,16 @@
 "use client";
 
 import {
+	cancelAdminBillingSubscriptionApi,
+	createAdminBillingPlanApi,
 	getAdminBillingPaymentsApi,
 	getAdminBillingPlansApi,
 	getAdminBillingSubscriptionsApi,
+	resumeAdminBillingSubscriptionApi,
+	updateAdminBillingPlanApi,
+	updateAdminBillingPlanStatusApi,
 } from "@/services/admin/billing/billing-admin.service";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const ADMIN_BILLING_KEY = {
 	PLANS: "ADMIN_BILLING_PLANS",
@@ -14,6 +19,8 @@ export const ADMIN_BILLING_KEY = {
 } as const;
 
 export const useAdminBilling = () => {
+	const queryClient = useQueryClient();
+
 	const plans = useQuery({
 		queryKey: [ADMIN_BILLING_KEY.PLANS],
 		queryFn: getAdminBillingPlansApi,
@@ -36,9 +43,56 @@ export const useAdminBilling = () => {
 		enabled: !payments.isLoading,
 	});
 
+	const invalidatePlans = async () => {
+		await queryClient.invalidateQueries({
+			queryKey: [ADMIN_BILLING_KEY.PLANS],
+		});
+	};
+
+	const invalidateSubscriptions = async () => {
+		await Promise.all([
+			queryClient.invalidateQueries({
+				queryKey: [ADMIN_BILLING_KEY.PAYMENTS],
+			}),
+			queryClient.invalidateQueries({
+				queryKey: [ADMIN_BILLING_KEY.SUBSCRIPTIONS],
+			}),
+		]);
+	};
+
+	const createPlan = useMutation({
+		mutationFn: createAdminBillingPlanApi,
+		onSuccess: invalidatePlans,
+	});
+
+	const updatePlan = useMutation({
+		mutationFn: updateAdminBillingPlanApi,
+		onSuccess: invalidatePlans,
+	});
+
+	const updatePlanStatus = useMutation({
+		mutationFn: updateAdminBillingPlanStatusApi,
+		onSuccess: invalidatePlans,
+	});
+
+	const cancelSubscription = useMutation({
+		mutationFn: cancelAdminBillingSubscriptionApi,
+		onSuccess: invalidateSubscriptions,
+	});
+
+	const resumeSubscription = useMutation({
+		mutationFn: resumeAdminBillingSubscriptionApi,
+		onSuccess: invalidateSubscriptions,
+	});
+
 	return {
 		plans,
 		subscriptions,
 		payments,
+		createPlan,
+		updatePlan,
+		updatePlanStatus,
+		cancelSubscription,
+		resumeSubscription,
 	};
 };

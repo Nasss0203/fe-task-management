@@ -28,7 +28,12 @@ import {
 type Props = {
 	workspace: WorkspaceItem | null;
 	onClose: () => void;
-	onChangePlan: (workspaceId: string, plan: PlanTypeWorkspace) => void;
+	onChangePlan: (
+		workspaceId: string,
+		plan: PlanTypeWorkspace,
+	) => Promise<void> | void;
+	isChangingPlan?: boolean;
+	canGrantPro?: boolean;
 };
 
 const formatDate = (value?: string | null) => {
@@ -95,6 +100,8 @@ export function WorkspaceDetailPanel({
 	workspace,
 	onClose,
 	onChangePlan,
+	isChangingPlan = false,
+	canGrantPro = true,
 }: Props) {
 	const handleOpenChange = (nextOpen: boolean) => {
 		if (!nextOpen) {
@@ -118,6 +125,10 @@ export function WorkspaceDetailPanel({
 
 	const isDeleted = workspace.status === "DELETED";
 	const nextPlanLabel = workspace.plan === "pro" ? "Chuyển về Free" : "Nâng lên Pro";
+	const isUpgradeDisabled =
+		isDeleted ||
+		isChangingPlan ||
+		(workspace.plan !== "pro" && !canGrantPro);
 
 	return (
 		<Drawer
@@ -325,12 +336,14 @@ export function WorkspaceDetailPanel({
 							<div className='flex flex-col gap-2 sm:flex-row'>
 								<Button
 									type='button'
-									disabled={isDeleted}
+									disabled={isUpgradeDisabled}
 									onClick={handleSavePlan}
 									className='h-11 w-full shrink-0 rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto'
 								>
 									<Crown className='mr-2 h-4 w-4' />
-									{nextPlanLabel}
+									{isChangingPlan
+										? "Đang cập nhật..."
+										: nextPlanLabel}
 								</Button>
 							</div>
 
@@ -340,6 +353,14 @@ export function WorkspaceDetailPanel({
 									gói.
 								</p>
 							)}
+
+							{!isDeleted &&
+								workspace.plan !== "pro" &&
+								!canGrantPro && (
+									<p className='mt-2 text-xs text-amber-400'>
+										Không tìm thấy gói Pro đang hoạt động.
+									</p>
+								)}
 						</div>
 					</div>
 				</div>

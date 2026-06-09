@@ -4,6 +4,8 @@ export type PlanStatus = "ACTIVE" | "DISABLED" | "DRAFT";
 
 export type BillingCycle = "MONTHLY" | "YEARLY";
 
+export type PlanBillingInterval = "MONTH" | "YEAR" | "LIFETIME";
+
 export type SubscriptionStatus = "ACTIVE" | "TRIAL" | "EXPIRED" | "CANCELED";
 
 export type CouponType = "PERCENT" | "FIXED" | "TRIAL_DAYS";
@@ -16,8 +18,13 @@ export type BillingPlan = {
 	id: string;
 	name: string;
 	code: string;
+	slug?: string;
 	description: string;
 	status: PlanStatus;
+	priceAmount?: number;
+	currency?: string;
+	billingInterval?: PlanBillingInterval;
+	sortOrder?: number;
 	monthlyPrice: number;
 	yearlyPrice: number;
 	workspaceLimit: number;

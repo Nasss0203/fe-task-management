@@ -26,6 +26,8 @@ import { BillingCouponManagementTable } from "@/components/admin/table/billing-c
 import { BillingPlanManagementTable } from "@/components/admin/table/billing-plan-management-table";
 import { BillingSubscriptionManagementTable } from "@/components/admin/table/billing-subscription-management-table";
 import { useAdminBilling } from "@/features/admin/modules/billing/hooks/useAdminBilling";
+import { toAdminBillingPlanPayload } from "@/services/admin/billing/billing-admin.service";
+import { toast } from "sonner";
 
 function addDays(date: string, days: number) {
 	const next = new Date(date);
@@ -34,13 +36,17 @@ function addDays(date: string, days: number) {
 }
 
 export default function AdminPlansBillingPage() {
-	const { plans: plansQuery, subscriptions: subscriptionsQuery } =
-		useAdminBilling();
+	const {
+		plans: plansQuery,
+		subscriptions: subscriptionsQuery,
+		createPlan,
+		updatePlan,
+		updatePlanStatus,
+		cancelSubscription,
+		resumeSubscription,
+	} = useAdminBilling();
 	const [section, setSection] = useState<BillingSection>("SUBSCRIPTIONS");
 
-	const [planOverrides, setPlanOverrides] = useState<BillingPlan[] | null>(
-		null,
-	);
 	const [subscriptionOverrides, setSubscriptionOverrides] = useState<
 		WorkspaceSubscription[] | null
 	>(null);
@@ -58,10 +64,7 @@ export default function AdminPlansBillingPage() {
 	const [kind, setKind] = useState("all");
 	const [createdAt, setCreatedAt] = useState("all");
 
-	const plans = useMemo(
-		() => planOverrides ?? plansQuery.data ?? [],
-		[planOverrides, plansQuery.data],
-	);
+	const plans = useMemo(() => plansQuery.data ?? [], [plansQuery.data]);
 	const subscriptions = useMemo(
 		() => subscriptionOverrides ?? subscriptionsQuery.data ?? [],
 		[subscriptionOverrides, subscriptionsQuery.data],
@@ -149,8 +152,11 @@ export default function AdminPlansBillingPage() {
 			id: `plan_${Date.now()}`,
 			name: "",
 			code: "",
+			slug: "",
 			description: "",
 			status: "DRAFT",
+			billingInterval: "MONTH",
+			currency: "VND",
 			monthlyPrice: 0,
 			yearlyPrice: 0,
 			workspaceLimit: 1,
@@ -180,31 +186,47 @@ export default function AdminPlansBillingPage() {
 		});
 	};
 
-	const handleSavePlan = (plan: BillingPlan) => {
-		setPlanOverrides((prev) => {
-			const source = prev ?? plans;
-			const exists = source.some((item) => item.id === plan.id);
-			if (!exists) return [plan, ...source];
-			return source.map((item) => (item.id === plan.id ? plan : item));
-		});
-		setSelectedPlan(null);
+	const handleSavePlan = async (plan: BillingPlan) => {
+		try {
+			const payload = toAdminBillingPlanPayload(plan);
+			const isNewPlan = plan.id.startsWith("plan_");
+
+			if (isNewPlan) {
+				await createPlan.mutateAsync(payload);
+				toast.success("Đã tạo gói dịch vụ.");
+			} else {
+				await updatePlan.mutateAsync({
+					planId: plan.id,
+					payload,
+				});
+				toast.success("Đã cập nhật gói dịch vụ.");
+			}
+
+			setSelectedPlan(null);
+		} catch (error) {
+			console.error("save admin billing plan failed", error);
+			toast.error("Không thể lưu gói dịch vụ.");
+		}
 	};
 
-	const handleTogglePlanStatus = (planId: string) => {
-		setPlanOverrides((prev) =>
-			(prev ?? plans).map((plan) =>
-				plan.id === planId
-					? {
-							...plan,
-							status:
-								plan.status === "ACTIVE"
-									? "DISABLED"
-									: "ACTIVE",
-							updatedAt: new Date().toISOString(),
-						}
-					: plan,
-			),
-		);
+	const handleTogglePlanStatus = async (planId: string) => {
+		const plan = plans.find((item) => item.id === planId);
+		if (!plan) return;
+
+		try {
+			await updatePlanStatus.mutateAsync({
+				planId,
+				isActive: plan.status !== "ACTIVE",
+			});
+			toast.success(
+				plan.status === "ACTIVE"
+					? "Đã tắt gói dịch vụ."
+					: "Đã bật gói dịch vụ.",
+			);
+		} catch (error) {
+			console.error("toggle admin billing plan status failed", error);
+			toast.error("Không thể cập nhật trạng thái gói.");
+		}
 	};
 
 	const handleSaveSubscription = (subscription: WorkspaceSubscription) => {
@@ -249,20 +271,34 @@ export default function AdminPlansBillingPage() {
 		);
 	};
 
-	const handleToggleSubscriptionStatus = (subscriptionId: string) => {
-		setSubscriptionOverrides((prev) =>
-			(prev ?? subscriptions).map((item) =>
-				item.id === subscriptionId
-					? {
-							...item,
-							status:
-								item.status === "CANCELED"
-									? "ACTIVE"
-									: "CANCELED",
-						}
-					: item,
-			),
+	const handleToggleSubscriptionStatus = async (subscriptionId: string) => {
+		const subscription = subscriptions.find(
+			(item) => item.id === subscriptionId,
 		);
+		if (!subscription) return;
+
+		try {
+			if (subscription.status === "CANCELED") {
+				await resumeSubscription.mutateAsync({
+					subscriptionId,
+					note: "Resumed from admin billing subscriptions",
+				});
+				setSubscriptionOverrides(null);
+				toast.success("Đã kích hoạt lại subscription.");
+				return;
+			}
+
+			await cancelSubscription.mutateAsync({
+				subscriptionId,
+				immediate: true,
+				note: "Canceled from admin billing subscriptions",
+			});
+			setSubscriptionOverrides(null);
+			toast.success("Đã hủy subscription.");
+		} catch (error) {
+			console.error("cancel admin billing subscription failed", error);
+			toast.error("Không thể hủy subscription.");
+		}
 	};
 
 	const handleSaveCoupon = (coupon: BillingCoupon) => {
@@ -334,6 +370,10 @@ export default function AdminPlansBillingPage() {
 					onManualRenew={handleManualRenew}
 					onGrantTrial={handleGrantTrial}
 					onToggleStatus={handleToggleSubscriptionStatus}
+					isUpdatingSubscription={
+						cancelSubscription.isPending ||
+						resumeSubscription.isPending
+					}
 				/>
 			)}
 
@@ -345,11 +385,12 @@ export default function AdminPlansBillingPage() {
 				/>
 			)}
 
-			<BillingPlanDetailPanel
+				<BillingPlanDetailPanel
 				key={selectedPlan?.id ?? "billing-plan"}
 				plan={selectedPlan}
 				onClose={() => setSelectedPlan(null)}
 				onSave={handleSavePlan}
+				isSaving={createPlan.isPending || updatePlan.isPending}
 			/>
 
 			<BillingSubscriptionDetailPanel

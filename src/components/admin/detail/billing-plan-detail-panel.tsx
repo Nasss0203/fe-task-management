@@ -10,15 +10,40 @@ import {
 	DrawerTitle,
 } from "@/components/ui/drawer";
 import { useEffect, useRef, useState } from "react";
-import type { BillingPlan, PlanStatus } from "../shared/billing-admin.types";
+import type {
+	BillingPlan,
+	PlanBillingInterval,
+	PlanStatus,
+} from "../shared/billing-admin.types";
 
 type Props = {
 	plan: BillingPlan | null;
 	onClose: () => void;
-	onSave: (plan: BillingPlan) => void;
+	onSave: (plan: BillingPlan) => Promise<void> | void;
+	isSaving?: boolean;
 };
 
-export function BillingPlanDetailPanel({ plan, onClose, onSave }: Props) {
+const toSlug = (value: string) =>
+	value
+		.trim()
+		.toLowerCase()
+		.replace(/[_\s]+/g, "-")
+		.replace(/[^a-z0-9-]/g, "")
+		.replace(/-+/g, "-")
+		.replace(/^-|-$/g, "");
+
+const getNumberInputValue = (value: number) =>
+	Number.isFinite(value) ? String(value) : "";
+
+const parseNumberInput = (value: string) =>
+	value.trim() === "" ? Number.NaN : Number(value);
+
+export function BillingPlanDetailPanel({
+	plan,
+	onClose,
+	onSave,
+	isSaving = false,
+}: Props) {
 	const [open, setOpen] = useState(Boolean(plan));
 	const [form, setForm] = useState<BillingPlan | null>(plan);
 	const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -32,6 +57,8 @@ export function BillingPlanDetailPanel({ plan, onClose, onSave }: Props) {
 	}, []);
 
 	const handleRequestClose = () => {
+		if (isSaving) return;
+
 		if (closeTimerRef.current) {
 			clearTimeout(closeTimerRef.current);
 		}
@@ -74,6 +101,7 @@ export function BillingPlanDetailPanel({ plan, onClose, onSave }: Props) {
 							type='button'
 							variant='ghost'
 							onClick={handleRequestClose}
+							disabled={isSaving}
 							className='h-9 rounded-xl border border-white/10 px-3 text-sm text-neutral-300 hover:bg-white/5 hover:text-white'
 						>
 							Close
@@ -122,6 +150,9 @@ export function BillingPlanDetailPanel({ plan, onClose, onSave }: Props) {
 													? {
 															...prev,
 															code: e.target.value.toUpperCase(),
+															slug: toSlug(
+																e.target.value,
+															),
 														}
 													: prev,
 											)
@@ -187,18 +218,50 @@ export function BillingPlanDetailPanel({ plan, onClose, onSave }: Props) {
 							<div className='space-y-4'>
 								<div>
 									<label className='mb-2 block text-sm text-neutral-400'>
+										Chu kỳ thanh toán
+									</label>
+									<select
+										value={form.billingInterval ?? "MONTH"}
+										onChange={(e) =>
+											setForm((prev) =>
+												prev
+													? {
+															...prev,
+															billingInterval: e
+																.target
+																.value as PlanBillingInterval,
+														}
+													: prev,
+											)
+										}
+										className='h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none'
+									>
+										<option value='MONTH'>Tháng</option>
+										<option value='YEAR'>Năm</option>
+										<option value='LIFETIME'>Trọn đời</option>
+									</select>
+								</div>
+
+								<div>
+									<label className='mb-2 block text-sm text-neutral-400'>
 										Giá tháng
 									</label>
 									<input
 										type='number'
-										value={form.monthlyPrice}
+										value={getNumberInputValue(
+											form.monthlyPrice,
+										)}
+										disabled={
+											form.billingInterval === "YEAR" ||
+											form.billingInterval === "LIFETIME"
+										}
 										onChange={(e) =>
 											setForm((prev) =>
 												prev
 													? {
 															...prev,
 															monthlyPrice:
-																Number(
+																parseNumberInput(
 																	e.target
 																		.value,
 																),
@@ -216,15 +279,23 @@ export function BillingPlanDetailPanel({ plan, onClose, onSave }: Props) {
 									</label>
 									<input
 										type='number'
-										value={form.yearlyPrice}
+										value={getNumberInputValue(
+											form.yearlyPrice,
+										)}
+										disabled={
+											form.billingInterval === "MONTH" ||
+											form.billingInterval === "LIFETIME"
+										}
 										onChange={(e) =>
 											setForm((prev) =>
 												prev
 													? {
 															...prev,
-															yearlyPrice: Number(
-																e.target.value,
-															),
+															yearlyPrice:
+																parseNumberInput(
+																	e.target
+																		.value,
+																),
 														}
 													: prev,
 											)
@@ -239,15 +310,19 @@ export function BillingPlanDetailPanel({ plan, onClose, onSave }: Props) {
 									</label>
 									<input
 										type='number'
-										value={form.trialDays}
+										value={getNumberInputValue(
+											form.trialDays,
+										)}
 										onChange={(e) =>
 											setForm((prev) =>
 												prev
 													? {
 															...prev,
-															trialDays: Number(
-																e.target.value,
-															),
+															trialDays:
+																parseNumberInput(
+																	e.target
+																		.value,
+																),
 														}
 													: prev,
 											)
@@ -270,14 +345,16 @@ export function BillingPlanDetailPanel({ plan, onClose, onSave }: Props) {
 									</label>
 									<input
 										type='number'
-										value={form.workspaceLimit}
+										value={getNumberInputValue(
+											form.workspaceLimit,
+										)}
 										onChange={(e) =>
 											setForm((prev) =>
 												prev
 													? {
 															...prev,
 															workspaceLimit:
-																Number(
+																parseNumberInput(
 																	e.target
 																		.value,
 																),
@@ -295,14 +372,16 @@ export function BillingPlanDetailPanel({ plan, onClose, onSave }: Props) {
 									</label>
 									<input
 										type='number'
-										value={form.membersLimit}
+										value={getNumberInputValue(
+											form.membersLimit,
+										)}
 										onChange={(e) =>
 											setForm((prev) =>
 												prev
 													? {
 															...prev,
 															membersLimit:
-																Number(
+																parseNumberInput(
 																	e.target
 																		.value,
 																),
@@ -320,14 +399,16 @@ export function BillingPlanDetailPanel({ plan, onClose, onSave }: Props) {
 									</label>
 									<input
 										type='number'
-										value={form.projectsLimit}
+										value={getNumberInputValue(
+											form.projectsLimit,
+										)}
 										onChange={(e) =>
 											setForm((prev) =>
 												prev
 													? {
 															...prev,
 															projectsLimit:
-																Number(
+																parseNumberInput(
 																	e.target
 																		.value,
 																),
@@ -345,14 +426,16 @@ export function BillingPlanDetailPanel({ plan, onClose, onSave }: Props) {
 									</label>
 									<input
 										type='number'
-										value={form.storageLimitGb}
+										value={getNumberInputValue(
+											form.storageLimitGb,
+										)}
 										onChange={(e) =>
 											setForm((prev) =>
 												prev
 													? {
 															...prev,
 															storageLimitGb:
-																Number(
+																parseNumberInput(
 																	e.target
 																		.value,
 																),
@@ -399,6 +482,7 @@ export function BillingPlanDetailPanel({ plan, onClose, onSave }: Props) {
 
 						<Button
 							type='button'
+							disabled={isSaving}
 							onClick={() =>
 								onSave({
 									...form,
@@ -407,7 +491,7 @@ export function BillingPlanDetailPanel({ plan, onClose, onSave }: Props) {
 							}
 							className='h-11 w-full rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-white hover:bg-white/10'
 						>
-							Lưu gói dịch vụ
+							{isSaving ? "Đang lưu..." : "Lưu gói dịch vụ"}
 						</Button>
 					</div>
 				</div>
@@ -416,6 +500,7 @@ export function BillingPlanDetailPanel({ plan, onClose, onSave }: Props) {
 					<Button
 						variant='outline'
 						onClick={handleRequestClose}
+						disabled={isSaving}
 						className='h-11 rounded-2xl border-white/10 bg-[#111111] text-white hover:bg-white/5 hover:text-white'
 					>
 						Close

@@ -3,6 +3,7 @@ import type {
 	BillingPayment,
 	BillingPlan,
 	PaymentStatus,
+	PlanBillingInterval,
 	PlanStatus,
 	SubscriptionStatus,
 	WorkspaceSubscription,
@@ -116,6 +117,20 @@ const normalizeBillingCycle = (source: BillingRecord): BillingCycle => {
 	return "MONTHLY";
 };
 
+const normalizePlanBillingInterval = (
+	source: BillingRecord,
+): PlanBillingInterval => {
+	const rawCycle = getString(source, [
+		"billingInterval",
+		"billingCycle",
+		"interval",
+	]).toUpperCase();
+
+	if (rawCycle === "YEAR" || rawCycle === "YEARLY") return "YEAR";
+	if (rawCycle === "LIFETIME") return "LIFETIME";
+	return "MONTH";
+};
+
 const normalizeSubscriptionStatus = (
 	source: BillingRecord,
 ): SubscriptionStatus => {
@@ -164,15 +179,22 @@ export const normalizeAdminBillingPlan = (item: unknown): BillingPlan => {
 	const source = isRecord(item) ? item : {};
 	const limits = getJsonRecord(source, ["limits"]);
 	const billingCycle = normalizeBillingCycle(source);
+	const billingInterval = normalizePlanBillingInterval(source);
 	const price = getNumber(source, ["priceAmount", "price", "amount"]);
 	const code = getString(source, ["code", "slug", "id"], "PLAN");
+	const storageMb = getLimit(limits, ["storageMb"], 0);
 
 	return {
 		id: getString(source, ["id"], code),
 		name: getString(source, ["name"], code),
 		code: normalizeCode(code),
+		slug: getString(source, ["slug", "code"], code),
 		description: getString(source, ["description"]),
 		status: normalizePlanStatus(source),
+		priceAmount: price,
+		currency: getString(source, ["currency"], "VND"),
+		billingInterval,
+		sortOrder: getNumber(source, ["sortOrder"]),
 		monthlyPrice: billingCycle === "MONTHLY" ? price : getNumber(source, ["monthlyPrice"]),
 		yearlyPrice: billingCycle === "YEARLY" ? price : getNumber(source, ["yearlyPrice"]),
 		workspaceLimit: getLimit(limits, ["upgradedWorkspaces", "workspaces"], 1),
@@ -180,7 +202,7 @@ export const normalizeAdminBillingPlan = (item: unknown): BillingPlan => {
 		projectsLimit: getLimit(limits, ["projects", "projectsLimit"], 5),
 		storageLimitGb: Math.round(
 			getLimit(limits, ["storageGb", "storageLimitGb"], 0) ||
-				getLimit(limits, ["storageMb"], 5120) / 1024,
+				(storageMb || 5120) / 1024,
 		),
 		features: normalizeFeatures(source),
 		trialDays: getNumber(source, ["trialDays", "trialPeriodDays"]),

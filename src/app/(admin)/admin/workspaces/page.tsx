@@ -14,6 +14,7 @@ import type {
 } from "@/services/admin/workspace/type";
 import type { PaginationState } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 const getCreatedFrom = (value: string) => {
 	if (value === "all") return undefined;
@@ -85,10 +86,33 @@ export default function AdminWorkspacesPage() {
 		};
 	}, [pagination]);
 
-	const { workspaces, updatePlan } = useAdminWorkspaces(workspaceQuery);
+	const {
+		workspaces,
+		billingPlans,
+		grantSubscription,
+		revokeSubscription,
+	} = useAdminWorkspaces(workspaceQuery);
 
 	const workspacePage = workspaces.data?.data;
 	const workspaceItems = workspacePage?.data ?? [];
+	const proPlan = useMemo(() => {
+		const activePlans =
+			billingPlans.data?.filter((item) => item.status === "ACTIVE") ?? [];
+
+		return (
+			activePlans.find(
+				(item) =>
+					item.slug?.toLowerCase() === "pro-monthly" ||
+					item.code.toLowerCase() === "pro_monthly",
+			) ??
+			activePlans.find(
+				(item) =>
+					item.slug?.toLowerCase() !== "free" &&
+					item.code.toLowerCase() !== "free",
+			) ??
+			null
+		);
+	}, [billingPlans.data]);
 	const filteredWorkspaceItems = useMemo(() => {
 		return workspaceItems.filter((workspace) => {
 			const matchSearch = matchesSearch(workspace, search);
@@ -143,14 +167,47 @@ export default function AdminWorkspacesPage() {
 		setSelectedWorkspace(workspace);
 	};
 
-	const handleChangePlan = (
+	const handleChangePlan = async (
 		workspaceId: string,
 		nextPlan: PlanTypeWorkspace,
 	) => {
-		updatePlan.mutate({
-			workspaceId,
-			planType: nextPlan,
-		});
+		try {
+			if (nextPlan === "pro") {
+				if (!proPlan) {
+					toast.error("Không tìm thấy gói Pro đang hoạt động.");
+					return;
+				}
+
+				await grantSubscription.mutateAsync({
+					workspaceId,
+					planId: proPlan.id,
+					months: 1,
+					note: "Granted from admin workspace detail",
+				});
+
+				toast.success("Đã nâng workspace lên Pro.");
+			} else {
+				await revokeSubscription.mutateAsync({
+					workspaceId,
+					note: "Revoked from admin workspace detail",
+				});
+
+				toast.success("Đã chuyển workspace về Free.");
+			}
+
+			setSelectedWorkspace((current) =>
+				current?.id === workspaceId
+					? {
+							...current,
+							plan: nextPlan,
+							updatedAt: new Date().toISOString(),
+						}
+					: current,
+			);
+		} catch (error) {
+			console.error("change workspace billing subscription failed", error);
+			toast.error("Không thể cập nhật gói workspace.");
+		}
 	};
 
 	const handleResetFilters = () => {
@@ -222,6 +279,10 @@ export default function AdminWorkspacesPage() {
 				workspace={selectedWorkspace}
 				onClose={() => setSelectedWorkspace(null)}
 				onChangePlan={handleChangePlan}
+				isChangingPlan={
+					grantSubscription.isPending || revokeSubscription.isPending
+				}
+				canGrantPro={Boolean(proPlan)}
 			/>
 		</div>
 	);
