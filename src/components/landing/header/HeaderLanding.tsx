@@ -15,65 +15,62 @@ const navItems = [
 const HeaderLanding = () => {
 	const { user } = useUser();
 	return (
-		<header className='mx-auto flex max-w-6xl items-center justify-between rounded-full border border-white/10 bg-white/5 px-5 py-3 backdrop-blur-md'>
+		<header className='mx-auto flex max-w-6xl items-center justify-between rounded-full border border-white/10 bg-white/5 px-6 py-3 backdrop-blur-md animate-in fade-in slide-in-from-top-4 duration-1000'>
 			<Link href='/' className='flex items-center gap-2'>
-				<div className='flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 ring-1 ring-white/10'>
-					<LayoutGrid className='h-4 w-4 text-white' />
+				<div className='flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/10'>
+					<LayoutGrid className='h-5 w-5 text-white' />
 				</div>
-				<span className='text-sm font-semibold tracking-wide'>
+				<span className='text-base font-semibold tracking-tight'>
 					Taskmanly
 				</span>
 			</Link>
 
-			<nav className='hidden items-center gap-7 lg:flex'>
+			<nav className='hidden items-center gap-8 lg:flex'>
 				{navItems.map((item) => (
 					<Link
 						key={item.label}
 						href={item.href}
-						className='flex items-center gap-1 text-sm text-white/70 transition hover:text-white'
+						className='flex items-center gap-1 text-sm font-medium text-white/50 transition-colors hover:text-white'
 					>
 						<span>{item.label}</span>
 						{item.label !== "Templates" && (
-							<ChevronDown className='h-4 w-4' />
+							<ChevronDown className='h-3.5 w-3.5 opacity-50' />
 						)}
 					</Link>
 				))}
 			</nav>
 
-			<div className='flex items-center gap-3'>
+			<div className='flex items-center gap-4'>
 				<Link
 					href='/contact'
-					className='hidden text-sm text-white/70 transition hover:text-white md:inline-block'
+					className='hidden text-sm font-medium text-white/50 transition-colors hover:text-white md:inline-block'
 				>
 					Contact Sales
 				</Link>
 
 				{user ? (
 					<Link href={"dashboard"}>
-						<Button className='bg-indigo-500 text-white hover:bg-indigo-400'>
-							Get Started
+						<Button className='rounded-full bg-indigo-500 px-6 font-semibold text-white hover:bg-indigo-400 active:scale-[0.98]'>
+							Dashboard
 						</Button>
 					</Link>
 				) : (
-					<>
+					<div className='flex items-center gap-2'>
 						<Link href={"sign-in"}>
 							<Button
-								variant='outline'
-								className='border-white/15 bg-transparent text-white hover:bg-white/10 hover:text-white'
+								variant='ghost'
+								className='rounded-full px-5 text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white'
 							>
 								Log In
 							</Button>
 						</Link>
 
 						<Link href={"sign-up"}>
-							<Button
-								variant='outline'
-								className='border-white/15 bg-transparent text-white hover:bg-white/10 hover:text-white'
-							>
+							<Button className='rounded-full bg-white px-6 font-semibold text-black hover:bg-white/90 active:scale-[0.98]'>
 								Register
 							</Button>
 						</Link>
-					</>
+					</div>
 				)}
 			</div>
 		</header>

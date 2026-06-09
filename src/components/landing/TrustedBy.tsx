@@ -1,43 +1,36 @@
 const brandItems = [
-	{ name: "StellarTech", icon: "✦" },
-	{ name: "CascadeStyle", icon: "⬡" },
-	{ name: "Braincraze", icon: "✹" },
-	{ name: "StackFlow", icon: "◈" },
-	{ name: "Biomark", icon: "◉" },
+	{ name: "Vercel", slug: "vercel" },
+	{ name: "Stripe", slug: "stripe" },
+	{ name: "Linear", slug: "linear" },
+	{ name: "GitHub", slug: "github" },
+	{ name: "Clerk", slug: "clerk" },
 ];
+
 const TrustedBy = () => {
 	return (
-		<>
-			<div className='mx-auto mt-14 max-w-6xl'>
-				<div className='overflow-hidden rounded-[28px] border border-white/10 bg-white/5 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_30px_100px_rgba(0,0,0,0.45)] backdrop-blur'>
-					<div className='flex items-center gap-2 border-b border-white/10 px-5 py-4'>
-						<div className='h-3 w-3 rounded-full bg-red-400/80' />
-						<div className='h-3 w-3 rounded-full bg-yellow-400/80' />
-						<div className='h-3 w-3 rounded-full bg-green-400/80' />
-						<div className='ml-4 h-8 flex-1 rounded-full border border-white/10 bg-black/40' />
+		<div className='mx-auto mt-24 max-w-6xl text-center animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500'>
+			<p className='text-sm font-medium tracking-widest uppercase text-white/40'>
+				Trusted by industry leaders
+			</p>
+
+			<div className='mt-10 flex flex-wrap items-center justify-center gap-x-12 gap-y-8 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-500'>
+				{brandItems.map((brand) => (
+					<div
+						key={brand.name}
+						className='flex items-center gap-3 transition-transform hover:scale-105'
+					>
+						<img
+							src={`https://cdn.simpleicons.org/${brand.slug}/ffffff`}
+							alt={brand.name}
+							className='h-6 w-auto'
+						/>
+						<span className='text-lg font-semibold tracking-tight text-white'>
+							{brand.name}
+						</span>
 					</div>
-
-					<div className='relative aspect-[16/9] w-full bg-[#0f0f12]'></div>
-				</div>
+				))}
 			</div>
-			<div className='mx-auto mt-14 max-w-6xl text-center'>
-				<p className='text-xl font-semibold text-white sm:text-2xl'>
-					Trusted by over 40,000 teams and companies worldwide
-				</p>
-
-				<div className='mt-8 flex flex-wrap items-center justify-center gap-x-10 gap-y-5 sm:gap-x-12 lg:gap-x-14'>
-					{brandItems.map((brand) => (
-						<div
-							key={brand.name}
-							className='flex items-center gap-2 text-base font-semibold text-white/80 sm:text-lg'
-						>
-							<span className='text-white'>{brand.icon}</span>
-							<span>{brand.name}</span>
-						</div>
-					))}
-				</div>
-			</div>
-		</>
+		</div>
 	);
 };
 
