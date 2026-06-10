@@ -6,7 +6,7 @@ import { useUser } from "@/features/auth/hooks/useUser";
 import { move } from "@dnd-kit/helpers";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
-import { DrawerItemView } from "../drawer/DrawerItemView";
+import { DrawerItemView } from "@/components/drawer/DrawerItemView";
 import ColumnDnd from "./column-dnd";
 import ItemsDnd from "./items-dnd";
 

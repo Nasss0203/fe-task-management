@@ -1,9 +1,9 @@
-import { Banner } from "@/components/landing/banner";
-import DepartmentUseCase from "@/components/landing/DepartmentUseCase";
-import FeatureHighlight from "@/components/landing/FeatureHighlight";
-import Integrations from "@/components/landing/Integrations";
-import TrustedBy from "@/components/landing/TrustedBy";
-import WorkManagement from "@/components/landing/WorkManagement";
+import { Banner } from "@/features/landing/components/landing/banner";
+import DepartmentUseCase from "@/features/landing/components/landing/DepartmentUseCase";
+import FeatureHighlight from "@/features/landing/components/landing/FeatureHighlight";
+import Integrations from "@/features/landing/components/landing/Integrations";
+import TrustedBy from "@/features/landing/components/landing/TrustedBy";
+import WorkManagement from "@/features/landing/components/landing/WorkManagement";
 
 export default function HomePage() {
 	return (

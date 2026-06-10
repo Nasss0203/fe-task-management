@@ -29,11 +29,11 @@ import { useUser } from "@/features/auth/hooks/useUser";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useEffect, useRef, useState } from "react";
 import { DateRange } from "react-day-picker";
-import { TaskAssigneeSelect } from "../task/TaskAssignSelect";
-import { TaskDateSelect } from "../task/TaskDateSelect";
-import TaskStatusSelect from "../task/TaskStatusSelect";
+import { TaskAssigneeSelect } from "@/features/task/components/task/TaskAssignSelect";
+import { TaskDateSelect } from "@/features/task/components/task/TaskDateSelect";
+import TaskStatusSelect from "@/features/task/components/task/TaskStatusSelect";
 import { Avatar, AvatarFallback } from "../ui/avatar";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -42,7 +42,7 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import { Separator } from "../ui/separator";
 
 const DialogAddTask = () => {

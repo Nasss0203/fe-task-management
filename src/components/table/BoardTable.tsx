@@ -34,7 +34,7 @@ import { CSS } from "@dnd-kit/utilities";
 
 import { useTask } from "@/features/task/hooks/useTask";
 import { cn } from "@/lib/utils";
-import PanigationTable from "../panigation/PanigationTable";
+import PanigationTable from "@/components/panigation/PanigationTable";
 import {
 	Table,
 	TableBody,

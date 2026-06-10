@@ -36,11 +36,11 @@ import { cn } from "@/lib/utils";
 import { useTask, useTaskPriority, useTaskStatus } from "@/features/task/hooks/useTask";
 import type { TaskItem } from "@/services/task/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
-import { useTableDnd } from "../dnd/backlog-sprint/ProviderSprintDnd";
-import TableRowDnd from "../dnd/backlog-sprint/TableRowSprintDnd";
-import TaskAssignees from "../task/TaskAssignees";
-import { TaskBulkActionBar } from "../task/TaskBulkActionBar";
-import TaskTrashDialog from "../task/TaskTrashDialog";
+import { useTableDnd } from "@/components/dnd/backlog-sprint/ProviderSprintDnd";
+import TableRowDnd from "@/components/dnd/backlog-sprint/TableRowSprintDnd";
+import TaskAssignees from "@/features/task/components/task/TaskAssignees";
+import { TaskBulkActionBar } from "@/features/task/components/task/TaskBulkActionBar";
+import TaskTrashDialog from "@/features/task/components/task/TaskTrashDialog";
 import DropdownTaskStatus from "@/components/dropdown/DropdownTaskStatus";
 import DropdownTaskPriority from "@/components/dropdown/DropdownTaskPriority";
 

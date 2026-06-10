@@ -1,102 +1,21 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDashboard } from "@/features/dashboard/hooks/useDashboard";
 import { cn } from "@/lib/utils";
-import type {
-	DashboardTaskResponseDto,
-	DashboardWorkspaceResponseDto,
-} from "@/services/dashboard/type";
-import {
-	BriefcaseBusiness,
-	ChevronDown,
-	ClipboardList,
-	Eye,
-	FolderKanban,
-	ListTodo,
-	Star,
-	UserRound,
-} from "lucide-react";
+import type { DashboardTaskResponseDto, DashboardWorkspaceResponseDto } from "@/services/dashboard/type";
+import { BriefcaseBusiness, ChevronDown, Eye, ListTodo, Star, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { DrawerItemView } from "@/components/drawer/DrawerItemView";
 import type { TaskItem } from "@/services/task/type";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { LoadingForYou } from "@/features/dashboard/components/for-you/LoadingForYou";
+import { RecentSpaceCard } from "@/features/dashboard/components/for-you/RecentSpaceCard";
+import { WorkItemRow } from "@/features/dashboard/components/for-you/WorkItemRow";
+import { toLocalDateInputValue, getClientTimezone } from "@/features/dashboard/utils/date";
 
 type ViewKey = "worked" | "viewed" | "assigned" | "starred" | "boards";
-
-const toLocalDateInputValue = () => {
-	const date = new Date();
-	const year = date.getFullYear();
-	const month = String(date.getMonth() + 1).padStart(2, "0");
-	const day = String(date.getDate()).padStart(2, "0");
-
-	return `${year}-${month}-${day}`;
-};
-
-const getClientTimezone = () => {
-	if (typeof Intl === "undefined") return undefined;
-
-	return Intl.DateTimeFormat().resolvedOptions().timeZone;
-};
-
-const getDateOnly = (value?: string | null) => {
-	if (!value) return null;
-
-	const date = new Date(value);
-	if (Number.isNaN(date.getTime())) return null;
-
-	date.setHours(0, 0, 0, 0);
-	return date;
-};
-
-const formatTaskKey = (task: DashboardTaskResponseDto, index: number) => {
-	const prefix = task.projectName
-		.split(/\s+/)
-		.filter(Boolean)
-		.map((word) => word[0])
-		.join("")
-		.slice(0, 3)
-		.toUpperCase();
-
-	return `${prefix || "TASK"}-${index + 1}`;
-};
-
-const getTaskStateLabel = (task: DashboardTaskResponseDto) => {
-	const dueDate = getDateOnly(task.dueAt);
-	if (!dueDate) return "No due date";
-
-	const today = new Date();
-	today.setHours(0, 0, 0, 0);
-
-	if (dueDate < today) return "Overdue";
-	if (dueDate.getTime() === today.getTime()) return "Due today";
-
-	return "Created";
-};
-
-const getTaskStateClass = (task: DashboardTaskResponseDto) => {
-	const label = getTaskStateLabel(task);
-
-	if (label === "Overdue") return "text-red-500 dark:text-red-400";
-	if (label === "Due today") return "text-blue-500 dark:text-blue-400";
-
-	return "text-muted-foreground";
-};
-
-const getInitials = (name?: string | null) => {
-	if (!name) return "ME";
-
-	const words = name.trim().split(/\s+/).filter(Boolean);
-	if (!words.length) return "ME";
-
-	return words
-		.slice(0, 2)
-		.map((word) => word[0])
-		.join("")
-		.toUpperCase();
-};
 
 function uniqueTasks(tasks: DashboardTaskResponseDto[]) {
 	const seen = new Set<string>();
@@ -108,144 +27,7 @@ function uniqueTasks(tasks: DashboardTaskResponseDto[]) {
 	});
 }
 
-function LoadingForYou() {
-	return (
-		<main className='flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto pb-10 px-2'>
-			<div className='flex w-full min-w-0 flex-col gap-10 max-w-7xl'>
-				<header className='border-b border-border/60 pb-6 pt-4'>
-					<Skeleton className='h-9 w-40 rounded-lg' />
-					<Skeleton className='mt-3 h-5 w-96 rounded-md' />
-				</header>
 
-				<section className='space-y-5'>
-					<div className='flex items-center justify-between gap-4 px-1'>
-						<Skeleton className='h-5 w-32 rounded-md' />
-						<Skeleton className='h-4 w-24 rounded-md' />
-					</div>
-
-					<div className='grid gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]'>
-						{Array.from({ length: 4 }).map((_, index) => (
-							<div key={index} className='flex flex-col h-[220px] rounded-xl border border-border/50 bg-card/60 p-4 shadow-sm'>
-								<div className="flex items-start gap-3">
-									<Skeleton className="size-8 rounded-lg" />
-									<div className="space-y-2 flex-1 mt-0.5">
-										<Skeleton className="h-4 w-3/4 rounded-md" />
-										<Skeleton className="h-3 w-1/2 rounded-md" />
-									</div>
-								</div>
-								<div className="mt-6 flex-1 space-y-3">
-									<Skeleton className="h-3 w-20 rounded-md" />
-									<Skeleton className="h-8 w-full rounded-md" />
-									<Skeleton className="h-8 w-full rounded-md" />
-								</div>
-								<Skeleton className="mt-4 h-4 w-24 rounded-md" />
-							</div>
-						))}
-					</div>
-				</section>
-
-				<section className='min-w-0'>
-					<div className='flex gap-6 border-b border-border/60 pb-3'>
-						{Array.from({ length: 4 }).map((_, index) => (
-							<Skeleton key={index} className='h-6 w-32 rounded-md' />
-						))}
-					</div>
-
-					<div className='pt-6'>
-						<Skeleton className='mb-4 h-4 w-28 rounded-md' />
-
-						<div className='flex flex-col gap-1'>
-							{Array.from({ length: 5 }).map((_, index) => (
-								<div key={index} className='flex items-center justify-between p-3 rounded-xl border border-border/40 bg-card/40'>
-									<div className='flex items-center gap-3'>
-										<Skeleton className='size-4 rounded-sm' />
-										<Skeleton className='h-4 w-64 rounded-md' />
-										<Skeleton className='h-5 w-16 rounded-full' />
-									</div>
-									<div className='flex items-center gap-4'>
-										<Skeleton className='h-4 w-32 rounded-md' />
-										<Skeleton className='h-6 w-20 rounded-full' />
-									</div>
-								</div>
-							))}
-						</div>
-					</div>
-				</section>
-			</div>
-		</main>
-	);
-}
-
-function RecentSpaceCard({
-	workspace,
-	openWorkCount,
-	doneCount,
-}: {
-	workspace: DashboardWorkspaceResponseDto;
-	openWorkCount: number;
-	doneCount: number;
-}) {
-	return (
-		<div className='group flex h-full flex-col min-w-0 overflow-hidden rounded-xl border border-border bg-card transition-all duration-200 hover:border-primary/30 hover:bg-accent/50 shadow-sm'>
-			<div className='flex h-full'>
-				<div className='w-1.5 shrink-0 bg-blue-500/80 transition-colors group-hover:bg-blue-400' />
-				<div className='flex flex-1 flex-col min-w-0 p-4'>
-					<div className='flex items-start gap-3'>
-						<div className='flex size-8 shrink-0 items-center justify-center rounded-lg border border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-400 shadow-sm'>
-							<FolderKanban className='size-4' />
-						</div>
-						<div className='min-w-0 flex-1 mt-0.5'>
-							<p className='truncate text-sm font-semibold text-foreground group-hover:text-primary transition-colors'>
-								{workspace.name}
-							</p>
-							<p className='mt-0.5 truncate text-xs text-muted-foreground'>
-								Team workspace
-							</p>
-						</div>
-					</div>
-
-					<div className='mt-4 flex-1 space-y-2'>
-						<p className='text-[10px] font-semibold uppercase tracking-wide text-muted-foreground'>
-							Quick links
-						</p>
-						<div className='flex flex-col gap-1.5'>
-							<div className='flex items-center justify-between gap-2 rounded-md p-1 transition-colors hover:bg-muted -mx-1 px-1.5'>
-								<Link
-									href='/dashboard/my-tasks'
-									className='truncate text-xs font-medium text-muted-foreground hover:text-foreground transition-colors flex-1'
-								>
-									My open work items
-								</Link>
-								<Badge variant='secondary' className='h-5 min-w-[20px] justify-center rounded-md border-border bg-muted px-1.5 text-[11px] font-semibold text-foreground hover:bg-muted/80'>
-									{openWorkCount}
-								</Badge>
-							</div>
-							<div className='flex items-center justify-between gap-2 rounded-md p-1 transition-colors hover:bg-muted -mx-1 px-1.5'>
-								<Link
-									href='/dashboard/my-tasks'
-									className='truncate text-xs font-medium text-muted-foreground hover:text-foreground transition-colors flex-1'
-								>
-									Done work items
-								</Link>
-								<Badge
-									variant='secondary'
-									className='h-5 min-w-[20px] justify-center rounded-md border-border bg-muted px-1.5 text-[11px] font-semibold text-foreground hover:bg-muted/80'
-								>
-									{doneCount}
-								</Badge>
-							</div>
-						</div>
-					</div>
-
-					<div className='mt-4 flex items-center gap-1.5 border-t border-border pt-3 text-xs font-medium text-muted-foreground'>
-						<span>{workspace.projectCount || 1} {workspace.projectCount === 1 ? 'project' : 'projects'}</span>
-					</div>
-				</div>
-			</div>
-		</div>
-
-	);
-}
 
 const mapDashboardTaskToTaskItem = (task: DashboardTaskResponseDto): TaskItem => {
 	return {
@@ -272,68 +54,6 @@ const mapDashboardTaskToTaskItem = (task: DashboardTaskResponseDto): TaskItem =>
 	};
 };
 
-function WorkItemRow({
-	task,
-	index,
-	displayName,
-	onClick,
-}: {
-	task: DashboardTaskResponseDto;
-	index: number;
-	displayName?: string;
-	onClick?: (task: DashboardTaskResponseDto) => void;
-}) {
-	return (
-		<div
-			role="button"
-			tabIndex={0}
-			onClick={() => onClick?.(task)}
-			onKeyDown={(e) => {
-				if (e.key === 'Enter' || e.key === ' ') {
-					e.preventDefault();
-					onClick?.(task);
-				}
-			}}
-			className='cursor-pointer group grid grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-4 rounded-xl px-3 py-3 transition-colors hover:bg-muted/50 -mx-3'
-		>
-			<div className='flex size-9 items-center justify-center rounded-lg border border-border bg-muted/30 text-muted-foreground transition-colors group-hover:bg-muted group-hover:text-foreground'>
-				<ClipboardList className='size-4' />
-			</div>
-
-			<div className='min-w-0'>
-				<p className='truncate text-[14px] font-semibold text-foreground transition-colors group-hover:text-primary'>{task.title}</p>
-				<div className='mt-1.5 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-[11px] font-medium text-muted-foreground'>
-					<span className="uppercase tracking-wider text-muted-foreground/80">{formatTaskKey(task, index)}</span>
-					<span className="text-muted-foreground/50">•</span>
-					<span className='truncate'>{task.projectName}</span>
-					<span className="text-muted-foreground/50">•</span>
-					<span className='truncate'>{task.workspaceName}</span>
-				</div>
-			</div>
-
-			<div className='flex min-w-[200px] items-center justify-end gap-4'>
-				<div className='hidden sm:flex items-center gap-2'>
-					{task.priorityName && (
-						<span className="rounded-md border border-border bg-muted/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-							{task.priorityName}
-						</span>
-					)}
-					<span className="rounded-md border border-border bg-muted/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-foreground">
-						{task.statusName || "To do"}
-					</span>
-				</div>
-				<span className={cn("hidden md:inline text-[12px] font-medium min-w-[70px] text-right", getTaskStateClass(task))}>
-					{getTaskStateLabel(task)}
-				</span>
-				<div className='flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-muted text-[10px] font-bold tracking-wider text-foreground shadow-sm'>
-					{getInitials(displayName)}
-				</div>
-			</div>
-		</div>
-
-
-	);
-}
 
 function BoardRow({ workspace }: { workspace: DashboardWorkspaceResponseDto }) {
 	return (

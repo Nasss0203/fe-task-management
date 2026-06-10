@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover } from "@/components/ui/popover";
 import { Users } from "lucide-react";
-import { PopoverContentV2, PopoverTriggerV2 } from "../popover/popover-custom";
+import { PopoverContentV2, PopoverTriggerV2 } from "@/components/popover/popover-custom";
 
 export function WorkspaceSharePopover() {
 	return (

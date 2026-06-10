@@ -1,6 +1,6 @@
 "use client";
 
-import WorkspaceSettingsContent from "@/components/workspaces/WorkspaceSettingsContent";
+import WorkspaceSettingsContent from "@/features/workspace/components/workspaces/WorkspaceSettingsContent";
 import { useParams } from "next/navigation";
 
 const WorkspaceSettingsPage = () => {

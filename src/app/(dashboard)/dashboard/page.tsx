@@ -11,13 +11,8 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useDashboard } from "@/features/dashboard/hooks/useDashboard";
 import { cn } from "@/lib/utils";
-import type {
-	DashboardActivityResponseDto,
-	DashboardTaskResponseDto,
-} from "@/services/dashboard/type";
 import {
 	Activity,
 	AlertTriangle,
@@ -35,8 +30,14 @@ import {
 	TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
-import type { ComponentType, ReactNode } from "react";
+import type { ComponentType } from "react";
 import { useMemo } from "react";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { LoadingDashboard } from "@/features/dashboard/components/overview/LoadingDashboard";
+import { DashboardTaskItem } from "@/features/dashboard/components/overview/DashboardTaskItem";
+import { DashboardActivityItem } from "@/features/dashboard/components/overview/DashboardActivityItem";
+import { toLocalDateInputValue, getClientTimezone, formatDashboardDate } from "@/features/dashboard/utils/date";
+import { clampPercent, formatMinutes } from "@/features/dashboard/utils/task-style";
 
 type StatCardItem = {
 	title: string;
@@ -47,312 +48,18 @@ type StatCardItem = {
 	tone: string;
 };
 
-const toLocalDateInputValue = () => {
-	const date = new Date();
-	const year = date.getFullYear();
-	const month = String(date.getMonth() + 1).padStart(2, "0");
-	const day = String(date.getDate()).padStart(2, "0");
-
-	return `${year}-${month}-${day}`;
-};
-
-const getClientTimezone = () => {
-	if (typeof Intl === "undefined") return undefined;
-
-	return Intl.DateTimeFormat().resolvedOptions().timeZone;
-};
-
-const clampPercent = (value?: number | null) => {
-	if (typeof value !== "number" || Number.isNaN(value)) return 0;
-
-	return Math.min(100, Math.max(0, value));
-};
-
-const formatDashboardDate = (dateValue?: string) => {
-	if (!dateValue) return "";
-
-	const [year, month, day] = dateValue.split("-").map(Number);
-
-	if (!year || !month || !day) return dateValue;
-
-	return new Intl.DateTimeFormat("vi-VN", {
-		weekday: "long",
-		day: "2-digit",
-		month: "2-digit",
-		year: "numeric",
-		timeZone: "UTC",
-	}).format(new Date(Date.UTC(year, month - 1, day)));
-};
-
-const formatDateTime = (dateValue?: string | null) => {
-	if (!dateValue) return "Chưa đặt hạn";
-
-	const date = new Date(dateValue);
-
-	if (Number.isNaN(date.getTime())) return "Chưa đặt hạn";
-
-	return new Intl.DateTimeFormat("vi-VN", {
-		day: "2-digit",
-		month: "2-digit",
-		year: "numeric",
-		hour: "2-digit",
-		minute: "2-digit",
-	}).format(date);
-};
-
-const formatMinutes = (minutes: number) => {
-	if (minutes < 60) return `${minutes} phút`;
-
-	const hours = Math.floor(minutes / 60);
-	const rest = minutes % 60;
-
-	return rest ? `${hours}h ${rest}m` : `${hours}h`;
-};
-
-const formatRelativeTime = (dateValue: string) => {
-	const date = new Date(dateValue);
-
-	if (Number.isNaN(date.getTime())) return "Vừa xong";
-
-	const diffMinutes = Math.max(
-		0,
-		Math.floor((Date.now() - date.getTime()) / 60000),
-	);
-
-	if (diffMinutes < 1) return "Vừa xong";
-	if (diffMinutes < 60) return `${diffMinutes} phút trước`;
-
-	const diffHours = Math.floor(diffMinutes / 60);
-
-	if (diffHours < 24) return `${diffHours} giờ trước`;
-
-	const diffDays = Math.floor(diffHours / 24);
-
-	return `${diffDays} ngày trước`;
-};
-
-const getPriorityClass = (priorityLevel?: number | null) => {
-	if (!priorityLevel) {
-		return "border-border bg-muted text-muted-foreground";
-	}
-
-	if (priorityLevel >= 3) {
-		return "border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-300";
-	}
-
-	if (priorityLevel === 2) {
-		return "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-300";
-	}
-
-	return "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300";
-};
-
-const getStatusClass = (statusName?: string | null) => {
-	const normalized = (statusName ?? "").trim().toLowerCase();
-
-	if (normalized.includes("progress")) {
-		return "border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-300";
-	}
-
-	if (normalized.includes("done") || normalized.includes("complete")) {
-		return "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300";
-	}
-
-	return "border-border bg-muted text-muted-foreground";
-};
-
-const getActivityTone = (action: string) => {
-	if (action.includes("START")) return "bg-emerald-500";
-	if (action.includes("TASK")) return "bg-blue-500";
-	if (action.includes("SPRINT")) return "bg-amber-500";
-
-	return "bg-muted-foreground";
-};
-
-function EmptyState({ children }: { children: ReactNode }) {
-	return (
-		<div className='rounded-lg border border-dashed bg-muted/20 p-6 text-center text-sm text-muted-foreground'>
-			{children}
-		</div>
-	);
-}
-
-function LoadingDashboard() {
-	return (
-		<main
-			className='flex min-h-0 min-w-0 w-full flex-1 flex-col gap-6 overflow-x-hidden overflow-y-auto pb-10 sm:max-w-full'
-			style={{ maxWidth: "calc(100dvw - 2rem)" }}
-		>
-			<Skeleton className='h-[168px] w-full rounded-2xl border border-border/50 bg-card/60 shadow-sm' />
-			
-			<section className='grid min-w-0 gap-6 xl:grid-cols-12'>
-				<div className='xl:col-span-8 space-y-6'>
-					<div className="rounded-2xl border border-border/50 bg-card p-6 shadow-sm">
-						<div className="flex flex-col gap-2 mb-6">
-							<Skeleton className="h-6 w-48 rounded-lg" />
-							<Skeleton className="h-4 w-64 rounded-lg" />
-						</div>
-						<div className="space-y-3">
-							{Array.from({ length: 3 }).map((_, i) => (
-								<Skeleton key={i} className="h-28 w-full rounded-xl" />
-							))}
-						</div>
-					</div>
-				</div>
-
-				<div className='xl:col-span-4 space-y-6'>
-					<div className="rounded-2xl border border-border/50 bg-card p-6 shadow-sm">
-						<div className="flex flex-col gap-2 mb-6">
-							<Skeleton className="h-6 w-40 rounded-lg" />
-							<Skeleton className="h-4 w-56 rounded-lg" />
-						</div>
-						<div className="space-y-4">
-							{Array.from({ length: 3 }).map((_, i) => (
-								<Skeleton key={i} className="h-[76px] w-full rounded-xl" />
-							))}
-						</div>
-					</div>
-				</div>
-			</section>
-
-			<section className='grid gap-6 sm:grid-cols-2 xl:grid-cols-4'>
-				{Array.from({ length: 4 }).map((_, index) => (
-					<div key={index} className="rounded-2xl border border-border/50 bg-card p-6 shadow-sm">
-						<div className="flex items-center justify-between mb-4">
-							<Skeleton className="h-4 w-20 rounded-lg" />
-							<Skeleton className="size-8 rounded-lg" />
-						</div>
-						<Skeleton className="h-8 w-16 rounded-lg mb-2" />
-						<Skeleton className="h-3 w-32 rounded-lg" />
-					</div>
-				))}
-			</section>
-
-			<section className='grid min-w-0 gap-6 xl:grid-cols-12'>
-				<div className='xl:col-span-8 space-y-6'>
-					<div className="rounded-2xl border border-border/50 bg-card p-6 shadow-sm">
-						<div className="flex flex-col gap-2 mb-6">
-							<Skeleton className="h-6 w-48 rounded-lg" />
-							<Skeleton className="h-4 w-64 rounded-lg" />
-						</div>
-						<div className="space-y-5">
-							{Array.from({ length: 4 }).map((_, i) => (
-								<div key={i} className="flex gap-4">
-									<div className="flex flex-col items-center">
-										<Skeleton className="size-3 rounded-full" />
-										<Skeleton className="mt-2 h-10 w-px" />
-									</div>
-									<div className="flex-1 space-y-2 pb-2">
-										<Skeleton className="h-4 w-3/4 rounded-lg" />
-										<Skeleton className="h-3 w-1/4 rounded-lg" />
-									</div>
-								</div>
-							))}
-						</div>
-					</div>
-				</div>
-
-				<div className='xl:col-span-4 space-y-6'>
-					<div className="rounded-2xl border border-border/50 bg-card p-6 shadow-sm">
-						<div className="flex flex-col gap-2 mb-6">
-							<Skeleton className="h-6 w-40 rounded-lg" />
-							<Skeleton className="h-4 w-56 rounded-lg" />
-						</div>
-						<div className="space-y-3">
-							{Array.from({ length: 2 }).map((_, i) => (
-								<Skeleton key={i} className="h-14 w-full rounded-xl" />
-							))}
-							<Skeleton className="h-20 w-full rounded-xl mt-4" />
-						</div>
-					</div>
-				</div>
-			</section>
-		</main>
-	);
-}
-
-function TaskItem({ task }: { task: DashboardTaskResponseDto }) {
-	const progress = clampPercent(task.progressPercent);
-
-	return (
-		<div className='group rounded-xl border border-border/60 bg-background p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:border-primary/40 hover:bg-muted/20'>
-			<div className='grid gap-4 lg:grid-cols-[minmax(0,1fr)_170px] lg:items-start'>
-				<div className='min-w-0'>
-					<div className='flex flex-wrap items-center gap-2'>
-						<h3 className='min-w-0 truncate text-[15px] font-semibold text-foreground group-hover:text-primary transition-colors'>
-							{task.title}
-						</h3>
-						<Badge
-							variant='outline'
-							className={cn("text-[10px] uppercase tracking-wider font-bold", getPriorityClass(task.priorityLevel))}
-						>
-							{task.priorityName ?? "No priority"}
-						</Badge>
-						<Badge
-							variant='outline'
-							className={cn("text-[10px] uppercase tracking-wider font-bold", getStatusClass(task.statusName))}
-						>
-							{task.statusName ?? "No status"}
-						</Badge>
-					</div>
-					<p className='mt-2 truncate text-[12px] text-muted-foreground'>
-						{task.workspaceName} / {task.projectName}
-					</p>
-				</div>
-
-				<div className='text-left lg:text-right'>
-					<p className='text-[13px] font-medium text-foreground'>
-						{formatDateTime(task.dueAt)}
-					</p>
-					<p className='mt-1 text-[11px] font-medium text-muted-foreground uppercase tracking-wider'>
-						{progress}% hoàn thành
-					</p>
-				</div>
-			</div>
-			<Progress value={progress} className='mt-4 h-1.5 bg-muted/60' />
-		</div>
-	);
-}
-
-function ActivityItem({
-	activity,
-	isLast,
-}: {
-	activity: DashboardActivityResponseDto;
-	isLast: boolean;
-}) {
-	return (
-		<div className='flex gap-3'>
-			<div className='flex flex-col items-center'>
-				<div
-					className={cn(
-						"mt-1 size-2.5 rounded-full",
-						getActivityTone(activity.action),
-					)}
-				/>
-				{isLast ? null : <div className='mt-2 h-full w-px bg-border' />}
-			</div>
-			<div className='min-w-0 pb-4'>
-				<p className='text-sm font-medium leading-6'>
-					{activity.message}
-				</p>
-				<p className='text-xs text-muted-foreground'>
-					{formatRelativeTime(activity.createdAt)}
-				</p>
-			</div>
-		</div>
-	);
-}
-
 export default function DashboardPage() {
+	const timezone = getClientTimezone();
+
 	const query = useMemo(
 		() => ({
 			date: toLocalDateInputValue(),
-			timezone: getClientTimezone(),
+			timezone,
 			limit: 5,
 		}),
-		[],
+		[timezone],
 	);
+
 	const {
 		myDashboard: { data: dashboardQuery, isLoading, isError, refetch },
 	} = useDashboard(query);
@@ -735,10 +442,10 @@ export default function DashboardPage() {
 					</CardHeader>
 					<CardContent className='flex flex-col gap-3'>
 						{dashboard.priorityTasks.length ? (
-							dashboard.priorityTasks.map((task) => (
-								<TaskItem key={task.id} task={task} />
-							))
-						) : (
+						dashboard.priorityTasks.map((task) => (
+							<DashboardTaskItem key={task.id} task={task} />
+						))
+					) : (
 							<EmptyState>
 								Chưa có task ưu tiên hôm nay.
 							</EmptyState>
@@ -797,22 +504,22 @@ export default function DashboardPage() {
 					</CardHeader>
 					<CardContent>
 						{dashboard.recentActivities.length ? (
-							<div className='flex flex-col'>
-								{dashboard.recentActivities.map(
-									(activity, index) => (
-										<ActivityItem
-											key={activity.id}
-											activity={activity}
-											isLast={
-												index ===
-												dashboard.recentActivities
-													.length -
-													1
-											}
-										/>
-									),
-								)}
-							</div>
+						<div className='flex flex-col'>
+							{dashboard.recentActivities.map(
+								(activity, index) => (
+									<DashboardActivityItem
+										key={activity.id}
+										activity={activity}
+										isLast={
+											index ===
+											dashboard.recentActivities
+												.length -
+												1
+										}
+									/>
+								),
+							)}
+						</div>
 						) : (
 							<EmptyState>Chưa có hoạt động gần đây.</EmptyState>
 						)}

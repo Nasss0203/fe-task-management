@@ -4,6 +4,8 @@ import React from "react";
 import { MoreHorizontal } from "lucide-react";
 
 import { useTask } from "@/features/task/hooks/useTask";
+import { useUser } from "@/features/auth/hooks/useUser";
+import { cn } from "@/lib/utils";
 import DropdownTaskStatus from "@/components/dropdown/DropdownTaskStatus";
 import DropdownTaskPriority from "@/components/dropdown/DropdownTaskPriority";
 import { TaskNameCell, TaskAssigneeCell } from "@/components/table/columns/column-task";
@@ -15,6 +17,7 @@ type BoardListProps = {
 
 const BoardList = ({ workspaceId, projectId }: BoardListProps) => {
 	const { taskQuery } = useTask(workspaceId, projectId);
+	const { user } = useUser();
 	const rawTasks = Array.isArray(taskQuery?.data?.data)
 		? taskQuery.data.data
 		: [];
@@ -24,12 +27,22 @@ const BoardList = ({ workspaceId, projectId }: BoardListProps) => {
 			<div className='flex-1 overflow-y-auto overflow-x-hidden'>
 				<div className='flex flex-col'>
 					{rawTasks.length > 0 ? (
-						rawTasks.map((task) => (
-							<div
-								key={task.id}
-								className='group flex items-center justify-between gap-4 border-b border-border/50 bg-background p-3 transition-colors last:border-b-0 hover:bg-muted/40'
-							>
-								{/* Left side: Status and Name */}
+						rawTasks.map((task) => {
+							const isAssignee = task.assignees?.some((a: any) => a.userId === user?.id) || false;
+							const canEdit = isAssignee;
+							const isReadOnly = !canEdit;
+
+							return (
+								<div
+									key={task.id}
+									className={cn(
+										'group flex items-center justify-between gap-4 border-b p-3 transition-all last:border-b-0 hover:bg-muted/40',
+										isReadOnly 
+											? 'opacity-60 bg-muted/20 border-dashed border-border/80' 
+											: 'border-border/50 bg-background'
+									)}
+								>
+									{/* Left side: Status and Name */}
 								<div className='flex min-w-0 flex-1 items-center gap-3'>
 									<div className='shrink-0'>
 										<DropdownTaskStatus
@@ -77,7 +90,8 @@ const BoardList = ({ workspaceId, projectId }: BoardListProps) => {
 									</button>
 								</div>
 							</div>
-						))
+							);
+						})
 					) : (
 						<div className='flex h-28 items-center justify-center text-sm text-muted-foreground'>
 							No tasks found.

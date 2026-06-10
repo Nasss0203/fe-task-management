@@ -10,8 +10,8 @@ import { useBoards } from "@/features/board/hooks/useBoards";
 import { useWorkspaceFeatures } from "@/features/workspace-feature/hooks/useWorkspaceFeatures";
 import { BoardItem, BoardViewType } from "@/services/board/type";
 import { PageBlockDataConfig } from "@/services/page_block/type";
-import { BacklogRenderContext } from "../backlog/types";
-import { BOARD_VIEW_CONFIG, isBoardViewEnabled } from "../board/view-board";
+import { BacklogRenderContext } from "@/features/sprint/components/backlog/types";
+import { BOARD_VIEW_CONFIG, isBoardViewEnabled } from "@/features/board/components/board/view-board";
 
 type Props = {
 	blockId?: string;

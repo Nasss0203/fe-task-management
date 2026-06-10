@@ -1,5 +1,5 @@
-// import ContactSection from "@/components/landing/contact/ContactSection";
-import TemplatesFaqSection from "@/components/landing/templates/TemplatesFaqSection";
+// import ContactSection from "@/features/landing/components/landing/contact/ContactSection";
+import TemplatesFaqSection from "@/features/landing/components/landing/templates/TemplatesFaqSection";
 export default function ContactPage() {
 	return (
 		<>

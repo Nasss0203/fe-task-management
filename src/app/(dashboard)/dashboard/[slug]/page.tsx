@@ -1,6 +1,6 @@
 "use client";
 
-import { WorkspacePageShell } from "@/components/workspaces/workspace-page";
+import { WorkspacePageShell } from "@/features/workspace/components/workspaces/workspace-page";
 import { usePageBlock } from "@/features/page-block/hooks/usePageBlock";
 import { usePage } from "@/features/page/hooks/usePage";
 import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";

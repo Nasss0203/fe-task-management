@@ -16,6 +16,7 @@ type RequirePermissionProps = {
 	children: ReactNode;
 	fallback?: ReactNode;
 	mode?: "hide" | "disable";
+	bypass?: boolean;
 };
 
 export function RequirePermission({
@@ -24,8 +25,11 @@ export function RequirePermission({
 	children,
 	fallback = null,
 	mode = "hide",
+	bypass = false,
 }: RequirePermissionProps) {
 	const { can, isLoading } = usePermission(workspaceId);
+
+	if (bypass) return <>{children}</>;
 
 	if (!workspaceId) return <>{children}</>;
 

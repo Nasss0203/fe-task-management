@@ -1,7 +1,7 @@
 "use client";
 
-import BacklogSprint from "@/components/backlog/BacklogSprint";
-import Sprint from "@/components/spints/Sprint";
+import BacklogSprint from "@/features/sprint/components/backlog/BacklogSprint";
+import Sprint from "@/features/sprint/components/spints/Sprint";
 import { useSprints } from "@/features/sprint/hooks/useSprints";
 import { useBoards } from "@/features/board/hooks/useBoards";
 import { usePage } from "@/features/page/hooks/usePage";

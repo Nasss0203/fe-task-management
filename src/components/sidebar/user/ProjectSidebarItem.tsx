@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/collapsible";
 
 import DialogAddTask from "@/components/dialog/DialogAddTask";
-import ProjectDropdown from "@/components/project/ProjectDropdown";
+import ProjectDropdown from "@/features/project/components/project/ProjectDropdown";
 import { PERMISSIONS } from "@/constants/permissions";
 import { RequirePermission } from "@/features/permission/components/RequirePermission";
 import { useSprints } from "@/features/sprint/hooks/useSprint";

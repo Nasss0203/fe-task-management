@@ -9,13 +9,11 @@ import {
 
 import ProjectSidebarItem from "@/components/sidebar/user/ProjectSidebarItem";
 import { useWorkspaceFeatures } from "@/features/workspace-feature/hooks/useWorkspaceFeatures";
-import WorkspaceDropdown from "@/components/workspaces/DropdownWorkspace";
+import WorkspaceDropdown from "@/features/workspace/components/workspaces/DropdownWorkspace";
 import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";
 import { findProjectByWorkspaceIdApi } from "@/services/project/project.service";
-
 import { PROJECT_KEY, type ProjectItems } from "@/services/project/type";
 import type { WorkspaceItem } from "@/services/workspace/type";
-
 import { useWorkspaceNameDraftStore } from "@/stores/use-workspace-name-draft";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useQueries } from "@tanstack/react-query";
@@ -33,34 +31,8 @@ import {
 	SidebarMenuSubV2,
 	SidebarMenuV2,
 } from "../../sidebar/user/sidebar-custom";
+import { WorkspaceProjectsSubmenu } from "./WorkspaceProjectsSubmenu";
 
-type WorkspaceProjectsSubmenuProps = {
-	workspace: WorkspaceItem;
-	projects: ProjectItems[];
-	handleSelectProject: (workspaceId: string, projectId: string) => void;
-};
-
-const WorkspaceProjectsSubmenu = ({
-	workspace,
-	projects,
-	handleSelectProject,
-}: WorkspaceProjectsSubmenuProps) => {
-	const { canUseSprint } = useWorkspaceFeatures(workspace.id);
-
-	return (
-		<SidebarMenuSubV2 className=' w-full  pr-4'>
-			{projects.map((project) => (
-				<ProjectSidebarItem
-					key={project.id}
-					project={project}
-					workspace={workspace}
-					canUseSprint={canUseSprint}
-					handleSelectProject={handleSelectProject}
-				/>
-			))}
-		</SidebarMenuSubV2>
-	);
-};
 
 export function NavMain() {
 	const { setCurrentWorkspaceId, setCurrentProjectId } =

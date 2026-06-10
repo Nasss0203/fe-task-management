@@ -8,7 +8,7 @@ import DropdownTaskPriority from "@/components/dropdown/DropdownTaskPriority";
 import { useTask } from "@/features/task/hooks/useTask";
 import { useMember } from "@/features/member/hooks/useMember";
 import { useUser } from "@/features/auth/hooks/useUser";
-import { TaskAssigneeSelect } from "@/components/task/TaskAssignSelect";
+import { TaskAssigneeSelect } from "@/features/task/components/task/TaskAssignSelect";
 import { MoreHorizontal } from "lucide-react";
 
 type TaskItem = {

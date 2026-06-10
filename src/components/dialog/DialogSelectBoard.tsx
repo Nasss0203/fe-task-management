@@ -2,9 +2,9 @@ import { Database } from "lucide-react";
 import { useState } from "react";
 
 import { BoardViewType } from "@/services/board/type";
-import DatabaseEmpty from "../board/DatabaseEmpty";
-import DatabaseRecommend from "../board/DatabaseRecommend";
-import { Button } from "../ui/button";
+import DatabaseEmpty from "@/features/board/components/board/DatabaseEmpty";
+import DatabaseRecommend from "@/features/board/components/board/DatabaseRecommend";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "../ui/scroll-area";
 import {
 	DialogContentV2,
