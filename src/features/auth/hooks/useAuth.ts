@@ -2,15 +2,13 @@
 
 import {
 	clearStoredAuth,
-	getStoredRefreshToken,
+	setSessionCookie,
 	setStoredAccessToken,
-	setStoredRefreshToken,
 	setStoredUser,
 } from "@/lib/auth-storage";
 import {
 	getMeApi,
 	loginApi,
-	logoutApi,
 	registerApi,
 } from "@/services/auth/auth.service";
 import { LoginDto, RegisterDto } from "@/services/auth/type";
@@ -26,7 +24,7 @@ export const useLogin = () => {
 				setStoredAccessToken(result.data.access_token);
 
 				if (result.data.refresh_token) {
-					setStoredRefreshToken(result.data.refresh_token);
+					await setSessionCookie(result.data.refresh_token);
 				}
 			}
 
@@ -51,7 +49,7 @@ export const useRegister = () => {
 				setStoredAccessToken(result.data.access_token);
 
 				if (result.data.refresh_token) {
-					setStoredRefreshToken(result.data.refresh_token);
+					await setSessionCookie(result.data.refresh_token);
 				}
 			}
 
@@ -65,9 +63,12 @@ export const useLogout = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: () => logoutApi(getStoredRefreshToken()),
-		onSettled: () => {
-			clearStoredAuth();
+		mutationFn: async () => {
+			// Call local Next.js logout API route which invalidates backend token and clears cookie
+			await fetch("/api/auth/logout", { method: "POST" });
+		},
+		onSettled: async () => {
+			await clearStoredAuth();
 			queryClient.clear();
 			router.replace("/");
 		},

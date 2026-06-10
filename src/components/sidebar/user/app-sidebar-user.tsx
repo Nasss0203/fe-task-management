@@ -28,11 +28,7 @@ import {
 import NavHome, { type NavHomeItem } from "../../nav/user/nav-home";
 
 const homeItems: NavHomeItem[] = [
-	{
-		name: "Tim kiem",
-		url: "#",
-		icon: Search,
-	},
+
 	{
 		name: "Trang chu",
 		url: "/dashboard",

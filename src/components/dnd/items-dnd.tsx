@@ -39,20 +39,13 @@ const ItemsDnd = ({
 	onUpdateName,
 	onOpenDetail,
 }: ItemsDndProps) => {
-	const { user } = useUser();
-	const isAssignee = React.useMemo(
-		() => assignees?.some((a) => a.userId === user?.id) || false,
-		[assignees, user?.id]
-	);
-	const canEdit = isAssignee;
-
 	const { ref, isDragging, handleRef } = useSortable({
 		id,
 		index,
 		group: column,
 		type: "item",
 		accept: ["item"],
-		disabled: !canEdit,
+		disabled: false,
 	});
 	const [preventOpenDetail, setPreventOpenDetail] = React.useState(false);
 	const wasDraggingRef = React.useRef(false);
@@ -77,12 +70,6 @@ const ItemsDnd = ({
 	return (
 		<div
 			ref={ref}
-			onPointerDownCapture={(e) => {
-				if (!canEdit) {
-					e.stopPropagation();
-					e.nativeEvent.stopImmediatePropagation();
-				}
-			}}
 			onClick={(event) => {
 				const target = event.target as HTMLElement | null;
 
@@ -107,7 +94,7 @@ const ItemsDnd = ({
 				description={description}
 				onUpdateName={onUpdateName}
 				onOpenDetail={onOpenDetail}
-				isReadOnly={!canEdit}
+				isReadOnly={false}
 			/>
 		</div>
 	);

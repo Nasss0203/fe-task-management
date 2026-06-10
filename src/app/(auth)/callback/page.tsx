@@ -1,6 +1,6 @@
 "use client";
 
-import { setStoredAccessToken } from "@/lib/auth-storage";
+import { setSessionCookie, setStoredAccessToken, setStoredUser } from "@/lib/auth-storage";
 import { getMeApi } from "@/services/auth/auth.service";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
@@ -12,6 +12,7 @@ function AuthCallbackContent() {
 	useEffect(() => {
 		const handleAuth = async () => {
 			const accessToken = searchParams.get("access_token");
+			const refreshToken = searchParams.get("refresh_token");
 
 			if (!accessToken) {
 				router.replace("/login");
@@ -20,10 +21,14 @@ function AuthCallbackContent() {
 
 			setStoredAccessToken(accessToken);
 
+			if (refreshToken) {
+				await setSessionCookie(refreshToken);
+			}
+
 			const me = await getMeApi();
 
 			if (me?.data) {
-				localStorage.setItem("user", JSON.stringify(me.data));
+				setStoredUser(me.data);
 			}
 
 			router.replace("/dashboard");

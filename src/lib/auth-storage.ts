@@ -1,67 +1,59 @@
 "use client";
 
-export const ACCESS_TOKEN_KEY = "access_token";
-export const REFRESH_TOKEN_KEY = "refresh_token";
 export const USER_STORAGE_KEY = "user";
 export const AUTH_TOKEN_CHANGED_EVENT = "auth:token-changed";
 export const USER_STORAGE_CHANGED_EVENT = "auth:user-changed";
 
-export const getStoredAccessToken = () => {
-	if (typeof window === "undefined") {
-		return null;
-	}
+// In-memory storage for access token to prevent XSS
+let inMemoryAccessToken: string | null = null;
 
-	return localStorage.getItem(ACCESS_TOKEN_KEY);
+export const getStoredAccessToken = () => {
+	return inMemoryAccessToken;
 };
 
 export const setStoredAccessToken = (token: string) => {
-	if (typeof window === "undefined") {
-		return;
+	inMemoryAccessToken = token;
+	if (typeof window !== "undefined") {
+		window.dispatchEvent(
+			new CustomEvent<string | null>(AUTH_TOKEN_CHANGED_EVENT, {
+				detail: token,
+			}),
+		);
 	}
-
-	localStorage.setItem(ACCESS_TOKEN_KEY, token);
-	window.dispatchEvent(
-		new CustomEvent<string | null>(AUTH_TOKEN_CHANGED_EVENT, {
-			detail: token,
-		}),
-	);
 };
 
 export const clearStoredAccessToken = () => {
-	if (typeof window === "undefined") {
-		return;
+	inMemoryAccessToken = null;
+	if (typeof window !== "undefined") {
+		window.dispatchEvent(
+			new CustomEvent<string | null>(AUTH_TOKEN_CHANGED_EVENT, {
+				detail: null,
+			}),
+		);
 	}
-
-	localStorage.removeItem(ACCESS_TOKEN_KEY);
-	window.dispatchEvent(
-		new CustomEvent<string | null>(AUTH_TOKEN_CHANGED_EVENT, {
-			detail: null,
-		}),
-	);
 };
 
-export const getStoredRefreshToken = () => {
-	if (typeof window === "undefined") {
-		return null;
+// API Helpers for HttpOnly Cookies
+export const setSessionCookie = async (refreshToken: string) => {
+	try {
+		await fetch("/api/auth/session", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ refresh_token: refreshToken }),
+		});
+	} catch (error) {
+		console.error("Failed to set session cookie", error);
 	}
-
-	return localStorage.getItem(REFRESH_TOKEN_KEY);
 };
 
-export const setStoredRefreshToken = (token: string) => {
-	if (typeof window === "undefined") {
-		return;
+export const clearSessionCookie = async () => {
+	try {
+		await fetch("/api/auth/session", {
+			method: "DELETE",
+		});
+	} catch (error) {
+		console.error("Failed to clear session cookie", error);
 	}
-
-	localStorage.setItem(REFRESH_TOKEN_KEY, token);
-};
-
-export const clearStoredRefreshToken = () => {
-	if (typeof window === "undefined") {
-		return;
-	}
-
-	localStorage.removeItem(REFRESH_TOKEN_KEY);
 };
 
 export const setStoredUser = (value: unknown) => {
@@ -82,8 +74,8 @@ export const clearStoredUser = () => {
 	window.dispatchEvent(new Event(USER_STORAGE_CHANGED_EVENT));
 };
 
-export const clearStoredAuth = () => {
+export const clearStoredAuth = async () => {
 	clearStoredAccessToken();
-	clearStoredRefreshToken();
 	clearStoredUser();
+	await clearSessionCookie();
 };
