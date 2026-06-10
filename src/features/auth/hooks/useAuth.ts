@@ -30,15 +30,11 @@ export const useLogin = () => {
 				}
 			}
 
-			return result;
-		},
-		onSuccess: async () => {
 			const me = await getMeApi();
+			const userData = me.data;
+			setStoredUser(userData);
 
-			const data = me.data;
-			setStoredUser(data);
-
-			return data;
+			return userData;
 		},
 		onError: (err) => {
 			console.error("login failed", err);

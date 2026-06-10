@@ -23,6 +23,12 @@ export interface LogoutResponse {
 	success?: boolean;
 }
 
+export enum SystemRole {
+	USER = 'USER',
+	SYSTEM_ADMIN = 'SYSTEM_ADMIN',
+	SUPER_ADMIN = 'SUPER_ADMIN',
+}
+
 export interface AuthGetMeResponse {
 	data: {
 		id: string;
@@ -31,6 +37,7 @@ export interface AuthGetMeResponse {
 		isActive: boolean;
 		createdAt: string;
 		updatedAt: string;
+		systemRole: SystemRole;
 		// avatarUrl?: string;
 	};
 }
@@ -44,5 +51,5 @@ export interface GetMeResponse {
 	updatedAt: string;
 	avatarUrl?: string;
 	googleId?: string;
-	systemRole: string;
+	systemRole: SystemRole;
 }

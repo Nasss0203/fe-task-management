@@ -369,12 +369,12 @@ export default function DashboardPage() {
 											{item.projectName}
 										</p>
 									</div>
-									<Badge
+									{/* <Badge
 										variant='outline'
 										className='shrink-0 border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-300'
 									>
 										{item.remainingLabel}
-									</Badge>
+									</Badge> */}
 								</div>
 							))
 						) : (
@@ -442,10 +442,10 @@ export default function DashboardPage() {
 					</CardHeader>
 					<CardContent className='flex flex-col gap-3'>
 						{dashboard.priorityTasks.length ? (
-						dashboard.priorityTasks.map((task) => (
-							<DashboardTaskItem key={task.id} task={task} />
-						))
-					) : (
+							dashboard.priorityTasks.map((task) => (
+								<DashboardTaskItem key={task.id} task={task} />
+							))
+						) : (
 							<EmptyState>
 								Chưa có task ưu tiên hôm nay.
 							</EmptyState>
@@ -504,22 +504,22 @@ export default function DashboardPage() {
 					</CardHeader>
 					<CardContent>
 						{dashboard.recentActivities.length ? (
-						<div className='flex flex-col'>
-							{dashboard.recentActivities.map(
-								(activity, index) => (
-									<DashboardActivityItem
-										key={activity.id}
-										activity={activity}
-										isLast={
-											index ===
-											dashboard.recentActivities
-												.length -
+							<div className='flex flex-col'>
+								{dashboard.recentActivities.map(
+									(activity, index) => (
+										<DashboardActivityItem
+											key={activity.id}
+											activity={activity}
+											isLast={
+												index ===
+												dashboard.recentActivities
+													.length -
 												1
-										}
-									/>
-								),
-							)}
-						</div>
+											}
+										/>
+									),
+								)}
+							</div>
 						) : (
 							<EmptyState>Chưa có hoạt động gần đây.</EmptyState>
 						)}

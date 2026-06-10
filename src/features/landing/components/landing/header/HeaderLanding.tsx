@@ -3,6 +3,7 @@ import { useUser } from "@/features/auth/hooks/useUser";
 import { ChevronDown, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import ToggleMode from "@/components/toggle/dark-mode";
 
 const navItems = [
 	{ label: "Features", href: "#" },
@@ -47,6 +48,8 @@ const HeaderLanding = () => {
 				>
 					Contact Sales
 				</Link>
+
+				<ToggleMode />
 
 				{user ? (
 					<Link href={"dashboard"}>

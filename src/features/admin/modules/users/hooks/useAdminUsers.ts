@@ -9,6 +9,8 @@ import {
 } from "@/services/admin/user/user-admin.service";
 import type { AdminFindAllUserQuery } from "@/services/admin/user/type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useUser } from "@/features/auth/hooks/useUser";
+import { isSystemAdmin } from "@/lib/auth/system-role";
 
 export const ADMIN_USERS_KEY = {
 	USER_OVERVIEW: "ADMIN_USER_OVERVIEW",
@@ -17,12 +19,15 @@ export const ADMIN_USERS_KEY = {
 
 export const useAdminUsers = (query?: AdminFindAllUserQuery) => {
 	const queryClient = useQueryClient();
+	const { user } = useUser();
+	const canAccessAdmin = isSystemAdmin(user);
 
 	const userOverview = useQuery({
 		queryKey: [ADMIN_USERS_KEY.USER_OVERVIEW],
 		queryFn: getAdminUserOverviewApi,
 		retry: false,
 		refetchOnWindowFocus: false,
+		enabled: canAccessAdmin,
 	});
 
 	const users = useQuery({
@@ -30,6 +35,7 @@ export const useAdminUsers = (query?: AdminFindAllUserQuery) => {
 		queryFn: () => findAllAdminUsersApi(query),
 		retry: false,
 		refetchOnWindowFocus: false,
+		enabled: canAccessAdmin,
 	});
 
 	const invalidateUsers = async () => {
