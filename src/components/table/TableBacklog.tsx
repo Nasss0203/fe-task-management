@@ -43,6 +43,8 @@ import { TaskBulkActionBar } from "@/features/task/components/task/TaskBulkActio
 import TaskTrashDialog from "@/features/task/components/task/TaskTrashDialog";
 import DropdownTaskStatus from "@/components/dropdown/DropdownTaskStatus";
 import DropdownTaskPriority from "@/components/dropdown/DropdownTaskPriority";
+import { DrawerItemView } from "@/components/drawer/DrawerItemView";
+import DropdownTaskContextMenu from "@/components/dropdown/DropdownTaskContextMenu";
 
 type TableBacklogProps = {
 	tasks: TaskItem[];
@@ -62,6 +64,7 @@ type getColumnsBacklogProps = {
 	}[];
 	onChangeStatus: (taskId: string, statusId: string) => void;
 	onChangePriority: (taskId: string, priorityId: string | null) => void;
+	onOpenDetail: (taskId: string) => void;
 	workspaceId: string;
 	projectId: string;
 };
@@ -72,6 +75,7 @@ const getColumnsBacklog = ({
 	taskStatus,
 	onChangePriority,
 	onChangeStatus,
+	onOpenDetail,
 	workspaceId,
 	projectId,
 }: getColumnsBacklogProps): ColumnDef<TaskItem>[] => [
@@ -108,8 +112,8 @@ const getColumnsBacklog = ({
 			const task = row.original;
 
 			return (
-				<div className='flex min-w-0 flex-col'>
-					<span className='truncate font-medium text-foreground'>
+				<div className='flex min-w-0 flex-col py-1'>
+					<span className='truncate text-[14px] font-medium text-foreground cursor-pointer hover:underline' title={row.original.title} onClick={() => onOpenDetail(row.original.id)}>
 						{task.title}
 					</span>
 
@@ -184,10 +188,17 @@ const getColumnsBacklog = ({
 		id: "actions",
 		size: 48,
 		header: "",
-		cell: () => (
-			<Button variant='ghost' size='icon' className='size-8'>
-				<Ellipsis className='size-4' />
-			</Button>
+		cell: ({ row }) => (
+			<DropdownTaskContextMenu
+				taskId={row.original.id}
+				workspaceId={workspaceId}
+				projectId={projectId}
+				onOpenDetail={() => onOpenDetail(row.original.id)}
+			>
+				<Button variant='ghost' size='icon' className='size-8'>
+					<Ellipsis className='size-4' />
+				</Button>
+			</DropdownTaskContextMenu>
 		),
 		enableSorting: false,
 		enableHiding: false,
@@ -209,6 +220,7 @@ const TableBacklog = ({
 	});
 	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 	const [taskTrashOpen, setTaskTrashOpen] = useState(false);
+	const [activeDrawerTaskId, setActiveDrawerTaskId] = useState<string | null>(null);
 
 	const { items } = useTableDnd();
 	const { bulkUpdateTasks, updateTask } = useTask(workspaceId, projectId);
@@ -233,6 +245,7 @@ const TableBacklog = ({
 				taskPriority,
 				workspaceId,
 				projectId,
+				onOpenDetail: setActiveDrawerTaskId,
 				onChangeStatus: async (taskId, statusId) => {
 					await updateTask.mutateAsync({
 						id: taskId,
@@ -288,6 +301,10 @@ const TableBacklog = ({
 	const selectedTaskIds = selectedTasks.map((task) => task.id);
 
 	const selectedCount = selectedTaskIds.length;
+
+	const activeDrawerTask = useMemo(() => {
+		return tasks.find((t) => t.id === activeDrawerTaskId) || null;
+	}, [tasks, activeDrawerTaskId]);
 
 	const { ref, isDropTarget } = useDroppable({
 		id: containerId,
@@ -354,6 +371,7 @@ const TableBacklog = ({
 											row={row}
 											index={index >= 0 ? index : 0}
 											containerId={containerId}
+											onClick={() => setActiveDrawerTaskId(row.original.id)}
 										/>
 									);
 								})
@@ -414,6 +432,18 @@ const TableBacklog = ({
 					table.resetRowSelection();
 				}}
 			/>
+
+			{activeDrawerTask ? (
+				<DrawerItemView
+					open={!!activeDrawerTask}
+					onOpenChange={(open) => {
+						if (!open) {
+							setActiveDrawerTaskId(null);
+						}
+					}}
+					task={activeDrawerTask}
+				/>
+			) : null}
 		</>
 	);
 };

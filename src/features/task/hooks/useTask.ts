@@ -66,6 +66,33 @@ export const useUpdateTask = (workspaceId: string, projectId: string) => {
 	});
 };
 
+export const useDeleteTask = (workspaceId: string, projectId: string) => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({ taskId }: { taskId: string }) =>
+			deleteTaskApi({
+				taskId,
+				workspaceId,
+			}),
+		onSuccess: async () => {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [TASK_KEY.TASK_TRASH, workspaceId, projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
+				}),
+			]);
+		},
+	});
+};
+
 export const useTask = (
 	workspaceId: string,
 	projectId: string,
@@ -118,29 +145,7 @@ export const useTask = (
 		enabled: !!workspaceId && includeTrash,
 	});
 
-	const deleteTask = useMutation({
-		mutationFn: ({ taskId }: { taskId: string }) =>
-			deleteTaskApi({
-				taskId,
-				workspaceId,
-			}),
-		onSuccess: async () => {
-			await Promise.all([
-				queryClient.invalidateQueries({
-					queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
-				}),
-				queryClient.invalidateQueries({
-					queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
-				}),
-				queryClient.invalidateQueries({
-					queryKey: [TASK_KEY.TASK_TRASH, workspaceId, projectId],
-				}),
-				queryClient.invalidateQueries({
-					queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
-				}),
-			]);
-		},
-	});
+	const deleteTask = useDeleteTask(workspaceId, projectId);
 
 	const restoreTask = useMutation({
 		mutationFn: ({ taskId }: { taskId: string }) =>

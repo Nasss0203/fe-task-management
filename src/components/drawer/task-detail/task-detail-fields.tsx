@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { cn } from "@/lib/utils";
 import { getTaskStatusStyle } from "@/lib/task-status-style";
 import type { TaskStatusItem } from "@/services/task-status/type";
@@ -13,6 +14,8 @@ import {
 	Paperclip,
 	Plus,
 	Tag,
+	Loader2,
+	Trash2,
 } from "lucide-react";
 import type { DateRange } from "react-day-picker";
 import { Badge } from "../../ui/badge";
@@ -21,12 +24,16 @@ import { Calendar } from "../../ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
 import { Textarea } from "../../ui/textarea";
 import { DetailRow } from "./task-detail-row";
-import type { LocalAttachment } from "./task-detail-types";
 import {
 	formatDateLabel,
 	getPriorityBadgeClass,
 	normalizeText,
+	formatBytes,
+	getFileExtension,
+	getAttachmentPreviewUrl,
 } from "./task-detail-utils";
+import type { AttachmentItem } from "@/services/attachment/type";
+import { useTaskAttachments } from "@/features/task/hooks/useTaskAttachments";
 
 type TaskStatusFieldProps = {
 	currentStatusName: string;
@@ -76,7 +83,7 @@ type TaskDescriptionFieldProps = {
 };
 
 type TaskAttachmentsFieldProps = {
-	attachments: LocalAttachment[];
+	attachmentsHook: ReturnType<typeof useTaskAttachments>;
 };
 
 function getTodayBoundary() {
@@ -105,23 +112,59 @@ function formatScheduleLabel(startDate?: Date, dueDate?: Date) {
 	return "Set schedule";
 }
 
-function AttachmentCard({ attachment }: { attachment: LocalAttachment }) {
+function AttachmentCard({
+	attachment,
+	onDownload,
+	onDelete,
+}: {
+	attachment: AttachmentItem;
+	onDownload: (id: string, name: string) => void;
+	onDelete: (id: string) => void;
+}) {
+	const previewUrl = getAttachmentPreviewUrl(attachment);
+	const extension = getFileExtension(attachment.fileName);
+
 	return (
-		<div className='flex h-16 min-w-0 items-center gap-3 rounded-xl border border-border bg-card px-3 shadow-xs transition-colors hover:bg-accent/40'>
-			<div className='flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-muted text-muted-foreground'>
-				<FileText className='size-4' />
+		<div className='group relative flex h-16 min-w-0 items-center gap-3 rounded-xl border border-border bg-card px-3 shadow-xs transition-colors hover:bg-accent/40'>
+			<div className='flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted text-muted-foreground'>
+				{previewUrl ? (
+					<img src={previewUrl} alt={attachment.fileName} className='size-full object-cover' />
+				) : (
+					<FileText className='size-4' />
+				)}
 			</div>
 
-			<div className='min-w-0 flex-1'>
-				<div className='truncate text-sm font-medium text-foreground'>
-					{attachment.name}
+			<div className='min-w-0 flex-1 pr-14'>
+				<div className='truncate text-sm font-medium text-foreground' title={attachment.fileName}>
+					{attachment.fileName}
 				</div>
 
 				<div className='mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground'>
-					<span className='uppercase'>{attachment.kind}</span>
+					<span className='uppercase'>{extension || "FILE"}</span>
 					<span>•</span>
-					<span>{attachment.size}</span>
+					<span>{formatBytes(attachment.size)}</span>
 				</div>
+			</div>
+
+			<div className='absolute right-3 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100'>
+				<Button
+					type='button'
+					variant='ghost'
+					size='icon-xs'
+					onClick={() => onDownload(attachment.id, attachment.fileName)}
+					className='text-muted-foreground hover:bg-background hover:text-foreground'
+				>
+					<Download className='size-3.5' />
+				</Button>
+				<Button
+					type='button'
+					variant='ghost'
+					size='icon-xs'
+					onClick={() => onDelete(attachment.id)}
+					className='text-destructive hover:bg-destructive/10 hover:text-destructive'
+				>
+					<Trash2 className='size-3.5' />
+				</Button>
 			</div>
 		</div>
 	);
@@ -473,8 +516,27 @@ export function TaskDescriptionField({
 }
 
 export function TaskAttachmentsField({
-	attachments,
+	attachmentsHook,
 }: TaskAttachmentsFieldProps) {
+	const { attachments, isLoadingAttachments, isUploading, handleUpload, handleDownload, deleteAttachment } = attachmentsHook;
+	const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const files = Array.from(event.target.files || []);
+		if (files.length > 0) {
+			void handleUpload(files);
+		}
+		if (fileInputRef.current) {
+			fileInputRef.current.value = "";
+		}
+	};
+
+	const handleDownloadAll = () => {
+		attachments.forEach((attachment) => {
+			void handleDownload(attachment.id, attachment.fileName);
+		});
+	};
+
 	return (
 		<DetailRow
 			icon={Paperclip}
@@ -482,42 +544,68 @@ export function TaskAttachmentsField({
 		>
 			<div className='space-y-2.5'>
 				<div className='flex items-center justify-end gap-2'>
-					<Button
-						type='button'
-						variant='outline'
-						size='sm'
-						className='h-8 rounded-lg px-3 text-xs'
-					>
-						<Download className='size-3.5' />
-						Download All
-					</Button>
+					{attachments.length > 0 && (
+						<Button
+							type='button'
+							variant='outline'
+							size='sm'
+							onClick={handleDownloadAll}
+							className='h-8 rounded-lg px-3 text-xs'
+						>
+							<Download className='size-3.5' />
+							Download All
+						</Button>
+					)}
 
 					<Button
 						type='button'
 						size='sm'
+						disabled={isUploading}
+						onClick={() => fileInputRef.current?.click()}
 						className='h-8 rounded-lg px-3 text-xs'
 					>
-						<Plus className='size-3.5' />
+						{isUploading ? <Loader2 className='size-3.5 animate-spin mr-1' /> : <Plus className='size-3.5 mr-1' />}
 						Add File
 					</Button>
+					<input
+						type='file'
+						multiple
+						className='hidden'
+						ref={fileInputRef}
+						onChange={handleFileChange}
+					/>
 				</div>
 
-				<div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
-					{attachments.map((attachment, index) => (
-						<AttachmentCard
-							key={`${attachment.id}-${index}`}
-							attachment={attachment}
-						/>
-					))}
+				{isLoadingAttachments ? (
+					<div className="flex h-16 items-center justify-center rounded-xl border border-dashed border-border bg-card/60 text-sm text-muted-foreground">
+						<Loader2 className="mr-2 size-4 animate-spin" /> Loading attachments...
+					</div>
+				) : (
+					<div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
+						{attachments.map((attachment) => (
+							<AttachmentCard
+								key={attachment.id}
+								attachment={attachment}
+								onDownload={handleDownload}
+								onDelete={deleteAttachment}
+							/>
+						))}
 
-					<button
-						type='button'
-						className='flex h-16 items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-card text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground'
-					>
-						<Plus className='size-4' />
-						<span>Add attachment</span>
-					</button>
-				</div>
+						<button
+							type='button'
+							disabled={isUploading}
+							onClick={() => fileInputRef.current?.click()}
+							className='flex h-16 items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-card text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-60'
+						>
+							{isUploading ? (
+								<Loader2 className='size-4 animate-spin' />
+							) : (
+								<Plus className='size-4' />
+							)}
+							<span>{isUploading ? "Uploading..." : "Add attachment"}</span>
+						</button>
+					</div>
+				)}
 			</div>
 		</DetailRow>
 	);

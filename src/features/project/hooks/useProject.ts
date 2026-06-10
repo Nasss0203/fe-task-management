@@ -1,10 +1,12 @@
 import {
 	CreateProjectApi,
 	deleteProjectApi,
+	findProjectByWorkspaceIdApi,
 	findDeletedProjectsApi,
 	restoreProjectApi,
+	updateProjectApi,
 } from "@/services/project/project.service";
-import { PROJECT_KEY, ProjectDto } from "@/services/project/type";
+import { PROJECT_KEY, ProjectDto, UpdateProjectDto } from "@/services/project/type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useProject = (workspaceId?: string) => {
@@ -49,6 +51,12 @@ export const useProject = (workspaceId?: string) => {
 		},
 	});
 
+	const projects = useQuery({
+		queryKey: [PROJECT_KEY.PROJECT, workspaceId],
+		queryFn: () => findProjectByWorkspaceIdApi(workspaceId as string),
+		enabled: !!workspaceId,
+	});
+
 	const deletedProjects = useQuery({
 		queryKey: [PROJECT_KEY.PROJECT_TRASH, workspaceId],
 		queryFn: () => findDeletedProjectsApi(workspaceId as string),
@@ -79,5 +87,25 @@ export const useProject = (workspaceId?: string) => {
 		},
 	});
 
-	return { createProject, deleteProject, deletedProjects, restoreProject };
+	const updateProject = useMutation({
+		mutationFn: async (input: {
+			workspaceId: string;
+			projectId: string;
+			data: UpdateProjectDto;
+		}) => {
+			const result = await updateProjectApi(input);
+
+			return result;
+		},
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: [PROJECT_KEY.PROJECT],
+			});
+		},
+		onError: (err) => {
+			console.error("updateProject failed", err);
+		},
+	});
+
+	return { projects, createProject, deleteProject, deletedProjects, restoreProject, updateProject };
 };

@@ -9,12 +9,14 @@ type TableRowDndProps<TData extends { id: string }> = {
 	row: Row<TData>;
 	index: number;
 	containerId: string;
+	onClick?: () => void;
 };
 
 const TableRowDnd = <TData extends { id: string }>({
 	row,
 	index,
 	containerId,
+	onClick,
 }: TableRowDndProps<TData>) => {
 	const { ref, isDragging } = useSortable({
 		id: row.original.id,
@@ -34,6 +36,7 @@ const TableRowDnd = <TData extends { id: string }>({
 			className={cn("h-14 cursor-pointer", isDragging && "opacity-40")}
 			data-state={row.getIsSelected() && "selected"}
 			style={{ touchAction: "none" }}
+			onClick={onClick}
 		>
 			{row.getVisibleCells().map((cell) => (
 				<TableCell key={cell.id}>

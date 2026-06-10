@@ -10,7 +10,7 @@ import {
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import BacklogTable from "@/components/table/BacklogTable";
-import { columnsBacklog } from "@/components/table/columns/column-backlog";
+import { getColumnsBacklog } from "@/components/table/columns/column-backlog";
 import { Button } from "@/components/ui/button";
 import { DrawerItemView } from "@/components/drawer/DrawerItemView";
 
@@ -50,33 +50,12 @@ const SprintTaskList = ({
 
 	// Enhanced columns to support opening detail
 	const columns = useMemo(() => {
-		return columnsBacklog.map((col) => {
-			if ("accessorKey" in col && col.accessorKey === "title") {
-				return {
-					...col,
-					cell: (info: any) => {
-						const task = info.row.original as TaskItem;
-						return (
-							<div
-								className='flex cursor-pointer min-w-0 flex-col py-1'
-								onClick={() => setActiveDrawerTaskId(task.id)}
-							>
-								<span className='truncate text-[14px] font-medium text-foreground hover:text-blue-400 transition-colors'>
-									{task.title}
-								</span>
-								{task.description ? (
-									<span className='truncate text-[12px] text-muted-foreground'>
-										{task.description}
-									</span>
-								) : null}
-							</div>
-						);
-					},
-				};
-			}
-			return col;
+		return getColumnsBacklog({
+			workspaceId,
+			projectId,
+			onOpenDetail: setActiveDrawerTaskId,
 		});
-	}, []);
+	}, [workspaceId, projectId]);
 
 	const table = useReactTable({
 		data: sprintTasks,

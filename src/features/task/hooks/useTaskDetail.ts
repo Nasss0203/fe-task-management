@@ -1,12 +1,13 @@
 "use client";
 
-import { buildAttachmentFallback } from "@/components/drawer/task-detail/task-detail-utils";
+
 import { useUser } from "@/features/auth/hooks/useUser";
 import type { TaskItem } from "@/services/task/type";
 import * as React from "react";
 import { useTaskDetailAssignees } from "./useTaskDetailAssignees";
 import { useTaskDetailComments } from "./useTaskDetailComments";
 import { useTaskDetailFields } from "./useTaskDetailFields";
+import { useTaskAttachments } from "./useTaskAttachments";
 
 export function useTaskDetail(task: TaskItem) {
 	const { user } = useUser();
@@ -19,10 +20,7 @@ export function useTaskDetail(task: TaskItem) {
 	const priorityName =
 		fields.priority.current?.name ?? task.priorityName ?? "No priority";
 	const currentPriorityColor = fields.priority.current?.color ?? "#71717A";
-	const attachments = React.useMemo(
-		() => buildAttachmentFallback(task),
-		[task],
-	);
+	const attachmentsHook = useTaskAttachments(task);
 	const contextTag = React.useMemo(
 		() =>
 			task.sprintName ??
@@ -42,7 +40,7 @@ export function useTaskDetail(task: TaskItem) {
 			priorityName,
 			currentPriorityColor,
 		},
-		attachments,
+		attachmentsHook,
 		contextTag,
 	};
 }

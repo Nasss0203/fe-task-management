@@ -5,6 +5,8 @@ import {
 	FindAllProjectResponse,
 	FindDeletedProjectResponse,
 	ProjectDto,
+	UpdateProjectDto,
+	UpdateProjectResponse,
 } from "./type";
 
 export const findProjectByWorkspaceIdApi = async (
@@ -21,6 +23,22 @@ export const CreateProjectApi = async (
 ): Promise<CreateProjectResponse> => {
 	const response = await instance.post<CreateProjectResponse>(
 		"/projects",
+		data,
+	);
+	return response.data;
+};
+
+export const updateProjectApi = async ({
+	workspaceId,
+	projectId,
+	data,
+}: {
+	workspaceId: string;
+	projectId: string;
+	data: UpdateProjectDto;
+}): Promise<UpdateProjectResponse> => {
+	const response = await instance.patch<UpdateProjectResponse>(
+		`/projects/workspaces/${workspaceId}/projects/${projectId}`,
 		data,
 	);
 	return response.data;

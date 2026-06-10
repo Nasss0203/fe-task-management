@@ -15,13 +15,6 @@ export type LocalComment = {
 	createdAt: string;
 };
 
-export type LocalAttachment = {
-	id: string;
-	name: string;
-	size: string;
-	kind: string;
-};
-
 export type LocalSubtask = {
 	id: string;
 	title: string;

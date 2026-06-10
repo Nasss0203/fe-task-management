@@ -1,5 +1,5 @@
 import type { TaskItem } from "@/services/task/type";
-import type { LocalAttachment } from "./task-detail-types";
+import type { AttachmentItem } from "@/services/attachment/type";
 
 export const normalizeText = (value?: string | null) =>
 	(value ?? "")
@@ -114,27 +114,22 @@ const slugify = (value?: string | null) => {
 	return nextValue || fallback;
 };
 
-export const buildAttachmentFallback = (task: TaskItem): LocalAttachment[] => {
-	const fileBase = slugify(task.title);
+export const formatBytes = (bytes: number, decimals = 2) => {
+	if (!+bytes) return "0 Bytes";
+	const k = 1024;
+	const dm = decimals < 0 ? 0 : decimals;
+	const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+	const i = Math.floor(Math.log(bytes) / Math.log(k));
+	return `${Number.parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+};
 
-	return [
-		{
-			id: `${task.id}-attachment-brief`,
-			name: `${fileBase}-brief.pdf`,
-			size: "1.5 MB",
-			kind: "PDF",
-		},
-		{
-			id: `${task.id}-attachment-notes`,
-			name: `${fileBase}-notes.txt`,
-			size: "28 KB",
-			kind: "TXT",
-		},
-		{
-			id: `${task.id}-attachment-notes`,
-			name: `${fileBase}-notes.txt`,
-			size: "28 KB",
-			kind: "TXT",
-		},
-	];
+export const getFileExtension = (filename: string) => {
+	return filename.slice((Math.max(0, filename.lastIndexOf(".")) || Infinity) + 1).toUpperCase();
+};
+
+export const getAttachmentPreviewUrl = (attachment: AttachmentItem) => {
+	if (attachment.provider === "CLOUDINARY" && attachment.secureUrl) {
+		return attachment.secureUrl;
+	}
+	return null;
 };

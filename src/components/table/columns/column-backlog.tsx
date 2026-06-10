@@ -9,6 +9,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { PriorityBadge } from "@/components/shared/priority-badge";
 import DropdownTaskStatus from "@/components/dropdown/DropdownTaskStatus";
 import DropdownTaskPriority from "@/components/dropdown/DropdownTaskPriority";
+import DropdownTaskContextMenu from "@/components/dropdown/DropdownTaskContextMenu";
 
 const getAssigneeName = (assignee: TaskItem["assignees"][number]) => {
 	return (
@@ -55,7 +56,17 @@ const formatDate = (value?: string | null) => {
 	}).format(date);
 };
 
-export const columnsBacklog: ColumnDef<TaskItem>[] = [
+type getColumnsBacklogProps = {
+	onOpenDetail?: (taskId: string) => void;
+	workspaceId: string;
+	projectId: string;
+};
+
+export const getColumnsBacklog = ({
+	onOpenDetail,
+	workspaceId,
+	projectId,
+}: getColumnsBacklogProps): ColumnDef<TaskItem>[] => [
 	{
 		id: "drag",
 		size: 36,
@@ -112,7 +123,7 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 		header: "Task",
 		cell: ({ row }) => (
 			<div className='flex min-w-0 flex-col py-1'>
-				<span className='truncate text-[14px] font-medium text-foreground' title={row.original.title}>
+				<span className='truncate text-[14px] font-medium text-foreground cursor-pointer hover:underline' title={row.original.title} onClick={() => onOpenDetail?.(row.original.id)}>
 					{row.original.title}
 				</span>
 				{row.original.description ? (
@@ -217,10 +228,17 @@ export const columnsBacklog: ColumnDef<TaskItem>[] = [
 		id: "actions",
 		size: 44,
 		header: "",
-		cell: () => (
-			<button className='rounded-md p-1.5 text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground hover:hover:text-foreground transition-colors'>
-				<MoreHorizontal size={14} />
-			</button>
+		cell: ({ row }) => (
+			<DropdownTaskContextMenu
+				taskId={row.original.id}
+				workspaceId={row.original.workspaceId}
+				projectId={row.original.projectId}
+				onOpenDetail={() => onOpenDetail?.(row.original.id)}
+			>
+				<button className='rounded-md p-1.5 text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground hover:hover:text-foreground transition-colors'>
+					<MoreHorizontal size={14} />
+				</button>
+			</DropdownTaskContextMenu>
 		),
 		enableSorting: false,
 		enableHiding: false,

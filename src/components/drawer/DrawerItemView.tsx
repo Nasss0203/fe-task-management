@@ -137,7 +137,7 @@ export function DrawerItemView({
 									/>
 
 									<TaskAttachmentsField
-										attachments={detail.attachments}
+										attachmentsHook={detail.attachmentsHook}
 									/>
 								</div>
 

@@ -44,9 +44,10 @@ type WorkspaceSummary = {
 type ProjectDropdownProps = {
 	project: ProjectItems;
 	workspace: WorkspaceSummary;
+	onRenameProject?: () => void;
 };
 
-const ProjectDropdown = ({ project, workspace }: ProjectDropdownProps) => {
+const ProjectDropdown = ({ project, workspace, onRenameProject }: ProjectDropdownProps) => {
 	const [openTrashDialog, setOpenTrashDialog] = useState(false);
 	const queryClient = useQueryClient();
 	const {
@@ -129,11 +130,15 @@ const ProjectDropdown = ({ project, workspace }: ProjectDropdownProps) => {
 						</DropdownMenuLabel>
 
 						<DropdownMenuItem
-							onSelect={() =>
-								toast.info(
-									"Rename project se duoc noi tiep khi backend update metadata san sang.",
-								)
-							}
+							onSelect={() => {
+								if (onRenameProject) {
+									onRenameProject();
+								} else {
+									toast.info(
+										"Rename project se duoc noi tiep khi backend update metadata san sang.",
+									);
+								}
+							}}
 							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'
 						>
 							<Pencil size={15} />

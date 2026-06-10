@@ -44,6 +44,7 @@ import {
 	TableRow,
 } from "../ui/table";
 import { useBacklogColumns } from "./columns/column-task";
+import { DrawerItemView } from "@/components/drawer/DrawerItemView";
 
 type TaskItem = {
 	id: string;
@@ -140,9 +141,12 @@ const BoardTable = ({
 	workspaceId: string;
 	projectId: string;
 }) => {
+	const [activeDrawerTaskId, setActiveDrawerTaskId] = React.useState<string | null>(null);
+
 	const columns = useBacklogColumns({
 		workspaceId,
 		projectId,
+		onOpenDetail: setActiveDrawerTaskId,
 	});
 
 	const { taskQuery } = useTask(workspaceId, projectId);
@@ -219,7 +223,12 @@ const BoardTable = ({
 	const rows = table.getRowModel()?.rows ?? [];
 	const columnCount = Math.max(columnOrder.length, columns.length, 1);
 
+	const activeDrawerTask = React.useMemo(() => {
+		return rawTasks.find((t: any) => t.id === activeDrawerTaskId) || null;
+	}, [rawTasks, activeDrawerTaskId]);
+
 	return (
+		<>
 		<section className='col-span-12 flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/80 shadow-sm backdrop-blur-sm xl:col-span-6'>
 			<DndContext
 				collisionDetection={closestCenter}
@@ -304,6 +313,19 @@ const BoardTable = ({
 			</DndContext>
 			<PanigationTable table={table} />
 		</section>
+
+		{activeDrawerTask ? (
+			<DrawerItemView
+				open={!!activeDrawerTask}
+				onOpenChange={(open) => {
+					if (!open) {
+						setActiveDrawerTaskId(null);
+					}
+				}}
+				task={activeDrawerTask}
+			/>
+		) : null}
+		</>
 	);
 };
 

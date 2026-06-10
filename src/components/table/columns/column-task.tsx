@@ -10,6 +10,7 @@ import { useMember } from "@/features/member/hooks/useMember";
 import { useUser } from "@/features/auth/hooks/useUser";
 import { TaskAssigneeSelect } from "@/features/task/components/task/TaskAssignSelect";
 import { MoreHorizontal } from "lucide-react";
+import DropdownTaskContextMenu from "@/components/dropdown/DropdownTaskContextMenu";
 
 type TaskItem = {
 	id: string;
@@ -29,6 +30,7 @@ type TaskItem = {
 type UseBacklogColumnsParams = {
 	projectId?: string;
 	workspaceId?: string;
+	onOpenDetail: (taskId: string) => void;
 };
 
 export const TaskNameCell = ({ taskId, workspaceId, projectId, initialTitle }: any) => {
@@ -110,6 +112,7 @@ export const TaskAssigneeCell = ({ taskId, workspaceId, projectId, assignees }: 
 export const useBacklogColumns = ({
 	projectId,
 	workspaceId,
+	onOpenDetail,
 }: UseBacklogColumnsParams) => {
 	const columns = React.useMemo<ColumnDef<TaskItem>[]>(
 		() => [
@@ -178,9 +181,16 @@ export const useBacklogColumns = ({
 				size: 140,
 				header: "Action",
 				cell: ({ row }) => (
-					<button className='rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors'>
-						<MoreHorizontal size={14} />
-					</button>
+					<DropdownTaskContextMenu
+						taskId={row.original.id}
+						workspaceId={workspaceId as string}
+						projectId={projectId as string}
+						onOpenDetail={() => onOpenDetail(row.original.id)}
+					>
+						<button className='rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors'>
+							<MoreHorizontal size={14} />
+						</button>
+					</DropdownTaskContextMenu>
 				),
 			},
 		],

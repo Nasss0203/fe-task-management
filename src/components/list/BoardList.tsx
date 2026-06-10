@@ -9,6 +9,9 @@ import { cn } from "@/lib/utils";
 import DropdownTaskStatus from "@/components/dropdown/DropdownTaskStatus";
 import DropdownTaskPriority from "@/components/dropdown/DropdownTaskPriority";
 import { TaskNameCell, TaskAssigneeCell } from "@/components/table/columns/column-task";
+import DropdownTaskContextMenu from "@/components/dropdown/DropdownTaskContextMenu";
+import { DrawerItemView } from "@/components/drawer/DrawerItemView";
+import type { TaskItem } from "@/services/task/type";
 
 type BoardListProps = {
 	workspaceId: string;
@@ -22,7 +25,13 @@ const BoardList = ({ workspaceId, projectId }: BoardListProps) => {
 		? taskQuery.data.data
 		: [];
 
+	const [activeDrawerTaskId, setActiveDrawerTaskId] = React.useState<string | null>(null);
+	const activeDrawerTask = React.useMemo(() => {
+		return rawTasks.find((t: TaskItem) => t.id === activeDrawerTaskId) || null;
+	}, [rawTasks, activeDrawerTaskId]);
+
 	return (
+		<>
 		<section className='col-span-12 flex h-full min-h-0 flex-col xl:col-span-6'>
 			<div className='flex-1 overflow-y-auto overflow-x-hidden'>
 				<div className='flex flex-col'>
@@ -85,9 +94,16 @@ const BoardList = ({ workspaceId, projectId }: BoardListProps) => {
 											assignees={task.assignees}
 										/>
 									</div>
-									<button className='rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground'>
-										<MoreHorizontal size={15} />
-									</button>
+									<DropdownTaskContextMenu
+										taskId={task.id}
+										workspaceId={workspaceId}
+										projectId={projectId}
+										onOpenDetail={() => setActiveDrawerTaskId(task.id)}
+									>
+										<button className='rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground'>
+											<MoreHorizontal size={15} />
+										</button>
+									</DropdownTaskContextMenu>
 								</div>
 							</div>
 							);
@@ -100,6 +116,19 @@ const BoardList = ({ workspaceId, projectId }: BoardListProps) => {
 				</div>
 			</div>
 		</section>
+
+		{activeDrawerTask ? (
+			<DrawerItemView
+				open={!!activeDrawerTask}
+				onOpenChange={(open) => {
+					if (!open) {
+						setActiveDrawerTaskId(null);
+					}
+				}}
+				task={activeDrawerTask}
+			/>
+		) : null}
+		</>
 	);
 };
 

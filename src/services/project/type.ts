@@ -49,3 +49,9 @@ export interface CreateProjectResponse {
 export interface DeleteProjectResponse {
 	success: boolean;
 }
+
+export type UpdateProjectDto = Partial<ProjectDto>;
+
+export interface UpdateProjectResponse {
+	data: ProjectItems;
+}

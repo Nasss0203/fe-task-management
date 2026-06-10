@@ -17,7 +17,8 @@ import { Filter, Plus, Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import PanigationTable from "@/components/panigation/PanigationTable";
 import BacklogTable from "@/components/table/BacklogTable";
-import { columnsBacklog } from "@/components/table/columns/column-backlog";
+import { getColumnsBacklog } from "@/components/table/columns/column-backlog";
+import { DrawerItemView } from "@/components/drawer/DrawerItemView";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -58,6 +59,7 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 	const [statusFilter, setStatusFilter] = useState(ALL_FILTER_VALUE);
 	const [priorityFilter, setPriorityFilter] = useState(ALL_FILTER_VALUE);
 	const [assigneeFilter, setAssigneeFilter] = useState(ALL_FILTER_VALUE);
+	const [activeDrawerTaskId, setActiveDrawerTaskId] = useState<string | null>(null);
 
 	const backlogFilters = useMemo(
 		() => ({
@@ -92,6 +94,10 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 		return Array.isArray(backlogData) ? backlogData : [];
 	}, [findTaskBacklog.data?.data]);
 	const totalPages = findTaskBacklog.data?.totalPages ?? 1;
+
+	const activeDrawerTask = useMemo(() => {
+		return taskBacklog.find((t: TaskItem) => t.id === activeDrawerTaskId) || null;
+	}, [taskBacklog, activeDrawerTaskId]);
 
 	const resetPage = () => {
 		setPagination((current) => ({ ...current, pageIndex: 0 }));
@@ -205,9 +211,17 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 		resetPage();
 	};
 
+	const columns = useMemo(() => {
+		return getColumnsBacklog({
+			workspaceId,
+			projectId,
+			onOpenDetail: setActiveDrawerTaskId,
+		});
+	}, [workspaceId, projectId]);
+
 	const table = useReactTable({
 		data: taskBacklog,
-		columns: columnsBacklog,
+		columns,
 		getRowId: (row) => row.id,
 		manualPagination: true,
 		pageCount: Math.max(totalPages, 1),
@@ -333,6 +347,18 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 			/>
 
 			<PanigationTable table={table} />
+
+			{activeDrawerTask ? (
+				<DrawerItemView
+					open={!!activeDrawerTask}
+					onOpenChange={(open) => {
+						if (!open) {
+							setActiveDrawerTaskId(null);
+						}
+					}}
+					task={activeDrawerTask}
+				/>
+			) : null}
 		</section>
 	);
 };
