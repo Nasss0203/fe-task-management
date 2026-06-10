@@ -147,10 +147,7 @@ export function StartSprintDialog({
 					type='button'
 					variant='outline'
 					size='sm'
-					className={cn(
-						"h-8 rounded-md border border-neutral-700 bg-[#1c1c1c] px-4 text-xs font-semibold text-white",
-						"hover:border-neutral-500 hover:bg-[#252525] hover:text-white",
-					)}
+					className="h-8 rounded-lg border-border bg-background text-[12px] font-medium hover:hover:bg-accent hover:text-accent-foreground hover:border-neutral-600 transition-all hover:text-foreground"
 				>
 					Start sprint
 				</Button>
@@ -158,13 +155,13 @@ export function StartSprintDialog({
 
 			<DialogContent
 				className={cn(
-					"max-w-140 border border-neutral-800 bg-[#171717] p-0 text-white shadow-2xl",
+					"max-w-140 border border-border bg-popover p-0 text-foreground shadow-2xl",
 					"sm:max-w-140",
 				)}
 			>
-				<div className='border-b border-neutral-800 px-6 py-4'>
+				<div className='border-b border-border px-6 py-4'>
 					<DialogHeader>
-						<DialogTitle className='text-base font-semibold text-white'>
+						<DialogTitle className='text-base font-semibold text-foreground'>
 							Start sprint
 						</DialogTitle>
 					</DialogHeader>
@@ -172,21 +169,21 @@ export function StartSprintDialog({
 
 				<div className='px-6 py-5'>
 					<div className='space-y-4'>
-						<p className='text-sm text-neutral-300'>
-							<span className='font-semibold text-white'>
+						<p className='text-sm text-foreground'>
+							<span className='font-semibold text-foreground'>
 								{workItemCount}
 							</span>{" "}
 							work item{workItemCount > 1 ? "s" : ""} will be
 							included in this sprint.
 						</p>
 
-						<p className='text-xs font-medium text-neutral-500'>
+						<p className='text-xs font-medium text-muted-foreground'>
 							Required fields are marked with an asterisk{" "}
 							<span className='text-red-400'>*</span>
 						</p>
 
 						<div className='space-y-1.5'>
-							<Label className='text-xs font-semibold text-neutral-300'>
+							<Label className='text-xs font-semibold text-foreground'>
 								Sprint name{" "}
 								<span className='text-red-400'>*</span>
 							</Label>
@@ -195,15 +192,15 @@ export function StartSprintDialog({
 								value={name}
 								onChange={(e) => setName(e.target.value)}
 								className={cn(
-									"h-9 rounded-md border-neutral-700 bg-[#101010] text-sm text-white",
-									"placeholder:text-neutral-600",
+									"h-9 rounded-md border-border bg-background text-sm text-foreground",
+									"placeholder:text-muted-foreground",
 									"focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500",
 								)}
 							/>
 						</div>
 
 						<div className='space-y-1.5'>
-							<Label className='text-xs font-semibold text-neutral-300'>
+							<Label className='text-xs font-semibold text-foreground'>
 								Duration <span className='text-red-400'>*</span>
 							</Label>
 
@@ -213,19 +210,19 @@ export function StartSprintDialog({
 							>
 								<SelectTrigger
 									className={cn(
-										"h-9 rounded-md border-neutral-700 bg-[#101010] text-sm text-white",
+										"h-9 rounded-md border-border bg-background text-sm text-foreground",
 										"focus:border-blue-500 focus:ring-1 focus:ring-blue-500",
 									)}
 								>
 									<SelectValue placeholder='Select duration' />
 								</SelectTrigger>
 
-								<SelectContent className='border-neutral-800 bg-[#171717] text-white'>
+								<SelectContent className='border-border bg-popover text-foreground'>
 									{durationOptions.map((item) => (
 										<SelectItem
 											key={item.value}
 											value={item.value}
-											className='focus:bg-[#252525] focus:text-white'
+											className='focus:focus:bg-accent focus:text-accent-foreground'
 										>
 											{item.label}
 										</SelectItem>
@@ -236,7 +233,7 @@ export function StartSprintDialog({
 
 						<div className='grid grid-cols-2 gap-3'>
 							<div className='space-y-1.5'>
-								<Label className='text-xs font-semibold text-neutral-300'>
+								<Label className='text-xs font-semibold text-foreground'>
 									Start date{" "}
 									<span className='text-red-400'>*</span>
 								</Label>
@@ -248,14 +245,14 @@ export function StartSprintDialog({
 										handleStartDateChange(e.target.value)
 									}
 									className={cn(
-										"h-9 rounded-md border-neutral-700 bg-[#101010] text-sm text-white",
+										"h-9 rounded-md border-border bg-background text-sm text-foreground",
 										"focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500",
 									)}
 								/>
 							</div>
 
 							<div className='space-y-1.5'>
-								<Label className='text-xs font-semibold text-neutral-300'>
+								<Label className='text-xs font-semibold text-foreground'>
 									Start time{" "}
 									<span className='text-red-400'>*</span>
 								</Label>
@@ -267,7 +264,7 @@ export function StartSprintDialog({
 										setStartTime(e.target.value)
 									}
 									className={cn(
-										"h-9 rounded-md border-neutral-700 bg-[#101010] text-sm text-white",
+										"h-9 rounded-md border-border bg-background text-sm text-foreground",
 										"focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500",
 									)}
 								/>
@@ -276,7 +273,7 @@ export function StartSprintDialog({
 
 						<div className='grid grid-cols-2 gap-3'>
 							<div className='space-y-1.5'>
-								<Label className='text-xs font-semibold text-neutral-300'>
+								<Label className='text-xs font-semibold text-foreground'>
 									End date{" "}
 									<span className='text-red-400'>*</span>
 								</Label>
@@ -290,8 +287,8 @@ export function StartSprintDialog({
 									className={cn(
 										"h-9 rounded-md text-sm",
 										isCustomDuration
-											? "border-neutral-700 bg-[#101010] text-white focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500"
-											: "border-neutral-800 bg-[#202020] text-neutral-500 disabled:cursor-not-allowed disabled:opacity-100",
+											? "border-border bg-background text-foreground focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500"
+											: "border-border bg-background text-muted-foreground disabled:cursor-not-allowed disabled:opacity-100",
 									)}
 								/>
 
@@ -303,7 +300,7 @@ export function StartSprintDialog({
 							</div>
 
 							<div className='space-y-1.5'>
-								<Label className='text-xs font-semibold text-neutral-300'>
+								<Label className='text-xs font-semibold text-foreground'>
 									End time{" "}
 									<span className='text-red-400'>*</span>
 								</Label>
@@ -313,7 +310,7 @@ export function StartSprintDialog({
 									value={startTime}
 									disabled
 									className={cn(
-										"h-9 rounded-md border-neutral-800 bg-[#202020] text-sm text-neutral-500",
+										"h-9 rounded-md border-border bg-background text-sm text-muted-foreground",
 										"disabled:cursor-not-allowed disabled:opacity-100",
 									)}
 								/>
@@ -321,7 +318,7 @@ export function StartSprintDialog({
 						</div>
 
 						<div className='space-y-1.5'>
-							<Label className='text-xs font-semibold text-neutral-300'>
+							<Label className='text-xs font-semibold text-foreground'>
 								Sprint goal
 							</Label>
 
@@ -330,20 +327,20 @@ export function StartSprintDialog({
 								onChange={(e) => setGoal(e.target.value)}
 								placeholder='What should this sprint accomplish?'
 								className={cn(
-									"min-h-27.5 resize-none rounded-md border-neutral-700 bg-[#101010] text-sm text-white",
-									"placeholder:text-neutral-600",
+									"min-h-27.5 resize-none rounded-md border-border bg-background text-sm text-foreground",
+									"placeholder:text-muted-foreground",
 									"focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500",
 								)}
 							/>
 						</div>
 					</div>
 
-					<div className='mt-6 flex justify-end gap-2 border-t border-neutral-800 pt-4'>
+					<div className='mt-6 flex justify-end gap-2 border-t border-border pt-4'>
 						<Button
 							type='button'
 							variant='ghost'
 							onClick={() => setOpen(false)}
-							className='h-8 rounded-md px-4 text-xs font-semibold text-neutral-400 hover:bg-[#252525] hover:text-white'
+							className='h-8 rounded-md px-4 text-xs font-semibold text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground'
 						>
 							Cancel
 						</Button>

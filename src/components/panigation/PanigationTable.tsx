@@ -26,14 +26,14 @@ const PanigationTable = <TData,>({
 	const to = Math.min((pageIndex + 1) * pageSize, totalRows);
 
 	return (
-		<div className='flex flex-col gap-3 border-t border-[#2a2a2a] bg-[#171717] px-4 py-3 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between'>
+		<div className='flex shrink-0 flex-col gap-3 border-t border-border bg-background px-4 py-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between'>
 			<div className='text-xs font-medium'>
 				Hiển thị{" "}
-				<span className='font-semibold text-slate-200'>
+				<span className='font-semibold text-foreground'>
 					{from} - {to}
 				</span>{" "}
 				trên{" "}
-				<span className='font-semibold text-slate-200'>
+				<span className='font-semibold text-foreground'>
 					{totalRows}
 				</span>{" "}
 				{itemLabel}
@@ -45,7 +45,7 @@ const PanigationTable = <TData,>({
 					onChange={(e) => {
 						table.setPageSize(Number(e.target.value));
 					}}
-					className='h-8 rounded-md border border-[#333] bg-[#202020] px-2 text-xs font-medium text-slate-200 outline-none transition hover:bg-[#262626] focus:border-blue-500'
+					className='h-8 rounded-md border border-border bg-background px-2 text-xs font-medium text-foreground outline-none transition hover:bg-accent focus:border-blue-500'
 				>
 					{[10, 20, 30, 40, 50].map((size) => (
 						<option key={size} value={size}>
@@ -59,7 +59,7 @@ const PanigationTable = <TData,>({
 						type='button'
 						onClick={() => table.firstPage()}
 						disabled={!table.getCanPreviousPage()}
-						className='flex size-8 items-center justify-center rounded-md border border-[#333] bg-[#202020] text-slate-300 transition hover:bg-[#262626] disabled:cursor-not-allowed disabled:opacity-40'
+						className='flex size-8 items-center justify-center rounded-md border border-border bg-background text-foreground transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40'
 					>
 						<ChevronsLeft size={15} />
 					</button>
@@ -68,14 +68,14 @@ const PanigationTable = <TData,>({
 						type='button'
 						onClick={() => table.previousPage()}
 						disabled={!table.getCanPreviousPage()}
-						className='flex size-8 items-center justify-center rounded-md border border-[#333] bg-[#202020] text-slate-300 transition hover:bg-[#262626] disabled:cursor-not-allowed disabled:opacity-40'
+						className='flex size-8 items-center justify-center rounded-md border border-border bg-background text-foreground transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40'
 					>
 						<ChevronLeft size={15} />
 					</button>
 
-					<div className='flex h-8 items-center gap-1 rounded-md border border-[#333] bg-[#202020] px-3 text-xs font-medium text-slate-400'>
+					<div className='flex h-8 items-center gap-1 rounded-md border border-border bg-background px-3 text-xs font-medium text-muted-foreground'>
 						<span>Trang</span>
-						<span className='font-semibold text-white'>
+						<span className='font-semibold text-foreground'>
 							{pageIndex + 1}
 						</span>
 						<span>/</span>
@@ -86,7 +86,7 @@ const PanigationTable = <TData,>({
 						type='button'
 						onClick={() => table.nextPage()}
 						disabled={!table.getCanNextPage()}
-						className='flex size-8 items-center justify-center rounded-md border border-[#333] bg-[#202020] text-slate-300 transition hover:bg-[#262626] disabled:cursor-not-allowed disabled:opacity-40'
+						className='flex size-8 items-center justify-center rounded-md border border-border bg-background text-foreground transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40'
 					>
 						<ChevronRight size={15} />
 					</button>
@@ -95,7 +95,7 @@ const PanigationTable = <TData,>({
 						type='button'
 						onClick={() => table.lastPage()}
 						disabled={!table.getCanNextPage()}
-						className='flex size-8 items-center justify-center rounded-md border border-[#333] bg-[#202020] text-slate-300 transition hover:bg-[#262626] disabled:cursor-not-allowed disabled:opacity-40'
+						className='flex size-8 items-center justify-center rounded-md border border-border bg-background text-foreground transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40'
 					>
 						<ChevronsRight size={15} />
 					</button>

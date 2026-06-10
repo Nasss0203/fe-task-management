@@ -18,7 +18,7 @@ const CommandTask = () => {
 				<Plus
 					onClick={() => setOpen(true)}
 					size={16}
-					className='hover:bg-neutral-700 rounded-xs'
+					className='hover:hover:bg-accent hover:text-accent-foreground rounded-xs'
 				/>
 			</div>
 			<CommandDialogV2 open={open} onOpenChange={setOpen}>

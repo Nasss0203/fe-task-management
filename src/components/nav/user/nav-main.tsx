@@ -9,13 +9,11 @@ import {
 
 import ProjectSidebarItem from "@/components/sidebar/user/ProjectSidebarItem";
 import { useWorkspaceFeatures } from "@/features/workspace-feature/hooks/useWorkspaceFeatures";
-import WorkspaceDropdown from "@/components/workspaces/DropdownWorkspace";
+import WorkspaceDropdown from "@/features/workspace/components/workspaces/DropdownWorkspace";
 import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";
 import { findProjectByWorkspaceIdApi } from "@/services/project/project.service";
-
 import { PROJECT_KEY, type ProjectItems } from "@/services/project/type";
 import type { WorkspaceItem } from "@/services/workspace/type";
-
 import { useWorkspaceNameDraftStore } from "@/stores/use-workspace-name-draft";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useQueries } from "@tanstack/react-query";
@@ -33,34 +31,8 @@ import {
 	SidebarMenuSubV2,
 	SidebarMenuV2,
 } from "../../sidebar/user/sidebar-custom";
+import { WorkspaceProjectsSubmenu } from "./WorkspaceProjectsSubmenu";
 
-type WorkspaceProjectsSubmenuProps = {
-	workspace: WorkspaceItem;
-	projects: ProjectItems[];
-	handleSelectProject: (workspaceId: string, projectId: string) => void;
-};
-
-const WorkspaceProjectsSubmenu = ({
-	workspace,
-	projects,
-	handleSelectProject,
-}: WorkspaceProjectsSubmenuProps) => {
-	const { canUseSprint } = useWorkspaceFeatures(workspace.id);
-
-	return (
-		<SidebarMenuSubV2 className=' w-full  pr-4'>
-			{projects.map((project) => (
-				<ProjectSidebarItem
-					key={project.id}
-					project={project}
-					workspace={workspace}
-					canUseSprint={canUseSprint}
-					handleSelectProject={handleSelectProject}
-				/>
-			))}
-		</SidebarMenuSubV2>
-	);
-};
 
 export function NavMain() {
 	const { setCurrentWorkspaceId, setCurrentProjectId } =
@@ -203,7 +175,7 @@ export function NavMain() {
 									<div className='group/workspace-item relative flex h-8 w-full items-center gap-1 overflow-hidden rounded-md border border-neutral-200 bg-white p-2 pr-2 text-left text-sm dark:border-none dark:bg-sidebar-accent dark:text-sidebar-accent-foreground'>
 										<CollapsibleTrigger asChild>
 											<div
-												className='mr-1 cursor-pointer flex size-5 shrink-0 items-center justify-center rounded-sm text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100'
+												className='mr-1 cursor-pointer flex size-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground hover:hover:text-foreground'
 												onClick={(e) => {
 													e.stopPropagation();
 													handleSelectWorkspace(
@@ -266,7 +238,7 @@ export function NavMain() {
 														cancelRenameWorkspace();
 													}
 												}}
-												className='h-6 w-full min-w-0 rounded border border-blue-500/60 bg-neutral-950 px-2 text-sm text-neutral-100 outline-none ring-2 ring-blue-500/20'
+												className='h-6 w-full min-w-0 rounded border border-blue-500/60 bg-background px-2 text-sm text-foreground outline-none ring-2 ring-blue-500/20'
 											/>
 										</form>
 									</div>
@@ -280,7 +252,7 @@ export function NavMain() {
 										<div>
 											<CollapsibleTrigger asChild>
 												<div
-													className='mr-1 cursor-pointer flex size-5 shrink-0 items-center justify-center rounded-sm text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100'
+													className='mr-1 cursor-pointer flex size-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground hover:hover:text-foreground'
 													onClick={(e) => {
 														e.stopPropagation();
 														handleSelectWorkspace(

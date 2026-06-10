@@ -1,12 +1,26 @@
+"use client";
+
 import DropdownTaskStatus from "@/components/dropdown/DropdownTaskStatus";
 import { cn } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
-import React from "react";
+import React, { useState, useRef } from "react";
+import DropdownTaskPriority from "@/components/dropdown/DropdownTaskPriority";
+import { useTask } from "@/features/task/hooks/useTask";
+import { useMember } from "@/features/member/hooks/useMember";
+import { useUser } from "@/features/auth/hooks/useUser";
+import { TaskAssigneeSelect } from "@/features/task/components/task/TaskAssignSelect";
+import { MoreHorizontal } from "lucide-react";
 
 type TaskItem = {
 	id: string;
 	title: string;
 	assigneeName: string | null;
+	assignees?: {
+		userId: string;
+		username: string | null;
+		fullName?: string | null;
+		avatarUrl?: string | null;
+	}[];
 	priorityName: string | null;
 	statusName: string;
 	estimateMinutes: number | null;
@@ -17,29 +31,81 @@ type UseBacklogColumnsParams = {
 	workspaceId?: string;
 };
 
-function getPriorityClass(priority: string | null) {
-	switch (priority?.toLowerCase()) {
-		case "high":
-			return "bg-red-500/15 text-red-600 border-red-500/20";
-		case "medium":
-			return "bg-amber-500/15 text-amber-600 border-amber-500/20";
-		case "low":
-			return "bg-sky-500/15 text-sky-600 border-sky-500/20";
-		default:
-			return "bg-slate-500/15 text-slate-600 border-slate-500/20";
+export const TaskNameCell = ({ taskId, workspaceId, projectId, initialTitle }: any) => {
+	const [title, setTitle] = useState(initialTitle);
+	const { updateTask } = useTask(workspaceId, projectId);
+	const [isEditing, setIsEditing] = useState(false);
+	const inputRef = useRef<HTMLInputElement>(null);
+
+	const handleSave = () => {
+		setIsEditing(false);
+		if (title.trim() && title !== initialTitle) {
+			updateTask.mutate({ id: taskId, title });
+		} else {
+			setTitle(initialTitle);
+		}
+	};
+
+	if (isEditing) {
+		return (
+			<input
+				ref={inputRef}
+				value={title}
+				onChange={(e) => setTitle(e.target.value)}
+				onBlur={handleSave}
+				onKeyDown={(e) => {
+					if (e.key === "Enter") handleSave();
+					if (e.key === "Escape") {
+						setTitle(initialTitle);
+						setIsEditing(false);
+					}
+				}}
+				className="w-full bg-transparent border-none outline-none text-[13px] font-medium text-foreground focus:ring-0 p-0 m-0 h-7 px-1 -ml-1 rounded border-ring focus:border-border"
+				autoFocus
+			/>
+		);
 	}
-}
 
-function formatEstimate(minutes: number | null) {
-	if (!minutes) return "—";
-	if (minutes < 60) return `${minutes} phút`;
+	return (
+		<div 
+			className="text-[13px] font-medium text-foreground truncate cursor-text w-full hover:bg-accent/50 rounded transition-colors h-7 flex items-center px-1 -ml-1"
+			onClick={() => setIsEditing(true)}
+		>
+			{title}
+		</div>
+	);
+};
 
-	const hour = Math.floor(minutes / 60);
-	const remain = minutes % 60;
+export const TaskAssigneeCell = ({ taskId, workspaceId, projectId, assignees }: any) => {
+	const { findAllMember } = useMember({ workspaceId });
+	const members = findAllMember.data?.data ?? [];
+	const { user } = useUser();
+	const { updateTask } = useTask(workspaceId, projectId);
 
-	if (!remain) return `${hour} giờ`;
-	return `${hour} giờ ${remain} phút`;
-}
+	const memberOptions = members.map((member: any) => ({
+		id: member.user_id,
+		name: member.full_name,
+		email: member.email,
+		avatarUrl: member.avatar_url,
+		isMe: member.user_id === user?.id,
+	}));
+
+	const value = assignees?.map((a: any) => a.userId) ?? [];
+
+	const handleChange = (newValue: string[]) => {
+		updateTask.mutate({ id: taskId, assigneeIds: newValue });
+	};
+
+	return (
+		<div className="-ml-2">
+			<TaskAssigneeSelect
+				members={memberOptions}
+				value={value}
+				onChange={handleChange}
+			/>
+		</div>
+	);
+};
 
 export const useBacklogColumns = ({
 	projectId,
@@ -51,63 +117,70 @@ export const useBacklogColumns = ({
 				accessorKey: "title",
 				id: "title",
 				size: 260,
-				header: "Tên công việc",
+				header: "Task Name",
 				cell: ({ row }) => (
-					<div className='font-medium text-foreground'>
-						{row.original.title}
-					</div>
+					<TaskNameCell 
+						taskId={row.original.id}
+						workspaceId={workspaceId}
+						projectId={projectId}
+						initialTitle={row.original.title}
+					/>
 				),
 			},
 			{
 				accessorKey: "assigneeName",
 				id: "assigneeName",
 				size: 180,
-				header: "Người được giao",
+				header: "Assignee",
 				cell: ({ row }) => (
-					<div className='text-muted-foreground'>
-						{row.original.assigneeName || "Chưa giao"}
-					</div>
+					<TaskAssigneeCell 
+						taskId={row.original.id}
+						workspaceId={workspaceId}
+						projectId={projectId}
+						assignees={row.original.assignees}
+					/>
 				),
 			},
 			{
 				accessorKey: "priorityName",
 				id: "priorityName",
 				size: 140,
-				header: "Ưu tiên",
+				header: "Priority",
 				cell: ({ row }) => (
-					<span
-						className={cn(
-							"inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium",
-							getPriorityClass(row.original.priorityName),
-						)}
-					>
-						{row.original.priorityName || "Chưa có"}
-					</span>
+					<div className="-ml-2">
+						<DropdownTaskPriority
+							taskId={row.original.id}
+							projectId={projectId as string}
+							workspaceId={workspaceId as string}
+							priorityName={row.original.priorityName}
+						/>
+					</div>
 				),
 			},
 			{
 				accessorKey: "statusName",
 				id: "statusName",
 				size: 160,
-				header: "Trạng thái",
+				header: "Status",
 				cell: ({ row }) => (
-					<DropdownTaskStatus
-						taskId={row.original.id}
-						projectId={projectId as string}
-						workspaceId={workspaceId as string}
-						statusName={row.original.statusName}
-					/>
+					<div className="-ml-2">
+						<DropdownTaskStatus
+							taskId={row.original.id}
+							projectId={projectId as string}
+							workspaceId={workspaceId as string}
+							statusName={row.original.statusName}
+						/>
+					</div>
 				),
 			},
 			{
-				accessorKey: "estimateMinutes",
-				id: "estimateMinutes",
+				id: "actions",
 				size: 140,
-				header: "Ước tính",
+				header: "Action",
 				cell: ({ row }) => (
-					<div className='text-muted-foreground'>
-						{formatEstimate(row.original.estimateMinutes)}
-					</div>
+					<button className='rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors'>
+						<MoreHorizontal size={14} />
+					</button>
 				),
 			},
 		],

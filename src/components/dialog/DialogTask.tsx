@@ -142,7 +142,7 @@ const DialogTask = ({ workspaceId, workspaceName }: Props) => {
 	return (
 		<DialogV2 open={open} onOpenChange={handleOpenChange}>
 			<DialogTriggerV2 asChild>
-				<div className='flex size-5 items-center justify-center rounded-sm text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100'>
+				<div className='flex size-5 items-center justify-center rounded-sm text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground hover:hover:text-foreground'>
 					<Plus size={14} />
 				</div>
 			</DialogTriggerV2>
@@ -155,7 +155,7 @@ const DialogTask = ({ workspaceId, workspaceName }: Props) => {
 					<DialogTitleV2>
 						<div className='flex items-center justify-between'>
 							<div className='flex items-center gap-3 flex-1'>
-								<div className='font-normal text-lg text-neutral-500'>
+								<div className='font-normal text-lg text-muted-foreground'>
 									Thêm vào
 								</div>
 								<div className='text-lg outline-none border-none flex-1 bg-transparent'>

@@ -78,10 +78,7 @@ export function CompleteSprintDialog({
 					type='button'
 					variant='outline'
 					size='sm'
-					className={cn(
-						"h-8 rounded-md border border-neutral-700 bg-[#1c1c1c] px-4 text-xs font-semibold text-white",
-						"hover:border-neutral-500 hover:bg-[#252525] hover:text-white",
-					)}
+					className="h-8 rounded-lg border-border bg-background text-[12px] font-medium hover:hover:bg-accent hover:text-accent-foreground hover:border-neutral-600 transition-all hover:text-foreground"
 				>
 					Complete
 				</Button>
@@ -89,13 +86,13 @@ export function CompleteSprintDialog({
 
 			<DialogContent
 				className={cn(
-					"max-w-140 border border-neutral-800 bg-[#171717] p-0 text-white shadow-2xl",
+					"max-w-140 border border-border bg-popover p-0 text-foreground shadow-2xl",
 					"sm:max-w-140",
 				)}
 			>
-				<div className='border-b border-neutral-800 px-6 py-4'>
+				<div className='border-b border-border px-6 py-4'>
 					<DialogHeader>
-						<DialogTitle className='text-base font-semibold text-white'>
+						<DialogTitle className='text-base font-semibold text-foreground'>
 							Complete {defaultSprintName}
 						</DialogTitle>
 					</DialogHeader>
@@ -103,20 +100,20 @@ export function CompleteSprintDialog({
 
 				<div className='px-6 py-5'>
 					<div className='space-y-4'>
-						<p className='text-sm text-neutral-300'>
+						<p className='text-sm text-foreground'>
 							This sprint contains{" "}
-							<span className='font-semibold text-white'>
+							<span className='font-semibold text-foreground'>
 								{completedWorkItemCount}
 							</span>{" "}
 							completed work item
 							{completedWorkItemCount > 1 ? "s" : ""} and{" "}
-							<span className='font-semibold text-white'>
+							<span className='font-semibold text-foreground'>
 								{openWorkItemCount}
 							</span>{" "}
 							open work item{openWorkItemCount > 1 ? "s" : ""}.
 						</p>
 
-						<ul className='ml-5 list-disc space-y-2 text-sm text-neutral-400'>
+						<ul className='ml-5 list-disc space-y-2 text-sm text-muted-foreground'>
 							<li>
 								Completed work items include everything in the
 								last column on the board.
@@ -129,7 +126,7 @@ export function CompleteSprintDialog({
 
 						{openWorkItemCount > 0 && (
 							<div className='space-y-1.5 pt-1'>
-								<Label className='text-xs font-semibold text-neutral-300'>
+								<Label className='text-xs font-semibold text-foreground'>
 									Move open work items to
 								</Label>
 
@@ -139,17 +136,17 @@ export function CompleteSprintDialog({
 								>
 									<SelectTrigger
 										className={cn(
-											"h-9 rounded-md border-neutral-700 bg-[#101010] text-sm text-white",
+											"h-9 rounded-md border-border bg-background text-sm text-foreground",
 											"focus:border-blue-500 focus:ring-1 focus:ring-blue-500",
 										)}
 									>
 										<SelectValue placeholder='Select destination' />
 									</SelectTrigger>
 
-									<SelectContent className='border-neutral-800 bg-[#171717] text-white'>
+									<SelectContent className='border-border bg-popover text-foreground'>
 										<SelectItem
 											value={BACKLOG_VALUE}
-											className='focus:bg-[#252525] focus:text-white'
+											className='focus:focus:bg-accent focus:text-accent-foreground'
 										>
 											Backlog
 										</SelectItem>
@@ -159,12 +156,12 @@ export function CompleteSprintDialog({
 						)}
 					</div>
 
-					<div className='mt-6 flex justify-end gap-2 border-t border-neutral-800 pt-4'>
+					<div className='mt-6 flex justify-end gap-2 border-t border-border pt-4'>
 						<Button
 							type='button'
 							variant='ghost'
 							onClick={() => setOpen(false)}
-							className='h-8 rounded-md px-4 text-xs font-semibold text-neutral-400 hover:bg-[#252525] hover:text-white'
+							className='h-8 rounded-md px-4 text-xs font-semibold text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground'
 						>
 							Cancel
 						</Button>

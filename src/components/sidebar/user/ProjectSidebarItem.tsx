@@ -10,7 +10,9 @@ import {
 } from "@/components/ui/collapsible";
 
 import DialogAddTask from "@/components/dialog/DialogAddTask";
-import ProjectDropdown from "@/components/project/ProjectDropdown";
+import ProjectDropdown from "@/features/project/components/project/ProjectDropdown";
+import { PERMISSIONS } from "@/constants/permissions";
+import { RequirePermission } from "@/features/permission/components/RequirePermission";
 import { useSprints } from "@/features/sprint/hooks/useSprint";
 import type { ProjectItems } from "@/services/project/type";
 import type { SprintItem } from "@/services/sprint/type";
@@ -56,12 +58,12 @@ const ProjectSidebarItem = ({
 	return (
 		<Collapsible asChild className='group/project'>
 			<SidebarMenuSubItemV2>
-				<div className='group/project-item relative flex items-center gap-1 rounded-md px-1 py-0.5 hover:bg-neutral-800/80'>
+				<div className='group/project-item relative flex items-center gap-1 rounded-md px-1 py-0.5 hover:bg-accent/50'>
 					{sprints.length > 0 ? (
 						<CollapsibleTrigger asChild>
 							<button
 								type='button'
-								className='z-10 flex size-5 shrink-0 items-center justify-center rounded-sm text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100'
+								className='z-10 flex size-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground'
 								onClick={() => setCurrentProjectId(projectId)}
 							>
 								<ChevronRight className='size-3 transition-transform duration-200 group-data-[state=open]/project:rotate-90' />
@@ -73,7 +75,7 @@ const ProjectSidebarItem = ({
 
 					<SidebarMenuSubButtonV2
 						asChild
-						className='h-7 flex-1 justify-start px-1 pr-14 text-sm font-medium text-neutral-100 hover:bg-transparent'
+						className='h-7 flex-1 justify-start px-1 pr-14 text-sm font-medium text-foreground hover:bg-transparent'
 					>
 						<Link
 							href={projectHref}
@@ -96,13 +98,18 @@ const ProjectSidebarItem = ({
 							workspace={workspace}
 						/>
 
-						<DialogAddTask></DialogAddTask>
+						<RequirePermission
+							workspaceId={workspace.id}
+							code={PERMISSIONS.TASK_CREATE}
+						>
+							<DialogAddTask></DialogAddTask>
+						</RequirePermission>
 					</div>
 				</div>
 
 				{canUseSprint ? (
 					<CollapsibleContent>
-						<SidebarMenuSubV2 className='mt-1 border-l border-neutral-700/80 pl-3 mr-0'>
+						<SidebarMenuSubV2 className='mt-1 border-l border-border pl-3 mr-0'>
 							{sprints.map((sprint) => {
 								const sprintHref = `/dashboard/${workspace.slug}/projects/${projectId}/sprints/${sprint.id}`;
 
@@ -110,7 +117,7 @@ const ProjectSidebarItem = ({
 									<SidebarMenuSubItemV2 key={sprint.id}>
 										<SidebarMenuSubButtonV2
 											asChild
-											className='h-7 text-sm text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100'
+											className='h-7 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground'
 										>
 											<Link
 												href={sprintHref}

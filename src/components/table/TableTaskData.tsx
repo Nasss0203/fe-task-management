@@ -13,8 +13,8 @@ import {
 } from "@tanstack/react-table";
 import { Fragment, useState } from "react";
 
-import PanigationTable from "../panigation/PanigationTable";
-import { TaskBulkActionBar } from "../task/TaskBulkActionBar";
+import PanigationTable from "@/components/panigation/PanigationTable";
+import { TaskBulkActionBar } from "@/features/task/components/task/TaskBulkActionBar";
 import {
 	TableBody,
 	TableCell,

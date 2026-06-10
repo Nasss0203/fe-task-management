@@ -58,7 +58,7 @@ const DeletedWorkspacesPage = () => {
 
 	if (isError) {
 		return (
-			<Card className='border-neutral-800 bg-neutral-950 text-neutral-100'>
+			<Card className='border-border bg-card text-card-foreground'>
 				<CardHeader>
 					<CardTitle>Khong tai duoc thung rac workspace</CardTitle>
 					<CardDescription>
@@ -79,11 +79,11 @@ const DeletedWorkspacesPage = () => {
 		<div className='mx-auto flex w-full max-w-5xl flex-col gap-6 pb-10'>
 			<div className='flex flex-wrap items-center justify-between gap-3'>
 				<div>
-					<div className='text-sm text-neutral-500'>Trash</div>
-					<h1 className='text-3xl font-semibold text-neutral-100'>
+					<div className='text-sm text-muted-foreground'>Trash</div>
+					<h1 className='text-3xl font-semibold text-foreground'>
 						Deleted workspaces
 					</h1>
-					<p className='mt-2 text-sm text-neutral-400'>
+					<p className='mt-2 text-sm text-muted-foreground'>
 						Workspace da xoa mem se hien o day de ban khoi phuc lai.
 					</p>
 				</div>
@@ -97,48 +97,49 @@ const DeletedWorkspacesPage = () => {
 			</div>
 
 			{workspaces.length === 0 ? (
-				<Card className='border-dashed border-neutral-800 bg-neutral-950 text-neutral-100'>
+				<Card className='border-dashed border-border bg-card text-card-foreground'>
 					<CardContent className='flex flex-col items-center justify-center gap-3 py-14 text-center'>
-						<div className='rounded-full border border-neutral-800 p-4'>
-							<Trash2 className='h-6 w-6 text-neutral-400' />
+						<div className='rounded-full border border-border bg-muted/50 p-4'>
+							<Trash2 className='h-6 w-6 text-muted-foreground' />
 						</div>
 						<div>
 							<div className='text-base font-medium'>
 								Chua co workspace nao trong thung rac
 							</div>
-							<div className='mt-1 text-sm text-neutral-500'>
+							<div className='mt-1 text-sm text-muted-foreground'>
 								Khi ban xoa workspace mem, no se hien o day.
 							</div>
 						</div>
 					</CardContent>
 				</Card>
 			) : (
-				<div className='grid gap-4'>
+				<div className='grid gap-3'>
 					{workspaces.map((workspace) => (
-						<Card
+						<div
 							key={workspace.id}
-							className='border-neutral-800 bg-neutral-950 text-neutral-100'
+							className='flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-4 text-card-foreground shadow-sm transition-all hover:shadow-md'
 						>
-							<CardHeader className='flex flex-row items-start justify-between gap-4 space-y-0'>
-								<div className='min-w-0'>
-									<CardTitle className='truncate text-lg'>
-										{workspace.name}
-									</CardTitle>
-									<div className='mt-3 text-xs text-neutral-500'>
-										Deleted{" "}
-										{formatDeletedAt(workspace.deletedAt)}
-									</div>
+							<div className='min-w-0 flex-1'>
+								<h3 className='truncate text-[15px] font-semibold text-foreground'>
+									{workspace.name}
+								</h3>
+								<div className='mt-1 text-[13px] text-muted-foreground'>
+									Deleted on{" "}
+									{formatDeletedAt(workspace.deletedAt)}
 								</div>
+							</div>
 
-								<Button
-									onClick={() => handleRestore(workspace.id)}
-									disabled={restoreWorkspace.isPending}
-								>
-									<RotateCcw className='mr-2 h-4 w-4' />
-									Restore
-								</Button>
-							</CardHeader>
-						</Card>
+							<Button
+								variant='outline'
+								size='sm'
+								className='h-8 shrink-0 rounded-lg border-border bg-background text-[12px] font-medium text-foreground hover:bg-accent hover:text-accent-foreground shadow-sm transition-all'
+								onClick={() => handleRestore(workspace.id)}
+								disabled={restoreWorkspace.isPending}
+							>
+								<RotateCcw className='mr-1.5 h-3.5 w-3.5' />
+								Restore
+							</Button>
+						</div>
 					))}
 				</div>
 			)}

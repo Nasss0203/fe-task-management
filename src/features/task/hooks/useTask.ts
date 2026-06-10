@@ -36,6 +36,36 @@ type TaskCacheSnapshot = {
 	previousBacklog: FindAllTaskBacklogResponse | undefined;
 };
 
+export const useUpdateTask = (workspaceId: string, projectId: string) => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({
+			id,
+			workspaceId: inputWorkspaceId,
+			projectId: inputProjectId,
+			...body
+		}: UpdateTaskInput) => {
+			void inputWorkspaceId;
+			void inputProjectId;
+
+			return updateTaskApi(id, body);
+		},
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
+			});
+			await queryClient.invalidateQueries({
+				queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
+			});
+
+			await queryClient.invalidateQueries({
+				queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
+			});
+		},
+	});
+};
+
 export const useTask = (
 	workspaceId: string,
 	projectId: string,
@@ -68,31 +98,7 @@ export const useTask = (
 		},
 	});
 
-	const updateTask = useMutation({
-		mutationFn: ({
-			id,
-			workspaceId: inputWorkspaceId,
-			projectId: inputProjectId,
-			...body
-		}: UpdateTaskInput) => {
-			void inputWorkspaceId;
-			void inputProjectId;
-
-			return updateTaskApi(id, body);
-		},
-		onSuccess: async () => {
-			await queryClient.invalidateQueries({
-				queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
-			});
-			await queryClient.invalidateQueries({
-				queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
-			});
-
-			await queryClient.invalidateQueries({
-				queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
-			});
-		},
-	});
+	const updateTask = useUpdateTask(workspaceId, projectId);
 
 	const findTaskBacklog = useQuery({
 		queryKey: [

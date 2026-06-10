@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import type { DateRange } from "react-day-picker";
 import { Badge } from "../../ui/badge";
-import { Button } from "../../ui/button";
+import { Button } from "@/components/ui/button";
 import { Calendar } from "../../ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
 import { Textarea } from "../../ui/textarea";

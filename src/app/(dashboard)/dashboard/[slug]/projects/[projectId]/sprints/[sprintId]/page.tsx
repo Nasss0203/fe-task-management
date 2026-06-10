@@ -1,7 +1,7 @@
 "use client";
 
-import BacklogSprint from "@/components/backlog/BacklogSprint";
-import Sprint from "@/components/spints/Sprint";
+import BacklogSprint from "@/features/sprint/components/backlog/BacklogSprint";
+import Sprint from "@/features/sprint/components/spints/Sprint";
 import { useSprints } from "@/features/sprint/hooks/useSprints";
 import { useBoards } from "@/features/board/hooks/useBoards";
 import { usePage } from "@/features/page/hooks/usePage";
@@ -49,26 +49,26 @@ const SprintPage = () => {
 	if (!workspaceId || !projectId || !sprintId) return null;
 
 	return (
-		<div className='flex min-h-0 flex-1 flex-col overflow-hidden pb-4'>
-			<div className='mb-4 flex shrink-0 flex-col gap-1'>
-				<h2 className='text-2xl font-bold tracking-tight text-white'>
+		<div className='flex h-full min-h-0 flex-1 flex-col overflow-hidden pb-4'>
+			<div className='mb-4 shrink-0 px-1'>
+				<h2 className='text-2xl font-bold tracking-tight text-foreground truncate'>
 					{sprintItem?.name}
 				</h2>
-				<p className='text-sm font-medium text-slate-400'>
+				<p className='text-sm font-medium text-muted-foreground truncate'>
 					Lập kế hoạch sprint từ backlog và theo dõi tiến độ sprint
 					hiện tại
 				</p>
 			</div>
 
-			<div className='grid min-h-0 flex-1 grid-cols-1 gap-4 overflow-y-auto pr-1 2xl:grid-cols-2 2xl:overflow-hidden 2xl:pr-0'>
-				<div className='min-h-[520px] min-w-0 overflow-hidden 2xl:min-h-0'>
+			<div className='grid min-h-0 flex-1 grid-cols-1 gap-4 overflow-hidden 2xl:grid-cols-2'>
+				<div className='flex min-h-0 flex-col overflow-hidden'>
 					<BacklogSprint
 						projectId={projectId}
 						workspaceId={workspaceId}
 					/>
 				</div>
 
-				<div className='min-h-[520px] min-w-0 overflow-hidden 2xl:min-h-0'>
+				<div className='flex min-h-0 flex-col overflow-hidden'>
 					<Sprint
 						boards={boards}
 						projectId={projectId}

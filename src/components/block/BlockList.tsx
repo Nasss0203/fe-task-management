@@ -207,7 +207,7 @@ const BlockList = ({ blocks, page }: BlockListProps) => {
 						<CreateBlockMenu onCreate={handleCreateFirstBlock}>
 							<button
 								type='button'
-								className='rounded-md p-1 text-neutral-500 hover:bg-neutral-700 hover:text-white'
+								className='rounded-md p-1 text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground hover:text-white'
 								aria-label='Create block'
 							>
 								<Plus size={16} />
@@ -216,7 +216,7 @@ const BlockList = ({ blocks, page }: BlockListProps) => {
 
 						<button
 							type='button'
-							className='rounded-md p-1 text-neutral-500 hover:bg-neutral-700 hover:text-white'
+							className='rounded-md p-1 text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground hover:text-white'
 							aria-label='Block actions'
 						>
 							<GripVertical size={16} />
@@ -300,7 +300,7 @@ const BlockList = ({ blocks, page }: BlockListProps) => {
 												>
 													<button
 														type='button'
-														className='rounded-md p-1 text-neutral-400 hover:bg-neutral-700 hover:text-white'
+														className='rounded-md p-1 text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground hover:text-white'
 													>
 														<Plus size={16} />
 													</button>
@@ -321,7 +321,7 @@ const BlockList = ({ blocks, page }: BlockListProps) => {
 															setActivatorNodeRef
 														}
 														type='button'
-														className='touch-none rounded-md p-1 text-neutral-400 hover:bg-neutral-700 hover:text-white'
+														className='touch-none rounded-md p-1 text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground hover:text-white'
 														{...attributes}
 														{...listeners}
 													>
@@ -356,7 +356,7 @@ const BlockList = ({ blocks, page }: BlockListProps) => {
 											PageBlockType.DATABASE_VIEW &&
 											isOpen &&
 											!config && (
-												<div className='ml-14 rounded-md border border-dashed border-neutral-800 px-3 py-4 text-sm text-neutral-500'>
+												<div className='ml-14 rounded-md border border-dashed border-border px-3 py-4 text-sm text-muted-foreground'>
 													Project view chua cau hinh.
 												</div>
 											)}

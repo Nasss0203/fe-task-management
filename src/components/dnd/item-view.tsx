@@ -11,8 +11,11 @@ import {
 	Trash,
 } from "lucide-react";
 import * as React from "react";
-import TaskAssignees from "../task/TaskAssignees";
-import TaskTrashDialog from "../task/TaskTrashDialog";
+import TaskAssignees from "@/features/task/components/task/TaskAssignees";
+import TaskTrashDialog from "@/features/task/components/task/TaskTrashDialog";
+import { RequirePermission } from "@/features/permission/components/RequirePermission";
+import { PERMISSIONS } from "@/constants/permissions";
+import { useUser } from "@/features/auth/hooks/useUser";
 import {
 	Command,
 	CommandEmpty,
@@ -96,6 +99,7 @@ type ItemViewProps = React.HTMLAttributes<HTMLDivElement> & {
 	description?: string;
 	onUpdateName?: (id: string, newName: string) => void;
 	onOpenDetail?: (taskId: string) => void;
+	isReadOnly?: boolean;
 };
 
 export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
@@ -114,6 +118,7 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 			dueAt,
 			onUpdateName,
 			onOpenDetail,
+			isReadOnly,
 			...props
 		},
 		ref,
@@ -128,6 +133,12 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 		const [taskTrashOpen, setTaskTrashOpen] = React.useState(false);
 		const inputRef = React.useRef<HTMLInputElement>(null);
 		const skipBlurCommitRef = React.useRef(false);
+
+		const { user } = useUser();
+		const isAssignee = React.useMemo(
+			() => assignees?.some((a) => a.userId === user?.id) || false,
+			[assignees, user?.id]
+		);
 
 		React.useEffect(() => {
 			setLocalName(name);
@@ -180,8 +191,10 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 				ref={ref}
 				{...props}
 				className={cn(
-					"w-full border border-neutral-400 px-4 py-2 rounded-lg bg-stone-100 dark:border-none cursor-pointer hover:opacity-70 transition-opacity",
-					"select-none touch-none",
+					"w-full border px-4 py-2 rounded-lg dark:border-white/5 transition-opacity shadow-sm select-none touch-none",
+					isReadOnly 
+						? "opacity-60 cursor-pointer border-dashed bg-muted/20 hover:opacity-80" 
+						: "cursor-grab hover:opacity-70 border-border active:cursor-grabbing",
 					getTaskStatusBackgroundClass(status),
 					isOverlay && "shadow-lg",
 					className,
@@ -230,27 +243,40 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 						</div>
 
 						<div className='flex items-center gap-1'>
-							<button
-								type='button'
-								data-prevent-open-detail='true'
-								aria-label='Rename task'
-								onClick={(e) => {
-									e.stopPropagation();
-									startEditingName();
-								}}
-								onPointerDown={(e) => e.stopPropagation()}
-								className={cn(
-									"rounded-sm p-1 hover:bg-neutral-500 dark:hover:bg-neutral-400",
-									isEditingName && "bg-neutral-500/20",
-								)}
+							<RequirePermission 
+								workspaceId={task?.workspaceId} 
+								code={PERMISSIONS.TASK_UPDATE} 
+								bypass={isAssignee} 
+								mode="hide"
 							>
-								<Pencil size={16} />
-							</button>
+								<button
+									type='button'
+									data-prevent-open-detail='true'
+									aria-label='Rename task'
+									onClick={(e) => {
+										e.stopPropagation();
+										startEditingName();
+									}}
+									onPointerDown={(e) => e.stopPropagation()}
+									className={cn(
+										"rounded-sm p-1 hover:bg-neutral-500 dark:hover:bg-neutral-400",
+										isEditingName && "bg-neutral-500/20",
+									)}
+								>
+									<Pencil size={16} />
+								</button>
+							</RequirePermission>
 
-							<Popover
-								open={isActionOpen}
-								onOpenChange={setIsActionOpen}
+							<RequirePermission 
+								workspaceId={task?.workspaceId} 
+								code={PERMISSIONS.TASK_UPDATE} 
+								bypass={isAssignee} 
+								mode="hide"
 							>
+								<Popover
+									open={isActionOpen}
+									onOpenChange={setIsActionOpen}
+								>
 								<PopoverTrigger asChild>
 									<button
 										type='button'
@@ -312,25 +338,32 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 													<span>Mở chi tiết</span>
 												</CommandItem>
 
-												<CommandItem
-													value='delete_task'
-													onSelect={() => {
-														setIsActionOpen(false);
-														setTaskTrashOpen(true);
-													}}
-													className='cursor-pointer rounded-lg px-2 py-2 text-red-500'
+												<RequirePermission 
+													workspaceId={task?.workspaceId} 
+													code={PERMISSIONS.TASK_DELETE} 
+													mode="hide"
 												>
-													<Trash
-														size={16}
-														className='text-red-500'
-													/>
-													<span>Xóa task</span>
-												</CommandItem>
+													<CommandItem
+														value='delete_task'
+														onSelect={() => {
+															setIsActionOpen(false);
+															setTaskTrashOpen(true);
+														}}
+														className='cursor-pointer rounded-lg px-2 py-2 text-red-500'
+													>
+														<Trash
+															size={16}
+															className='text-red-500'
+														/>
+														<span>Xóa task</span>
+													</CommandItem>
+												</RequirePermission>
 											</CommandGroup>
 										</CommandList>
 									</Command>
 								</PopoverContent>
 							</Popover>
+							</RequirePermission>
 						</div>
 					</div>
 

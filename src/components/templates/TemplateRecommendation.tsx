@@ -52,10 +52,10 @@ type TemplateRecommendationProps = {
 
 const TemplateRecommendation = ({ onSelect }: TemplateRecommendationProps) => {
 	return (
-		<div className='flex flex-col gap-5'>
-			<div>Được đề xuất</div>
+		<div className='flex flex-col gap-4'>
+			<div className='text-sm font-semibold uppercase tracking-wider text-muted-foreground'>Được đề xuất</div>
 
-			<div className='grid grid-cols-1 gap-5 md:grid-cols-2'>
+			<div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
 				{TEMPLATE_OPTIONS.map((item) => {
 					const Icon = item.icon;
 
@@ -64,17 +64,17 @@ const TemplateRecommendation = ({ onSelect }: TemplateRecommendationProps) => {
 							key={item.key}
 							type='button'
 							onClick={() => onSelect(item.key)}
-							className='cursor-pointer rounded-2xl border border-neutral-800 bg-neutral-900/40 p-5 text-left transition hover:border-neutral-600 disabled:cursor-not-allowed disabled:opacity-60'
+							className='group cursor-pointer rounded-2xl border border-border/50 bg-muted/10 p-5 text-left transition-all hover:bg-muted/30 hover:border-blue-500/30 hover:shadow-sm hover:shadow-blue-500/5 disabled:cursor-not-allowed disabled:opacity-60'
 						>
-							<div className='mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-800'>
+							<div className='mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-background border border-border/50 shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white group-hover:border-blue-600 text-muted-foreground'>
 								<Icon size={18} />
 							</div>
 
-							<div className='mb-1 text-base font-semibold'>
+							<div className='mb-1.5 text-[15px] font-semibold text-foreground'>
 								{item.title}
 							</div>
 
-							<div className='text-sm text-neutral-400'>
+							<div className='text-[13px] leading-relaxed text-muted-foreground'>
 								{item.description}
 							</div>
 						</button>

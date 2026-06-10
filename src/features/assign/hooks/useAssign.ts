@@ -4,6 +4,7 @@ import { SPRINT_KEY } from "@/services/sprint/type";
 import { assignService } from "@/services/assign/assign.service";
 import type { AssignInput } from "@/services/assign/type";
 import { TASK_KEY } from "@/services/task/type";
+import { WORKSPACE_OVERVIEW_KEY } from "@/features/workspace/hooks/useWorkspaceOverview";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ASSIGN_QUERY_KEYS } from "../constants";
 
@@ -21,6 +22,9 @@ export function useAssign(taskId: string) {
 			}),
 			queryClient.invalidateQueries({
 				queryKey: [SPRINT_KEY.SPRINTS],
+			}),
+			queryClient.invalidateQueries({
+				queryKey: [WORKSPACE_OVERVIEW_KEY],
 			}),
 		]);
 	};

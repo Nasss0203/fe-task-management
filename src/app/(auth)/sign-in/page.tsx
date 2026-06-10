@@ -25,6 +25,7 @@ import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { FaApple } from "react-icons/fa";
 import z from "zod";
+import { SystemRole } from "@/services/auth/type";
 
 const formSchema = z.object({
 	email: z
@@ -50,8 +51,17 @@ const SignIn = () => {
 
 	function onSubmit(data: z.infer<typeof formSchema>) {
 		mutate(data, {
-			onSuccess: () => {
-				router.push("/dashboard");
+			onSuccess: (userData) => {
+				if (userData.systemRole === SystemRole.USER) {
+					router.push("/dashboard");
+				} else if (
+					userData.systemRole === SystemRole.SYSTEM_ADMIN ||
+					userData.systemRole === SystemRole.SUPER_ADMIN
+				) {
+					router.push("/admin");
+				} else {
+					router.push("/dashboard");
+				}
 			},
 		});
 	}

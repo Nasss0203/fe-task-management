@@ -4,6 +4,9 @@ import type { TaskItem } from "@/services/task/type";
 import { useSortable } from "@dnd-kit/react/sortable";
 import * as React from "react";
 import { ItemView } from "./item-view";
+import { usePermission } from "@/features/permission/hooks/usePermission";
+import { useUser } from "@/features/auth/hooks/useUser";
+import { PERMISSIONS } from "@/constants/permissions";
 
 type ItemsDndProps = {
 	id: string;
@@ -36,12 +39,20 @@ const ItemsDnd = ({
 	onUpdateName,
 	onOpenDetail,
 }: ItemsDndProps) => {
-	const { ref, isDragging } = useSortable({
+	const { user } = useUser();
+	const isAssignee = React.useMemo(
+		() => assignees?.some((a) => a.userId === user?.id) || false,
+		[assignees, user?.id]
+	);
+	const canEdit = isAssignee;
+
+	const { ref, isDragging, handleRef } = useSortable({
 		id,
 		index,
 		group: column,
 		type: "item",
 		accept: ["item"],
+		disabled: !canEdit,
 	});
 	const [preventOpenDetail, setPreventOpenDetail] = React.useState(false);
 	const wasDraggingRef = React.useRef(false);
@@ -66,6 +77,12 @@ const ItemsDnd = ({
 	return (
 		<div
 			ref={ref}
+			onPointerDownCapture={(e) => {
+				if (!canEdit) {
+					e.stopPropagation();
+					e.nativeEvent.stopImmediatePropagation();
+				}
+			}}
 			onClick={(event) => {
 				const target = event.target as HTMLElement | null;
 
@@ -90,6 +107,7 @@ const ItemsDnd = ({
 				description={description}
 				onUpdateName={onUpdateName}
 				onOpenDetail={onOpenDetail}
+				isReadOnly={!canEdit}
 			/>
 		</div>
 	);

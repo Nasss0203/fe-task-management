@@ -36,11 +36,13 @@ import { cn } from "@/lib/utils";
 import { useTask, useTaskPriority, useTaskStatus } from "@/features/task/hooks/useTask";
 import type { TaskItem } from "@/services/task/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
-import { useTableDnd } from "../dnd/backlog-sprint/ProviderSprintDnd";
-import TableRowDnd from "../dnd/backlog-sprint/TableRowSprintDnd";
-import TaskAssignees from "../task/TaskAssignees";
-import { TaskBulkActionBar } from "../task/TaskBulkActionBar";
-import TaskTrashDialog from "../task/TaskTrashDialog";
+import { useTableDnd } from "@/components/dnd/backlog-sprint/ProviderSprintDnd";
+import TableRowDnd from "@/components/dnd/backlog-sprint/TableRowSprintDnd";
+import TaskAssignees from "@/features/task/components/task/TaskAssignees";
+import { TaskBulkActionBar } from "@/features/task/components/task/TaskBulkActionBar";
+import TaskTrashDialog from "@/features/task/components/task/TaskTrashDialog";
+import DropdownTaskStatus from "@/components/dropdown/DropdownTaskStatus";
+import DropdownTaskPriority from "@/components/dropdown/DropdownTaskPriority";
 
 type TableBacklogProps = {
 	tasks: TaskItem[];
@@ -60,6 +62,8 @@ type getColumnsBacklogProps = {
 	}[];
 	onChangeStatus: (taskId: string, statusId: string) => void;
 	onChangePriority: (taskId: string, priorityId: string | null) => void;
+	workspaceId: string;
+	projectId: string;
 };
 
 const getColumnsBacklog = ({
@@ -68,6 +72,8 @@ const getColumnsBacklog = ({
 	taskStatus,
 	onChangePriority,
 	onChangeStatus,
+	workspaceId,
+	projectId,
 }: getColumnsBacklogProps): ColumnDef<TaskItem>[] => [
 	{
 		id: "select",
@@ -134,32 +140,16 @@ const getColumnsBacklog = ({
 		header: "Status",
 		cell: ({ row }) => {
 			const task = row.original;
-			const value = task.statusId;
 
 			return (
-				<Select
-					value={value}
-					onValueChange={(statusId) => {
-						if (statusId === task.statusId) return;
-						onChangeStatus(task.id, statusId);
-					}}
-				>
-					<SelectTrigger
-						className='h-8 w-32.5'
-						onPointerDown={(e) => e.stopPropagation()}
-						onClick={(e) => e.stopPropagation()}
-					>
-						<SelectValue placeholder='No status' />
-					</SelectTrigger>
-
-					<SelectContent>
-						{taskStatus.map((item) => (
-							<SelectItem value={item.id} key={item.id}>
-								{item.name}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
+				<div className="-ml-2">
+					<DropdownTaskStatus
+						taskId={task.id}
+						projectId={projectId}
+						workspaceId={workspaceId}
+						statusName={task.statusName ?? (task as any).status?.name ?? taskStatus.find((s) => s.id === task.statusId)?.name ?? ""}
+					/>
+				</div>
 			);
 		},
 	},
@@ -169,38 +159,16 @@ const getColumnsBacklog = ({
 		header: "Priority",
 		cell: ({ row }) => {
 			const task = row.original;
-			const value = task.priorityId ?? "none";
 
 			return (
-				<Select
-					value={value}
-					onValueChange={(priorityId) => {
-						const nextPriorityId =
-							priorityId === "none" ? null : priorityId;
-
-						if (nextPriorityId === task.priorityId) return;
-
-						onChangePriority(task.id, nextPriorityId);
-					}}
-				>
-					<SelectTrigger
-						className='h-8 w-32.5'
-						onPointerDown={(e) => e.stopPropagation()}
-						onClick={(e) => e.stopPropagation()}
-					>
-						<SelectValue placeholder='No priority' />
-					</SelectTrigger>
-
-					<SelectContent>
-						<SelectItem value='none'>No priority</SelectItem>
-
-						{taskPriority.map((item) => (
-							<SelectItem value={item.id} key={item.id}>
-								{item.name}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
+				<div className="-ml-2">
+					<DropdownTaskPriority
+						taskId={task.id}
+						projectId={projectId}
+						workspaceId={workspaceId}
+						priorityName={task.priorityName ?? (task as any).priority?.name ?? taskPriority.find((p) => p.id === task.priorityId)?.name ?? ""}
+					/>
+				</div>
 			);
 		},
 	},
@@ -263,6 +231,8 @@ const TableBacklog = ({
 				showSprint,
 				taskStatus,
 				taskPriority,
+				workspaceId,
+				projectId,
 				onChangeStatus: async (taskId, statusId) => {
 					await updateTask.mutateAsync({
 						id: taskId,

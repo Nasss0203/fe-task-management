@@ -15,6 +15,8 @@ import type {
 } from "@/services/admin/user/type";
 import type { ApiResponse } from "@/services/admin/dashboard/type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useUser } from "@/features/auth/hooks/useUser";
+import { isSystemAdmin } from "@/lib/auth/system-role";
 
 export const ADMIN_USERS_KEY = {
 	USER_OVERVIEW: "ADMIN_USER_OVERVIEW",
@@ -27,12 +29,15 @@ export const useAdminUsers = (
 	userGrowthPeriod: UserGrowthPeriod = "7d",
 ) => {
 	const queryClient = useQueryClient();
+	const { user } = useUser();
+	const canAccessAdmin = isSystemAdmin(user);
 
 	const userOverview = useQuery({
 		queryKey: [ADMIN_USERS_KEY.USER_OVERVIEW],
 		queryFn: getAdminUserOverviewApi,
 		retry: false,
 		refetchOnWindowFocus: false,
+		enabled: canAccessAdmin,
 	});
 
 	const users = useQuery<ApiResponse<AdminUserPaginationResponse>>({
@@ -40,6 +45,7 @@ export const useAdminUsers = (
 		queryFn: () => findAllAdminUsersApi(query),
 		retry: false,
 		refetchOnWindowFocus: false,
+		enabled: canAccessAdmin,
 	});
 
 	const userGrowth = useQuery({

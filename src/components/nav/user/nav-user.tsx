@@ -6,7 +6,10 @@ import {
 	CreditCard,
 	LogOut,
 	Sparkles,
+	ShieldAlert,
 } from "lucide-react";
+
+import { isSystemAdmin } from "@/lib/auth/system-role";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -114,6 +117,19 @@ export function NavUser() {
 								<DropdownMenuSeparator />
 							</>
 						) : null}
+						{isSystemAdmin(user) && (
+							<>
+								<DropdownMenuGroup>
+									<DropdownMenuItem
+										onSelect={() => router.push("/admin")}
+									>
+										<ShieldAlert />
+										Admin Dashboard
+									</DropdownMenuItem>
+								</DropdownMenuGroup>
+								<DropdownMenuSeparator />
+							</>
+						)}
 						<DropdownMenuGroup>
 							<DropdownMenuItem>
 								<BadgeCheck />

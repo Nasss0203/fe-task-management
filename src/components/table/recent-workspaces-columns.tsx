@@ -22,7 +22,7 @@ export const recentWorkspacesColumns: ColumnDef<WorkspaceItem>[] = [
 				<div className='font-medium text-white'>
 					{row.original.name}
 				</div>
-				<div className='mt-1 max-w-75 truncate text-xs text-neutral-500'>
+				<div className='mt-1 max-w-75 truncate text-xs text-muted-foreground'>
 					{row.original.slug}
 				</div>
 			</div>
@@ -52,12 +52,13 @@ export const recentWorkspacesColumns: ColumnDef<WorkspaceItem>[] = [
 				</div>
 			);
 		},
+
 	},
 	{
 		accessorKey: "membersCount",
 		header: "Thành viên",
 		cell: ({ row }) => (
-			<span className='text-neutral-200'>
+			<span className='text-foreground'>
 				{row.original.membersCount}
 			</span>
 		),
@@ -66,7 +67,7 @@ export const recentWorkspacesColumns: ColumnDef<WorkspaceItem>[] = [
 		accessorKey: "projectsCount",
 		header: "Project",
 		cell: ({ row }) => (
-			<span className='text-neutral-200'>
+			<span className='text-foreground'>
 				{row.original.projectsCount}
 			</span>
 		),
@@ -75,14 +76,14 @@ export const recentWorkspacesColumns: ColumnDef<WorkspaceItem>[] = [
 		accessorKey: "tasksCount",
 		header: "Task",
 		cell: ({ row }) => (
-			<span className='text-neutral-200'>{row.original.tasksCount}</span>
+			<span className='text-foreground'>{row.original.tasksCount}</span>
 		),
 	},
 	{
 		accessorKey: "plan",
 		header: "Gói",
 		cell: ({ row }) => (
-			<span className='rounded-full border border-neutral-700 bg-neutral-900 px-2.5 py-1 text-xs font-medium uppercase text-neutral-200'>
+			<span className='rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium uppercase text-foreground'>
 				{row.original.plan}
 			</span>
 		),
@@ -91,7 +92,7 @@ export const recentWorkspacesColumns: ColumnDef<WorkspaceItem>[] = [
 		accessorKey: "createdAt",
 		header: "Ngày tạo",
 		cell: ({ row }) => (
-			<span className='text-neutral-400'>
+			<span className='text-muted-foreground'>
 				{formatDate(row.original.createdAt)}
 			</span>
 		),

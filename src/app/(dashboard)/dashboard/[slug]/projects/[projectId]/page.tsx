@@ -5,7 +5,7 @@ import type { AvailableTabItem } from "@/components/block/ProjectBlock";
 import {
 	BOARD_VIEW_CONFIG,
 	isBoardViewEnabled,
-} from "@/components/board/view-board";
+} from "@/features/board/components/board/view-board";
 import { useBoards } from "@/features/board/hooks/useBoards";
 import { usePage } from "@/features/page/hooks/usePage";
 import { useWorkspaceFeatures } from "@/features/workspace-feature/hooks/useWorkspaceFeatures";

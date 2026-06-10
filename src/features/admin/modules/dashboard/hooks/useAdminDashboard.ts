@@ -21,6 +21,8 @@ import {
 	getAdminDashboardSummaryApi,
 } from "@/services/admin/dashboard/workspace-admin.service";
 import { useQuery } from "@tanstack/react-query";
+import { useUser } from "@/features/auth/hooks/useUser";
+import { isSystemAdmin } from "@/lib/auth/system-role";
 
 export const ADMIN_DASHBOARD_KEY = {
 	USER_GROWTH: "ADMIN_USER_GROWTH",
@@ -38,12 +40,15 @@ export const useAdminDashboard = (
 	userGrowthPeriod: UserGrowthPeriod = "7d",
 	workspaceGrowthPeriod: WorkspaceGrowthPeriod = "7d",
 ) => {
+	const { user } = useUser();
+	const canAccessAdmin = isSystemAdmin(user);
 	const dashboardSummary = useQuery<ApiResponse<DashboardSummaryResponseDto>>(
 		{
 			queryKey: [WORKSPACE_ADMIN_KEY.ADMIN_DASHBOARD_SUMMARY],
 			queryFn: getAdminDashboardSummaryApi,
 			retry: false,
 			refetchOnWindowFocus: false,
+			enabled: canAccessAdmin,
 		},
 	);
 
@@ -52,6 +57,7 @@ export const useAdminDashboard = (
 		queryFn: () => findAllWorkspaceAdminApi(query),
 		retry: false,
 		refetchOnWindowFocus: false,
+		enabled: canAccessAdmin,
 	});
 
 	const allWorkspaces = useQuery<ApiResponse<WorkspacePaginationResponse>>({
@@ -73,6 +79,7 @@ export const useAdminDashboard = (
 		queryFn: () => getUserGrowthApi(userGrowthPeriod),
 		retry: false,
 		refetchOnWindowFocus: false,
+		enabled: canAccessAdmin,
 	});
 
 	const workspaceGrowth = useQuery({
@@ -80,6 +87,7 @@ export const useAdminDashboard = (
 		queryFn: () => getWorkspaceGrowthApi(workspaceGrowthPeriod),
 		retry: false,
 		refetchOnWindowFocus: false,
+		enabled: canAccessAdmin,
 	});
 
 	const workspacePlan = useQuery({
@@ -87,6 +95,7 @@ export const useAdminDashboard = (
 		queryFn: getWorkspacePlanApi,
 		retry: false,
 		refetchOnWindowFocus: false,
+		enabled: canAccessAdmin,
 	});
 
 	const retentionMetrics = useQuery({
@@ -94,6 +103,7 @@ export const useAdminDashboard = (
 		queryFn: getRetentionMetricsApi,
 		retry: false,
 		refetchOnWindowFocus: false,
+		enabled: canAccessAdmin,
 	});
 
 	const systemHealth = useQuery({
@@ -101,6 +111,7 @@ export const useAdminDashboard = (
 		queryFn: getSystemHealthApi,
 		retry: false,
 		refetchOnWindowFocus: false,
+		enabled: canAccessAdmin,
 	});
 
 	const recentActivities = useQuery({
@@ -108,6 +119,7 @@ export const useAdminDashboard = (
 		queryFn: getRecentActivitiesApi,
 		retry: false,
 		refetchOnWindowFocus: false,
+		enabled: canAccessAdmin,
 	});
 
 	return {

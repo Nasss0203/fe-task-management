@@ -11,13 +11,8 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useDashboard } from "@/features/dashboard/hooks/useDashboard";
 import { cn } from "@/lib/utils";
-import type {
-	DashboardActivityResponseDto,
-	DashboardTaskResponseDto,
-} from "@/services/dashboard/type";
 import {
 	Activity,
 	AlertTriangle,
@@ -35,8 +30,14 @@ import {
 	TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
-import type { ComponentType, ReactNode } from "react";
+import type { ComponentType } from "react";
 import { useMemo } from "react";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { LoadingDashboard } from "@/features/dashboard/components/overview/LoadingDashboard";
+import { DashboardTaskItem } from "@/features/dashboard/components/overview/DashboardTaskItem";
+import { DashboardActivityItem } from "@/features/dashboard/components/overview/DashboardActivityItem";
+import { toLocalDateInputValue, getClientTimezone, formatDashboardDate } from "@/features/dashboard/utils/date";
+import { clampPercent, formatMinutes } from "@/features/dashboard/utils/task-style";
 
 type StatCardItem = {
 	title: string;
@@ -47,242 +48,18 @@ type StatCardItem = {
 	tone: string;
 };
 
-const toLocalDateInputValue = () => {
-	const date = new Date();
-	const year = date.getFullYear();
-	const month = String(date.getMonth() + 1).padStart(2, "0");
-	const day = String(date.getDate()).padStart(2, "0");
-
-	return `${year}-${month}-${day}`;
-};
-
-const getClientTimezone = () => {
-	if (typeof Intl === "undefined") return undefined;
-
-	return Intl.DateTimeFormat().resolvedOptions().timeZone;
-};
-
-const clampPercent = (value?: number | null) => {
-	if (typeof value !== "number" || Number.isNaN(value)) return 0;
-
-	return Math.min(100, Math.max(0, value));
-};
-
-const formatDashboardDate = (dateValue?: string) => {
-	if (!dateValue) return "";
-
-	const [year, month, day] = dateValue.split("-").map(Number);
-
-	if (!year || !month || !day) return dateValue;
-
-	return new Intl.DateTimeFormat("vi-VN", {
-		weekday: "long",
-		day: "2-digit",
-		month: "2-digit",
-		year: "numeric",
-		timeZone: "UTC",
-	}).format(new Date(Date.UTC(year, month - 1, day)));
-};
-
-const formatDateTime = (dateValue?: string | null) => {
-	if (!dateValue) return "Chưa đặt hạn";
-
-	const date = new Date(dateValue);
-
-	if (Number.isNaN(date.getTime())) return "Chưa đặt hạn";
-
-	return new Intl.DateTimeFormat("vi-VN", {
-		day: "2-digit",
-		month: "2-digit",
-		year: "numeric",
-		hour: "2-digit",
-		minute: "2-digit",
-	}).format(date);
-};
-
-const formatMinutes = (minutes: number) => {
-	if (minutes < 60) return `${minutes} phút`;
-
-	const hours = Math.floor(minutes / 60);
-	const rest = minutes % 60;
-
-	return rest ? `${hours}h ${rest}m` : `${hours}h`;
-};
-
-const formatRelativeTime = (dateValue: string) => {
-	const date = new Date(dateValue);
-
-	if (Number.isNaN(date.getTime())) return "Vừa xong";
-
-	const diffMinutes = Math.max(
-		0,
-		Math.floor((Date.now() - date.getTime()) / 60000),
-	);
-
-	if (diffMinutes < 1) return "Vừa xong";
-	if (diffMinutes < 60) return `${diffMinutes} phút trước`;
-
-	const diffHours = Math.floor(diffMinutes / 60);
-
-	if (diffHours < 24) return `${diffHours} giờ trước`;
-
-	const diffDays = Math.floor(diffHours / 24);
-
-	return `${diffDays} ngày trước`;
-};
-
-const getPriorityClass = (priorityLevel?: number | null) => {
-	if (!priorityLevel) {
-		return "border-border bg-muted text-muted-foreground";
-	}
-
-	if (priorityLevel >= 3) {
-		return "border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-300";
-	}
-
-	if (priorityLevel === 2) {
-		return "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-300";
-	}
-
-	return "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300";
-};
-
-const getStatusClass = (statusName?: string | null) => {
-	const normalized = (statusName ?? "").trim().toLowerCase();
-
-	if (normalized.includes("progress")) {
-		return "border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-300";
-	}
-
-	if (normalized.includes("done") || normalized.includes("complete")) {
-		return "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300";
-	}
-
-	return "border-border bg-muted text-muted-foreground";
-};
-
-const getActivityTone = (action: string) => {
-	if (action.includes("START")) return "bg-emerald-500";
-	if (action.includes("TASK")) return "bg-blue-500";
-	if (action.includes("SPRINT")) return "bg-amber-500";
-
-	return "bg-muted-foreground";
-};
-
-function EmptyState({ children }: { children: ReactNode }) {
-	return (
-		<div className='rounded-lg border border-dashed bg-muted/20 p-6 text-center text-sm text-muted-foreground'>
-			{children}
-		</div>
-	);
-}
-
-function LoadingDashboard() {
-	return (
-		<main
-			className='flex min-h-0 min-w-0 w-full flex-1 flex-col gap-5 overflow-x-hidden overflow-y-auto pb-10 sm:max-w-full'
-			style={{ maxWidth: "calc(100dvw - 2rem)" }}
-		>
-			<Skeleton className='h-36 w-full rounded-xl' />
-			<div className='grid gap-4 xl:grid-cols-12'>
-				<Skeleton className='h-80 rounded-xl xl:col-span-8' />
-				<Skeleton className='h-80 rounded-xl xl:col-span-4' />
-			</div>
-			<div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-4'>
-				{Array.from({ length: 4 }).map((_, index) => (
-					<Skeleton key={index} className='h-40 rounded-xl' />
-				))}
-			</div>
-			<div className='grid gap-4 xl:grid-cols-12'>
-				<Skeleton className='h-96 rounded-xl xl:col-span-8' />
-				<Skeleton className='h-96 rounded-xl xl:col-span-4' />
-			</div>
-		</main>
-	);
-}
-
-function TaskItem({ task }: { task: DashboardTaskResponseDto }) {
-	const progress = clampPercent(task.progressPercent);
-
-	return (
-		<div className='rounded-lg border bg-background p-4 transition hover:border-primary/30 hover:bg-muted/30'>
-			<div className='grid gap-4 lg:grid-cols-[minmax(0,1fr)_170px] lg:items-start'>
-				<div className='min-w-0'>
-					<div className='flex flex-wrap items-center gap-2'>
-						<h3 className='min-w-0 truncate text-sm font-semibold md:text-base'>
-							{task.title}
-						</h3>
-						<Badge
-							variant='outline'
-							className={getPriorityClass(task.priorityLevel)}
-						>
-							{task.priorityName ?? "No priority"}
-						</Badge>
-						<Badge
-							variant='outline'
-							className={getStatusClass(task.statusName)}
-						>
-							{task.statusName ?? "No status"}
-						</Badge>
-					</div>
-					<p className='mt-2 truncate text-sm text-muted-foreground'>
-						{task.workspaceName} / {task.projectName}
-					</p>
-				</div>
-
-				<div className='text-left lg:text-right'>
-					<p className='text-sm font-medium'>
-						{formatDateTime(task.dueAt)}
-					</p>
-					<p className='mt-1 text-xs text-muted-foreground'>
-						{progress}% hoàn thành
-					</p>
-				</div>
-			</div>
-			<Progress value={progress} className='mt-4 h-1.5 bg-muted' />
-		</div>
-	);
-}
-
-function ActivityItem({
-	activity,
-	isLast,
-}: {
-	activity: DashboardActivityResponseDto;
-	isLast: boolean;
-}) {
-	return (
-		<div className='flex gap-3'>
-			<div className='flex flex-col items-center'>
-				<div
-					className={cn(
-						"mt-1 size-2.5 rounded-full",
-						getActivityTone(activity.action),
-					)}
-				/>
-				{isLast ? null : <div className='mt-2 h-full w-px bg-border' />}
-			</div>
-			<div className='min-w-0 pb-4'>
-				<p className='text-sm font-medium leading-6'>
-					{activity.message}
-				</p>
-				<p className='text-xs text-muted-foreground'>
-					{formatRelativeTime(activity.createdAt)}
-				</p>
-			</div>
-		</div>
-	);
-}
-
 export default function DashboardPage() {
+	const timezone = getClientTimezone();
+
 	const query = useMemo(
 		() => ({
 			date: toLocalDateInputValue(),
-			timezone: getClientTimezone(),
+			timezone,
 			limit: 5,
 		}),
-		[],
+		[timezone],
 	);
+
 	const {
 		myDashboard: { data: dashboardQuery, isLoading, isError, refetch },
 	} = useDashboard(query);
@@ -367,56 +144,54 @@ export default function DashboardPage() {
 			className='flex min-h-0 min-w-0 w-full flex-1 flex-col gap-5 overflow-x-hidden overflow-y-auto pb-10 sm:max-w-full'
 			style={{ maxWidth: "calc(100dvw - 2rem)" }}
 		>
-			<Card>
-				<CardHeader className='gap-5 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center'>
+			<section className='mb-2 rounded-2xl border-none bg-gradient-to-br from-muted/50 to-background p-6 xl:p-8'>
+				<div className='flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between'>
 					<div className='min-w-0'>
-						<CardDescription>
+						<p className='text-[13px] font-bold tracking-widest text-primary uppercase'>
 							Bảng điều khiển cá nhân
-						</CardDescription>
-						<CardTitle className='mt-2 text-2xl md:text-3xl'>
+						</p>
+						<h1 className='mt-2 text-3xl font-bold tracking-tight md:text-4xl'>
 							Chào bạn, {dashboard.greeting.displayName}
-						</CardTitle>
-						<p className='mt-3 max-w-3xl text-sm leading-6 text-muted-foreground'>
-							Bạn có {dashboard.greeting.todayPriorityCount} việc
-							ưu tiên hôm nay. Dashboard đang gom deadline, nhịp
+						</h1>
+						<p className='mt-3 max-w-2xl text-[15px] leading-7 text-muted-foreground'>
+							Bạn có <strong className='text-foreground font-semibold'>{dashboard.greeting.todayPriorityCount} việc ưu tiên</strong> hôm nay. Dashboard đang gom deadline, nhịp
 							làm việc, workspace gần đây và hoạt động mới nhất
 							vào một màn hình.
 						</p>
 					</div>
 
-					<CardAction className='static col-auto row-auto flex flex-wrap items-center gap-2 self-auto justify-self-start xl:justify-self-end'>
-						<div className='rounded-md border px-3 py-2 text-sm text-muted-foreground'>
+					<div className='flex flex-wrap items-center gap-3'>
+						<div className='rounded-full border bg-background px-4 py-2 text-sm font-medium text-muted-foreground shadow-sm'>
 							{formatDashboardDate(dashboard.greeting.date)}
 						</div>
-						<Button asChild variant='outline'>
+						<Button asChild variant='default' className='rounded-full shadow-sm'>
 							<Link href='/dashboard/my-tasks'>
-								<ListTodo />
+								<ListTodo className="mr-2 h-4 w-4" />
 								<span>
-									Xem {dashboard.priorityTasks.length} task ưu
-									tiên
+									Xem {dashboard.priorityTasks.length} task ưu tiên
 								</span>
 							</Link>
 						</Button>
 						{primaryWorkspace ? (
-							<Button asChild className='max-w-[240px]'>
+							<Button asChild variant='secondary' className='rounded-full max-w-[240px] shadow-sm'>
 								<Link
 									href={`/dashboard/${primaryWorkspace.slug}`}
 								>
-									<FolderKanban />
+									<FolderKanban className="mr-2 h-4 w-4" />
 									<span className='truncate'>
 										Mở {primaryWorkspace.name}
 									</span>
 								</Link>
 							</Button>
 						) : (
-							<Button disabled>
-								<FolderKanban />
+							<Button disabled variant='secondary' className='rounded-full'>
+								<FolderKanban className="mr-2 h-4 w-4" />
 								Chưa có workspace
 							</Button>
 						)}
-					</CardAction>
-				</CardHeader>
-			</Card>
+					</div>
+				</div>
+			</section>
 
 			<section className='grid min-w-0 gap-4 xl:grid-cols-12'>
 				<Card className='xl:col-span-8'>
@@ -500,15 +275,15 @@ export default function DashboardPage() {
 										{dashboard.rhythmBlocks.map((item) => (
 											<div
 												key={`${item.taskId}-${item.time}`}
-												className='rounded-md border bg-background/70 p-3'
+												className='rounded-xl border border-border/50 bg-background/80 p-3 shadow-sm transition hover:shadow-md hover:border-primary/40 cursor-default'
 											>
-												<p className='text-xs font-medium text-muted-foreground'>
+												<p className='text-[11px] font-bold text-muted-foreground tracking-wider uppercase'>
 													{item.time}
 												</p>
 												<p className='mt-1 truncate text-sm font-semibold'>
 													{item.title}
 												</p>
-												<p className='mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground'>
+												<p className='mt-1 line-clamp-2 text-[12px] leading-5 text-muted-foreground'>
 													{item.subtitle}
 												</p>
 											</div>
@@ -583,23 +358,23 @@ export default function DashboardPage() {
 							dashboard.recentDeadlines.map((item) => (
 								<div
 									key={item.id}
-									className='flex items-center justify-between gap-3 rounded-lg border bg-muted/35 p-3'
+									className='flex items-center justify-between gap-3 rounded-xl border border-border/50 bg-muted/20 p-3.5 shadow-sm transition-colors hover:bg-muted/40'
 								>
 									<div className='min-w-0'>
-										<p className='truncate text-sm font-medium'>
+										<p className='truncate text-[14px] font-semibold text-foreground'>
 											{item.title}
 										</p>
-										<p className='mt-1 truncate text-xs text-muted-foreground'>
+										<p className='mt-1 truncate text-[12px] text-muted-foreground'>
 											{item.workspaceName} /{" "}
 											{item.projectName}
 										</p>
 									</div>
-									<Badge
+									{/* <Badge
 										variant='outline'
 										className='shrink-0 border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-300'
 									>
 										{item.remainingLabel}
-									</Badge>
+									</Badge> */}
 								</div>
 							))
 						) : (
@@ -616,7 +391,7 @@ export default function DashboardPage() {
 					return (
 						<Card
 							key={item.title}
-							className='transition hover:border-primary/30'
+							className='transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/40'
 						>
 							<CardContent className='flex flex-col gap-5'>
 								<div className='flex items-start justify-between gap-3'>
@@ -668,7 +443,7 @@ export default function DashboardPage() {
 					<CardContent className='flex flex-col gap-3'>
 						{dashboard.priorityTasks.length ? (
 							dashboard.priorityTasks.map((task) => (
-								<TaskItem key={task.id} task={task} />
+								<DashboardTaskItem key={task.id} task={task} />
 							))
 						) : (
 							<EmptyState>
@@ -732,14 +507,14 @@ export default function DashboardPage() {
 							<div className='flex flex-col'>
 								{dashboard.recentActivities.map(
 									(activity, index) => (
-										<ActivityItem
+										<DashboardActivityItem
 											key={activity.id}
 											activity={activity}
 											isLast={
 												index ===
 												dashboard.recentActivities
 													.length -
-													1
+												1
 											}
 										/>
 									),

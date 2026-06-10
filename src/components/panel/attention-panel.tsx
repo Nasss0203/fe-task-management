@@ -4,56 +4,56 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AttentionItem } from "@/types/type";
 import { AlertCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type Props = {
 	items: AttentionItem[];
 };
 
 const attentionTypeLabel: Record<string, string> = {
-	Overdue: "Quá hạn",
+	Overdue: "Overdue",
 	Deadline: "Deadline",
-	Unassigned: "Chưa assign",
+	Unassigned: "Unassigned",
 };
 
 const attentionTone: Record<string, string> = {
 	Overdue:
-		"border-l-red-500/80 bg-background/45 hover:bg-background/70 [&_.attention-badge]:border-red-500/35 [&_.attention-badge]:bg-red-500/10 [&_.attention-badge]:text-red-500",
+		"border-rose-500/20 bg-rose-500/10 text-rose-400",
 	Deadline:
-		"border-l-orange-500/80 bg-background/45 hover:bg-background/70 [&_.attention-badge]:border-orange-500/35 [&_.attention-badge]:bg-orange-500/10 [&_.attention-badge]:text-orange-500",
+		"border-amber-500/20 bg-amber-500/10 text-amber-400",
 	Unassigned:
-		"border-l-yellow-500/80 bg-background/45 hover:bg-background/70 [&_.attention-badge]:border-yellow-500/35 [&_.attention-badge]:bg-yellow-500/10 [&_.attention-badge]:text-yellow-500",
+		"border-yellow-500/20 bg-yellow-500/10 text-yellow-400",
 };
 
 export function AttentionPanel({ items }: Props) {
 	return (
-		<Card className='border-border/60 bg-card/80 shadow-sm'>
-			<CardHeader className='pb-3'>
-				<CardTitle className='flex items-center gap-2 text-base'>
-					<span className='flex size-8 items-center justify-center rounded-lg border border-amber-500/20 bg-amber-500/10 text-amber-500'>
+		<Card className='rounded-2xl border-border bg-muted/50 shadow-sm'>
+			<CardHeader className='pb-3 border-b border-border/50 bg-muted/50 rounded-t-2xl px-5'>
+				<CardTitle className='flex items-center gap-2 text-base text-foreground'>
+					<span className='flex size-8 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground'>
 						<AlertCircle className='h-4 w-4' />
 					</span>
-					Cần chú ý
+					Needs Attention
 				</CardTitle>
 			</CardHeader>
 
-			<CardContent className='space-y-3'>
+			<CardContent className='space-y-3 p-5'>
 				{items.map((item) => (
 					<div
 						key={item.id}
-						className={`rounded-xl border border-border/55 border-l-2 p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] ring-1 ring-transparent transition hover:ring-border/60 ${
-							attentionTone[item.type] ??
-							"border-l-amber-500/70 bg-background/45 hover:bg-background/70"
-						}`}
+						className={`rounded-xl border border-border bg-muted/50 p-4 transition-all hover:hover:bg-muted/80 hover:border-border shadow-sm`}
 					>
 						<div className='mb-2 flex items-center justify-between gap-2'>
-							<Badge
-								variant='outline'
-								className='attention-badge'
+							<div
+								className={cn(
+									"inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[11px] font-medium transition-colors",
+									attentionTone[item.type] ?? "border-border bg-muted text-foreground"
+								)}
 							>
 								{attentionTypeLabel[item.type] ?? item.type}
-							</Badge>
+							</div>
 						</div>
-						<p className='text-sm font-medium leading-6'>
+						<p className='text-[13px] font-medium leading-6 text-foreground'>
 							{item.title}
 						</p>
 					</div>

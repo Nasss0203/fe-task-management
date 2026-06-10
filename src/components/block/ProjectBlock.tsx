@@ -1,7 +1,7 @@
 import { BoardItem, BoardViewType } from "@/services/board/type";
 import { type LucideIcon } from "lucide-react";
-import AddBoard from "../board/AddBoard";
-import { BOARD_VIEW_CONFIG } from "../board/view-board";
+import AddBoard from "@/features/board/components/board/AddBoard";
+import { BOARD_VIEW_CONFIG } from "@/features/board/components/board/view-board";
 import { TabsListCustom, TabsTriggerCustom } from "../tabs";
 import { Separator } from "../ui/separator";
 import { Tabs } from "../ui/tabs";

@@ -51,36 +51,42 @@ const DialogAddWorkspace = () => {
 				</div>
 			</DialogTriggerV2>
 
-			<DialogContentV2 className='max-w-[calc(100%-35%)]! min-h-[calc(100%-10%)]! overflow-hidden border border-neutral-800 bg-[#191919] p-0 text-white'>
-				<div className='h-full p-7'>
-					<DialogHeaderV2 className='mb-6'>
-						<DialogTitleV2 className='text-2xl font-bold'>
-							Tạo workspace
-						</DialogTitleV2>
-
-						<DialogDescriptionV2 className='text-sm text-neutral-400'>
-							Nhập tên rồi chọn template. Bấm vào template là tạo
-							luôn.
-						</DialogDescriptionV2>
-					</DialogHeaderV2>
-
-					<div className='mb-6'>
-						<label className='mb-2 block text-sm text-neutral-300'>
-							Tên workspace
-						</label>
-						<input
-							value={workspaceName}
-							onChange={(e) => setWorkspaceName(e.target.value)}
-							placeholder='Ví dụ: Marketing Team'
-							className='h-11 w-full rounded-xl border border-neutral-700 bg-neutral-900 px-4 text-sm outline-none placeholder:text-neutral-500 focus:border-blue-500'
-						/>
+			<DialogContentV2 className='max-w-3xl! overflow-hidden border border-border/50 bg-background/95 backdrop-blur-xl p-0 shadow-2xl sm:rounded-2xl text-foreground'>
+				<div className='flex h-full flex-col'>
+					{/* Header section with gradient background */}
+					<div className='relative overflow-hidden border-b border-border/50 bg-muted/30 px-8 py-8'>
+						<div className='absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-transparent' />
+						<div className='relative'>
+							<DialogHeaderV2 className='mb-0 space-y-2'>
+								<DialogTitleV2 className='text-2xl font-bold tracking-tight text-foreground'>
+									Tạo workspace
+								</DialogTitleV2>
+								<DialogDescriptionV2 className='text-[14px] text-muted-foreground'>
+									Nhập tên rồi chọn template. Bấm vào template là tạo luôn.
+								</DialogDescriptionV2>
+							</DialogHeaderV2>
+						</div>
 					</div>
 
-					<TemplateGrid>
-						<TemplateRecommendation
-							onSelect={handleCreateByTemplate}
-						/>
-					</TemplateGrid>
+					<div className='p-8'>
+						<div className='mb-8 space-y-3'>
+							<label className='text-[13px] font-semibold text-foreground uppercase tracking-wider'>
+								Tên workspace
+							</label>
+							<input
+								value={workspaceName}
+								onChange={(e) => setWorkspaceName(e.target.value)}
+								placeholder='Ví dụ: Marketing Team'
+								className='h-12 w-full rounded-xl border border-border/50 bg-muted/20 px-4 text-[15px] outline-none transition-all placeholder:text-muted-foreground/60 focus:border-blue-500/50 focus:bg-background focus:ring-4 focus:ring-blue-500/10'
+							/>
+						</div>
+
+						<TemplateGrid>
+							<TemplateRecommendation
+								onSelect={handleCreateByTemplate}
+							/>
+						</TemplateGrid>
+					</div>
 				</div>
 			</DialogContentV2>
 		</Dialog>
