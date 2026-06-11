@@ -192,7 +192,7 @@ const WorkspaceSettingsContent = ({
 						<SettingsAccessSection
 							members={members}
 							isMembersLoading={isMembersLoading}
-							canAddMember={can(PERMISSIONS.WORKSPACE_MEMBER_ADD)}
+							workspaceId={workspace.id}
 							onAddPeople={() => setOpenAddPeopleDialog(true)}
 						/>
 					)}

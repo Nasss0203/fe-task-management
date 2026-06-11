@@ -129,21 +129,26 @@ const ProjectDropdown = ({ project, workspace, onRenameProject }: ProjectDropdow
 							Project
 						</DropdownMenuLabel>
 
-						<DropdownMenuItem
-							onSelect={() => {
-								if (onRenameProject) {
-									onRenameProject();
-								} else {
-									toast.info(
-										"Rename project se duoc noi tiep khi backend update metadata san sang.",
-									);
-								}
-							}}
-							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'
+						<RequirePermission
+							workspaceId={workspace.id}
+							code={PERMISSIONS.PROJECT_UPDATE}
 						>
-							<Pencil size={15} />
-							<span>Doi ten project</span>
-						</DropdownMenuItem>
+							<DropdownMenuItem
+								onSelect={() => {
+									if (onRenameProject) {
+										onRenameProject();
+									} else {
+										toast.info(
+											"Rename project se duoc noi tiep khi backend update metadata san sang.",
+										);
+									}
+								}}
+								className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'
+							>
+								<Pencil size={15} />
+								<span>Doi ten project</span>
+							</DropdownMenuItem>
+						</RequirePermission>
 
 						<DropdownMenuItem
 							onSelect={async () => {

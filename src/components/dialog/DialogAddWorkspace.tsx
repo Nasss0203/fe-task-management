@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";
 import { useWorkspaceTemplates } from "@/features/workspace-template/hooks/useWorkspaceTemplates";
+import { usePlan } from "@/features/billing/hooks/usePlan";
 import TemplateGrid from "../templates/TemplateGrid";
 import TemplateRecommendation from "../templates/TemplateRecommendation";
 import { Dialog } from "../ui/dialog";
@@ -15,14 +16,22 @@ import {
 	DialogTitleV2,
 	DialogTriggerV2,
 } from "./dialog-custom";
+import { DialogUpgradePlan } from "./DialogUpgradePlan";
 
 const DialogAddWorkspace = () => {
 	const [workspaceName, setWorkspaceName] = useState("");
 	const [open, setOpen] = useState(false);
+	const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
 
 	const {
 		createWorkspace: { mutate, isSuccess },
+		workspaceFindAll
 	} = useWorkspace();
+	const { planInfo } = usePlan();
+
+	const workspaces = workspaceFindAll.data?.data || [];
+	const workspaceLimit = planInfo.data?.data?.plan?.limits?.workspaces ?? 5;
+	const isAtLimit = workspaces.length >= workspaceLimit;
 
 	const { workspaceTemplatesFindAll } = useWorkspaceTemplates();
 	const { data: templatesData, isLoading } = workspaceTemplatesFindAll;
@@ -43,17 +52,32 @@ const DialogAddWorkspace = () => {
 		mutate({
 			name: finalName,
 			templateId,
+		}, {
+			onError: (err: any) => {
+				if (err?.response?.data?.code === 'WORKSPACE_LIMIT_EXCEEDED') {
+					setOpen(false);
+					setUpgradeModalOpen(true);
+				}
+			}
 		});
 	};
 
 	return (
+		<>
 		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTriggerV2 className='w-full'>
-				<div className='flex h-8 w-full cursor-pointer items-center justify-start gap-2 text-[13px] font-medium hover:bg-sidebar-accent'>
-					<Plus size={12} className='font-semibold' />
-					Thêm mới
-				</div>
-			</DialogTriggerV2>
+			<div 
+				onClick={() => {
+					if (isAtLimit) {
+						setUpgradeModalOpen(true);
+					} else {
+						setOpen(true);
+					}
+				}}
+				className='flex h-8 w-full cursor-pointer items-center justify-start gap-2 text-[13px] font-medium hover:bg-sidebar-accent'
+			>
+				<Plus size={12} className='font-semibold' />
+				Thêm mới
+			</div>
 
 			<DialogContentV2 className='max-w-3xl! overflow-hidden border border-border/50 bg-background/95 backdrop-blur-xl p-0 shadow-2xl sm:rounded-2xl text-foreground'>
 				<div className='flex h-full flex-col'>
@@ -101,6 +125,8 @@ const DialogAddWorkspace = () => {
 				</div>
 			</DialogContentV2>
 		</Dialog>
+		<DialogUpgradePlan open={upgradeModalOpen} onOpenChange={setUpgradeModalOpen} />
+		</>
 	);
 };
 

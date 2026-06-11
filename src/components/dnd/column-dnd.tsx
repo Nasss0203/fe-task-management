@@ -53,7 +53,7 @@ export default function ColumnDnd({
 						<div className={cn("w-2 h-2 rounded-full", s.dot)} />
 						<div className='text-xs'>
 							{statusName || s.label}
-							{isDone ? " - Done" : ""}
+							{isDone}
 						</div>
 					</div>
 

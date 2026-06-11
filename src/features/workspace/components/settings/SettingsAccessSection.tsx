@@ -1,17 +1,19 @@
 import Image from "next/image";
 import type { WorkspaceMemberItem } from "@/services/member/type";
+import { RequirePermission } from "@/features/permission/components/RequirePermission";
+import { PERMISSIONS } from "@/constants/permissions";
 
 interface SettingsAccessSectionProps {
 	members: WorkspaceMemberItem[];
 	isMembersLoading: boolean;
-	canAddMember: boolean;
+	workspaceId: string;
 	onAddPeople: () => void;
 }
 
 export function SettingsAccessSection({
 	members,
 	isMembersLoading,
-	canAddMember,
+	workspaceId,
 	onAddPeople,
 }: SettingsAccessSectionProps) {
 	return (
@@ -25,7 +27,7 @@ export function SettingsAccessSection({
 						Manage workspace members and roles.
 					</div>
 				</div>
-				{canAddMember && (
+				<RequirePermission workspaceId={workspaceId} code={PERMISSIONS.WORKSPACE_MEMBER_ADD} mode="hide">
 					<button
 						type='button'
 						onClick={onAddPeople}
@@ -33,7 +35,7 @@ export function SettingsAccessSection({
 					>
 						Add people
 					</button>
-				)}
+				</RequirePermission>
 			</div>
 
 			<div className='rounded-md border border-border'>

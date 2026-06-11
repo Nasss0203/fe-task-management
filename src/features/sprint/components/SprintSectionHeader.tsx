@@ -113,12 +113,22 @@ export function SprintSectionHeader({
 					</DropdownMenuTrigger>
 
 					<DropdownMenuContent align='end' className="bg-popover border-border rounded-xl min-w-[160px]">
-						<DropdownMenuItem className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">
-							Edit sprint
-						</DropdownMenuItem>
-						<DropdownMenuItem className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">
-							Delete sprint
-						</DropdownMenuItem>
+						<RequirePermission
+							workspaceId={workspaceId}
+							code={PERMISSIONS.SPRINT_UPDATE}
+						>
+							<DropdownMenuItem className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">
+								Edit sprint
+							</DropdownMenuItem>
+						</RequirePermission>
+						<RequirePermission
+							workspaceId={workspaceId}
+							code={PERMISSIONS.SPRINT_DELETE}
+						>
+							<DropdownMenuItem className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">
+								Delete sprint
+							</DropdownMenuItem>
+						</RequirePermission>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</div>

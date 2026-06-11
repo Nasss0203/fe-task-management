@@ -267,12 +267,6 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 								</button>
 							</RequirePermission>
 
-							<RequirePermission 
-								workspaceId={task?.workspaceId} 
-								code={PERMISSIONS.TASK_UPDATE} 
-								bypass={isAssignee} 
-								mode="hide"
-							>
 								<Popover
 									open={isActionOpen}
 									onOpenChange={setIsActionOpen}
@@ -317,14 +311,21 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 												heading='Công việc'
 												className='px-2 pb-2'
 											>
-												<CommandItem
-													value='doi ten task'
-													onSelect={startEditingName}
-													className='cursor-pointer rounded-lg px-2 py-2'
+												<RequirePermission
+													workspaceId={task?.workspaceId}
+													code={PERMISSIONS.TASK_UPDATE}
+													bypass={isAssignee}
+													mode="hide"
 												>
-													<Pencil size={16} />
-													<span>Đổi tên task</span>
-												</CommandItem>
+													<CommandItem
+														value='doi ten task'
+														onSelect={startEditingName}
+														className='cursor-pointer rounded-lg px-2 py-2'
+													>
+														<Pencil size={16} />
+														<span>Đổi tên task</span>
+													</CommandItem>
+												</RequirePermission>
 
 												<CommandItem
 													value='mo chi tiet'
@@ -363,7 +364,6 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 									</Command>
 								</PopoverContent>
 							</Popover>
-							</RequirePermission>
 						</div>
 					</div>
 

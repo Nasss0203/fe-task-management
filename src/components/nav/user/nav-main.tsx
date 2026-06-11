@@ -22,6 +22,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { DialogCreateProject } from "../../dialog";
+import { RequirePermission } from "@/features/permission/components/RequirePermission";
+import { PERMISSIONS } from "@/constants/permissions";
 import SidebarMenuButtonV2 from "../../sidebar/user/button-sidebar";
 import {
 	SidebarGroupLabelV2,
@@ -291,12 +293,18 @@ export function NavMain() {
 													}
 												/>
 
-												<DialogCreateProject
+												<RequirePermission
 													workspaceId={workspace.id}
-													workspaceName={
-														workspace.name
-													}
-												/>
+													code={PERMISSIONS.PROJECT_CREATE}
+													mode="hide"
+												>
+													<DialogCreateProject
+														workspaceId={workspace.id}
+														workspaceName={
+															workspace.name
+														}
+													/>
+												</RequirePermission>
 											</div>
 										</div>
 									</SidebarMenuButtonV2>
