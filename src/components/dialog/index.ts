@@ -1,1 +1,1 @@
-export { default as DialogTask } from "./DialogTask";
+export { default as DialogCreateProject } from "./DialogCreateProject";

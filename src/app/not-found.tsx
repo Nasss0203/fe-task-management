@@ -21,13 +21,6 @@ export default function NotFound() {
 				<h2 className='mb-4 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl'>
 					Không tìm thấy trang
 				</h2>
-
-				<p className='mb-10 max-w-[480px] text-base leading-relaxed text-muted-foreground'>
-					Có vẻ như bạn đã đi lạc khỏi không gian làm việc. Trang bạn
-					đang tìm kiếm không tồn tại, đã bị xóa, hoặc bạn không có
-					quyền truy cập.
-				</p>
-
 				<div className='flex flex-col items-center gap-4 sm:flex-row'>
 					<Button
 						asChild

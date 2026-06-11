@@ -240,7 +240,7 @@ const BoardTable = ({
 					<div className='w-full overflow-x-auto'>
 						<Table
 							className={cn(
-								"w-full min-w-225 border-collapse",
+								"w-full min-w-max border-collapse",
 
 								"[&_th]:border-b [&_th]:border-border/50",
 								"[&_td]:border-b [&_td]:border-border/50",

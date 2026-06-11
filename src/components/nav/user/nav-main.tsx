@@ -21,7 +21,7 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { DialogTask } from "../../dialog";
+import { DialogCreateProject } from "../../dialog";
 import SidebarMenuButtonV2 from "../../sidebar/user/button-sidebar";
 import {
 	SidebarGroupLabelV2,
@@ -291,10 +291,10 @@ export function NavMain() {
 													}
 												/>
 
-												<DialogTask
+												<DialogCreateProject
 													workspaceId={workspace.id}
 													workspaceName={
-														workspaceName
+														workspace.name
 													}
 												/>
 											</div>

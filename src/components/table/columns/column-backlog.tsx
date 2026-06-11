@@ -164,20 +164,19 @@ export const getColumnsBacklog = ({
 		accessorKey: "assignees",
 		size: 140,
 		header: "Assignees",
-		meta: { className: "hidden 2xl:table-cell" },
 		cell: ({ row }) => {
 			const assignees = row.original.assignees ?? [];
 
 			if (!assignees.length) {
 				return (
-					<span className='text-[13px] text-muted-foreground italic hidden 2xl:inline'>
+					<span className='text-[13px] text-muted-foreground italic'>
 						Unassigned
 					</span>
 				);
 			}
 
 			return (
-				<div className='hidden items-center gap-2 2xl:flex min-w-0'>
+				<div className='flex items-center gap-2 min-w-0'>
 					<div className='flex -space-x-1.5 shrink-0'>
 						{assignees.slice(0, 3).map((assignee) => {
 							const name = getAssigneeName(assignee);
@@ -206,9 +205,8 @@ export const getColumnsBacklog = ({
 		accessorKey: "estimateMinutes",
 		size: 80,
 		header: "Est.",
-		meta: { className: "hidden xl:table-cell" },
 		cell: ({ row }) => (
-			<span className='hidden text-[13px] font-medium text-foreground xl:inline'>
+			<span className='text-[13px] font-medium text-foreground'>
 				{formatEstimate(row.original.estimateMinutes)}
 			</span>
 		),
@@ -217,9 +215,8 @@ export const getColumnsBacklog = ({
 		accessorKey: "dueAt",
 		size: 80,
 		header: "Due",
-		meta: { className: "hidden 2xl:table-cell" },
 		cell: ({ row }) => (
-			<span className='hidden text-[13px] text-muted-foreground 2xl:inline'>
+			<span className='text-[13px] text-muted-foreground'>
 				{formatDate(row.original.dueAt)}
 			</span>
 		),

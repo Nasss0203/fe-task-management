@@ -60,15 +60,12 @@ const SprintPage = () => {
 				</p>
 			</div>
 
-			<div className='grid min-h-0 flex-1 grid-cols-1 gap-4 overflow-hidden 2xl:grid-cols-2'>
-				<div className='flex min-h-0 flex-col overflow-hidden'>
-					<BacklogSprint
-						projectId={projectId}
-						workspaceId={workspaceId}
-					/>
+			<div className="grid min-h-0 flex-1 grid-cols-1 gap-4 overflow-hidden 2xl:grid-cols-2">
+				<div className="flex min-h-0 flex-col overflow-hidden">
+					<BacklogSprint projectId={projectId} workspaceId={workspaceId} />
 				</div>
 
-				<div className='flex min-h-0 flex-col overflow-hidden'>
+				<div className="flex min-h-0 flex-col overflow-hidden">
 					<Sprint
 						boards={boards}
 						projectId={projectId}

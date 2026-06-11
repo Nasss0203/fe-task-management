@@ -29,7 +29,7 @@ const BacklogTable = <TData, TValue>({
 				className,
 			)}
 		>
-			<Table containerClassName='flex-1 min-h-0 overflow-auto' className='w-full min-w-[720px] table-fixed'>
+			<Table containerClassName='flex-1 min-h-0 overflow-auto' className='w-full min-w-max table-fixed'>
 				<TableHeader>
 					{table.getHeaderGroups().map((headerGroup) => (
 						<TableRow

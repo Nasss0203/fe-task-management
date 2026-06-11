@@ -186,22 +186,39 @@
 		background-color: oklch(var(--primary) / 20%);
 		color: oklch(var(--primary));
 	}
+
 	* {
 		@apply border-border outline-ring/50;
 	}
+
 	body {
 		@apply bg-background text-foreground antialiased;
 		scroll-behavior: smooth;
 	}
+
 	/* Add smooth global transitions for common interactive elements without breaking layout */
-	button, a, input, select, textarea, .card, .popover, [role="button"], [role="dialog"], [role="menuitem"] {
+	button,
+	a,
+	input,
+	select,
+	textarea,
+	.card,
+	.popover,
+	[role="button"],
+	[role="dialog"],
+	[role="menuitem"] {
 		@apply transition-all duration-200 ease-in-out;
 	}
+
 	/* Subtle glassmorphism and depth in dark mode */
-	.dark .card, .dark [role="dialog"], .dark [role="menu"], .dark .popover {
+	.dark .card,
+	.dark [role="dialog"],
+	.dark [role="menu"],
+	.dark .popover {
 		border-top: 1px solid oklch(1 1 1 / 5%);
-		box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+		box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
 	}
+
 	.sx-react-calendar-wrapper {
 		width: 100%;
 		max-width: 100%;
@@ -274,6 +291,7 @@
 	.sx__ripple::after {
 		all: unset !important;
 	}
+
 	.integration-marquee {
 		position: relative;
 		overflow: hidden;
@@ -306,6 +324,7 @@
 		from {
 			transform: translateX(-50%);
 		}
+
 		to {
 			transform: translateX(0);
 		}
@@ -316,14 +335,18 @@
 		width: 8px;
 		height: 8px;
 	}
+
 	::-webkit-scrollbar-track {
 		background: transparent;
 	}
+
 	::-webkit-scrollbar-thumb {
-		background: oklch(var(--border));
+		background: oklch(0.35 0.03 260);
+		/* sáng hơn một chút so với background */
 		border-radius: 4px;
 	}
+
 	::-webkit-scrollbar-thumb:hover {
-		background: oklch(var(--muted-foreground));
+		background: oklch(0.5 0.03 260);
 	}
 }
