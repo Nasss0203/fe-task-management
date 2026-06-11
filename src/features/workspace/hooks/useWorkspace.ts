@@ -16,6 +16,7 @@ import {
 } from "@/services/workspace/workspace.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useProjectSelectionStore } from "@/stores/use-project-selection";
 
 export const useWorkspace = () => {
 	const queryClient = useQueryClient();
@@ -32,6 +33,10 @@ export const useWorkspace = () => {
 			});
 
 			const workspace = data.data ?? data;
+
+			if (workspace.id) {
+				useProjectSelectionStore.getState().setCurrentWorkspaceId(workspace.id);
+			}
 
 			if (workspace.slug) {
 				router.push(`/dashboard/${workspace.slug}`);

@@ -4,10 +4,9 @@ import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";
+import { useWorkspaceTemplates } from "@/features/workspace-template/hooks/useWorkspaceTemplates";
 import TemplateGrid from "../templates/TemplateGrid";
-import TemplateRecommendation, {
-	type WorkspaceTemplateType,
-} from "../templates/TemplateRecommendation";
+import TemplateRecommendation from "../templates/TemplateRecommendation";
 import { Dialog } from "../ui/dialog";
 import {
 	DialogContentV2,
@@ -25,6 +24,10 @@ const DialogAddWorkspace = () => {
 		createWorkspace: { mutate, isSuccess },
 	} = useWorkspace();
 
+	const { workspaceTemplatesFindAll } = useWorkspaceTemplates();
+	const { data: templatesData, isLoading } = workspaceTemplatesFindAll;
+	const templates = templatesData?.data || [];
+
 	useEffect(() => {
 		if (isSuccess) {
 			setOpen(false);
@@ -32,13 +35,14 @@ const DialogAddWorkspace = () => {
 		}
 	}, [isSuccess]);
 
-	const handleCreateByTemplate = (template: WorkspaceTemplateType) => {
+	const handleCreateByTemplate = (templateId: string) => {
+		const selectedTemplate = templates.find((t) => t.id === templateId);
 		const finalName =
-			workspaceName.trim() || getDefaultWorkspaceName(template);
+			workspaceName.trim() || getDefaultWorkspaceName(selectedTemplate?.name);
 
 		mutate({
 			name: finalName,
-			template,
+			templateId,
 		});
 	};
 
@@ -81,11 +85,18 @@ const DialogAddWorkspace = () => {
 							/>
 						</div>
 
-						<TemplateGrid>
-							<TemplateRecommendation
-								onSelect={handleCreateByTemplate}
-							/>
-						</TemplateGrid>
+						{isLoading ? (
+							<div className="flex justify-center items-center py-12">
+								<div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+							</div>
+						) : (
+							<TemplateGrid>
+								<TemplateRecommendation
+									templates={templates}
+									onSelect={handleCreateByTemplate}
+								/>
+							</TemplateGrid>
+						)}
 					</div>
 				</div>
 			</DialogContentV2>
@@ -95,17 +106,9 @@ const DialogAddWorkspace = () => {
 
 export default DialogAddWorkspace;
 
-function getDefaultWorkspaceName(template: WorkspaceTemplateType) {
-	switch (template) {
-		case "TASK_TRACKER":
-			return "Task Tracker Workspace";
-		case "PROJECT":
-			return "Project Workspace";
-		case "BLANK_DATABASE":
-			return "Database Workspace";
-		case "BLANK_PAGE":
-			return "Blank Workspace";
-		default:
-			return "My Workspace";
+function getDefaultWorkspaceName(templateName?: string) {
+	if (templateName) {
+		return `${templateName} Workspace`;
 	}
+	return "My Workspace";
 }

@@ -21,15 +21,11 @@ export interface WorkspaceItem {
 	deletedBy?: string | null;
 }
 
-export type WorkspaceTemplateType =
-	| "BLANK_PAGE"
-	| "BLANK_DATABASE"
-	| "TASK_TRACKER"
-	| "PROJECT";
+
 
 export interface WorkspaceDto {
 	name: string;
-	template: WorkspaceTemplateType;
+	templateId?: string;
 }
 
 export interface UpdateWorkspaceDto {
