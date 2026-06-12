@@ -24,6 +24,7 @@ import {
 	UpdateTaskDto,
 } from "@/services/task/type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTaskFilterStore } from "@/stores/use-task-filter";
 
 type UpdateTaskInput = Omit<UpdateTaskDto, "id"> & {
 	id: string;
@@ -96,16 +97,19 @@ export const useDeleteTask = (workspaceId: string, projectId: string) => {
 export const useTask = (
 	workspaceId: string,
 	projectId: string,
-	backlogFilters?: FindBacklogTasksFilters,
+	filtersProp?: FindBacklogTasksFilters,
 	options?: {
 		includeTrash?: boolean;
 	},
 ) => {
 	const queryClient = useQueryClient();
+	const filtersByProject = useTaskFilterStore((state) => state.filtersByProject);
+	const globalFilters = filtersByProject[projectId] || {};
+	const activeFilters = filtersProp ?? globalFilters;
 	const includeTrash = options?.includeTrash === true;
 	const taskQuery = useQuery({
-		queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
-		queryFn: () => findAllTaskApi(workspaceId, projectId),
+		queryKey: [TASK_KEY.TASKS, workspaceId, projectId, activeFilters],
+		queryFn: () => findAllTaskApi(workspaceId, projectId, activeFilters),
 		enabled: !!workspaceId && !!projectId,
 	});
 
@@ -132,10 +136,10 @@ export const useTask = (
 			TASK_KEY.TASK_BACKLOG,
 			workspaceId,
 			projectId,
-			backlogFilters,
+			activeFilters,
 		],
 		queryFn: () =>
-			findAllBacklogTaskApi(workspaceId, projectId, backlogFilters),
+			findAllBacklogTaskApi(workspaceId, projectId, activeFilters),
 		enabled: !!workspaceId && !!projectId,
 	});
 

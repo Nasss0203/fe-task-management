@@ -118,47 +118,4 @@ export const BOARD_VIEW_CONFIG: Partial<
 		enabled: true,
 		requiresSprint: true,
 	},
-	TIMELINE: {
-		label: "Timeline",
-		icon: GanttChart,
-		component: Timeline,
-		enabled: true,
-	},
-
-	GALLERY: {
-		label: "Gallery",
-		icon: Image,
-		component: UnsupportedView,
-		enabled: false,
-	},
-	CHART: {
-		label: "Chart",
-		icon: BarChart3,
-		component: UnsupportedView,
-		enabled: false,
-	},
-	DASHBOARD: {
-		label: "Dashboard",
-		icon: LayoutDashboard,
-		component: UnsupportedView,
-		enabled: false,
-	},
-	FORM: {
-		label: "Form",
-		icon: FileText,
-		component: UnsupportedView,
-		enabled: false,
-	},
-	MAP: {
-		label: "Map",
-		icon: Map,
-		component: UnsupportedView,
-		enabled: false,
-	},
-	FEED: {
-		label: "Feed",
-		icon: Rss,
-		component: UnsupportedView,
-		enabled: false,
-	},
 };
