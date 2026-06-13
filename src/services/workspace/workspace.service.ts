@@ -116,3 +116,9 @@ export const findWorkspaceAccessApi = async (
 
 	return response.data;
 };
+
+export const removeWorkspaceFromUserTrashApi = async (
+	workspaceId: string,
+): Promise<void> => {
+	await instance.delete(`/workspaces/trash/${workspaceId}`);
+};
