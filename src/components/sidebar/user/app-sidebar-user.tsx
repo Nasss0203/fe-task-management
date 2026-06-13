@@ -11,6 +11,7 @@ import {
 	Map,
 	PieChart,
 	Search,
+	LayoutTemplate,
 } from "lucide-react";
 import * as React from "react";
 
@@ -43,6 +44,11 @@ const homeItems: NavHomeItem[] = [
 		name: "Hop thu den",
 		icon: Mail,
 		type: "inbox",
+	},
+	{
+		name: "Explore Templates",
+		url: "/dashboard/templates",
+		icon: LayoutTemplate,
 	},
 ];
 

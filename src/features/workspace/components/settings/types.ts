@@ -7,10 +7,11 @@ import {
 	Trash2,
 	Users,
 	Zap,
+	LayoutTemplate,
 } from "lucide-react";
 import type React from "react";
 
-export type SettingsSection = "details" | "access" | "features" | "board" | "danger";
+export type SettingsSection = "details" | "access" | "features" | "board" | "template" | "danger";
 
 export const SETTINGS_NAV: {
 	key: SettingsSection;
@@ -21,6 +22,7 @@ export const SETTINGS_NAV: {
 	{ key: "access", label: "Access", icon: Users },
 	{ key: "features", label: "Features", icon: Zap },
 	{ key: "board", label: "Board", icon: Columns3 },
+	{ key: "template", label: "Templates", icon: LayoutTemplate },
 	{ key: "danger", label: "Danger zone", icon: Trash2 },
 ];
 

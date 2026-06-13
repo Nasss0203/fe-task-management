@@ -21,6 +21,7 @@ import { SettingsBoardSection } from "@/features/workspace/components/settings/S
 import { SettingsDangerSection } from "@/features/workspace/components/settings/SettingsDangerSection";
 import { SettingsDetailsSection } from "@/features/workspace/components/settings/SettingsDetailsSection";
 import { SettingsFeaturesSection } from "@/features/workspace/components/settings/SettingsFeaturesSection";
+import { SettingsTemplateSection } from "@/features/workspace/components/settings/SettingsTemplateSection";
 import { SettingsSidebar } from "@/features/workspace/components/settings/SettingsSidebar";
 import { SETTINGS_NAV, type SettingsSection } from "@/features/workspace/components/settings/types";
 
@@ -216,6 +217,10 @@ const WorkspaceSettingsContent = ({
 							canUpdate={can(PERMISSIONS.WORKSPACE_UPDATE)}
 							onUpdateLayoutMode={handleUpdateLayoutMode}
 						/>
+					)}
+
+					{activeSection === "template" && (
+						<SettingsTemplateSection workspaceId={workspace.id} />
 					)}
 
 					{activeSection === "danger" && (

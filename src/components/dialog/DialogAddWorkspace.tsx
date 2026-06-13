@@ -35,7 +35,7 @@ const DialogAddWorkspace = () => {
 
 	const { workspaceTemplatesFindAll } = useWorkspaceTemplates();
 	const { data: templatesData, isLoading } = workspaceTemplatesFindAll;
-	const templates = templatesData?.data || [];
+	const templates = templatesData?.data?.data?.filter((t) => t.isSystem) || [];
 
 	useEffect(() => {
 		if (isSuccess) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { Archive, Cog, Pencil, Star, Trash2, UserPlus } from "lucide-react";
+import { Archive, Cog, Pencil, Star, Trash2, UserPlus, LayoutTemplate } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import {
 import { PERMISSIONS } from "@/constants/permissions";
 import { RequirePermission } from "@/features/permission/components/RequirePermission";
 import { AddPeopleDialog } from "@/components/dialog/AddPeopleDialog";
+import { SaveTemplateDialog } from "@/features/workspace-template/components/SaveTemplateDialog";
 
 type WorkspaceMenuProps = {
 	workspaceId: string;
@@ -41,6 +42,7 @@ export function WorkspaceMenu({
 	onStar,
 }: WorkspaceMenuProps) {
 	const [openAddPeople, setOpenAddPeople] = useState(false);
+	const [openSaveTemplate, setOpenSaveTemplate] = useState(false);
 
 	return (
 		<>
@@ -106,6 +108,19 @@ export function WorkspaceMenu({
 							<Cog className='h-4 w-4' />
 							<span>Space settings</span>
 						</DropdownMenuItem>
+
+						<RequirePermission
+							workspaceId={workspaceId}
+							code={PERMISSIONS.WORKSPACE_UPDATE}
+						>
+							<DropdownMenuItem
+								onClick={() => setOpenSaveTemplate(true)}
+								className='gap-3'
+							>
+								<LayoutTemplate className='h-4 w-4' />
+								<span>Save workspace template</span>
+							</DropdownMenuItem>
+						</RequirePermission>
 					</DropdownMenuGroup>
 
 					<DropdownMenuSeparator />
@@ -136,6 +151,12 @@ export function WorkspaceMenu({
 				workspaceId={workspaceId}
 				workspaceName={workspaceName}
 				inviteLink={inviteLink}
+			/>
+
+			<SaveTemplateDialog
+				workspaceId={workspaceId}
+				isOpen={openSaveTemplate}
+				onClose={() => setOpenSaveTemplate(false)}
 			/>
 		</>
 	);

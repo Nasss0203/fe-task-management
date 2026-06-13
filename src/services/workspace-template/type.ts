@@ -1,36 +1,43 @@
-export enum WORKSPACE_TEMPLATE_KEY {
-	WORKSPACE_TEMPLATE = "workspace-template",
-}
-
-export enum TemplateStatus {
-	DRAFT = "DRAFT",
-	PUBLISHED = "PUBLISHED",
-	ARCHIVED = "ARCHIVED",
-}
-
-export enum TemplateVisibility {
-	PRIVATE = "PRIVATE",
-	WORKSPACE = "WORKSPACE",
-	PUBLIC = "PUBLIC",
-}
-
-export interface WorkspaceTemplateItem {
+export interface WorkspaceTemplateDto {
 	id: string;
 	name: string;
-	description: string | null;
-	category: string | null;
-	coverUrl: string | null;
+	description?: string;
 	isSystem: boolean;
-	status: TemplateStatus;
-	visibility: TemplateVisibility;
-	createdBy: string | null;
-	workspaceId: string | null;
-	useCount: number;
-	likesCount: number;
+	status: string;
+	visibility: string;
+	createdBy?: string;
+	workspaceId?: string;
 	createdAt: string;
 	updatedAt: string;
 }
 
-export interface FindAllWorkspaceTemplateResponse {
-	data: WorkspaceTemplateItem[];
+export interface PaginatedWorkspaceTemplateResponse {
+	statusCode: number;
+	message: string;
+	data: {
+		data: WorkspaceTemplateDto[];
+		total: number;
+		page: number;
+		pageSize: number;
+		totalPages: number;
+	};
 }
+
+export interface SaveWorkspaceAsTemplateDto {
+	name: string;
+	description?: string;
+	category?: string;
+	visibility?: "PRIVATE" | "WORKSPACE" | "PUBLIC";
+}
+
+export interface UpdateWorkspaceTemplateDto {
+	name?: string;
+	description?: string;
+	category?: string;
+	visibility?: "PRIVATE" | "WORKSPACE" | "PUBLIC";
+}
+
+export const WORKSPACE_TEMPLATE_KEY = {
+	TEMPLATES: "workspace-templates",
+	TEMPLATE_DETAIL: "workspace-template-detail",
+};
