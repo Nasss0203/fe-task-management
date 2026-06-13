@@ -1,8 +1,9 @@
 "use client";
 
-import { ExternalLink, Pencil, Trash } from "lucide-react";
+import { ExternalLink, Pencil, Trash, ArrowRight, MinusCircle } from "lucide-react";
 import React, { useState } from "react";
-import { useDeleteTask } from "@/features/task/hooks/useTask";
+import { useDeleteTask, useTaskMoveSprint } from "@/features/task/hooks/useTask";
+import { useParams } from "next/navigation";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 
@@ -13,15 +14,30 @@ type Props = {
 	projectId: string;
 	onRename?: () => void;
 	onOpenDetail?: () => void;
+	isSprintContext?: boolean;
 };
 
-const DropdownTaskContextMenu = ({ children, taskId, workspaceId, projectId, onRename, onOpenDetail }: Props) => {
+const DropdownTaskContextMenu = ({ children, taskId, workspaceId, projectId, onRename, onOpenDetail, isSprintContext }: Props) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const deleteTask = useDeleteTask(workspaceId, projectId);
+	const params = useParams<{ sprintId?: string }>();
+	const currentSprintId = params?.sprintId;
+	const { taskMoveSprint, removeTaskSprint } = useTaskMoveSprint({ workspaceId, projectId });
 
 	const handleDelete = () => {
 		setIsOpen(false);
 		deleteTask.mutate({ taskId });
+	};
+
+	const handleMoveToSprint = () => {
+		if (!currentSprintId) return;
+		setIsOpen(false);
+		taskMoveSprint.mutate({ taskId, sprintId: currentSprintId });
+	};
+
+	const handleRemoveFromSprint = () => {
+		setIsOpen(false);
+		removeTaskSprint.mutate({ taskId });
 	};
 
 	return (
@@ -66,6 +82,28 @@ const DropdownTaskContextMenu = ({ children, taskId, workspaceId, projectId, onR
 								<ExternalLink size={16} />
 								<span>Mở chi tiết</span>
 							</CommandItem>
+
+							{!isSprintContext && currentSprintId && (
+								<CommandItem
+									value='move_to_sprint'
+									onSelect={handleMoveToSprint}
+									className='cursor-pointer rounded-lg px-2 py-2'
+								>
+									<ArrowRight size={16} />
+									<span>Chuyển vào Sprint</span>
+								</CommandItem>
+							)}
+
+							{isSprintContext && (
+								<CommandItem
+									value='remove_from_sprint'
+									onSelect={handleRemoveFromSprint}
+									className='cursor-pointer rounded-lg px-2 py-2 text-amber-600 data-[selected=true]:bg-amber-500/10 data-[selected=true]:text-amber-600'
+								>
+									<MinusCircle size={16} className='text-amber-600' />
+									<span>Bỏ khỏi Sprint</span>
+								</CommandItem>
+							)}
 
 							<CommandItem
 								value='delete_task'

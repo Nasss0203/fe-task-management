@@ -35,10 +35,9 @@ const SprintTaskList = ({
 		null,
 	);
 
-	const sprintTasks = useMemo(() => {
-		const data = sprintsTaskQuery.data?.data;
-		return Array.isArray(data) ? data : [];
-	}, [sprintsTaskQuery.data?.data]);
+	const sprintTasks = useMemo<TaskItem[]>(() => {
+		return sprintsTaskQuery.data?.data?.tasks || [];
+	}, [sprintsTaskQuery.data?.data?.tasks]);
 
 	const taskMap = useMemo(() => {
 		return Object.fromEntries(sprintTasks.map((task) => [task.id, task]));
@@ -54,6 +53,7 @@ const SprintTaskList = ({
 			workspaceId,
 			projectId,
 			onOpenDetail: setActiveDrawerTaskId,
+			isSprintContext: true,
 		});
 	}, [workspaceId, projectId]);
 

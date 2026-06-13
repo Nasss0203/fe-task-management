@@ -12,6 +12,9 @@ import type { SprintItem } from "@/services/sprint/type";
 import { ChevronDown, MoreHorizontal } from "lucide-react";
 import { CompleteSprintDialog } from "@/components/dialog/CompleteSprintDialog";
 import { StartSprintDialog } from "@/components/dialog/DialogStartSprint";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { BarChart2 } from "lucide-react";
 
 enum SprintStatus {
 	PLANNED = "PLANNED",
@@ -41,6 +44,7 @@ export function SprintSectionHeader({
 	const normalizedStatus = String(status).toUpperCase();
 	const completedCount = tasks.filter((task: any) => task.status?.isDone === true).length;
 	const openCount = tasks.filter((task: any) => task.status?.isDone !== true).length;
+	const { slug } = useParams();
 
 	return (
 		<div className='flex items-center justify-between gap-4 border-b border-border bg-muted/50 px-4 py-3'>
@@ -98,6 +102,22 @@ export function SprintSectionHeader({
 							completedWorkItemCount={completedCount}
 							openWorkItemCount={openCount}
 						/>
+					</RequirePermission>
+				) : normalizedStatus === SprintStatus.COMPLETED ? (
+					<RequirePermission
+						workspaceId={workspaceId}
+						code={PERMISSIONS.SPRINT_READ}
+					>
+						<Link href={`/dashboard/${slug}/projects/${projectId}/sprints/${sprint.id}/report`}>
+							<Button
+								variant="outline"
+								size="sm"
+								className="h-8 gap-2 text-primary hover:text-primary/90"
+							>
+								<BarChart2 className="w-4 h-4" />
+								<span className="hidden sm:inline">View Report</span>
+							</Button>
+						</Link>
 					</RequirePermission>
 				) : null}
 

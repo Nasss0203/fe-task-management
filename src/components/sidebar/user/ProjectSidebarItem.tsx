@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, BarChart2 } from "lucide-react";
 import Link from "next/link";
 
 import {
@@ -59,7 +59,7 @@ const ProjectSidebarItem = ({
 		<Collapsible asChild className='group/project'>
 			<SidebarMenuSubItemV2>
 				<div className='group/project-item relative flex items-center gap-1 rounded-md px-1 py-0.5 hover:bg-accent/50'>
-					{sprints.length > 0 ? (
+					{canUseSprint ? (
 						<CollapsibleTrigger asChild>
 							<button
 								type='button'
@@ -136,6 +136,30 @@ const ProjectSidebarItem = ({
 									</SidebarMenuSubItemV2>
 								);
 							})}
+
+							<SidebarMenuSubItemV2>
+								<SidebarMenuSubButtonV2
+									asChild
+									className='h-7 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+								>
+									<Link
+										href={`/dashboard/${workspace.slug}/projects/${projectId}/reports`}
+										onClick={() =>
+											handleSelectProject(
+												workspace.id,
+												projectId,
+											)
+										}
+									>
+										<div className="flex items-center gap-1.5 w-full">
+											<BarChart2 className="size-3.5 shrink-0" />
+											<span className='line-clamp-1'>
+												Reports
+											</span>
+										</div>
+									</Link>
+								</SidebarMenuSubButtonV2>
+							</SidebarMenuSubItemV2>
 						</SidebarMenuSubV2>
 					</CollapsibleContent>
 				) : null}

@@ -63,6 +63,9 @@ export const useUpdateTask = (workspaceId: string, projectId: string) => {
 			await queryClient.invalidateQueries({
 				queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
 			});
+			await queryClient.invalidateQueries({
+				queryKey: [SPRINT_KEY.SPRINT, workspaceId, projectId],
+			});
 		},
 	});
 };
@@ -88,6 +91,9 @@ export const useDeleteTask = (workspaceId: string, projectId: string) => {
 				}),
 				queryClient.invalidateQueries({
 					queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [SPRINT_KEY.SPRINT, workspaceId, projectId],
 				}),
 			]);
 		},
@@ -171,6 +177,9 @@ export const useTask = (
 				queryClient.invalidateQueries({
 					queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
 				}),
+				queryClient.invalidateQueries({
+					queryKey: [SPRINT_KEY.SPRINT, workspaceId, projectId],
+				}),
 			]);
 		},
 	});
@@ -195,6 +204,9 @@ export const useTask = (
 
 			await queryClient.invalidateQueries({
 				queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId], // giữ nguyên cho sprint tasks
+			});
+			await queryClient.invalidateQueries({
+				queryKey: [SPRINT_KEY.SPRINT, workspaceId, projectId], 
 			});
 		},
 	});
@@ -243,6 +255,10 @@ export const useTaskMoveSprint = ({
 		await Promise.all([
 			queryClient.invalidateQueries({
 				queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
+				refetchType: "active",
+			}),
+			queryClient.invalidateQueries({
+				queryKey: [SPRINT_KEY.SPRINT, workspaceId, projectId],
 				refetchType: "active",
 			}),
 			queryClient.invalidateQueries({

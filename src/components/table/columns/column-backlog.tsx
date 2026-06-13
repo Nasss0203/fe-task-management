@@ -60,12 +60,14 @@ type getColumnsBacklogProps = {
 	onOpenDetail?: (taskId: string) => void;
 	workspaceId: string;
 	projectId: string;
+	isSprintContext?: boolean;
 };
 
 export const getColumnsBacklog = ({
 	onOpenDetail,
 	workspaceId,
 	projectId,
+	isSprintContext,
 }: getColumnsBacklogProps): ColumnDef<TaskItem>[] => [
 	{
 		id: "drag",
@@ -231,6 +233,7 @@ export const getColumnsBacklog = ({
 				workspaceId={row.original.workspaceId}
 				projectId={row.original.projectId}
 				onOpenDetail={() => onOpenDetail?.(row.original.id)}
+				isSprintContext={isSprintContext}
 			>
 				<button className='rounded-md p-1.5 text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground hover:hover:text-foreground transition-colors'>
 					<MoreHorizontal size={14} />

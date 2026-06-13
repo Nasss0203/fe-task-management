@@ -1,4 +1,5 @@
 import { BoardItem } from "@/services/board/type";
+import type { TaskItem } from "@/services/task/type";
 import { useSprints } from "@/features/sprint/hooks/useSprint";
 import { CalendarDays, MoreHorizontal, Settings2, PlayCircle, CheckCircle } from "lucide-react";
 import {
@@ -18,7 +19,7 @@ type SprintProps = {
 };
 
 const Sprint = ({ projectId, workspaceId, sprintId }: SprintProps) => {
-	const { sprintsQuery, startSprint, completed } = useSprints({ workspaceId, projectId, sprintId });
+	const { sprintsQuery, sprintsTaskQuery, startSprint, completed } = useSprints({ workspaceId, projectId, sprintId });
 	const currentSprint = sprintsQuery.data?.data.find(
 		(sprint) => sprint.id === sprintId,
 	);
@@ -28,6 +29,14 @@ const Sprint = ({ projectId, workspaceId, sprintId }: SprintProps) => {
 	const dateDisplay = hasDates 
 		? `${formatDate(currentSprint.startAt)} → ${formatDate(currentSprint.endAt)}`
 		: "Chưa lên lịch";
+
+	const sprintData = sprintsTaskQuery.data?.data;
+	const sprintTasks: TaskItem[] = sprintData?.tasks || [];
+	const totalTasks = sprintTasks.length;
+	const completedTasks = sprintTasks.filter(t => t.completedAt || t.statusName?.toLowerCase().includes("done") || t.statusName?.toLowerCase().includes("hoàn thành")).length;
+	const remainingTasks = totalTasks - completedTasks;
+	const totalEstimate = sprintTasks.reduce((sum: number, t) => sum + (t.estimateMinutes || 0), 0);
+	const totalEstimateDisplay = totalEstimate > 0 ? (totalEstimate / 60).toFixed(1) + "h" : "0h";
 
 	return (
 		<section className='flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-background shadow-sm'>
@@ -97,18 +106,18 @@ const Sprint = ({ projectId, workspaceId, sprintId }: SprintProps) => {
 				</div>
 
 				<div className='mt-3 grid grid-cols-4 gap-2'>
-					<StatCard value='18' label='Công việc' />
+					<StatCard value={String(totalTasks)} label='Công việc' />
 					<StatCard
-						value='11'
+						value={String(completedTasks)}
 						label='Hoàn thành'
 						className='text-emerald-600 dark:text-emerald-400'
 					/>
 					<StatCard
-						value='7'
+						value={String(remainingTasks)}
 						label='Còn lại'
 						className='text-amber-600 dark:text-amber-400'
 					/>
-					<StatCard value='36' label='SP (Tổng)' />
+					<StatCard value={totalEstimateDisplay} label='Est. (Tổng)' />
 				</div>
 			</div>
 
