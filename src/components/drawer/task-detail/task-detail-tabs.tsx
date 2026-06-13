@@ -1,6 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { TaskActivityFeed } from "./task-activity-feed";
+import { ActivityResponseDto } from "@/services/activity/type";
 import {
 	AtSign,
 	Check,
@@ -25,6 +27,8 @@ type TaskDetailTabsProps = {
 	onCommentDraftChange: (value: string) => void;
 	onCancelComment: () => void;
 	onSaveComment: () => void;
+	activities?: ActivityResponseDto[];
+	isLoadingActivities?: boolean;
 };
 
 function SubtaskCard({ item }: { item: LocalSubtask }) {
@@ -69,6 +73,8 @@ export function TaskDetailTabs({
 	onCommentDraftChange,
 	onCancelComment,
 	onSaveComment,
+	activities = [],
+	isLoadingActivities = false,
 }: TaskDetailTabsProps) {
 	return (
 		<Tabs defaultValue='subtasks' className='gap-0'>
@@ -96,6 +102,11 @@ export function TaskDetailTabs({
 					className='h-12 rounded-none px-0 pb-4 pt-3 text-base font-medium data-[state=active]:bg-transparent data-[state=active]:text-foreground after:bg-foreground'
 				>
 					Activities
+					{activities.length > 0 && (
+						<span className='ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-muted px-1.5 py-0.5 text-xs font-semibold text-muted-foreground'>
+							{activities.length}
+						</span>
+					)}
 				</TabsTrigger>
 			</TabsList>
 
@@ -239,7 +250,9 @@ export function TaskDetailTabs({
 				</div>
 			</TabsContent>
 
-			<TabsContent value='activities' className='pt-6'></TabsContent>
+			<TabsContent value='activities' className='pt-6'>
+				<TaskActivityFeed activities={activities} isLoading={isLoadingActivities} />
+			</TabsContent>
 		</Tabs>
 	);
 }

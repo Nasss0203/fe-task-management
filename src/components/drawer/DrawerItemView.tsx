@@ -159,6 +159,8 @@ export function DrawerItemView({
 									}
 									onCancelComment={detail.comments.onCancel}
 									onSaveComment={detail.comments.onSave}
+									activities={detail.activities.activities}
+									isLoadingActivities={detail.activities.isLoading}
 								/>
 
 								<div className='rounded-2xl border border-dashed border-border bg-card/60 px-4 py-3 text-xs leading-6 text-muted-foreground'>

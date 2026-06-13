@@ -1,6 +1,5 @@
 "use client";
 
-
 import { useUser } from "@/features/auth/hooks/useUser";
 import type { TaskItem } from "@/services/task/type";
 import * as React from "react";
@@ -8,12 +7,14 @@ import { useTaskDetailAssignees } from "./useTaskDetailAssignees";
 import { useTaskDetailComments } from "./useTaskDetailComments";
 import { useTaskDetailFields } from "./useTaskDetailFields";
 import { useTaskAttachments } from "./useTaskAttachments";
+import { useTaskDetailActivities } from "./useTaskDetailActivities";
 
 export function useTaskDetail(task: TaskItem) {
 	const { user } = useUser();
 	const fields = useTaskDetailFields(task);
 	const assignee = useTaskDetailAssignees(task, user);
 	const comments = useTaskDetailComments(task, user);
+	const activities = useTaskDetailActivities(task.workspaceId, task.id);
 
 	const currentStatusName =
 		fields.status.current?.name ?? task.statusName ?? "No status";
@@ -34,6 +35,7 @@ export function useTaskDetail(task: TaskItem) {
 		priority: fields.priority,
 		schedule: fields.schedule,
 		comments,
+		activities,
 		isUpdatingTask: fields.isUpdatingTask,
 		display: {
 			currentStatusName,
