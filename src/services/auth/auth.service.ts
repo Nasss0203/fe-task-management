@@ -39,3 +39,24 @@ export const logoutApi = async (
 	});
 	return response.data;
 };
+
+export const verifyEmailApi = async (data: { token: string }) => {
+	const response = await instance.post("/auth/verify-email", data);
+	return response.data;
+};
+
+export const resendVerificationApi = async (data: { email: string }) => {
+	const response = await instance.post("/auth/resend-verification", data);
+	return response.data;
+};
+
+export const forgotPasswordApi = async (data: { email: string }) => {
+	const response = await instance.post("/auth/forgot-password", data);
+	return response.data;
+};
+
+export const resetPasswordApi = async (data: { token: string; newPassword: string }) => {
+	const response = await instance.post("/auth/reset-password", data);
+	return response.data;
+};
+
