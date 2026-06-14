@@ -9,6 +9,7 @@ import {
 export const getWorkspaceTemplatesApi = async (params?: {
 	ownedByMe?: boolean;
 	status?: string;
+	visibility?: string;
 	page?: number;
 	limit?: number;
 }): Promise<PaginatedWorkspaceTemplateResponse> => {
@@ -16,6 +17,11 @@ export const getWorkspaceTemplatesApi = async (params?: {
 		"/workspace-templates",
 		{ params }
 	);
+	return response.data;
+};
+
+export const getWorkspaceTemplateByIdApi = async (id: string) => {
+	const response = await instance.get(`/workspace-templates/${id}`);
 	return response.data;
 };
 

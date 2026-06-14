@@ -1,9 +1,40 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
-import { Filter } from "lucide-react";
+import { Filter, Loader2 } from "lucide-react";
 import TemplateCard from "./TemplateCard";
-import { templateItems } from "./template-data";
+import { useWorkspaceTemplates } from "@/features/workspace-template/hooks/useWorkspaceTemplates";
+import { TemplateItem } from "./template-data";
 
 export default function TemplatesSection() {
+	const { workspaceTemplatesFindAll } = useWorkspaceTemplates({
+		visibility: "PUBLIC",
+		status: "PUBLISHED",
+	});
+
+	const { data, isLoading } = workspaceTemplatesFindAll;
+	const templates = data?.data?.data || [];
+
+	const mappedTemplates: TemplateItem[] = templates.map((template, index) => {
+		const variants: ("kanban" | "mindmap" | "checklist" | "timeline" | "planner" | "meeting")[] = [
+			"kanban",
+			"mindmap",
+			"checklist",
+			"timeline",
+			"planner",
+			"meeting",
+		];
+		// Pick a stable variant based on index or just use a default
+		const variant = variants[index % variants.length];
+
+		return {
+			id: template.id,
+			title: template.name,
+			description: template.description || "A complete workspace template for your team.",
+			variant,
+		};
+	});
+
 	return (
 		<section className='py-10 md:py-14'>
 			<div className='mb-8 flex items-center justify-between gap-4'>
@@ -26,11 +57,22 @@ export default function TemplatesSection() {
 				</Button>
 			</div>
 
-			<div className='grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3'>
-				{templateItems.map((item) => (
-					<TemplateCard key={item.id} item={item} />
-				))}
-			</div>
+			{isLoading ? (
+				<div className="flex justify-center items-center py-20">
+					<Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+				</div>
+			) : (
+				<div className='grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3'>
+					{mappedTemplates.map((item) => (
+						<TemplateCard key={item.id} item={item} />
+					))}
+					{mappedTemplates.length === 0 && (
+						<div className="col-span-full py-10 text-center text-muted-foreground">
+							No public templates found.
+						</div>
+					)}
+				</div>
+			)}
 		</section>
 	);
 }
