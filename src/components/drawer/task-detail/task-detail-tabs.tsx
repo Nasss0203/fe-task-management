@@ -9,6 +9,9 @@ import {
 	Link2,
 	MessageSquareText,
 	Paperclip,
+	MoreHorizontal,
+	Pencil,
+	Trash2,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -16,17 +19,33 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
 import { Textarea } from "../../ui/textarea";
 import type { LocalComment, LocalSubtask } from "./task-detail-types";
 import { getInitials } from "./task-detail-utils";
+import { type TaskCommentItem } from "@/services/comment/type";
+import { format } from "date-fns";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import * as React from "react";
 
 type TaskDetailTabsProps = {
-	comments: LocalComment[];
+	comments: TaskCommentItem[];
 	currentUsername: string;
 	currentUserAvatar?: string | null;
+	currentUserId?: string;
 	commentDraft: string;
 	composerOpen: boolean;
 	onComposerFocus: () => void;
 	onCommentDraftChange: (value: string) => void;
-	onCancelComment: () => void;
-	onSaveComment: () => void;
+	onCancelComment?: () => void;
+	onSaveComment?: () => void;
+	isSavingComment?: boolean;
+	editingCommentId?: string | null;
+	onEditComment?: (commentId: string, content: string) => void;
+	onDeleteComment?: (commentId: string) => void;
+	isUpdatingComment?: boolean;
+	isDeletingComment?: boolean;
 	activities?: ActivityResponseDto[];
 	isLoadingActivities?: boolean;
 };
@@ -67,15 +86,24 @@ export function TaskDetailTabs({
 	comments,
 	currentUsername,
 	currentUserAvatar,
+	currentUserId,
 	commentDraft,
 	composerOpen,
 	onComposerFocus,
 	onCommentDraftChange,
 	onCancelComment,
 	onSaveComment,
+	isSavingComment,
+	editingCommentId,
+	onEditComment,
+	onDeleteComment,
+	isUpdatingComment,
+	isDeletingComment,
 	activities = [],
 	isLoadingActivities = false,
 }: TaskDetailTabsProps) {
+	if (!comments) return null;
+
 	return (
 		<Tabs defaultValue='subtasks' className='gap-0'>
 			<TabsList
@@ -119,33 +147,70 @@ export function TaskDetailTabs({
 					</div>
 
 					{comments.length ? (
-						<div className='space-y-4'>
+						<div className='space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar'>
 							{comments.map((comment) => (
 								<div key={comment.id} className='flex gap-3'>
 									<Avatar className='size-10 border border-border'>
 										<AvatarImage
 											src={
-												comment.authorAvatar ??
+												comment.authorAvatarUrl ??
 												undefined
 											}
-											alt={comment.authorName}
+											alt={comment.authorName ?? 'Unknown User'}
 										/>
 										<AvatarFallback className='bg-muted text-xs font-semibold text-foreground'>
-											{getInitials(comment.authorName)}
+											{getInitials(comment.authorName ?? 'Unknown')}
 										</AvatarFallback>
 									</Avatar>
 
-									<div className='min-w-0 flex-1 rounded-2xl border border-border bg-card px-4 py-4 shadow-xs'>
-										<div className='flex flex-wrap items-center gap-2 text-sm'>
-											<span className='font-semibold text-foreground'>
-												{comment.authorName}
-											</span>
-											<span className='text-muted-foreground'>
-												{comment.createdAt}
-											</span>
+									<div className='min-w-0 flex-1 rounded-2xl border border-border bg-card px-4 py-4 shadow-xs relative group'>
+										<div className='flex flex-wrap items-center justify-between gap-2 text-sm'>
+											<div className='flex items-center gap-2'>
+												<span className='font-semibold text-foreground'>
+													{comment.authorName ?? 'Unknown User'}
+												</span>
+												<span className='text-muted-foreground'>
+													{format(new Date(comment.createdAt), "MMM d, yyyy h:mm a")}
+												</span>
+												{comment.isEdited && (
+													<span className='text-muted-foreground text-xs italic'>
+														(edited)
+													</span>
+												)}
+											</div>
+											{currentUserId === comment.authorId && (
+												<DropdownMenu>
+													<DropdownMenuTrigger asChild>
+														<Button
+															variant='ghost'
+															size='icon'
+															className='h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 top-2'
+														>
+															<MoreHorizontal className='h-4 w-4 text-muted-foreground' />
+														</Button>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent align='end' className='w-40'>
+														<DropdownMenuItem
+															onClick={() => onEditComment?.(comment.id, comment.content)}
+														>
+															<Pencil className='mr-2 h-4 w-4' />
+															Edit
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															className='text-destructive focus:bg-destructive/10 focus:text-destructive'
+															onClick={() => onDeleteComment?.(comment.id)}
+															disabled={isDeletingComment}
+														>
+															<Trash2 className='mr-2 h-4 w-4' />
+															Delete
+														</DropdownMenuItem>
+													</DropdownMenuContent>
+												</DropdownMenu>
+											)}
 										</div>
-										<p className='mt-2 whitespace-pre-wrap text-sm leading-7 text-muted-foreground'>
-											{comment.body}
+
+										<p className={cn('mt-2 whitespace-pre-wrap text-sm leading-7 text-muted-foreground', editingCommentId === comment.id && 'opacity-50')}>
+											{comment.content}
 										</p>
 									</div>
 								</div>
@@ -237,10 +302,13 @@ export function TaskDetailTabs({
 											type='button'
 											size='sm'
 											onClick={onSaveComment}
-											disabled={!commentDraft.trim()}
+											disabled={!commentDraft.trim() || isSavingComment || isUpdatingComment}
 											className='rounded-xl'
 										>
-											Save
+											{editingCommentId 
+												? (isUpdatingComment ? "Updating..." : "Update") 
+												: (isSavingComment ? "Saving..." : "Save")
+											}
 										</Button>
 									</div>
 								</div>
