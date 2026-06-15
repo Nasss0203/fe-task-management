@@ -101,9 +101,8 @@ export default function AdminPlansBillingPage() {
 			const keyword = search.toLowerCase();
 
 			const matchesSearch =
-				subscription.workspaceName.toLowerCase().includes(keyword) ||
-				subscription.ownerName.toLowerCase().includes(keyword) ||
-				subscription.ownerEmail.toLowerCase().includes(keyword) ||
+				subscription.userName.toLowerCase().includes(keyword) ||
+				subscription.userEmail.toLowerCase().includes(keyword) ||
 				subscription.planName.toLowerCase().includes(keyword);
 
 			const matchesStatus =

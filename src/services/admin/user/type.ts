@@ -1,4 +1,5 @@
 export type AdminUserStatus = "ACTIVE" | "LOCKED";
+export type AdminUserPlan = "free" | "pro";
 
 export type AdminSystemRole = "USER" | "SYSTEM_ADMIN" | "SUPER_ADMIN";
 
@@ -23,6 +24,7 @@ export type AdminUser = {
 	email: string;
 	avatarUrl?: string | null;
 	status: AdminUserStatus;
+	plan: AdminUserPlan;
 	systemRole: AdminSystemRole;
 	workspaces: AdminUserWorkspace[];
 	createdAt: string;

@@ -89,13 +89,13 @@ const SignIn = () => {
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
 										<FieldLabel htmlFor='form-rhf-demo-title'>
-											Email
+											Email or username
 										</FieldLabel>
 										<Input
 											{...field}
 											id='form-rhf-demo-title'
 											aria-invalid={fieldState.invalid}
-											placeholder='Login button not working on mobile'
+											placeholder='member6 or member6@gmail.com'
 											autoComplete='off'
 										/>
 										{fieldState.invalid && (

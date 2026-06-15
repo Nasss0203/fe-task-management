@@ -244,7 +244,7 @@ export function BillingPlanDetailPanel({
 
 								<div>
 									<label className='mb-2 block text-sm text-neutral-400'>
-										Giá tháng
+										Giá tháng (VND)
 									</label>
 									<input
 										type='number'
@@ -275,7 +275,7 @@ export function BillingPlanDetailPanel({
 
 								<div>
 									<label className='mb-2 block text-sm text-neutral-400'>
-										Giá năm
+										Giá năm (VND)
 									</label>
 									<input
 										type='number'

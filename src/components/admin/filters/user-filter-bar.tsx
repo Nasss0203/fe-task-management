@@ -127,7 +127,6 @@ export function UserFilterBar({
 								className='h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-sky-500/50'
 							>
 								<option value='all'>Tất cả</option>
-								<option value='SUPER_ADMIN'>Super Admin</option>
 								<option value='SYSTEM_ADMIN'>
 									System Admin
 								</option>

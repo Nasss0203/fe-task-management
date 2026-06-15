@@ -39,30 +39,31 @@ export type AdminBillingPlanPayload = {
 };
 
 export type GrantAdminSubscriptionPayload = {
-	workspaceId: string;
+	userId: string;
 	planId: string;
 	months?: number;
 	note?: string;
 };
 
 export type GrantAdminSubscriptionResult = {
-	workspaceId: string;
+	userId: string;
 	subscriptionId: string;
 	planId: string;
-	ownerId: string;
+	affectedWorkspaceIds: string[];
 	currentPeriodStart: string;
 	currentPeriodEnd: string | null;
 };
 
 export type RevokeAdminSubscriptionPayload = {
-	workspaceId: string;
+	userId: string;
 	note?: string;
 };
 
 export type RevokeAdminSubscriptionResult = {
-	workspaceId: string;
+	userId: string;
 	revoked: true;
 	subscriptionId: string | null;
+	affectedWorkspaceIds: string[];
 };
 
 export type CancelAdminSubscriptionPayload = {

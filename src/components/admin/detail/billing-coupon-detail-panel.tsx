@@ -171,7 +171,9 @@ export function BillingCouponDetailPanel({ coupon, onClose, onSave }: Props) {
 
 								<div>
 									<label className='mb-2 block text-sm text-neutral-400'>
-										Giá trị
+										{form.type === "FIXED"
+											? "Giá trị (VND)"
+											: "Giá trị"}
 									</label>
 									<input
 										type='number'

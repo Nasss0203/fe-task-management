@@ -9,16 +9,12 @@ import {
 	DrawerHeader,
 	DrawerTitle,
 } from "@/components/ui/drawer";
-import type {
-	PlanTypeWorkspace,
-	WorkspaceItem,
-} from "@/services/admin/workspace/type";
+import type { WorkspaceItem } from "@/services/admin/workspace/type";
 import {
 	ArchiveX,
 	CalendarDays,
 	Clock3,
 	Copy,
-	Crown,
 	FolderKanban,
 	LayoutDashboard,
 	ListChecks,
@@ -28,12 +24,6 @@ import {
 type Props = {
 	workspace: WorkspaceItem | null;
 	onClose: () => void;
-	onChangePlan: (
-		workspaceId: string,
-		plan: PlanTypeWorkspace,
-	) => Promise<void> | void;
-	isChangingPlan?: boolean;
-	canGrantPro?: boolean;
 };
 
 const formatDate = (value?: string | null) => {
@@ -99,9 +89,6 @@ const getWorkspacePlanLabel = (plan: WorkspaceItem["plan"]) => {
 export function WorkspaceDetailPanel({
 	workspace,
 	onClose,
-	onChangePlan,
-	isChangingPlan = false,
-	canGrantPro = true,
 }: Props) {
 	const handleOpenChange = (nextOpen: boolean) => {
 		if (!nextOpen) {
@@ -115,20 +102,7 @@ export function WorkspaceDetailPanel({
 		await navigator.clipboard.writeText(workspace.id);
 	};
 
-	const handleSavePlan = () => {
-		if (!workspace) return;
-
-		onChangePlan(workspace.id, workspace.plan === "pro" ? "free" : "pro");
-	};
-
 	if (!workspace) return null;
-
-	const isDeleted = workspace.status === "DELETED";
-	const nextPlanLabel = workspace.plan === "pro" ? "Chuyển về Free" : "Nâng lên Pro";
-	const isUpgradeDisabled =
-		isDeleted ||
-		isChangingPlan ||
-		(workspace.plan !== "pro" && !canGrantPro);
 
 	return (
 		<Drawer
@@ -328,40 +302,6 @@ export function WorkspaceDetailPanel({
 							</div>
 						</div>
 
-						<div className='rounded-2xl border border-white/10 bg-[#111111] p-4'>
-							<h3 className='mb-4 text-sm font-semibold uppercase tracking-wide text-neutral-500'>
-								Chuyển gói workspace
-							</h3>
-
-							<div className='flex flex-col gap-2 sm:flex-row'>
-								<Button
-									type='button'
-									disabled={isUpgradeDisabled}
-									onClick={handleSavePlan}
-									className='h-11 w-full shrink-0 rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-white hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto'
-								>
-									<Crown className='mr-2 h-4 w-4' />
-									{isChangingPlan
-										? "Đang cập nhật..."
-										: nextPlanLabel}
-								</Button>
-							</div>
-
-							{isDeleted && (
-								<p className='mt-2 text-xs text-amber-400'>
-									Workspace đã xóa mềm nên chưa thể chuyển
-									gói.
-								</p>
-							)}
-
-							{!isDeleted &&
-								workspace.plan !== "pro" &&
-								!canGrantPro && (
-									<p className='mt-2 text-xs text-amber-400'>
-										Không tìm thấy gói Pro đang hoạt động.
-									</p>
-								)}
-						</div>
 					</div>
 				</div>
 

@@ -9,9 +9,11 @@ import type {
 } from "./billing-admin.types";
 
 export function formatCurrency(amount: number) {
-	return new Intl.NumberFormat("en-US", {
+	return new Intl.NumberFormat("vi-VN", {
 		style: "currency",
-		currency: "USD",
+		currency: "VND",
+		currencyDisplay: "symbol",
+		minimumFractionDigits: 0,
 		maximumFractionDigits: 0,
 	}).format(amount);
 }

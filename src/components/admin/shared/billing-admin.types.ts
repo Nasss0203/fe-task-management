@@ -48,10 +48,9 @@ export type BillingPayment = {
 export type WorkspaceSubscription = {
 	rowId: string;
 	id: string;
-	workspaceId: string;
-	workspaceName: string;
-	ownerName: string;
-	ownerEmail: string;
+	userId: string;
+	userName: string;
+	userEmail: string;
 	planCode: string;
 	planName: string;
 	status: SubscriptionStatus;

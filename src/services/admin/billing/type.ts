@@ -245,16 +245,11 @@ export const normalizeAdminBillingSubscription = (
 ): WorkspaceSubscription => {
 	const source = isRecord(item) ? item : {};
 	const plan = getRecord(source, "plan");
-	const workspace =
-		getRecord(source, "workspace") ??
-		getRecord(source, "targetWorkspace") ??
-		getRecord(source, "subscriptionWorkspace");
-	const owner = getRecord(source, "owner") ?? getRecord(source, "user");
+	const user = getRecord(source, "user") ?? getRecord(source, "owner");
 
 	const id = getString(source, ["id"]);
-	const workspaceId =
-		getString(source, ["workspaceId", "targetWorkspaceId"]) ||
-		getString(workspace ?? {}, ["workspaceId", "id"]);
+	const userId =
+		getString(source, ["userId"]) || getString(user ?? {}, ["userId", "id"]);
 	const planCode = getString(source, ["planCode"]) || getString(plan ?? {}, ["code", "slug", "id"]);
 	const planName = getString(source, ["planName"]) || getString(plan ?? {}, ["name"], planCode);
 	const paymentHistory = [
@@ -267,18 +262,15 @@ export const normalizeAdminBillingSubscription = (
 	return {
 		rowId:
 			getString(source, ["rowId"]) ||
-			[id, workspaceId, planCode].filter(Boolean).join(":"),
+			[id, userId, planCode].filter(Boolean).join(":"),
 		id,
-		workspaceId,
-		workspaceName:
-			getString(source, ["workspaceName"]) ||
-			getString(workspace ?? {}, ["workspaceName", "name"], "-"),
-		ownerName:
-			getString(source, ["ownerName"]) ||
-			getString(owner ?? {}, ["name", "fullName", "email"], "-"),
-		ownerEmail:
-			getString(source, ["ownerEmail"]) ||
-			getString(owner ?? {}, ["email"], "-"),
+		userId,
+		userName:
+			getString(source, ["userName"]) ||
+			getString(user ?? {}, ["displayName", "fullName", "username", "email"], "-"),
+		userEmail:
+			getString(source, ["userEmail"]) ||
+			getString(user ?? {}, ["email"], "-"),
 		planCode: normalizeCode(planCode || planName || "PLAN"),
 		planName,
 		status: normalizeSubscriptionStatus(source),

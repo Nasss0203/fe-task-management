@@ -50,3 +50,15 @@ export const useVerifyVnpayReturn = () => {
 		verifyPaymentReturn,
 	};
 };
+
+export const useVerifyStripeCheckout = () => {
+	const { verifyStripeCheckout } = billingService;
+	const verifyPaymentReturn = useMutation({
+		mutationKey: [PLAN_KEY.VERIFY_VNPAY_RETURN, "STRIPE"],
+		mutationFn: (sessionId: string) => verifyStripeCheckout(sessionId),
+	});
+
+	return {
+		verifyPaymentReturn,
+	};
+};

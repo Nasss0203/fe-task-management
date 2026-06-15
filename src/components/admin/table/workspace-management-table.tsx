@@ -8,10 +8,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type {
-	PlanTypeWorkspace,
-	WorkspaceItem,
-} from "@/services/admin/workspace/type";
+import type { WorkspaceItem } from "@/services/admin/workspace/type";
 import type { OnChangeFn, PaginationState } from "@tanstack/react-table";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import {
@@ -20,7 +17,6 @@ import {
 	Ellipsis,
 	Eye,
 	RefreshCcw,
-	ShieldCheck,
 } from "lucide-react";
 
 type Props = {
@@ -30,7 +26,6 @@ type Props = {
 	totalRows: number;
 	onPaginationChange: OnChangeFn<PaginationState>;
 	onView: (workspace: WorkspaceItem) => void;
-	onChangePlan: (workspaceId: string, plan: PlanTypeWorkspace) => void;
 };
 
 const getInitials = (name: string) => {
@@ -111,7 +106,6 @@ export function WorkspaceManagementTable({
 	totalRows,
 	onPaginationChange,
 	onView,
-	onChangePlan,
 }: Props) {
 	const table = useReactTable({
 		data: workspaces,
@@ -166,8 +160,6 @@ export function WorkspaceManagementTable({
 					<tbody className='divide-y divide-white/5'>
 						{table.getRowModel().rows.map((row) => {
 							const workspace = row.original;
-							const nextPlan: PlanTypeWorkspace =
-								workspace.plan === "pro" ? "free" : "pro";
 
 							return (
 								<tr
@@ -274,29 +266,6 @@ export function WorkspaceManagementTable({
 														<Eye className='mr-2 h-4 w-4' />
 														Xem chi tiết
 													</DropdownMenuItem>
-
-													{workspace.status !==
-														"DELETED" && (
-														<>
-															<DropdownMenuSeparator className='my-1 bg-white/10' />
-
-															<DropdownMenuItem
-																onClick={() =>
-																	onChangePlan(
-																		workspace.id,
-																		nextPlan,
-																	)
-																}
-																className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-white/5 focus:text-white'
-															>
-																<ShieldCheck className='mr-2 h-4 w-4' />
-																{workspace.plan ===
-																"pro"
-																	? "Chuyển về Free"
-																	: "Nâng lên Pro"}
-															</DropdownMenuItem>
-														</>
-													)}
 
 													{workspace.status ===
 														"DELETED" && (

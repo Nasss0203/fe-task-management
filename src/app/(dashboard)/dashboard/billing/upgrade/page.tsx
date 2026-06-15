@@ -33,6 +33,7 @@ import {
 	ShieldCheck,
 	Smartphone,
 	Sparkles,
+	CreditCard,
 	WalletCards,
 } from "lucide-react";
 import Link from "next/link";
@@ -72,6 +73,12 @@ const PAYMENT_METHODS: PaymentMethod[] = [
 		title: "VNPay",
 		description: "Thanh toan qua cong VNPAY, QR, ATM hoac banking.",
 		icon: WalletCards,
+	},
+	{
+		provider: BillingProvider.STRIPE,
+		title: "Visa / Mastercard",
+		description: "Thanh toan the quoc te an toan qua Stripe Checkout.",
+		icon: CreditCard,
 	},
 ];
 
@@ -268,13 +275,13 @@ function UpgradeBillingContent() {
 							<CardHeader>
 								<CardTitle>Choose payment method</CardTitle>
 								<CardDescription>
-									Chon Manual, MoMo hoac VNPay. Frontend chi
-									redirect den paymentUrl cua phuong thuc da
-									chon.
+									Chon phuong thuc thanh toan. Visa va
+									Mastercard se duoc xu ly an toan boi Stripe
+									Checkout.
 								</CardDescription>
 							</CardHeader>
 							<CardContent>
-								<div className='grid gap-3 md:grid-cols-3'>
+								<div className='grid gap-3 sm:grid-cols-2 xl:grid-cols-4'>
 									{PAYMENT_METHODS.map((method) => {
 										const Icon = method.icon;
 										const isSelected =

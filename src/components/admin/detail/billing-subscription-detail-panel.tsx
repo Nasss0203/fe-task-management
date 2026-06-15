@@ -120,20 +120,17 @@ export function BillingSubscriptionDetailPanel({
 							<div className='space-y-3 text-sm'>
 								<div>
 									<p className='text-neutral-500'>
-										Workspace
+										User
 									</p>
 									<p className='text-white'>
-										{form.workspaceName}
+										{form.userName}
 									</p>
 								</div>
 
 								<div>
-									<p className='text-neutral-500'>Owner</p>
-									<p className='text-white'>
-										{form.ownerName}
-									</p>
+									<p className='text-neutral-500'>Email</p>
 									<p className='text-xs text-neutral-500'>
-										{form.ownerEmail}
+										{form.userEmail}
 									</p>
 								</div>
 
