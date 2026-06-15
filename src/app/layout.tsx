@@ -2,11 +2,11 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/config/theme-provider";
 import { RealtimeProviderWrapper } from "@/providers/RealtimeProviderWrapper";
 import type { Metadata } from "next";
-import { Outfit, JetBrains_Mono } from "next/font/google";
+import { Montserrat, JetBrains_Mono } from "next/font/google";
 import Providers from "../config/providers";
 import "./globals.css";
 
-const outfitSans = Outfit({
+const montserrat = Montserrat({
 	variable: "--font-geist-sans", // Keeping variable name same to prevent breakage in tailwind config if hardcoded somewhere, though CSS maps it.
 	subsets: ["latin"],
 	display: "swap",
@@ -31,7 +31,7 @@ export default function RootLayout({
 	return (
 		<html lang='en' suppressHydrationWarning>
 			<body
-				className={`antialiased ${outfitSans.variable} ${jetbrainsMono.variable} font-sans`}
+				className={`antialiased ${montserrat.variable} ${jetbrainsMono.variable} font-sans`}
 			>
 				<ThemeProvider
 					attribute='class'

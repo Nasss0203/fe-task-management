@@ -1,10 +1,10 @@
 "use client";
 
-import type { LocalComment } from "@/components/drawer/task-detail/task-detail-types";
-import { formatCommentTime } from "@/components/drawer/task-detail/task-detail-utils";
+import { useGetComments, useCreateComment, useUpdateComment, useDeleteComment } from "./useComments";
 import type { GetMeResponse } from "@/services/auth/type";
 import type { TaskItem } from "@/services/task/type";
 import * as React from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 type TaskDetailCommentsUser = GetMeResponse | undefined;
 
@@ -14,49 +14,89 @@ export function useTaskDetailComments(
 ) {
 	const [commentDraft, setCommentDraft] = React.useState("");
 	const [composerOpen, setComposerOpen] = React.useState(false);
-	const [comments, setComments] = React.useState<LocalComment[]>([]);
+	const [editingCommentId, setEditingCommentId] = React.useState<string | null>(null);
+
+	const { data: comments = [], isLoading } = useGetComments(
+		task.workspaceId,
+		task.projectId,
+		task.id,
+	);
+
+	const createCommentMutation = useCreateComment();
+	const updateCommentMutation = useUpdateComment();
+	const deleteCommentMutation = useDeleteComment();
 
 	React.useEffect(() => {
 		setCommentDraft("");
 		setComposerOpen(false);
-		setComments([]);
+		setEditingCommentId(null);
 	}, [task.id]);
 
 	const handleSaveComment = () => {
 		const trimmed = commentDraft.trim();
 
-		if (!trimmed) return;
+		if (!trimmed || !user) return;
 
-		const now = new Date();
+		if (editingCommentId) {
+			updateCommentMutation.mutate({
+				workspaceId: task.workspaceId,
+				projectId: task.projectId,
+				taskId: task.id,
+				commentId: editingCommentId,
+				content: trimmed,
+			});
+		} else {
+			createCommentMutation.mutate({
+				workspaceId: task.workspaceId,
+				projectId: task.projectId,
+				taskId: task.id,
+				content: trimmed,
+			});
+		}
 
-		setComments((current) => [
-			{
-				id: `${task.id}-${now.getTime()}`,
-				authorName: user?.username ?? "You",
-				authorAvatar: user?.avatarUrl,
-				body: trimmed,
-				createdAt: formatCommentTime(now),
-			},
-			...current,
-		]);
 		setCommentDraft("");
 		setComposerOpen(false);
+		setEditingCommentId(null);
 	};
 
 	const handleCancelComment = () => {
 		setCommentDraft("");
 		setComposerOpen(false);
+		setEditingCommentId(null);
+	};
+
+	const handleEditComment = (commentId: string, content: string) => {
+		setEditingCommentId(commentId);
+		setCommentDraft(content);
+		setComposerOpen(true);
+	};
+
+	const handleDeleteComment = (commentId: string) => {
+		deleteCommentMutation.mutate({
+			workspaceId: task.workspaceId,
+			projectId: task.projectId,
+			taskId: task.id,
+			commentId,
+		});
 	};
 
 	return {
 		items: comments,
+		isLoading,
 		draft: commentDraft,
 		composerOpen,
+		editingCommentId,
+		currentUserId: user?.id,
 		currentUsername: user?.username ?? "You",
 		currentUserAvatar: user?.avatarUrl,
 		onComposerFocus: () => setComposerOpen(true),
 		onDraftChange: setCommentDraft,
 		onCancel: handleCancelComment,
 		onSave: handleSaveComment,
+		onEdit: handleEditComment,
+		isSaving: createCommentMutation.isPending,
+		onDelete: handleDeleteComment,
+		isUpdating: updateCommentMutation.isPending,
+		isDeleting: deleteCommentMutation.isPending,
 	};
 }

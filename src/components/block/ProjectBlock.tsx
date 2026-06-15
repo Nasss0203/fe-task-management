@@ -1,11 +1,13 @@
 import { BoardItem, BoardViewType } from "@/services/board/type";
-import { type LucideIcon, Kanban, Table2, ListTodo, Calendar, Presentation, Image as ImageIcon, FolderKanban } from "lucide-react";
+import { type LucideIcon, Kanban, Table2, ListTodo, Calendar, Presentation, Image as ImageIcon, FolderKanban, ListFilter, ArrowDown } from "lucide-react";
 import AddBoard from "@/features/board/components/board/AddBoard";
 import { BOARD_VIEW_CONFIG } from "@/features/board/components/board/view-board";
 import { TabsListCustom, TabsTriggerCustom } from "../tabs";
 import { Separator } from "../ui/separator";
 import { Tabs } from "../ui/tabs"; import { useBoards } from "@/features/board/hooks/useBoards";
 import { toast } from "sonner";
+import { Button } from "../ui/button";
+import { ProjectTaskFilter } from "../filter/ProjectTaskFilter";
 
 export type AvailableTabItem = {
 	icon: LucideIcon;
@@ -98,6 +100,8 @@ const ProjectBlock = ({
 									/>
 								)}
 							</div>
+
+							<ProjectTaskFilter workspaceId={workspaceId} projectId={projectId} />
 						</div>
 						<Separator />
 					</>

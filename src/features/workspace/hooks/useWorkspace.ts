@@ -13,6 +13,7 @@ import {
 	softDeleteWorkspaceApi,
 	updateWorkspaceApi,
 	updateWorkspaceLayoutModeApi,
+	removeWorkspaceFromUserTrashApi,
 } from "@/services/workspace/workspace.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -136,6 +137,23 @@ export const useWorkspace = () => {
 		},
 	});
 
+	const removeWorkspaceFromUserTrash = useMutation({
+		mutationFn: removeWorkspaceFromUserTrashApi,
+		onSuccess: async () => {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: [WORKSPACE_KEY.WORKSPACE_TRASH],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [WORKSPACE_KEY.WORKSPACE],
+				}),
+			]);
+		},
+		onError: (err) => {
+			console.error("removeWorkspaceFromUserTrashApi failed", err);
+		},
+	});
+
 	return {
 		createWorkspace,
 		workspaceFindAll,
@@ -144,5 +162,6 @@ export const useWorkspace = () => {
 		workspaceTrash,
 		softDeleteWorkspace,
 		restoreWorkspace,
+		removeWorkspaceFromUserTrash,
 	};
 };

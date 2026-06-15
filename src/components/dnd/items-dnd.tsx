@@ -4,9 +4,6 @@ import type { TaskItem } from "@/services/task/type";
 import { useSortable } from "@dnd-kit/react/sortable";
 import * as React from "react";
 import { ItemView } from "./item-view";
-import { usePermission } from "@/features/permission/hooks/usePermission";
-import { useUser } from "@/features/auth/hooks/useUser";
-import { PERMISSIONS } from "@/constants/permissions";
 
 type ItemsDndProps = {
 	id: string;
@@ -68,35 +65,28 @@ const ItemsDnd = ({
 	}, [isDragging]);
 
 	return (
-		<div
+		<ItemView
 			ref={ref}
+			id={id}
+			task={task}
+			status={status}
+			name={name}
+			priority={priority}
+			assignees={assignees}
+			startAt={startAt}
+			dueAt={dueAt}
+			description={description}
+			onUpdateName={onUpdateName}
+			onOpenDetail={onOpenDetail}
+			isReadOnly={false}
+			style={{ opacity: isDragging ? 0.4 : 1 }}
 			onClick={(event) => {
 				const target = event.target as HTMLElement | null;
-
-				if (target?.closest("[data-prevent-open-detail='true']")) {
+				if (target?.closest("[data-prevent-open-detail='true']"))
 					return;
-				}
-
-				if (!preventOpenDetail) {
-					onOpenDetail?.(id);
-				}
+				if (!preventOpenDetail) onOpenDetail?.(id);
 			}}
-		>
-			<ItemView
-				id={id}
-				task={task}
-				status={status}
-				name={name}
-				priority={priority}
-				assignees={assignees}
-				startAt={startAt}
-				dueAt={dueAt}
-				description={description}
-				onUpdateName={onUpdateName}
-				onOpenDetail={onOpenDetail}
-				isReadOnly={false}
-			/>
-		</div>
+		/>
 	);
 };
 

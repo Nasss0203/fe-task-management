@@ -1,5 +1,5 @@
 export type TemplateItem = {
-	id: number;
+	id: string | number;
 	title: string;
 	description: string;
 	variant:

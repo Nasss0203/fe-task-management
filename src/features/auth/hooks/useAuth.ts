@@ -45,14 +45,8 @@ export const useRegister = () => {
 		mutationFn: async (data: RegisterDto) => {
 			const result = await registerApi(data);
 
-			if (typeof window !== "undefined") {
-				setStoredAccessToken(result.data.access_token);
-
-				if (result.data.refresh_token) {
-					await setSessionCookie(result.data.refresh_token);
-				}
-			}
-
+			// Token is no longer returned or set on registration
+			// User must verify email first
 			return result;
 		},
 	});
@@ -71,6 +65,42 @@ export const useLogout = () => {
 			await clearStoredAuth();
 			queryClient.clear();
 			router.replace("/");
+		},
+	});
+};
+
+export const useVerifyEmail = () => {
+	return useMutation({
+		mutationFn: async (data: { token: string }) => {
+			const { verifyEmailApi } = await import("@/services/auth/auth.service");
+			return verifyEmailApi(data);
+		},
+	});
+};
+
+export const useResendVerification = () => {
+	return useMutation({
+		mutationFn: async (data: { email: string }) => {
+			const { resendVerificationApi } = await import("@/services/auth/auth.service");
+			return resendVerificationApi(data);
+		},
+	});
+};
+
+export const useForgotPassword = () => {
+	return useMutation({
+		mutationFn: async (data: { email: string }) => {
+			const { forgotPasswordApi } = await import("@/services/auth/auth.service");
+			return forgotPasswordApi(data);
+		},
+	});
+};
+
+export const useResetPassword = () => {
+	return useMutation({
+		mutationFn: async (data: { token: string; newPassword: string }) => {
+			const { resetPasswordApi } = await import("@/services/auth/auth.service");
+			return resetPasswordApi(data);
 		},
 	});
 };

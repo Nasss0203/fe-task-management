@@ -67,9 +67,13 @@ const serializeBacklogFilters = (filters?: FindBacklogTasksFilters) => {
 export const findAllTaskApi = async (
 	workspaceId: string,
 	projectId: string,
+	filters?: FindBacklogTasksFilters,
 ): Promise<FindAllTaskResponse> => {
 	const response = await instance.get<FindAllTaskResponse>(
 		`/tasks/workspace/${workspaceId}/project/${projectId}`,
+		{
+			params: serializeBacklogFilters(filters),
+		},
 	);
 
 	return response.data;

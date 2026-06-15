@@ -17,9 +17,11 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Separator } from "@/components/ui/separator";
 import { useRegister } from "@/features/auth/hooks/useAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { FaApple } from "react-icons/fa";
@@ -41,7 +43,8 @@ const formSchema = z.object({
 		.max(100, "Description must be at most 100 characters."),
 });
 const SignUp = () => {
-	const { mutate } = useRegister();
+	const router = useRouter();
+	const { mutate, isPending } = useRegister();
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -52,21 +55,21 @@ const SignUp = () => {
 	});
 
 	function onSubmit(data: z.infer<typeof formSchema>) {
-		toast("You submitted the following values:", {
-			description: (
-				<pre className='bg-code text-code-foreground mt-2 w-[320px] overflow-x-auto rounded-md p-4'>
-					<code>{JSON.stringify(data, null, 2)}</code>
-				</pre>
-			),
-			position: "bottom-right",
-			classNames: {
-				content: "flex flex-col gap-2",
+		mutate(data, {
+			onSuccess: () => {
+				toast.success("Đăng ký thành công!", {
+					description: "Vui lòng kiểm tra email của bạn để xác minh tài khoản.",
+					position: "bottom-right",
+				});
+				router.push("/sign-in");
 			},
-			style: {
-				"--border-radius": "calc(var(--radius)  + 4px)",
-			} as React.CSSProperties,
+			onError: (err: any) => {
+				toast.error("Đăng ký thất bại", {
+					description: err?.response?.data?.message || "Đã xảy ra lỗi.",
+					position: "bottom-right",
+				});
+			}
 		});
-		mutate(data);
 	}
 	return (
 		<div className='w-125  flex items-center'>
@@ -144,13 +147,12 @@ const SignUp = () => {
 										<FieldLabel htmlFor='form-rhf-demo-title'>
 											Password
 										</FieldLabel>
-										<Input
+										<PasswordInput
 											{...field}
 											id='form-rhf-demo-title'
 											aria-invalid={fieldState.invalid}
-											placeholder='Login button not working on mobile'
+											placeholder='Nhập mật khẩu'
 											autoComplete='off'
-											type='password'
 										/>
 										{fieldState.invalid && (
 											<FieldError

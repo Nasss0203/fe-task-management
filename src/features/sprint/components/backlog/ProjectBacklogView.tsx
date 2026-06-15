@@ -7,8 +7,12 @@ import { Input } from "@/components/ui/input";
 
 import { useSprints } from "@/features/sprint/hooks/useSprint";
 import { useTask, useTaskMoveSprint } from "@/features/task/hooks/useTask";
-
+import { sprintReportService } from "@/services/sprint_report/sprint_report.service";
+import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useMemo } from "react";
+import { BarChart2 } from "lucide-react";
 import { ProviderSprintDnd } from "@/components/dnd/backlog-sprint/ProviderSprintDnd";
 import SprintProjectSection from "../spints/SprintProjectSection";
 import BacklogSection from "./BacklogSection";
@@ -27,6 +31,9 @@ const ProjectBacklogView = ({
 
 	const { taskQuery } = useTask(workspaceId, projectId);
 	const allTasks = taskQuery.data?.data ?? [];
+	const { slug } = useParams();
+
+
 
 	const initialItems = useMemo(() => {
 		const items: Record<string, string[]> = { backlog: [] };
@@ -148,6 +155,8 @@ const ProjectBacklogView = ({
 						projectId={projectId as string}
 						workspaceId={workspaceId as string}
 					/>
+
+
 				</div>
 			</ProviderSprintDnd>
 		</div>

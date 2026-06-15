@@ -16,11 +16,11 @@ import { Bell } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { SettingsAccessSection } from "@/features/workspace/components/settings/SettingsAccessSection";
 import { SettingsBoardSection } from "@/features/workspace/components/settings/SettingsBoardSection";
 import { SettingsDangerSection } from "@/features/workspace/components/settings/SettingsDangerSection";
 import { SettingsDetailsSection } from "@/features/workspace/components/settings/SettingsDetailsSection";
 import { SettingsFeaturesSection } from "@/features/workspace/components/settings/SettingsFeaturesSection";
+import { SettingsTemplateSection } from "@/features/workspace/components/settings/SettingsTemplateSection";
 import { SettingsSidebar } from "@/features/workspace/components/settings/SettingsSidebar";
 import { SETTINGS_NAV, type SettingsSection } from "@/features/workspace/components/settings/types";
 
@@ -188,34 +188,29 @@ const WorkspaceSettingsContent = ({
 						/>
 					)}
 
-					{activeSection === "access" && (
-						<SettingsAccessSection
-							members={members}
-							isMembersLoading={isMembersLoading}
-							workspaceId={workspace.id}
-							onAddPeople={() => setOpenAddPeopleDialog(true)}
-						/>
+
+					{activeSection === "preferences" && (
+						<div className="space-y-6">
+							<SettingsFeaturesSection
+								sprintFeature={sprintFeature}
+								sprintPlanEnabled={sprintPlanEnabled}
+								sprintEnabled={sprintEnabled}
+								isFeatureLoading={isFeatureLoading}
+								isUpdatingFeature={isUpdatingFeature}
+								canUpdate={can(PERMISSIONS.WORKSPACE_FEATURE_UPDATE)}
+								onToggleSprint={handleToggleSprint}
+							/>
+							<SettingsBoardSection
+								currentLayoutMode={workspace.layoutMode}
+								isUpdatingLayout={isUpdatingLayout}
+								canUpdate={can(PERMISSIONS.WORKSPACE_UPDATE)}
+								onUpdateLayoutMode={handleUpdateLayoutMode}
+							/>
+						</div>
 					)}
 
-					{activeSection === "features" && (
-						<SettingsFeaturesSection
-							sprintFeature={sprintFeature}
-							sprintPlanEnabled={sprintPlanEnabled}
-							sprintEnabled={sprintEnabled}
-							isFeatureLoading={isFeatureLoading}
-							isUpdatingFeature={isUpdatingFeature}
-							canUpdate={can(PERMISSIONS.WORKSPACE_FEATURE_UPDATE)}
-							onToggleSprint={handleToggleSprint}
-						/>
-					)}
-
-					{activeSection === "board" && (
-						<SettingsBoardSection
-							currentLayoutMode={workspace.layoutMode}
-							isUpdatingLayout={isUpdatingLayout}
-							canUpdate={can(PERMISSIONS.WORKSPACE_UPDATE)}
-							onUpdateLayoutMode={handleUpdateLayoutMode}
-						/>
+					{activeSection === "template" && (
+						<SettingsTemplateSection workspaceId={workspace.id} />
 					)}
 
 					{activeSection === "danger" && (

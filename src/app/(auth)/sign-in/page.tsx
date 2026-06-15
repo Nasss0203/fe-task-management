@@ -17,8 +17,9 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Separator } from "@/components/ui/separator";
-import { useLogin } from "@/features/auth/hooks/useAuth";
+import { useLogin, useResendVerification } from "@/features/auth/hooks/useAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -26,6 +27,7 @@ import { Controller, useForm } from "react-hook-form";
 import { FaApple } from "react-icons/fa";
 import z from "zod";
 import { SystemRole } from "@/services/auth/type";
+import { toast } from "sonner";
 
 const formSchema = z.object({
 	email: z
@@ -49,6 +51,8 @@ const SignIn = () => {
 
 	const { mutate, isPending } = useLogin();
 
+	const { mutate: resendVerify } = useResendVerification();
+
 	function onSubmit(data: z.infer<typeof formSchema>) {
 		mutate(data, {
 			onSuccess: (userData) => {
@@ -63,6 +67,27 @@ const SignIn = () => {
 					router.push("/dashboard");
 				}
 			},
+			onError: (err: any) => {
+				const errorCode = err?.response?.data?.code;
+				if (errorCode === "EMAIL_NOT_VERIFIED") {
+					toast.error("Tài khoản chưa được xác minh", {
+						description: "Vui lòng kiểm tra email của bạn để xác minh tài khoản.",
+						action: {
+							label: "Gửi lại email",
+							onClick: () => {
+								resendVerify({ email: data.email }, {
+									onSuccess: () => toast.success("Đã gửi lại email xác nhận", { description: "Vui lòng kiểm tra hộp thư của bạn." }),
+									onError: () => toast.error("Có lỗi xảy ra khi gửi lại email")
+								});
+							}
+						}
+					});
+				} else {
+					toast.error("Đăng nhập thất bại", {
+						description: err?.response?.data?.message || "Sai email hoặc mật khẩu",
+					});
+				}
+			}
 		});
 	}
 	return (
@@ -116,13 +141,12 @@ const SignIn = () => {
 										<FieldLabel htmlFor='form-rhf-demo-title'>
 											Password
 										</FieldLabel>
-										<Input
+										<PasswordInput
 											{...field}
 											id='form-rhf-demo-title'
 											aria-invalid={fieldState.invalid}
-											placeholder='Login button not working on mobile'
+											placeholder='Nhập mật khẩu'
 											autoComplete='off'
-											type='password'
 										/>
 										{fieldState.invalid && (
 											<FieldError
@@ -138,9 +162,9 @@ const SignIn = () => {
 							className='flex items-center justify-between'
 						>
 							<div></div>
-							<div className='text-xs hover:underline cursor-pointer'>
+							<Link href='/forgot-password' className='text-xs hover:underline cursor-pointer'>
 								Forgot password?
-							</div>
+							</Link>
 						</Field>
 						<Field orientation='horizontal'>
 							<Button
