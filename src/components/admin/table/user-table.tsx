@@ -13,6 +13,7 @@ import type { OnChangeFn, PaginationState } from "@tanstack/react-table";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import {
 	Clock3,
+	Crown,
 	Ellipsis,
 	Eye,
 	History,
@@ -41,6 +42,9 @@ type Props = {
 	onToggleLock: (userId: string) => void;
 	onToggleAdmin: (userId: string) => void;
 	onResetStatus: (userId: string) => void;
+	onChangePlan: (user: AdminUser) => void;
+	isChangingPlan?: boolean;
+	canGrantPro?: boolean;
 };
 
 export function UserTable({
@@ -53,6 +57,9 @@ export function UserTable({
 	onToggleLock,
 	onToggleAdmin,
 	onResetStatus,
+	onChangePlan,
+	isChangingPlan = false,
+	canGrantPro = true,
 }: Props) {
 	const table = useReactTable({
 		data: users,
@@ -79,7 +86,7 @@ export function UserTable({
 	return (
 		<>
 		<div className='overflow-x-auto'>
-			<table className='w-full min-w-295 border-separate border-spacing-y-3'>
+			<table className='w-full min-w-320 border-separate border-spacing-y-3'>
 				<thead>
 					<tr className='text-left text-sm text-neutral-500'>
 						<th className='px-4 py-2 font-medium'>User</th>
@@ -88,6 +95,7 @@ export function UserTable({
 						<th className='px-4 py-2 font-medium'>
 							Vai trò hệ thống
 						</th>
+						<th className='px-4 py-2 font-medium'>Gói</th>
 						<th className='px-4 py-2 font-medium'>
 							Không gian làm việc
 						</th>
@@ -149,6 +157,18 @@ export function UserTable({
 										)}`}
 									>
 										{getStatusLabel(user.status)}
+									</span>
+								</td>
+
+								<td className='border-y border-white/5 bg-[#101010] px-4 py-4'>
+									<span
+										className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${
+											user.plan === "pro"
+												? "border-sky-500/20 bg-sky-500/10 text-sky-400"
+												: "border-white/10 bg-white/5 text-neutral-300"
+										}`}
+									>
+										{user.plan === "pro" ? "Pro" : "Free"}
 									</span>
 								</td>
 
@@ -237,6 +257,31 @@ export function UserTable({
 
 												{!isSuperAdmin && (
 													<>
+														<DropdownMenuSeparator className='my-1 bg-white/10' />
+
+														<DropdownMenuItem
+															disabled={
+																isChangingPlan ||
+																(user.plan !==
+																	"pro" &&
+																	!canGrantPro)
+															}
+															onClick={() =>
+																onChangePlan(
+																	user,
+																)
+															}
+															className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-white/5 focus:text-white disabled:cursor-not-allowed disabled:opacity-50'
+														>
+															<Crown className='mr-2 h-4 w-4' />
+															{isChangingPlan
+																? "Đang cập nhật..."
+																: user.plan ===
+																	  "pro"
+																	? "Chuyển về Free"
+																	: "Cấp Pro"}
+														</DropdownMenuItem>
+
 														<DropdownMenuSeparator className='my-1 bg-white/10' />
 
 														<DropdownMenuItem

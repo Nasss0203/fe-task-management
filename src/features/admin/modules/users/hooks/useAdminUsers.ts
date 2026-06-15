@@ -1,6 +1,5 @@
 "use client";
 
-import { getUserGrowthApi } from "@/services/admin/dashboard/user-growth";
 import {
 	findAllAdminUsersApi,
 	getAdminUserOverviewApi,
@@ -8,7 +7,11 @@ import {
 	unlockAdminUserApi,
 	updateAdminUserSystemRoleApi,
 } from "@/services/admin/user/user-admin.service";
-import type { UserGrowthPeriod } from "@/services/admin/dashboard/type";
+import {
+	getAdminBillingPlansApi,
+	grantAdminBillingSubscriptionApi,
+	revokeAdminBillingSubscriptionApi,
+} from "@/services/admin/billing/billing-admin.service";
 import type {
 	AdminFindAllUserQuery,
 	AdminUserPaginationResponse,
@@ -21,13 +24,10 @@ import { isSystemAdmin } from "@/lib/auth/system-role";
 export const ADMIN_USERS_KEY = {
 	USER_OVERVIEW: "ADMIN_USER_OVERVIEW",
 	USER_LIST: "ADMIN_USER_LIST",
-	USER_GROWTH: "ADMIN_USER_GROWTH",
+	BILLING_PLANS: "ADMIN_USER_BILLING_PLANS",
 } as const;
 
-export const useAdminUsers = (
-	query?: AdminFindAllUserQuery,
-	userGrowthPeriod: UserGrowthPeriod = "7d",
-) => {
+export const useAdminUsers = (query?: AdminFindAllUserQuery) => {
 	const queryClient = useQueryClient();
 	const { user } = useUser();
 	const canAccessAdmin = isSystemAdmin(user);
@@ -48,11 +48,12 @@ export const useAdminUsers = (
 		enabled: canAccessAdmin,
 	});
 
-	const userGrowth = useQuery({
-		queryKey: [ADMIN_USERS_KEY.USER_GROWTH, userGrowthPeriod],
-		queryFn: () => getUserGrowthApi(userGrowthPeriod),
+	const billingPlans = useQuery({
+		queryKey: [ADMIN_USERS_KEY.BILLING_PLANS],
+		queryFn: getAdminBillingPlansApi,
 		retry: false,
 		refetchOnWindowFocus: false,
+		enabled: canAccessAdmin,
 	});
 
 	const invalidateUsers = async () => {
@@ -62,6 +63,9 @@ export const useAdminUsers = (
 			}),
 			queryClient.invalidateQueries({
 				queryKey: [ADMIN_USERS_KEY.USER_LIST],
+			}),
+			queryClient.invalidateQueries({
+				queryKey: ["ADMIN_WORKSPACE_LIST"],
 			}),
 		]);
 	};
@@ -81,12 +85,24 @@ export const useAdminUsers = (
 		onSuccess: invalidateUsers,
 	});
 
+	const grantSubscription = useMutation({
+		mutationFn: grantAdminBillingSubscriptionApi,
+		onSuccess: invalidateUsers,
+	});
+
+	const revokeSubscription = useMutation({
+		mutationFn: revokeAdminBillingSubscriptionApi,
+		onSuccess: invalidateUsers,
+	});
+
 	return {
 		userOverview,
 		users,
-		userGrowth,
+		billingPlans,
 		lockUser,
 		unlockUser,
 		updateSystemRole,
+		grantSubscription,
+		revokeSubscription,
 	};
 };

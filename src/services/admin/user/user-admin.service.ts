@@ -31,14 +31,17 @@ export const findAllAdminUsersApi = async (
 	);
 
 	if (Array.isArray(response.data.data)) {
+		const total = response.data.data.length;
+		const pageSize = query?.pageSize ?? total;
+
 		return {
 			...response.data,
 			data: {
 				data: response.data.data,
-				total: response.data.data.length,
+				total,
 				page: query?.page ?? 1,
-				pageSize: query?.pageSize ?? response.data.data.length,
-				totalPages: 1,
+				pageSize,
+				totalPages: pageSize > 0 ? Math.ceil(total / pageSize) : 0,
 			},
 		};
 	}

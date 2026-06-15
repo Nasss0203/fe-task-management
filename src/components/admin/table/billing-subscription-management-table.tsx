@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
 	Clock3,
+	CreditCard,
 	Ellipsis,
 	Eye,
 	RefreshCcw,
@@ -21,6 +22,25 @@ import {
 	getSubscriptionStatusClass,
 	getSubscriptionStatusLabel,
 } from "../shared/billing-admin.utils";
+
+const getPaymentMethodLabel = (paymentMethod: string) => {
+	switch (paymentMethod.toUpperCase()) {
+		case "VISA":
+			return "Visa";
+		case "MASTERCARD":
+			return "Mastercard";
+		case "STRIPE":
+			return "Stripe";
+		case "VNPAY":
+			return "VNPay";
+		case "MOMO":
+			return "MoMo";
+		case "MANUAL":
+			return "Thủ công";
+		default:
+			return paymentMethod || "Không xác định";
+	}
+};
 
 type Props = {
 	subscriptions: WorkspaceSubscription[];
@@ -68,14 +88,14 @@ export function BillingSubscriptionManagementTable({
 			</div>
 
 			<div className='overflow-x-auto'>
-				<table className='w-full min-w-[1260px] border-collapse'>
+				<table className='w-full min-w-[1240px] border-collapse'>
 					<thead>
 						<tr className='border-b border-white/10 text-left text-xs uppercase tracking-[0.12em] text-neutral-500'>
-							<th className='px-5 py-3 font-medium'>Workspace</th>
-							<th className='px-4 py-3 font-medium'>Owner</th>
+							<th className='px-5 py-3 font-medium'>User</th>
 							<th className='px-4 py-3 font-medium'>Plan</th>
 							<th className='px-4 py-3 font-medium'>Trạng thái</th>
 							<th className='px-4 py-3 font-medium'>Chu kỳ</th>
+							<th className='px-4 py-3 font-medium'>Thanh toán</th>
 							<th className='px-4 py-3 font-medium'>Amount</th>
 							<th className='px-4 py-3 font-medium'>Gia hạn</th>
 							<th className='px-4 py-3 font-medium'>Coupon</th>
@@ -94,21 +114,10 @@ export function BillingSubscriptionManagementTable({
 								<td className='px-5 py-4'>
 									<div className='space-y-1'>
 										<p className='font-medium text-white'>
-											{subscription.workspaceName}
+											{subscription.userName}
 										</p>
 										<p className='text-xs text-neutral-500'>
-											{subscription.workspaceId}
-										</p>
-									</div>
-								</td>
-
-								<td className='px-4 py-4'>
-									<div className='space-y-1'>
-										<p className='font-medium text-white'>
-											{subscription.ownerName}
-										</p>
-										<p className='text-xs text-neutral-500'>
-											{subscription.ownerEmail}
+											{subscription.userEmail}
 										</p>
 									</div>
 								</td>
@@ -138,6 +147,15 @@ export function BillingSubscriptionManagementTable({
 
 								<td className='px-4 py-4 text-neutral-300'>
 									{getCycleLabel(subscription.billingCycle)}
+								</td>
+
+								<td className='px-4 py-4'>
+									<span className='inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-neutral-200'>
+										<CreditCard className='h-3.5 w-3.5 text-neutral-400' />
+										{getPaymentMethodLabel(
+											subscription.paymentMethod,
+										)}
+									</span>
 								</td>
 
 								<td className='px-4 py-4 text-white'>

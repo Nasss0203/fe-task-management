@@ -8,6 +8,7 @@ import {
 import { Ellipsis, Eye, Power } from "lucide-react";
 import type { BillingCoupon } from "../shared/billing-admin.types";
 import {
+	formatCurrency,
 	formatDate,
 	getCouponStatusClass,
 	getCouponStatusLabel,
@@ -95,7 +96,7 @@ export function BillingCouponManagementTable({
 									{coupon.type === "PERCENT"
 										? `${coupon.value}%`
 										: coupon.type === "FIXED"
-											? `$${coupon.value}`
+											? formatCurrency(coupon.value)
 											: `${coupon.value} ngày`}
 								</td>
 

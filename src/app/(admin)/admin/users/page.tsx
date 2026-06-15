@@ -7,7 +7,6 @@ import { UserAdminHeader } from "@/components/admin/header/user-admin-header";
 import { UsersOverview } from "@/components/admin/overview/user-overview-cards";
 import { UserTable } from "@/components/admin/table/user-table";
 import { useAdminUsers } from "@/features/admin/modules/users/hooks/useAdminUsers";
-import type { UserGrowthPeriod } from "@/services/admin/dashboard/type";
 import type {
 	AdminFindAllUserQuery,
 	AdminSystemRole,
@@ -16,6 +15,7 @@ import type {
 } from "@/services/admin/user/type";
 import type { PaginationState } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 const formatQueryDate = (date?: Date) => {
 	if (!date) return undefined;
@@ -38,9 +38,6 @@ export default function AdminUsersPage() {
 		pageIndex: 0,
 		pageSize: 10,
 	});
-	const [userGrowthPeriod, setUserGrowthPeriod] =
-		useState<UserGrowthPeriod>("7d");
-
 	const userQuery = useMemo<AdminFindAllUserQuery>(() => {
 		return {
 			search: search.trim() || undefined,
@@ -55,15 +52,35 @@ export default function AdminUsersPage() {
 	const {
 		userOverview,
 		users,
-		userGrowth,
+		billingPlans,
 		lockUser,
 		unlockUser,
 		updateSystemRole,
-	} = useAdminUsers(userQuery, userGrowthPeriod);
+		grantSubscription,
+		revokeSubscription,
+	} = useAdminUsers(userQuery);
 
 	const overview = userOverview.data?.data;
 	const userPage = users.data?.data;
-	const userItems = userPage?.data ?? [];
+	const userItems = useMemo(() => userPage?.data ?? [], [userPage?.data]);
+	const proPlan = useMemo(() => {
+		const activePlans =
+			billingPlans.data?.filter((item) => item.status === "ACTIVE") ?? [];
+
+		return (
+			activePlans.find(
+				(item) =>
+					item.slug?.toLowerCase() === "pro-monthly" ||
+					item.code.toLowerCase() === "pro_monthly",
+			) ??
+			activePlans.find(
+				(item) =>
+					item.slug?.toLowerCase() !== "free" &&
+					item.code.toLowerCase() !== "free",
+			) ??
+			null
+		);
+	}, [billingPlans.data]);
 	const visibleUserItems = useMemo(() => {
 		if (userItems.length <= pagination.pageSize) {
 			return userItems;
@@ -74,8 +91,6 @@ export default function AdminUsersPage() {
 
 		return userItems.slice(start, end);
 	}, [userItems, pagination]);
-	const userGrowthItems = userGrowth.data?.data ?? [];
-
 	const resetToFirstPage = () => {
 		setPagination((current) => ({ ...current, pageIndex: 0 }));
 	};
@@ -135,6 +150,49 @@ export default function AdminUsersPage() {
 		unlockUser.mutate(userId);
 	};
 
+	const handleChangePlan = async (user: AdminUser) => {
+		const nextPlan = user.plan === "pro" ? "free" : "pro";
+
+		try {
+			if (nextPlan === "pro") {
+				if (!proPlan) {
+					toast.error("Không tìm thấy gói Pro đang hoạt động.");
+					return;
+				}
+
+				await grantSubscription.mutateAsync({
+					userId: user.id,
+					planId: proPlan.id,
+					months: 1,
+					note: "Granted from admin user management",
+				});
+				toast.success(
+					"Đã cấp Pro cho user và toàn bộ workspace sở hữu.",
+				);
+			} else {
+				await revokeSubscription.mutateAsync({
+					userId: user.id,
+					note: "Revoked from admin user management",
+				});
+				toast.success(
+					"Đã chuyển user và toàn bộ workspace sở hữu về Free.",
+				);
+			}
+
+			setSelectedUser((current) =>
+				current?.id === user.id
+					? {
+							...current,
+							plan: nextPlan,
+						}
+					: current,
+			);
+		} catch (error) {
+			console.error("change user billing subscription failed", error);
+			toast.error("Không thể cập nhật gói của user.");
+		}
+	};
+
 	const handleResetFilters = () => {
 		setSearch("");
 		setStatus("all");
@@ -151,9 +209,6 @@ export default function AdminUsersPage() {
 
 			<UserManagementInsightCharts
 				overview={overview}
-				growthData={userGrowth.isError ? [] : userGrowthItems}
-				period={userGrowthPeriod}
-				onPeriodChange={setUserGrowthPeriod}
 			/>
 
 			<div className='rounded-2xl border border-white/10 bg-[#0b0b0b] p-4 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset] md:p-5'>
@@ -193,6 +248,12 @@ export default function AdminUsersPage() {
 							onToggleLock={handleToggleLock}
 							onToggleAdmin={handleToggleAdmin}
 							onResetStatus={handleResetStatus}
+							onChangePlan={handleChangePlan}
+							isChangingPlan={
+								grantSubscription.isPending ||
+								revokeSubscription.isPending
+							}
+							canGrantPro={Boolean(proPlan)}
 						/>
 					)}
 				</div>

@@ -11,8 +11,11 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useVerifyVnpayReturn } from "@/features/billing/hooks/usePlan";
+import {
+	useVerifyVnpayReturn,
+} from "@/features/billing/hooks/usePlan";
 import { PLAN_KEY } from "@/features/billing/types/type";
+import { billingService } from "@/services/billing/billing.service";
 import type { PaymentReturnResult } from "@/services/billing/type";
 import { WORKSPACE_KEY } from "@/services/workspace/type";
 import { useQueryClient } from "@tanstack/react-query";
@@ -33,6 +36,31 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
 type PaymentStatus = "loading" | "success" | "failed";
+
+const STRIPE_VERIFY_ATTEMPTS = 3;
+const STRIPE_VERIFY_DELAY_MS = 500;
+const stripeVerificationRequests = new Map<
+	string,
+	ReturnType<typeof billingService.verifyStripeCheckout>
+>();
+
+const delay = (milliseconds: number) =>
+	new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+const verifyStripeCheckoutOnce = (sessionId: string) => {
+	const existingRequest = stripeVerificationRequests.get(sessionId);
+	if (existingRequest) return existingRequest;
+
+	const request = billingService.verifyStripeCheckout(sessionId);
+	stripeVerificationRequests.set(sessionId, request);
+
+	void request.then(
+		() => stripeVerificationRequests.delete(sessionId),
+		() => stripeVerificationRequests.delete(sessionId),
+	);
+
+	return request;
+};
 
 const formatCurrency = (amount?: number, currency = "VND") => {
 	if (typeof amount !== "number") return "-";
@@ -86,27 +114,61 @@ function PaymentReturnContent() {
 	const searchParams = useSearchParams();
 	const queryString = searchParams.toString();
 	const queryClient = useQueryClient();
-	const { verifyPaymentReturn } = useVerifyVnpayReturn();
-	const { mutateAsync } = verifyPaymentReturn;
+	const { verifyPaymentReturn: verifyVnpayReturn } = useVerifyVnpayReturn();
+	const verifyVnpay = verifyVnpayReturn.mutateAsync;
 	const [status, setStatus] = useState<PaymentStatus>("loading");
 	const [message, setMessage] = useState("Dang xac nhan thanh toan...");
 	const [paymentResult, setPaymentResult] =
 		useState<PaymentReturnResult | null>(null);
 	const vnpOrderCode = searchParams.get("vnp_TxnRef") ?? undefined;
 	const vnpResponseCode = searchParams.get("vnp_ResponseCode") ?? undefined;
+	const stripeSessionId = searchParams.get("session_id") ?? undefined;
+	const isStripeReturn =
+		searchParams.get("provider") === "stripe" || Boolean(stripeSessionId);
 
 	useEffect(() => {
 		let isMounted = true;
 
 		const verifyPayment = async () => {
-			if (!queryString) {
+			if (!queryString || (isStripeReturn && !stripeSessionId)) {
 				setStatus("failed");
 				setMessage("Khong tim thay thong tin thanh toan.");
 				return;
 			}
 
 			try {
-				const response = await mutateAsync(queryString);
+				let response;
+
+				if (isStripeReturn) {
+					let lastError: unknown;
+
+					for (
+						let attempt = 1;
+						attempt <= STRIPE_VERIFY_ATTEMPTS;
+						attempt += 1
+					) {
+						try {
+							response =
+								await verifyStripeCheckoutOnce(
+									stripeSessionId!,
+								);
+							break;
+						} catch (error) {
+							lastError = error;
+
+							if (attempt < STRIPE_VERIFY_ATTEMPTS) {
+								await delay(STRIPE_VERIFY_DELAY_MS);
+							}
+						}
+					}
+
+					if (!response) {
+						throw lastError;
+					}
+				} else {
+					response = await verifyVnpay(queryString);
+				}
+
 				const result = response.data;
 				const isCompleted =
 					result.completed === true ||
@@ -117,7 +179,10 @@ function PaymentReturnContent() {
 				setPaymentResult(result);
 
 				if (isCompleted) {
-					await Promise.all([
+					setStatus("success");
+					setMessage("Nang cap Pro thanh cong.");
+
+					await Promise.allSettled([
 						queryClient.invalidateQueries({
 							queryKey: [PLAN_KEY.PLAN_INFOR],
 						}),
@@ -129,8 +194,6 @@ function PaymentReturnContent() {
 						}),
 					]);
 
-					setStatus("success");
-					setMessage("Nang cap Pro thanh cong.");
 					return;
 				}
 
@@ -142,7 +205,7 @@ function PaymentReturnContent() {
 			} catch (error) {
 				if (!isMounted) return;
 
-				console.error("verify VNPAY return failed", error);
+				console.error("verify payment return failed", error);
 				setStatus("failed");
 				setMessage("Xac nhan thanh toan that bai. Vui long thu lai.");
 			}
@@ -153,13 +216,23 @@ function PaymentReturnContent() {
 		return () => {
 			isMounted = false;
 		};
-	}, [mutateAsync, queryClient, queryString]);
+	}, [
+		isStripeReturn,
+		queryClient,
+		queryString,
+		stripeSessionId,
+		verifyVnpay,
+	]);
 
 	const isLoading = status === "loading";
 	const isSuccess = status === "success";
 	const provider =
 		paymentResult?.provider ??
-		(searchParams.has("vnp_TmnCode") ? "VNPAY" : undefined);
+		(isStripeReturn
+			? "STRIPE"
+			: searchParams.has("vnp_TmnCode")
+				? "VNPAY"
+				: undefined);
 	const orderCode = paymentResult?.orderCode ?? vnpOrderCode;
 	const paymentStatus =
 		paymentResult?.status ??
@@ -197,7 +270,9 @@ function PaymentReturnContent() {
 									done={!isLoading}
 									icon={<CreditCard className='size-3.5' />}
 								>
-									VNPAY result received
+									{isStripeReturn
+										? "Stripe payment confirmed"
+										: "VNPAY result received"}
 								</StepItem>
 								<StepItem
 									done={isSuccess}
@@ -209,7 +284,9 @@ function PaymentReturnContent() {
 							<Separator />
 							<p className='text-sm leading-6 text-muted-foreground'>
 								{isLoading
-									? "He thong dang verify chu ky VNPAY va dong bo subscription. Vui long khong dong trang nay."
+									? isStripeReturn
+										? "He thong dang doi chieu Stripe Checkout va dong bo subscription. Vui long khong dong trang nay."
+										: "He thong dang verify chu ky VNPAY va dong bo subscription. Vui long khong dong trang nay."
 									: isSuccess
 										? "Subscription va workspace limits da duoc cap nhat. Ban co the quay lai dashboard de tiep tuc lam viec."
 										: "Neu tai khoan da bi tru tien, hay gui order code cho support de doi soat giao dich."}
@@ -267,8 +344,16 @@ function PaymentReturnContent() {
 									)}
 								/>
 								<DetailRow
-									label='VNPAY code'
-									value={vnpResponseCode}
+									label={
+										isStripeReturn
+											? "Stripe status"
+											: "VNPAY code"
+									}
+									value={
+										isStripeReturn
+											? paymentResult?.stripePaymentStatus
+											: vnpResponseCode
+									}
 								/>
 							</div>
 						</div>

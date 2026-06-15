@@ -53,4 +53,17 @@ export const billingService = {
 
 		return data;
 	},
+
+	verifyStripeCheckout: async (
+		sessionId: string,
+	): Promise<ApiResponse<PaymentReturnResult>> => {
+		const { data } = await instance.get<ApiResponse<PaymentReturnResult>>(
+			`/billing/stripe/checkout-session/${encodeURIComponent(sessionId)}`,
+			{
+				timeout: 15000,
+			},
+		);
+
+		return data;
+	},
 };

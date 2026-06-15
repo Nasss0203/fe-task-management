@@ -20,6 +20,7 @@ export enum BillingProvider {
 	MANUAL = "MANUAL",
 	MOMO = "MOMO",
 	VNPAY = "VNPAY",
+	STRIPE = "STRIPE",
 }
 
 export interface Plan {
@@ -64,6 +65,8 @@ export interface PaymentReturnResult {
 	currency?: string;
 	status?: string;
 	message?: string;
+	stripeSessionStatus?: string;
+	stripePaymentStatus?: string;
 }
 
 export interface BillingPlanReponse {
