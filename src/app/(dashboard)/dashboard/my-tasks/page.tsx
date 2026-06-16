@@ -67,12 +67,11 @@ function BoardRow({ workspace }: { workspace: DashboardWorkspaceResponseDto }) {
 			<div className='min-w-0'>
 				<p className='truncate text-[14px] font-semibold text-foreground group-hover:text-primary transition-colors'>{workspace.name}</p>
 				<p className='mt-1.5 text-[11px] font-medium text-muted-foreground'>
-					{workspace.projectCount} {workspace.projectCount === 1 ? 'project' : 'projects'} <span className="text-muted-foreground/50 mx-1">•</span> {workspace.openTaskCount} open
-					tasks
+					{workspace.projectCount} dự án <span className="text-muted-foreground/50 mx-1">•</span> {workspace.openTaskCount} tác vụ đang mở
 				</p>
 			</div>
 			<span className='text-[12px] font-semibold text-blue-600 dark:text-blue-400 opacity-0 transition-all group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0'>
-				Open
+				Mở
 			</span>
 		</Link>
 	);
@@ -114,10 +113,10 @@ export default function MyTasksPage() {
 			<main className='flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto pb-10'>
 				<div className='rounded-2xl border border-border bg-muted/20 p-8'>
 					<h1 className='text-xl font-bold tracking-tight text-foreground'>
-						Failed to load tasks
+						Không thể tải tác vụ
 					</h1>
 					<p className='mt-2 text-sm text-muted-foreground'>
-						Please refresh the page to try again.
+						Vui lòng tải lại trang để thử lại.
 					</p>
 				</div>
 			</main>
@@ -143,31 +142,31 @@ export default function MyTasksPage() {
 	}[] = [
 			{
 				key: "worked",
-				label: "Worked on",
+				label: "Đã thực hiện",
 				count: tasks.length,
 				icon: ListTodo,
 			},
 			{
 				key: "viewed",
-				label: "Viewed",
+				label: "Đã xem",
 				count: dashboard.recentDeadlines.length,
 				icon: Eye,
 			},
 			{
 				key: "assigned",
-				label: "Assigned to me",
+				label: "Được giao cho tôi",
 				count: tasks.length,
 				icon: UserRound,
 			},
 			{
 				key: "starred",
-				label: "Starred",
+				label: "Có gắn sao",
 				count: 0,
 				icon: Star,
 			},
 			{
 				key: "boards",
-				label: "Boards",
+				label: "Bảng",
 				count: dashboard.recentWorkspaces.length,
 				icon: BriefcaseBusiness,
 			},
@@ -178,21 +177,21 @@ export default function MyTasksPage() {
 			<div className='flex w-full min-w-0 flex-col gap-10 max-w-7xl'>
 				<header className='border-b border-border/60 pb-6 pt-4'>
 					<h1 className='text-3xl font-bold tracking-tight text-foreground'>
-						For you
+						Dành cho bạn
 					</h1>
 					<p className='mt-2 text-[14px] text-muted-foreground'>
-						A quick overview of your active tasks and recent workspaces.
+						Tổng quan nhanh về các tác vụ đang hoạt động và không gian làm việc gần đây của bạn.
 					</p>
 				</header>
 
 				<section className='space-y-5'>
 					<div className='flex items-center justify-between gap-4 px-1'>
-						<h2 className='text-[15px] font-semibold text-foreground'>Recent spaces</h2>
+						<h2 className='text-[15px] font-semibold text-foreground'>Không gian làm việc gần đây</h2>
 						<Link
 							href='/dashboard'
 							className='text-[13px] font-semibold text-muted-foreground hover:text-foreground transition-colors'
 						>
-							View all spaces
+							Xem tất cả không gian làm việc
 						</Link>
 					</div>
 
@@ -211,7 +210,7 @@ export default function MyTasksPage() {
 						</div>
 					) : (
 						<div className='rounded-2xl border border-dashed border-border bg-muted/20 p-8 text-center text-[13px] font-medium text-muted-foreground'>
-							No recent workspaces found.
+							Không tìm thấy không gian làm việc gần đây.
 						</div>
 					)}
 				</section>
@@ -245,7 +244,7 @@ export default function MyTasksPage() {
 
 						<div className='pt-6'>
 							<p className='mb-4 px-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground'>
-								In the last month
+								Trong tháng trước
 							</p>
 
 							<TabsContent value='worked' className='mt-0'>
@@ -265,7 +264,7 @@ export default function MyTasksPage() {
 										))
 									) : (
 										<div className='rounded-2xl border border-dashed border-border bg-muted/20 p-8 text-center text-[13px] font-medium text-muted-foreground mt-2'>
-											No matching work items found.
+											Không tìm thấy mục công việc phù hợp.
 										</div>
 									)}
 								</div>
@@ -290,7 +289,7 @@ export default function MyTasksPage() {
 										)
 									) : (
 										<div className='rounded-2xl border border-dashed border-border bg-muted/20 p-8 text-center text-[13px] font-medium text-muted-foreground mt-2'>
-											No viewed work items found.
+											Không tìm thấy mục công việc đã xem.
 										</div>
 									)}
 								</div>
@@ -313,7 +312,7 @@ export default function MyTasksPage() {
 										))
 									) : (
 										<div className='rounded-2xl border border-dashed border-border bg-muted/20 p-8 text-center text-[13px] font-medium text-muted-foreground mt-2'>
-											No assigned work items found.
+											Không tìm thấy mục công việc được giao.
 										</div>
 									)}
 								</div>
@@ -321,7 +320,7 @@ export default function MyTasksPage() {
 
 							<TabsContent value='starred' className='mt-0'>
 								<div className='rounded-2xl border border-dashed border-border bg-muted/20 p-8 text-center text-[13px] font-medium text-muted-foreground mt-2'>
-									No starred work items found.
+									Không tìm thấy mục công việc có gắn sao.
 								</div>
 							</TabsContent>
 

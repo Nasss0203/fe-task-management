@@ -50,9 +50,6 @@ const ListView = ({ board }: BoardViewProps) => (
 	/>
 );
 
-const Timeline = ({ board }: BoardViewProps) => (
-	<div>Tiimeline - {board.name}</div>
-);
 
 const Backlog = ({ context = "workspace" }: BoardViewProps) => (
 	<BoardBacklog context={context} />

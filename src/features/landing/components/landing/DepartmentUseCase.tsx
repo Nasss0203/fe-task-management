@@ -8,17 +8,17 @@ import {
 import { Button } from "@/components/ui/button";
 
 const departmentTabs = [
-	"Engineering",
-	"Product",
+	"Kỹ thuật",
+	"Sản phẩm",
 	"Marketing",
-	"Operations",
-	"Company-wide",
+	"Vận hành",
+	"Toàn công ty",
 ];
 
 const engineeringPoints = [
-	"Write technical specs and link directly to tracking issues.",
-	"Track sprint progress with integrated Kanban boards.",
-	"Collaborate on architectural decisions in real-time.",
+	"Viết đặc tả kỹ thuật và liên kết trực tiếp tới các lỗi đang theo dõi.",
+	"Theo dõi tiến độ sprint với các bảng Kanban được tích hợp.",
+	"Cộng tác đưa ra quyết định kiến trúc theo thời gian thực.",
 ];
 
 const DepartmentUseCase = () => {
@@ -27,14 +27,14 @@ const DepartmentUseCase = () => {
 			<div className='grid gap-12 lg:grid-cols-2 lg:items-start'>
 				<div>
 					<h2 className='text-4xl font-semibold leading-tight tracking-tight text-foreground sm:text-5xl'>
-						Built for every workflow.
+						Được xây dựng cho mọi quy trình.
 					</h2>
 				</div>
 
 				<div>
 					<p className='text-lg text-muted-foreground'>
-						Discover how different teams use Taskmanly to track work
-						and document knowledge side-by-side, without missing a beat.
+						Khám phá cách các đội ngũ khác nhau sử dụng Taskmanly để theo dõi công việc
+						và tài liệu hóa kiến thức song song, mà không bỏ lỡ một nhịp nào.
 					</p>
 				</div>
 			</div>
@@ -66,15 +66,15 @@ const DepartmentUseCase = () => {
 									</div>
 									<div>
 										<h3 className='text-lg font-semibold text-foreground'>
-											Engineering Wiki
+											Wiki Kỹ thuật
 										</h3>
 										<p className='text-xs text-muted-foreground'>
-											Documentation · Q3 2026
+											Tài liệu · Quý 3 2026
 										</p>
 									</div>
 								</div>
 								<div className='rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-500 dark:text-emerald-400'>
-									Synced
+									Đã đồng bộ
 								</div>
 							</div>
 
@@ -100,12 +100,12 @@ const DepartmentUseCase = () => {
 
 				<div className='flex flex-col justify-center py-8'>
 					<h3 className='text-3xl font-semibold tracking-tight text-foreground sm:text-4xl'>
-						Ship faster, document better.
+						Ra mắt nhanh hơn, tài liệu hóa tốt hơn.
 					</h3>
 
 					<p className='mt-6 text-lg text-muted-foreground'>
-						Maximize resource effectiveness and confidently expand
-						the workflow of any sprint with precision.
+						Tối đa hóa hiệu quả nguồn lực và tự tin mở rộng
+						quy trình công việc của bất kỳ sprint nào với độ chính xác cao.
 					</p>
 
 					<div className='mt-10 space-y-5'>
@@ -123,7 +123,7 @@ const DepartmentUseCase = () => {
 
 					<div className='mt-12'>
 						<Button className='h-12 rounded-full bg-primary px-8 font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.98]'>
-							Explore Engineering
+							Khám phá bộ Kỹ thuật
 						</Button>
 					</div>
 				</div>

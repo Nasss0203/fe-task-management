@@ -144,8 +144,20 @@ export function useTaskDetailFields(task: TaskItem) {
 		}
 	};
 
+	const handleDescriptionChange = async (description: string) => {
+		try {
+			await updateTaskMutate({
+				id: task.id,
+				description,
+			});
+		} catch (error) {
+			console.error("Failed to update task description", error);
+		}
+	};
+
 	return {
 		isUpdatingTask,
+		updateDescription: handleDescriptionChange,
 		status: {
 			open: statusOpen,
 			onOpenChange: setStatusOpen,

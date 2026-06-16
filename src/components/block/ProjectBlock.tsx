@@ -8,6 +8,8 @@ import { Tabs } from "../ui/tabs"; import { useBoards } from "@/features/board/h
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { ProjectTaskFilter } from "../filter/ProjectTaskFilter";
+import DialogAddTask from "../dialog/DialogAddTask";
+import { Plus } from "lucide-react";
 
 export type AvailableTabItem = {
 	icon: LucideIcon;
@@ -91,17 +93,25 @@ const ProjectBlock = ({
 									})}
 								</TabsListCustom>
 
-								{blockId && (
-									<AddBoard
-										blockId={blockId}
-										boards={boards}
-										projectId={projectId}
-										workspaceId={workspaceId}
-									/>
-								)}
+								<AddBoard
+									blockId={blockId}
+									boards={boards}
+									projectId={projectId}
+									workspaceId={workspaceId}
+								/>
 							</div>
 
-							<ProjectTaskFilter workspaceId={workspaceId} projectId={projectId} />
+							<div className="flex items-center gap-2">
+								<ProjectTaskFilter workspaceId={workspaceId} projectId={projectId} />
+								<DialogAddTask 
+									trigger={
+										<Button size="sm" className="h-8 gap-1.5 px-3 rounded-md text-xs font-medium shadow-sm">
+											<Plus className="size-3.5" />
+											<span>Tạo công việc</span>
+										</Button>
+									} 
+								/>
+							</div>
 						</div>
 						<Separator />
 					</>
@@ -121,22 +131,20 @@ const ProjectBlock = ({
 									Chọn một chế độ xem để bắt đầu hiển thị dữ liệu trên trang này.
 								</p>
 
-								{blockId && (
-									<div className="flex flex-wrap gap-2 ml-8">
-										<button onClick={() => handleCreateBoard(BoardViewType.BOARD, 'Theo trạng thái')} disabled={createBoard.isPending} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/50 text-xs hover:bg-accent hover:text-accent-foreground transition-colors">
-											<Kanban size={14} className="text-amber-500" /> Board
-										</button>
-										<button onClick={() => handleCreateBoard(BoardViewType.TABLE, 'Bảng tính')} disabled={createBoard.isPending} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/50 text-xs hover:bg-accent hover:text-accent-foreground transition-colors">
-											<Table2 size={14} className="text-blue-500" /> Table
-										</button>
-										<button onClick={() => handleCreateBoard(BoardViewType.LIST, 'Danh sách')} disabled={createBoard.isPending} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/50 text-xs hover:bg-accent hover:text-accent-foreground transition-colors">
-											<ListTodo size={14} className="text-emerald-500" /> List
-										</button>
-										<button onClick={() => handleCreateBoard(BoardViewType.CALENDAR, 'Lịch')} disabled={createBoard.isPending} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/50 text-xs hover:bg-accent hover:text-accent-foreground transition-colors">
-											<Calendar size={14} className="text-rose-500" /> Calendar
-										</button>
-									</div>
-								)}
+								<div className="flex flex-wrap gap-2 ml-8">
+									<button onClick={() => handleCreateBoard(BoardViewType.BOARD, 'Theo trạng thái')} disabled={createBoard.isPending} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/50 text-xs hover:bg-accent hover:text-accent-foreground transition-colors">
+										<Kanban size={14} className="text-amber-500" /> Board
+									</button>
+									<button onClick={() => handleCreateBoard(BoardViewType.TABLE, 'Bảng tính')} disabled={createBoard.isPending} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/50 text-xs hover:bg-accent hover:text-accent-foreground transition-colors">
+										<Table2 size={14} className="text-blue-500" /> Table
+									</button>
+									<button onClick={() => handleCreateBoard(BoardViewType.LIST, 'Danh sách')} disabled={createBoard.isPending} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/50 text-xs hover:bg-accent hover:text-accent-foreground transition-colors">
+										<ListTodo size={14} className="text-emerald-500" /> List
+									</button>
+									<button onClick={() => handleCreateBoard(BoardViewType.CALENDAR, 'Lịch')} disabled={createBoard.isPending} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/50 text-xs hover:bg-accent hover:text-accent-foreground transition-colors">
+										<Calendar size={14} className="text-rose-500" /> Calendar
+									</button>
+								</div>
 							</div>
 						) : (
 							<div className="flex flex-col items-center justify-center text-center animate-in fade-in slide-in-from-bottom-4 duration-700 mt-20 mb-20">
@@ -145,52 +153,50 @@ const ProjectBlock = ({
 								</div>
 								<h3 className="text-2xl font-semibold mb-3 tracking-tight">Dự án của bạn đang trống</h3>
 
-								{blockId && (
-									<div className="bg-background/50 border shadow-sm rounded-2xl w-full max-w-3xl backdrop-blur-sm p-6 border-border/60">
-										<h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-5 text-left ml-1">Chọn chế độ xem đầu tiên</h4>
-										<div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-											<button onClick={() => handleCreateBoard(BoardViewType.BOARD, 'Theo trạng thái')} disabled={createBoard.isPending} className="flex flex-col items-start gap-3 p-4 rounded-xl border border-border/50 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all text-sm text-foreground group text-left">
-												<div className="p-2.5 rounded-lg bg-amber-500/10 text-amber-500 group-hover:scale-110 transition-transform">
-													<Kanban size={20} />
-												</div>
-												<div>
-													<div className="font-semibold text-base mb-0.5">Board</div>
-													<div className="text-xs text-muted-foreground">Bảng Kanban</div>
-												</div>
-											</button>
+								<div className="bg-background/50 border shadow-sm rounded-2xl w-full max-w-3xl backdrop-blur-sm p-6 border-border/60">
+									<h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-5 text-left ml-1">Chọn chế độ xem đầu tiên</h4>
+									<div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+										<button onClick={() => handleCreateBoard(BoardViewType.BOARD, 'Theo trạng thái')} disabled={createBoard.isPending} className="flex flex-col items-start gap-3 p-4 rounded-xl border border-border/50 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all text-sm text-foreground group text-left">
+											<div className="p-2.5 rounded-lg bg-amber-500/10 text-amber-500 group-hover:scale-110 transition-transform">
+												<Kanban size={20} />
+											</div>
+											<div>
+												<div className="font-semibold text-base mb-0.5">Board</div>
+												<div className="text-xs text-muted-foreground">Bảng Kanban</div>
+											</div>
+										</button>
 
-											<button onClick={() => handleCreateBoard(BoardViewType.TABLE, 'Bảng tính')} disabled={createBoard.isPending} className="flex flex-col items-start gap-3 p-4 rounded-xl border border-border/50 hover:border-blue-500/30 hover:bg-blue-500/5 transition-all text-sm text-foreground group text-left">
-												<div className="p-2.5 rounded-lg bg-blue-500/10 text-blue-500 group-hover:scale-110 transition-transform">
-													<Table2 size={20} />
-												</div>
-												<div>
-													<div className="font-semibold text-base mb-0.5">Table</div>
-													<div className="text-xs text-muted-foreground">Dạng bảng lưới</div>
-												</div>
-											</button>
+										<button onClick={() => handleCreateBoard(BoardViewType.TABLE, 'Bảng tính')} disabled={createBoard.isPending} className="flex flex-col items-start gap-3 p-4 rounded-xl border border-border/50 hover:border-blue-500/30 hover:bg-blue-500/5 transition-all text-sm text-foreground group text-left">
+											<div className="p-2.5 rounded-lg bg-blue-500/10 text-blue-500 group-hover:scale-110 transition-transform">
+												<Table2 size={20} />
+											</div>
+											<div>
+												<div className="font-semibold text-base mb-0.5">Table</div>
+												<div className="text-xs text-muted-foreground">Dạng bảng lưới</div>
+											</div>
+										</button>
 
-											<button onClick={() => handleCreateBoard(BoardViewType.LIST, 'Danh sách')} disabled={createBoard.isPending} className="flex flex-col items-start gap-3 p-4 rounded-xl border border-border/50 hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all text-sm text-foreground group text-left">
-												<div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-500 group-hover:scale-110 transition-transform">
-													<ListTodo size={20} />
-												</div>
-												<div>
-													<div className="font-semibold text-base mb-0.5">List</div>
-													<div className="text-xs text-muted-foreground">Danh sách cơ bản</div>
-												</div>
-											</button>
+										<button onClick={() => handleCreateBoard(BoardViewType.LIST, 'Danh sách')} disabled={createBoard.isPending} className="flex flex-col items-start gap-3 p-4 rounded-xl border border-border/50 hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all text-sm text-foreground group text-left">
+											<div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-500 group-hover:scale-110 transition-transform">
+												<ListTodo size={20} />
+											</div>
+											<div>
+												<div className="font-semibold text-base mb-0.5">List</div>
+												<div className="text-xs text-muted-foreground">Danh sách cơ bản</div>
+											</div>
+										</button>
 
-											<button onClick={() => handleCreateBoard(BoardViewType.CALENDAR, 'Lịch')} disabled={createBoard.isPending} className="flex flex-col items-start gap-3 p-4 rounded-xl border border-border/50 hover:border-rose-500/30 hover:bg-rose-500/5 transition-all text-sm text-foreground group text-left">
-												<div className="p-2.5 rounded-lg bg-rose-500/10 text-rose-500 group-hover:scale-110 transition-transform">
-													<Calendar size={20} />
-												</div>
-												<div>
-													<div className="font-semibold text-base mb-0.5">Calendar</div>
-													<div className="text-xs text-muted-foreground">Theo lịch biểu</div>
-												</div>
-											</button>
-										</div>
+										<button onClick={() => handleCreateBoard(BoardViewType.CALENDAR, 'Lịch')} disabled={createBoard.isPending} className="flex flex-col items-start gap-3 p-4 rounded-xl border border-border/50 hover:border-rose-500/30 hover:bg-rose-500/5 transition-all text-sm text-foreground group text-left">
+											<div className="p-2.5 rounded-lg bg-rose-500/10 text-rose-500 group-hover:scale-110 transition-transform">
+												<Calendar size={20} />
+											</div>
+											<div>
+												<div className="font-semibold text-base mb-0.5">Calendar</div>
+												<div className="text-xs text-muted-foreground">Theo lịch biểu</div>
+											</div>
+										</button>
 									</div>
-								)}
+								</div>
 							</div>
 						)
 					) : (

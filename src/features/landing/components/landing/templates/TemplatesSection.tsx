@@ -30,7 +30,7 @@ export default function TemplatesSection() {
 		return {
 			id: template.id,
 			title: template.name,
-			description: template.description || "A complete workspace template for your team.",
+			description: template.description || "Một mẫu không gian làm việc hoàn chỉnh cho đội ngũ của bạn.",
 			variant,
 		};
 	});
@@ -40,11 +40,10 @@ export default function TemplatesSection() {
 			<div className='mb-8 flex items-center justify-between gap-4'>
 				<div>
 					<h1 className='text-2xl font-semibold tracking-tight text-foreground md:text-3xl'>
-						Templates
+						Mẫu
 					</h1>
 					<p className='mt-2 text-sm text-muted-foreground md:text-base'>
-						Start faster with ready-made layouts for planning,
-						meetings, and productivity.
+						Bắt đầu nhanh hơn với các bố cục có sẵn cho việc lập kế hoạch, các cuộc họp và tối ưu năng suất.
 					</p>
 				</div>
 
@@ -53,7 +52,7 @@ export default function TemplatesSection() {
 					className='h-11 rounded-xl border-border bg-background/50 px-4 text-foreground hover:bg-secondary hover:text-foreground'
 				>
 					<Filter className='mr-2 h-4 w-4' />
-					Filter
+					Lọc
 				</Button>
 			</div>
 
@@ -68,7 +67,7 @@ export default function TemplatesSection() {
 					))}
 					{mappedTemplates.length === 0 && (
 						<div className="col-span-full py-10 text-center text-muted-foreground">
-							No public templates found.
+							Không tìm thấy mẫu công khai nào.
 						</div>
 					)}
 				</div>

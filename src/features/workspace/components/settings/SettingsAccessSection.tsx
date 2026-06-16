@@ -75,15 +75,15 @@ export function SettingsAccessSection({
 	const isCurrentUserOwner = members.find(m => m.user_id === user?.id)?.role_name?.toLowerCase() === "owner";
 
 	return (
-		<div className='max-w-4xl space-y-4 w-full'>
+		<div className='w-full space-y-4'>
 			{!hideHeader && (
 				<div className='flex items-center justify-between gap-4'>
 					<div>
 						<div className='text-sm font-semibold'>
-							Current users
+							Thành viên hiện tại
 						</div>
 						<div className='mt-1 text-sm text-muted-foreground'>
-							Manage workspace members and roles.
+							Quản lý thành viên và vai trò trong workspace.
 						</div>
 					</div>
 					<RequirePermission workspaceId={workspaceId} code={PERMISSIONS.WORKSPACE_MEMBER_ADD} mode="hide">
@@ -92,7 +92,7 @@ export function SettingsAccessSection({
 							onClick={onAddPeople}
 							className='rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-400'
 						>
-							Add people
+							Thêm thành viên
 						</button>
 					</RequirePermission>
 				</div>
@@ -103,19 +103,19 @@ export function SettingsAccessSection({
 					className='grid border-b border-border px-4 py-3 text-xs font-semibold uppercase text-muted-foreground'
 					style={{ gridTemplateColumns: "1fr 150px 150px 150px 120px" }}
 				>
-					<div>Name</div>
-					<div>Joined Date</div>
-					<div>Tasks</div>
-					<div>Role</div>
-					<div>Action</div>
+					<div>Tên</div>
+					<div>Ngày tham gia</div>
+					<div>Số tác vụ</div>
+					<div>Vai trò</div>
+					<div>Thao tác</div>
 				</div>
 				{isMembersLoading ? (
 					<div className='px-4 py-4 text-sm text-muted-foreground'>
-						Loading members...
+						Đang tải danh sách thành viên...
 					</div>
 				) : members.length === 0 ? (
 					<div className='px-4 py-4 text-sm text-muted-foreground'>
-						No members found in this workspace yet.
+						Chưa có thành viên nào trong workspace này.
 					</div>
 				) : (
 					members.map((member) => (
@@ -153,7 +153,7 @@ export function SettingsAccessSection({
 								{member.joinedAt ? new Date(member.joinedAt).toLocaleDateString() : '-'}
 							</div>
 							<div className='text-muted-foreground text-sm'>
-								{member.taskCount || 0} task{member.taskCount !== 1 ? 's' : ''}
+								{member.taskCount || 0} tác vụ
 							</div>
 							<div className='uppercase text-foreground'>
 								{member.role_name}
@@ -180,7 +180,7 @@ export function SettingsAccessSection({
 															<DropdownMenuSub>
 																<DropdownMenuSubTrigger>
 																	<UserPen className="mr-2 size-4" />
-																	Change role
+																	Đổi vai trò
 																</DropdownMenuSubTrigger>
 																<DropdownMenuPortal>
 																	<DropdownMenuSubContent>
@@ -206,12 +206,12 @@ export function SettingsAccessSection({
 														{isSelf ? (
 															<>
 																<LogOut className="mr-2 size-4" />
-																Leave workspace
+																Rời workspace
 															</>
 														) : (
 															<>
 																<Trash className="mr-2 size-4" />
-																Remove member
+																Xoá thành viên
 															</>
 														)}
 													</DropdownMenuItem>

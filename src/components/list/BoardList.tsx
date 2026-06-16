@@ -1,9 +1,10 @@
 "use client";
 
 import React from "react";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Plus } from "lucide-react";
+import DialogAddTask from "@/components/dialog/DialogAddTask";
 
-import { useTask } from "@/features/task/hooks/useTask";
+import { useTask, useTaskStatus } from "@/features/task/hooks/useTask";
 import { useUser } from "@/features/auth/hooks/useUser";
 import { cn } from "@/lib/utils";
 import DropdownTaskStatus from "@/components/dropdown/DropdownTaskStatus";
@@ -19,8 +20,38 @@ type BoardListProps = {
 };
 
 const BoardList = ({ workspaceId, projectId }: BoardListProps) => {
-	const { taskQuery } = useTask(workspaceId, projectId);
+	const { taskQuery, createTask } = useTask(workspaceId, projectId);
+	const { data: taskStatusData } = useTaskStatus(workspaceId, projectId);
+	const taskStatus = React.useMemo(() => taskStatusData?.data ?? [], [taskStatusData?.data]);
 	const { user } = useUser();
+
+	const [isQuickAdding, setIsQuickAdding] = React.useState(false);
+	const [quickAddTitle, setQuickAddTitle] = React.useState("");
+	const [isCreating, setIsCreating] = React.useState(false);
+
+	const handleQuickAdd = async () => {
+		if (!quickAddTitle.trim() || !taskStatus.length) {
+			setIsQuickAdding(false);
+			setQuickAddTitle("");
+			return;
+		}
+
+		setIsCreating(true);
+		try {
+			await createTask({
+				title: quickAddTitle.trim(),
+				statusId: taskStatus[0].id,
+				workspaceId,
+				projectId,
+				createdBy: user?.id || "",
+			});
+			setQuickAddTitle("");
+		} catch (error) {
+			console.error("Failed to create task", error);
+		} finally {
+			setIsCreating(false);
+		}
+	};
 	const rawTasks = Array.isArray(taskQuery?.data?.data)
 		? taskQuery.data.data
 		: [];
@@ -45,10 +76,7 @@ const BoardList = ({ workspaceId, projectId }: BoardListProps) => {
 								<div
 									key={task.id}
 									className={cn(
-										'group flex items-center justify-between gap-4 border-b p-3 transition-all last:border-b-0 hover:bg-muted/40',
-										isReadOnly 
-											? 'opacity-60 bg-muted/20 border-dashed border-border/80' 
-											: 'border-border/50 bg-background'
+										'group flex items-center justify-between gap-4 border-b p-3 transition-all last:border-b-0 hover:bg-muted/40 border-border/50 bg-card'
 									)}
 								>
 									{/* Left side: Status and Name */}
@@ -112,6 +140,42 @@ const BoardList = ({ workspaceId, projectId }: BoardListProps) => {
 						<div className='flex h-28 items-center justify-center text-sm text-muted-foreground'>
 							No tasks found.
 						</div>
+					)}
+					{isQuickAdding ? (
+						<div className="flex w-full items-center gap-2 border-b border-transparent p-2 px-3">
+							<Plus className="size-4 text-muted-foreground" />
+							<input
+								autoFocus
+								type="text"
+								value={quickAddTitle}
+								onChange={(e) => setQuickAddTitle(e.target.value)}
+								onKeyDown={(e) => {
+									if (e.key === "Enter" && !e.shiftKey) {
+										e.preventDefault();
+										handleQuickAdd();
+									} else if (e.key === "Escape") {
+										setIsQuickAdding(false);
+										setQuickAddTitle("");
+									}
+								}}
+								onBlur={() => {
+									if (!quickAddTitle.trim()) {
+										setIsQuickAdding(false);
+									}
+								}}
+								disabled={isCreating}
+								placeholder="Nhập tên nhiệm vụ..."
+								className="flex-1 bg-transparent text-[13px] font-medium outline-none placeholder:text-muted-foreground/50 disabled:opacity-50"
+							/>
+						</div>
+					) : (
+						<button 
+							onClick={() => setIsQuickAdding(true)}
+							className='flex w-full items-center gap-2 border-b border-transparent p-3 text-[13px] font-medium text-muted-foreground hover:bg-muted/40 hover:text-foreground transition-all cursor-pointer text-left'
+						>
+							<Plus className='size-4' />
+							nhiệm vụ mới
+						</button>
 					)}
 				</div>
 			</div>

@@ -135,6 +135,17 @@ export function TaskBulkActionBar({
 							Status
 						</Button>
 
+						{onMoveToSprint && (
+							<Button
+								type='button'
+								variant='outline'
+								size='sm'
+								onClick={onMoveToSprint}
+							>
+								Thêm vào sprint
+							</Button>
+						)}
+
 						<Button
 							type='button'
 							variant='outline'

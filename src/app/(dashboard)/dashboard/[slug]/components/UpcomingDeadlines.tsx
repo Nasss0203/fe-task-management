@@ -12,11 +12,11 @@ export const UpcomingDeadlines = ({ deadlines }: UpcomingDeadlinesProps) => {
   return (
     <Card className="relative overflow-hidden border-white/5 bg-zinc-900/50 backdrop-blur-sm shadow-[0_1px_1px_rgba(0,0,0,0.05),0_4px_6px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.05)] h-full">
       <CardHeader className="pt-8 px-8 pb-4">
-        <CardTitle className="text-lg font-semibold tracking-tight text-foreground">Deadline sắp tới</CardTitle>
+        <CardTitle className="text-lg font-semibold tracking-tight text-foreground">Hạn chót sắp tới</CardTitle>
       </CardHeader>
       <CardContent className="px-8 pb-8">
         {deadlines.length === 0 ? (
-          <EmptyState title="Không có deadline" description="Không có deadline nào trong 7 ngày tới." />
+          <EmptyState title="Không có hạn chót" description="Không có hạn chót nào trong 7 ngày tới." />
         ) : (
           <div className="space-y-3">
             {deadlines.map((item) => (
@@ -39,7 +39,7 @@ export const UpcomingDeadlines = ({ deadlines }: UpcomingDeadlinesProps) => {
                 </div>
                 <div className="text-right space-y-0.5">
                   <p className={`text-[12px] font-bold ${item.daysLeft <= 2 ? 'text-red-400' : 'text-foreground/80'}`}>
-                    In {item.daysLeft} days
+                    Trong {item.daysLeft} ngày
                   </p>
                   <p className="text-[10px] font-medium text-muted-foreground/40">{item.deadline}</p>
                 </div>

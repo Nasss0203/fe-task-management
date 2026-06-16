@@ -29,10 +29,10 @@ export default function TemplateReviewPage() {
 	if (error || !template) {
 		return (
 			<div className="py-40 text-center">
-				<h1 className="text-2xl font-bold">Template not found</h1>
-				<p className="mt-2 text-muted-foreground">The template you are looking for does not exist or is private.</p>
+				<h1 className="text-2xl font-bold">Không tìm thấy template</h1>
+				<p className="mt-2 text-muted-foreground">Template bạn đang tìm không tồn tại hoặc ở chế độ riêng tư.</p>
 				<Link href="/#templates" className="mt-6 inline-block">
-					<Button variant="outline">Back to Home</Button>
+					<Button variant="outline">Trở về Trang chủ</Button>
 				</Link>
 			</div>
 		);
@@ -42,7 +42,7 @@ export default function TemplateReviewPage() {
 		<div className="py-10 md:py-16 max-w-5xl mx-auto">
 			<Link href="/#templates" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-8">
 				<ArrowLeft className="mr-2 h-4 w-4" />
-				Back to Templates
+				Quay lại Templates
 			</Link>
 
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
@@ -51,37 +51,37 @@ export default function TemplateReviewPage() {
 					<div>
 						<div className="flex items-center gap-3 mb-4">
 							<Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20">
-								{template.category || "General"}
+								{template.category || "Chung"}
 							</Badge>
 						</div>
 						<h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
 							{template.name}
 						</h1>
 						<p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-							{template.description || "A comprehensive workspace template designed to jumpstart your team's productivity and streamline workflows."}
+							{template.description || "Một mẫu không gian làm việc toàn diện được thiết kế để khởi động năng suất của nhóm bạn và tối ưu hóa các luồng công việc."}
 						</p>
 					</div>
 
 					<div className="flex flex-col sm:flex-row gap-4 mt-4">
 						<Button className="h-12 px-8 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-base font-semibold">
-							Use Template
+							Sử dụng Template
 						</Button>
 
 						<Dialog>
 							<DialogTrigger asChild>
 								<Button variant="outline" className="h-12 px-8 rounded-xl border-border bg-background/50 hover:bg-secondary text-base font-medium">
 									<PlayCircle className="mr-2 h-5 w-5" />
-									Preview Workflow
+									Xem trước
 								</Button>
 							</DialogTrigger>
 							<DialogContent className="max-w-[95vw] md:max-w-[85vw] h-[85vh] border-border bg-background p-0 overflow-hidden rounded-2xl flex flex-col">
 								<DialogHeader className="p-6 pb-2 shrink-0">
 									<DialogTitle className="text-xl flex items-center gap-2">
-										<Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">Sandbox Mode</Badge>
+										<Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">Chế độ thử nghiệm</Badge>
 										{template.name}
 									</DialogTitle>
 									<DialogDescription>
-										This is a live interactive sandbox. Drag and drop tasks to try out the workflow. All changes will be reset when you close this window.
+										Đây là môi trường thử nghiệm tương tác trực tiếp. Kéo thả các tác vụ để thử luồng công việc. Mọi thay đổi sẽ được đặt lại khi bạn đóng cửa sổ này.
 									</DialogDescription>
 								</DialogHeader>
 								<div className="flex-1 w-full bg-muted/10 overflow-hidden relative">
@@ -92,13 +92,13 @@ export default function TemplateReviewPage() {
 					</div>
 
 					<div className="mt-8 border-t border-border pt-8">
-						<h3 className="font-semibold text-foreground mb-4">What's included in this template:</h3>
+						<h3 className="font-semibold text-foreground mb-4">Template này bao gồm:</h3>
 						<ul className="space-y-3">
 							{[
-								"Pre-configured task boards and statuses",
-								"Custom labels and priority tags",
-								"Sample data to get you started quickly",
-								"Optimized for team collaboration",
+								"Các bảng tác vụ và trạng thái đã được cấu hình sẵn",
+								"Nhãn dán tùy chỉnh và thẻ độ ưu tiên",
+								"Dữ liệu mẫu giúp bạn bắt đầu nhanh chóng",
+								"Được tối ưu hóa để cộng tác nhóm",
 							].map((feature, i) => (
 								<li key={i} className="flex items-center gap-3 text-muted-foreground">
 									<div className="h-1.5 w-1.5 rounded-full bg-primary/50" />

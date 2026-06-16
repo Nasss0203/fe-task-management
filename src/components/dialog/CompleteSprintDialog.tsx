@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { useSprints } from "@/features/sprint/hooks/useSprint";
 import { cn } from "@/lib/utils";
+import { useParams, useRouter } from "next/navigation";
 
 type CompleteSprintDialogProps = {
 	defaultSprintName?: string;
@@ -28,6 +29,7 @@ type CompleteSprintDialogProps = {
 	sprintId: string;
 	completedWorkItemCount?: number;
 	openWorkItemCount?: number;
+	trigger?: React.ReactNode;
 };
 
 const BACKLOG_VALUE = "backlog";
@@ -39,6 +41,7 @@ export function CompleteSprintDialog({
 	sprintId,
 	completedWorkItemCount = 0,
 	openWorkItemCount = 0,
+	trigger,
 }: CompleteSprintDialogProps) {
 	const { completed, sprintsQuery } = useSprints({
 		workspaceId,
@@ -56,6 +59,9 @@ export function CompleteSprintDialog({
 		});
 	}, [sprints, sprintId]);
 
+	const router = useRouter();
+	const { slug } = useParams();
+
 	const handleComplete = () => {
 		completed.mutate(
 			{
@@ -66,6 +72,7 @@ export function CompleteSprintDialog({
 			{
 				onSuccess: () => {
 					setOpen(false);
+					router.push(`/dashboard/${slug}/projects/${projectId}`);
 				},
 			},
 		);
@@ -74,14 +81,18 @@ export function CompleteSprintDialog({
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button
-					type='button'
-					variant='outline'
-					size='sm'
-					className="h-8 rounded-lg border-border bg-background text-[12px] font-medium hover:hover:bg-accent hover:text-accent-foreground hover:border-neutral-600 transition-all hover:text-foreground"
-				>
-					Complete
-				</Button>
+				{trigger ? (
+					trigger
+				) : (
+					<Button
+						type='button'
+						variant='outline'
+						size='sm'
+						className="h-8 rounded-lg border-border bg-background text-[12px] font-medium hover:hover:bg-accent hover:text-accent-foreground hover:border-neutral-600 transition-all hover:text-foreground"
+					>
+						Complete
+					</Button>
+				)}
 			</DialogTrigger>
 
 			<DialogContent

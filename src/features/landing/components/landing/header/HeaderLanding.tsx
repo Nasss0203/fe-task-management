@@ -22,26 +22,26 @@ import HeaderMegaMenu, { MegaMenuItemType } from "./HeaderMegaMenu";
 
 const featuresMenu: MegaMenuItemType[] = [
 	{
-		title: "Kanban Boards",
-		description: "Visualize work and optimize flow with drag-and-drop boards.",
+		title: "Bảng Kanban",
+		description: "Trực quan hóa công việc và tối ưu quy trình với các bảng kéo thả.",
 		icon: <Columns className="h-5 w-5" />,
 		href: "/#features",
 	},
 	{
-		title: "Mindmaps",
-		description: "Brainstorm and connect ideas visually before execution.",
+		title: "Bản đồ tư duy",
+		description: "Lên ý tưởng và kết nối ý tưởng một cách trực quan trước khi thực hiện.",
 		icon: <Network className="h-5 w-5" />,
 		href: "/#features",
 	},
 	{
-		title: "Real-time Chat",
-		description: "Communicate directly on tasks without leaving the app.",
+		title: "Nhắn tin thời gian thực",
+		description: "Trao đổi trực tiếp trên tác vụ mà không cần rời khỏi ứng dụng.",
 		icon: <MessageSquare className="h-5 w-5" />,
 		href: "/#features",
 	},
 	{
-		title: "Checklists",
-		description: "Break complex tasks into manageable sub-tasks.",
+		title: "Danh sách kiểm tra",
+		description: "Chia nhỏ các tác vụ phức tạp thành các tác vụ phụ dễ quản lý.",
 		icon: <CheckSquare className="h-5 w-5" />,
 		href: "/#features",
 	},
@@ -49,31 +49,31 @@ const featuresMenu: MegaMenuItemType[] = [
 
 const solutionsMenu: MegaMenuItemType[] = [
 	{
-		title: "For Software Teams",
-		description: "Sprint planning, bug tracking, and agile workflows.",
+		title: "Cho nhóm Phần mềm",
+		description: "Lập kế hoạch Sprint, theo dõi lỗi, và quy trình Agile.",
 		icon: <Box className="h-5 w-5" />,
 		href: "/#solutions",
 	},
 	{
-		title: "For Marketing",
-		description: "Campaign management and content calendars.",
+		title: "Cho Marketing",
+		description: "Quản lý chiến dịch và lịch nội dung.",
 		icon: <Zap className="h-5 w-5" />,
 		href: "/#solutions",
 	},
 	{
-		title: "For Product",
-		description: "Roadmaps, feature tracking, and release planning.",
+		title: "Cho Sản phẩm",
+		description: "Lộ trình, theo dõi tính năng, và lên kế hoạch ra mắt.",
 		icon: <BarChart3 className="h-5 w-5" />,
 		href: "/#solutions",
 	},
 ];
 
 const navItems = [
-	{ label: "Features", megaMenu: featuresMenu },
-	{ label: "Solutions", megaMenu: solutionsMenu },
-	{ label: "Resources", href: "/#resources" },
-	{ label: "Enterprise", href: "/#enterprise" },
-	{ label: "Templates", href: "/templates" },
+	{ label: "Tính năng", megaMenu: featuresMenu },
+	{ label: "Giải pháp", megaMenu: solutionsMenu },
+	{ label: "Tài nguyên", href: "/#resources" },
+	{ label: "Doanh nghiệp", href: "/#enterprise" },
+	{ label: "Mẫu", href: "/templates" },
 ];
 
 const HeaderLanding = () => {
@@ -134,7 +134,7 @@ const HeaderLanding = () => {
 						isLinkActive("/contact") ? "text-foreground" : "text-muted-foreground"
 					}`}
 				>
-					Contact Sales
+					Liên hệ
 				</Link>
 
 				<ToggleMode />
@@ -142,7 +142,7 @@ const HeaderLanding = () => {
 				{user ? (
 					<Link href={"/dashboard"}>
 						<Button className='rounded-full bg-primary px-6 font-semibold text-primary-foreground hover:bg-primary/90 active:scale-[0.98]'>
-							Dashboard
+							Bảng điều khiển
 						</Button>
 					</Link>
 				) : (
@@ -152,13 +152,13 @@ const HeaderLanding = () => {
 								variant='ghost'
 								className='rounded-full px-5 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground'
 							>
-								Log In
+								Đăng nhập
 							</Button>
 						</Link>
 
 						<Link href={"/sign-up"}>
 							<Button className='rounded-full bg-foreground px-6 font-semibold text-background hover:bg-foreground/90 active:scale-[0.98]'>
-								Register
+								Đăng ký
 							</Button>
 						</Link>
 					</div>
@@ -199,7 +199,7 @@ const HeaderLanding = () => {
 									isLinkActive("/contact") ? "text-foreground" : "text-muted-foreground"
 								}`}
 							>
-								Contact Sales
+								Liên hệ
 							</Link>
 						</nav>
 
@@ -207,7 +207,7 @@ const HeaderLanding = () => {
 							{user ? (
 								<Link href={"/dashboard"} onClick={() => setIsOpen(false)}>
 									<Button className='w-full rounded-xl bg-primary py-6 font-semibold text-primary-foreground hover:bg-primary/90 active:scale-[0.98]'>
-										Dashboard
+										Bảng điều khiển
 									</Button>
 								</Link>
 							) : (
@@ -217,12 +217,12 @@ const HeaderLanding = () => {
 											variant='outline'
 											className='w-full rounded-xl py-6 font-medium text-foreground'
 										>
-											Log In
+											Đăng nhập
 										</Button>
 									</Link>
 									<Link href={"/sign-up"} onClick={() => setIsOpen(false)}>
 										<Button className='w-full rounded-xl bg-foreground py-6 font-semibold text-background hover:bg-foreground/90 active:scale-[0.98]'>
-											Register
+											Đăng ký
 										</Button>
 									</Link>
 								</>

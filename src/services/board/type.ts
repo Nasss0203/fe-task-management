@@ -3,13 +3,7 @@ export enum BoardViewType {
 	TABLE = "TABLE",
 	LIST = "LIST",
 	CALENDAR = "CALENDAR",
-	TIMELINE = "TIMELINE",
-	GALLERY = "GALLERY",
-	CHART = "CHART",
-	DASHBOARD = "DASHBOARD",
-	FORM = "FORM",
-	MAP = "MAP",
-	FEED = "FEED",
+
 	BACKLOG = "BACKLOG",
 }
 
@@ -30,5 +24,5 @@ export type CreateBoarDto = {
 	viewType: BoardViewType;
 	projectId: string;
 	workspaceId: string;
-	blockId: string;
+	blockId?: string;
 };

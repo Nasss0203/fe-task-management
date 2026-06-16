@@ -5,12 +5,14 @@ import {
 	findAllSprintApi,
 	findTasksBySprintApi,
 	startSprintApi,
+	updateSprintApi,
 } from "@/services/sprint/sprint.service";
 import {
 	CompleteSprintParams,
 	CreateSprintDto,
 	SPRINT_KEY,
 	StartSprintParams,
+	UpdateSprintParams,
 } from "@/services/sprint/type";
 import { TASK_KEY } from "@/services/task/type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -94,11 +96,30 @@ export const useSprints = ({
 		},
 	});
 
+	const updateSprint = useMutation({
+		mutationFn: async (data: UpdateSprintParams) => {
+			const result = await updateSprintApi(data);
+			return result;
+		},
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: [SPRINT_KEY.SPRINTS],
+			});
+			await queryClient.invalidateQueries({
+				queryKey: [TASK_KEY.TASK_BACKLOG],
+			});
+		},
+		onError: (err) => {
+			console.error("updateSprint failed", err);
+		},
+	});
+
 	return {
 		sprintsQuery,
 		sprintsTaskQuery,
 		createSprint,
 		startSprint,
 		completed,
+		updateSprint,
 	};
 };

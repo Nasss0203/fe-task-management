@@ -14,43 +14,43 @@ import { useState } from "react";
 const faqLeft = [
 	{
 		id: "item-1",
-		question: "What is task management software, and why do I need it?",
-		answer: "Task management software helps individuals and teams organize, prioritize, and track tasks to enhance productivity and collaboration. It ensures efficient workflow and successful project completion.",
+		question: "Phần mềm quản lý tác vụ là gì và tại sao tôi cần nó?",
+		answer: "Phần mềm quản lý tác vụ giúp cá nhân và đội ngũ tổ chức, ưu tiên và theo dõi các tác vụ để nâng cao năng suất và hiệu quả cộng tác. Nó đảm bảo quy trình làm việc trôi chảy và hoàn thành dự án thành công.",
 	},
 	{
 		id: "item-2",
-		question: "Is task management software suitable for remote teams?",
-		answer: "Yes. It helps remote teams coordinate work, assign responsibilities, track progress, and communicate clearly across locations.",
+		question: "Phần mềm quản lý tác vụ có phù hợp với các đội ngũ làm việc từ xa không?",
+		answer: "Có. Nó giúp các đội ngũ làm việc từ xa điều phối công việc, phân công trách nhiệm, theo dõi tiến độ và giao tiếp rõ ràng giữa các vị trí địa lý khác nhau.",
 	},
 	{
 		id: "item-3",
-		question: "How does task management software improve collaboration?",
-		answer: "It centralizes tasks, deadlines, comments, and updates so everyone can work from a shared source of truth.",
+		question: "Phần mềm quản lý tác vụ cải thiện sự cộng tác như thế nào?",
+		answer: "Nó tập trung các tác vụ, ngày đến hạn, bình luận và cập nhật để mọi người có thể làm việc trên một nguồn thông tin duy nhất.",
 	},
 	{
 		id: "item-4",
-		question: "How secure is my data in task management software?",
-		answer: "Most platforms provide authentication, access control, encrypted connections, and permission-based sharing to protect your data.",
+		question: "Dữ liệu của tôi trong phần mềm quản lý tác vụ an toàn đến mức nào?",
+		answer: "Hầu hết các nền tảng đều cung cấp xác thực, kiểm soát truy cập, kết nối mã hóa và chia sẻ dựa trên quyền để bảo vệ dữ liệu của bạn.",
 	},
 ];
 
 const faqRight = [
 	{
 		id: "item-5",
-		question: "Can I use task management software for personal tasks?",
-		answer: "Absolutely. It can be used for daily planning, habits, study schedules, personal goals, and to-do tracking.",
+		question: "Tôi có thể sử dụng phần mềm quản lý tác vụ cho công việc cá nhân không?",
+		answer: "Chắc chắn rồi. Nó có thể được sử dụng cho việc lập kế hoạch hàng ngày, thói quen, lịch học, mục tiêu cá nhân và theo dõi danh sách việc cần làm.",
 	},
 	{
 		id: "item-6",
 		question:
-			"What features should I look for in task management software?",
-		answer: "Look for task assignment, due dates, collaboration tools, views like kanban, calendar, timeline, reminders, and integrations.",
+			"Tôi nên tìm kiếm các tính năng nào trong phần mềm quản lý tác vụ?",
+		answer: "Hãy tìm kiếm tính năng giao việc, ngày đến hạn, công cụ cộng tác, các chế độ xem như Kanban, Lịch, Tiến độ, nhắc nhở và tiện ích tích hợp.",
 	},
 	{
 		id: "item-7",
 		question:
-			"How does task management software help with time management?",
-		answer: "It helps you prioritize work, visualize deadlines, reduce missed tasks, and allocate time more effectively.",
+			"Phần mềm quản lý tác vụ giúp ích thế nào cho việc quản lý thời gian?",
+		answer: "Nó giúp bạn ưu tiên công việc, trực quan hóa ngày đến hạn, giảm thiểu các tác vụ bị bỏ sót và phân bổ thời gian hiệu quả hơn.",
 	},
 ];
 
@@ -181,7 +181,7 @@ export default function TemplatesFaqSection() {
 		<section className='py-16 md:py-20'>
 			<div className='mx-auto max-w-5xl'>
 				<h2 className='mb-10 text-center text-3xl font-semibold tracking-tight text-foreground md:text-4xl'>
-					Frequently Asked Questions
+					Các câu hỏi thường gặp
 				</h2>
 
 				<div className='grid gap-5 md:grid-cols-2'>
@@ -218,22 +218,22 @@ export default function TemplatesFaqSection() {
 
 				<div className='max-w-[430px] text-center md:text-left'>
 					<h3 className='text-3xl font-semibold leading-[1.12] text-foreground md:text-[48px]'>
-						Connect Your Tools to
+						Kết nối các Công cụ của bạn với
 						<br />
 						Taskmanly
 					</h3>
 
 					<p className='mt-5 text-sm leading-8 text-muted-foreground'>
-						We have more than 200+ integrations, so you can use your
-						favorite work tools to communicate, collaborate, and
-						coordinate work in one place, from start to finish.
+						Chúng tôi có hơn 200 tiện ích tích hợp, giúp bạn sử dụng các
+						công cụ làm việc yêu thích để giao tiếp, cộng tác và
+						điều phối công việc ở một nơi, từ đầu đến cuối.
 					</p>
 
 					<Button
 						variant='outline'
 						className='mt-6 h-11 rounded-md border-white/15 bg-black px-6 text-sm font-medium text-foreground hover:bg-white hover:text-black'
 					>
-						Learn More
+						Tìm hiểu thêm
 					</Button>
 				</div>
 			</div>

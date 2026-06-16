@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,12 +23,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { useSprints } from "@/features/sprint/hooks/useSprint";
 import { cn } from "@/lib/utils";
 
-type StartSprintDialogProps = {
+type EditSprintDialogProps = {
 	defaultSprintName?: string;
+	defaultGoal?: string;
+	defaultStartAt?: Date | null;
+	defaultEndAt?: Date | null;
+	isSprintActive?: boolean;
 	workspaceId: string;
 	projectId: string;
 	sprintId: string;
-	workItemCount?: number;
 	trigger?: React.ReactNode;
 };
 
@@ -42,13 +45,25 @@ const durationOptions = [
 	{ label: "Custom", value: CUSTOM_DURATION },
 ];
 
-const formatDateInput = (date: Date) => {
-	const year = date.getFullYear();
-	const month = String(date.getMonth() + 1).padStart(2, "0");
-	const day = String(date.getDate()).padStart(2, "0");
+const formatDateInput = (date: Date | null | undefined) => {
+	if (!date) return "";
+	const d = new Date(date);
+	if (isNaN(d.getTime())) return "";
+	const year = d.getFullYear();
+	const month = String(d.getMonth() + 1).padStart(2, "0");
+	const day = String(d.getDate()).padStart(2, "0");
 
 	return `${year}-${month}-${day}`;
 };
+
+const formatTimeInput = (date: Date | null | undefined) => {
+	if (!date) return "09:00";
+	const d = new Date(date);
+	if (isNaN(d.getTime())) return "09:00";
+	const hours = String(d.getHours()).padStart(2, "0");
+	const mins = String(d.getMinutes()).padStart(2, "0");
+	return `${hours}:${mins}`;
+}
 
 const addWeeksToDate = (date: string, weeks: number) => {
 	if (!date) return "";
@@ -63,28 +78,40 @@ const toISOStringDateTime = (date: string, time: string) => {
 	return new Date(`${date}T${time}:00`).toISOString();
 };
 
-export function StartSprintDialog({
+export function EditSprintDialog({
 	defaultSprintName = "Sprint",
+	defaultGoal = "",
+	defaultStartAt,
+	defaultEndAt,
+	isSprintActive = false,
 	workspaceId,
 	projectId,
 	sprintId,
-	workItemCount = 0,
 	trigger,
-}: StartSprintDialogProps) {
-	const { startSprint } = useSprints({
+}: EditSprintDialogProps) {
+	const { updateSprint } = useSprints({
 		workspaceId,
 		projectId,
 	});
 
-	const today = formatDateInput(new Date());
-
 	const [open, setOpen] = useState(false);
 	const [name, setName] = useState(defaultSprintName);
 	const [duration, setDuration] = useState("1");
-	const [startDate, setStartDate] = useState(today);
-	const [startTime, setStartTime] = useState("09:00");
-	const [endDate, setEndDate] = useState(addWeeksToDate(today, 1));
-	const [goal, setGoal] = useState("");
+	const [startDate, setStartDate] = useState(formatDateInput(defaultStartAt));
+	const [startTime, setStartTime] = useState(formatTimeInput(defaultStartAt));
+	const [endDate, setEndDate] = useState(formatDateInput(defaultEndAt));
+	const [goal, setGoal] = useState(defaultGoal);
+
+	useEffect(() => {
+		if (open) {
+			setName(defaultSprintName);
+			setGoal(defaultGoal || "");
+			setStartDate(formatDateInput(defaultStartAt));
+			setStartTime(formatTimeInput(defaultStartAt));
+			setEndDate(formatDateInput(defaultEndAt));
+			setDuration(CUSTOM_DURATION);
+		}
+	}, [open, defaultSprintName, defaultGoal, defaultStartAt, defaultEndAt]);
 
 	const isCustomDuration = duration === CUSTOM_DURATION;
 
@@ -111,28 +138,30 @@ export function StartSprintDialog({
 		}
 	};
 
-	const handleStart = () => {
+	const handleUpdate = () => {
 		if (
-			!name.trim() ||
-			!startDate ||
-			!startTime ||
-			!endDate ||
-			isInvalidDateRange
+			(!isSprintActive && !name.trim()) ||
+			(startDate && endDate && isInvalidDateRange)
 		) {
 			return;
 		}
 
-		startSprint.mutate(
+		const data: any = {
+			goal: goal.trim() || undefined,
+			endAt: endDate ? toISOStringDateTime(endDate, startTime) : null,
+		};
+
+		if (!isSprintActive) {
+			data.name = name.trim();
+			data.startAt = startDate ? toISOStringDateTime(startDate, startTime) : null;
+		}
+
+		updateSprint.mutate(
 			{
 				workspaceId,
 				projectId,
 				sprintId,
-				data: {
-					name: name.trim(),
-					goal: goal.trim() || undefined,
-					startAt: toISOStringDateTime(startDate, startTime),
-					endAt: toISOStringDateTime(endDate, startTime),
-				},
+				data,
 			},
 			{
 				onSuccess: () => {
@@ -154,7 +183,7 @@ export function StartSprintDialog({
 						size='sm'
 						className="h-8 rounded-lg border-border bg-background text-[12px] font-medium hover:hover:bg-accent hover:text-accent-foreground hover:border-neutral-600 transition-all hover:text-foreground"
 					>
-						Start sprint
+						Edit sprint
 					</Button>
 				)}
 			</DialogTrigger>
@@ -168,21 +197,13 @@ export function StartSprintDialog({
 				<div className='border-b border-border px-6 py-4'>
 					<DialogHeader>
 						<DialogTitle className='text-base font-semibold text-foreground'>
-							Start sprint
+							Edit sprint
 						</DialogTitle>
 					</DialogHeader>
 				</div>
 
 				<div className='px-6 py-5'>
 					<div className='space-y-4'>
-						<p className='text-sm text-foreground'>
-							<span className='font-semibold text-foreground'>
-								{workItemCount}
-							</span>{" "}
-							work item{workItemCount > 1 ? "s" : ""} will be
-							included in this sprint.
-						</p>
-
 						<p className='text-xs font-medium text-muted-foreground'>
 							Required fields are marked with an asterisk{" "}
 							<span className='text-red-400'>*</span>
@@ -196,18 +217,20 @@ export function StartSprintDialog({
 
 							<Input
 								value={name}
+								disabled={isSprintActive}
 								onChange={(e) => setName(e.target.value)}
 								className={cn(
 									"h-9 rounded-md border-border bg-background text-sm text-foreground",
 									"placeholder:text-muted-foreground",
 									"focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500",
+									isSprintActive && "opacity-50 cursor-not-allowed"
 								)}
 							/>
 						</div>
 
 						<div className='space-y-1.5'>
 							<Label className='text-xs font-semibold text-foreground'>
-								Duration <span className='text-red-400'>*</span>
+								Duration
 							</Label>
 
 							<Select
@@ -240,38 +263,40 @@ export function StartSprintDialog({
 						<div className='grid grid-cols-2 gap-3'>
 							<div className='space-y-1.5'>
 								<Label className='text-xs font-semibold text-foreground'>
-									Start date{" "}
-									<span className='text-red-400'>*</span>
+									Start date
 								</Label>
 
 								<Input
 									type='date'
 									value={startDate}
+									disabled={isSprintActive}
 									onChange={(e) =>
 										handleStartDateChange(e.target.value)
 									}
 									className={cn(
 										"h-9 rounded-md border-border bg-background text-sm text-foreground",
 										"focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500",
+										isSprintActive && "opacity-50 cursor-not-allowed"
 									)}
 								/>
 							</div>
 
 							<div className='space-y-1.5'>
 								<Label className='text-xs font-semibold text-foreground'>
-									Start time{" "}
-									<span className='text-red-400'>*</span>
+									Start time
 								</Label>
 
 								<Input
 									type='time'
 									value={startTime}
+									disabled={isSprintActive}
 									onChange={(e) =>
 										setStartTime(e.target.value)
 									}
 									className={cn(
 										"h-9 rounded-md border-border bg-background text-sm text-foreground",
 										"focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500",
+										isSprintActive && "opacity-50 cursor-not-allowed"
 									)}
 								/>
 							</div>
@@ -280,8 +305,7 @@ export function StartSprintDialog({
 						<div className='grid grid-cols-2 gap-3'>
 							<div className='space-y-1.5'>
 								<Label className='text-xs font-semibold text-foreground'>
-									End date{" "}
-									<span className='text-red-400'>*</span>
+									End date
 								</Label>
 
 								<Input
@@ -307,8 +331,7 @@ export function StartSprintDialog({
 
 							<div className='space-y-1.5'>
 								<Label className='text-xs font-semibold text-foreground'>
-									End time{" "}
-									<span className='text-red-400'>*</span>
+									End time
 								</Label>
 
 								<Input
@@ -353,18 +376,15 @@ export function StartSprintDialog({
 
 						<Button
 							type='button'
-							onClick={handleStart}
+							onClick={handleUpdate}
 							disabled={
 								!name.trim() ||
-								!startDate ||
-								!startTime ||
-								!endDate ||
 								isInvalidDateRange ||
-								startSprint.isPending
+								updateSprint.isPending
 							}
 							className='h-8 rounded-md bg-blue-600 px-4 text-xs font-semibold text-white hover:bg-blue-500 disabled:opacity-50'
 						>
-							{startSprint.isPending ? "Starting..." : "Start"}
+							{updateSprint.isPending ? "Updating..." : "Update sprint"}
 						</Button>
 					</div>
 				</div>

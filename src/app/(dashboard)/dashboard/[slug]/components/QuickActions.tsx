@@ -6,8 +6,8 @@ import { Plus, UserPlus, Briefcase } from "lucide-react";
 
 export const QuickActions = () => {
   const actions = [
-    { label: "Tạo task mới", icon: Plus, color: "bg-indigo-500 hover:bg-indigo-400 text-white shadow-lg shadow-indigo-500/20 border-none" },
-    { label: "Tạo project", icon: Briefcase, variant: "outline" as const, className: "bg-white/[0.02] border-white/5 hover:bg-white/[0.05]" },
+    { label: "Tạo tác vụ mới", icon: Plus, color: "bg-indigo-500 hover:bg-indigo-400 text-white shadow-lg shadow-indigo-500/20 border-none" },
+    { label: "Tạo dự án", icon: Briefcase, variant: "outline" as const, className: "bg-white/[0.02] border-white/5 hover:bg-white/[0.05]" },
     { label: "Mời thành viên", icon: UserPlus, variant: "outline" as const, className: "bg-white/[0.02] border-white/5 hover:bg-white/[0.05]" },
   ];
 

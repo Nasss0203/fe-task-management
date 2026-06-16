@@ -53,7 +53,7 @@ const RestPage = () => {
 		return projects.data?.data.find((p) => p.id === projectId);
 	}, [projects.data?.data, projectId]);
 
-	const projectName = project?.name ?? "Untitled project";
+	const projectName = project?.name ?? "Dự án chưa có tên";
 	const draftName = useProjectNameDraftStore(
 		(state) => state.drafts[projectId],
 	);
@@ -94,7 +94,7 @@ const RestPage = () => {
 		const name = value.trim();
 
 		if (!name) {
-			toast.error("Ten project khong duoc de trong.");
+			toast.error("Tên dự án không được để trống.");
 			setDraft(projectId, projectName);
 			inputRef.current?.focus();
 			return;
@@ -118,10 +118,10 @@ const RestPage = () => {
 			});
 			clearDraft(projectId);
 			setIsEditingName(false);
-			toast.success("Project da duoc doi ten.");
+			toast.success("Dự án đã được đổi tên.");
 		} catch (error) {
 			console.error("renameProject failed", error);
-			toast.error("Khong the doi ten project.");
+			toast.error("Không thể đổi tên dự án.");
 		}
 	};
 

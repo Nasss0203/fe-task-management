@@ -134,6 +134,8 @@ export function DrawerItemView({
 
 									<TaskDescriptionField
 										description={task.description}
+										onSave={detail.updateDescription}
+										isUpdating={detail.isUpdatingTask}
 									/>
 
 									<TaskAttachmentsField

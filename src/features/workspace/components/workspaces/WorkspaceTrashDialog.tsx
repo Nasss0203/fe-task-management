@@ -48,10 +48,10 @@ const WorkspaceTrashDialog = ({
 				router.push("/dashboard/trash/workspaces");
 			}
 
-			toast.success("Workspace da duoc chuyen vao thung rac.");
+			toast.success("Workspace đã được chuyển vào thùng rác.");
 		} catch (error) {
 			console.error("trashWorkspace failed", error);
-			toast.error("Khong the chuyen workspace vao thung rac.");
+			toast.error("Không thể chuyển workspace vào thùng rác.");
 		}
 	};
 
@@ -59,21 +59,16 @@ const WorkspaceTrashDialog = ({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className='border-border bg-popover text-foreground sm:max-w-md'>
 				<DialogHeader>
-					<DialogTitle>Chuyen workspace vao Thung rac?</DialogTitle>
+					<DialogTitle>Chuyển workspace vào Thùng rác?</DialogTitle>
 					<DialogDescription className='text-muted-foreground'>
 						Workspace{" "}
 						<span className='font-medium text-foreground'>
 							{workspace.name}
 						</span>{" "}
-						se bi an khoi danh sach dang hoat dong. Ban van co the
-						khoi phuc no tu trang Thung rac.
+						sẽ bị ẩn khỏi danh sách đang hoạt động. Bạn vẫn có thể
+						khôi phục nó từ trang Thùng rác.
 					</DialogDescription>
 				</DialogHeader>
-
-				<div className='rounded-md border border-red-500/20 bg-red-500/5 p-3 text-sm text-red-200/80'>
-					Hanh dong nay la xoa mem, khong xoa vinh vien du lieu ngay
-					lap tuc.
-				</div>
 
 				<DialogFooter className='gap-2 sm:justify-end'>
 					<Button
@@ -81,7 +76,7 @@ const WorkspaceTrashDialog = ({
 						onClick={() => onOpenChange(false)}
 						disabled={softDeleteWorkspace.isPending}
 					>
-						Huy
+						Hủy
 					</Button>
 					<Button
 						onClick={handleConfirm}
@@ -89,8 +84,8 @@ const WorkspaceTrashDialog = ({
 						className='bg-red-600 text-white hover:bg-red-700'
 					>
 						{softDeleteWorkspace.isPending
-							? "Dang chuyen..."
-							: "Chuyen vao Thung rac"}
+							? "Đang chuyển..."
+							: "Chuyển vào Thùng rác"}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

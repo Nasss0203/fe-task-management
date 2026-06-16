@@ -2,6 +2,7 @@
 
 import { ChevronRight, BarChart2 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import {
 	Collapsible,
@@ -37,6 +38,7 @@ const ProjectSidebarItem = ({
 	canUseSprint = false,
 	handleSelectProject,
 }: ProjectSidebarItemProps) => {
+	const pathname = usePathname();
 	const { setCurrentProjectId } = useProjectSelectionStore();
 	const projectId = project.id ?? "";
 	const projectName = project.name ?? "Untitled project";
@@ -75,6 +77,7 @@ const ProjectSidebarItem = ({
 
 					<SidebarMenuSubButtonV2
 						asChild
+						isActive={pathname === projectHref}
 						className='h-7 flex-1 justify-start px-1 pr-14 text-sm font-medium text-foreground hover:bg-transparent'
 					>
 						<Link
@@ -117,6 +120,7 @@ const ProjectSidebarItem = ({
 									<SidebarMenuSubItemV2 key={sprint.id}>
 										<SidebarMenuSubButtonV2
 											asChild
+											isActive={pathname === sprintHref}
 											className='h-7 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground'
 										>
 											<Link
@@ -140,6 +144,7 @@ const ProjectSidebarItem = ({
 							<SidebarMenuSubItemV2>
 								<SidebarMenuSubButtonV2
 									asChild
+									isActive={pathname === `/dashboard/${workspace.slug}/projects/${projectId}/reports`}
 									className='h-7 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground'
 								>
 									<Link

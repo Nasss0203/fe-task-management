@@ -47,12 +47,12 @@ const TaskTrashDialog = ({
 
 			toast.success(
 				taskCount === 1
-					? "Task da duoc chuyen vao thung rac."
-					: `${taskCount} task da duoc chuyen vao thung rac.`,
+					? "Task đã được chuyển vào thùng rác."
+					: `${taskCount} task đã được chuyển vào thùng rác.`,
 			);
 		} catch (error) {
 			console.error("deleteTaskFromDialog failed", error);
-			toast.error("Khong the chuyen task vao thung rac.");
+			toast.error("Không thể chuyển task vào thùng rác.");
 		}
 	};
 
@@ -65,7 +65,7 @@ const TaskTrashDialog = ({
 				className='border-border bg-background text-foreground sm:max-w-md'
 			>
 				<DialogHeader>
-					<DialogTitle>Chuyen task vao Thung rac?</DialogTitle>
+					<DialogTitle>Chuyển task vào Thùng rác?</DialogTitle>
 					<DialogDescription className='text-muted-foreground'>
 						{taskCount === 1 ? (
 							<>
@@ -73,25 +73,20 @@ const TaskTrashDialog = ({
 								<span className='font-medium text-foreground'>
 									{firstTaskTitle}
 								</span>{" "}
-								se bi an khoi backlog va board. Ban co the khoi
-								phuc no sau tu danh sach deleted tasks.
+								sẽ bị ẩn khỏi backlog và board. Bạn có thể khôi
+								phục nó sau từ danh sách task đã xóa.
 							</>
 						) : (
 							<>
 								<span className='font-medium text-foreground'>
 									{taskCount} task
 								</span>{" "}
-								se bi an khoi backlog va board. Ban co the khoi
-								phuc chung sau tu danh sach deleted tasks.
+								sẽ bị ẩn khỏi backlog và board. Bạn có thể khôi
+								phục chúng sau từ danh sách task đã xóa.
 							</>
 						)}
 					</DialogDescription>
 				</DialogHeader>
-
-				<div className='rounded-md border border-red-500/20 bg-red-500/5 p-3 text-sm text-red-200/80'>
-					Hanh dong nay la xoa mem, khong xoa vinh vien du lieu ngay
-					lap tuc.
-				</div>
 
 				<DialogFooter className='gap-2 sm:justify-end'>
 					<Button
@@ -99,14 +94,14 @@ const TaskTrashDialog = ({
 						onClick={() => onOpenChange(false)}
 						disabled={isDeletingTask}
 					>
-						Huy
+						Hủy
 					</Button>
 					<Button
 						onClick={handleConfirm}
 						disabled={isDeletingTask || taskCount === 0}
 						className='bg-red-600 text-white hover:bg-red-700'
 					>
-						{isDeletingTask ? "Dang chuyen..." : "Chuyen vao Thung rac"}
+						{isDeletingTask ? "Đang chuyển..." : "Chuyển vào Thùng rác"}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

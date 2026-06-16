@@ -2,9 +2,9 @@ import { FileText, CheckSquare, Link as LinkIcon, RefreshCw } from "lucide-react
 
 const productivityCards = [
 	{
-		title: "Rich Document Editor",
+		title: "Trình soạn thảo Tài liệu đa dạng",
 		description:
-			"Write specs, meeting notes, and wikis with a powerful block-based editor.",
+			"Viết đặc tả, ghi chú họp và wiki với trình soạn thảo khối mạnh mẽ.",
 		icon: FileText,
 		className: "md:col-span-2",
 		visual: (
@@ -23,8 +23,8 @@ const productivityCards = [
 		),
 	},
 	{
-		title: "Advanced Kanban & Lists",
-		description: "Manage work states, assignees, and due dates effortlessly.",
+		title: "Bảng Kanban và Danh sách nâng cao",
+		description: "Quản lý trạng thái công việc, người phụ trách và ngày đến hạn một cách dễ dàng.",
 		icon: CheckSquare,
 		className: "md:col-span-1",
 		visual: (
@@ -41,8 +41,8 @@ const productivityCards = [
 		),
 	},
 	{
-		title: "Everything Connected",
-		description: "Tag issues directly inside your documents. They stay synced automatically.",
+		title: "Mọi thứ đều được kết nối",
+		description: "Gắn thẻ các vấn đề trực tiếp trong tài liệu của bạn. Chúng được đồng bộ tự động.",
 		icon: LinkIcon,
 		className: "md:col-span-1",
 		visual: (
@@ -58,9 +58,9 @@ const productivityCards = [
 		),
 	},
 	{
-		title: "Real-time Collaboration",
+		title: "Cộng tác theo thời gian thực",
 		description:
-			"Work together simultaneously. See cursors, changes, and comments instantly.",
+			"Làm việc cùng nhau đồng thời. Xem con trỏ, thay đổi và bình luận ngay lập tức.",
 		icon: RefreshCw,
 		className: "md:col-span-2",
 		visual: (
@@ -84,12 +84,12 @@ const FeatureHighlight = () => {
 		<div className='mx-auto mt-32 max-w-6xl'>
 			<div className='text-center animate-in fade-in slide-in-from-bottom-4 duration-1000'>
 				<h2 className='text-4xl font-semibold leading-tight tracking-tight text-foreground sm:text-5xl'>
-					Write, plan, and execute in one place.
+					Viết, lập kế hoạch và thực hiện tại một nơi.
 				</h2>
 
 				<p className='mx-auto mt-6 max-w-2xl text-lg text-muted-foreground'>
-					Ditch the fragmented tools. Taskmanly brings your team's documents
-					and task tracking together, creating a true single source of truth.
+					Loại bỏ các công cụ rời rạc. Taskmanly kết hợp tài liệu
+					và theo dõi tác vụ của nhóm bạn, tạo ra một nguồn thông tin duy nhất (SSOT).
 				</p>
 			</div>
 

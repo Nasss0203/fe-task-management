@@ -19,6 +19,7 @@ import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useQueries } from "@tanstack/react-query";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { DialogCreateProject } from "../../dialog";
@@ -37,6 +38,7 @@ import { WorkspaceProjectsSubmenu } from "./WorkspaceProjectsSubmenu";
 
 
 export function NavMain() {
+	const pathname = usePathname();
 	const { setCurrentWorkspaceId, setCurrentProjectId } =
 		useProjectSelectionStore();
 	const [editingWorkspaceId, setEditingWorkspaceId] = useState<string | null>(
@@ -249,6 +251,7 @@ export function NavMain() {
 										asChild
 										tooltip={workspaceName}
 										variant='default'
+										isActive={pathname === `/dashboard/${workspace.slug}`}
 										className='group/workspace-item relative pr-14'
 									>
 										<div>

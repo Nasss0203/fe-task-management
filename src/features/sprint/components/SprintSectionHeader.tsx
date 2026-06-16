@@ -12,6 +12,7 @@ import type { SprintItem } from "@/services/sprint/type";
 import { ChevronDown, MoreHorizontal } from "lucide-react";
 import { CompleteSprintDialog } from "@/components/dialog/CompleteSprintDialog";
 import { StartSprintDialog } from "@/components/dialog/DialogStartSprint";
+import { EditSprintDialog } from "@/components/dialog/DialogEditSprint";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { BarChart2 } from "lucide-react";
@@ -47,7 +48,7 @@ export function SprintSectionHeader({
 	const { slug } = useParams();
 
 	return (
-		<div className='flex items-center justify-between gap-4 border-b border-border bg-muted/50 px-4 py-3'>
+		<div className='flex items-center justify-between gap-4 border-b border-border bg-transparent px-4 py-3'>
 			<div className='flex items-center gap-3'>
 				<Button
 					variant='ghost'
@@ -137,9 +138,21 @@ export function SprintSectionHeader({
 							workspaceId={workspaceId}
 							code={PERMISSIONS.SPRINT_UPDATE}
 						>
-							<DropdownMenuItem className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">
-								Edit sprint
-							</DropdownMenuItem>
+							<EditSprintDialog
+								workspaceId={workspaceId}
+								projectId={projectId}
+								sprintId={sprint.id}
+								defaultSprintName={sprint.name}
+								defaultGoal={sprint.goal || ""}
+								defaultStartAt={sprint.startAt}
+								defaultEndAt={sprint.endAt}
+								isSprintActive={normalizedStatus === SprintStatus.ACTIVE}
+								trigger={
+									<DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">
+										Edit sprint
+									</DropdownMenuItem>
+								}
+							/>
 						</RequirePermission>
 						<RequirePermission
 							workspaceId={workspaceId}

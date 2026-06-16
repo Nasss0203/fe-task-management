@@ -52,20 +52,21 @@ export const useUpdateTask = (workspaceId: string, projectId: string) => {
 
 			return updateTaskApi(id, body);
 		},
-		onSuccess: async () => {
-			await queryClient.invalidateQueries({
-				queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
-			});
-			await queryClient.invalidateQueries({
-				queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
-			});
-
-			await queryClient.invalidateQueries({
-				queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
-			});
-			await queryClient.invalidateQueries({
-				queryKey: [SPRINT_KEY.SPRINT, workspaceId, projectId],
-			});
+		onSuccess: () => {
+			void Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [SPRINT_KEY.SPRINT, workspaceId, projectId],
+				}),
+			]);
 		},
 	});
 };
@@ -125,6 +126,13 @@ export const useTask = (
 			queryClient.invalidateQueries({
 				queryKey: [
 					TASK_KEY.TASKS,
+					variables.workspaceId,
+					variables.projectId,
+				],
+			});
+			queryClient.invalidateQueries({
+				queryKey: [
+					TASK_KEY.TASK_BACKLOG,
 					variables.workspaceId,
 					variables.projectId,
 				],
@@ -211,12 +219,40 @@ export const useTask = (
 		},
 	});
 
+	const bulkMoveToSprint = useMutation({
+		mutationFn: async ({ taskIds, sprintId }: { taskIds: string[]; sprintId: string }) => {
+			if (!workspaceId || !projectId) {
+				throw new Error("Missing workspaceId or projectId");
+			}
+			await Promise.all(
+				taskIds.map((taskId) =>
+					moveTaskToSprintApi({
+						taskId,
+						sprintId,
+					})
+				)
+			);
+		},
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
+			});
+			await queryClient.invalidateQueries({
+				queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
+			});
+			await queryClient.invalidateQueries({
+				queryKey: [SPRINT_KEY.SPRINT, workspaceId, projectId],
+			});
+		},
+	});
+
 	return {
 		taskQuery,
 		createTask,
 		updateTask,
 		findTaskBacklog,
 		deletedTasks,
+		bulkMoveToSprint,
 		deleteTask,
 		restoreTask,
 		bulkUpdateTasks,

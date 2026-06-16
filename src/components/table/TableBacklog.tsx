@@ -12,7 +12,7 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import { Ellipsis } from "lucide-react";
+import { Ellipsis, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,9 @@ import DropdownTaskStatus from "@/components/dropdown/DropdownTaskStatus";
 import DropdownTaskPriority from "@/components/dropdown/DropdownTaskPriority";
 import { DrawerItemView } from "@/components/drawer/DrawerItemView";
 import DropdownTaskContextMenu from "@/components/dropdown/DropdownTaskContextMenu";
+import MoveToSprintDialog from "@/components/dialog/MoveToSprintDialog";
+import DialogAddTask from "@/components/dialog/DialogAddTask";
+import { useUser } from "@/features/auth/hooks/useUser";
 
 type TableBacklogProps = {
 	tasks: TaskItem[];
@@ -92,13 +95,15 @@ const getColumnsBacklog = ({
 					table.toggleAllPageRowsSelected(!!value)
 				}
 				aria-label='Select all'
+				className="border-border data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
 			/>
 		),
 		cell: ({ row }) => (
 			<Checkbox
 				checked={row.getIsSelected()}
 				onCheckedChange={(value) => row.toggleSelected(!!value)}
-				aria-label='Select row'
+				aria-label='Select task'
+				className="border-border data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
 			/>
 		),
 		enableSorting: false,
@@ -218,6 +223,7 @@ const TableBacklog = ({
 	const { currentProjectId, currentWorkspaceId } = useProjectSelectionStore();
 	const workspaceId = currentWorkspaceId as string;
 	const projectId = currentProjectId as string;
+	const { user } = useUser();
 
 	const [pagination, setPagination] = useState<PaginationState>({
 		pageIndex: 0,
@@ -226,9 +232,17 @@ const TableBacklog = ({
 	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 	const [taskTrashOpen, setTaskTrashOpen] = useState(false);
 	const [activeDrawerTaskId, setActiveDrawerTaskId] = useState<string | null>(null);
+	const [moveToSprintOpen, setMoveToSprintOpen] = useState(false);
+	
+	const [isQuickAdding, setIsQuickAdding] = useState(false);
+	const [quickAddTitle, setQuickAddTitle] = useState("");
+	const [isCreating, setIsCreating] = useState(false);
 
 	const { items } = useTableDnd();
-	const { bulkUpdateTasks, updateTask } = useTask(workspaceId, projectId);
+	const { updateTask, bulkUpdateTasks, bulkMoveToSprint, createTask } = useTask(
+		workspaceId,
+		projectId,
+	);
 	const { data: taskStatusData } = useTaskStatus(workspaceId, projectId);
 	const { data: taskPriorityData } = useTaskPriority(workspaceId, projectId);
 
@@ -275,6 +289,7 @@ const TableBacklog = ({
 			updateTask,
 			workspaceId,
 			projectId,
+			containerId,
 		],
 	);
 	// eslint-disable-next-line react-hooks/incompatible-library
@@ -311,6 +326,30 @@ const TableBacklog = ({
 		return tasks.find((t) => t.id === activeDrawerTaskId) || null;
 	}, [tasks, activeDrawerTaskId]);
 
+	const handleQuickAdd = async () => {
+		if (!quickAddTitle.trim() || !taskStatus.length) {
+			setIsQuickAdding(false);
+			setQuickAddTitle("");
+			return;
+		}
+
+		setIsCreating(true);
+		try {
+			await createTask({
+				title: quickAddTitle.trim(),
+				statusId: taskStatus[0].id,
+				workspaceId,
+				projectId,
+				createdBy: user?.id || "",
+			});
+			setQuickAddTitle("");
+		} catch (error) {
+			console.error("Failed to create task", error);
+		} finally {
+			setIsCreating(false);
+		}
+	};
+
 	const { ref, isDropTarget } = useDroppable({
 		id: containerId,
 		type: "task-table",
@@ -324,22 +363,22 @@ const TableBacklog = ({
 		<>
 			<div
 				className={cn(
-					"rounded-md border",
+					"border-t-0",
 					isDropTarget && "ring-1 ring-sky-400/60",
 				)}
 			>
-				<div className='relative max-h-150 overflow-auto rounded-md'>
+				<div className='relative max-h-[520px] overflow-auto'>
 					<table className='w-full caption-bottom text-sm'>
 						<TableHeader>
 							{table.getHeaderGroups().map((headerGroup) => (
 								<TableRow
 									key={headerGroup.id}
-									className='hover:bg-transparent'
+									className='h-12 hover:bg-transparent border-b border-border bg-muted/30'
 								>
 									{headerGroup.headers.map((header) => (
 										<TableHead
 											key={header.id}
-											className='sticky top-0 z-20 h-10 bg-background shadow-[inset_0_-1px_0_hsl(var(--border))]'
+											className='sticky top-0 z-20 h-10 bg-muted/30 whitespace-nowrap px-3 text-xs font-semibold text-muted-foreground shadow-[inset_0_-1px_0_rgba(255,255,255,0.05)] backdrop-blur-md'
 											style={{
 												width: header.getSize(),
 												minWidth: header.getSize(),
@@ -389,6 +428,48 @@ const TableBacklog = ({
 									</TableCell>
 								</TableRow>
 							)}
+							{containerId === "backlog" && (
+								<TableRow className="border-b-0 hover:bg-transparent">
+									<TableCell colSpan={columns.length} className="p-0 border-0 border-b-0">
+										{isQuickAdding ? (
+											<div className="flex w-full items-center gap-2 p-2 px-4">
+												<Plus className="size-4 text-muted-foreground" />
+												<input
+													autoFocus
+													type="text"
+													value={quickAddTitle}
+													onChange={(e) => setQuickAddTitle(e.target.value)}
+													onKeyDown={(e) => {
+														if (e.key === "Enter" && !e.shiftKey) {
+															e.preventDefault();
+															handleQuickAdd();
+														} else if (e.key === "Escape") {
+															setIsQuickAdding(false);
+															setQuickAddTitle("");
+														}
+													}}
+													onBlur={() => {
+														if (!quickAddTitle.trim()) {
+															setIsQuickAdding(false);
+														}
+													}}
+													disabled={isCreating}
+													placeholder="Nhập tên nhiệm vụ..."
+													className="flex-1 bg-transparent text-[13px] font-medium outline-none placeholder:text-muted-foreground/50 disabled:opacity-50"
+												/>
+											</div>
+										) : (
+											<button 
+												onClick={() => setIsQuickAdding(true)}
+												className='flex w-full items-center gap-2 p-3 px-4 text-[13px] font-medium text-muted-foreground hover:bg-muted/40 hover:text-foreground transition-all cursor-pointer text-left outline-none'
+											>
+												<Plus className='size-4' />
+												nhiệm vụ mới
+											</button>
+										)}
+									</TableCell>
+								</TableRow>
+							)}
 						</TableBody>
 					</table>
 				</div>
@@ -403,7 +484,7 @@ const TableBacklog = ({
 				onSelectAll={() => table.toggleAllRowsSelected(true)}
 				onClear={() => table.resetRowSelection()}
 				onMoveToSprint={() => {
-					console.log("move to sprint", selectedTaskIds);
+					setMoveToSprintOpen(true);
 				}}
 				onAssign={() => {
 					console.log("assign", selectedTaskIds);
@@ -423,6 +504,21 @@ const TableBacklog = ({
 				}}
 				onDelete={() => {
 					setTaskTrashOpen(true);
+				}}
+			/>
+
+			<MoveToSprintDialog
+				open={moveToSprintOpen}
+				onOpenChange={setMoveToSprintOpen}
+				workspaceId={workspaceId}
+				projectId={projectId}
+				isPending={bulkMoveToSprint.isPending}
+				onConfirm={async (sprintId) => {
+					await bulkMoveToSprint.mutateAsync({
+						taskIds: selectedTaskIds,
+						sprintId,
+					});
+					table.resetRowSelection();
 				}}
 			/>
 

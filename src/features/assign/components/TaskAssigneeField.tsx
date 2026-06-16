@@ -39,7 +39,7 @@ export function TaskAssigneeField({
 	onUnassignAssignee,
 }: TaskAssigneeFieldProps) {
 	return (
-		<DetailRow icon={Users} label='Assignee'>
+		<DetailRow icon={Users} label='Người thực hiện'>
 			<div className='flex flex-wrap items-center gap-3'>
 				<Popover open={open} onOpenChange={onOpenChange}>
 					<PopoverTrigger asChild>
@@ -73,7 +73,7 @@ export function TaskAssigneeField({
 								))
 							) : (
 								<div className='rounded-full bg-muted px-3 py-2 text-sm text-muted-foreground flex items-center gap-2 cursor-pointer'>
-									No assignee
+									Chưa phân công
 								</div>
 							)}
 							<ChevronDown className='size-4 text-muted-foreground cursor-pointer' />
@@ -127,19 +127,19 @@ export function TaskAssigneeField({
 									))
 								) : (
 									<span className='text-sm text-muted-foreground'>
-										No one assigned yet
+										Chưa có người thực hiện
 									</span>
 								)}
 							</div>
 						</div>
 
 						<Command className='bg-transparent'>
-							<CommandInput placeholder='Search member...' />
+							<CommandInput placeholder='Tìm kiếm thành viên...' />
 							<CommandList className='max-h-64 p-1'>
 								<CommandEmpty>
-									No member found in this workspace.
+									Không tìm thấy thành viên.
 								</CommandEmpty>
-								<CommandGroup heading='Members'>
+								<CommandGroup heading='Thành viên'>
 									{members.map((member) => {
 										const checked =
 											selectedAssigneeIds.includes(
@@ -176,7 +176,7 @@ export function TaskAssigneeField({
 														{member.name}
 														{member.isMe ? (
 															<span className='ml-1 text-muted-foreground'>
-																(you)
+																(bạn)
 															</span>
 														) : null}
 													</div>

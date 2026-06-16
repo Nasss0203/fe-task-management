@@ -16,6 +16,7 @@ import { DrawerItemView } from "@/components/drawer/DrawerItemView";
 import { useTask, useTaskStatus } from "@/features/task/hooks/useTask";
 import { TaskBulkActionBar } from "@/features/task/components/task/TaskBulkActionBar";
 import TaskTrashDialog from "@/features/task/components/task/TaskTrashDialog";
+import MoveToSprintDialog from "@/components/dialog/MoveToSprintDialog";
 
 type SprintTaskListProps = {
 	workspaceId: string;
@@ -34,7 +35,7 @@ const SprintTaskList = ({
 		sprintId,
 	});
 
-	const { bulkUpdateTasks } = useTask(workspaceId, projectId);
+	const { bulkUpdateTasks, bulkMoveToSprint } = useTask(workspaceId, projectId);
 	const { data: taskStatusData } = useTaskStatus(workspaceId, projectId);
 
 	const [activeDrawerTaskId, setActiveDrawerTaskId] = useState<string | null>(
@@ -42,6 +43,7 @@ const SprintTaskList = ({
 	);
 	const [rowSelection, setRowSelection] = useState({});
 	const [taskTrashOpen, setTaskTrashOpen] = useState(false);
+	const [moveToSprintOpen, setMoveToSprintOpen] = useState(false);
 
 	const sprintTasks = useMemo<TaskItem[]>(() => {
 		return sprintsTaskQuery.data?.data?.tasks || [];
@@ -61,7 +63,6 @@ const SprintTaskList = ({
 			workspaceId,
 			projectId,
 			onOpenDetail: setActiveDrawerTaskId,
-			isSprintContext: true,
 		});
 	}, [workspaceId, projectId]);
 
@@ -118,8 +119,24 @@ const SprintTaskList = ({
 					});
 					table.resetRowSelection();
 				}}
+				onMoveToSprint={() => setMoveToSprintOpen(true)}
 				onDelete={() => {
 					setTaskTrashOpen(true);
+				}}
+			/>
+
+			<MoveToSprintDialog
+				open={moveToSprintOpen}
+				onOpenChange={setMoveToSprintOpen}
+				workspaceId={workspaceId}
+				projectId={projectId}
+				isPending={bulkMoveToSprint.isPending}
+				onConfirm={async (selectedSprintId) => {
+					await bulkMoveToSprint.mutateAsync({
+						taskIds: selectedTaskIds,
+						sprintId: selectedSprintId,
+					});
+					table.resetRowSelection();
 				}}
 			/>
 

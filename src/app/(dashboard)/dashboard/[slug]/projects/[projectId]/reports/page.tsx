@@ -28,7 +28,7 @@ const ReportsList = () => {
 			<div className="flex items-center justify-center h-[calc(100vh-100px)] w-full">
 				<div className="flex flex-col items-center gap-4">
 					<Loader2 className="w-10 h-10 animate-spin text-muted-foreground" />
-					<p className="text-sm text-muted-foreground animate-pulse font-medium">Loading reports...</p>
+					<p className="text-sm text-muted-foreground animate-pulse font-medium">Đang tải báo cáo...</p>
 				</div>
 			</div>
 		);
@@ -43,13 +43,13 @@ const ReportsList = () => {
 							<ArrowLeft className="w-5 h-5" />
 						</Button>
 					</Link>
-					<h1 className="text-2xl font-semibold text-foreground">Sprint Reports</h1>
+					<h1 className="text-2xl font-semibold text-foreground">Báo cáo Sprint</h1>
 				</div>
 			</div>
 
 			<div className="w-full px-8 flex-1 mt-4">
 				<h2 className="text-muted-foreground font-medium mb-6 flex items-center gap-2">
-					<span className="text-foreground font-semibold">{reportsData?.data?.length || 0}</span> sprints đã hoàn thành trong dự án này
+					<span className="text-foreground font-semibold">{reportsData?.data?.length || 0}</span> sprint đã hoàn thành trong dự án này
 				</h2>
 				
 				{!reportsData?.data || reportsData.data.length === 0 ? (
@@ -91,7 +91,7 @@ const ReportsList = () => {
 											{report.sprintName}
 										</h3>
 										<div className="px-2.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-md text-xs font-medium border border-emerald-200 dark:border-emerald-800/50 whitespace-nowrap ml-2">
-											Completed
+											Hoàn thành
 										</div>
 									</div>
 									
@@ -106,7 +106,7 @@ const ReportsList = () => {
 									
 									<div className="grid grid-cols-2 gap-3 mb-5">
 										<div className="bg-secondary/50 rounded-lg p-3">
-											<div className="text-xs text-muted-foreground mb-1">Tasks hoàn thành</div>
+											<div className="text-xs text-muted-foreground mb-1">Tác vụ hoàn thành</div>
 											<div className="text-xl font-semibold text-foreground mb-0.5 flex items-baseline gap-1">
 												{report.completedTasks} <span className="text-muted-foreground text-sm font-normal">/ {report.totalTasks}</span>
 											</div>

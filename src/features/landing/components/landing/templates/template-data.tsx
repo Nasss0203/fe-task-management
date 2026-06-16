@@ -14,44 +14,44 @@ export type TemplateItem = {
 export const templateItems: TemplateItem[] = [
 	{
 		id: 1,
-		title: "Project Kick-Off Template",
+		title: "Mẫu Khởi động Dự án",
 		description:
-			"This comprehensive template covers key elements from goal setting to task allocation, providing a structured foundation for project success.",
+			"Mẫu toàn diện này bao gồm các yếu tố chính từ việc thiết lập mục tiêu đến phân công tác vụ, cung cấp nền tảng có cấu trúc cho sự thành công của dự án.",
 		variant: "kanban",
 	},
 	{
 		id: 2,
-		title: "Project Timeline Template",
+		title: "Mẫu Tiến độ Dự án",
 		description:
-			"Define objectives, break them down into actionable steps, and monitor your progress towards achieving your targets.",
+			"Xác định mục tiêu, chia nhỏ chúng thành các bước có thể thực hiện và theo dõi tiến độ của bạn để đạt được mục tiêu.",
 		variant: "timeline",
 	},
 	{
 		id: 3,
-		title: "Team Meeting Agenda",
+		title: "Chương trình Họp Nhóm",
 		description:
-			"Structured to cover important discussion points, action items, and follow-ups, this template ensures your team stays focused and aligned.",
+			"Được cấu trúc để bao gồm các điểm thảo luận quan trọng, hành động và theo dõi, mẫu này đảm bảo nhóm của bạn luôn tập trung và đồng bộ.",
 		variant: "mindmap",
 	},
 	{
 		id: 4,
-		title: "Daily Task Checklist",
+		title: "Danh sách Công việc Hàng ngày",
 		description:
-			"Easily organize and prioritize your tasks for the day, ensuring nothing gets overlooked and maximizing your daily productivity.",
+			"Dễ dàng sắp xếp và ưu tiên các tác vụ trong ngày, đảm bảo không có gì bị bỏ sót và tối đa hóa năng suất hàng ngày của bạn.",
 		variant: "checklist",
 	},
 	{
 		id: 5,
-		title: "Goal Setting Worksheet",
+		title: "Bảng Thiết lập Mục tiêu",
 		description:
-			"Define objectives, break them down into actionable steps, and monitor your progress towards achieving your targets.",
+			"Xác định mục tiêu, chia nhỏ chúng thành các bước có thể thực hiện và theo dõi tiến độ của bạn để đạt được mục tiêu.",
 		variant: "timeline",
 	},
 	{
 		id: 6,
-		title: "Personal Productivity Planner",
+		title: "Kế hoạch Năng suất Cá nhân",
 		description:
-			"Organize your tasks, set priorities, and track your accomplishments to maximize efficiency in your day-to-day activities.",
+			"Tổ chức các tác vụ, thiết lập mức độ ưu tiên và theo dõi thành tựu của bạn để tối đa hóa hiệu quả trong các hoạt động hàng ngày.",
 		variant: "planner",
 	},
 ];

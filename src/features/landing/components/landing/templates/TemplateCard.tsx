@@ -26,7 +26,7 @@ export default function TemplateCard({ item }: TemplateCardProps) {
 									console.log("Use Template:", item.title)
 								}
 							>
-								Use Template
+								Dùng Mẫu
 							</Button>
 
 							<Link href={`/templates/${item.id}`} className="w-full pointer-events-auto">
@@ -34,7 +34,7 @@ export default function TemplateCard({ item }: TemplateCardProps) {
 									variant='outline'
 									className='h-11 w-full rounded-xl border-border bg-background/50 text-foreground hover:bg-secondary hover:text-foreground backdrop-blur-sm'
 								>
-									Preview
+									Xem trước
 								</Button>
 							</Link>
 						</div>

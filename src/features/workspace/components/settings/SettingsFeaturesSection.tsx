@@ -22,9 +22,9 @@ export function SettingsFeaturesSection({
 }: SettingsFeaturesSectionProps) {
 	return (
 		<div className='max-w-3xl space-y-4'>
-			<div className='rounded-md border border-blue-500/20 bg-blue-500/10 p-4 text-sm text-blue-100'>
-				Feature settings decide what this workspace can
-				use after the plan allows it.
+			<div className='rounded-md border border-blue-500/20 bg-blue-500/10 p-4 text-sm text-blue-800 dark:text-blue-200'>
+				Cài đặt tính năng quyết định những gì workspace này có thể
+				sử dụng nếu gói đăng ký cho phép.
 			</div>
 
 			<div className='rounded-md border border-border bg-muted/50'>
@@ -34,8 +34,8 @@ export function SettingsFeaturesSection({
 							Sprint
 						</div>
 						<div className='mt-1 text-sm text-muted-foreground'>
-							Enable sprint planning, backlog
-							views, and sprint task workflows.
+							Bật tính năng lập kế hoạch sprint, xem backlog
+							và luồng công việc sprint.
 						</div>
 					</div>
 					<Switch
@@ -54,12 +54,12 @@ export function SettingsFeaturesSection({
 				<div className='grid grid-cols-3 gap-4 px-5 py-4 text-sm'>
 					<div>
 						<div className='text-xs uppercase text-muted-foreground'>
-							Plan
+							Gói đăng ký
 						</div>
 						<div className='mt-1 font-medium'>
 							{sprintPlanEnabled
-								? "Allowed"
-								: "Not allowed"}
+								? "Được phép"
+								: "Không được phép"}
 						</div>
 					</div>
 					<div>
@@ -69,18 +69,18 @@ export function SettingsFeaturesSection({
 						<div className='mt-1 font-medium'>
 							{sprintFeature?.workspaceEnabled ===
 							false
-								? "Off"
-								: "On"}
+								? "Tắt"
+								: "Bật"}
 						</div>
 					</div>
 					<div>
 						<div className='text-xs uppercase text-muted-foreground'>
-							Result
+							Kết quả
 						</div>
 						<div className='mt-1 font-medium'>
 							{sprintEnabled
-								? "Enabled"
-								: "Disabled"}
+								? "Đã bật"
+								: "Đã tắt"}
 						</div>
 					</div>
 				</div>

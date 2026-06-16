@@ -41,12 +41,11 @@ export function SettingsDangerSection({
 					<Lock className='mt-0.5 size-5 text-red-300' />
 					<div className='min-w-0 flex-1'>
 						<div className='text-sm font-semibold text-red-200'>
-							Danger zone
+							Thùng rác workspace
 						</div>
 						<div className='mt-1 text-sm text-red-200/70'>
-							Move this workspace to trash.
-							Project deletion can be handled
-							later.
+							Chuyển workspace này vào thùng rác.
+							Việc xóa dự án có thể được xử lý sau.
 						</div>
 					</div>
 					{canDeleteWorkspace ? (
@@ -55,7 +54,7 @@ export function SettingsDangerSection({
 							onClick={onMoveToTrash}
 							className='rounded-md border border-red-500/30 px-3 py-2 text-sm font-medium text-red-300 transition hover:bg-red-500/10'
 						>
-							Move to trash
+							Chuyển vào thùng rác
 						</button>
 					) : (
 						<span className='text-xs text-neutral-600'>Chỉ Owner mới có thể xóa workspace.</span>
@@ -68,24 +67,24 @@ export function SettingsDangerSection({
 				<div className='mb-4 flex items-start justify-between gap-4'>
 					<div>
 						<div className='text-sm font-semibold'>
-							Deleted projects
+							Dự án đã xóa
 						</div>
 						<div className='mt-1 text-sm text-muted-foreground'>
-							Restore projects that were soft-deleted in this workspace.
+							Khôi phục các dự án đã xóa tạm thời trong workspace này.
 						</div>
 					</div>
 					<div className='rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground'>
-						{deletedProjectItems.length} items
+						{deletedProjectItems.length} mục
 					</div>
 				</div>
 
 				{isDeletedProjectsLoading ? (
 					<div className='text-sm text-muted-foreground'>
-						Loading deleted projects...
+						Đang tải dự án đã xóa...
 					</div>
 				) : deletedProjectItems.length === 0 ? (
 					<div className='rounded-md border border-dashed border-border px-4 py-6 text-sm text-muted-foreground'>
-						Chua co project nao trong thung rac cua workspace nay.
+						Chưa có dự án nào trong thùng rác của workspace này.
 					</div>
 				) : (
 					<div className='grid gap-3'>
@@ -96,10 +95,10 @@ export function SettingsDangerSection({
 							>
 								<div className='min-w-0'>
 									<div className='truncate text-sm font-medium text-foreground'>
-										{project.name ?? "Untitled project"}
+										{project.name ?? "Dự án chưa có tên"}
 									</div>
 									<div className='mt-1 text-xs text-muted-foreground'>
-										Deleted at {formatDeletedAt(project.deleted_at)}
+										Đã xóa lúc {formatDeletedAt(project.deleted_at)}
 									</div>
 								</div>
 
@@ -112,7 +111,7 @@ export function SettingsDangerSection({
 										className='border-border bg-transparent text-foreground hover:hover:bg-accent hover:text-accent-foreground'
 									>
 										<RotateCcw className='mr-2 h-4 w-4' />
-										Restore
+										Khôi phục
 									</Button>
 								)}
 							</div>
@@ -126,26 +125,26 @@ export function SettingsDangerSection({
 				<div className='mb-4 flex items-start justify-between gap-4'>
 					<div>
 						<div className='text-sm font-semibold'>
-							Deleted tasks
+							Tác vụ đã xóa
 						</div>
 						<div className='mt-1 text-sm text-muted-foreground'>
-							Restore tasks that were soft-deleted
-							in this workspace.
+							Khôi phục các tác vụ đã xóa tạm thời
+							trong workspace này.
 						</div>
 					</div>
 					<div className='rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground'>
-						{deletedTaskItems.length} items
+						{deletedTaskItems.length} mục
 					</div>
 				</div>
 
 				{isDeletedTasksLoading ? (
 					<div className='text-sm text-muted-foreground'>
-						Loading deleted tasks...
+						Đang tải tác vụ đã xóa...
 					</div>
 				) : deletedTaskItems.length === 0 ? (
 					<div className='rounded-md border border-dashed border-border px-4 py-6 text-sm text-muted-foreground'>
-						Chua co task nao trong thung rac cua
-						workspace nay.
+						Chưa có tác vụ nào trong thùng rác của
+						workspace này.
 					</div>
 				) : (
 					<div className='grid gap-3'>
@@ -157,7 +156,7 @@ export function SettingsDangerSection({
 								<div className='min-w-0'>
 									<div className='truncate text-sm font-medium text-foreground'>
 										{task.title ??
-											"Untitled task"}
+											"Tác vụ chưa có tên"}
 									</div>
 									<div className='mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground'>
 										<span>
@@ -170,7 +169,7 @@ export function SettingsDangerSection({
 										</span>
 										{task.statusName ? (
 											<span>
-												Status:{" "}
+												Trạng thái:{" "}
 												{
 													task.statusName
 												}
@@ -178,14 +177,14 @@ export function SettingsDangerSection({
 										) : null}
 										{task.priorityName ? (
 											<span>
-												Priority:{" "}
+												Mức độ ưu tiên:{" "}
 												{
 													task.priorityName
 												}
 											</span>
 										) : null}
 										<span>
-											Deleted at{" "}
+											Đã xóa lúc{" "}
 											{formatDeletedAt(
 												task.deletedAt,
 											)}
@@ -208,7 +207,7 @@ export function SettingsDangerSection({
 										className='border-border bg-transparent text-foreground hover:hover:bg-accent hover:text-accent-foreground'
 									>
 										<RotateCcw className='mr-2 h-4 w-4' />
-										Restore
+										Khôi phục
 									</Button>
 								)}
 							</div>

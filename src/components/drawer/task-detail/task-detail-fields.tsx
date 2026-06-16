@@ -81,6 +81,8 @@ type TaskTagsFieldProps = {
 
 type TaskDescriptionFieldProps = {
 	description?: string | null;
+	onSave?: (description: string) => void;
+	isUpdating?: boolean;
 };
 
 type TaskAttachmentsFieldProps = {
@@ -110,7 +112,7 @@ function formatScheduleLabel(startDate?: Date, dueDate?: Date) {
 		return formatDateLabel(startDate);
 	}
 
-	return "Set schedule";
+	return "Thiết lập thời gian";
 }
 
 function AttachmentCard({
@@ -191,7 +193,7 @@ export function TaskStatusField({
 	);
 
 	return (
-		<DetailRow icon={Circle} label='Status'>
+		<DetailRow icon={Circle} label='Trạng thái'>
 			<Popover open={open} onOpenChange={onOpenChange}>
 				<PopoverTrigger asChild>
 					<button
@@ -215,7 +217,7 @@ export function TaskStatusField({
 					className='w-64 rounded-2xl border border-border bg-popover p-2 shadow-md'
 				>
 					<div className='px-2 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground'>
-						Status
+						Trạng thái
 					</div>
 					<div className='space-y-1'>
 						{statuses.map((status) => {
@@ -226,7 +228,7 @@ export function TaskStatusField({
 							const active =
 								status.id === selectedStatusId ||
 								normalizeText(status.name) ===
-									normalizeText(currentStatusName);
+								normalizeText(currentStatusName);
 
 							return (
 								<button
@@ -238,7 +240,7 @@ export function TaskStatusField({
 									className={cn(
 										"flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
 										active &&
-											"bg-accent text-accent-foreground",
+										"bg-accent text-accent-foreground",
 									)}
 								>
 									<span
@@ -273,13 +275,13 @@ export function TaskPriorityField({
 	selectedPriorityId,
 	onSelect,
 }: TaskPriorityFieldProps) {
-	const noPriorityLabel = "No priority";
+	const noPriorityLabel = "Không ưu tiên";
 	const noPriorityActive =
 		!selectedPriorityId &&
 		normalizeText(currentPriorityName) === normalizeText(noPriorityLabel);
 
 	return (
-		<DetailRow icon={Tag} label='Priority'>
+		<DetailRow icon={Tag} label='Độ ưu tiên'>
 			<Popover open={open} onOpenChange={onOpenChange}>
 				<PopoverTrigger asChild>
 					<button
@@ -304,7 +306,7 @@ export function TaskPriorityField({
 					className='w-64 rounded-2xl border border-border bg-popover p-2 shadow-md'
 				>
 					<div className='px-2 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground'>
-						Priority
+						Độ ưu tiên
 					</div>
 					<div className='space-y-1'>
 						<button
@@ -315,7 +317,7 @@ export function TaskPriorityField({
 							className={cn(
 								"flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
 								noPriorityActive &&
-									"bg-accent text-accent-foreground",
+								"bg-accent text-accent-foreground",
 							)}
 						>
 							<Circle
@@ -334,7 +336,7 @@ export function TaskPriorityField({
 							const active =
 								priority.id === selectedPriorityId ||
 								normalizeText(priority.name) ===
-									normalizeText(currentPriorityName);
+								normalizeText(currentPriorityName);
 
 							return (
 								<button
@@ -346,7 +348,7 @@ export function TaskPriorityField({
 									className={cn(
 										"flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
 										active &&
-											"bg-accent text-accent-foreground",
+										"bg-accent text-accent-foreground",
 									)}
 								>
 									<Circle
@@ -414,7 +416,7 @@ export function TaskScheduleField({
 	};
 
 	return (
-		<DetailRow icon={CalendarDays} label='Schedule'>
+		<DetailRow icon={CalendarDays} label='Thời hạn'>
 			<Popover open={open} onOpenChange={onOpenChange}>
 				<PopoverTrigger asChild>
 					<button
@@ -425,8 +427,8 @@ export function TaskScheduleField({
 						<span
 							className={cn(
 								!startDate &&
-									!dueDate &&
-									"text-muted-foreground",
+								!dueDate &&
+								"text-muted-foreground",
 							)}
 						>
 							{formatScheduleLabel(startDate, dueDate)}
@@ -453,9 +455,9 @@ export function TaskScheduleField({
 					/>
 					<div className="flex items-center gap-2 px-3 pb-3 pt-2 border-t">
 						<div className="flex flex-col gap-1 flex-1">
-							<label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Start Time</label>
-							<input 
-								type="time" 
+							<label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Thời gian bắt đầu</label>
+							<input
+								type="time"
 								value={startDate ? format(startDate, "HH:mm") : ""}
 								onChange={(e) => handleTimeChange('from', e.target.value)}
 								className="flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
@@ -463,9 +465,9 @@ export function TaskScheduleField({
 							/>
 						</div>
 						<div className="flex flex-col gap-1 flex-1">
-							<label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">End Time</label>
-							<input 
-								type="time" 
+							<label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Thời gian kết thúc</label>
+							<input
+								type="time"
 								value={dueDate ? format(dueDate, "HH:mm") : ""}
 								onChange={(e) => handleTimeChange('to', e.target.value)}
 								className="flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
@@ -509,7 +511,7 @@ export function TaskDueDateField({
 	};
 
 	return (
-		<DetailRow icon={CalendarDays} label='Due date'>
+		<DetailRow icon={CalendarDays} label='Hạn chót'>
 			<Popover open={open} onOpenChange={onOpenChange}>
 				<PopoverTrigger asChild>
 					<button
@@ -541,9 +543,9 @@ export function TaskDueDateField({
 					/>
 					<div className="flex items-center gap-2 px-3 pb-3 pt-2 border-t">
 						<div className="flex flex-col gap-1 flex-1">
-							<label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Due Time</label>
-							<input 
-								type="time" 
+							<label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Thời gian hạn chót</label>
+							<input
+								type="time"
 								value={dueDate ? format(dueDate, "HH:mm") : ""}
 								onChange={(e) => handleTimeChange(e.target.value)}
 								className="flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
@@ -562,7 +564,7 @@ export function TaskTagsField({
 	priorityName,
 }: TaskTagsFieldProps) {
 	return (
-		<DetailRow icon={Tag} label='Tags'>
+		<DetailRow icon={Tag} label='Thẻ'>
 			<div className='flex flex-wrap gap-2'>
 				<Badge className='rounded-md border border-border bg-accent px-3 py-1 text-sm font-medium text-accent-foreground shadow-none'>
 					{contextTag}
@@ -582,17 +584,66 @@ export function TaskTagsField({
 
 export function TaskDescriptionField({
 	description,
+	onSave,
+	isUpdating,
 }: TaskDescriptionFieldProps) {
+	const [value, setValue] = React.useState(description ?? "");
+	const [isEditing, setIsEditing] = React.useState(false);
+
+	const prevDescriptionRef = React.useRef(description);
+
+	React.useEffect(() => {
+		if (description !== prevDescriptionRef.current) {
+			prevDescriptionRef.current = description;
+			if (!isEditing) {
+				setValue(description ?? "");
+			}
+		}
+	}, [description, isEditing]);
+
+	const handleSave = () => {
+		setIsEditing(false);
+		if (value !== (description ?? "")) {
+			onSave?.(value);
+		}
+	};
+
+	const handleCancel = () => {
+		setIsEditing(false);
+		setValue(description ?? "");
+	};
+
 	return (
-		<DetailRow icon={FileText} label='Description'>
-			<Textarea
-				readOnly
-				value={
-					description ??
-					"This drawer now follows the KPI-style detail layout. Connect real task description editing when the backend update flow is ready."
-				}
-				className='min-h-22 resize-none rounded-2xl border-border bg-card px-4 py-3 text-sm leading-7 text-foreground shadow-none focus-visible:ring-0'
-			/>
+		<DetailRow icon={FileText} label='Mô tả'>
+			<div className='flex w-full flex-col gap-2'>
+				<Textarea
+					value={value}
+					onChange={(e) => setValue(e.target.value)}
+					onFocus={() => setIsEditing(true)}
+					disabled={isUpdating}
+					placeholder='Thêm mô tả chi tiết...'
+					className='min-h-22 w-full resize-none rounded-2xl border-border bg-card px-4 py-3 text-sm leading-7 text-foreground shadow-none focus-visible:ring-1 focus-visible:ring-primary'
+				/>
+				{isEditing && (
+					<div className='flex justify-end gap-2'>
+						<Button
+							variant='outline'
+							size='sm'
+							onClick={handleCancel}
+							disabled={isUpdating}
+						>
+							Hủy
+						</Button>
+						<Button
+							size='sm'
+							onClick={handleSave}
+							disabled={isUpdating}
+						>
+							{isUpdating ? "Đang lưu..." : "Lưu"}
+						</Button>
+					</div>
+				)}
+			</div>
 		</DetailRow>
 	);
 }
@@ -622,7 +673,7 @@ export function TaskAttachmentsField({
 	return (
 		<DetailRow
 			icon={Paperclip}
-			label={`Attachment (${attachments.length})`}
+			label={`Tệp đính kèm (${attachments.length})`}
 		>
 			<div className='space-y-2.5'>
 				<div className='flex items-center justify-end gap-2'>
@@ -635,7 +686,7 @@ export function TaskAttachmentsField({
 							className='h-8 rounded-lg px-3 text-xs'
 						>
 							<Download className='size-3.5' />
-							Download All
+							Tải xuống tất cả
 						</Button>
 					)}
 
@@ -647,7 +698,7 @@ export function TaskAttachmentsField({
 						className='h-8 rounded-lg px-3 text-xs'
 					>
 						{isUploading ? <Loader2 className='size-3.5 animate-spin mr-1' /> : <Plus className='size-3.5 mr-1' />}
-						Add File
+						Thêm tệp
 					</Button>
 					<input
 						type='file'
@@ -660,7 +711,7 @@ export function TaskAttachmentsField({
 
 				{isLoadingAttachments ? (
 					<div className="flex h-16 items-center justify-center rounded-xl border border-dashed border-border bg-card/60 text-sm text-muted-foreground">
-						<Loader2 className="mr-2 size-4 animate-spin" /> Loading attachments...
+						<Loader2 className="mr-2 size-4 animate-spin" /> Đang tải tệp đính kèm...
 					</div>
 				) : (
 					<div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
@@ -684,7 +735,7 @@ export function TaskAttachmentsField({
 							) : (
 								<Plus className='size-4' />
 							)}
-							<span>{isUploading ? "Uploading..." : "Add attachment"}</span>
+							<span>{isUploading ? "Đang tải lên..." : "Thêm tệp đính kèm"}</span>
 						</button>
 					</div>
 				)}

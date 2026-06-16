@@ -1,14 +1,14 @@
 const workManagementViews = [
 	{
-		title: "List View",
+		title: "Dạng Danh sách",
 		description:
-			"Organize and assign tasks. With lists, teams see immediately what they need to do, which tasks are a priority, and when work is due.",
+			"Sắp xếp và giao việc. Với danh sách, nhóm sẽ thấy ngay những gì cần làm, tác vụ nào là ưu tiên, và thời hạn hoàn thành.",
 		active: true,
 	},
-	{ title: "Kanban Board", description: "", active: false },
-	{ title: "Document View", description: "", active: false },
-	{ title: "Timeline View", description: "", active: false },
-	{ title: "Calendar", description: "", active: false },
+	{ title: "Bảng Kanban", description: "", active: false },
+	{ title: "Dạng Tài liệu", description: "", active: false },
+	{ title: "Dạng Tiến độ", description: "", active: false },
+	{ title: "Lịch", description: "", active: false },
 ];
 
 const WorkManagement = () => {
@@ -17,12 +17,12 @@ const WorkManagement = () => {
 			<div className='grid gap-16 lg:grid-cols-2 lg:items-center'>
 				<div className='animate-in fade-in slide-in-from-left-8 duration-1000'>
 					<h2 className='text-4xl font-semibold leading-tight tracking-tight text-foreground sm:text-5xl'>
-						Manage work alongside your knowledge.
+						Quản lý công việc song song với kiến thức của bạn.
 					</h2>
 
 					<p className='mt-6 text-lg text-muted-foreground'>
-						Seamlessly switch between boards, lists, and documents.
-						Keeping your specs and tasks in one place has never been more adaptable.
+						Chuyển đổi liền mạch giữa bảng, danh sách và tài liệu.
+						Việc giữ cho các đặc tả và tác vụ ở cùng một nơi chưa bao giờ linh hoạt đến thế.
 					</p>
 
 					<div className='mt-12 space-y-6'>

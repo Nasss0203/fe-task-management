@@ -181,7 +181,7 @@ const SprintProjectSection = ({
 	const [open, setOpen] = useState<boolean>(true);
 
 	return (
-		<Card className='overflow-hidden py-0! flex flex-col gap-0 rounded-2xl border-border bg-muted/50'>
+		<Card className='flex flex-col gap-0 overflow-hidden rounded-xl border border-border bg-card shadow-sm !py-0'>
 			<SprintSectionHeader
 				sprint={sprint}
 				status={status}
@@ -191,13 +191,11 @@ const SprintProjectSection = ({
 				onToggle={() => setOpen(!open)}
 			/>
 
-			{open ? (
-				<div className='flex flex-col gap-6 p-4'>
-					<div className='overflow-x-auto rounded-xl border border-border/50 bg-muted/50'>
-						<TableBacklog tasks={tasks} containerId={containerId} />
-					</div>
+			{open && (
+				<div className='relative overflow-auto border-t-0'>
+					<TableBacklog tasks={tasks} containerId={containerId} />
 				</div>
-			) : null}
+			)}
 		</Card>
 	);
 };

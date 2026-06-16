@@ -16,11 +16,12 @@ export const findBoardById = async (boardId: string): Promise<any> => {
 	return response.data;
 };
 
-export const CreateBoardAndAttachToPage = async (data: CreateBoarDto) => {
-	const response = await instance.post<any>(
-		"/boards/create-and-attach",
-		data,
-	);
-	console.log("🚀 ~ response~", response);
-	return response.data;
+export const createBoardApi = async (data: CreateBoarDto) => {
+	if (data.blockId) {
+		const response = await instance.post<any>("/boards/create-and-attach", data);
+		return response.data;
+	} else {
+		const response = await instance.post<any>("/boards", data);
+		return response.data;
+	}
 };

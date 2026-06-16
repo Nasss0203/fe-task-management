@@ -54,7 +54,7 @@ export default function DashboardPage() {
 			>
 				<Card>
 					<CardHeader>
-						<CardTitle>Không tải được dashboard</CardTitle>
+						<CardTitle>Không tải được Bảng điều khiển</CardTitle>
 						<CardDescription>
 							Vui lòng thử lại để lấy dữ liệu mới nhất từ hệ
 							thống.

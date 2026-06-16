@@ -42,8 +42,8 @@ const SprintReportPage = () => {
   if (!currentReport) {
     return (
       <div className="p-6 h-full flex flex-col items-center justify-center text-neutral-500">
-        <h2 className="text-xl font-semibold mb-2">No Report Found</h2>
-        <p>This sprint might not be completed yet, or no report was generated.</p>
+        <h2 className="text-xl font-semibold mb-2">Không tìm thấy báo cáo</h2>
+        <p>Sprint này có thể chưa hoàn thành, hoặc không có báo cáo nào được tạo.</p>
       </div>
     );
   }

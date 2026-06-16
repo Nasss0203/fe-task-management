@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
 	Folder,
 	Forward,
@@ -36,16 +37,17 @@ export function NavProjects({
 	}[];
 }) {
 	const { isMobile } = useSidebar();
+	const pathname = usePathname();
 
 	return (
 		<SidebarGroup className='group-data-[collapsible=icon]:hidden'>
-			<SidebarGroupLabel>More</SidebarGroupLabel>
+			<SidebarGroupLabel>Khác</SidebarGroupLabel>
 			<SidebarMenu>
 				<SidebarMenuItem>
-					<SidebarMenuButton asChild>
+					<SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/trash')}>
 						<Link href='/dashboard/trash/workspaces'>
 							<Trash2 className='text-sidebar-foreground/70' />
-							<span>Thung rac</span>
+							<span>Thùng rác</span>
 						</Link>
 					</SidebarMenuButton>
 				</SidebarMenuItem>

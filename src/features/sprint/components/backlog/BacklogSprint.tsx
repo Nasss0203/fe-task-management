@@ -30,6 +30,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import MoveToSprintDialog from "@/components/dialog/MoveToSprintDialog";
 
 const ALL_FILTER_VALUE = "all";
 
@@ -62,6 +63,7 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 	const [priorityFilter, setPriorityFilter] = useState(ALL_FILTER_VALUE);
 	const [assigneeFilter, setAssigneeFilter] = useState(ALL_FILTER_VALUE);
 	const [activeDrawerTaskId, setActiveDrawerTaskId] = useState<string | null>(null);
+	const [moveToSprintOpen, setMoveToSprintOpen] = useState(false);
 
 	const backlogFilters = useMemo(
 		() => ({
@@ -87,7 +89,7 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 			pagination.pageSize,
 		],
 	);
-	const { findTaskBacklog, bulkUpdateTasks } = useTask(workspaceId, projectId, backlogFilters);
+	const { findTaskBacklog, bulkUpdateTasks, bulkMoveToSprint } = useTask(workspaceId, projectId, backlogFilters);
 	const { findAllMember } = useMember({ workspaceId });
 	const { data: taskStatusData } = useTaskStatus(workspaceId, projectId);
 	const { data: taskPriorityData } = useTaskPriority(workspaceId, projectId);
@@ -380,8 +382,24 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 					});
 					table.resetRowSelection();
 				}}
+				onMoveToSprint={() => setMoveToSprintOpen(true)}
 				onDelete={() => {
 					setTaskTrashOpen(true);
+				}}
+			/>
+
+			<MoveToSprintDialog
+				open={moveToSprintOpen}
+				onOpenChange={setMoveToSprintOpen}
+				workspaceId={workspaceId}
+				projectId={projectId}
+				isPending={bulkMoveToSprint.isPending}
+				onConfirm={async (sprintId) => {
+					await bulkMoveToSprint.mutateAsync({
+						taskIds: selectedTaskIds,
+						sprintId,
+					});
+					table.resetRowSelection();
 				}}
 			/>
 

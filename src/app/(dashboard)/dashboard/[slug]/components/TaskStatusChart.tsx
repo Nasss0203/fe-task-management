@@ -29,13 +29,13 @@ export const TaskStatusChart = ({ data, slug }: TaskStatusChartProps) => {
   return (
     <Card className="relative overflow-hidden border border-border dark:border-white/5 bg-card/80 dark:bg-zinc-900/50 backdrop-blur-sm shadow-[0_1px_1px_rgba(0,0,0,0.05),0_4px_6px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.05)]">
       <CardHeader className="pb-2 pt-8 px-8">
-        <CardTitle className="text-lg font-semibold tracking-tight text-foreground">Trạng thái Task</CardTitle>
+        <CardTitle className="text-lg font-semibold tracking-tight text-foreground">Trạng thái tác vụ</CardTitle>
       </CardHeader>
       <CardContent className="px-8 pb-8">
         <div
           className="h-[240px] w-full"
           role="img"
-          aria-label="Biểu đồ trạng thái task trong workspace"
+          aria-label="Biểu đồ trạng thái tác vụ trong không gian làm việc"
         >
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>

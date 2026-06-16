@@ -23,7 +23,7 @@ import {
 } from "@/components/popover/popover-custom";
 
 type AddBoardProps = {
-	blockId: string;
+	blockId?: string;
 	projectId: string;
 	workspaceId: string;
 	boards: BoardItem[];

@@ -7,6 +7,7 @@ import {
 	SprintItem,
 	SprintParams,
 	StartSprintParams,
+	UpdateSprintParams,
 } from "./type";
 
 export const findAllSprintApi = async (
@@ -59,6 +60,17 @@ export const completeSprintApi = async (params: CompleteSprintParams) => {
 
 	const response = await instance.patch<any>(
 		`/sprints/workspaces/${workspaceId}/projects/${projectId}/sprints/${sprintId}/complete`,
+	);
+
+	return response.data;
+};
+
+export const updateSprintApi = async (params: UpdateSprintParams) => {
+	const { workspaceId, projectId, sprintId, data } = params;
+
+	const response = await instance.patch<any>(
+		`/sprints/workspaces/${workspaceId}/projects/${projectId}/sprint/${sprintId}`,
+		data,
 	);
 
 	return response.data;

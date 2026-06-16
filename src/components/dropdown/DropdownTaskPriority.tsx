@@ -69,7 +69,7 @@ const DropdownTaskPriority = ({
 							currentStyle.dot,
 						)}
 					/>
-					<span className="text-[13px] font-medium text-foreground">{currentPriority?.name ?? priorityName ?? "No priority"}</span>
+					<span className="text-[13px] font-medium text-foreground">{currentPriority?.name || priorityName || "No priority"}</span>
 					<ChevronDown className="h-3 w-3 text-muted-foreground" />
 				</div>
 			</DropdownMenuTriggerV2>
@@ -79,6 +79,22 @@ const DropdownTaskPriority = ({
 					<DropdownMenuLabelV2 className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
 						PRIORITY
 					</DropdownMenuLabelV2>
+
+					<DropdownMenuItemV2
+						className={cn(
+							"focus:focus:bg-accent rounded-xl cursor-pointer transition-colors px-3 py-2 mt-1 first:mt-0",
+							!currentPriority && !priorityName && "bg-muted/50"
+						)}
+						onClick={() => handleUpdateTask(null)}
+					>
+						<div className="flex items-center justify-between w-full">
+							<div className="flex items-center gap-3">
+								<span className="size-2.5 rounded-full bg-slate-400 dark:bg-slate-500" />
+								<span className="font-semibold text-[13px]">No priority</span>
+							</div>
+							{!currentPriority && !priorityName && <Check className="h-4 w-4 text-blue-500" />}
+						</div>
+					</DropdownMenuItemV2>
 
 					{priorities.map((priority) => {
 						const style = getUserFacingPriorityStyle(priority.name);

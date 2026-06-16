@@ -82,10 +82,10 @@ const ProjectTrashDialog = ({
 				router.push(`/dashboard/${workspace.slug}`);
 			}
 
-			toast.success("Project da duoc chuyen vao thung rac.");
+			toast.success("Project đã được chuyển vào thùng rác.");
 		} catch (error) {
 			console.error("deleteProjectFromDialog failed", error);
-			toast.error("Khong the chuyen project vao thung rac.");
+			toast.error("Không thể chuyển project vào thùng rác.");
 		}
 	};
 
@@ -93,21 +93,16 @@ const ProjectTrashDialog = ({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className='border-border bg-popover text-foreground sm:max-w-md'>
 				<DialogHeader>
-					<DialogTitle>Chuyen project vao Thung rac?</DialogTitle>
+					<DialogTitle>Chuyển project vào Thùng rác?</DialogTitle>
 					<DialogDescription className='text-muted-foreground'>
 						Project{" "}
 						<span className='font-medium text-foreground'>
 							{project.name ?? "Untitled project"}
 						</span>{" "}
-						se bi an khoi workspace. Ban co the khoi phuc no sau tu
-						trash project.
+						sẽ bị ẩn khỏi workspace. Bạn có thể khôi phục nó sau từ
+						thùng rác.
 					</DialogDescription>
 				</DialogHeader>
-
-				<div className='rounded-md border border-red-500/20 bg-red-500/5 p-3 text-sm text-red-200/80'>
-					Neu project dang hien thi tren page workspace, block hien thi se
-					duoc go bo cung luc de giao dien khong bi hong.
-				</div>
 
 				<DialogFooter className='gap-2 sm:justify-end'>
 					<Button
@@ -115,14 +110,14 @@ const ProjectTrashDialog = ({
 						onClick={() => onOpenChange(false)}
 						disabled={isDeletingProject}
 					>
-						Huy
+						Hủy
 					</Button>
 					<Button
 						onClick={handleConfirm}
 						disabled={isDeletingProject}
 						className='bg-red-600 text-white hover:bg-red-700'
 					>
-						{isDeletingProject ? "Dang chuyen..." : "Chuyen vao Thung rac"}
+						{isDeletingProject ? "Đang chuyển..." : "Chuyển vào Thùng rác"}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

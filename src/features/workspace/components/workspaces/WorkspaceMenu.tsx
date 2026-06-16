@@ -76,13 +76,13 @@ export function WorkspaceMenu({
 								className='gap-3'
 							>
 								<Pencil className='h-4 w-4' />
-								<span>Rename workspace</span>
+								<span>Đổi tên workspace</span>
 							</DropdownMenuItem>
 						</RequirePermission>
 
 						<DropdownMenuItem onClick={onStar} className='gap-3'>
 							<Star className='h-4 w-4' />
-							<span>Add to starred</span>
+							<span>Thêm vào danh sách đánh dấu</span>
 						</DropdownMenuItem>
 
 						<RequirePermission
@@ -97,7 +97,7 @@ export function WorkspaceMenu({
 								}}
 							>
 								<UserPlus className='h-4 w-4' />
-								<span>Add people</span>
+								<span>Thêm người</span>
 							</DropdownMenuItem>
 						</RequirePermission>
 
@@ -106,7 +106,7 @@ export function WorkspaceMenu({
 							className='gap-3'
 						>
 							<Cog className='h-4 w-4' />
-							<span>Space settings</span>
+							<span>Cài đặt không gian</span>
 						</DropdownMenuItem>
 
 						<RequirePermission
@@ -118,7 +118,7 @@ export function WorkspaceMenu({
 								className='gap-3'
 							>
 								<LayoutTemplate className='h-4 w-4' />
-								<span>Save workspace template</span>
+								<span>Lưu mẫu workspace</span>
 							</DropdownMenuItem>
 						</RequirePermission>
 					</DropdownMenuGroup>
@@ -131,7 +131,7 @@ export function WorkspaceMenu({
 					>
 						<DropdownMenuItem onClick={onArchive} className='gap-3'>
 							<Archive className='h-4 w-4' />
-							<span>Archive space</span>
+							<span>Lưu trữ không gian</span>
 						</DropdownMenuItem>
 
 						<DropdownMenuItem
@@ -139,7 +139,7 @@ export function WorkspaceMenu({
 							className='gap-3 text-red-500 focus:text-red-500'
 						>
 							<Trash2 className='h-4 w-4' />
-							<span>Delete space</span>
+							<span>Xóa không gian</span>
 						</DropdownMenuItem>
 					</RequirePermission>
 				</DropdownMenuContent>

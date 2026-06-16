@@ -20,7 +20,7 @@ import { SettingsBoardSection } from "@/features/workspace/components/settings/S
 import { SettingsDangerSection } from "@/features/workspace/components/settings/SettingsDangerSection";
 import { SettingsDetailsSection } from "@/features/workspace/components/settings/SettingsDetailsSection";
 import { SettingsFeaturesSection } from "@/features/workspace/components/settings/SettingsFeaturesSection";
-import { SettingsTemplateSection } from "@/features/workspace/components/settings/SettingsTemplateSection";
+
 import { SettingsSidebar } from "@/features/workspace/components/settings/SettingsSidebar";
 import { SETTINGS_NAV, type SettingsSection } from "@/features/workspace/components/settings/types";
 
@@ -209,9 +209,6 @@ const WorkspaceSettingsContent = ({
 						</div>
 					)}
 
-					{activeSection === "template" && (
-						<SettingsTemplateSection workspaceId={workspace.id} />
-					)}
 
 					{activeSection === "danger" && (
 						<SettingsDangerSection
@@ -232,7 +229,7 @@ const WorkspaceSettingsContent = ({
 
 					<div className='mt-8 flex items-center gap-2 text-xs text-neutral-600'>
 						<Bell className='size-3.5' />
-						Changes apply to this workspace only.
+						Thay đổi chỉ áp dụng cho workspace này.
 					</div>
 				</div>
 			</main>

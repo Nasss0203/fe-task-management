@@ -55,3 +55,14 @@ export interface StartSprintParams extends SprintParams {
 }
 
 export interface CompleteSprintParams extends SprintParams {}
+
+export interface UpdateSprintDto {
+	name?: string;
+	goal?: string;
+	startAt?: string | null;
+	endAt?: string | null;
+}
+
+export interface UpdateSprintParams extends SprintParams {
+	data: UpdateSprintDto;
+}

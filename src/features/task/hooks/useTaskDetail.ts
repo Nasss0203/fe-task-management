@@ -44,5 +44,6 @@ export function useTaskDetail(task: TaskItem) {
 		},
 		attachmentsHook,
 		contextTag,
+		updateDescription: fields.updateDescription,
 	};
 }

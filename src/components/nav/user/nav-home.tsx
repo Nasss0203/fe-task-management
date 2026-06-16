@@ -2,6 +2,7 @@
 
 import { type LucideIcon } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import {
 	SidebarGroup,
@@ -27,6 +28,7 @@ export type NavHomeItem = {
 
 const NavHome = ({ home }: { home: NavHomeItem[] }) => {
 	const { isMobile } = useSidebar();
+	const pathname = usePathname();
 
 	return (
 		<SidebarGroup className='p-0'>
@@ -60,7 +62,7 @@ const NavHome = ({ home }: { home: NavHomeItem[] }) => {
 
 					return (
 						<SidebarMenuItem key={item.name}>
-							<SidebarMenuButton asChild>
+							<SidebarMenuButton asChild isActive={item.url ? pathname === item.url : false}>
 								<Link href={item.url ?? "#"}>
 									<Icon />
 									<span>{item.name}</span>

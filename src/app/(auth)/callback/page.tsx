@@ -4,6 +4,7 @@ import { setSessionCookie, setStoredAccessToken, setStoredUser } from "@/lib/aut
 import { getMeApi } from "@/services/auth/auth.service";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
+import { Loader2 } from "lucide-react";
 
 function AuthCallbackContent() {
 	const router = useRouter();
@@ -37,12 +38,22 @@ function AuthCallbackContent() {
 		handleAuth();
 	}, [searchParams, router]);
 
-	return <div>Dang dang nhap...</div>;
+	return (
+		<div className="flex flex-col items-center justify-center min-h-screen gap-4">
+			<Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+			<p className="text-muted-foreground font-medium">Đang đăng nhập...</p>
+		</div>
+	);
 }
 
 export default function AuthCallbackPage() {
 	return (
-		<Suspense fallback={<div>Dang xu ly dang nhap...</div>}>
+		<Suspense fallback={
+			<div className="flex flex-col items-center justify-center min-h-screen gap-4">
+				<Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+				<p className="text-muted-foreground font-medium">Đang xử lý đăng nhập...</p>
+			</div>
+		}>
 			<AuthCallbackContent />
 		</Suspense>
 	);

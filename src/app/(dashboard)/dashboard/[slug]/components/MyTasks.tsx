@@ -27,7 +27,7 @@ export const MyTasks = ({ tasks, slug }: MyTasksProps) => {
   return (
     <Card className="relative overflow-hidden border-white/5 bg-zinc-900/50 backdrop-blur-sm shadow-[0_1px_1px_rgba(0,0,0,0.05),0_4px_6px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.05)]">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6 pt-8 px-8">
-        <CardTitle className="text-lg font-semibold tracking-tight text-foreground">Task của tôi</CardTitle>
+        <CardTitle className="text-lg font-semibold tracking-tight text-foreground">Tác vụ của tôi</CardTitle>
         <Link
           href={`/dashboard/${slug}/tasks?assignee=me`}
           className="text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-indigo-400 transition-colors"
@@ -41,8 +41,8 @@ export const MyTasks = ({ tasks, slug }: MyTasksProps) => {
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-900 border border-white/5 shadow-sm mb-4">
               <Calendar className="h-5 w-5 text-muted-foreground" />
             </div>
-            <p className="text-sm font-medium text-foreground">Không có task nào</p>
-            <p className="text-xs text-muted-foreground mt-1">Bạn hiện không có task nào được giao.</p>
+            <p className="text-sm font-medium text-foreground">Không có tác vụ nào</p>
+            <p className="text-xs text-muted-foreground mt-1">Bạn hiện không có tác vụ nào được giao.</p>
           </div>
         ) : (
           <div className="space-y-3">

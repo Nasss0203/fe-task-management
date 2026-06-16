@@ -36,7 +36,7 @@ export const DashboardHeader = ({
       <div className="flex flex-wrap items-center gap-3">
         <Button variant="outline" size="sm" className="h-10 rounded-2xl border-white/5 bg-white/[0.02] px-4 font-semibold text-foreground/80 hover:bg-white/[0.05] hover:text-foreground transition-all active:scale-95">
           <Briefcase className="mr-2 h-3.5 w-3.5 text-muted-foreground/60" />
-          Tạo project
+          Tạo dự án
         </Button>
         <Button variant="outline" size="sm" className="h-10 rounded-2xl border-white/5 bg-white/[0.02] px-4 font-semibold text-foreground/80 hover:bg-white/[0.05] hover:text-foreground transition-all active:scale-95">
           <UserPlus className="mr-2 h-3.5 w-3.5 text-muted-foreground/60" />
@@ -44,7 +44,7 @@ export const DashboardHeader = ({
         </Button>
         <Button size="sm" className="h-10 rounded-2xl bg-indigo-500 px-5 font-semibold text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-400 border-none transition-all active:scale-95">
           <Plus className="mr-2 h-4 w-4" />
-          Tạo task mới
+          Tạo tác vụ mới
         </Button>
       </div>
     </div>

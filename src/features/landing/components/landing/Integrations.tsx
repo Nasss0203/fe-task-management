@@ -20,33 +20,33 @@ const integrationTools: {
 }[] = [
 	{
 		name: "Google Calendar",
-		description: "Schedule and manage your project-related events.",
+		description: "Lên lịch và quản lý các sự kiện liên quan đến dự án.",
 		icon: faCalendarIcon,
 	},
 	{
 		name: "Github",
-		description: "Track code changes and manage issues effortlessly.",
+		description: "Theo dõi thay đổi mã nguồn và quản lý lỗi dễ dàng.",
 		icon: faGithub,
 	},
 	{
 		name: "Google Sheet",
-		description: "Keep your project data up-to-date with reports.",
+		description: "Giữ dữ liệu dự án của bạn luôn cập nhật với các báo cáo.",
 		icon: faTableCellsLarge,
 		iconClassName: "text-emerald-500 dark:text-emerald-400",
 	},
 	{
 		name: "Slack",
-		description: "Receive project updates and collaborate as a team.",
+		description: "Nhận thông báo cập nhật dự án và cộng tác nhóm.",
 		icon: faSlack,
 	},
 	{
 		name: "Dropbox",
-		description: "Keep all documents in one central location.",
+		description: "Lưu trữ mọi tài liệu tại một không gian tập trung.",
 		icon: faDropbox,
 	},
 	{
 		name: "Google Workspace",
-		description: "Bring your Google tools together to centralize work.",
+		description: "Kết hợp các công cụ Google của bạn để tập trung công việc.",
 		icon: faGoogle,
 	},
 ];
@@ -57,11 +57,11 @@ const Integrations = () => {
 			<div className='grid gap-12 lg:grid-cols-2 lg:items-end'>
 				<div>
 					<h2 className='text-4xl font-semibold leading-tight tracking-tight text-foreground sm:text-5xl'>
-						Connect your tools.
+						Kết nối các công cụ của bạn.
 					</h2>
 					<p className='mt-6 text-lg text-muted-foreground'>
-						We have more than 200+ integrations, so you can use your
-						favorite tools to communicate and coordinate.
+						Chúng tôi có hơn 200 tiện ích tích hợp, giúp bạn thoải mái sử dụng
+						các công cụ yêu thích để giao tiếp và phối hợp.
 					</p>
 				</div>
 
@@ -70,7 +70,7 @@ const Integrations = () => {
 						variant='outline'
 						className='h-12 rounded-full border-border bg-secondary px-8 font-semibold text-foreground transition-all hover:bg-secondary/80 active:scale-[0.98]'
 					>
-						Explore Integrations
+						Khám phá các Tiện ích Tích hợp
 					</Button>
 				</div>
 			</div>

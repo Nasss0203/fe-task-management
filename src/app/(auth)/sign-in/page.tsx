@@ -32,12 +32,12 @@ import { toast } from "sonner";
 const formSchema = z.object({
 	email: z
 		.string()
-		.min(5, "Bug title must be at least 5 characters.")
-		.max(32, "Bug title must be at most 32 characters."),
+		.min(5, "Email phải có ít nhất 5 ký tự.")
+		.max(32, "Email không được vượt quá 32 ký tự."),
 	password: z
 		.string()
 		// .min(20, "Description must be at least 20 characters.")
-		.max(100, "Description must be at most 100 characters."),
+		.max(100, "Mật khẩu không được vượt quá 100 ký tự."),
 });
 const SignIn = () => {
 	const router = useRouter();
@@ -95,10 +95,10 @@ const SignIn = () => {
 			<Card className='w-full sm:max-w-md '>
 				<CardHeader className='mt-10'>
 					<CardTitle className='text-2xl'>
-						Sign in to your account
+						Đăng nhập vào tài khoản
 					</CardTitle>
 					<CardDescription>
-						Welcome back! Please enter your details.
+						Chào mừng trở lại! Vui lòng nhập thông tin của bạn.
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
@@ -114,7 +114,7 @@ const SignIn = () => {
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
 										<FieldLabel htmlFor='form-rhf-demo-title'>
-											Email or username
+											Email hoặc tên đăng nhập
 										</FieldLabel>
 										<Input
 											{...field}
@@ -139,7 +139,7 @@ const SignIn = () => {
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
 										<FieldLabel htmlFor='form-rhf-demo-title'>
-											Password
+											Mật khẩu
 										</FieldLabel>
 										<PasswordInput
 											{...field}
@@ -163,7 +163,7 @@ const SignIn = () => {
 						>
 							<div></div>
 							<Link href='/forgot-password' className='text-xs hover:underline cursor-pointer'>
-								Forgot password?
+								Quên mật khẩu?
 							</Link>
 						</Field>
 						<Field orientation='horizontal'>
@@ -182,9 +182,9 @@ const SignIn = () => {
 						</Field>
 					</form>
 					<div className='flex items-center gap-1 justify-center mt-6 text-xs'>
-						<div className='text-neutral-500'>{`You don't have account?`}</div>
+						<div className='text-neutral-500'>Bạn chưa có tài khoản?</div>
 						<Link href={"/sign-up"} className='hover:underline'>
-							Sign up
+							Đăng ký
 						</Link>
 					</div>
 				</CardContent>
@@ -192,7 +192,7 @@ const SignIn = () => {
 					<div className='flex items-center gap-3 w-full'>
 						<Separator className='flex-1' />
 						<span className='text-xs text-neutral-400 whitespace-nowrap'>
-							Or continue with
+							Hoặc tiếp tục với
 						</span>
 						<Separator className='flex-1' />
 					</div>
@@ -200,7 +200,7 @@ const SignIn = () => {
 						<div className='flex items-center gap-2 justify-between'>
 							<Button className='flex items-center gap-1.5 flex-1 text-xs'>
 								<FaApple />
-								Sign in with Apple
+								Đăng nhập bằng Apple
 							</Button>
 							<GoogleLoginButton></GoogleLoginButton>
 						</div>

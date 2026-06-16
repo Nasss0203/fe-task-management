@@ -93,11 +93,11 @@ export const TaskAssigneeCell = ({ taskId, workspaceId, projectId, assignees }: 
 		isMe: member.user_id === user?.id,
 	}));
 
-	const value = assignees?.map((a: any) => a.userId) ?? [];
+	const value: string[] = assignees?.map((a: any) => a.userId) ?? [];
 
 	const handleChange = async (newValue: string[]) => {
-		const added = newValue.find((id) => !value.includes(id));
-		const removed = value.find((id) => !newValue.includes(id));
+		const added = newValue.find((id: string) => !value.includes(id));
+		const removed = value.find((id: string) => !newValue.includes(id));
 
 		if (added) {
 			await assign.mutateAsync({ taskId, userId: added });

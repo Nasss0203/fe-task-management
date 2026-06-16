@@ -28,12 +28,11 @@ export function SettingsBoardSection({
 					<LayoutList className='mt-0.5 size-5 text-muted-foreground' />
 					<div className='min-w-0 flex-1'>
 						<div className='text-sm font-semibold'>
-							Workspace layout
+							Bố cục workspace
 						</div>
 						<div className='mt-1 text-sm text-muted-foreground'>
-							Choose whether this workspace opens
-							in a Jira-style tab layout or a
-							Notion-style block page.
+							Chọn xem workspace này mở theo bố cục tab (kiểu Jira) 
+							hay trang dạng khối (kiểu Notion).
 						</div>
 
 						<div className='mt-4 max-w-xs'>
@@ -46,23 +45,22 @@ export function SettingsBoardSection({
 								disabled={isUpdatingLayout || !canUpdate}
 							>
 								<SelectTrigger className='w-full border-border bg-background text-foreground'>
-									<SelectValue placeholder='Select layout' />
+									<SelectValue placeholder='Chọn bố cục' />
 								</SelectTrigger>
 								<SelectContent className='border-border bg-popover text-foreground'>
 									<SelectItem value={WorkspaceLayoutMode.TABS}>
 										Tabs
 									</SelectItem>
 									<SelectItem value={WorkspaceLayoutMode.BLOCKS}>
-										Blocks
+										Khối
 									</SelectItem>
 								</SelectContent>
 							</Select>
 						</div>
 
 						<div className='mt-3 text-xs text-muted-foreground'>
-							Tabs shows Summary and Pages. Blocks
-							opens straight into the page block
-							list.
+							Bố cục Tabs hiển thị Tổng quan và các Trang con.
+							Bố cục Blocks mở thẳng vào danh sách khối trang.
 						</div>
 					</div>
 				</div>

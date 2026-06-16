@@ -86,7 +86,7 @@ const WorkspaceDropdown = ({
 							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'
 						>
 							<Pencil size={15} />
-							<span>Doi ten workspace</span>
+							<span>Đổi tên workspace</span>
 						</DropdownMenuItem>
 
 						<DropdownMenuItem
@@ -94,7 +94,7 @@ const WorkspaceDropdown = ({
 							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'
 						>
 							<Link2 size={15} />
-							<span>Sao chep lien ket</span>
+							<span>Sao chép liên kết</span>
 						</DropdownMenuItem>
 
 						<DropdownMenuItem asChild>
@@ -104,7 +104,7 @@ const WorkspaceDropdown = ({
 								className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'
 							>
 								<ExternalLink size={15} />
-								<span>Mo trong tab moi</span>
+								<span>Mở trong tab mới</span>
 							</Link>
 						</DropdownMenuItem>
 					</DropdownMenuGroup>
@@ -119,7 +119,7 @@ const WorkspaceDropdown = ({
 								className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'
 							>
 								<Users size={15} />
-								<span>Quan ly thanh vien</span>
+								<span>Quản lý thành viên</span>
 							</Link>
 						</DropdownMenuItem>
 
@@ -131,7 +131,7 @@ const WorkspaceDropdown = ({
 							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'
 						>
 							<Settings size={15} />
-							<span>Cai dat workspace</span>
+							<span>Cài đặt workspace</span>
 						</DropdownMenuItem>
 					</DropdownMenuGroup>
 
@@ -145,7 +145,7 @@ const WorkspaceDropdown = ({
 							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm text-red-400 focus:bg-red-500/10 focus:text-red-300'
 						>
 							<Trash2 size={15} />
-							<span>Chuyen vao Thung rac</span>
+							<span>Chuyển vào Thùng rác</span>
 						</DropdownMenuItem>
 					</RequirePermission>
 				</DropdownMenuContent>

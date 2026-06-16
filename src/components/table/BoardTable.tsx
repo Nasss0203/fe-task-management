@@ -35,16 +35,12 @@ import { CSS } from "@dnd-kit/utilities";
 import { useTask } from "@/features/task/hooks/useTask";
 import { cn } from "@/lib/utils";
 import PanigationTable from "@/components/panigation/PanigationTable";
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "../ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { useBacklogColumns } from "./columns/column-task";
 import { DrawerItemView } from "@/components/drawer/DrawerItemView";
+import { useUser } from "@/features/auth/hooks/useUser";
+import { useTaskStatus } from "@/features/task/hooks/useTask";
+import { Plus } from "lucide-react";
 
 type TaskItem = {
 	id: string;
@@ -149,7 +145,38 @@ const BoardTable = ({
 		onOpenDetail: setActiveDrawerTaskId,
 	});
 
-	const { taskQuery } = useTask(workspaceId, projectId);
+	const { taskQuery, createTask } = useTask(workspaceId, projectId);
+	const { data: taskStatusData } = useTaskStatus(workspaceId, projectId);
+	const taskStatus = React.useMemo(() => taskStatusData?.data ?? [], [taskStatusData?.data]);
+	const { user } = useUser();
+	
+	const [isQuickAdding, setIsQuickAdding] = useState(false);
+	const [quickAddTitle, setQuickAddTitle] = useState("");
+	const [isCreating, setIsCreating] = useState(false);
+
+	const handleQuickAdd = async () => {
+		if (!quickAddTitle.trim() || !taskStatus.length) {
+			setIsQuickAdding(false);
+			setQuickAddTitle("");
+			return;
+		}
+
+		setIsCreating(true);
+		try {
+			await createTask({
+				title: quickAddTitle.trim(),
+				statusId: taskStatus[0].id,
+				workspaceId,
+				projectId,
+				createdBy: user?.id || "",
+			});
+			setQuickAddTitle("");
+		} catch (error) {
+			console.error("Failed to create task", error);
+		} finally {
+			setIsCreating(false);
+		}
+	};
 	const rawTasks = Array.isArray(taskQuery?.data?.data)
 		? taskQuery.data.data
 		: [];
@@ -251,7 +278,7 @@ const BoardTable = ({
 								{table.getHeaderGroups().map((headerGroup) => (
 									<TableRow
 										key={headerGroup.id}
-										className='h-10 border-b border-border/50 bg-background hover:bg-muted/30 transition-colors'
+										className='h-10 border-b border-border/50 bg-muted/50 hover:bg-muted/60 transition-colors'
 									>
 										<SortableContext
 											items={columnOrder}
@@ -277,7 +304,7 @@ const BoardTable = ({
 									rows.map((row) => (
 										<TableRow
 											key={row.id}
-											className='h-11 border-b border-border/50 bg-background transition-colors hover:bg-muted/40 last:border-b-0'
+											className='h-11 border-b border-border/50 bg-card transition-colors hover:bg-muted/40 last:border-b-0'
 										>
 											<SortableContext
 												items={columnOrder}
@@ -306,6 +333,46 @@ const BoardTable = ({
 										</TableCell>
 									</TableRow>
 								)}
+								<TableRow className="border-b-0 hover:bg-transparent">
+									<TableCell colSpan={columnCount} className="p-0 border-0 border-b-0">
+										{isQuickAdding ? (
+											<div className="flex w-full items-center gap-2 p-2 px-4">
+												<Plus className="size-4 text-muted-foreground" />
+												<input
+													autoFocus
+													type="text"
+													value={quickAddTitle}
+													onChange={(e) => setQuickAddTitle(e.target.value)}
+													onKeyDown={(e) => {
+														if (e.key === "Enter" && !e.shiftKey) {
+															e.preventDefault();
+															handleQuickAdd();
+														} else if (e.key === "Escape") {
+															setIsQuickAdding(false);
+															setQuickAddTitle("");
+														}
+													}}
+													onBlur={() => {
+														if (!quickAddTitle.trim()) {
+															setIsQuickAdding(false);
+														}
+													}}
+													disabled={isCreating}
+													placeholder="Nhập tên nhiệm vụ..."
+													className="flex-1 bg-transparent text-[13px] font-medium outline-none placeholder:text-muted-foreground/50 disabled:opacity-50"
+												/>
+											</div>
+										) : (
+											<button 
+												onClick={() => setIsQuickAdding(true)}
+												className='flex w-full items-center gap-2 p-3 px-4 text-[13px] font-medium text-muted-foreground hover:bg-muted/40 hover:text-foreground transition-all cursor-pointer text-left outline-none'
+											>
+												<Plus className='size-4' />
+												nhiệm vụ mới
+											</button>
+										)}
+									</TableCell>
+								</TableRow>
 							</TableBody>
 						</Table>
 					</div>

@@ -114,7 +114,7 @@ export function TaskDetailTabs({
 					value='subtasks'
 					className='h-12 rounded-none px-0 pb-4 pt-3 text-base font-medium data-[state=active]:bg-transparent data-[state=active]:text-foreground after:bg-foreground'
 				>
-					Subtasks
+					Tác vụ con
 				</TabsTrigger>
 				<TabsTrigger
 					value='comments'
@@ -129,7 +129,7 @@ export function TaskDetailTabs({
 					value='activities'
 					className='h-12 rounded-none px-0 pb-4 pt-3 text-base font-medium data-[state=active]:bg-transparent data-[state=active]:text-foreground after:bg-foreground'
 				>
-					Activities
+					Hoạt động
 					{activities.length > 0 && (
 						<span className='ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-muted px-1.5 py-0.5 text-xs font-semibold text-muted-foreground'>
 							{activities.length}
@@ -143,7 +143,7 @@ export function TaskDetailTabs({
 			<TabsContent value='comments' className='pt-6'>
 				<div className='space-y-5'>
 					<div className='text-2xl font-bold tracking-tight text-foreground'>
-						Comments
+						Bình luận
 					</div>
 
 					{comments.length ? (
@@ -174,7 +174,7 @@ export function TaskDetailTabs({
 												</span>
 												{comment.isEdited && (
 													<span className='text-muted-foreground text-xs italic'>
-														(edited)
+														(đã chỉnh sửa)
 													</span>
 												)}
 											</div>
@@ -194,7 +194,7 @@ export function TaskDetailTabs({
 															onClick={() => onEditComment?.(comment.id, comment.content)}
 														>
 															<Pencil className='mr-2 h-4 w-4' />
-															Edit
+															Chỉnh sửa
 														</DropdownMenuItem>
 														<DropdownMenuItem
 															className='text-destructive focus:bg-destructive/10 focus:text-destructive'
@@ -202,7 +202,7 @@ export function TaskDetailTabs({
 															disabled={isDeletingComment}
 														>
 															<Trash2 className='mr-2 h-4 w-4' />
-															Delete
+															Xóa
 														</DropdownMenuItem>
 													</DropdownMenuContent>
 												</DropdownMenu>
@@ -218,8 +218,7 @@ export function TaskDetailTabs({
 						</div>
 					) : (
 						<div className='rounded-2xl border border-dashed border-border bg-card/60 px-4 py-6 text-sm text-muted-foreground'>
-							No comments yet. Add one below to preview the
-							comment state.
+							Chưa có bình luận. Hãy thêm bình luận ở dưới.
 						</div>
 					)}
 
@@ -279,7 +278,7 @@ export function TaskDetailTabs({
 								onChange={(event) =>
 									onCommentDraftChange(event.target.value)
 								}
-								placeholder='Type a quick update or blocker note here...'
+								placeholder='Nhập nội dung cập nhật hoặc ghi chú tại đây...'
 								className='min-h-[120px] resize-none border-0 bg-transparent px-4 py-4 text-sm text-foreground shadow-none focus-visible:ring-0'
 							/>
 
@@ -295,7 +294,7 @@ export function TaskDetailTabs({
 											onClick={onCancelComment}
 											className='text-muted-foreground hover:bg-accent hover:text-accent-foreground'
 										>
-											Cancel
+											Hủy
 										</Button>
 										<Button
 											type='button'
@@ -305,8 +304,8 @@ export function TaskDetailTabs({
 											className='rounded-xl'
 										>
 											{editingCommentId 
-												? (isUpdatingComment ? "Updating..." : "Update") 
-												: (isSavingComment ? "Saving..." : "Save")
+												? (isUpdatingComment ? "Đang cập nhật..." : "Cập nhật") 
+												: (isSavingComment ? "Đang lưu..." : "Lưu")
 											}
 										</Button>
 									</div>

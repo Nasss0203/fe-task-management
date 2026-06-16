@@ -10,7 +10,7 @@ const TrustedBy = () => {
 	return (
 		<div className='mx-auto mt-24 max-w-6xl text-center animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500'>
 			<p className='text-sm font-medium tracking-widest uppercase text-muted-foreground'>
-				Trusted by industry leaders
+				Được tin dùng bởi các công ty hàng đầu
 			</p>
 
 			<div className='mt-10 flex flex-wrap items-center justify-center gap-x-12 gap-y-8 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-500'>

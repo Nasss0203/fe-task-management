@@ -88,12 +88,12 @@ const DeletedWorkspacesPage = () => {
 				selectedIds.map((id) => restoreWorkspace.mutateAsync(id)),
 			);
 			toast.success(
-				`${selectedIds.length} workspaces da duoc khoi phuc.`,
+				`${selectedIds.length} không gian làm việc đã được khôi phục.`,
 			);
 			setSelectedIds([]);
 		} catch (error) {
 			console.error("bulk restore failed", error);
-			toast.error("Co loi khi khoi phuc workspaces.");
+			toast.error("Có lỗi khi khôi phục không gian làm việc.");
 		} finally {
 			setIsBulkRestoring(false);
 		}
@@ -109,13 +109,13 @@ const DeletedWorkspacesPage = () => {
 				),
 			);
 			toast.success(
-				`${selectedIds.length} workspaces removed from trash.`,
+				`Đã xóa ${selectedIds.length} không gian làm việc khỏi thùng rác.`,
 			);
 			setSelectedIds([]);
 			setBulkRemoveConfirm(false);
 		} catch (error) {
 			console.error("bulk remove failed", error);
-			toast.error("Co loi khi xoa workspaces.");
+			toast.error("Có lỗi khi xóa không gian làm việc.");
 		} finally {
 			setIsBulkRemoving(false);
 		}
@@ -124,17 +124,17 @@ const DeletedWorkspacesPage = () => {
 	const handleRestore = async (workspaceId: string) => {
 		try {
 			await restoreWorkspace.mutateAsync(workspaceId);
-			toast.success("Workspace da duoc khoi phuc.");
+			toast.success("Không gian làm việc đã được khôi phục.");
 		} catch (error) {
 			console.error("restoreWorkspace failed", error);
-			toast.error("Khong the khoi phuc workspace.");
+			toast.error("Không thể khôi phục không gian làm việc.");
 		}
 	};
 
 	if (isLoading) {
 		return (
 			<div className='flex h-full items-center justify-center text-sm text-muted-foreground'>
-				Loading deleted workspaces...
+				Đang tải không gian làm việc đã xóa...
 			</div>
 		);
 	}
@@ -143,15 +143,15 @@ const DeletedWorkspacesPage = () => {
 		return (
 			<Card className='border-border bg-card text-card-foreground'>
 				<CardHeader>
-					<CardTitle>Khong tai duoc thung rac workspace</CardTitle>
+					<CardTitle>Không tải được thùng rác không gian làm việc</CardTitle>
 					<CardDescription>
-						Thu tai lai de lay danh sach workspace da xoa.
+						Thử tải lại để lấy danh sách không gian làm việc đã xóa.
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<Button variant='outline' onClick={() => refetch()}>
 						<RefreshCw className='mr-2 h-4 w-4' />
-						Tai lai
+						Tải lại
 					</Button>
 				</CardContent>
 			</Card>
@@ -162,19 +162,19 @@ const DeletedWorkspacesPage = () => {
 		<div className='mx-auto flex w-full max-w-5xl flex-col gap-6 pb-10'>
 			<div className='flex flex-wrap items-center justify-between gap-3'>
 				<div>
-					<div className='text-sm text-muted-foreground'>Trash</div>
+					<div className='text-sm text-muted-foreground'>Thùng rác</div>
 					<h1 className='text-3xl font-semibold text-foreground'>
-						Deleted workspaces
+						Không gian làm việc đã xóa
 					</h1>
 					<p className='mt-2 text-sm text-muted-foreground'>
-						Workspace da xoa mem se hien o day de ban khoi phuc lai.
+						Không gian làm việc đã xóa mềm sẽ hiện ở đây để bạn khôi phục lại.
 					</p>
 				</div>
 
 				<Button asChild variant='outline'>
 					<Link href='/dashboard'>
 						<ArrowLeft className='mr-2 h-4 w-4' />
-						Back to dashboard
+						Quay lại bảng điều khiển
 					</Link>
 				</Button>
 			</div>
@@ -187,10 +187,10 @@ const DeletedWorkspacesPage = () => {
 						</div>
 						<div>
 							<div className='text-base font-medium'>
-								Chua co workspace nao trong thung rac
+								Chưa có không gian làm việc nào trong thùng rác
 							</div>
 							<div className='mt-1 text-sm text-muted-foreground'>
-								Khi ban xoa workspace mem, no se hien o day.
+								Khi bạn xóa không gian làm việc, nó sẽ hiện ở đây.
 							</div>
 						</div>
 					</CardContent>
@@ -217,7 +217,7 @@ const DeletedWorkspacesPage = () => {
 										{workspace.name}
 									</h3>
 									<div className='mt-1 text-[13px] text-muted-foreground'>
-										Deleted on{" "}
+										Đã xóa vào{" "}
 										{formatDeletedAt(workspace.deletedAt)}
 									</div>
 								</div>
@@ -232,7 +232,7 @@ const DeletedWorkspacesPage = () => {
 									disabled={restoreWorkspace.isPending}
 								>
 									<RotateCcw className='mr-1.5 h-3.5 w-3.5' />
-									Restore
+									Khôi phục
 								</Button>
 								<Button
 									variant='outline'
@@ -246,7 +246,7 @@ const DeletedWorkspacesPage = () => {
 									}
 								>
 									<Trash2 className='mr-1.5 h-3.5 w-3.5' />
-									Delete forever
+									Xóa vĩnh viễn
 								</Button>
 							</div>
 						</div>
@@ -294,7 +294,7 @@ const DeletedWorkspacesPage = () => {
 							disabled={isBulkRestoring || isBulkRemoving}
 						>
 							<RotateCcw className='mr-1.5 h-3.5 w-3.5' />
-							Restore
+							Khôi phục
 						</Button>
 						<Button
 							variant='outline'
@@ -304,7 +304,7 @@ const DeletedWorkspacesPage = () => {
 							disabled={isBulkRestoring || isBulkRemoving}
 						>
 							<Trash2 className='mr-1.5 h-3.5 w-3.5' />
-							Delete
+							Xóa
 						</Button>
 					</div>
 
@@ -327,10 +327,9 @@ const DeletedWorkspacesPage = () => {
 			>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>Remove from trash</DialogTitle>
+						<DialogTitle>Xóa khỏi thùng rác</DialogTitle>
 						<DialogDescription>
-							This will remove the workspace from your trash. It
-							will not delete the workspace for other members.
+							Hành động này sẽ xóa không gian làm việc khỏi thùng rác của bạn. Nó sẽ không xóa không gian làm việc của các thành viên khác.
 						</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>
@@ -338,7 +337,7 @@ const DeletedWorkspacesPage = () => {
 							variant='outline'
 							onClick={() => setWorkspaceToRemove(null)}
 						>
-							Cancel
+							Hủy
 						</Button>
 						<Button
 							variant='destructive'
@@ -349,7 +348,7 @@ const DeletedWorkspacesPage = () => {
 										{
 											onSuccess: () => {
 												toast.success(
-													"Workspace removed from trash",
+													"Đã xóa không gian làm việc khỏi thùng rác",
 												);
 												setWorkspaceToRemove(null);
 											},
@@ -359,7 +358,7 @@ const DeletedWorkspacesPage = () => {
 							}}
 							disabled={removeWorkspaceFromUserTrash.isPending}
 						>
-							Delete from my view
+							Xóa khỏi chế độ xem của tôi
 						</Button>
 					</DialogFooter>
 				</DialogContent>
@@ -371,11 +370,9 @@ const DeletedWorkspacesPage = () => {
 			>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>Remove selected from trash</DialogTitle>
+						<DialogTitle>Xóa các mục đã chọn khỏi thùng rác</DialogTitle>
 						<DialogDescription>
-							This will remove {selectedIds.length} selected
-							workspaces from your trash. It will not delete them
-							for other members.
+							Hành động này sẽ xóa {selectedIds.length} không gian làm việc đã chọn khỏi thùng rác của bạn. Nó sẽ không xóa chúng đối với các thành viên khác.
 						</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>
@@ -383,14 +380,14 @@ const DeletedWorkspacesPage = () => {
 							variant='outline'
 							onClick={() => setBulkRemoveConfirm(false)}
 						>
-							Cancel
+							Hủy
 						</Button>
 						<Button
 							variant='destructive'
 							onClick={handleBulkRemove}
 							disabled={isBulkRemoving}
 						>
-							Delete from my view
+							Xóa khỏi chế độ xem của tôi
 						</Button>
 					</DialogFooter>
 				</DialogContent>

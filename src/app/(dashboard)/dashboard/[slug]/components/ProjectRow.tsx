@@ -13,9 +13,9 @@ interface ProjectRowProps {
 
 export const ProjectRow = ({ project, slug }: ProjectRowProps) => {
   const statusConfig = {
-    'on-track': { label: 'On Track', className: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' },
-    'at-risk': { label: 'At Risk', className: 'bg-amber-500/10 text-amber-500 border-amber-500/20' },
-    'almost-done': { label: 'Almost Done', className: 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20' },
+    'on-track': { label: 'Đúng tiến độ', className: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' },
+    'at-risk': { label: 'Có nguy cơ', className: 'bg-amber-500/10 text-amber-500 border-amber-500/20' },
+    'almost-done': { label: 'Sắp hoàn thành', className: 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20' },
   };
 
   const status = statusConfig[project.status];
@@ -37,10 +37,10 @@ export const ProjectRow = ({ project, slug }: ProjectRowProps) => {
           </div>
           <div className="flex items-center gap-4 text-xs font-medium text-muted-foreground/60">
             <span className="flex items-center gap-1.5">
-              <span className="text-foreground/80">{project.openTasks}</span> open tasks
+              <span className="text-foreground/80">{project.openTasks}</span> tác vụ mở
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="text-foreground/80">{project.doneTasks}</span> done
+              <span className="text-foreground/80">{project.doneTasks}</span> hoàn thành
             </span>
             <span className="flex items-center gap-1.5">
               <Calendar className="h-3 w-3 opacity-50" />
@@ -53,7 +53,7 @@ export const ProjectRow = ({ project, slug }: ProjectRowProps) => {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8 lg:gap-12">
         <div className="w-full space-y-2 sm:w-32 lg:w-40">
           <div className="flex items-center justify-between text-[11px] font-medium">
-            <span className="text-muted-foreground/60">Progress</span>
+            <span className="text-muted-foreground/60">Tiến độ</span>
             <span className="text-foreground/80">{project.progress}%</span>
           </div>
           <Progress value={project.progress} className="h-1.5 bg-white/5" indicatorClassName="bg-indigo-500" />

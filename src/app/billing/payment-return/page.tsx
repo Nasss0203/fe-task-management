@@ -117,7 +117,7 @@ function PaymentReturnContent() {
 	const { verifyPaymentReturn: verifyVnpayReturn } = useVerifyVnpayReturn();
 	const verifyVnpay = verifyVnpayReturn.mutateAsync;
 	const [status, setStatus] = useState<PaymentStatus>("loading");
-	const [message, setMessage] = useState("Dang xac nhan thanh toan...");
+	const [message, setMessage] = useState("Đang xác nhận thanh toán...");
 	const [paymentResult, setPaymentResult] =
 		useState<PaymentReturnResult | null>(null);
 	const vnpOrderCode = searchParams.get("vnp_TxnRef") ?? undefined;
@@ -132,7 +132,7 @@ function PaymentReturnContent() {
 		const verifyPayment = async () => {
 			if (!queryString || (isStripeReturn && !stripeSessionId)) {
 				setStatus("failed");
-				setMessage("Khong tim thay thong tin thanh toan.");
+				setMessage("Không tìm thấy thông tin thanh toán.");
 				return;
 			}
 
@@ -180,7 +180,7 @@ function PaymentReturnContent() {
 
 				if (isCompleted) {
 					setStatus("success");
-					setMessage("Nang cap Pro thanh cong.");
+					setMessage("Nâng cấp Pro thành công.");
 
 					await Promise.allSettled([
 						queryClient.invalidateQueries({
@@ -200,14 +200,14 @@ function PaymentReturnContent() {
 				setStatus("failed");
 				setMessage(
 					result.message ??
-						"Thanh toan chua hoan tat hoac da bi huy.",
+						"Thanh toán chưa hoàn tất hoặc đã bị hủy.",
 				);
 			} catch (error) {
 				if (!isMounted) return;
 
 				console.error("verify payment return failed", error);
 				setStatus("failed");
-				setMessage("Xac nhan thanh toan that bai. Vui long thu lai.");
+				setMessage("Xác nhận thanh toán thất bại. Vui lòng thử lại.");
 			}
 		};
 
@@ -244,15 +244,15 @@ function PaymentReturnContent() {
 				<section className='flex flex-col justify-center gap-6'>
 					<div className='space-y-4'>
 						<Badge variant='secondary' className='rounded-md px-3 py-1'>
-							Billing payment
+							Thanh toán
 						</Badge>
 						<div className='space-y-3'>
 							<h1 className='max-w-2xl text-3xl font-semibold tracking-normal md:text-4xl'>
 								{isLoading
-									? "Dang xac nhan giao dich"
+									? "Đang xác nhận giao dịch"
 									: isSuccess
-										? "Workspace cua ban da duoc nang cap"
-										: "Chua the hoan tat thanh toan"}
+										? "Workspace của bạn đã được nâng cấp"
+										: "Chưa thể hoàn tất thanh toán"}
 							</h1>
 							<p className='max-w-2xl text-sm leading-6 text-muted-foreground md:text-base'>
 								{message}
@@ -264,32 +264,32 @@ function PaymentReturnContent() {
 						<CardContent className='space-y-5 pt-6'>
 							<ul className='space-y-4'>
 								<StepItem done icon={<Clock3 className='size-3.5' />}>
-									Payment created
+									Đã tạo thanh toán
 								</StepItem>
 								<StepItem
 									done={!isLoading}
 									icon={<CreditCard className='size-3.5' />}
 								>
 									{isStripeReturn
-										? "Stripe payment confirmed"
-										: "VNPAY result received"}
+										? "Đã xác nhận thanh toán Stripe"
+										: "Đã nhận kết quả từ VNPAY"}
 								</StepItem>
 								<StepItem
 									done={isSuccess}
 									icon={<ShieldCheck className='size-3.5' />}
 								>
-									Subscription updated
+									Đã cập nhật gói đăng ký
 								</StepItem>
 							</ul>
 							<Separator />
 							<p className='text-sm leading-6 text-muted-foreground'>
 								{isLoading
 									? isStripeReturn
-										? "He thong dang doi chieu Stripe Checkout va dong bo subscription. Vui long khong dong trang nay."
-										: "He thong dang verify chu ky VNPAY va dong bo subscription. Vui long khong dong trang nay."
+										? "Hệ thống đang đối chiếu Stripe Checkout và đồng bộ gói đăng ký. Vui lòng không đóng trang này."
+										: "Hệ thống đang xác thực chữ ký VNPAY và đồng bộ gói đăng ký. Vui lòng không đóng trang này."
 									: isSuccess
-										? "Subscription va workspace limits da duoc cap nhat. Ban co the quay lai dashboard de tiep tuc lam viec."
-										: "Neu tai khoan da bi tru tien, hay gui order code cho support de doi soat giao dich."}
+										? "Gói đăng ký và giới hạn workspace đã được cập nhật. Bạn có thể quay lại trang chủ để tiếp tục làm việc."
+										: "Nếu tài khoản đã bị trừ tiền, hãy gửi mã đơn hàng cho hỗ trợ để đối soát giao dịch."}
 							</p>
 						</CardContent>
 					</Card>
@@ -309,13 +309,13 @@ function PaymentReturnContent() {
 									)}
 								</div>
 								<div>
-									<CardTitle>Payment receipt</CardTitle>
+									<CardTitle>Biên lai thanh toán</CardTitle>
 									<CardDescription>
 										{isLoading
-											? "Verification in progress"
+											? "Đang xác minh"
 											: isSuccess
-												? "Payment confirmed"
-												: "Payment needs review"}
+												? "Đã xác nhận thanh toán"
+												: "Thanh toán cần xem xét lại"}
 									</CardDescription>
 								</div>
 							</div>
@@ -323,7 +323,7 @@ function PaymentReturnContent() {
 								variant={isSuccess ? "default" : "secondary"}
 								className='rounded-md'
 							>
-								{paymentStatus}
+								{paymentStatus === "VERIFYING" ? "ĐANG XÁC NHẬN" : paymentStatus === "SUCCEEDED" ? "THÀNH CÔNG" : paymentStatus === "FAILED" ? "THẤT BẠI" : paymentStatus}
 							</Badge>
 						</div>
 					</CardHeader>
@@ -331,13 +331,13 @@ function PaymentReturnContent() {
 						<div className='rounded-lg bg-muted/60 p-4'>
 							<div className='flex items-center gap-2 text-sm font-medium'>
 								<ReceiptText className='size-4' />
-								Transaction detail
+								Chi tiết giao dịch
 							</div>
 							<div className='mt-4 space-y-3'>
-								<DetailRow label='Provider' value={provider} />
-								<DetailRow label='Order code' value={orderCode} />
+								<DetailRow label='Nhà cung cấp' value={provider} />
+								<DetailRow label='Mã đơn hàng' value={orderCode} />
 								<DetailRow
-									label='Amount'
+									label='Số tiền'
 									value={formatCurrency(
 										paymentResult?.amount,
 										paymentResult?.currency,
@@ -346,8 +346,8 @@ function PaymentReturnContent() {
 								<DetailRow
 									label={
 										isStripeReturn
-											? "Stripe status"
-											: "VNPAY code"
+											? "Trạng thái Stripe"
+											: "Mã VNPAY"
 									}
 									value={
 										isStripeReturn
@@ -367,12 +367,12 @@ function PaymentReturnContent() {
 						{isLoading ? (
 							<Button className='w-full' disabled>
 								<Loader2 className='animate-spin' />
-								Verifying payment
+								Đang xác nhận thanh toán
 							</Button>
 						) : (
 							<Button asChild className='w-full'>
 								<Link href='/dashboard'>
-									Go to dashboard
+									Đi đến trang chủ
 									<ArrowRight />
 								</Link>
 							</Button>
@@ -381,7 +381,7 @@ function PaymentReturnContent() {
 							<Button asChild variant='outline' className='w-full'>
 								<Link href='/dashboard/billing/upgrade'>
 									<RefreshCcw />
-									Try again
+									Thử lại
 								</Link>
 							</Button>
 						)}

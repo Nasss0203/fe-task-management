@@ -4,39 +4,39 @@ import Link from "next/link";
 
 const footerColumns = [
 	{
-		title: "Product",
+		title: "Sản phẩm",
 		links: [
-			"Home",
-			"Pricing",
-			"Enterprise",
-			"Trust & Security",
-			"Integrations",
-			"Templates",
+			"Trang chủ",
+			"Bảng giá",
+			"Doanh nghiệp",
+			"Bảo mật & Tin cậy",
+			"Tích hợp",
+			"Mẫu",
 		],
 	},
 	{
-		title: "Solutions",
+		title: "Giải pháp",
 		links: [
-			"Task Management",
-			"Document Editor",
-			"Engineering Wikis",
-			"Meeting Notes",
-			"Agile Workflows",
+			"Quản lý Tác vụ",
+			"Trình soạn thảo",
+			"Wiki Kỹ thuật",
+			"Ghi chú họp",
+			"Quy trình Agile",
 		],
 	},
 	{
-		title: "Resources",
+		title: "Tài nguyên",
 		links: [
-			"Help Center",
+			"Trung tâm Trợ giúp",
 			"Blog",
-			"Community",
-			"Developer API",
-			"Accessibility",
+			"Cộng đồng",
+			"API cho Lập trình viên",
+			"Trợ năng",
 		],
 	},
 	{
-		title: "Company",
-		links: ["About Us", "Careers", "Press", "Customers", "Contact"],
+		title: "Công ty",
+		links: ["Về chúng tôi", "Tuyển dụng", "Báo chí", "Khách hàng", "Liên hệ"],
 	},
 ];
 
@@ -46,12 +46,12 @@ const Footer = () => {
 			<div className='border-b border-border px-8 py-20 lg:px-16'>
 				<div className='mx-auto max-w-3xl text-center'>
 					<h2 className='text-4xl font-semibold tracking-tight text-foreground sm:text-5xl'>
-						Ready to streamline?
+						Sẵn sàng tối ưu hóa?
 					</h2>
 
 					<p className='mx-auto mt-6 max-w-xl text-lg text-muted-foreground'>
-						Join over 40,000 teams building the future with
-						Taskmanly. Start your free trial today.
+						Tham gia cùng hơn 40.000 đội ngũ kiến tạo tương lai với
+						Taskmanly. Bắt đầu dùng thử miễn phí ngay hôm nay.
 					</p>
 
 					<div className='mx-auto mt-10 flex max-w-md flex-col gap-3 sm:flex-row'>
@@ -59,13 +59,13 @@ const Footer = () => {
 							<Mail className='h-4 w-4 text-muted-foreground' />
 							<input
 								type='email'
-								placeholder='Enter your email'
+								placeholder='Nhập email của bạn'
 								className='w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground'
 							/>
 						</div>
 
 						<Button className='h-12 rounded-full bg-foreground px-8 font-semibold text-background hover:bg-foreground/90 active:scale-[0.98]'>
-							Get Started
+							Bắt đầu ngay
 						</Button>
 					</div>
 				</div>
@@ -84,8 +84,8 @@ const Footer = () => {
 						</div>
 
 						<p className='mt-6 max-w-xs text-sm leading-relaxed text-muted-foreground'>
-							The optimal solution for collaborative tasks across
-							diverse functions. Built for modern teams.
+							Giải pháp tối ưu cho cộng tác trên nhiều bộ phận.
+							Được xây dựng cho các nhóm làm việc hiện đại.
 						</p>
 					</div>
 
@@ -116,13 +116,13 @@ const Footer = () => {
 					</p>
 					<div className='flex flex-wrap items-center gap-x-8 gap-y-2 text-xs text-muted-foreground'>
 						<Link href='#' className='hover:text-foreground transition-colors'>
-							Privacy Policy
+							Chính sách bảo mật
 						</Link>
 						<Link href='#' className='hover:text-foreground transition-colors'>
-							Terms of Service
+							Điều khoản dịch vụ
 						</Link>
 						<Link href='#' className='hover:text-foreground transition-colors'>
-							Security
+							Bảo mật
 						</Link>
 					</div>
 				</div>

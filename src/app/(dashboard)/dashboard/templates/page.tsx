@@ -31,34 +31,34 @@ export default function WorkspaceTemplatesPage() {
 			<div className="mb-8">
 				<h1 className="text-3xl font-bold tracking-tight mb-2 flex items-center gap-2">
 					<LayoutTemplate className="w-8 h-8 text-primary" />
-					Explore Templates
+					Khám phá Mẫu
 				</h1>
 				<p className="text-muted-foreground text-lg">
-					Quick-start your new workspace with pre-configured projects, boards, and tasks.
+					Khởi tạo nhanh không gian làm việc mới với các dự án, bảng và tác vụ được cấu hình sẵn.
 				</p>
 			</div>
 
 			<Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
 				<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
 					<TabsList className="grid w-full sm:w-[300px] grid-cols-2">
-						<TabsTrigger value="all">All Templates</TabsTrigger>
-						<TabsTrigger value="mine">My Templates</TabsTrigger>
+						<TabsTrigger value="all">Tất cả Mẫu</TabsTrigger>
+						<TabsTrigger value="mine">Mẫu của tôi</TabsTrigger>
 					</TabsList>
 
 				<div className="flex items-center gap-2 w-full sm:w-auto">
 					<Filter className="w-4 h-4 text-muted-foreground hidden sm:block" />
 					<Select value={selectedCategory} onValueChange={setSelectedCategory}>
 						<SelectTrigger className="w-full sm:w-[200px]">
-							<SelectValue placeholder="All Categories" />
+							<SelectValue placeholder="Tất cả danh mục" />
 						</SelectTrigger>
 						<SelectContent>
-							<SelectItem value="all">All Categories</SelectItem>
-							<SelectItem value="Software">Software Development</SelectItem>
+							<SelectItem value="all">Tất cả danh mục</SelectItem>
+							<SelectItem value="Software">Phát triển Phần mềm</SelectItem>
 							<SelectItem value="Marketing">Marketing</SelectItem>
-							<SelectItem value="HR">Human Resources</SelectItem>
+							<SelectItem value="HR">Nhân sự</SelectItem>
 							<SelectItem value="Design">Design</SelectItem>
-							<SelectItem value="Personal">Personal</SelectItem>
-							<SelectItem value="Other">Other</SelectItem>
+							<SelectItem value="Personal">Cá nhân</SelectItem>
+							<SelectItem value="Other">Khác</SelectItem>
 						</SelectContent>
 					</Select>
 				</div>
@@ -74,11 +74,11 @@ export default function WorkspaceTemplatesPage() {
 					) : templates.length === 0 ? (
 						<div className="text-center py-20 border rounded-xl bg-muted/20 border-dashed">
 							<LayoutTemplate className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-							<h3 className="text-xl font-semibold mb-2">No templates found</h3>
+							<h3 className="text-xl font-semibold mb-2">Không tìm thấy mẫu</h3>
 							<p className="text-muted-foreground">
 								{activeTab === "mine"
-									? "You haven't created any templates yet. Save an existing workspace as a template to see it here."
-									: "No templates are available at the moment."}
+									? "Bạn chưa tạo mẫu nào. Lưu không gian làm việc hiện tại thành mẫu để xem ở đây."
+									: "Không có mẫu nào vào lúc này."}
 							</p>
 						</div>
 					) : (

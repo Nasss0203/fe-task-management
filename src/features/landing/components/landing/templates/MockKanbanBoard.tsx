@@ -39,17 +39,17 @@ type Column = {
 
 // Mock Data
 const MOCK_COLUMNS: Column[] = [
-	{ id: "col-todo", title: "To Do" },
-	{ id: "col-in-progress", title: "In Progress" },
-	{ id: "col-done", title: "Done" },
+	{ id: "col-todo", title: "Cần làm" },
+	{ id: "col-in-progress", title: "Đang làm" },
+	{ id: "col-done", title: "Hoàn thành" },
 ];
 
 const MOCK_TASKS: Task[] = [
-	{ id: "t-1", title: "Define project scope and goals", columnId: "col-todo" },
-	{ id: "t-2", title: "Setup database schema", columnId: "col-todo" },
-	{ id: "t-3", title: "Design landing page UI", columnId: "col-todo" },
-	{ id: "t-4", title: "Implement authentication", columnId: "col-in-progress" },
-	{ id: "t-5", title: "Create mockup designs", columnId: "col-done" },
+	{ id: "t-1", title: "Xác định phạm vi và mục tiêu dự án", columnId: "col-todo" },
+	{ id: "t-2", title: "Thiết lập schema cơ sở dữ liệu", columnId: "col-todo" },
+	{ id: "t-3", title: "Thiết kế giao diện landing page", columnId: "col-todo" },
+	{ id: "t-4", title: "Triển khai tính năng xác thực", columnId: "col-in-progress" },
+	{ id: "t-5", title: "Tạo thiết kế mockup", columnId: "col-done" },
 ];
 
 // --- Sortable Task Component ---

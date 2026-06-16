@@ -11,17 +11,16 @@ import {
 } from "lucide-react";
 import type React from "react";
 
-export type SettingsSection = "details" | "preferences" | "template" | "danger";
+export type SettingsSection = "details" | "preferences" | "danger";
 
 export const SETTINGS_NAV: {
 	key: SettingsSection;
 	label: string;
 	icon: React.ComponentType<{ className?: string }>;
 }[] = [
-	{ key: "details", label: "Details", icon: Settings },
-	{ key: "preferences", label: "Preferences", icon: Zap },
-	{ key: "template", label: "Templates", icon: LayoutTemplate },
-	{ key: "danger", label: "Danger zone", icon: Trash2 },
+	{ key: "details", label: "Chi tiết", icon: Settings },
+	{ key: "preferences", label: "Tùy chọn", icon: Zap },
+	{ key: "danger", label: "Thùng rác workspace", icon: Trash2 },
 ];
 
 export const formatDeletedAt = (value?: string | null) => {

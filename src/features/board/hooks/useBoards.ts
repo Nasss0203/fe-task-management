@@ -1,7 +1,7 @@
 "use client";
 
 import {
-	CreateBoardAndAttachToPage,
+	createBoardApi,
 	findAllBoard,
 	findBoardById,
 } from "@/services/board/board.service";
@@ -31,7 +31,7 @@ export const useBoards = ({
 
 	const createBoard = useMutation({
 		mutationFn: async (data: CreateBoarDto) => {
-			return await CreateBoardAndAttachToPage(data);
+			return await createBoardApi(data);
 		},
 		onSuccess: async (_, variables) => {
 			await queryClient.invalidateQueries({

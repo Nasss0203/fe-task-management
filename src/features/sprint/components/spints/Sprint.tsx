@@ -10,6 +10,9 @@ import {
 	DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import SprintTaskList from "./SprintTaskList";
+import { CompleteSprintDialog } from "@/components/dialog/CompleteSprintDialog";
+import { StartSprintDialog } from "@/components/dialog/DialogStartSprint";
+import { EditSprintDialog } from "@/components/dialog/DialogEditSprint";
 
 type SprintProps = {
 	boards: BoardItem[];
@@ -24,9 +27,9 @@ const Sprint = ({ projectId, workspaceId, sprintId }: SprintProps) => {
 		(sprint) => sprint.id === sprintId,
 	);
 	const statusMeta = getStatusMeta(currentSprint?.status);
-	
+
 	const hasDates = currentSprint?.startAt && currentSprint?.endAt;
-	const dateDisplay = hasDates 
+	const dateDisplay = hasDates
 		? `${formatDate(currentSprint.startAt)} → ${formatDate(currentSprint.endAt)}`
 		: "Chưa lên lịch";
 
@@ -68,26 +71,58 @@ const Sprint = ({ projectId, workspaceId, sprintId }: SprintProps) => {
 									</button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align='end' className='w-48 border-border bg-popover text-popover-foreground'>
-									<DropdownMenuItem className='gap-2 focus:bg-accent focus:text-accent-foreground'>
-										<PlayCircle size={14} />
-										<span>Lập kế hoạch</span>
-									</DropdownMenuItem>
-									<DropdownMenuItem className='gap-2 focus:bg-accent focus:text-accent-foreground'>
-										<Settings2 size={14} />
-										<span>Cấu hình sprint</span>
-									</DropdownMenuItem>
-									<DropdownMenuSeparator className='bg-border' />
-									<DropdownMenuItem 
-										className='gap-2 text-emerald-600 dark:text-emerald-400 focus:bg-accent focus:text-emerald-600 dark:focus:text-emerald-300'
-										onClick={() => {
-											if (confirm("Hoàn thành sprint này?")) {
-												completed.mutate({ workspaceId, projectId, sprintId });
+									{currentSprint?.status === "PLANNED" && (
+										<StartSprintDialog
+											defaultSprintName={currentSprint?.name}
+											workspaceId={workspaceId}
+											projectId={projectId}
+											sprintId={sprintId}
+											workItemCount={totalTasks}
+											trigger={
+												<DropdownMenuItem onSelect={(e) => e.preventDefault()} className='gap-2 focus:bg-accent focus:text-accent-foreground cursor-pointer'>
+													<PlayCircle size={14} />
+													<span>Lập kế hoạch</span>
+												</DropdownMenuItem>
 											}
-										}}
-									>
-										<CheckCircle size={14} />
-										<span>Hoàn thành sprint</span>
-									</DropdownMenuItem>
+										/>
+									)}
+									<EditSprintDialog
+										workspaceId={workspaceId}
+										projectId={projectId}
+										sprintId={sprintId}
+										defaultSprintName={currentSprint?.name}
+										defaultGoal={currentSprint?.goal || ""}
+										defaultStartAt={currentSprint?.startAt}
+										defaultEndAt={currentSprint?.endAt}
+										isSprintActive={currentSprint?.status === "ACTIVE"}
+										trigger={
+											<DropdownMenuItem onSelect={(e) => e.preventDefault()} className='gap-2 focus:bg-accent focus:text-accent-foreground cursor-pointer'>
+												<Settings2 size={14} />
+												<span>Cấu hình sprint</span>
+											</DropdownMenuItem>
+										}
+									/>
+									{currentSprint?.status === "ACTIVE" && (
+										<>
+											<DropdownMenuSeparator className='bg-border' />
+											<CompleteSprintDialog
+												workspaceId={workspaceId}
+												projectId={projectId}
+												sprintId={sprintId}
+												completedWorkItemCount={completedTasks}
+												openWorkItemCount={remainingTasks}
+												trigger={
+													<DropdownMenuItem
+														onSelect={(e) => e.preventDefault()}
+														className='gap-2 text-emerald-600 dark:text-emerald-400 focus:bg-accent focus:text-emerald-600 dark:focus:text-emerald-300 cursor-pointer'
+													>
+														<CheckCircle size={14} />
+														<span>Hoàn thành sprint</span>
+													</DropdownMenuItem>
+												}
+											/>
+										</>
+									)}
 								</DropdownMenuContent>
 							</DropdownMenu>
 						</div>

@@ -31,12 +31,15 @@ const TableRowDnd = <TData extends { id: string }>({
 	return (
 		<TableRow
 			ref={ref}
-			className={cn("h-14", isDragging && "opacity-40")}
+			className={cn(
+				"h-14 border-b border-border/70 transition-colors hover:bg-muted/35 data-[state=selected]:bg-muted",
+				isDragging && "opacity-40",
+			)}
 			data-state={row.getIsSelected() && "selected"}
 			style={{ touchAction: "none" }}
 		>
 			{row.getVisibleCells().map((cell) => (
-				<TableCell key={cell.id}>
+				<TableCell key={cell.id} className="whitespace-nowrap px-3 py-2 text-sm text-foreground">
 					{flexRender(cell.column.columnDef.cell, cell.getContext())}
 				</TableCell>
 			))}

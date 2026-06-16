@@ -43,7 +43,7 @@ const layout = ({
 									<BreadcrumbSeparator className='hidden md:block' />
 									<BreadcrumbItem>
 										<BreadcrumbPage>
-											Dashboard
+											Bảng điều khiển
 										</BreadcrumbPage>
 									</BreadcrumbItem>
 								</BreadcrumbList>

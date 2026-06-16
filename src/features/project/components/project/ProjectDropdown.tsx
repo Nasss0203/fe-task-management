@@ -99,10 +99,10 @@ const ProjectDropdown = ({ project, workspace, onRenameProject }: ProjectDropdow
 				queryKey: [PAGE_KEY.PAGE, workspace.id],
 			});
 
-			toast.success("Project da hien thi trong page.");
+			toast.success("Dự án đã hiển thị trong trang.");
 		} catch (error) {
 			console.error("showProjectInPage failed", error);
-			toast.error("Khong the hien thi project trong page.");
+			toast.error("Không thể hiển thị dự án trong trang.");
 		}
 	};
 
@@ -126,7 +126,7 @@ const ProjectDropdown = ({ project, workspace, onRenameProject }: ProjectDropdow
 				>
 					<DropdownMenuGroup>
 						<DropdownMenuLabel className='px-2 py-1.5 text-xs font-medium text-muted-foreground'>
-							Project
+							Dự án
 						</DropdownMenuLabel>
 
 						<RequirePermission
@@ -139,14 +139,14 @@ const ProjectDropdown = ({ project, workspace, onRenameProject }: ProjectDropdow
 										onRenameProject();
 									} else {
 										toast.info(
-											"Rename project se duoc noi tiep khi backend update metadata san sang.",
+											"Đổi tên dự án sẽ được hỗ trợ khi backend cập nhật.",
 										);
 									}
 								}}
 								className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'
 							>
 								<Pencil size={15} />
-								<span>Doi ten project</span>
+								<span>Đổi tên dự án</span>
 							</DropdownMenuItem>
 						</RequirePermission>
 
@@ -156,16 +156,16 @@ const ProjectDropdown = ({ project, workspace, onRenameProject }: ProjectDropdow
 
 								try {
 									await navigator.clipboard.writeText(targetUrl);
-									toast.success("Da sao chep lien ket project.");
+									toast.success("Đã sao chép liên kết dự án.");
 								} catch (error) {
 									console.error("copyProjectLink failed", error);
-									toast.error("Khong the sao chep lien ket project.");
+									toast.error("Không thể sao chép liên kết dự án.");
 								}
 							}}
 							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'
 						>
 							<Link2 size={15} />
-							<span>Sao chep lien ket</span>
+							<span>Sao chép liên kết</span>
 						</DropdownMenuItem>
 
 						<DropdownMenuItem asChild>
@@ -175,7 +175,7 @@ const ProjectDropdown = ({ project, workspace, onRenameProject }: ProjectDropdow
 								className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'
 							>
 								<ExternalLink size={15} />
-								<span>Mo trong tab moi</span>
+								<span>Mở trong tab mới</span>
 							</Link>
 						</DropdownMenuItem>
 					</DropdownMenuGroup>
@@ -189,7 +189,7 @@ const ProjectDropdown = ({ project, workspace, onRenameProject }: ProjectDropdow
 						>
 							<DropdownMenuItem className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'>
 								<PlayCircle size={15} />
-								<span>Tao sprint moi</span>
+								<span>Tạo sprint mới</span>
 							</DropdownMenuItem>
 						</RequirePermission>
 
@@ -199,7 +199,7 @@ const ProjectDropdown = ({ project, workspace, onRenameProject }: ProjectDropdow
 						>
 							<DropdownMenuItem className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'>
 								<Columns3 size={15} />
-								<span>Them board / view</span>
+								<span>Thêm board / view</span>
 							</DropdownMenuItem>
 						</RequirePermission>
 
@@ -214,7 +214,7 @@ const ProjectDropdown = ({ project, workspace, onRenameProject }: ProjectDropdow
 									className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'
 								>
 									<Eye size={15} />
-									<span>Them vao trang</span>
+									<span>Thêm vào trang</span>
 								</DropdownMenuItem>
 							</RequirePermission>
 						)}
@@ -231,7 +231,7 @@ const ProjectDropdown = ({ project, workspace, onRenameProject }: ProjectDropdow
 							className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm text-red-400 focus:bg-red-500/10 focus:text-red-300'
 						>
 							<Trash2 size={15} />
-							<span>Xoa project</span>
+							<span>Xóa dự án</span>
 						</DropdownMenuItem>
 					</RequirePermission>
 				</DropdownMenuContent>

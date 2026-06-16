@@ -31,16 +31,16 @@ import z from "zod";
 const formSchema = z.object({
 	email: z
 		.string()
-		.min(5, "Bug title must be at least 5 characters.")
-		.max(32, "Bug title must be at most 32 characters."),
+		.min(5, "Email phải có ít nhất 5 ký tự.")
+		.max(32, "Email không được vượt quá 32 ký tự."),
 	username: z
 		.string()
-		.min(5, "Bug title must be at least 5 characters.")
-		.max(32, "Bug title must be at most 32 characters."),
+		.min(5, "Tên đăng nhập phải có ít nhất 5 ký tự.")
+		.max(32, "Tên đăng nhập không được vượt quá 32 ký tự."),
 	password: z
 		.string()
 		// .min(20, "Description must be at least 20 characters.")
-		.max(100, "Description must be at most 100 characters."),
+		.max(100, "Mật khẩu không được vượt quá 100 ký tự."),
 });
 const SignUp = () => {
 	const router = useRouter();
@@ -76,10 +76,10 @@ const SignUp = () => {
 			<Card className='w-full sm:max-w-md '>
 				<CardHeader className='mt-10'>
 					<CardTitle className='text-2xl'>
-						Create your account
+						Tạo tài khoản mới
 					</CardTitle>
 					<CardDescription>
-						Enter your details below to create your account
+						Nhập thông tin của bạn dưới đây để tạo tài khoản
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
@@ -101,7 +101,7 @@ const SignUp = () => {
 											{...field}
 											id='form-rhf-demo-title'
 											aria-invalid={fieldState.invalid}
-											placeholder='Login button not working on mobile'
+											placeholder='VD: user@example.com'
 											autoComplete='off'
 										/>
 										{fieldState.invalid && (
@@ -120,13 +120,13 @@ const SignUp = () => {
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
 										<FieldLabel htmlFor='form-rhf-demo-title'>
-											Username
+											Tên đăng nhập
 										</FieldLabel>
 										<Input
 											{...field}
 											id='form-rhf-demo-title'
 											aria-invalid={fieldState.invalid}
-											placeholder='Login button not working on mobile'
+											placeholder='VD: username123'
 											autoComplete='off'
 										/>
 										{fieldState.invalid && (
@@ -145,7 +145,7 @@ const SignUp = () => {
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
 										<FieldLabel htmlFor='form-rhf-demo-title'>
-											Password
+											Mật khẩu
 										</FieldLabel>
 										<PasswordInput
 											{...field}
@@ -175,9 +175,9 @@ const SignUp = () => {
 						</Field>
 					</form>
 					<div className='flex items-center gap-1 justify-center mt-6 text-xs'>
-						<div className='text-neutral-500'>{`Already have an account?`}</div>
+						<div className='text-neutral-500'>Đã có tài khoản?</div>
 						<Link href={"/sign-in"} className='hover:underline'>
-							Sign In
+							Đăng nhập
 						</Link>
 					</div>
 				</CardContent>
@@ -185,7 +185,7 @@ const SignUp = () => {
 					<div className='flex items-center gap-3 w-full'>
 						<Separator className='flex-1' />
 						<span className='text-xs text-neutral-400 whitespace-nowrap'>
-							Or continue with
+							Hoặc tiếp tục với
 						</span>
 						<Separator className='flex-1' />
 					</div>
@@ -193,7 +193,7 @@ const SignUp = () => {
 						<div className='flex items-center gap-2 justify-between'>
 							<Button className='flex items-center gap-1.5 flex-1 text-xs'>
 								<FaApple />
-								Sign up with Apple
+								Đăng ký bằng Apple
 							</Button>
 							<GoogleLoginButton></GoogleLoginButton>
 						</div>

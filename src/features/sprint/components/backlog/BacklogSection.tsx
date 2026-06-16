@@ -61,8 +61,8 @@ const BacklogSection = ({
 	};
 
 	return (
-		<Card className='overflow-hidden py-0! flex flex-col gap-0 rounded-2xl border-border bg-muted/50'>
-			<div className='flex items-center justify-between gap-4 border-b border-border bg-muted/50 px-4 py-3'>
+		<Card className='flex flex-col gap-0 overflow-hidden rounded-xl border border-border bg-card shadow-sm !py-0'>
+			<div className='flex items-center justify-between gap-4 border-b border-border bg-transparent px-4 py-3'>
 				<div className='flex items-center gap-3'>
 					<Button
 						variant='ghost'
@@ -116,14 +116,11 @@ const BacklogSection = ({
 				</div>
 			</div>
 
-			{open ? (
-				<div className='flex flex-col gap-6 p-4'>
-					<div className="overflow-x-auto rounded-xl border border-border/50 bg-muted/50">
-						<TableBacklog tasks={taskBacklog} containerId={containerId} />
-					</div>
-
+			{open && (
+				<div className='relative overflow-auto border-t-0'>
+					<TableBacklog tasks={taskBacklog} containerId={containerId} />
 				</div>
-			) : null}
+			)}
 		</Card>
 	);
 };

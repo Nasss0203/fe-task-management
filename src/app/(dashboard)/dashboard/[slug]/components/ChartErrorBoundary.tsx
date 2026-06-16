@@ -30,12 +30,12 @@ export class ChartErrorBoundary extends Component<Props, State> {
       return (
         <Card className="relative overflow-hidden border-white/5 bg-zinc-900/50 backdrop-blur-sm shadow-sm">
           <CardHeader className="pt-8 px-8 pb-4">
-            <CardTitle className="text-lg font-semibold tracking-tight text-foreground">Trạng thái Task</CardTitle>
+            <CardTitle className="text-lg font-semibold tracking-tight text-foreground">Trạng thái tác vụ</CardTitle>
           </CardHeader>
           <CardContent className="flex h-[240px] items-center justify-center text-center px-8 pb-8">
             <div className="space-y-3">
               <AlertCircle className="mx-auto h-10 w-10 text-red-500/20" />
-              <p className="text-sm font-medium text-muted-foreground/60">Không thể tải biểu đồ trạng thái task</p>
+              <p className="text-sm font-medium text-muted-foreground/60">Không thể tải biểu đồ trạng thái tác vụ</p>
             </div>
           </CardContent>
         </Card>

@@ -42,43 +42,32 @@ import { useMemo, useState, Suspense } from "react";
 import { toast } from "sonner";
 
 const PLAN_FEATURES = [
-	"Unlimited upgraded workspaces",
-	"More members, projects, tasks, and pages",
-	"Priority storage for attachments",
-	"Advanced sprint and template limits",
+	"Không giới hạn số lượng không gian làm việc nâng cấp",
+	"Nhiều thành viên, dự án, tác vụ và trang hơn",
+	"Ưu tiên dung lượng lưu trữ cho tệp đính kèm",
+	"Giới hạn nâng cao cho sprint và mẫu",
 ];
 
 type PaymentMethod = {
 	provider: BillingProvider;
 	title: string;
 	description: string;
-	icon: LucideIcon;
+	icon?: LucideIcon;
+	logoUrl?: string;
 };
 
 const PAYMENT_METHODS: PaymentMethod[] = [
 	{
-		provider: BillingProvider.MANUAL,
-		title: "Manual",
-		description: "Tao yeu cau thanh toan thu cong de admin xac nhan.",
-		icon: Landmark,
-	},
-	{
-		provider: BillingProvider.MOMO,
-		title: "MoMo",
-		description: "Thanh toan bang vi MoMo neu backend tra ve payment URL.",
-		icon: Smartphone,
-	},
-	{
 		provider: BillingProvider.VNPAY,
 		title: "VNPay",
-		description: "Thanh toan qua cong VNPAY, QR, ATM hoac banking.",
-		icon: WalletCards,
+		description: "Thanh toán qua cổng VNPAY, QR, ATM hoặc banking.",
+		logoUrl: "/assets/images/vnpay.webp",
 	},
 	{
 		provider: BillingProvider.STRIPE,
 		title: "Visa / Mastercard",
-		description: "Thanh toan the quoc te an toan qua Stripe Checkout.",
-		icon: CreditCard,
+		description: "Thanh toán thẻ quốc tế an toàn qua Stripe Checkout.",
+		logoUrl: "/assets/images/visa.png",
 	},
 ];
 
@@ -127,12 +116,12 @@ function UpgradeBillingContent() {
 
 	const handlePayment = async () => {
 		if (!selectedPlan) {
-			toast.error("Khong tim thay goi PRO de tao thanh toan.");
+			toast.error("Không tìm thấy gói PRO để tạo thanh toán.");
 			return;
 		}
 
 		if (!targetWorkspaceId) {
-			toast.error("Vui long chon workspace truoc khi tao thanh toan.");
+			toast.error("Vui lòng chọn không gian làm việc trước khi tạo thanh toán.");
 			return;
 		}
 
@@ -146,7 +135,7 @@ function UpgradeBillingContent() {
 
 			if (!paymentUrl) {
 				toast.error(
-					`${selectedPaymentMethod.title} chua co payment URL tu server.`,
+					`${selectedPaymentMethod.title} chưa có URL thanh toán từ máy chủ.`,
 				);
 				return;
 			}
@@ -154,7 +143,7 @@ function UpgradeBillingContent() {
 			window.location.assign(paymentUrl);
 		} catch (error) {
 			console.error("create billing payment failed", error);
-			toast.error("Tao thanh toan that bai. Vui long thu lai.");
+			toast.error("Tạo thanh toán thất bại. Vui lòng thử lại.");
 		}
 	};
 
@@ -171,24 +160,23 @@ function UpgradeBillingContent() {
 						>
 							<Link href='/dashboard'>
 								<ArrowLeft />
-								Back to dashboard
+								Quay lại bảng điều khiển
 							</Link>
 						</Button>
 						<div className='space-y-2'>
 							<div className='flex items-center gap-2'>
 								<Sparkles className='size-5 text-primary' />
 								<h1 className='text-2xl font-semibold tracking-normal md:text-3xl'>
-									Upgrade to Pro
+									Nâng cấp lên Pro
 								</h1>
 							</div>
 							<p className='max-w-2xl text-sm leading-6 text-muted-foreground'>
-								Mo khoa gioi han cao hon cho workspace, project,
-								task, page va attachment cua team.
+								Mở khóa giới hạn cao hơn cho không gian làm việc, dự án, tác vụ, trang và tệp đính kèm của nhóm.
 							</p>
 						</div>
 					</div>
 					<Badge variant='secondary' className='rounded-md px-3 py-1'>
-						Current plan: Free
+						Gói hiện tại: Miễn phí
 					</Badge>
 				</div>
 
@@ -196,10 +184,9 @@ function UpgradeBillingContent() {
 					<section className='space-y-6'>
 						<Card className='rounded-lg'>
 							<CardHeader>
-								<CardTitle>Choose billing cycle</CardTitle>
+								<CardTitle>Chọn chu kỳ thanh toán</CardTitle>
 								<CardDescription>
-									He thong se lay plan PRO tu API va dung plan
-									id de tao payment.
+									Hệ thống sẽ lấy gói PRO từ API và dùng id gói để tạo thanh toán.
 								</CardDescription>
 							</CardHeader>
 							<CardContent>
@@ -224,14 +211,14 @@ function UpgradeBillingContent() {
 											}
 										>
 											<span className='flex flex-col items-start gap-1 text-left'>
-												<span>Monthly</span>
+												<span>Hàng tháng</span>
 												<span className='text-xs font-normal opacity-75'>
 													{monthlyPlan
 														? `${formatCurrency(
 																monthlyPlan.priceAmount,
 																monthlyPlan.currency,
-															)}/month`
-														: "Unavailable"}
+															)}/tháng`
+														: "Không khả dụng"}
 												</span>
 											</span>
 											{billingInterval === "MONTH" ? (
@@ -252,14 +239,14 @@ function UpgradeBillingContent() {
 											}
 										>
 											<span className='flex flex-col items-start gap-1 text-left'>
-												<span>Yearly</span>
+												<span>Hàng năm</span>
 												<span className='text-xs font-normal opacity-75'>
 													{yearlyPlan
 														? `${formatCurrency(
 																yearlyPlan.priceAmount,
 																yearlyPlan.currency,
-															)}/year`
-														: "Unavailable"}
+															)}/năm`
+														: "Không khả dụng"}
 												</span>
 											</span>
 											{billingInterval === "YEAR" ? (
@@ -273,15 +260,13 @@ function UpgradeBillingContent() {
 
 						<Card className='rounded-lg'>
 							<CardHeader>
-								<CardTitle>Choose payment method</CardTitle>
+								<CardTitle>Chọn phương thức thanh toán</CardTitle>
 								<CardDescription>
-									Chon phuong thuc thanh toan. Visa va
-									Mastercard se duoc xu ly an toan boi Stripe
-									Checkout.
+									Chọn phương thức thanh toán. Visa và Mastercard sẽ được xử lý an toàn bởi Stripe Checkout.
 								</CardDescription>
 							</CardHeader>
 							<CardContent>
-								<div className='grid gap-3 sm:grid-cols-2 xl:grid-cols-4'>
+								<div className='grid gap-3 sm:grid-cols-2'>
 									{PAYMENT_METHODS.map((method) => {
 										const Icon = method.icon;
 										const isSelected =
@@ -305,8 +290,12 @@ function UpgradeBillingContent() {
 												}
 											>
 												<span className='flex w-full items-center justify-between gap-3'>
-													<span className='flex size-10 items-center justify-center rounded-md border bg-background'>
-														<Icon className='size-5' />
+													<span className='flex size-10 overflow-hidden items-center justify-center rounded-md border bg-background'>
+														{method.logoUrl ? (
+															<img src={method.logoUrl} alt={method.title} className='w-full h-full object-contain p-1.5' />
+														) : Icon ? (
+															<Icon className='size-5' />
+														) : null}
 													</span>
 													{isSelected ? (
 														<span className='flex size-6 items-center justify-center rounded-full bg-primary text-primary-foreground'>
@@ -335,9 +324,9 @@ function UpgradeBillingContent() {
 							<CardHeader>
 								<div className='flex items-center justify-between gap-3'>
 									<div>
-										<CardTitle>Order summary</CardTitle>
+										<CardTitle>Tóm tắt đơn hàng</CardTitle>
 										<CardDescription>
-											Plan {PlanName.PRO}
+											Gói {PlanName.PRO}
 										</CardDescription>
 									</div>
 									<CircleDollarSign className='size-5 text-muted-foreground' />
@@ -347,17 +336,17 @@ function UpgradeBillingContent() {
 								<div className='space-y-3'>
 									<div className='flex items-center justify-between text-sm'>
 										<span className='text-muted-foreground'>
-											Billing cycle
+											Chu kỳ thanh toán
 										</span>
 										<span className='font-medium'>
 											{billingInterval === "MONTH"
-												? "Monthly"
-												: "Yearly"}
+												? "Hàng tháng"
+												: "Hàng năm"}
 										</span>
 									</div>
 									<div className='flex items-center justify-between text-sm'>
 										<span className='text-muted-foreground'>
-											Payment
+											Thanh toán
 										</span>
 										<span className='font-medium'>
 											{selectedPaymentMethod.title}
@@ -367,7 +356,7 @@ function UpgradeBillingContent() {
 								<Separator />
 								<div className='flex items-end justify-between gap-4'>
 									<span className='text-sm text-muted-foreground'>
-										Total
+										Tổng cộng
 									</span>
 									<span className='text-2xl font-semibold'>
 										{selectedPlan
@@ -381,7 +370,7 @@ function UpgradeBillingContent() {
 								<div className='space-y-3 rounded-lg bg-muted p-4'>
 									<div className='flex items-center gap-2 text-sm font-medium'>
 										<ShieldCheck className='size-4' />
-										Pro includes
+										Pro bao gồm
 									</div>
 									<ul className='space-y-2 text-sm text-muted-foreground'>
 										{PLAN_FEATURES.map((feature) => (
@@ -407,10 +396,10 @@ function UpgradeBillingContent() {
 									{createBillingPayment.isPending ? (
 										<>
 											<Loader2 className='animate-spin' />
-											Creating payment
+											Đang tạo thanh toán
 										</>
 									) : (
-										`Continue with ${selectedPaymentMethod.title}`
+										`Tiếp tục với ${selectedPaymentMethod.title}`
 									)}
 								</Button>
 							</CardFooter>
@@ -424,7 +413,7 @@ function UpgradeBillingContent() {
 
 export default function UpgradeBillingPage() {
 	return (
-		<Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading...</div>}>
+		<Suspense fallback={<div className="p-8 text-center text-muted-foreground">Đang tải...</div>}>
 			<UpgradeBillingContent />
 		</Suspense>
 	);

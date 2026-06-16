@@ -33,7 +33,7 @@ const SlugPage = () => {
 	if (isLoading || isPageBlocksPending || isWorkspaceLoading) {
 		return (
 			<div className='flex h-full items-center justify-center text-sm text-muted-foreground'>
-				Loading...
+				Đang tải...
 			</div>
 		);
 	}
