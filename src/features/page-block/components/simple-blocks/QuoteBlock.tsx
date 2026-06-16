@@ -66,7 +66,7 @@ const QuoteBlock = ({ block, text, onUpdate }: QuoteBlockProps) => {
 	};
 
 	return (
-		<div className='my-1 border-l-2 border-neutral-600'>
+		<div className='my-1 border-l-2 border-border'>
 			<textarea
 				ref={textareaRef}
 				value={value}
@@ -75,7 +75,7 @@ const QuoteBlock = ({ block, text, onUpdate }: QuoteBlockProps) => {
 				onKeyDown={handleKeyDown}
 				placeholder='Quote'
 				rows={1}
-				className='block w-full resize-none overflow-hidden bg-transparent px-3 py-1 text-sm text-neutral-300 outline-none'
+				className='block w-full resize-none overflow-hidden bg-transparent px-3 py-1 text-sm text-muted-foreground outline-none'
 			/>
 		</div>
 	);

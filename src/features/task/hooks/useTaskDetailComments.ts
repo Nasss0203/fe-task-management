@@ -69,6 +69,9 @@ export function useTaskDetailComments(
 		setEditingCommentId(commentId);
 		setCommentDraft(content);
 		setComposerOpen(true);
+		setTimeout(() => {
+			document.getElementById("comment-composer")?.focus();
+		}, 0);
 	};
 
 	const handleDeleteComment = (commentId: string) => {

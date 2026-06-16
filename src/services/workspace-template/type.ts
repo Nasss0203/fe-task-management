@@ -2,6 +2,7 @@ export interface WorkspaceTemplateDto {
 	id: string;
 	name: string;
 	description?: string;
+	category?: string;
 	isSystem: boolean;
 	status: string;
 	visibility: string;

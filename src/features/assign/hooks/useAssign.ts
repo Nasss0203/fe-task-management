@@ -24,6 +24,9 @@ export function useAssign(taskId: string) {
 				queryKey: [SPRINT_KEY.SPRINTS],
 			}),
 			queryClient.invalidateQueries({
+				queryKey: [SPRINT_KEY.SPRINT],
+			}),
+			queryClient.invalidateQueries({
 				queryKey: [WORKSPACE_OVERVIEW_KEY],
 			}),
 		]);

@@ -38,7 +38,7 @@ import type { TaskItem } from "@/services/task/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useTableDnd } from "@/components/dnd/backlog-sprint/ProviderSprintDnd";
 import TableRowDnd from "@/components/dnd/backlog-sprint/TableRowSprintDnd";
-import TaskAssignees from "@/features/task/components/task/TaskAssignees";
+import { TaskAssigneeCell } from "./columns/column-task";
 import { TaskBulkActionBar } from "@/features/task/components/task/TaskBulkActionBar";
 import TaskTrashDialog from "@/features/task/components/task/TaskTrashDialog";
 import DropdownTaskStatus from "@/components/dropdown/DropdownTaskStatus";
@@ -181,7 +181,12 @@ const getColumnsBacklog = ({
 		size: 160,
 		header: "Assignee",
 		cell: ({ row }) => (
-			<TaskAssignees assignees={row.original.assignees ?? []} />
+			<TaskAssigneeCell
+				taskId={row.original.id}
+				workspaceId={workspaceId}
+				projectId={projectId}
+				assignees={row.original.assignees}
+			/>
 		),
 	},
 	{
@@ -371,7 +376,6 @@ const TableBacklog = ({
 											row={row}
 											index={index >= 0 ? index : 0}
 											containerId={containerId}
-											onClick={() => setActiveDrawerTaskId(row.original.id)}
 										/>
 									);
 								})

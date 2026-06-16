@@ -11,6 +11,7 @@ import { useUser } from "@/features/auth/hooks/useUser";
 import { TaskAssigneeSelect } from "@/features/task/components/task/TaskAssignSelect";
 import { MoreHorizontal } from "lucide-react";
 import DropdownTaskContextMenu from "@/components/dropdown/DropdownTaskContextMenu";
+import { useAssign } from "@/features/assign/hooks/useAssign";
 
 type TaskItem = {
 	id: string;
@@ -82,7 +83,7 @@ export const TaskAssigneeCell = ({ taskId, workspaceId, projectId, assignees }: 
 	const { findAllMember } = useMember({ workspaceId });
 	const members = findAllMember.data?.data ?? [];
 	const { user } = useUser();
-	const { updateTask } = useTask(workspaceId, projectId);
+	const { assign, unassign } = useAssign(taskId);
 
 	const memberOptions = members.map((member: any) => ({
 		id: member.user_id,
@@ -94,8 +95,15 @@ export const TaskAssigneeCell = ({ taskId, workspaceId, projectId, assignees }: 
 
 	const value = assignees?.map((a: any) => a.userId) ?? [];
 
-	const handleChange = (newValue: string[]) => {
-		updateTask.mutate({ id: taskId, assigneeIds: newValue });
+	const handleChange = async (newValue: string[]) => {
+		const added = newValue.find((id) => !value.includes(id));
+		const removed = value.find((id) => !newValue.includes(id));
+
+		if (added) {
+			await assign.mutateAsync({ taskId, userId: added });
+		} else if (removed) {
+			await unassign.mutateAsync(removed);
+		}
 	};
 
 	return (

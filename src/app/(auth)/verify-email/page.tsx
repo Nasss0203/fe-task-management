@@ -14,7 +14,9 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-export default function VerifyEmailPage() {
+import { Suspense } from "react";
+
+function VerifyEmailContent() {
 	const searchParams = useSearchParams();
 	const token = searchParams.get("token");
 	const { mutate, isPending } = useVerifyEmail();
@@ -81,5 +83,19 @@ export default function VerifyEmailPage() {
 				</CardContent>
 			</Card>
 		</div>
+	);
+}
+
+export default function VerifyEmailPage() {
+	return (
+		<Suspense
+			fallback={
+				<div className="w-125 flex items-center justify-center min-h-[50vh]">
+					<Loader2 className="h-8 w-8 text-neutral-500 animate-spin" />
+				</div>
+			}
+		>
+			<VerifyEmailContent />
+		</Suspense>
 	);
 }

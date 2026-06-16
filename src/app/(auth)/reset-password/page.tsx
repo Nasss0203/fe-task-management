@@ -33,7 +33,9 @@ const formSchema = z.object({
 	path: ["confirmPassword"],
 });
 
-export default function ResetPasswordPage() {
+import { Suspense } from "react";
+
+function ResetPasswordContent() {
 	const searchParams = useSearchParams();
 	const token = searchParams.get("token");
 	const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
@@ -169,5 +171,19 @@ export default function ResetPasswordPage() {
 				</CardContent>
 			</Card>
 		</div>
+	);
+}
+
+export default function ResetPasswordPage() {
+	return (
+		<Suspense
+			fallback={
+				<div className="w-125 flex items-center justify-center min-h-[50vh]">
+					<div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+				</div>
+			}
+		>
+			<ResetPasswordContent />
+		</Suspense>
 	);
 }

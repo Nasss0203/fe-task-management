@@ -99,8 +99,13 @@ export function SettingsAccessSection({
 			)}
 
 			<div className='rounded-md border border-border'>
-				<div className='grid grid-cols-[1fr_220px_120px] border-b border-border px-4 py-3 text-xs font-semibold uppercase text-muted-foreground'>
+				<div 
+					className='grid border-b border-border px-4 py-3 text-xs font-semibold uppercase text-muted-foreground'
+					style={{ gridTemplateColumns: "1fr 150px 150px 150px 120px" }}
+				>
 					<div>Name</div>
+					<div>Joined Date</div>
+					<div>Tasks</div>
 					<div>Role</div>
 					<div>Action</div>
 				</div>
@@ -116,10 +121,11 @@ export function SettingsAccessSection({
 					members.map((member) => (
 						<div
 							key={member.id}
-							className='grid grid-cols-[1fr_220px_120px] items-center border-t border-border px-4 py-4 text-sm first:border-t-0'
+							className='grid items-center border-t border-border px-4 py-4 text-sm first:border-t-0'
+							style={{ gridTemplateColumns: "1fr 150px 150px 150px 120px" }}
 						>
-							<div className='flex min-w-0 items-center gap-3'>
-								<div className='flex size-8 items-center justify-center overflow-hidden rounded-full bg-violet-600 text-xs font-bold uppercase'>
+							<div className='flex min-w-0 items-center gap-3 pr-4'>
+								<div className='flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-violet-600 text-xs font-bold uppercase text-white'>
 									{member.avatar_url ? (
 										<Image
 											src={member.avatar_url}
@@ -142,6 +148,12 @@ export function SettingsAccessSection({
 										{member.email}
 									</div>
 								</div>
+							</div>
+							<div className='text-muted-foreground text-sm'>
+								{member.joinedAt ? new Date(member.joinedAt).toLocaleDateString() : '-'}
+							</div>
+							<div className='text-muted-foreground text-sm'>
+								{member.taskCount || 0} task{member.taskCount !== 1 ? 's' : ''}
 							</div>
 							<div className='uppercase text-foreground'>
 								{member.role_name}

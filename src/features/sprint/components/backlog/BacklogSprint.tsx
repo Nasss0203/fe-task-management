@@ -21,6 +21,8 @@ import { getColumnsBacklog } from "@/components/table/columns/column-backlog";
 import { DrawerItemView } from "@/components/drawer/DrawerItemView";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { TaskBulkActionBar } from "@/features/task/components/task/TaskBulkActionBar";
+import TaskTrashDialog from "@/features/task/components/task/TaskTrashDialog";
 import {
 	Select,
 	SelectContent,
@@ -85,7 +87,7 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 			pagination.pageSize,
 		],
 	);
-	const { findTaskBacklog } = useTask(workspaceId, projectId, backlogFilters);
+	const { findTaskBacklog, bulkUpdateTasks } = useTask(workspaceId, projectId, backlogFilters);
 	const { findAllMember } = useMember({ workspaceId });
 	const { data: taskStatusData } = useTaskStatus(workspaceId, projectId);
 	const { data: taskPriorityData } = useTaskPriority(workspaceId, projectId);
@@ -94,6 +96,9 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 		return Array.isArray(backlogData) ? backlogData : [];
 	}, [findTaskBacklog.data?.data]);
 	const totalPages = findTaskBacklog.data?.totalPages ?? 1;
+
+	const [rowSelection, setRowSelection] = useState({});
+	const [taskTrashOpen, setTaskTrashOpen] = useState(false);
 
 	const activeDrawerTask = useMemo(() => {
 		return taskBacklog.find((t: TaskItem) => t.id === activeDrawerTaskId) || null;
@@ -228,10 +233,17 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 		onPaginationChange: setPagination,
+		onRowSelectionChange: setRowSelection,
 		state: {
 			pagination,
+			rowSelection,
 		},
 	});
+
+	const selectedTaskIds = Object.keys(rowSelection);
+	const selectedTasks = selectedTaskIds
+		.map((id) => taskBacklog.find((task) => task.id === id))
+		.filter((task): task is TaskItem => task !== undefined);
 
 	return (
 		<section className='flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-background shadow-sm'>
@@ -347,6 +359,42 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 			/>
 
 			<PanigationTable table={table} />
+
+			<TaskBulkActionBar
+				selectedCount={selectedTaskIds.length}
+				totalCount={taskBacklog.length}
+				selectedTaskIds={selectedTaskIds}
+				taskStatus={taskStatusData?.data ?? []}
+				isChangeStatusPending={bulkUpdateTasks.isPending}
+				onSelectAll={() => table.toggleAllRowsSelected(true)}
+				onClear={() => table.resetRowSelection()}
+				onSubmitChangeStatus={async ({
+					taskIds,
+					statusId,
+					sendNotification,
+				}) => {
+					await bulkUpdateTasks.mutateAsync({
+						taskIds,
+						statusId,
+						sendNotification,
+					});
+					table.resetRowSelection();
+				}}
+				onDelete={() => {
+					setTaskTrashOpen(true);
+				}}
+			/>
+
+			<TaskTrashDialog
+				tasks={selectedTasks}
+				workspaceId={workspaceId}
+				projectId={projectId}
+				open={taskTrashOpen}
+				onOpenChange={setTaskTrashOpen}
+				onDeleted={() => {
+					table.resetRowSelection();
+				}}
+			/>
 
 			{activeDrawerTask ? (
 				<DrawerItemView

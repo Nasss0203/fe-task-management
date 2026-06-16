@@ -72,7 +72,7 @@ const TodoBlock = ({
 			<button
 				type='button'
 				onClick={handleToggle}
-				className='shrink-0 text-neutral-500 hover:text-neutral-200'
+				className='shrink-0 text-muted-foreground hover:text-foreground'
 			>
 				{checked ? (
 					<SquareCheck size={18} className='text-blue-500' />
@@ -90,8 +90,8 @@ const TodoBlock = ({
 				className={cn(
 					"w-full bg-transparent text-sm outline-none",
 					checked
-						? "text-neutral-500 line-through"
-						: "text-neutral-200",
+						? "text-muted-foreground line-through"
+						: "text-foreground",
 				)}
 			/>
 		</div>

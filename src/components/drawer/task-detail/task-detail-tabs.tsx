@@ -273,6 +273,7 @@ export function TaskDetailTabs({
 							) : null}
 
 							<Textarea
+								id='comment-composer'
 								value={commentDraft}
 								onFocus={onComposerFocus}
 								onChange={(event) =>
@@ -285,8 +286,6 @@ export function TaskDetailTabs({
 							{composerOpen ? (
 								<div className='flex items-center justify-between gap-3 border-t border-border px-4 py-3'>
 									<div className='text-xs text-muted-foreground'>
-										Comments are still stored locally in the
-										UI preview.
 									</div>
 									<div className='flex items-center gap-2'>
 										<Button

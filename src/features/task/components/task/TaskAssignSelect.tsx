@@ -59,10 +59,12 @@ export const TaskAssigneeSelect = ({
 	const toggleMember = (memberId: string) => {
 		if (value.includes(memberId)) {
 			onChange(value.filter((id) => id !== memberId));
+			setOpen(false);
 			return;
 		}
 
 		onChange([...value, memberId]);
+		setOpen(false);
 	};
 
 	return (

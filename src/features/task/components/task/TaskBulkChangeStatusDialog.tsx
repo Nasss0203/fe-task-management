@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AlertCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -81,7 +82,7 @@ export function TaskBulkChangeStatusDialog({
 						<Select value={statusId} onValueChange={setStatusId}>
 							<SelectTrigger
 								className={`h-9 w-full ${
-									hasError ? "border-destructive" : ""
+									hasError ? "border-destructive text-destructive focus:ring-destructive" : ""
 								}`}
 							>
 								<SelectValue placeholder='Select status' />
@@ -97,20 +98,22 @@ export function TaskBulkChangeStatusDialog({
 						</Select>
 
 						{hasError && (
-							<p className='text-xs text-destructive'>
-								This field is required
-							</p>
+							<div className='flex items-center gap-1.5 text-xs text-destructive'>
+								<AlertCircle className='h-3.5 w-3.5' />
+								<p>This field is required</p>
+							</div>
 						)}
 					</div>
 
 					<label className='flex items-start gap-2 text-sm text-muted-foreground'>
 						<Checkbox
+							className='mt-0.5'
 							checked={sendNotification}
 							onCheckedChange={(checked) =>
 								setSendNotification(checked === true)
 							}
 						/>
-						<span>
+						<span className='leading-snug'>
 							Send a notification for work items that are affected
 							by this bulk action.
 						</span>
@@ -129,9 +132,7 @@ export function TaskBulkChangeStatusDialog({
 						<Button
 							type='button'
 							onClick={handleSubmit}
-							disabled={
-								!statusId || isPending || taskIds.length === 0
-							}
+							disabled={isPending || taskIds.length === 0}
 						>
 							Submit
 						</Button>

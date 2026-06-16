@@ -2,13 +2,12 @@ import {
 	ClipboardList,
 	FileText,
 	FolderKanban,
-	Lightbulb,
 	LayoutTemplate,
+	Lightbulb,
 	type LucideIcon,
 } from "lucide-react";
-import { WorkspaceTemplateItem } from "@/services/workspace-template/type";
 
-export const getTemplateIcon = (category: string | null): LucideIcon => {
+export const getTemplateIcon = (category?: string | null): LucideIcon => {
 	switch (category?.toLowerCase()) {
 		case "task":
 		case "task tracking":
@@ -25,15 +24,22 @@ export const getTemplateIcon = (category: string | null): LucideIcon => {
 	}
 };
 
+import { type WorkspaceTemplateDto } from "@/services/workspace-template/type";
+
 type TemplateRecommendationProps = {
-	templates: WorkspaceTemplateItem[];
+	templates: WorkspaceTemplateDto[];
 	onSelect: (value: string) => void;
 };
 
-const TemplateRecommendation = ({ templates, onSelect }: TemplateRecommendationProps) => {
+const TemplateRecommendation = ({
+	templates,
+	onSelect,
+}: TemplateRecommendationProps) => {
 	return (
 		<div className='flex flex-col gap-4'>
-			<div className='text-sm font-semibold uppercase tracking-wider text-muted-foreground'>Được đề xuất</div>
+			<div className='text-sm font-semibold uppercase tracking-wider text-muted-foreground'>
+				Được đề xuất
+			</div>
 
 			<div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
 				{templates.map((item) => {
@@ -61,7 +67,7 @@ const TemplateRecommendation = ({ templates, onSelect }: TemplateRecommendationP
 					);
 				})}
 				{templates.length === 0 && (
-					<div className="col-span-full py-8 text-center text-sm text-muted-foreground">
+					<div className='col-span-full py-8 text-center text-sm text-muted-foreground'>
 						Không có mẫu nào.
 					</div>
 				)}

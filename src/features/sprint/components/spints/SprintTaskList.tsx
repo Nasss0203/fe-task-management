@@ -13,6 +13,9 @@ import BacklogTable from "@/components/table/BacklogTable";
 import { getColumnsBacklog } from "@/components/table/columns/column-backlog";
 import { Button } from "@/components/ui/button";
 import { DrawerItemView } from "@/components/drawer/DrawerItemView";
+import { useTask, useTaskStatus } from "@/features/task/hooks/useTask";
+import { TaskBulkActionBar } from "@/features/task/components/task/TaskBulkActionBar";
+import TaskTrashDialog from "@/features/task/components/task/TaskTrashDialog";
 
 type SprintTaskListProps = {
 	workspaceId: string;
@@ -31,9 +34,14 @@ const SprintTaskList = ({
 		sprintId,
 	});
 
+	const { bulkUpdateTasks } = useTask(workspaceId, projectId);
+	const { data: taskStatusData } = useTaskStatus(workspaceId, projectId);
+
 	const [activeDrawerTaskId, setActiveDrawerTaskId] = useState<string | null>(
 		null,
 	);
+	const [rowSelection, setRowSelection] = useState({});
+	const [taskTrashOpen, setTaskTrashOpen] = useState(false);
 
 	const sprintTasks = useMemo<TaskItem[]>(() => {
 		return sprintsTaskQuery.data?.data?.tasks || [];
@@ -63,7 +71,16 @@ const SprintTaskList = ({
 		getRowId: (row) => row.id,
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
+		onRowSelectionChange: setRowSelection,
+		state: {
+			rowSelection,
+		},
 	});
+
+	const selectedTaskIds = Object.keys(rowSelection);
+	const selectedTasks = selectedTaskIds
+		.map((id) => taskMap[id])
+		.filter((task): task is TaskItem => task !== undefined);
 
 	if (sprintsTaskQuery.isLoading) {
 		return (
@@ -78,7 +95,43 @@ const SprintTaskList = ({
 			<BacklogTable
 				table={table}
 				emptyText='Chưa có công việc nào trong sprint này'
-				className='min-h-0 flex-1 rounded-none border-0 bg-transparent shadow-none'
+				className='min-h-0 flex-1 rounded-none border-0 shadow-none'
+			/>
+
+			<TaskBulkActionBar
+				selectedCount={selectedTaskIds.length}
+				totalCount={sprintTasks.length}
+				selectedTaskIds={selectedTaskIds}
+				taskStatus={taskStatusData?.data ?? []}
+				isChangeStatusPending={bulkUpdateTasks.isPending}
+				onSelectAll={() => table.toggleAllRowsSelected(true)}
+				onClear={() => table.resetRowSelection()}
+				onSubmitChangeStatus={async ({
+					taskIds,
+					statusId,
+					sendNotification,
+				}) => {
+					await bulkUpdateTasks.mutateAsync({
+						taskIds,
+						statusId,
+						sendNotification,
+					});
+					table.resetRowSelection();
+				}}
+				onDelete={() => {
+					setTaskTrashOpen(true);
+				}}
+			/>
+
+			<TaskTrashDialog
+				tasks={selectedTasks}
+				workspaceId={workspaceId}
+				projectId={projectId}
+				open={taskTrashOpen}
+				onOpenChange={setTaskTrashOpen}
+				onDeleted={() => {
+					table.resetRowSelection();
+				}}
 			/>
 
 			{activeDrawerTask ? (

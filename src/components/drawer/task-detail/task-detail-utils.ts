@@ -54,6 +54,18 @@ export const formatDateLabel = (value?: string | Date | null) => {
 
 	if (Number.isNaN(date.getTime())) return "No due date";
 
+	const hasTime = date.getHours() !== 0 || date.getMinutes() !== 0;
+
+	if (hasTime) {
+		return new Intl.DateTimeFormat("en-GB", {
+			day: "numeric",
+			month: "long",
+			year: "numeric",
+			hour: "2-digit",
+			minute: "2-digit",
+		}).format(date);
+	}
+
 	return new Intl.DateTimeFormat("en-GB", {
 		day: "numeric",
 		month: "long",

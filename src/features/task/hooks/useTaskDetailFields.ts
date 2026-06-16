@@ -100,10 +100,6 @@ export function useTaskDetailFields(task: TaskItem) {
 		setStartDate(nextStartDate);
 		setDueDate(nextDueDate);
 
-		if (nextStartDate && nextDueDate) {
-			setScheduleOpen(false);
-		}
-
 		try {
 			await updateTaskMutate({
 				id: task.id,

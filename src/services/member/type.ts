@@ -12,6 +12,7 @@ export type WorkspaceMemberItem = {
 	role_name: string;
 	lastOpenedAt: string | null;
 	joinedAt: string | null;
+	taskCount: number;
 };
 
 export type FindAllMemberResponse = {

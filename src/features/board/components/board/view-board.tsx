@@ -32,7 +32,7 @@ const BoardView = ({ board }: BoardViewProps) => (
 	/>
 );
 
-const CalendarView = () => <CalendarApp />;
+const CalendarView = ({ board }: BoardViewProps) => <CalendarApp workspaceId={board.workspaceId} projectId={board.projectId} />;
 
 const TableView = ({ board }: BoardViewProps) => (
 	<BoardTable

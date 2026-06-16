@@ -55,7 +55,7 @@ const CreateBlockMenu = ({ children, onCreate }: CreateBlockMenuProps) => {
 
 			<DropdownMenuContentV2 className='w-56' align='start' side='right'>
 				<DropdownMenuGroupV2>
-					<DropdownMenuLabelV2>Create block</DropdownMenuLabelV2>
+					<DropdownMenuLabelV2 className="text-foreground">Create block</DropdownMenuLabelV2>
 
 					{BLOCK_OPTIONS.map((item) => {
 						const Icon = item.icon;
@@ -64,9 +64,10 @@ const CreateBlockMenu = ({ children, onCreate }: CreateBlockMenuProps) => {
 							<DropdownMenuItemV2
 								key={item.type}
 								onSelect={() => onCreate(item.type)}
+								className="text-foreground [&_svg]:text-foreground"
 							>
 								<Icon size={16} />
-								<div>{item.label}</div>
+								<div className="font-medium">{item.label}</div>
 							</DropdownMenuItemV2>
 						);
 					})}

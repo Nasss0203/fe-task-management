@@ -36,7 +36,7 @@ const WorkspaceSettingsContent = ({
 	workspaceSlug,
 	variant = "page",
 }: WorkspaceSettingsContentProps) => {
-	const [activeSection, setActiveSection] = useState<SettingsSection>("features");
+	const [activeSection, setActiveSection] = useState<SettingsSection>("details");
 	const [openTrashDialog, setOpenTrashDialog] = useState(false);
 	const [openAddPeopleDialog, setOpenAddPeopleDialog] = useState(false);
 

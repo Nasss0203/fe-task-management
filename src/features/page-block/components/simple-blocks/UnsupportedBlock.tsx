@@ -6,7 +6,7 @@ type UnsupportedBlockProps = {
 
 const UnsupportedBlock = ({ type }: UnsupportedBlockProps) => {
 	return (
-		<div className='px-3 py-1 text-sm text-neutral-500'>
+		<div className='px-3 py-1 text-sm text-muted-foreground'>
 			Unsupported block: {type}
 		</div>
 	);

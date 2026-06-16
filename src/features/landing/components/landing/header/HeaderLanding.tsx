@@ -182,7 +182,7 @@ const HeaderLanding = () => {
 								return (
 									<Link
 										key={item.label}
-										href={item.href}
+										href={item.href || "#"}
 										onClick={() => setIsOpen(false)}
 										className={`text-lg font-medium transition-colors hover:text-foreground ${
 											active ? "text-foreground" : "text-muted-foreground"

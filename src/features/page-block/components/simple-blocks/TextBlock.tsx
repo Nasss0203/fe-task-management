@@ -42,7 +42,7 @@ const TextBlock = ({ block, text, onUpdate }: TextBlockProps) => {
 			onBlur={handleSave}
 			rows={rows}
 			placeholder='Text'
-			className='w-full resize-none overflow-hidden bg-transparent px-3 text-sm leading-6 text-neutral-200 outline-none'
+			className='w-full resize-none overflow-hidden bg-transparent px-3 text-sm leading-6 text-foreground outline-none'
 		/>
 	);
 };

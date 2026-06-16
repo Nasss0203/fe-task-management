@@ -32,7 +32,7 @@ export const UpdateTemplateModal = ({ template, isOpen, onClose }: UpdateTemplat
 				name: template.name || "",
 				description: template.description || "",
 				category: template.category || "",
-				visibility: template.visibility || "PRIVATE",
+				visibility: (template.visibility as "WORKSPACE" | "PRIVATE" | "PUBLIC") || "PRIVATE",
 			});
 		}
 	}, [template]);

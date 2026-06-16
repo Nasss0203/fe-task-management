@@ -76,7 +76,7 @@ const CodeBlock = ({ block, code, onUpdate }: CodeBlockProps) => {
 			rows={1}
 			placeholder='// Code'
 			spellCheck={false}
-			className='my-1 block w-full resize-none overflow-hidden rounded-md bg-neutral-950 px-3 py-2 font-mono text-xs text-neutral-200 outline-none'
+			className='my-1 block w-full resize-none overflow-hidden rounded-md bg-muted px-3 py-2 font-mono text-xs text-foreground outline-none'
 		/>
 	);
 };

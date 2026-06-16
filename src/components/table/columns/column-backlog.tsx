@@ -10,24 +10,7 @@ import { PriorityBadge } from "@/components/shared/priority-badge";
 import DropdownTaskStatus from "@/components/dropdown/DropdownTaskStatus";
 import DropdownTaskPriority from "@/components/dropdown/DropdownTaskPriority";
 import DropdownTaskContextMenu from "@/components/dropdown/DropdownTaskContextMenu";
-
-const getAssigneeName = (assignee: TaskItem["assignees"][number]) => {
-	return (
-		assignee.fullName?.trim() ||
-		assignee.username?.trim() ||
-		"Unnamed"
-	);
-};
-
-const getInitials = (name: string) => {
-	return name
-		.split(" ")
-		.filter(Boolean)
-		.map((word) => word[0])
-		.join("")
-		.slice(0, 2)
-		.toUpperCase();
-};
+import { TaskAssigneeCell } from "./column-task";
 
 const formatEstimate = (minutes?: number | null) => {
 	if (!minutes) return "-";
@@ -167,38 +150,14 @@ export const getColumnsBacklog = ({
 		size: 140,
 		header: "Assignees",
 		cell: ({ row }) => {
-			const assignees = row.original.assignees ?? [];
-
-			if (!assignees.length) {
-				return (
-					<span className='text-[13px] text-muted-foreground italic'>
-						Unassigned
-					</span>
-				);
-			}
-
 			return (
-				<div className='flex items-center gap-2 min-w-0'>
-					<div className='flex -space-x-1.5 shrink-0'>
-						{assignees.slice(0, 3).map((assignee) => {
-							const name = getAssigneeName(assignee);
-
-							return (
-								<div
-									key={assignee.userId}
-									className='flex size-6 items-center justify-center rounded-full border border-border bg-muted text-[10px] font-semibold text-foreground shadow-sm'
-									title={name}
-								>
-									{getInitials(name)}
-								</div>
-							);
-						})}
-					</div>
-
-					<span className='truncate text-[13px] text-foreground flex-1 min-w-0'>
-						{getAssigneeName(assignees[0])}
-						{assignees.length > 1 ? ` +${assignees.length - 1}` : ""}
-					</span>
+				<div className='-ml-2'>
+					<TaskAssigneeCell
+						taskId={row.original.id}
+						workspaceId={workspaceId}
+						projectId={projectId}
+						assignees={row.original.assignees}
+					/>
 				</div>
 			);
 		},

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { getTaskStatusStyle } from "@/lib/task-status-style";
 import type { TaskStatusItem } from "@/services/task-status/type";
@@ -381,6 +382,37 @@ export function TaskScheduleField({
 }: TaskScheduleFieldProps) {
 	const today = getTodayBoundary();
 
+	const handleSelect = (range?: DateRange) => {
+		if (!range) {
+			void onSelect(undefined);
+			return;
+		}
+		const newRange = { ...range };
+		if (newRange.from && startDate) {
+			newRange.from.setHours(startDate.getHours(), startDate.getMinutes());
+		}
+		if (newRange.to && dueDate) {
+			newRange.to.setHours(dueDate.getHours(), dueDate.getMinutes());
+		}
+		void onSelect(newRange);
+	};
+
+	const handleTimeChange = (type: 'from' | 'to', timeString: string) => {
+		const [hours, minutes] = timeString.split(':').map(Number);
+		const newRange = { from: startDate, to: dueDate };
+		if (type === 'from' && newRange.from) {
+			const newFrom = new Date(newRange.from);
+			newFrom.setHours(hours || 0, minutes || 0);
+			newRange.from = newFrom;
+		}
+		if (type === 'to' && newRange.to) {
+			const newTo = new Date(newRange.to);
+			newTo.setHours(hours || 0, minutes || 0);
+			newRange.to = newTo;
+		}
+		void onSelect(newRange);
+	};
+
 	return (
 		<DetailRow icon={CalendarDays} label='Schedule'>
 			<Popover open={open} onOpenChange={onOpenChange}>
@@ -416,11 +448,31 @@ export function TaskScheduleField({
 						}}
 						defaultMonth={startDate ?? dueDate}
 						disabled={{ before: today }}
-						onSelect={(selectedRange) => {
-							void onSelect(selectedRange);
-						}}
+						onSelect={handleSelect}
 						className='bg-popover p-4'
 					/>
+					<div className="flex items-center gap-2 px-3 pb-3 pt-2 border-t">
+						<div className="flex flex-col gap-1 flex-1">
+							<label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Start Time</label>
+							<input 
+								type="time" 
+								value={startDate ? format(startDate, "HH:mm") : ""}
+								onChange={(e) => handleTimeChange('from', e.target.value)}
+								className="flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+								disabled={!startDate}
+							/>
+						</div>
+						<div className="flex flex-col gap-1 flex-1">
+							<label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">End Time</label>
+							<input 
+								type="time" 
+								value={dueDate ? format(dueDate, "HH:mm") : ""}
+								onChange={(e) => handleTimeChange('to', e.target.value)}
+								className="flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+								disabled={!dueDate}
+							/>
+						</div>
+					</div>
 				</PopoverContent>
 			</Popover>
 		</DetailRow>
@@ -435,6 +487,26 @@ export function TaskDueDateField({
 	onSelect,
 }: TaskDueDateFieldProps) {
 	const today = getTodayBoundary();
+
+	const handleSelect = (date?: Date) => {
+		if (!date) {
+			void onSelect(undefined);
+			return;
+		}
+		const newDate = new Date(date);
+		if (dueDate) {
+			newDate.setHours(dueDate.getHours(), dueDate.getMinutes());
+		}
+		void onSelect(newDate);
+	};
+
+	const handleTimeChange = (timeString: string) => {
+		if (!dueDate) return;
+		const [hours, minutes] = timeString.split(':').map(Number);
+		const newDate = new Date(dueDate);
+		newDate.setHours(hours || 0, minutes || 0);
+		void onSelect(newDate);
+	};
 
 	return (
 		<DetailRow icon={CalendarDays} label='Due date'>
@@ -464,11 +536,21 @@ export function TaskDueDateField({
 						selected={dueDate}
 						defaultMonth={dueDate}
 						disabled={{ before: today }}
-						onSelect={(selectedDate) => {
-							void onSelect(selectedDate);
-						}}
+						onSelect={handleSelect}
 						className='bg-popover p-4'
 					/>
+					<div className="flex items-center gap-2 px-3 pb-3 pt-2 border-t">
+						<div className="flex flex-col gap-1 flex-1">
+							<label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Due Time</label>
+							<input 
+								type="time" 
+								value={dueDate ? format(dueDate, "HH:mm") : ""}
+								onChange={(e) => handleTimeChange(e.target.value)}
+								className="flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+								disabled={!dueDate}
+							/>
+						</div>
+					</div>
 				</PopoverContent>
 			</Popover>
 		</DetailRow>
