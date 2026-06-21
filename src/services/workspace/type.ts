@@ -19,6 +19,7 @@ export interface WorkspaceItem {
 	updatedAt: string;
 	deletedAt?: string | null;
 	deletedBy?: string | null;
+	createdBy?: string | null;
 }
 
 

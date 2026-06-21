@@ -21,8 +21,8 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Separator } from "@/components/ui/separator";
 import { useRegister } from "@/features/auth/hooks/useAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { FaApple } from "react-icons/fa";
 import { toast } from "sonner";
@@ -58,17 +58,19 @@ const SignUp = () => {
 		mutate(data, {
 			onSuccess: () => {
 				toast.success("Đăng ký thành công!", {
-					description: "Vui lòng kiểm tra email của bạn để xác minh tài khoản.",
+					description:
+						"Vui lòng kiểm tra email của bạn để xác minh tài khoản.",
 					position: "bottom-right",
 				});
-				router.push("/sign-in");
+				router.push("/verify-email");
 			},
 			onError: (err: any) => {
 				toast.error("Đăng ký thất bại", {
-					description: err?.response?.data?.message || "Đã xảy ra lỗi.",
+					description:
+						err?.response?.data?.message || "Đã xảy ra lỗi.",
 					position: "bottom-right",
 				});
-			}
+			},
 		});
 	}
 	return (

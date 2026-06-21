@@ -4,12 +4,14 @@ interface SettingsDetailsSectionProps {
 	workspaceName: string;
 	workspaceSlug: string;
 	planName?: string | null;
+	createdByName?: string | null;
 }
 
 export function SettingsDetailsSection({
 	workspaceName,
 	workspaceSlug,
 	planName,
+	createdByName,
 }: SettingsDetailsSectionProps) {
 	return (
 		<div className='max-w-3xl space-y-4'>
@@ -45,6 +47,17 @@ export function SettingsDetailsSection({
 							{formatPlanName(planName)}
 						</span>
 					</div>
+
+					{createdByName && (
+						<div className='flex items-center justify-between gap-4 border-t border-border pt-3'>
+							<span className='text-sm text-muted-foreground'>
+								Người tạo
+							</span>
+							<span className='text-sm font-medium'>
+								{createdByName}
+							</span>
+						</div>
+					)}
 				</div>
 			</div>
 		</div>

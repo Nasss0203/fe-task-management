@@ -86,6 +86,10 @@ const WorkspaceSettingsContent = ({
 			? undefined
 			: `${window.location.origin}/dashboard/${workspace?.slug ?? ""}`;
 
+	const createdByName = workspace?.createdBy
+		? (members.find((m) => m.user_id === workspace.createdBy)?.full_name ?? null)
+		: null;
+
 	const handleToggleSprint = (enabled: boolean) => {
 		if (!workspace?.id) return;
 
@@ -185,6 +189,7 @@ const WorkspaceSettingsContent = ({
 							workspaceName={workspace.name}
 							workspaceSlug={workspace.slug}
 							planName={planName}
+							createdByName={createdByName}
 						/>
 					)}
 
