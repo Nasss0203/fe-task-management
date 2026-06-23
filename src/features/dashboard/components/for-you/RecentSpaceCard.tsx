@@ -18,8 +18,8 @@ export function RecentSpaceCard({
 				<div className='w-1.5 shrink-0 bg-blue-500/80 transition-colors group-hover:bg-blue-400' />
 				<div className='flex flex-1 flex-col min-w-0 p-4'>
 					<div className='flex items-start gap-3'>
-						<div className='flex size-8 shrink-0 items-center justify-center rounded-lg border border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-400 shadow-sm'>
-							<FolderKanban className='size-4' />
+						<div className='flex size-10 shrink-0 items-center justify-center rounded-[14px] bg-slate-100 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300'>
+							<FolderKanban className='size-5' strokeWidth={1.5} />
 						</div>
 						<div className='min-w-0 flex-1 mt-0.5'>
 							<p className='truncate text-sm font-semibold text-foreground group-hover:text-primary transition-colors'>

@@ -26,12 +26,46 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       style={
         {
-          "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)",
-          "--normal-border": "var(--border)",
           "--border-radius": "var(--radius)",
+
+          // Normal
+          "--normal-bg": "hsl(0 0% 100%)",
+          "--normal-text": "hsl(222 47% 11%)",
+          "--normal-border": "hsl(214 32% 88%)",
+
+          // Success — emerald
+          "--success-bg": "hsl(0 0% 100%)",
+          "--success-text": "hsl(222 47% 11%)",
+          "--success-border": "hsl(160 84% 39%)",
+
+          // Error — red
+          "--error-bg": "hsl(0 0% 100%)",
+          "--error-text": "hsl(222 47% 11%)",
+          "--error-border": "hsl(0 84% 60%)",
+
+          // Warning — amber
+          "--warning-bg": "hsl(0 0% 100%)",
+          "--warning-text": "hsl(222 47% 11%)",
+          "--warning-border": "hsl(38 92% 50%)",
+
+          // Info — blue
+          "--info-bg": "hsl(0 0% 100%)",
+          "--info-text": "hsl(222 47% 11%)",
+          "--info-border": "hsl(221 83% 53%)",
         } as React.CSSProperties
       }
+      toastOptions={{
+        classNames: {
+          toast: "border-l-[3px]! shadow-md! shadow-slate-100!",
+          success: "border-l-emerald-500! [&_[data-icon]]:text-emerald-500!",
+          error: "border-l-red-500! [&_[data-icon]]:text-red-500!",
+          warning: "border-l-amber-500! [&_[data-icon]]:text-amber-500!",
+          info: "border-l-blue-500! [&_[data-icon]]:text-blue-500!",
+          description: "text-slate-500! text-[13px]!",
+          actionButton: "bg-transparent! border! border-current! text-slate-800! text-[12px]! font-semibold! rounded-md! px-3! py-1! hover:bg-slate-50! transition-colors!",
+          cancelButton: "bg-transparent! text-slate-400! text-[12px]! rounded-md! px-2! py-1! hover:text-slate-600!",
+        },
+      }}
       {...props}
     />
   )

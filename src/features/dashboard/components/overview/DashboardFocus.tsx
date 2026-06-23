@@ -93,8 +93,15 @@ export function DashboardFocus({ focus, rhythmBlocks, stats }: DashboardFocusPro
 										: "text-emerald-600 dark:text-emerald-300",
 								)}
 							>
-								{focus.momentumPercent > 0 ? "+" : ""}
-								{focus.momentumPercent}%
+								{focus.momentumPercent != null ? (
+									<>
+										{focus.momentumPercent > 0 ? "+" : ""}
+										{focus.momentumPercent}%
+									</>
+								) : (
+									<span className="text-muted-foreground text-sm">—</span>
+								)}
+
 							</p>
 							<p className='mt-1 text-xs leading-5 text-muted-foreground'>
 								Đà hoàn thành so với nhịp mục tiêu

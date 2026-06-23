@@ -1,15 +1,7 @@
 "use client";
 
-import GoogleLoginButton from "@/components/button/GoogleLoginButton";
+import { AuthCard } from "@/components/auth/AuthCard";
 import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
 import {
 	Field,
 	FieldError,
@@ -18,13 +10,11 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { Separator } from "@/components/ui/separator";
 import { useRegister } from "@/features/auth/hooks/useAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
+import type { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
-import { FaApple } from "react-icons/fa";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -37,12 +27,20 @@ const formSchema = z.object({
 		.string()
 		.min(5, "Tên đăng nhập phải có ít nhất 5 ký tự.")
 		.max(32, "Tên đăng nhập không được vượt quá 32 ký tự."),
-	password: z
-		.string()
-		// .min(20, "Description must be at least 20 characters.")
-		.max(100, "Mật khẩu không được vượt quá 100 ký tự."),
+	password: z.string().max(100, "Mật khẩu không được vượt quá 100 ký tự."),
 });
-const SignUp = () => {
+
+const authInputClassName =
+	"h-12 rounded-xl border-slate-200 bg-white/85 px-4 shadow-sm focus-visible:border-primary/70 focus-visible:ring-primary/15 dark:border-white/10 dark:bg-white/5";
+
+const submitButtonClassName =
+	"h-12 w-full rounded-xl text-sm font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/30";
+
+type ApiErrorResponse = {
+	message?: string;
+};
+
+export default function SignUp() {
 	const router = useRouter();
 	const { mutate, isPending } = useRegister();
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -64,146 +62,122 @@ const SignUp = () => {
 				});
 				router.push("/verify-email");
 			},
-			onError: (err: any) => {
+			onError: (err: unknown) => {
+				const responseData = (err as AxiosError<ApiErrorResponse>).response
+					?.data;
+
 				toast.error("Đăng ký thất bại", {
-					description:
-						err?.response?.data?.message || "Đã xảy ra lỗi.",
+					description: responseData?.message || "Đã xảy ra lỗi.",
 					position: "bottom-right",
 				});
 			},
 		});
 	}
+
 	return (
-		<div className='w-125  flex items-center'>
-			<Card className='w-full sm:max-w-md '>
-				<CardHeader className='mt-10'>
-					<CardTitle className='text-2xl'>
-						Tạo tài khoản mới
-					</CardTitle>
-					<CardDescription>
-						Nhập thông tin của bạn dưới đây để tạo tài khoản
-					</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<form
-						id='form-rhf-demo'
-						onSubmit={form.handleSubmit(onSubmit)}
-						className='flex flex-col gap-5'
+		<AuthCard
+			title='Tạo tài khoản mới'
+			description='Nhập thông tin của bạn bên dưới để bắt đầu workspace đầu tiên một cách gọn gàng hơn.'
+			alternateText='Đã có tài khoản?'
+			alternateHref='/sign-in'
+			alternateLabel='Đăng nhập'
+			googleLabel='Tiếp tục với Google'
+		>
+			<form
+				id='sign-up-form'
+				onSubmit={form.handleSubmit(onSubmit)}
+				className='flex flex-col gap-4'
+			>
+				<FieldGroup>
+					<Controller
+						name='email'
+						control={form.control}
+						render={({ field, fieldState }) => (
+							<Field data-invalid={fieldState.invalid}>
+								<FieldLabel htmlFor='sign-up-email'>Email</FieldLabel>
+								<Input
+									{...field}
+									id='sign-up-email'
+									type='email'
+									aria-invalid={fieldState.invalid}
+									className={authInputClassName}
+									placeholder='VD: user@example.com'
+									autoComplete='email'
+								/>
+								{fieldState.invalid && (
+									<FieldError errors={[fieldState.error]} />
+								)}
+							</Field>
+						)}
+					/>
+				</FieldGroup>
+
+				<FieldGroup>
+					<Controller
+						name='username'
+						control={form.control}
+						render={({ field, fieldState }) => (
+							<Field data-invalid={fieldState.invalid}>
+								<FieldLabel htmlFor='sign-up-username'>
+									Tên đăng nhập
+								</FieldLabel>
+								<Input
+									{...field}
+									id='sign-up-username'
+									aria-invalid={fieldState.invalid}
+									className={authInputClassName}
+									placeholder='VD: username123'
+									autoComplete='username'
+								/>
+								{fieldState.invalid && (
+									<FieldError errors={[fieldState.error]} />
+								)}
+							</Field>
+						)}
+					/>
+				</FieldGroup>
+
+				<FieldGroup>
+					<Controller
+						name='password'
+						control={form.control}
+						render={({ field, fieldState }) => (
+							<Field data-invalid={fieldState.invalid}>
+								<FieldLabel htmlFor='sign-up-password'>
+									Mật khẩu
+								</FieldLabel>
+								<PasswordInput
+									{...field}
+									id='sign-up-password'
+									aria-invalid={fieldState.invalid}
+									className={authInputClassName}
+									placeholder='Nhập mật khẩu'
+									autoComplete='new-password'
+								/>
+								{fieldState.invalid && (
+									<FieldError errors={[fieldState.error]} />
+								)}
+							</Field>
+						)}
+					/>
+				</FieldGroup>
+
+				<Field orientation='horizontal' className='pt-2'>
+					<Button
+						type='submit'
+						form='sign-up-form'
+						size='lg'
+						className={submitButtonClassName}
+						disabled={isPending}
 					>
-						<FieldGroup>
-							<Controller
-								name='email'
-								control={form.control}
-								render={({ field, fieldState }) => (
-									<Field data-invalid={fieldState.invalid}>
-										<FieldLabel htmlFor='form-rhf-demo-title'>
-											Email
-										</FieldLabel>
-										<Input
-											{...field}
-											id='form-rhf-demo-title'
-											aria-invalid={fieldState.invalid}
-											placeholder='VD: user@example.com'
-											autoComplete='off'
-										/>
-										{fieldState.invalid && (
-											<FieldError
-												errors={[fieldState.error]}
-											/>
-										)}
-									</Field>
-								)}
-							/>
-						</FieldGroup>
-						<FieldGroup>
-							<Controller
-								name='username'
-								control={form.control}
-								render={({ field, fieldState }) => (
-									<Field data-invalid={fieldState.invalid}>
-										<FieldLabel htmlFor='form-rhf-demo-title'>
-											Tên đăng nhập
-										</FieldLabel>
-										<Input
-											{...field}
-											id='form-rhf-demo-title'
-											aria-invalid={fieldState.invalid}
-											placeholder='VD: username123'
-											autoComplete='off'
-										/>
-										{fieldState.invalid && (
-											<FieldError
-												errors={[fieldState.error]}
-											/>
-										)}
-									</Field>
-								)}
-							/>
-						</FieldGroup>
-						<FieldGroup>
-							<Controller
-								name='password'
-								control={form.control}
-								render={({ field, fieldState }) => (
-									<Field data-invalid={fieldState.invalid}>
-										<FieldLabel htmlFor='form-rhf-demo-title'>
-											Mật khẩu
-										</FieldLabel>
-										<PasswordInput
-											{...field}
-											id='form-rhf-demo-title'
-											aria-invalid={fieldState.invalid}
-											placeholder='Nhập mật khẩu'
-											autoComplete='off'
-										/>
-										{fieldState.invalid && (
-											<FieldError
-												errors={[fieldState.error]}
-											/>
-										)}
-									</Field>
-								)}
-							/>
-						</FieldGroup>
-
-						<Field orientation='horizontal'>
-							<Button
-								type='submit'
-								form='form-rhf-demo'
-								className='w-full'
-							>
-								Đăng ký
-							</Button>
-						</Field>
-					</form>
-					<div className='flex items-center gap-1 justify-center mt-6 text-xs'>
-						<div className='text-neutral-500'>Đã có tài khoản?</div>
-						<Link href={"/sign-in"} className='hover:underline'>
-							Đăng nhập
-						</Link>
-					</div>
-				</CardContent>
-				<CardFooter className='flex-col gap-5 mb-5'>
-					<div className='flex items-center gap-3 w-full'>
-						<Separator className='flex-1' />
-						<span className='text-xs text-neutral-400 whitespace-nowrap'>
-							Hoặc tiếp tục với
-						</span>
-						<Separator className='flex-1' />
-					</div>
-					<div className='w-full '>
-						<div className='flex items-center gap-2 justify-between'>
-							<Button className='flex items-center gap-1.5 flex-1 text-xs'>
-								<FaApple />
-								Đăng ký bằng Apple
-							</Button>
-							<GoogleLoginButton></GoogleLoginButton>
-						</div>
-					</div>
-				</CardFooter>
-			</Card>
-		</div>
+						{isPending ? (
+							<div className='h-5 w-5 animate-spin rounded-full border-[2.5px] border-white/35 border-t-white' />
+						) : (
+							<span>Đăng ký</span>
+						)}
+					</Button>
+				</Field>
+			</form>
+		</AuthCard>
 	);
-};
-
-export default SignUp;
+}

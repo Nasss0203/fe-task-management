@@ -5,8 +5,8 @@ import {
 	CheckCircle2,
 	Clock3,
 	ListTodo,
+	type LucideIcon,
 } from "lucide-react";
-import type { ComponentType } from "react";
 import { useMemo } from "react";
 import { clampPercent } from "@/features/dashboard/utils/task-style";
 import type { DashboardStatsResponseDto } from "@/services/dashboard/type";
@@ -16,7 +16,7 @@ type StatCardItem = {
 	value: number;
 	description: string;
 	change: string;
-	icon: ComponentType<{ className?: string }>;
+	icon: LucideIcon;
 	tone: string;
 };
 
@@ -33,7 +33,7 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
 				description: `${stats.priorityToday} việc ưu tiên hôm nay`,
 				change: "Tổng task đang theo dõi",
 				icon: ListTodo,
-				tone: "border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-300",
+				tone: "text-blue-600 dark:text-blue-400",
 			},
 			{
 				title: "Sắp đến hạn",
@@ -41,7 +41,7 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
 				description: `Trong ${stats.upcomingWindowDays} ngày tới`,
 				change: "Cần giữ nhịp",
 				icon: Clock3,
-				tone: "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-300",
+				tone: "text-amber-600 dark:text-amber-400",
 			},
 			{
 				title: "Quá hạn",
@@ -49,7 +49,7 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
 				description: "Cần xử lý trước",
 				change: stats.overdue ? "Đang có rủi ro" : "Đang ổn",
 				icon: AlertTriangle,
-				tone: "border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-300",
+				tone: "text-red-600 dark:text-red-400",
 			},
 			{
 				title: "Hoàn thành",
@@ -57,7 +57,7 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
 				description: "Tuần này",
 				change: `${clampPercent(stats.weeklyGoalPercent)}% mục tiêu`,
 				icon: CheckCircle2,
-				tone: "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300",
+				tone: "text-emerald-600 dark:text-emerald-400",
 			},
 		];
 	}, [stats]);
@@ -74,13 +74,8 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
 					>
 						<CardContent className='flex flex-col gap-5'>
 							<div className='flex items-start justify-between gap-3'>
-								<div
-									className={cn(
-										"rounded-lg border p-2.5",
-										item.tone,
-									)}
-								>
-									<Icon />
+								<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300">
+									<Icon size={22} strokeWidth={1.5} />
 								</div>
 								<span className='text-xs font-medium text-muted-foreground'>
 									{item.change}
