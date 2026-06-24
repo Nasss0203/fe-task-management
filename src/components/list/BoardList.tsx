@@ -43,7 +43,6 @@ const BoardList = ({ workspaceId, projectId }: BoardListProps) => {
 				statusId: taskStatus[0].id,
 				workspaceId,
 				projectId,
-				createdBy: user?.id || "",
 			});
 			setQuickAddTitle("");
 		} catch (error) {

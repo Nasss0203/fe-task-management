@@ -340,7 +340,6 @@ const TableBacklog = ({
 				statusId: taskStatus[0].id,
 				workspaceId,
 				projectId,
-				createdBy: user?.id || "",
 			});
 			setQuickAddTitle("");
 		} catch (error) {

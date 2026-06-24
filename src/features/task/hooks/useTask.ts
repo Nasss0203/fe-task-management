@@ -45,6 +45,7 @@ export const useUpdateTask = (workspaceId: string, projectId: string) => {
 			id,
 			workspaceId: inputWorkspaceId,
 			projectId: inputProjectId,
+			position: _position, // Strip position since backend doesn't support it yet
 			...body
 		}: UpdateTaskInput) => {
 			void inputWorkspaceId;

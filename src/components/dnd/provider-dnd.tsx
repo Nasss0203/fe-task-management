@@ -143,7 +143,6 @@ const ProviderDragDrop = ({
 			projectId,
 			title: "Test update task hoàn tất",
 			statusId,
-			createdBy: user?.id as string,
 		});
 	};
 

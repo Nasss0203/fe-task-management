@@ -81,9 +81,8 @@ export function TaskBulkChangeStatusDialog({
 					<div className='flex flex-col gap-2'>
 						<Select value={statusId} onValueChange={setStatusId}>
 							<SelectTrigger
-								className={`h-9 w-full ${
-									hasError ? "border-destructive text-destructive focus:ring-destructive" : ""
-								}`}
+								className={`h-9 w-full ${hasError ? "border-destructive text-destructive focus:ring-destructive" : ""
+									}`}
 							>
 								<SelectValue placeholder='Select status' />
 							</SelectTrigger>

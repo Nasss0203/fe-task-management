@@ -88,8 +88,6 @@ export interface CreateTaskDto {
 
 	estimateMinutes?: number | null;
 
-	createdBy: string;
-
 	assigneeIds?: string[];
 
 	initialComment?: string | null;

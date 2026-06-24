@@ -126,7 +126,6 @@ const DialogAddTask = ({ trigger, workspaceId: propWorkspaceId, projectId: propP
 						? dateRange.from.toISOString()
 						: null,
 				initialComment: null,
-				createdBy: user.id,
 			});
 
 			resetForm();
