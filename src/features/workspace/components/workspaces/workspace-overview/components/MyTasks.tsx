@@ -47,7 +47,7 @@ export function MyTasks({ workspaceSlug, tasks }: MyTasksProps) {
 								<h4 className='text-sm font-semibold text-foreground line-clamp-1 group-hover:text-blue-400 transition-colors'>
 									{task.title}
 								</h4>
-								<p className='text-[10px] text-muted-foreground mt-0.5'>
+								<p className='text-xs text-muted-foreground mt-1 truncate'>
 									{task.project.name}
 								</p>
 							</div>
@@ -57,30 +57,32 @@ export function MyTasks({ workspaceSlug, tasks }: MyTasksProps) {
 							/>
 						</div>
 
-						<div className='flex items-center gap-3'>
-							{task.priority && (
+						<div className='flex items-center justify-between mt-2'>
+							<div className='flex flex-col gap-1.5 items-start'>
+								{task.priority && (
+									<span
+										className='text-[10px] font-bold uppercase tracking-wider whitespace-nowrap'
+										style={{
+											color: task.priority.color || "#71717a",
+										}}
+									>
+										{task.priority.name}
+									</span>
+								)}
 								<span
-									className='text-[10px] font-bold uppercase tracking-wider'
+									className='rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border whitespace-nowrap'
 									style={{
-										color: task.priority.color || "#71717a",
+										backgroundColor: `${task.status.color || "#71717a"}1a`,
+										color: task.status.color || "#71717a",
+										borderColor: `${task.status.color || "#71717a"}33`,
 									}}
 								>
-									{task.priority.name}
+									{task.status.name}
 								</span>
-							)}
-							<span
-								className='rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border'
-								style={{
-									backgroundColor: `${task.status.color || "#71717a"}1a`,
-									color: task.status.color || "#71717a",
-									borderColor: `${task.status.color || "#71717a"}33`,
-								}}
-							>
-								{task.status.name}
-							</span>
+							</div>
 							<div
 								className={cn(
-									"ml-auto flex items-center gap-1.5 text-[10px]",
+									"flex items-center gap-1.5 text-[11px] whitespace-nowrap",
 									task.isOverdue
 										? "text-red-400 font-bold"
 										: "text-muted-foreground",

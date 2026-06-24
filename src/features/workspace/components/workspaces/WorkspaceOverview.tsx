@@ -38,9 +38,9 @@ export default function WorkspaceOverview({
 						/>
 					))}
 				</div>
-				<div className='grid grid-cols-1 gap-6 xl:grid-cols-12'>
-					<div className='xl:col-span-8 h-96 animate-pulse rounded-xl bg-muted/50 border border-border' />
-					<div className='xl:col-span-4 h-96 animate-pulse rounded-xl bg-muted/50 border border-border' />
+				<div className='grid grid-cols-1 gap-6 lg:grid-cols-12'>
+					<div className='lg:col-span-8 h-96 animate-pulse rounded-xl bg-muted/50 border border-border' />
+					<div className='lg:col-span-4 h-96 animate-pulse rounded-xl bg-muted/50 border border-border' />
 				</div>
 			</div>
 		);
@@ -92,19 +92,22 @@ export default function WorkspaceOverview({
 			</div>
 
 			{/* Main Grid */}
-			<div className='grid grid-cols-1 gap-6 xl:grid-cols-12 grid-flow-dense'>
-				{/* Left Column: Project Overview */}
-				<div className='xl:col-span-8 h-full'>
-					<div className='animate-in fade-in slide-in-from-left-4 duration-700 fill-mode-both delay-300 h-full'>
+			<div className='grid grid-cols-1 gap-6 lg:grid-cols-12 items-start'>
+				{/* Left Column: Project Overview, Activity Feed */}
+				<div className='lg:col-span-8 flex flex-col gap-6'>
+					<div className='animate-in fade-in slide-in-from-left-4 duration-700 fill-mode-both delay-300'>
 						<ProjectOverview
 							workspaceSlug={workspaceSlug}
 							projects={data.projects}
 						/>
 					</div>
+					<div className='animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both delay-500'>
+						<ActivityFeed activities={data.activities} />
+					</div>
 				</div>
 
-				{/* Right Column: Status, Attention, Tasks */}
-				<div className='xl:col-span-4 space-y-6'>
+				{/* Right Column: Status, Attention, Tasks, Deadlines */}
+				<div className='lg:col-span-4 flex flex-col gap-6'>
 					<div className='animate-in fade-in slide-in-from-right-4 duration-700 fill-mode-both delay-400'>
 						<TaskStatusChart
 							workspaceSlug={workspaceSlug}
@@ -124,19 +127,12 @@ export default function WorkspaceOverview({
 							tasks={data.myTasks}
 						/>
 					</div>
-				</div>
-			</div>
-
-			{/* Bottom Grid */}
-			<div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
-				<div className='animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both delay-500'>
-					<ActivityFeed activities={data.activities} />
-				</div>
-				<div className='animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both delay-700'>
-					<UpcomingDeadlines
-						workspaceSlug={workspaceSlug}
-						items={data.upcomingDeadlines}
-					/>
+					<div className='animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both delay-700'>
+						<UpcomingDeadlines
+							workspaceSlug={workspaceSlug}
+							items={data.upcomingDeadlines}
+						/>
+					</div>
 				</div>
 			</div>
 		</div>

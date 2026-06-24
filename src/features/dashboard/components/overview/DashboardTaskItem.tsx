@@ -18,13 +18,13 @@ export function DashboardTaskItem({ task }: { task: DashboardTaskResponseDto }) 
 						</h3>
 						<Badge
 							variant='outline'
-							className={cn("text-[10px] uppercase tracking-wider font-bold", getPriorityClass(task.priorityLevel))}
+							className={cn("text-[10px] uppercase tracking-wider font-bold whitespace-nowrap", getPriorityClass(task.priorityLevel))}
 						>
 							{task.priorityName ?? "No priority"}
 						</Badge>
 						<Badge
 							variant='outline'
-							className={cn("text-[10px] uppercase tracking-wider font-bold", getStatusClass(task.statusName))}
+							className={cn("text-[10px] uppercase tracking-wider font-bold whitespace-nowrap", getStatusClass(task.statusName))}
 						>
 							{task.statusName ?? "No status"}
 						</Badge>

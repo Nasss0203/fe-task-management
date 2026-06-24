@@ -54,7 +54,7 @@ export default function DashboardPage() {
 			>
 				<Card>
 					<CardHeader>
-						<CardTitle>Không tải được Bảng điều khiển</CardTitle>
+						<CardTitle>Không tải được trang.</CardTitle>
 						<CardDescription>
 							Vui lòng thử lại để lấy dữ liệu mới nhất từ hệ
 							thống.
@@ -82,7 +82,7 @@ export default function DashboardPage() {
 				recentWorkspaces={dashboard.recentWorkspaces}
 			/>
 
-			<section className='grid min-w-0 gap-4 xl:grid-cols-12'>
+			<section className='grid min-w-0 gap-4 lg:grid-cols-12'>
 				<DashboardFocus
 					focus={dashboard.focus}
 					rhythmBlocks={dashboard.rhythmBlocks}
@@ -93,12 +93,12 @@ export default function DashboardPage() {
 
 			<DashboardStats stats={dashboard.stats} />
 
-			<section className='grid min-w-0 grid-cols-1 gap-4 xl:grid-cols-12'>
+			<section className='grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-12'>
 				<DashboardPriorityTasks priorityTasks={dashboard.priorityTasks} />
 				<DashboardRecentWorkspaces recentWorkspaces={dashboard.recentWorkspaces} />
 			</section>
 
-			<section className='grid min-w-0 gap-4 xl:grid-cols-12'>
+			<section className='grid min-w-0 gap-4 lg:grid-cols-12'>
 				<DashboardRecentActivities recentActivities={dashboard.recentActivities} />
 				<DashboardSuggestions suggestions={dashboard.suggestions} stats={dashboard.stats} />
 			</section>

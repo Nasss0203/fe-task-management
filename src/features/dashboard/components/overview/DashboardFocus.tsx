@@ -40,14 +40,14 @@ export function DashboardFocus({ focus, rhythmBlocks, stats }: DashboardFocusPro
 	const { dayProgress, MomentumIcon } = memoizedDerivedState;
 
 	return (
-		<Card className='xl:col-span-8'>
+		<Card className='lg:col-span-8'>
 			<CardHeader>
 				<CardTitle>{focus.title}</CardTitle>
 				<CardDescription>{focus.message}</CardDescription>
 			</CardHeader>
 			<CardContent className='grid gap-5 lg:grid-cols-[minmax(0,1fr)_240px]'>
 				<div className='flex flex-col gap-5'>
-					<div className='grid gap-3 md:grid-cols-3'>
+					<div className='grid gap-3 md:grid-cols-3 xl:grid-cols-2 2xl:grid-cols-3'>
 						<div className='rounded-lg border bg-muted/35 p-4'>
 							<div className='mb-3 flex items-center justify-between gap-3'>
 								<Target className='text-muted-foreground' />

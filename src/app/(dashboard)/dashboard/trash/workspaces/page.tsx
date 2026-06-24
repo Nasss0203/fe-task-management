@@ -143,7 +143,7 @@ const DeletedWorkspacesPage = () => {
 		return (
 			<Card className='border-border bg-card text-card-foreground'>
 				<CardHeader>
-					<CardTitle>Không tải được thùng rác không gian làm việc</CardTitle>
+					<CardTitle>Không tải được trang</CardTitle>
 					<CardDescription>
 						Thử tải lại để lấy danh sách không gian làm việc đã xóa.
 					</CardDescription>

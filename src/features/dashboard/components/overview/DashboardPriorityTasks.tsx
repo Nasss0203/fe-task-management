@@ -28,7 +28,7 @@ type DashboardPriorityTasksProps = {
 
 export function DashboardPriorityTasks({ priorityTasks }: DashboardPriorityTasksProps) {
 	return (
-		<Card id='priority-today' className='scroll-mt-4 xl:col-span-8'>
+		<Card id='priority-today' className='scroll-mt-4 lg:col-span-8'>
 			<CardHeader>
 				<CardTitle>Ưu tiên hôm nay</CardTitle>
 				<CardDescription>

@@ -24,7 +24,7 @@ export function DashboardSuggestions({ suggestions, stats }: DashboardSuggestion
 	const weeklyGoal = useMemo(() => clampPercent(stats.weeklyGoalPercent), [stats.weeklyGoalPercent]);
 
 	return (
-		<Card className='xl:col-span-4'>
+		<Card className='lg:col-span-4'>
 			<CardHeader>
 				<CardTitle>Gợi ý hành động</CardTitle>
 				<CardDescription>

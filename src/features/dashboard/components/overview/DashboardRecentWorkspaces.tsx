@@ -16,7 +16,7 @@ type DashboardRecentWorkspacesProps = {
 
 export function DashboardRecentWorkspaces({ recentWorkspaces }: DashboardRecentWorkspacesProps) {
 	return (
-		<Card className='xl:col-span-4'>
+		<Card className='lg:col-span-4'>
 			<CardHeader>
 				<CardTitle>Workspace gần đây</CardTitle>
 				<CardDescription>

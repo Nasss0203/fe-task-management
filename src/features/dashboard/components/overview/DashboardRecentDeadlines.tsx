@@ -16,7 +16,7 @@ type DashboardRecentDeadlinesProps = {
 
 export function DashboardRecentDeadlines({ recentDeadlines }: DashboardRecentDeadlinesProps) {
 	return (
-		<Card className='xl:col-span-4'>
+		<Card className='lg:col-span-4'>
 			<CardHeader>
 				<CardTitle>Lịch gần nhất</CardTitle>
 				<CardDescription>

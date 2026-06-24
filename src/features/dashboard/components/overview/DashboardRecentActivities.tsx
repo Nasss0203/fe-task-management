@@ -24,7 +24,7 @@ type DashboardRecentActivitiesProps = {
 
 export function DashboardRecentActivities({ recentActivities }: DashboardRecentActivitiesProps) {
 	return (
-		<Card className='xl:col-span-8'>
+		<Card className='lg:col-span-8'>
 			<CardHeader>
 				<CardTitle>Hoạt động gần đây</CardTitle>
 				<CardDescription>

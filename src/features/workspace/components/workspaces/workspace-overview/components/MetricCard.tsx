@@ -23,19 +23,19 @@ export function MetricCard({ label, count, subText, icon: Icon, link, tone }: Me
     <Link 
       href={link}
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md"
+        "group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md"
       )}
     >
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-[13px] font-bold text-muted-foreground uppercase tracking-wider">{label}</p>
-          <h3 className="mt-2 text-3xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">{count}</h3>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider truncate" title={label}>{label}</p>
+          <h3 className="mt-1.5 text-2xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">{count}</h3>
         </div>
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 transition-transform duration-300 group-hover:scale-110">
-          <Icon size={22} strokeWidth={1.5} />
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 transition-transform duration-300 group-hover:scale-110">
+          <Icon size={20} strokeWidth={1.5} />
         </div>
       </div>
-      <p className="mt-4 text-[12px] font-medium text-muted-foreground">
+      <p className="mt-3 text-[11px] font-medium text-muted-foreground truncate" title={subText}>
         {subText}
       </p>
       
