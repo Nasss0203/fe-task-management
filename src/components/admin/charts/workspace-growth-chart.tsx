@@ -11,6 +11,14 @@ import type {
 	WorkspaceGrowthPeriod,
 } from "@/services/admin/dashboard/type";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+
 
 const chartConfig = {
 	workspaces: {
@@ -87,18 +95,17 @@ export function WorkspaceGrowthChart({ data, period, onPeriodChange }: Props) {
 					</p>
 				</div>
 
-				<select
-					value={period}
-					onChange={(e) =>
-						onPeriodChange(e.target.value as WorkspaceGrowthPeriod)
-					}
-					className='rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-white outline-none'
-				>
-					<option value='7d'>7 ngày</option>
-					<option value='30d'>1 tháng</option>
-					<option value='60d'>2 tháng</option>
-					<option value='1y'>1 năm</option>
-				</select>
+				<Select value={period} onValueChange={(val) => onPeriodChange(val as WorkspaceGrowthPeriod)}>
+					<SelectTrigger className="rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-white outline-none">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+					<SelectItem value="7d">7 ngày</SelectItem>
+					<SelectItem value="30d">1 tháng</SelectItem>
+					<SelectItem value="60d">2 tháng</SelectItem>
+					<SelectItem value="1y">1 năm</SelectItem>
+				</SelectContent>
+				</Select>
 			</div>
 
 			<div className='h-[280px]'>

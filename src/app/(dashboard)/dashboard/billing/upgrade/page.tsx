@@ -204,7 +204,7 @@ function UpgradeBillingContent() {
 													? "default"
 													: "outline"
 											}
-											className='h-auto justify-between rounded-lg px-4 py-4'
+											className='h-full justify-between rounded-lg px-4 py-4'
 											disabled={!monthlyPlan}
 											onClick={() =>
 												setBillingInterval("MONTH")
@@ -232,7 +232,7 @@ function UpgradeBillingContent() {
 													? "default"
 													: "outline"
 											}
-											className='h-auto justify-between rounded-lg px-4 py-4'
+											className='h-full justify-between rounded-lg px-4 py-4'
 											disabled={!yearlyPlan}
 											onClick={() =>
 												setBillingInterval("YEAR")
@@ -266,7 +266,7 @@ function UpgradeBillingContent() {
 								</CardDescription>
 							</CardHeader>
 							<CardContent>
-								<div className='grid gap-3 sm:grid-cols-2'>
+								<div className='grid gap-3 sm:grid-cols-2 items-stretch'>
 									{PAYMENT_METHODS.map((method) => {
 										const Icon = method.icon;
 										const isSelected =
@@ -279,7 +279,7 @@ function UpgradeBillingContent() {
 												type='button'
 												aria-pressed={isSelected}
 												className={cn(
-													"flex min-h-36 flex-col items-start gap-4 rounded-lg border bg-card p-4 text-left text-sm transition-colors hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+													"flex h-full min-h-36 flex-col items-start gap-4 rounded-lg border bg-card p-4 text-left text-sm transition-colors hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
 													isSelected &&
 														"border-primary bg-accent",
 												)}
@@ -303,7 +303,7 @@ function UpgradeBillingContent() {
 														</span>
 													) : null}
 												</span>
-												<span className='space-y-1'>
+												<span className='space-y-1 flex-1'>
 													<span className='block font-medium'>
 														{method.title}
 													</span>

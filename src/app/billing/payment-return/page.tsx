@@ -75,8 +75,8 @@ const formatCurrency = (amount?: number, currency = "VND") => {
 function DetailRow({ label, value }: { label: string; value?: string }) {
 	return (
 		<div className='flex items-center justify-between gap-4 text-sm'>
-			<span className='text-muted-foreground'>{label}</span>
-			<span className='max-w-56 truncate text-right font-medium'>
+			<span className='text-muted-foreground font-medium'>{label}</span>
+			<span className='max-w-[200px] truncate text-right font-semibold text-foreground'>
 				{value || "-"}
 			</span>
 		</div>
@@ -93,15 +93,15 @@ function StepItem({
 	icon: React.ReactNode;
 }) {
 	return (
-		<li className='flex items-center gap-3 text-sm'>
+		<li className='flex items-center gap-4'>
 			<span
-				className={`flex size-7 shrink-0 items-center justify-center rounded-full border ${
+				className={`flex size-10 shrink-0 items-center justify-center rounded-full border shadow-sm transition-colors ${
 					done
-						? "border-emerald-600 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30"
-						: "bg-background text-muted-foreground"
+						? "border-emerald-200 bg-emerald-100 text-emerald-600 dark:border-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-400"
+						: "border-border bg-muted/50 text-muted-foreground"
 				}`}
 			>
-				{done ? <Check className='size-3.5' /> : icon}
+				{done ? <Check className='size-5' strokeWidth={3} /> : icon}
 			</span>
 			<span className={done ? "text-foreground" : "text-muted-foreground"}>
 				{children}
@@ -239,148 +239,144 @@ function PaymentReturnContent() {
 		(isLoading ? "VERIFYING" : isSuccess ? "SUCCEEDED" : "FAILED");
 
 	return (
-		<main className='min-h-svh bg-background px-4 py-8 md:py-12'>
-			<div className='mx-auto grid w-full max-w-5xl gap-6 lg:grid-cols-[1fr_360px]'>
-				<section className='flex flex-col justify-center gap-6'>
-					<div className='space-y-4'>
-						<Badge variant='secondary' className='rounded-md px-3 py-1'>
-							Thanh toán
-						</Badge>
-						<div className='space-y-3'>
-							<h1 className='max-w-2xl text-3xl font-semibold tracking-normal md:text-4xl'>
+		<main className='min-h-svh relative flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-12 overflow-hidden'>
+			{/* Abstract background shapes for premium feel */}
+			<div className="absolute top-0 inset-x-0 h-[500px] bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
+			<div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none" />
+			<div className="absolute top-40 -left-40 w-[500px] h-[500px] bg-blue-500/10 blur-[100px] rounded-full pointer-events-none" />
+
+			<div className='mx-auto grid w-full max-w-5xl gap-12 lg:grid-cols-[1.2fr_1fr] relative z-10'>
+				<section className='flex flex-col justify-center gap-10 lg:pr-6'>
+					<div className='space-y-6'>
+						<div className={`inline-flex items-center rounded-full px-4 py-1.5 text-sm font-semibold w-fit border shadow-sm ${isSuccess ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : isLoading ? 'bg-blue-500/10 text-blue-600 border-blue-500/20' : 'bg-red-500/10 text-red-600 border-red-500/20'}`}>
+							<Sparkles className="w-4 h-4 mr-2" />
+							{isLoading ? "Đang xử lý giao dịch..." : isSuccess ? "Thanh toán hoàn tất" : "Thanh toán thất bại"}
+						</div>
+						<div className='space-y-4'>
+							<h1 className='text-4xl font-extrabold tracking-tight md:text-5xl lg:leading-[1.1] text-foreground'>
 								{isLoading
-									? "Đang xác nhận giao dịch"
+									? "Vui lòng chờ trong giây lát"
 									: isSuccess
 										? "Workspace của bạn đã được nâng cấp"
 										: "Chưa thể hoàn tất thanh toán"}
 							</h1>
-							<p className='max-w-2xl text-sm leading-6 text-muted-foreground md:text-base'>
+							<p className='text-lg text-muted-foreground leading-relaxed'>
 								{message}
 							</p>
 						</div>
 					</div>
 
-					<Card className='rounded-lg'>
-						<CardContent className='space-y-5 pt-6'>
-							<ul className='space-y-4'>
-								<StepItem done icon={<Clock3 className='size-3.5' />}>
-									Đã tạo thanh toán
+					<Card className='rounded-2xl border-0 shadow-none bg-transparent'>
+						<CardContent className='p-0 space-y-8'>
+							<ul className='space-y-6'>
+								<StepItem done icon={<Clock3 className='size-5' />}>
+									<span className="text-base font-semibold">Đã tạo yêu cầu thanh toán</span>
 								</StepItem>
 								<StepItem
 									done={!isLoading}
-									icon={<CreditCard className='size-3.5' />}
+									icon={<CreditCard className='size-5' />}
 								>
-									{isStripeReturn
-										? "Đã xác nhận thanh toán Stripe"
-										: "Đã nhận kết quả từ VNPAY"}
+									<span className="text-base font-semibold">
+										{isStripeReturn
+											? "Xác nhận giao dịch từ Stripe"
+											: "Nhận kết quả từ VNPAY"}
+									</span>
 								</StepItem>
 								<StepItem
 									done={isSuccess}
-									icon={<ShieldCheck className='size-3.5' />}
+									icon={<ShieldCheck className='size-5' />}
 								>
-									Đã cập nhật gói đăng ký
+									<span className="text-base font-semibold">Kích hoạt gói đăng ký & Nâng cấp giới hạn</span>
 								</StepItem>
 							</ul>
-							<Separator />
-							<p className='text-sm leading-6 text-muted-foreground'>
-								{isLoading
-									? isStripeReturn
-										? "Hệ thống đang đối chiếu Stripe Checkout và đồng bộ gói đăng ký. Vui lòng không đóng trang này."
-										: "Hệ thống đang xác thực chữ ký VNPAY và đồng bộ gói đăng ký. Vui lòng không đóng trang này."
-									: isSuccess
-										? "Gói đăng ký và giới hạn workspace đã được cập nhật. Bạn có thể quay lại trang chủ để tiếp tục làm việc."
-										: "Nếu tài khoản đã bị trừ tiền, hãy gửi mã đơn hàng cho hỗ trợ để đối soát giao dịch."}
-							</p>
+							
+							<div className="bg-background/60 backdrop-blur-md rounded-2xl p-6 border shadow-sm">
+								<p className='text-sm leading-relaxed text-foreground font-medium'>
+									{isLoading
+										? isStripeReturn
+											? "Hệ thống đang đối chiếu Stripe Checkout và đồng bộ gói đăng ký. Vui lòng không đóng trang này."
+											: "Hệ thống đang xác thực chữ ký VNPAY và đồng bộ gói đăng ký. Vui lòng không đóng trang này."
+										: isSuccess
+											? "Mọi thứ đã sẵn sàng! Gói đăng ký và giới hạn workspace đã được cập nhật thành công. Bạn có thể bắt đầu trải nghiệm các tính năng Pro ngay bây giờ."
+											: "Nếu tài khoản của bạn đã bị trừ tiền, hãy liên hệ với bộ phận hỗ trợ khách hàng và cung cấp mã đơn hàng để đối soát."}
+								</p>
+							</div>
 						</CardContent>
 					</Card>
 				</section>
 
-				<Card className='self-center rounded-lg'>
-					<CardHeader>
-						<div className='flex items-start justify-between gap-3'>
-							<div className='space-y-2'>
-								<div className='flex size-12 items-center justify-center rounded-lg bg-muted'>
-									{isLoading ? (
-										<Loader2 className='size-6 animate-spin' />
-									) : isSuccess ? (
-										<CheckCircle2 className='size-6 text-emerald-600' />
-									) : (
-										<XCircle className='size-6 text-destructive' />
-									)}
-								</div>
-								<div>
-									<CardTitle>Biên lai thanh toán</CardTitle>
-									<CardDescription>
-										{isLoading
-											? "Đang xác minh"
-											: isSuccess
-												? "Đã xác nhận thanh toán"
-												: "Thanh toán cần xem xét lại"}
-									</CardDescription>
-								</div>
-							</div>
-							<Badge
-								variant={isSuccess ? "default" : "secondary"}
-								className='rounded-md'
-							>
-								{paymentStatus === "VERIFYING" ? "ĐANG XÁC NHẬN" : paymentStatus === "SUCCEEDED" ? "THÀNH CÔNG" : paymentStatus === "FAILED" ? "THẤT BẠI" : paymentStatus}
-							</Badge>
+				<Card className='self-center border-0 shadow-2xl shadow-slate-200/50 dark:shadow-black/50 rounded-3xl overflow-hidden relative bg-card'>
+					{/* Gradient top bar */}
+					<div className={`h-2.5 w-full ${isSuccess ? 'bg-gradient-to-r from-emerald-400 to-teal-500' : isLoading ? 'bg-gradient-to-r from-blue-400 to-indigo-500' : 'bg-gradient-to-r from-red-400 to-rose-500'}`} />
+					
+					<CardHeader className="pt-10 pb-6 px-8 items-center text-center">
+						<div className={`flex size-20 items-center justify-center rounded-full mb-6 shadow-sm ${isSuccess ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' : isLoading ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30' : 'bg-red-100 text-red-600 dark:bg-red-900/30'}`}>
+							{isLoading ? (
+								<Loader2 className='size-10 animate-spin' />
+							) : isSuccess ? (
+								<CheckCircle2 className='size-10' />
+							) : (
+								<XCircle className='size-10' />
+							)}
 						</div>
+						<CardTitle className="text-2xl font-bold">Biên lai giao dịch</CardTitle>
+						<Badge
+							variant={isSuccess ? "default" : "secondary"}
+							className={`mt-3 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-widest ${isSuccess ? 'bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 border-emerald-200 dark:border-emerald-800' : ''}`}
+						>
+							{paymentStatus === "VERIFYING" ? "ĐANG XÁC NHẬN" : paymentStatus === "SUCCEEDED" ? "THÀNH CÔNG" : paymentStatus === "FAILED" ? "THẤT BẠI" : paymentStatus}
+						</Badge>
 					</CardHeader>
-					<CardContent className='space-y-4'>
-						<div className='rounded-lg bg-muted/60 p-4'>
-							<div className='flex items-center gap-2 text-sm font-medium'>
-								<ReceiptText className='size-4' />
-								Chi tiết giao dịch
-							</div>
-							<div className='mt-4 space-y-3'>
-								<DetailRow label='Nhà cung cấp' value={provider} />
-								<DetailRow label='Mã đơn hàng' value={orderCode} />
-								<DetailRow
-									label='Số tiền'
-									value={formatCurrency(
-										paymentResult?.amount,
-										paymentResult?.currency,
-									)}
-								/>
-								<DetailRow
-									label={
-										isStripeReturn
-											? "Trạng thái Stripe"
-											: "Mã VNPAY"
-									}
-									value={
-										isStripeReturn
-											? paymentResult?.stripePaymentStatus
-											: vnpResponseCode
-									}
-								/>
+
+					<CardContent className='px-8 pb-8'>
+						{/* The Amount Block */}
+						<div className="text-center py-6 bg-muted/30 rounded-2xl mb-8 border border-border/50">
+							<div className="text-sm font-semibold text-muted-foreground mb-2 uppercase tracking-wider">Tổng thanh toán</div>
+							<div className="text-4xl font-black text-foreground tracking-tight">
+								{formatCurrency(paymentResult?.amount)}
 							</div>
 						</div>
+
+						{/* Dashed Line with notches for Receipt Effect */}
+						<div className="border-t-2 border-dashed border-border w-full my-8 relative">
+							<div className="absolute -top-[13px] w-6 h-6 bg-slate-50 dark:bg-slate-950 rounded-full shadow-inner border border-border" style={{ left: '-45px' }} />
+							<div className="absolute -top-[13px] w-6 h-6 bg-slate-50 dark:bg-slate-950 rounded-full shadow-inner border border-border" style={{ right: '-45px' }} />
+						</div>
+
+						<div className='space-y-5 pt-2'>
+							<DetailRow label='Nhà cung cấp' value={provider} />
+							<DetailRow label='Mã đơn hàng' value={orderCode} />
+							<DetailRow
+								label={isStripeReturn ? "Trạng thái Stripe" : "Mã tham chiếu"}
+								value={isStripeReturn ? paymentResult?.stripePaymentStatus : vnpResponseCode}
+							/>
+						</div>
+						
 						{isLoading ? (
-							<div className='h-1.5 overflow-hidden rounded-full bg-muted'>
+							<div className='h-1.5 overflow-hidden rounded-full bg-muted mt-8'>
 								<div className='h-full w-2/3 animate-pulse rounded-full bg-primary' />
 							</div>
 						) : null}
 					</CardContent>
-					<CardFooter className='flex-col gap-2'>
+
+					<CardFooter className='flex-col gap-3 px-8 pb-8 pt-0'>
 						{isLoading ? (
-							<Button className='w-full' disabled>
-								<Loader2 className='animate-spin' />
-								Đang xác nhận thanh toán
+							<Button className='w-full rounded-xl h-12 text-base font-semibold shadow-sm' disabled>
+								<Loader2 className='animate-spin mr-2' />
+								Đang xác nhận...
 							</Button>
 						) : (
-							<Button asChild className='w-full'>
+							<Button asChild className='w-full rounded-xl h-12 text-base font-semibold shadow-sm group'>
 								<Link href='/dashboard'>
-									Đi đến trang chủ
-									<ArrowRight />
+									Đi đến bảng điều khiển
+									<ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
 								</Link>
 							</Button>
 						)}
 						{isSuccess || isLoading ? null : (
-							<Button asChild variant='outline' className='w-full'>
+							<Button asChild variant='outline' className='w-full rounded-xl h-12 text-base font-semibold'>
 								<Link href='/dashboard/billing/upgrade'>
-									<RefreshCcw />
+									<RefreshCcw className="mr-2 w-4 h-4" />
 									Thử lại
 								</Link>
 							</Button>

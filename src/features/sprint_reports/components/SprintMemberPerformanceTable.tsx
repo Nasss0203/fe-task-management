@@ -18,15 +18,15 @@ export const SprintMemberPerformanceTable: React.FC<Props> = ({ memberPerformanc
   };
 
   return (
-    <div className="bg-card rounded-[2rem] border border-border shadow-sm overflow-hidden relative">
-      <div className="relative p-6 md:p-8 flex flex-col gap-6">
+    <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+      <div className="p-6 md:p-8 flex flex-col gap-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
-            <TrendingUp className="w-5 h-5 text-primary" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-secondary/50">
+            <TrendingUp className="h-5 w-5 text-muted-foreground" />
           </div>
           <div>
-            <h3 className="text-xl font-extrabold text-foreground tracking-tight">Member Performance</h3>
-            <p className="text-sm text-muted-foreground mt-0.5">Hiệu suất làm việc của từng thành viên trong sprint</p>
+            <h3 className="text-lg font-bold text-foreground">Member Performance</h3>
+            <p className="text-sm text-muted-foreground">Hiệu suất làm việc của từng thành viên trong sprint</p>
           </div>
         </div>
 

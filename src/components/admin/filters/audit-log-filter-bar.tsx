@@ -1,4 +1,12 @@
 import { RotateCcw, Search } from "lucide-react";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+
 
 type Props = {
 	search: string;
@@ -46,55 +54,58 @@ export function AuditLogFilterBar({
 					<label className='mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-500'>
 						Action
 					</label>
-					<select
-						value={action}
-						onChange={(e) => onActionChange(e.target.value)}
-						className='h-11 w-full rounded-2xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-white/20'
-					>
-						<option value='all'>Tất cả</option>
-						<option value='WORKSPACE_CREATED'>Tạo workspace</option>
-						<option value='WORKSPACE_DELETED'>Xóa workspace</option>
-						<option value='WORKSPACE_LOCKED'>Khóa workspace</option>
-						<option value='USER_LOCKED'>Khóa tài khoản</option>
-						<option value='USER_UNLOCKED'>Mở khóa tài khoản</option>
-						<option value='ROLE_CHANGED'>Đổi role</option>
-						<option value='BILLING_CHANGED'>Billing changed</option>
-						<option value='ADMIN_LOGIN'>Admin login</option>
-					</select>
+					<Select value={action} onValueChange={(val) => onActionChange(val)}>
+					<SelectTrigger className="h-11 w-full rounded-2xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-white/20">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">Tất cả</SelectItem>
+						<SelectItem value="WORKSPACE_CREATED">Tạo workspace</SelectItem>
+						<SelectItem value="WORKSPACE_DELETED">Xóa workspace</SelectItem>
+						<SelectItem value="WORKSPACE_LOCKED">Khóa workspace</SelectItem>
+						<SelectItem value="USER_LOCKED">Khóa tài khoản</SelectItem>
+						<SelectItem value="USER_UNLOCKED">Mở khóa tài khoản</SelectItem>
+						<SelectItem value="ROLE_CHANGED">Đổi role</SelectItem>
+						<SelectItem value="BILLING_CHANGED">Billing changed</SelectItem>
+						<SelectItem value="ADMIN_LOGIN">Admin login</SelectItem>
+					</SelectContent>
+				</Select>
 				</div>
 
 				<div className='lg:col-span-2'>
 					<label className='mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-500'>
 						Target
 					</label>
-					<select
-						value={target}
-						onChange={(e) => onTargetChange(e.target.value)}
-						className='h-11 w-full rounded-2xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-white/20'
-					>
-						<option value='all'>Tất cả</option>
-						<option value='WORKSPACE'>Workspace</option>
-						<option value='USER'>User</option>
-						<option value='ROLE'>Role</option>
-						<option value='BILLING'>Billing</option>
-						<option value='AUTH'>Auth</option>
-					</select>
+					<Select value={target} onValueChange={(val) => onTargetChange(val)}>
+					<SelectTrigger className="h-11 w-full rounded-2xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-white/20">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">Tất cả</SelectItem>
+						<SelectItem value="WORKSPACE">Workspace</SelectItem>
+						<SelectItem value="USER">User</SelectItem>
+						<SelectItem value="ROLE">Role</SelectItem>
+						<SelectItem value="BILLING">Billing</SelectItem>
+						<SelectItem value="AUTH">Auth</SelectItem>
+					</SelectContent>
+				</Select>
 				</div>
 
 				<div className='lg:col-span-2'>
 					<label className='mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-500'>
 						Thời gian
 					</label>
-					<select
-						value={time}
-						onChange={(e) => onTimeChange(e.target.value)}
-						className='h-11 w-full rounded-2xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-white/20'
-					>
-						<option value='all'>Tất cả</option>
-						<option value='24h'>24 giờ gần đây</option>
-						<option value='7d'>7 ngày gần đây</option>
-						<option value='30d'>30 ngày gần đây</option>
-					</select>
+					<Select value={time} onValueChange={(val) => onTimeChange(val)}>
+					<SelectTrigger className="h-11 w-full rounded-2xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-white/20">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">Tất cả</SelectItem>
+						<SelectItem value="24h">24 giờ gần đây</SelectItem>
+						<SelectItem value="7d">7 ngày gần đây</SelectItem>
+						<SelectItem value="30d">30 ngày gần đây</SelectItem>
+					</SelectContent>
+				</Select>
 				</div>
 
 				<div className='lg:col-span-2'>

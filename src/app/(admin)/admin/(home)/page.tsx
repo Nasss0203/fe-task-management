@@ -7,6 +7,10 @@ import { WorkspacePlanChart } from "@/components/admin/charts/workspace-plan-cha
 import { DashboardHeader } from "@/components/admin/header/dashboard-header";
 import { SystemHealth } from "@/components/admin/health/system-health";
 import { RetentionCard } from "@/components/admin/retention/retention-card";
+import {
+	adminMetricCardClass,
+	getAdminToneClass,
+} from "@/components/admin/shared/theme";
 import { RecentWorkspacesTable } from "@/components/admin/table/recent-workspaces-table";
 import { useAdminDashboard } from "@/features/admin/modules/dashboard/hooks/useAdminDashboard";
 import type {
@@ -105,16 +109,15 @@ const filterWorkspaces = (
 		return matchesSearch && matchesPlan && matchesCreatedAt;
 	});
 };
-
 function MetricTile({ item }: { item: MetricItem }) {
 	const Icon = item.icon;
 
 	return (
-		<div className='rounded-xl border border-white/10 bg-[#101010] p-4 lg:p-3.5'>
+		<div className={adminMetricCardClass}>
 			<div className='flex items-start justify-between gap-4'>
 				<div>
-					<p className='text-sm text-neutral-400'>{item.title}</p>
-					<p className='mt-2 text-2xl font-semibold text-white'>
+					<p className='text-sm font-medium text-muted-foreground'>{item.title}</p>
+					<p className='mt-2 text-2xl font-bold text-foreground'>
 						{item.value}
 					</p>
 				</div>
@@ -126,7 +129,7 @@ function MetricTile({ item }: { item: MetricItem }) {
 				</div>
 			</div>
 
-			<p className='mt-3 text-xs leading-4 text-neutral-500'>
+			<p className='mt-3 text-xs leading-4 text-muted-foreground'>
 				{item.description}
 			</p>
 		</div>
@@ -137,13 +140,13 @@ function SignalRow({ item }: { item: SignalItem }) {
 	const Icon = item.icon;
 	const toneClass =
 		item.tone === "success"
-			? "border-emerald-500/20 bg-emerald-500/10 text-emerald-300"
+			? getAdminToneClass("success", "icon")
 			: item.tone === "warning"
-				? "border-amber-500/20 bg-amber-500/10 text-amber-300"
-				: "border-white/10 bg-white/5 text-neutral-300";
+				? getAdminToneClass("warning", "icon")
+				: getAdminToneClass("neutral", "icon");
 
 	return (
-		<div className='flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-[#101010] p-3'>
+		<div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-border/70 bg-card/95 p-4 shadow-sm'>
 			<div className='flex min-w-0 items-center gap-3'>
 				<div
 					className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${toneClass}`}
@@ -151,36 +154,31 @@ function SignalRow({ item }: { item: SignalItem }) {
 					<Icon className='h-4 w-4' />
 				</div>
 				<div className='min-w-0'>
-					<p className='text-sm font-medium text-white'>
+					<p className='text-sm font-semibold text-foreground line-clamp-1'>
 						{item.label}
 					</p>
-					<p className='mt-0.5 truncate text-xs text-neutral-500'>
+					<p className='mt-0.5 truncate text-xs text-muted-foreground'>
 						{item.description}
 					</p>
 				</div>
 			</div>
 
-			<span className='shrink-0 text-sm font-semibold text-white'>
+			<div className='shrink-0 text-sm font-bold text-foreground sm:text-right sm:max-w-[40%] self-end sm:self-auto text-right'>
 				{item.value}
-			</span>
+			</div>
 		</div>
 	);
 }
 
 export default function AdminDashboardPage() {
-	const [workspaceFilters, setWorkspaceFilters] =
-		useState<AdminFindAllWorkspaceQuery>({});
-	const [workspacePagination, setWorkspacePagination] =
-		useState<PaginationState>({
-			pageIndex: 0,
-			pageSize: 10,
-		});
+	const [workspaceFilters, setWorkspaceFilters] = useState<AdminFindAllWorkspaceQuery>({});
+	const [workspacePagination, setWorkspacePagination] = useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: 10,
+	});
 
-	const [userGrowthPeriod, setUserGrowthPeriod] =
-		useState<UserGrowthPeriod>("7d");
-
-	const [workspaceGrowthPeriod, setWorkspaceGrowthPeriod] =
-		useState<WorkspaceGrowthPeriod>("7d");
+	const [userGrowthPeriod, setUserGrowthPeriod] = useState<UserGrowthPeriod>('7d');
+	const [workspaceGrowthPeriod, setWorkspaceGrowthPeriod] = useState<WorkspaceGrowthPeriod>('7d');
 
 	const workspaceQuery = useMemo<AdminFindAllWorkspaceQuery>(
 		() => ({
@@ -291,30 +289,28 @@ export default function AdminDashboardPage() {
 			value: totalUsers,
 			description: `${activeUsers} tài khoản đang hoạt động`,
 			icon: Users,
-			accentClass: "border-sky-500/20 bg-sky-500/10 text-sky-300",
+			accentClass: getAdminToneClass("brand", "icon"),
 		},
 		{
 			title: "Workspace",
 			value: totalWorkspaces,
 			description: `${paidWorkspaces} workspace trả phí`,
 			icon: BriefcaseBusiness,
-			accentClass:
-				"border-emerald-500/20 bg-emerald-500/10 text-emerald-300",
+			accentClass: getAdminToneClass("success", "icon"),
 		},
 		{
 			title: "Project",
 			value: totalProjects,
 			description: "Tổng project trên toàn hệ thống",
 			icon: Workflow,
-			accentClass:
-				"border-violet-500/20 bg-violet-500/10 text-violet-300",
+			accentClass: getAdminToneClass("accent", "icon"),
 		},
 		{
 			title: "Task",
 			value: totalTasks,
 			description: "Tổng task đã được tạo",
 			icon: CheckSquare,
-			accentClass: "border-amber-500/20 bg-amber-500/10 text-amber-300",
+			accentClass: getAdminToneClass("warning", "icon"),
 		},
 	];
 
@@ -342,7 +338,7 @@ export default function AdminDashboardPage() {
 		},
 		{
 			label: "Tăng trưởng mới nhất",
-			value: `+${latestUserGrowth} user / +${latestWorkspaceGrowth} workspace`,
+			value: `+${latestUserGrowth} user, +${latestWorkspaceGrowth} ws`,
 			description: "Điểm dữ liệu mới nhất trong chart",
 			icon: TrendingUp,
 			tone:
@@ -364,41 +360,41 @@ export default function AdminDashboardPage() {
 		systemHealth.isLoading ||
 		recentActivities.isLoading
 	) {
-		return <div className='text-neutral-400'>Đang tải dashboard...</div>;
+		return <div className='text-muted-foreground p-6'>Đang tải dashboard...</div>;
 	}
 
 	if (dashboardSummary.isError || workspaces.isError) {
-		return <div className='text-red-400'>Không thể tải dashboard</div>;
+		return <div className='text-destructive p-6'>Không thể tải dashboard</div>;
 	}
 
 	return (
-		<div className='space-y-3 p-4 sm:p-6'>
+		<div className='space-y-6 p-4 sm:p-6 lg:p-8'>
 			<DashboardHeader />
 
-			<section className='rounded-2xl border border-white/10 bg-[#0b0b0b] p-4 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset]'>
-				<div className='mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
+			<section className='rounded-3xl border border-border/70 bg-card/95 p-5 shadow-sm sm:p-6'>
+				<div className='mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
 					<div>
-						<div className='flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-neutral-500'>
-							<Database className='h-4 w-4 text-sky-400' />
+						<div className='mb-1.5 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground'>
+							<Database className='h-4 w-4 text-primary' />
 							Live overview
 						</div>
-						<h2 className='mt-2 text-lg font-semibold text-white'>
+						<h2 className='text-xl font-bold text-foreground'>
 							Tình hình vận hành
 						</h2>
 					</div>
-					<div className='inline-flex w-fit items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-300'>
+					<div className={`inline-flex w-fit items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-bold ${getAdminToneClass("success")}`}>
 						<ShieldCheck className='h-4 w-4' />
 						Dữ liệu trực tiếp
 					</div>
 				</div>
 
-				<div className='grid gap-3 md:grid-cols-2 xl:grid-cols-4'>
+				<div className='grid gap-4 md:grid-cols-2 xl:grid-cols-4'>
 					{metrics.map((item) => (
 						<MetricTile key={item.title} item={item} />
 					))}
 				</div>
 
-				<div className='mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-4'>
+				<div className='mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4'>
 					{signals.map((item) => (
 						<SignalRow key={item.label} item={item} />
 					))}

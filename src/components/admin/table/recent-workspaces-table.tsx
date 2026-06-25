@@ -12,6 +12,14 @@ import type { OnChangeFn, PaginationState } from "@tanstack/react-table";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { Search, X } from "lucide-react";
 import { useState } from "react";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+
 
 type Props = {
 	items: WorkspaceItem[];
@@ -96,17 +104,16 @@ export function RecentWorkspacesTable({
 					/>
 				</div>
 
-				<select
-					value={plan}
-					onChange={(event) =>
-						setPlan(event.target.value as PlanTypeWorkspace | "")
-					}
-					className='h-10 rounded-xl border border-neutral-800 bg-neutral-900/70 px-3 text-sm text-white outline-none'
-				>
-					<option value=''>Tất cả gói</option>
-					<option value='free'>Free</option>
-					<option value='pro'>Pro</option>
-				</select>
+				<Select value={plan || "all"} onValueChange={(val) => setPlan(val === "all" ? "" : (val as PlanTypeWorkspace))}>
+					<SelectTrigger className="h-10 rounded-xl border border-neutral-800 bg-neutral-900/70 px-3 text-sm text-white outline-none">
+						<SelectValue placeholder="Tất cả gói" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value='all'>Tất cả gói</SelectItem>
+						<SelectItem value="free">Free</SelectItem>
+						<SelectItem value="pro">Pro</SelectItem>
+					</SelectContent>
+				</Select>
 
 				<input
 					type='date'

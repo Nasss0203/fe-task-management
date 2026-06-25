@@ -29,10 +29,12 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang='en' suppressHydrationWarning>
-			<body
-				className={`antialiased ${montserrat.variable} ${jetbrainsMono.variable} font-sans`}
-			>
+		<html
+			lang='en'
+			suppressHydrationWarning
+			className={`${montserrat.variable} ${jetbrainsMono.variable}`}
+		>
+			<body className='font-sans antialiased'>
 				<ThemeProvider
 					attribute='class'
 					defaultTheme='system'

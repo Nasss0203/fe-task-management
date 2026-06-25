@@ -194,3 +194,25 @@ export function getBillingSearchPlaceholder(section: BillingSection) {
 			return "Tìm kiếm";
 	}
 }
+
+export function getNumberInputValue(value: number | undefined | null): string {
+	if (value === undefined || value === null || isNaN(value)) return "";
+	return value.toString();
+}
+
+export function parseNumberInput(value: string): number {
+	if (value === "") return 0;
+	return Number(value);
+}
+
+export function toSlug(str: string): string {
+	return str
+		.toLowerCase()
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "")
+		.replace(/[đĐ]/g, "d")
+		.replace(/[^a-z0-9 -]/g, "")
+		.replace(/\s+/g, "-")
+		.replace(/-+/g, "-")
+		.trim();
+}

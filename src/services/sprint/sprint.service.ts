@@ -1,8 +1,10 @@
 import instance from "../axios";
 import { ApiResponse } from "../types";
 import {
+	CancelSprintParams,
 	CompleteSprintParams,
 	CreateSprintDto,
+	DeleteSprintParams,
 	FindAllSprintResponse,
 	SprintItem,
 	SprintParams,
@@ -32,13 +34,11 @@ export const findTasksBySprintApi = async (
 };
 
 export const createSprintApi = async (data: CreateSprintDto) => {
-	const { workspaceId, projectId } = data;
+	const { workspaceId, projectId, ...rest } = data;
 
 	const response = await instance.post<any>(
 		`/sprints/workspaces/${workspaceId}/projects/${projectId}`,
-		{
-			data,
-		},
+		rest,
 	);
 
 	return response.data;
@@ -71,6 +71,26 @@ export const updateSprintApi = async (params: UpdateSprintParams) => {
 	const response = await instance.patch<any>(
 		`/sprints/workspaces/${workspaceId}/projects/${projectId}/sprint/${sprintId}`,
 		data,
+	);
+
+	return response.data;
+};
+
+export const cancelSprintApi = async (params: CancelSprintParams) => {
+	const { workspaceId, projectId, sprintId } = params;
+
+	const response = await instance.patch<any>(
+		`/sprints/workspaces/${workspaceId}/projects/${projectId}/sprints/${sprintId}/cancel`,
+	);
+
+	return response.data;
+};
+
+export const deleteSprintApi = async (params: DeleteSprintParams) => {
+	const { workspaceId, projectId, sprintId } = params;
+
+	const response = await instance.delete<any>(
+		`/sprints/workspaces/${workspaceId}/projects/${projectId}/sprints/${sprintId}`,
 	);
 
 	return response.data;

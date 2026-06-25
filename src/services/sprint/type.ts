@@ -56,6 +56,10 @@ export interface StartSprintParams extends SprintParams {
 
 export interface CompleteSprintParams extends SprintParams {}
 
+export interface CancelSprintParams extends SprintParams {}
+
+export interface DeleteSprintParams extends SprintParams {}
+
 export interface UpdateSprintDto {
 	name?: string;
 	goal?: string;

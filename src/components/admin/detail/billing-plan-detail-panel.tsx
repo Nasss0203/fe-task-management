@@ -15,34 +15,32 @@ import type {
 	PlanBillingInterval,
 	PlanStatus,
 } from "../shared/billing-admin.types";
+import {
+	getNumberInputValue,
+	parseNumberInput,
+	toSlug,
+} from "../shared/billing-admin.utils";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+
 
 type Props = {
 	plan: BillingPlan | null;
 	onClose: () => void;
-	onSave: (plan: BillingPlan) => Promise<void> | void;
+	onSave: (plan: BillingPlan) => void;
 	isSaving?: boolean;
 };
-
-const toSlug = (value: string) =>
-	value
-		.trim()
-		.toLowerCase()
-		.replace(/[_\s]+/g, "-")
-		.replace(/[^a-z0-9-]/g, "")
-		.replace(/-+/g, "-")
-		.replace(/^-|-$/g, "");
-
-const getNumberInputValue = (value: number) =>
-	Number.isFinite(value) ? String(value) : "";
-
-const parseNumberInput = (value: string) =>
-	value.trim() === "" ? Number.NaN : Number(value);
 
 export function BillingPlanDetailPanel({
 	plan,
 	onClose,
 	onSave,
-	isSaving = false,
+	isSaving,
 }: Props) {
 	const [open, setOpen] = useState(Boolean(plan));
 	const [form, setForm] = useState<BillingPlan | null>(plan);
@@ -57,8 +55,6 @@ export function BillingPlanDetailPanel({
 	}, []);
 
 	const handleRequestClose = () => {
-		if (isSaving) return;
-
 		if (closeTimerRef.current) {
 			clearTimeout(closeTimerRef.current);
 		}
@@ -88,12 +84,11 @@ export function BillingPlanDetailPanel({
 					<div className='flex items-start justify-between gap-4'>
 						<div>
 							<DrawerTitle className='text-xl font-semibold text-white'>
-								{plan
-									? "Chỉnh sửa gói dịch vụ"
-									: "Tạo gói dịch vụ"}
+								Quản lý gói dịch vụ
 							</DrawerTitle>
 							<DrawerDescription className='mt-1 text-sm text-neutral-400'>
-								Cấu hình giá, giới hạn và tính năng cho gói.
+								Thiết lập giá, giới hạn và tính năng cho gói
+								dịch vụ.
 							</DrawerDescription>
 						</div>
 
@@ -113,7 +108,7 @@ export function BillingPlanDetailPanel({
 					<div className='space-y-4'>
 						<div className='rounded-2xl border border-white/10 bg-[#111111] p-4'>
 							<h3 className='mb-4 text-sm font-semibold uppercase tracking-wide text-neutral-500'>
-								Thông tin gói
+								Thông tin cơ bản
 							</h3>
 
 							<div className='space-y-4'>
@@ -187,25 +182,26 @@ export function BillingPlanDetailPanel({
 									<label className='mb-2 block text-sm text-neutral-400'>
 										Trạng thái
 									</label>
-									<select
-										value={form.status}
-										onChange={(e) =>
-											setForm((prev) =>
-												prev
-													? {
-															...prev,
-															status: e.target
-																.value as PlanStatus,
-														}
-													: prev,
-											)
-										}
-										className='h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none'
+									<Select 
+										value={form.status} 
+										onValueChange={(val) => setForm((prev) =>
+											prev
+												? {
+														...prev,
+														status: val as PlanStatus,
+												  }
+												: prev
+										)}
 									>
-										<option value='DRAFT'>Bản nháp</option>
-										<option value='ACTIVE'>Đang bán</option>
-										<option value='DISABLED'>Đã tắt</option>
-									</select>
+										<SelectTrigger className="h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none">
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="DRAFT">Bản nháp</SelectItem>
+											<SelectItem value="ACTIVE">Đang bán</SelectItem>
+											<SelectItem value="DISABLED">Đã tắt</SelectItem>
+										</SelectContent>
+									</Select>
 								</div>
 							</div>
 						</div>
@@ -220,26 +216,26 @@ export function BillingPlanDetailPanel({
 									<label className='mb-2 block text-sm text-neutral-400'>
 										Chu kỳ thanh toán
 									</label>
-									<select
-										value={form.billingInterval ?? "MONTH"}
-										onChange={(e) =>
-											setForm((prev) =>
-												prev
-													? {
-															...prev,
-															billingInterval: e
-																.target
-																.value as PlanBillingInterval,
-														}
-													: prev,
-											)
-										}
-										className='h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none'
+									<Select 
+										value={form.billingInterval ?? "MONTH"} 
+										onValueChange={(val) => setForm((prev) =>
+											prev
+												? {
+														...prev,
+														billingInterval: val as PlanBillingInterval,
+												  }
+												: prev
+										)}
 									>
-										<option value='MONTH'>Tháng</option>
-										<option value='YEAR'>Năm</option>
-										<option value='LIFETIME'>Trọn đời</option>
-									</select>
+										<SelectTrigger className="h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none">
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="MONTH">Tháng</SelectItem>
+											<SelectItem value="YEAR">Năm</SelectItem>
+											<SelectItem value="LIFETIME">Trọn đời</SelectItem>
+										</SelectContent>
+									</Select>
 								</div>
 
 								<div>

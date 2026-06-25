@@ -13,6 +13,10 @@ import type {
 	AdminUser,
 	AdminUserStatus,
 } from "@/services/admin/user/type";
+import {
+	adminEmptyStateClass,
+	adminPanelCompactClass,
+} from "@/components/admin/shared/theme";
 import type { PaginationState } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -211,7 +215,7 @@ export default function AdminUsersPage() {
 				overview={overview}
 			/>
 
-			<div className='rounded-2xl border border-white/10 bg-[#0b0b0b] p-4 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset] md:p-5'>
+			<div className={`${adminPanelCompactClass} p-4 md:p-5`}>
 				<UserFilterBar
 					search={search}
 					status={status}
@@ -226,14 +230,14 @@ export default function AdminUsersPage() {
 
 				<div className='mt-4'>
 					{users.isLoading ? (
-						<div className='rounded-2xl border border-white/10 bg-[#101010] p-10 text-center'>
-							<p className='text-sm text-neutral-400'>
+						<div className={adminEmptyStateClass}>
+							<p className='text-sm text-muted-foreground'>
 								Đang tải danh sách người dùng...
 							</p>
 						</div>
 					) : users.isError ? (
-						<div className='rounded-2xl border border-red-500/20 bg-red-500/5 p-10 text-center'>
-							<p className='text-sm text-red-400'>
+						<div className={adminEmptyStateClass}>
+							<p className='text-sm text-danger'>
 								Không thể tải danh sách người dùng.
 							</p>
 						</div>

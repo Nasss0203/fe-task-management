@@ -1,6 +1,14 @@
 import { RotateCcw, Search } from "lucide-react";
 import type { BillingSection } from "../shared/billing-admin.types";
 import { getBillingSearchPlaceholder } from "../shared/billing-admin.utils";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+
 
 type Props = {
 	section: BillingSection;
@@ -125,50 +133,53 @@ export function BillingFilterBar({
 					<label className='mb-2 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-500'>
 						Trạng thái
 					</label>
-					<select
-						value={status}
-						onChange={(e) => onStatusChange(e.target.value)}
-						className='h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-sky-500/50'
-					>
+					<Select value={status} onValueChange={(val) => onStatusChange(val)}>
+					<SelectTrigger className="h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-sky-500/50">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
 						{statusOptions.map((item) => (
-							<option key={item.value} value={item.value}>
+							<SelectItem key={item.value} value={item.value}>
 								{item.label}
-							</option>
+							</SelectItem>
 						))}
-					</select>
+					</SelectContent>
+				</Select>
 				</div>
 
 				<div className='lg:col-span-2'>
 					<label className='mb-2 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-500'>
 						{kindLabel}
 					</label>
-					<select
-						value={kind}
-						onChange={(e) => onKindChange(e.target.value)}
-						className='h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-sky-500/50'
-					>
+					<Select value={kind} onValueChange={(val) => onKindChange(val)}>
+					<SelectTrigger className="h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-sky-500/50">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
 						{kindOptions.map((item) => (
-							<option key={item.value} value={item.value}>
+							<SelectItem key={item.value} value={item.value}>
 								{item.label}
-							</option>
+							</SelectItem>
 						))}
-					</select>
+					</SelectContent>
+				</Select>
 				</div>
 
 				<div className='lg:col-span-2'>
 					<label className='mb-2 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-500'>
 						Thời gian
 					</label>
-					<select
-						value={createdAt}
-						onChange={(e) => onCreatedAtChange(e.target.value)}
-						className='h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-sky-500/50'
-					>
-						<option value='all'>Tất cả</option>
-						<option value='7d'>7 ngày gần đây</option>
-						<option value='30d'>30 ngày gần đây</option>
-						<option value='90d'>90 ngày gần đây</option>
-					</select>
+					<Select value={createdAt} onValueChange={(val) => onCreatedAtChange(val)}>
+					<SelectTrigger className="h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-sky-500/50">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">Tất cả</SelectItem>
+						<SelectItem value="7d">7 ngày gần đây</SelectItem>
+						<SelectItem value="30d">30 ngày gần đây</SelectItem>
+						<SelectItem value="90d">90 ngày gần đây</SelectItem>
+					</SelectContent>
+				</Select>
 				</div>
 
 				<div className='lg:col-span-2'>

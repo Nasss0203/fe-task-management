@@ -18,6 +18,14 @@ import {
 	Search,
 	SlidersHorizontal,
 } from "lucide-react";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+
 
 type Props = {
 	search: string;
@@ -105,15 +113,16 @@ export function UserFilterBar({
 								Trạng thái
 							</label>
 
-							<select
-								value={status}
-								onChange={(e) => onStatusChange(e.target.value)}
-								className='h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-sky-500/50'
-							>
-								<option value='all'>Tất cả</option>
-								<option value='ACTIVE'>Hoạt động</option>
-								<option value='LOCKED'>Bị khóa</option>
-							</select>
+							<Select value={status} onValueChange={(val) => onStatusChange(val)}>
+					<SelectTrigger className="h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-sky-500/50">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+								<SelectItem value="all">Tất cả</SelectItem>
+								<SelectItem value="ACTIVE">Hoạt động</SelectItem>
+								<SelectItem value="LOCKED">Bị khóa</SelectItem>
+							</SelectContent>
+				</Select>
 						</div>
 
 						<div className='space-y-2'>
@@ -121,17 +130,18 @@ export function UserFilterBar({
 								Vai trò hệ thống
 							</label>
 
-							<select
-								value={role}
-								onChange={(e) => onRoleChange(e.target.value)}
-								className='h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-sky-500/50'
-							>
-								<option value='all'>Tất cả</option>
-								<option value='SYSTEM_ADMIN'>
+							<Select value={role} onValueChange={(val) => onRoleChange(val)}>
+					<SelectTrigger className="h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-sky-500/50">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+								<SelectItem value="all">Tất cả</SelectItem>
+								<SelectItem value="SYSTEM_ADMIN">
 									System Admin
-								</option>
-								<option value='USER'>User</option>
-							</select>
+								</SelectItem>
+								<SelectItem value="USER">User</SelectItem>
+							</SelectContent>
+				</Select>
 						</div>
 
 						<div className='space-y-2'>

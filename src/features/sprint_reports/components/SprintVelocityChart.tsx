@@ -41,10 +41,10 @@ export const SprintVelocityChart: React.FC<SprintVelocityChartProps> = ({
   if (data.length === 0) return null;
 
   return (
-    <div className="w-full h-[450px] p-6 md:p-8 border border-border rounded-2xl bg-card shadow-sm flex flex-col">
-      <div className="mb-8">
-        <h3 className="text-xl font-bold text-foreground mb-1">Velocity Chart</h3>
-        <p className="text-sm text-muted-foreground">
+    <div className="w-full h-[450px] p-6 md:p-8 border border-border rounded-xl bg-card shadow-sm flex flex-col">
+      <div className="mb-6">
+        <h3 className="text-lg font-bold text-foreground">Velocity Chart</h3>
+        <p className="text-sm text-muted-foreground mt-0.5">
           Tracks total tasks (Total) vs actual completed tasks (Completed) across past sprints.
         </p>
       </div>

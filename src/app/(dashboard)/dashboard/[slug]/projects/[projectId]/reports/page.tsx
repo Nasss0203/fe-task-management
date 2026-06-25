@@ -61,7 +61,7 @@ const ReportsList = () => {
 						</p>
 					</div>
 				) : (
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-start">
+					<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 items-start">
 						{reportsData.data.map((report) => {
 							const taskProgress = report.totalTasks > 0 ? Math.round((report.completedTasks / report.totalTasks) * 100) : 0;
 							const pointProgress = report.totalEstimate > 0 ? Math.round((report.completedEstimate / report.totalEstimate) * 100) : 0;
@@ -87,10 +87,10 @@ const ReportsList = () => {
 									className="group flex flex-col rounded-xl p-5 bg-card border border-border shadow-sm hover:shadow-md transition-all duration-300 h-full"
 								>
 									<div className="flex justify-between items-start mb-1">
-										<h3 className="font-semibold text-lg text-foreground">
+										<h3 className="font-semibold text-lg text-foreground truncate pr-2">
 											{report.sprintName}
 										</h3>
-										<div className="px-2.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-md text-xs font-medium border border-emerald-200 dark:border-emerald-800/50 whitespace-nowrap ml-2">
+										<div className="px-2.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-md text-xs font-medium border border-emerald-200 dark:border-emerald-800/50 whitespace-nowrap">
 											Hoàn thành
 										</div>
 									</div>
@@ -99,25 +99,25 @@ const ReportsList = () => {
 										{report.sprintGoal || "Không có mục tiêu"}
 									</p>
 									
-									<div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-5">
-										<Calendar className="w-3.5 h-3.5" />
-										<span>{dateString}</span>
+									<div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-5 truncate">
+										<Calendar className="w-3.5 h-3.5 shrink-0" />
+										<span className="truncate">{dateString}</span>
 									</div>
 									
 									<div className="grid grid-cols-2 gap-3 mb-5">
-										<div className="bg-secondary/50 rounded-lg p-3">
-											<div className="text-xs text-muted-foreground mb-1">Tác vụ hoàn thành</div>
-											<div className="text-xl font-semibold text-foreground mb-0.5 flex items-baseline gap-1">
-												{report.completedTasks} <span className="text-muted-foreground text-sm font-normal">/ {report.totalTasks}</span>
+										<div className="bg-secondary/50 rounded-lg p-3 min-w-0">
+											<div className="text-xs text-muted-foreground mb-1 truncate" title="Task hoàn thành">Task hoàn thành</div>
+											<div className="text-xl font-semibold text-foreground mb-0.5 flex items-baseline gap-1 flex-wrap">
+												{report.completedTasks} <span className="text-muted-foreground text-sm font-normal whitespace-nowrap">/ {report.totalTasks}</span>
 											</div>
-											<div className="text-[11px] text-muted-foreground">{taskProgress}% hoàn thành</div>
+											<div className="text-[11px] text-muted-foreground truncate">{taskProgress}% hoàn thành</div>
 										</div>
-										<div className="bg-secondary/50 rounded-lg p-3">
-											<div className="text-xs text-muted-foreground mb-1">Story Points</div>
-											<div className="text-xl font-semibold text-foreground mb-0.5 flex items-baseline gap-1">
-												{report.completedEstimate} <span className="text-muted-foreground text-sm font-normal">/ {report.totalEstimate}</span>
+										<div className="bg-secondary/50 rounded-lg p-3 min-w-0">
+											<div className="text-xs text-muted-foreground mb-1 truncate" title="Story Points">Story Points</div>
+											<div className="text-xl font-semibold text-foreground mb-0.5 flex items-baseline gap-1 flex-wrap">
+												{report.completedEstimate} <span className="text-muted-foreground text-sm font-normal whitespace-nowrap">/ {report.totalEstimate}</span>
 											</div>
-											<div className="text-[11px] text-muted-foreground">{pointProgress}% đạt mục tiêu</div>
+											<div className="text-[11px] text-muted-foreground truncate">{pointProgress}% đạt mục tiêu</div>
 										</div>
 									</div>
 									

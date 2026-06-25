@@ -27,6 +27,14 @@ import {
 	getSupportStatusClass,
 	getSupportStatusLabel,
 } from "../shared/support-admin.utils";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+
 
 type Props = {
 	ticket: SupportTicket | null;
@@ -248,71 +256,68 @@ export function SupportTicketDetailPanel({
 									<label className='mb-2 block text-sm text-neutral-400'>
 										Assignee
 									</label>
-									<select
-										value={selectedAssignee}
-										onChange={(e) =>
-											setSelectedAssignee(e.target.value)
-										}
-										className='h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none'
-									>
-										<option value=''>Chưa assign</option>
+									<Select value={selectedAssignee} onValueChange={(val) => setSelectedAssignee(val)}>
+					<SelectTrigger className="h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+										<SelectItem value=''>Chưa assign</SelectItem>
 										{supportAgents.map((agent) => (
-											<option key={agent} value={agent}>
+											<SelectItem key={agent} value={agent}>
 												{agent}
-											</option>
+											</SelectItem>
 										))}
-									</select>
+									</SelectContent>
+				</Select>
 								</div>
 
 								<div>
 									<label className='mb-2 block text-sm text-neutral-400'>
 										Status
 									</label>
-									<select
-										value={selectedStatus}
-										onChange={(e) =>
-											setSelectedStatus(
+									<Select value={selectedStatus} onValueChange={(val) => setSelectedStatus(
 												e.target
 													.value as SupportTicketStatus,
-											)
-										}
-										className='h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none'
-									>
-										<option value='OPEN'>Mới mở</option>
-										<option value='IN_PROGRESS'>
+											)}>
+					<SelectTrigger className="h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+										<SelectItem value="OPEN">Mới mở</SelectItem>
+										<SelectItem value="IN_PROGRESS">
 											Đang xử lý
-										</option>
-										<option value='WAITING_CUSTOMER'>
+										</SelectItem>
+										<SelectItem value="WAITING_CUSTOMER">
 											Chờ khách hàng
-										</option>
-										<option value='RESOLVED'>
+										</SelectItem>
+										<SelectItem value="RESOLVED">
 											Đã xử lý
-										</option>
-										<option value='CLOSED'>Đã đóng</option>
-									</select>
+										</SelectItem>
+										<SelectItem value="CLOSED">Đã đóng</SelectItem>
+									</SelectContent>
+				</Select>
 								</div>
 
 								<div>
 									<label className='mb-2 block text-sm text-neutral-400'>
 										Priority
 									</label>
-									<select
-										value={selectedPriority}
-										onChange={(e) =>
-											setSelectedPriority(
+									<Select value={selectedPriority} onValueChange={(val) => setSelectedPriority(
 												e.target
 													.value as SupportTicketPriority,
-											)
-										}
-										className='h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none'
-									>
-										<option value='LOW'>Thấp</option>
-										<option value='MEDIUM'>
+											)}>
+					<SelectTrigger className="h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+										<SelectItem value="LOW">Thấp</SelectItem>
+										<SelectItem value="MEDIUM">
 											Trung bình
-										</option>
-										<option value='HIGH'>Cao</option>
-										<option value='URGENT'>Khẩn cấp</option>
-									</select>
+										</SelectItem>
+										<SelectItem value="HIGH">Cao</SelectItem>
+										<SelectItem value="URGENT">Khẩn cấp</SelectItem>
+									</SelectContent>
+				</Select>
 								</div>
 
 								<button

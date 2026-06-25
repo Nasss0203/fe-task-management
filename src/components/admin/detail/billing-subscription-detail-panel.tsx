@@ -24,6 +24,14 @@ import {
 	getSubscriptionStatusClass,
 	getSubscriptionStatusLabel,
 } from "../shared/billing-admin.utils";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+
 
 type Props = {
 	subscription: WorkspaceSubscription | null;
@@ -182,13 +190,12 @@ export function BillingSubscriptionDetailPanel({
 									<label className='mb-2 block text-sm text-neutral-400'>
 										Plan
 									</label>
-									<select
-										value={form.planCode}
-										onChange={(e) => {
-											const nextCode = e.target.value;
+									<Select 
+										value={form.planCode} 
+										onValueChange={(val) => {
+											const nextCode = val;
 											const nextPlan = plans.find(
-												(plan) =>
-													plan.code === nextCode,
+												(plan) => plan.code === nextCode,
 											);
 
 											setForm((prev) => {
@@ -201,36 +208,38 @@ export function BillingSubscriptionDetailPanel({
 														nextPlan?.name ??
 														prev.planName,
 													amount: nextPlan
-														? prev.billingCycle ===
-															"MONTHLY"
+														? prev.billingCycle === "MONTHLY"
 															? nextPlan.monthlyPrice
 															: nextPlan.yearlyPrice
 														: prev.amount,
 												};
 											});
 										}}
-										className='h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none'
 									>
-										{plans.map((plan) => (
-											<option
-												key={plan.id}
-												value={plan.code}
-											>
-												{plan.name}
-											</option>
-										))}
-									</select>
+										<SelectTrigger className="h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none">
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											{plans.map((plan) => (
+												<SelectItem 
+													key={plan.id}
+													value={plan.code}
+												>
+													{plan.name}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
 								</div>
 
 								<div>
 									<label className='mb-2 block text-sm text-neutral-400'>
 										Chu kỳ
 									</label>
-									<select
-										value={form.billingCycle}
-										onChange={(e) => {
-											const nextCycle = e.target
-												.value as BillingCycle;
+									<Select 
+										value={form.billingCycle} 
+										onValueChange={(val) => {
+											const nextCycle = val as BillingCycle;
 
 											setForm((prev) => {
 												if (!prev) return prev;
@@ -239,47 +248,49 @@ export function BillingSubscriptionDetailPanel({
 													...prev,
 													billingCycle: nextCycle,
 													amount: selectedPlan
-														? nextCycle ===
-															"MONTHLY"
+														? nextCycle === "MONTHLY"
 															? selectedPlan.monthlyPrice
 															: selectedPlan.yearlyPrice
 														: prev.amount,
 												};
 											});
 										}}
-										className='h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none'
 									>
-										<option value='MONTHLY'>Tháng</option>
-										<option value='YEARLY'>Năm</option>
-									</select>
+										<SelectTrigger className="h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none">
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="MONTHLY">Tháng</SelectItem>
+											<SelectItem value="YEARLY">Năm</SelectItem>
+										</SelectContent>
+									</Select>
 								</div>
 
 								<div>
 									<label className='mb-2 block text-sm text-neutral-400'>
 										Trạng thái
 									</label>
-									<select
-										value={form.status}
-										onChange={(e) =>
-											setForm((prev) =>
-												prev
-													? {
-															...prev,
-															status: e.target
-																.value as SubscriptionStatus,
-														}
-													: prev,
-											)
-										}
-										className='h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none'
+									<Select 
+										value={form.status} 
+										onValueChange={(val) => setForm((prev) =>
+											prev
+												? {
+														...prev,
+														status: val as SubscriptionStatus,
+												  }
+												: prev
+										)}
 									>
-										<option value='ACTIVE'>Active</option>
-										<option value='TRIAL'>Trial</option>
-										<option value='EXPIRED'>Expired</option>
-										<option value='CANCELED'>
-											Canceled
-										</option>
-									</select>
+										<SelectTrigger className="h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none">
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="ACTIVE">Active</SelectItem>
+											<SelectItem value="TRIAL">Trial</SelectItem>
+											<SelectItem value="EXPIRED">Expired</SelectItem>
+											<SelectItem value="CANCELED">Canceled</SelectItem>
+										</SelectContent>
+									</Select>
 								</div>
 
 								<div>

@@ -1,4 +1,12 @@
 import { RotateCcw, Search } from "lucide-react";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+
 
 type Props = {
 	search: string;
@@ -50,68 +58,72 @@ export function MonitoringFilterBar({
 					<label className='mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-500'>
 						Loại sự kiện
 					</label>
-					<select
-						value={eventType}
-						onChange={(e) => onEventTypeChange(e.target.value)}
-						className='h-11 w-full rounded-2xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-white/20'
-					>
-						<option value='all'>Tất cả</option>
-						<option value='REQUEST_ERROR'>Request error</option>
-						<option value='QUEUE_FAILED'>Queue failed</option>
-						<option value='EMAIL_FAILED'>Email failed</option>
-						<option value='WEBHOOK_FAILED'>Webhook failed</option>
-						<option value='SYSTEM_LOG'>System log</option>
-						<option value='ALERT'>Alert</option>
-					</select>
+					<Select value={eventType} onValueChange={(val) => onEventTypeChange(val)}>
+					<SelectTrigger className="h-11 w-full rounded-2xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-white/20">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">Tất cả</SelectItem>
+						<SelectItem value="REQUEST_ERROR">Request error</SelectItem>
+						<SelectItem value="QUEUE_FAILED">Queue failed</SelectItem>
+						<SelectItem value="EMAIL_FAILED">Email failed</SelectItem>
+						<SelectItem value="WEBHOOK_FAILED">Webhook failed</SelectItem>
+						<SelectItem value="SYSTEM_LOG">System log</SelectItem>
+						<SelectItem value="ALERT">Alert</SelectItem>
+					</SelectContent>
+				</Select>
 				</div>
 
 				<div>
 					<label className='mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-500'>
 						Severity
 					</label>
-					<select
-						value={severity}
-						onChange={(e) => onSeverityChange(e.target.value)}
-						className='h-11 w-full rounded-2xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-white/20'
-					>
-						<option value='all'>Tất cả</option>
-						<option value='INFO'>Thông tin</option>
-						<option value='WARNING'>Cảnh báo</option>
-						<option value='CRITICAL'>Nghiêm trọng</option>
-					</select>
+					<Select value={severity} onValueChange={(val) => onSeverityChange(val)}>
+					<SelectTrigger className="h-11 w-full rounded-2xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-white/20">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">Tất cả</SelectItem>
+						<SelectItem value="INFO">Thông tin</SelectItem>
+						<SelectItem value="WARNING">Cảnh báo</SelectItem>
+						<SelectItem value="CRITICAL">Nghiêm trọng</SelectItem>
+					</SelectContent>
+				</Select>
 				</div>
 
 				<div>
 					<label className='mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-500'>
 						Status
 					</label>
-					<select
-						value={status}
-						onChange={(e) => onStatusChange(e.target.value)}
-						className='h-11 w-full rounded-2xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-white/20'
-					>
-						<option value='all'>Tất cả</option>
-						<option value='OPEN'>Mới</option>
-						<option value='ACKNOWLEDGED'>Đã ghi nhận</option>
-						<option value='RESOLVED'>Đã xử lý</option>
-					</select>
+					<Select value={status} onValueChange={(val) => onStatusChange(val)}>
+					<SelectTrigger className="h-11 w-full rounded-2xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-white/20">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">Tất cả</SelectItem>
+						<SelectItem value="OPEN">Mới</SelectItem>
+						<SelectItem value="ACKNOWLEDGED">Đã ghi nhận</SelectItem>
+						<SelectItem value="RESOLVED">Đã xử lý</SelectItem>
+					</SelectContent>
+				</Select>
 				</div>
 
 				<div>
 					<label className='mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-neutral-500'>
 						Thời gian
 					</label>
-					<select
-						value={time}
-						onChange={(e) => onTimeChange(e.target.value)}
-						className='h-11 w-full rounded-2xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-white/20'
-					>
-						<option value='all'>Tất cả</option>
-						<option value='1h'>1 giờ gần đây</option>
-						<option value='24h'>24 giờ gần đây</option>
-						<option value='7d'>7 ngày gần đây</option>
-						<option value='30d'>30 ngày gần đây</option>
-					</select>
+					<Select value={time} onValueChange={(val) => onTimeChange(val)}>
+					<SelectTrigger className="h-11 w-full rounded-2xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-white/20">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">Tất cả</SelectItem>
+						<SelectItem value="1h">1 giờ gần đây</SelectItem>
+						<SelectItem value="24h">24 giờ gần đây</SelectItem>
+						<SelectItem value="7d">7 ngày gần đây</SelectItem>
+						<SelectItem value="30d">30 ngày gần đây</SelectItem>
+					</SelectContent>
+				</Select>
 				</div>
 
 				<div>

@@ -17,28 +17,25 @@ export const SprintTaskListTable: React.FC<Props> = ({ completedTasks, incomplet
   if (!completedTasks && !incompleteTasks) return null;
 
   return (
-    <div className="bg-card rounded-[2rem] border border-border shadow-sm overflow-hidden relative">
-      {/* Decorative background element */}
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -ml-32 -mb-32 pointer-events-none" />
-      
-      <div className="relative p-6 md:p-8 flex flex-col gap-6">
+    <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+      <div className="p-6 md:p-8 flex flex-col gap-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center border border-emerald-100 dark:border-emerald-900/50">
-              <ListTodo className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-secondary/50">
+              <ListTodo className="h-5 w-5 text-muted-foreground" />
             </div>
             <div>
-              <h3 className="text-xl font-extrabold text-foreground tracking-tight">Chi tiết Tasks</h3>
-              <p className="text-sm text-muted-foreground mt-0.5">Danh sách công việc trong sprint</p>
+              <h3 className="text-lg font-bold text-foreground">Chi tiết Tasks</h3>
+              <p className="text-sm text-muted-foreground">Danh sách công việc trong sprint</p>
             </div>
           </div>
           
-          <div className="inline-flex bg-secondary/50 p-1 rounded-xl border border-border">
+          <div className="inline-flex bg-secondary/50 p-1 rounded-lg border border-border">
             <button
               onClick={() => setActiveTab("completed")}
-              className={`relative px-4 py-2 text-sm font-bold rounded-lg transition-all ${
+              className={`relative px-4 py-2 text-sm font-bold rounded-md transition-all ${
                 activeTab === "completed" 
-                  ? "text-emerald-700 dark:text-emerald-400 shadow-sm bg-background border border-border/50" 
+                  ? "text-foreground shadow-sm bg-background border border-border/50" 
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -51,9 +48,9 @@ export const SprintTaskListTable: React.FC<Props> = ({ completedTasks, incomplet
             </button>
             <button
               onClick={() => setActiveTab("incomplete")}
-              className={`relative px-4 py-2 text-sm font-bold rounded-lg transition-all ${
+              className={`relative px-4 py-2 text-sm font-bold rounded-md transition-all ${
                 activeTab === "incomplete" 
-                  ? "text-amber-700 dark:text-amber-400 shadow-sm bg-background border border-border/50" 
+                  ? "text-foreground shadow-sm bg-background border border-border/50" 
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >

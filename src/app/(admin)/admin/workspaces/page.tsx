@@ -4,6 +4,7 @@ import { WorkspaceDetailPanel } from "@/components/admin/detail/workspace-detail
 import { WorkspaceFilterBar } from "@/components/admin/filters/workspace-filter-bar";
 import { WorkspaceAdminHeader } from "@/components/admin/header/workspace-admin-header";
 import { WorkspaceOverviewCards } from "@/components/admin/overview/workspace-overview-cards";
+import { adminEmptyStateClass } from "@/components/admin/shared/theme";
 import { WorkspaceManagementTable } from "@/components/admin/table/workspace-management-table";
 import { useAdminWorkspaces } from "@/features/admin/modules/workspaces/hooks/useAdminWorkspaces";
 import type {
@@ -170,14 +171,14 @@ export default function AdminWorkspacesPage() {
 			/>
 
 			{workspaces.isLoading ? (
-				<div className='rounded-2xl border border-white/10 bg-[#0b0b0b] p-10 text-center'>
-					<p className='text-sm text-neutral-400'>
+				<div className={adminEmptyStateClass}>
+					<p className='text-sm text-muted-foreground'>
 						Đang tải danh sách workspace...
 					</p>
 				</div>
 			) : workspaces.isError ? (
-				<div className='rounded-2xl border border-red-500/20 bg-red-500/5 p-10 text-center'>
-					<p className='text-sm text-red-400'>
+				<div className={adminEmptyStateClass}>
+					<p className='text-sm text-danger'>
 						Không thể tải danh sách workspace.
 					</p>
 				</div>

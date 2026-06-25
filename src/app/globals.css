@@ -33,10 +33,16 @@
 	--color-secondary: var(--secondary);
 	--color-primary-foreground: var(--primary-foreground);
 	--color-primary: var(--primary);
+	--color-info: var(--info);
+	--color-success: var(--success);
+	--color-warning: var(--warning);
+	--color-danger: var(--danger);
 	--color-popover-foreground: var(--popover-foreground);
 	--color-popover: var(--popover);
 	--color-card-foreground: var(--card-foreground);
 	--color-card: var(--card);
+	--color-surface: var(--surface);
+	--color-surface-foreground: var(--surface-foreground);
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
@@ -64,9 +70,15 @@
 	--accent: oklch(0.90 0.02 260);
 	--accent-foreground: oklch(0.2 0.02 260);
 	--destructive: oklch(0.577 0.245 27.325);
+	--info: oklch(0.61 0.14 245);
+	--success: oklch(0.68 0.16 154);
+	--warning: oklch(0.76 0.16 82);
+	--danger: oklch(0.62 0.2 18);
 	--border: oklch(0.88 0.01 260);
 	--input: oklch(0.88 0.01 260);
 	--ring: oklch(0.45 0.15 260);
+	--surface: oklch(0.985 0.006 260);
+	--surface-foreground: oklch(0.18 0.02 260);
 	--chart-1: oklch(0.646 0.222 41.116);
 	--chart-2: oklch(0.6 0.118 184.704);
 	--chart-3: oklch(0.398 0.07 227.392);
@@ -83,50 +95,50 @@
 
 	/* Calendar */
 	/* Primary colors */
-	--sx-color-primary: hsl(var(--primary));
-	--sx-color-on-primary: hsl(var(--primary-foreground));
-	--sx-color-primary-container: hsl(var(--muted));
-	--sx-color-on-primary-container: hsl(var(--muted-foreground));
+	--sx-color-primary: var(--primary);
+	--sx-color-on-primary: var(--primary-foreground);
+	--sx-color-primary-container: var(--muted);
+	--sx-color-on-primary-container: var(--muted-foreground);
 
 	/* Secondary colors */
-	--sx-color-secondary: hsl(var(--secondary));
-	--sx-color-on-secondary: hsl(var(--secondary-foreground));
-	--sx-color-secondary-container: hsl(var(--accent));
-	--sx-color-on-secondary-container: hsl(var(--accent-foreground));
+	--sx-color-secondary: var(--secondary);
+	--sx-color-on-secondary: var(--secondary-foreground);
+	--sx-color-secondary-container: var(--accent);
+	--sx-color-on-secondary-container: var(--accent-foreground);
 
 	/* Tertiary colors */
-	--sx-color-tertiary: hsl(var(--muted));
-	--sx-color-on-tertiary: hsl(var(--muted-foreground));
-	--sx-color-tertiary-container: hsl(var(--accent));
-	--sx-color-on-tertiary-container: hsl(var(--accent-foreground));
+	--sx-color-tertiary: var(--muted);
+	--sx-color-on-tertiary: var(--muted-foreground);
+	--sx-color-tertiary-container: var(--accent);
+	--sx-color-on-tertiary-container: var(--accent-foreground);
 
 	/* Surface colors */
-	--sx-color-surface: hsl(var(--background));
-	--sx-color-surface-dim: hsl(var(--muted));
-	--sx-color-surface-bright: hsl(var(--card));
-	--sx-color-on-surface: hsl(var(--foreground));
-	--sx-color-surface-container: hsl(var(--card));
-	--sx-color-surface-container-low: hsl(var(--muted));
-	--sx-color-surface-container-high: hsl(var(--accent));
+	--sx-color-surface: var(--background);
+	--sx-color-surface-dim: var(--muted);
+	--sx-color-surface-bright: var(--card);
+	--sx-color-on-surface: var(--foreground);
+	--sx-color-surface-container: var(--card);
+	--sx-color-surface-container-low: var(--muted);
+	--sx-color-surface-container-high: var(--accent);
 
 	/* Background colors */
-	--sx-color-background: hsl(var(--background));
-	--sx-color-on-background: hsl(var(--foreground));
+	--sx-color-background: var(--background);
+	--sx-color-on-background: var(--foreground);
 
 	/* Utility colors */
-	--sx-color-outline: hsl(var(--border));
-	--sx-color-outline-variant: hsl(var(--border));
-	--sx-color-shadow: hsl(var(--border));
-	--sx-color-surface-tint: hsl(var(--primary));
+	--sx-color-outline: var(--border);
+	--sx-color-outline-variant: var(--border);
+	--sx-color-shadow: var(--border);
+	--sx-color-surface-tint: var(--primary);
 
 	/* Neutral colors */
-	--sx-color-neutral: hsl(var(--foreground));
-	--sx-color-neutral-variant: hsl(var(--muted-foreground));
+	--sx-color-neutral: var(--foreground);
+	--sx-color-neutral-variant: var(--muted-foreground);
 
 	/* Internal colors */
-	--sx-internal-color-gray-ripple-background: hsl(var(--muted));
-	--sx-internal-color-light-gray: hsl(var(--muted));
-	--sx-internal-color-text: hsl(var(--foreground));
+	--sx-internal-color-gray-ripple-background: var(--muted);
+	--sx-internal-color-light-gray: var(--muted);
+	--sx-internal-color-text: var(--foreground);
 
 	/* Radius */
 	--sx-rounding-extra-small: 0.5rem;
@@ -159,9 +171,15 @@
 	--accent: oklch(0.25 0.04 260);
 	--accent-foreground: oklch(0.98 0.01 260);
 	--destructive: oklch(0.6 0.2 25);
+	--info: oklch(0.72 0.12 245);
+	--success: oklch(0.76 0.16 154);
+	--warning: oklch(0.82 0.16 82);
+	--danger: oklch(0.72 0.18 18);
 	--border: oklch(0.25 0.03 260);
 	--input: oklch(0.25 0.03 260);
 	--ring: oklch(0.6 0.18 260);
+	--surface: oklch(0.18 0.02 260);
+	--surface-foreground: oklch(0.98 0.01 260);
 	--chart-1: oklch(0.488 0.243 264.376);
 	--chart-2: oklch(0.696 0.17 162.48);
 	--chart-3: oklch(0.769 0.188 70.08);
@@ -183,8 +201,8 @@
 
 @layer base {
 	::selection {
-		background-color: oklch(var(--primary) / 20%);
-		color: oklch(var(--primary));
+		background-color: color-mix(in oklab, var(--primary) 18%, transparent);
+		color: var(--primary);
 	}
 
 	* {
@@ -193,6 +211,17 @@
 
 	body {
 		@apply bg-background text-foreground antialiased;
+		background-image:
+			radial-gradient(
+				circle at top right,
+				color-mix(in oklab, var(--primary) 10%, transparent),
+				transparent 34%
+			),
+			linear-gradient(
+				180deg,
+				color-mix(in oklab, var(--muted) 45%, transparent),
+				transparent 32%
+			);
 		scroll-behavior: smooth;
 	}
 
@@ -215,7 +244,7 @@
 	.dark [role="dialog"],
 	.dark [role="menu"],
 	.dark .popover {
-		border-top: 1px solid oklch(1 1 1 / 5%);
+		border-top: 1px solid color-mix(in oklab, white 10%, transparent);
 		box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
 	}
 
@@ -237,7 +266,7 @@
 		margin-top: 10px;
 		box-shadow: none;
 		border-width: 1px;
-		border-color: hsl(var(--border));
+		border-color: var(--border);
 	}
 
 	.sx__date-picker-popup {
@@ -246,14 +275,14 @@
 		margin-top: 10px;
 		box-shadow: none;
 		border-width: 1px;
-		border-color: hsl(var(--border));
+		border-color: var(--border);
 	}
 
 	.sx__event-modal.sx__event-modal-default {
 		overflow: hidden;
 		box-shadow: none;
 		border-width: 1px;
-		border-color: hsl(var(--border));
+		border-color: var(--border);
 	}
 
 	.sx__forward-backward-navigation {
@@ -341,12 +370,12 @@
 	}
 
 	::-webkit-scrollbar-thumb {
-		background: oklch(0.35 0.03 260);
+		background: color-mix(in oklab, var(--foreground) 18%, transparent);
 		/* sáng hơn một chút so với background */
 		border-radius: 4px;
 	}
 
 	::-webkit-scrollbar-thumb:hover {
-		background: oklch(0.5 0.03 260);
+		background: color-mix(in oklab, var(--foreground) 28%, transparent);
 	}
 }

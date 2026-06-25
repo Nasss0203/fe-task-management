@@ -13,6 +13,14 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+
 
 type Props = {
 	data: UserGrowthItem[];
@@ -33,18 +41,17 @@ export function UserGrowthChart({ data, period, onPeriodChange }: Props) {
 					</p>
 				</div>
 
-				<select
-					value={period}
-					onChange={(e) =>
-						onPeriodChange(e.target.value as UserGrowthPeriod)
-					}
-					className='rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-white outline-none'
-				>
-					<option value='7d'>7 ngày</option>
-					<option value='30d'>30 ngày</option>
-					<option value='60d'>60 ngày</option>
-					<option value='1y'>1 năm</option>
-				</select>
+				<Select value={period} onValueChange={(val) => onPeriodChange(val as UserGrowthPeriod)}>
+					<SelectTrigger className="rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-white outline-none">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+					<SelectItem value="7d">7 ngày</SelectItem>
+					<SelectItem value="30d">30 ngày</SelectItem>
+					<SelectItem value="60d">60 ngày</SelectItem>
+					<SelectItem value="1y">1 năm</SelectItem>
+				</SelectContent>
+				</Select>
 			</div>
 
 			<div className='h-70'>

@@ -1,4 +1,5 @@
 "use client";
+import { toast } from "sonner";
 import {
 	completeSprintApi,
 	createSprintApi,
@@ -6,10 +7,14 @@ import {
 	findTasksBySprintApi,
 	startSprintApi,
 	updateSprintApi,
+	cancelSprintApi,
+	deleteSprintApi,
 } from "@/services/sprint/sprint.service";
 import {
 	CompleteSprintParams,
+	CancelSprintParams,
 	CreateSprintDto,
+	DeleteSprintParams,
 	SPRINT_KEY,
 	StartSprintParams,
 	UpdateSprintParams,
@@ -114,6 +119,44 @@ export const useSprints = ({
 		},
 	});
 
+	const deleteSprint = useMutation({
+		mutationFn: async (data: DeleteSprintParams) => {
+			const result = await deleteSprintApi(data);
+			return result;
+		},
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: [SPRINT_KEY.SPRINTS],
+			});
+			await queryClient.invalidateQueries({
+				queryKey: [TASK_KEY.TASK_BACKLOG],
+			});
+		},
+		onError: (err: any) => {
+			console.error("deleteSprint failed", err);
+			toast.error(err?.response?.data?.message || "Failed to delete sprint");
+		},
+	});
+
+	const cancelSprint = useMutation({
+		mutationFn: async (data: CancelSprintParams) => {
+			const result = await cancelSprintApi(data);
+			return result;
+		},
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: [SPRINT_KEY.SPRINTS],
+			});
+			await queryClient.invalidateQueries({
+				queryKey: [TASK_KEY.TASK_BACKLOG],
+			});
+		},
+		onError: (err: any) => {
+			console.error("cancelSprint failed", err);
+			toast.error(err?.response?.data?.message || "Failed to cancel sprint");
+		},
+	});
+
 	return {
 		sprintsQuery,
 		sprintsTaskQuery,
@@ -121,5 +164,7 @@ export const useSprints = ({
 		startSprint,
 		completed,
 		updateSprint,
+		deleteSprint,
+		cancelSprint,
 	};
 };

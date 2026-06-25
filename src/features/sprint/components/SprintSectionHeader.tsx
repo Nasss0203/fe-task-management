@@ -13,6 +13,8 @@ import { ChevronDown, MoreHorizontal } from "lucide-react";
 import { CompleteSprintDialog } from "@/components/dialog/CompleteSprintDialog";
 import { StartSprintDialog } from "@/components/dialog/DialogStartSprint";
 import { EditSprintDialog } from "@/components/dialog/DialogEditSprint";
+import { DeleteSprintDialog } from "@/components/dialog/DialogDeleteSprint";
+import { CancelSprintDialog } from "@/components/dialog/DialogCancelSprint";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { BarChart2 } from "lucide-react";
@@ -154,14 +156,42 @@ export function SprintSectionHeader({
 								}
 							/>
 						</RequirePermission>
-						<RequirePermission
-							workspaceId={workspaceId}
-							code={PERMISSIONS.SPRINT_DELETE}
-						>
-							<DropdownMenuItem className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">
-								Delete sprint
-							</DropdownMenuItem>
-						</RequirePermission>
+						{normalizedStatus === SprintStatus.ACTIVE && (
+							<RequirePermission
+								workspaceId={workspaceId}
+								code={PERMISSIONS.SPRINT_CANCEL}
+							>
+								<CancelSprintDialog
+									workspaceId={workspaceId}
+									projectId={projectId}
+									sprintId={sprint.id}
+									sprintName={sprint.name}
+									trigger={
+										<DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer text-orange-500 focus:text-orange-600">
+											Cancel sprint
+										</DropdownMenuItem>
+									}
+								/>
+							</RequirePermission>
+						)}
+						{normalizedStatus !== SprintStatus.ACTIVE && normalizedStatus !== SprintStatus.COMPLETED && (
+							<RequirePermission
+								workspaceId={workspaceId}
+								code={PERMISSIONS.SPRINT_DELETE}
+							>
+								<DeleteSprintDialog
+									workspaceId={workspaceId}
+									projectId={projectId}
+									sprintId={sprint.id}
+									sprintName={sprint.name}
+									trigger={
+										<DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer text-red-500 focus:text-red-600">
+											Delete sprint
+										</DropdownMenuItem>
+									}
+								/>
+							</RequirePermission>
+						)}
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</div>

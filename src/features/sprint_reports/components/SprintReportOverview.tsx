@@ -20,94 +20,78 @@ export const SprintReportOverview: React.FC<SprintReportOverviewProps> = ({ repo
   const taskProgress = formatPercentage(report.completedTasks, report.totalTasks);
 
   return (
-    <div className="space-y-8 pb-10">
-      {/* Premium Header */}
-      <div className="relative overflow-hidden rounded-[2rem] border border-border bg-card shadow-sm">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-blue-500/5" />
-        <div className="relative p-8 md:p-10 flex flex-col gap-6">
-          <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-            <div className="flex flex-col gap-2">
-              <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-sm font-medium text-primary w-fit mb-2">
-                Sprint Report
+    <div className="space-y-6 pb-10">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* Left Column: Stacks components tightly vertically */}
+        <div className="xl:col-span-2 flex flex-col gap-6">
+          {/* Header & Stats Card */}
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col">
+            <div className="flex flex-col lg:flex-row justify-between items-start gap-6">
+              <div className="flex-1 min-w-0">
+                <div className="inline-flex items-center rounded-full border border-border bg-secondary/50 px-3 py-1 text-xs font-semibold text-foreground w-fit mb-3">
+                  Sprint Report
+                </div>
+                <h2 className="text-2xl font-bold tracking-tight text-foreground truncate">{report.sprintName}</h2>
+                {report.sprintGoal ? (
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2 max-w-md">{report.sprintGoal}</p>
+                ) : (
+                  <p className="text-sm text-muted-foreground mt-1 italic">Không có mục tiêu nào được đặt cho sprint này.</p>
+                )}
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">{report.sprintName}</h2>
-              {report.sprintGoal ? (
-                <p className="text-lg text-muted-foreground mt-1 max-w-2xl">{report.sprintGoal}</p>
-              ) : (
-                <p className="text-lg text-muted-foreground mt-1 max-w-2xl italic">Không có mục tiêu nào được đặt cho sprint này.</p>
-              )}
+              
+              <div className="flex flex-wrap sm:flex-nowrap gap-4 w-full lg:w-auto">
+                <div className="bg-secondary/40 rounded-xl p-4 flex-1 sm:w-32 flex flex-col justify-center">
+                  <div className="text-xs font-medium text-muted-foreground">Total Tasks</div>
+                  <div className="text-3xl font-bold text-foreground mt-2">{report.totalTasks}</div>
+                </div>
+                <div className="bg-secondary/40 rounded-xl p-4 flex-1 sm:w-40 flex flex-col justify-center">
+                  <div className="text-xs font-medium text-muted-foreground">Completed</div>
+                  <div className="text-3xl font-bold text-emerald-500 mt-2">{report.completedTasks}</div>
+                  <div className="text-xs text-muted-foreground mt-2">{taskProgress}% hoàn thành</div>
+                </div>
+              </div>
             </div>
-          </div>
-          
-          <div className="flex flex-wrap items-center gap-6 pt-6 border-t border-border/50">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center border border-border">
-                <svg className="w-5 h-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-              </div>
+            
+            <div className="flex flex-wrap items-center gap-x-12 gap-y-6 mt-8 pt-6 border-t border-border">
               <div className="flex flex-col">
-                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Started</span>
-                <span className="font-medium text-foreground">
+                <span className="text-xs font-medium text-muted-foreground mb-1">Started</span>
+                <span className="text-sm font-semibold text-foreground">
                   {report.startAt ? new Date(report.startAt).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) : "N/A"}
                 </span>
               </div>
-            </div>
-            
-            <div className="w-px h-8 bg-border hidden sm:block" />
-            
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center border border-emerald-100 dark:border-emerald-900/50">
-                <svg className="w-5 h-5 text-emerald-600 dark:text-emerald-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-              </div>
               <div className="flex flex-col">
-                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Completed</span>
-                <span className="font-medium text-foreground">
+                <span className="text-xs font-medium text-muted-foreground mb-1">Completed</span>
+                <span className="text-sm font-semibold text-foreground">
                   {report.completedAt ? new Date(report.completedAt).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) : "N/A"}
                 </span>
               </div>
             </div>
           </div>
+
+          <SprintTaskListTable 
+            completedTasks={report.completedTaskDetails} 
+            incompleteTasks={report.incompleteTaskDetails} 
+          />
+          <SprintMemberPerformanceTable memberPerformance={report.memberPerformance} />
+        </div>
+
+        {/* Right Column: Stacks components tightly vertically */}
+        <div className="xl:col-span-1 flex flex-col gap-6">
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+            <h3 className="text-sm font-medium text-muted-foreground mb-4">Sprint progress</h3>
+            <div className="flex items-baseline gap-2 mb-4">
+              <span className="text-4xl font-bold text-emerald-500">{report.completedTasks}</span>
+              <span className="text-lg font-medium text-muted-foreground">/ {report.totalTasks} tasks</span>
+            </div>
+            <div className="w-full h-2.5 bg-secondary rounded-full overflow-hidden mb-3">
+              <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${taskProgress}%` }} />
+            </div>
+          </div>
+
+          <SprintVelocityChart allReports={allReports} />
         </div>
       </div>
 
-      {/* Advanced Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <div className="group relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:border-border/80">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <svg className="w-16 h-16 text-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-          </div>
-          <div className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wide">Total Tasks</div>
-          <div className="flex items-end gap-2">
-            <div className="text-5xl font-black text-foreground tracking-tighter">{report.totalTasks}</div>
-          </div>
-        </div>
-        
-        <div className="group relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:border-emerald-500/30">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <svg className="w-16 h-16 text-emerald-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          </div>
-          <div className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wide">Completed Tasks</div>
-          <div className="flex flex-col gap-1">
-            <div className="flex items-end gap-2">
-              <div className="text-5xl font-black text-emerald-600 dark:text-emerald-500 tracking-tighter">{report.completedTasks}</div>
-            </div>
-            <div className="flex items-center gap-2 mt-2">
-              <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 rounded-full transition-all duration-1000" style={{ width: `${taskProgress}%` }} />
-              </div>
-              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-500">{taskProgress}%</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid gap-6">
-        <SprintMemberPerformanceTable memberPerformance={report.memberPerformance} />
-        <SprintTaskListTable 
-          completedTasks={report.completedTaskDetails} 
-          incompleteTasks={report.incompleteTaskDetails} 
-        />
-        <SprintVelocityChart allReports={allReports} />
-      </div>
     </div>
   );
 };

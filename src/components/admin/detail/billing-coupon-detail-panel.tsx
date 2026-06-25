@@ -16,6 +16,14 @@ import type {
 	CouponType,
 } from "../shared/billing-admin.types";
 import { toDateInputValue } from "../shared/billing-admin.utils";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+
 
 type Props = {
 	coupon: BillingCoupon | null;
@@ -117,56 +125,52 @@ export function BillingCouponDetailPanel({ coupon, onClose, onSave }: Props) {
 									<label className='mb-2 block text-sm text-neutral-400'>
 										Trạng thái
 									</label>
-									<select
-										value={form.status}
-										onChange={(e) =>
-											setForm((prev) =>
-												prev
-													? {
-															...prev,
-															status: e.target
-																.value as CouponStatus,
-														}
-													: prev,
-											)
-										}
-										className='h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none'
+									<Select 
+										value={form.status} 
+										onValueChange={(val) => setForm((prev) =>
+											prev
+												? {
+														...prev,
+														status: val as CouponStatus,
+												  }
+												: prev
+										)}
 									>
-										<option value='ACTIVE'>
-											Đang chạy
-										</option>
-										<option value='INACTIVE'>Đã tắt</option>
-										<option value='EXPIRED'>Hết hạn</option>
-									</select>
+										<SelectTrigger className="h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none">
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="ACTIVE">Đang chạy</SelectItem>
+											<SelectItem value="INACTIVE">Đã tắt</SelectItem>
+											<SelectItem value="EXPIRED">Hết hạn</SelectItem>
+										</SelectContent>
+									</Select>
 								</div>
 
 								<div>
 									<label className='mb-2 block text-sm text-neutral-400'>
 										Loại coupon
 									</label>
-									<select
-										value={form.type}
-										onChange={(e) =>
-											setForm((prev) =>
-												prev
-													? {
-															...prev,
-															type: e.target
-																.value as CouponType,
-														}
-													: prev,
-											)
-										}
-										className='h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none'
+									<Select 
+										value={form.type} 
+										onValueChange={(val) => setForm((prev) =>
+											prev
+												? {
+														...prev,
+														type: val as CouponType,
+												  }
+												: prev
+										)}
 									>
-										<option value='PERCENT'>Giảm %</option>
-										<option value='FIXED'>
-											Giảm cố định
-										</option>
-										<option value='TRIAL_DAYS'>
-											Ngày trial
-										</option>
-									</select>
+										<SelectTrigger className="h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none">
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="PERCENT">Giảm %</SelectItem>
+											<SelectItem value="FIXED">Giảm cố định</SelectItem>
+											<SelectItem value="TRIAL_DAYS">Ngày trial</SelectItem>
+										</SelectContent>
+									</Select>
 								</div>
 
 								<div>
