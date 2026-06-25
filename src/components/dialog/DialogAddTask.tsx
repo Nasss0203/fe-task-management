@@ -153,6 +153,7 @@ const DialogAddTask = ({ trigger, workspaceId: propWorkspaceId, projectId: propP
 			</DialogTriggerV2>
 
 			<DialogContentV2
+				aria-describedby={undefined}
 				showCloseButton={false}
 				className='flex overflow-hidden flex-col sm:max-w-3xl! lg:max-w-3xl! min-h-0! h-fit rounded-xl border-border/50 bg-background shadow-2xl p-0'
 			>

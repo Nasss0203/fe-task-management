@@ -18,19 +18,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { formSchema } from "@/features/auth/schemas/sign-in.schema";
 import z from "zod";
-
-const formSchema = z.object({
-	email: z
-		.string()
-		.email("Email không hợp lệ.")
-		.min(5, "Email phải có ít nhất 5 ký tự.")
-		.max(32, "Email không được vượt quá 32 ký tự."),
-	password: z
-		.string()
-		.min(6, "Mật khẩu phải có ít nhất 6 ký tự.")
-		.max(100, "Mật khẩu không được vượt quá 100 ký tự."),
-});
 
 const authInputClassName =
 	"h-12 rounded-xl border-slate-200 bg-white/85 px-4 shadow-sm focus-visible:border-primary/70 focus-visible:ring-primary/15 dark:border-white/10 dark:bg-white/5";

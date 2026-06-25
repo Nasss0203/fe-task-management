@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getTaskPriorityKey, normalizeTaskPriorityName } from './task-priority-style';
+import { getTaskPriorityKey, normalizeTaskPriorityName } from '@/lib/task-priority-style';
 
 describe('task-priority-style', () => {
   describe('normalizeTaskPriorityName', () => {

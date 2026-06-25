@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getTaskStatusKey, normalizeTaskStatusName } from './task-status-style';
+import { getTaskStatusKey, normalizeTaskStatusName } from '@/lib/task-status-style';
 
 describe('task-status-style', () => {
   describe('normalizeTaskStatusName', () => {

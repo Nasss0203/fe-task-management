@@ -61,8 +61,9 @@ export const useSprints = ({
 				queryKey: [SPRINT_KEY.SPRINTS],
 			});
 		},
-		onError: (err) => {
-			console.error("createWorkspaceApi failed", err);
+		onError: (err: any) => {
+			console.error("createSprint failed", err);
+			toast.error(err?.response?.data?.message || "Failed to create sprint");
 		},
 	});
 
@@ -77,8 +78,9 @@ export const useSprints = ({
 				queryKey: [SPRINT_KEY.SPRINTS],
 			});
 		},
-		onError: (err) => {
+		onError: (err: any) => {
 			console.error("startSprint failed", err);
+			toast.error(err?.response?.data?.message || "Failed to start sprint");
 		},
 	});
 
@@ -96,8 +98,9 @@ export const useSprints = ({
 				queryKey: [TASK_KEY.TASK_BACKLOG],
 			});
 		},
-		onError: (err) => {
-			console.error("startSprint failed", err);
+		onError: (err: any) => {
+			console.error("completedSprint failed", err);
+			toast.error(err?.response?.data?.message || "Failed to complete sprint");
 		},
 	});
 
@@ -114,8 +117,9 @@ export const useSprints = ({
 				queryKey: [TASK_KEY.TASK_BACKLOG],
 			});
 		},
-		onError: (err) => {
+		onError: (err: any) => {
 			console.error("updateSprint failed", err);
+			toast.error(err?.response?.data?.message || "Failed to update sprint");
 		},
 	});
 

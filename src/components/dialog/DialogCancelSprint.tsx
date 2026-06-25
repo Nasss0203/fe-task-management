@@ -68,6 +68,7 @@ export function CancelSprintDialog({
 			</DialogTrigger>
 
 			<DialogContent
+				aria-describedby={undefined}
 				className={cn(
 					"max-w-140 border border-border bg-popover p-0 text-foreground shadow-2xl",
 					"sm:max-w-[400px]",
