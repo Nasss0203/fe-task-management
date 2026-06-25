@@ -275,10 +275,7 @@ export function SupportTicketDetailPanel({
 									<label className='mb-2 block text-sm text-neutral-400'>
 										Status
 									</label>
-									<Select value={selectedStatus} onValueChange={(val) => setSelectedStatus(
-												e.target
-													.value as SupportTicketStatus,
-											)}>
+									<Select value={selectedStatus} onValueChange={(val) => setSelectedStatus(val as SupportTicketStatus)}>
 					<SelectTrigger className="h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none">
 						<SelectValue />
 					</SelectTrigger>
@@ -302,10 +299,7 @@ export function SupportTicketDetailPanel({
 									<label className='mb-2 block text-sm text-neutral-400'>
 										Priority
 									</label>
-									<Select value={selectedPriority} onValueChange={(val) => setSelectedPriority(
-												e.target
-													.value as SupportTicketPriority,
-											)}>
+									<Select value={selectedPriority} onValueChange={(val) => setSelectedPriority(val as SupportTicketPriority)}>
 					<SelectTrigger className="h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none">
 						<SelectValue />
 					</SelectTrigger>
