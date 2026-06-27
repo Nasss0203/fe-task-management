@@ -33,34 +33,34 @@ type RevenuePoint = {
 const revenueChartConfig = {
 	revenue: {
 		label: "Doanh thu",
-		color: "#8b5cf6",
+		color: "#7C3AED",
 	},
 } satisfies ChartConfig;
 
 const subscriptionChartConfig = {
 	active: {
 		label: "Active",
-		color: "#34d399",
+		color: "#22C55E",
 	},
 	trial: {
 		label: "Trial",
-		color: "#38bdf8",
+		color: "#3B82F6",
 	},
 	expired: {
 		label: "Expired",
-		color: "#f59e0b",
+		color: "#EAB308",
 	},
 	canceled: {
 		label: "Canceled",
-		color: "#fb7185",
+		color: "#EF4444",
 	},
 } satisfies ChartConfig;
 
 const statusColorMap = {
-	active: "#34d399",
-	trial: "#38bdf8",
-	expired: "#f59e0b",
-	canceled: "#fb7185",
+	active: "#22C55E",
+	trial: "#3B82F6",
+	expired: "#EAB308",
+	canceled: "#EF4444",
 };
 
 const formatMonthLabel = (date: Date) =>
@@ -129,12 +129,12 @@ export function BillingInsightCharts({ subscriptions }: Props) {
 
 	return (
 		<section className='grid gap-4 xl:grid-cols-5'>
-			<div className='rounded-2xl border border-white/10 bg-[#0b0b0b] p-5 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset] xl:col-span-3'>
+			<div className='rounded-2xl border border-border bg-white p-5 shadow-sm xl:col-span-3'>
 				<div className='mb-4'>
-					<h2 className='text-base font-semibold text-white'>
+					<h2 className='text-base font-semibold text-[#0F172A]'>
 						Doanh thu thanh toán
 					</h2>
-					<p className='mt-1 text-sm text-neutral-500'>
+					<p className='mt-1 text-sm text-[#64748B]'>
 						Area chart theo payment đã thanh toán trong 6 tháng gần nhất.
 					</p>
 				</div>
@@ -168,19 +168,19 @@ export function BillingInsightCharts({ subscriptions }: Props) {
 							<CartesianGrid
 								vertical={false}
 								strokeDasharray='3 3'
-								stroke='#262626'
+								stroke='#E2E8F0'
 							/>
 							<XAxis
 								dataKey='month'
 								tickLine={false}
 								axisLine={false}
 								tickMargin={10}
-								stroke='#737373'
+								stroke='#64748B'
 							/>
 							<YAxis
 								tickLine={false}
 								axisLine={false}
-								stroke='#737373'
+								stroke='#64748B'
 								tickFormatter={(value) =>
 									formatCurrency(Number(value))
 								}
@@ -191,10 +191,10 @@ export function BillingInsightCharts({ subscriptions }: Props) {
 									<ChartTooltipContent
 										formatter={(value, name) => (
 											<div className='flex min-w-32 items-center justify-between gap-4'>
-												<span className='text-neutral-400'>
+												<span className='text-[#64748B]'>
 													{name}
 												</span>
-												<span className='font-medium text-white'>
+												<span className='font-medium text-[#0F172A]'>
 													{formatCurrency(
 														Number(value),
 													)}
@@ -216,12 +216,12 @@ export function BillingInsightCharts({ subscriptions }: Props) {
 				</div>
 			</div>
 
-			<div className='rounded-2xl border border-white/10 bg-[#0b0b0b] p-5 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset] xl:col-span-2'>
+			<div className='rounded-2xl border border-border bg-white p-5 shadow-sm xl:col-span-2'>
 				<div className='mb-4'>
-					<h2 className='text-base font-semibold text-white'>
+					<h2 className='text-base font-semibold text-[#0F172A]'>
 						Trạng thái subscription
 					</h2>
-					<p className='mt-1 text-sm text-neutral-500'>
+					<p className='mt-1 text-sm text-[#64748B]'>
 						Phân bổ active, trial, expired và canceled.
 					</p>
 				</div>
@@ -269,7 +269,7 @@ export function BillingInsightCharts({ subscriptions }: Props) {
 							return (
 								<div
 									key={item.key}
-									className='flex items-center justify-between rounded-xl border border-white/10 bg-[#101010] px-3 py-2'
+									className='flex items-center justify-between rounded-xl border border-border bg-[#F8FAFC] px-3 py-2'
 								>
 									<div className='flex items-center gap-2'>
 										<span
@@ -281,11 +281,11 @@ export function BillingInsightCharts({ subscriptions }: Props) {
 													],
 											}}
 										/>
-										<span className='text-sm text-neutral-400'>
+										<span className='text-sm text-[#64748B]'>
 											{item.name}
 										</span>
 									</div>
-									<span className='text-sm font-semibold text-white'>
+									<span className='text-sm font-semibold text-[#0F172A]'>
 										{item.value} · {rate}%
 									</span>
 								</div>

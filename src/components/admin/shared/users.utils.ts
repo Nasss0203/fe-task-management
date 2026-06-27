@@ -1,13 +1,13 @@
 export function getStatusClass(status: string) {
 	switch (status) {
 		case "ACTIVE":
-			return "border-emerald-500/20 bg-emerald-500/10 text-emerald-400";
+			return "border-[#BBF7D0] bg-[#F0FDF4] text-[#15803D]";
 		case "LOCKED":
-			return "border-rose-500/20 bg-rose-500/10 text-rose-400";
+			return "border-[#FECACA] bg-[#FEF2F2] text-[#B91C1C]";
 		case "PENDING":
-			return "border-amber-500/20 bg-amber-500/10 text-amber-400";
+			return "border-[#FDE68A] bg-[#FFFBEB] text-[#A16207]";
 		default:
-			return "border-white/10 bg-white/5 text-neutral-300";
+			return "border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]";
 	}
 }
 
@@ -27,9 +27,9 @@ export function getStatusLabel(status: string) {
 export function getSystemRoleClass(role: string) {
 	switch (role) {
 		case "SYSTEM_ADMIN":
-			return "border-sky-500/20 bg-sky-500/10 text-sky-400";
+			return "border-[#BFDBFE] bg-[#EFF6FF] text-[#1D4ED8]";
 		default:
-			return "border-white/10 bg-white/5 text-neutral-300";
+			return "border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]";
 	}
 }
 

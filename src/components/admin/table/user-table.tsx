@@ -75,8 +75,8 @@ export function UserTable({
 
 	if (!users.length) {
 		return (
-			<div className='rounded-3xl border border-white/10 bg-[#101010] p-10 text-center'>
-				<p className='text-sm text-neutral-400'>
+			<div className='rounded-3xl border border-border bg-white p-10 text-center'>
+				<p className='text-sm text-[#64748B]'>
 					Không tìm thấy người dùng phù hợp.
 				</p>
 			</div>
@@ -88,7 +88,7 @@ export function UserTable({
 		<div className='overflow-x-auto'>
 			<table className='w-full min-w-320 border-separate border-spacing-y-3'>
 				<thead>
-					<tr className='text-left text-sm text-neutral-500'>
+					<tr className='text-left text-sm text-[#475569]'>
 						<th className='px-4 py-2 font-medium'>User</th>
 						<th className='px-4 py-2 font-medium'>Email</th>
 						<th className='px-4 py-2 font-medium'>Trạng thái</th>
@@ -119,38 +119,35 @@ export function UserTable({
 						return (
 							<tr
 								key={user.id}
-								className='text-sm text-neutral-200'
+								className='text-sm text-[#1E293B]'
 							>
-								<td className='rounded-l-3xl border-y border-l border-white/5 bg-[#101010] px-4 py-4'>
+								<td className='rounded-l-3xl border-y border-l border-[#EEF2F6] bg-white px-4 py-4'>
 									<div className='flex items-center gap-3'>
 										{user.avatarUrl ? (
 											<img
 												src={user.avatarUrl}
 												alt={user.fullName}
-												className='h-11 w-11 rounded-full border border-white/10 object-cover'
+												className='h-11 w-11 rounded-full border border-border object-cover'
 											/>
 										) : (
-											<div className='flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-[#171717] text-sm font-semibold text-white'>
+											<div className='flex h-11 w-11 items-center justify-center rounded-full border border-[#BFDBFE] bg-[#EFF6FF] text-sm font-semibold text-[#2563EB]'>
 												{getInitials(user.fullName)}
 											</div>
 										)}
 
-										<div className='space-y-0.5'>
-											<p className='font-medium text-white'>
+										<div>
+											<p className='font-medium text-[#0F172A]'>
 												{user.fullName}
-											</p>
-											<p className='max-w-42 truncate text-xs text-neutral-500'>
-												ID: {user.id}
 											</p>
 										</div>
 									</div>
 								</td>
 
-								<td className='border-y border-white/5 bg-[#101010] px-4 py-4 text-neutral-300'>
+								<td className='border-y border-[#EEF2F6] bg-white px-4 py-4 text-[#334155]'>
 									{user.email}
 								</td>
 
-								<td className='border-y border-white/5 bg-[#101010] px-4 py-4'>
+								<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
 									<span
 										className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${getStatusClass(
 											user.status,
@@ -160,19 +157,19 @@ export function UserTable({
 									</span>
 								</td>
 
-								<td className='border-y border-white/5 bg-[#101010] px-4 py-4'>
+								<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
 									<span
 										className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${
 											user.plan === "pro"
-												? "border-sky-500/20 bg-sky-500/10 text-sky-400"
-												: "border-white/10 bg-white/5 text-neutral-300"
+												? "border-[#DDD6FE] bg-[#F5F3FF] text-[#7C3AED]"
+												: "border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]"
 										}`}
 									>
 										{user.plan === "pro" ? "Pro" : "Free"}
 									</span>
 								</td>
 
-								<td className='border-y border-white/5 bg-[#101010] px-4 py-4'>
+								<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
 									<span
 										className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${getSystemRoleClass(
 											user.systemRole,
@@ -182,13 +179,13 @@ export function UserTable({
 									</span>
 								</td>
 
-								<td className='border-y border-white/5 bg-[#101010] px-4 py-4'>
+								<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
 									<div className='space-y-0.5'>
-										<p className='font-medium text-white'>
+										<p className='font-medium text-[#0F172A]'>
 											{user.workspaces.length} workspace
 										</p>
 
-										<p className='text-xs text-neutral-500'>
+										<p className='text-xs text-[#64748B]'>
 											{user.workspaces.length === 0
 												? "Không có workspace"
 												: user.workspaces
@@ -206,13 +203,13 @@ export function UserTable({
 									</div>
 								</td>
 
-								<td className='border-y border-white/5 bg-[#101010] px-4 py-4 text-neutral-300'>
+								<td className='border-y border-[#EEF2F6] bg-white px-4 py-4 text-[#334155]'>
 									{formatDate(user.createdAt)}
 								</td>
 
-								<td className='border-y border-white/5 bg-[#101010] px-4 py-4'>
-									<div className='inline-flex items-center gap-2 text-neutral-300'>
-										<Clock3 className='h-4 w-4 text-neutral-500' />
+								<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
+									<div className='inline-flex items-center gap-2 text-[#334155]'>
+										<Clock3 className='h-4 w-4 text-[#64748B]' />
 										<span>
 											{user.lastActive
 												? formatRelativeTime(
@@ -223,25 +220,25 @@ export function UserTable({
 									</div>
 								</td>
 
-								<td className='rounded-r-3xl border-y border-r border-white/5 bg-[#101010] px-4 py-4'>
+								<td className='rounded-r-3xl border-y border-r border-[#EEF2F6] bg-white px-4 py-4'>
 									<div className='flex justify-end'>
 										<DropdownMenu>
 											<DropdownMenuTrigger asChild>
-												<button className='inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-[#171717] text-neutral-300 transition hover:bg-white/5 hover:text-white'>
+												<button className='inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#CBD5E1] bg-white text-[#475569] transition hover:bg-[#F8FAFC] hover:text-[#0F172A]'>
 													<Ellipsis className='h-4 w-4' />
 												</button>
 											</DropdownMenuTrigger>
 
 											<DropdownMenuContent
 												align='end'
-												className='w-60 rounded-2xl border border-white/10 bg-[#0f0f0f] p-2 text-white'
+												className='w-60 rounded-2xl border border-border bg-white p-2 text-[#1E293B] shadow-xl'
 											>
 												<DropdownMenuItem
 													onSelect={(e) => {
 														e.preventDefault();
 														onView(user);
 													}}
-													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-white/5 focus:text-white'
+													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
 												>
 													<Eye className='mr-2 h-4 w-4' />
 													Xem chi tiết
@@ -249,7 +246,7 @@ export function UserTable({
 
 												<DropdownMenuItem
 													onClick={() => onView(user)}
-													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-white/5 focus:text-white'
+													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
 												>
 													<History className='mr-2 h-4 w-4' />
 													Xem lịch sử hoạt động
@@ -257,7 +254,7 @@ export function UserTable({
 
 												{!isSuperAdmin && (
 													<>
-														<DropdownMenuSeparator className='my-1 bg-white/10' />
+														<DropdownMenuSeparator className='my-1 bg-border' />
 
 														<DropdownMenuItem
 															disabled={
@@ -271,7 +268,7 @@ export function UserTable({
 																	user,
 																)
 															}
-															className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-white/5 focus:text-white disabled:cursor-not-allowed disabled:opacity-50'
+															className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A] disabled:cursor-not-allowed disabled:opacity-50'
 														>
 															<Crown className='mr-2 h-4 w-4' />
 															{isChangingPlan
@@ -282,7 +279,7 @@ export function UserTable({
 																	: "Cấp Pro"}
 														</DropdownMenuItem>
 
-														<DropdownMenuSeparator className='my-1 bg-white/10' />
+														<DropdownMenuSeparator className='my-1 bg-border' />
 
 														<DropdownMenuItem
 															onClick={() =>
@@ -290,7 +287,7 @@ export function UserTable({
 																	user.id,
 																)
 															}
-															className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-white/5 focus:text-white'
+															className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
 														>
 															{user.status ===
 															"LOCKED" ? (
@@ -316,7 +313,7 @@ export function UserTable({
 																		user.id,
 																	)
 																}
-																className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-white/5 focus:text-white'
+																className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
 															>
 																<RotateCcw className='mr-2 h-4 w-4' />
 																Reset trạng thái
@@ -327,7 +324,7 @@ export function UserTable({
 
 												{!isSuperAdmin && (
 													<>
-														<DropdownMenuSeparator className='my-1 bg-white/10' />
+														<DropdownMenuSeparator className='my-1 bg-border' />
 
 														<DropdownMenuItem
 															onClick={() =>
@@ -335,7 +332,7 @@ export function UserTable({
 																	user.id,
 																)
 															}
-															className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-white/5 focus:text-white'
+															className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
 														>
 															<ShieldCheck className='mr-2 h-4 w-4' />
 															{isSystemAdmin

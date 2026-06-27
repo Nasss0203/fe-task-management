@@ -75,10 +75,10 @@ const formatDateTime = (value?: string | null) => {
 
 const getWorkspaceStatusClass = (status: WorkspaceItem["status"]) => {
 	if (status === "ACTIVE") {
-		return "border-emerald-500/20 bg-emerald-500/10 text-emerald-400";
+		return "border-[#BBF7D0] bg-[#F0FDF4] text-[#15803D]";
 	}
 
-	return "border-amber-500/20 bg-amber-500/10 text-amber-400";
+	return "border-[#FDE68A] bg-[#FFFBEB] text-[#A16207]";
 };
 
 const getWorkspaceStatusLabel = (status: WorkspaceItem["status"]) => {
@@ -88,10 +88,10 @@ const getWorkspaceStatusLabel = (status: WorkspaceItem["status"]) => {
 
 const getWorkspacePlanClass = (plan: WorkspaceItem["plan"]) => {
 	if (plan === "pro") {
-		return "border-sky-500/20 bg-sky-500/10 text-sky-400";
+		return "border-[#DDD6FE] bg-[#F5F3FF] text-[#7C3AED]";
 	}
 
-	return "border-white/10 bg-white/5 text-neutral-300";
+	return "border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]";
 };
 
 const getWorkspacePlanLabel = (plan: WorkspaceItem["plan"]) => {
@@ -121,8 +121,8 @@ export function WorkspaceManagementTable({
 
 	if (!workspaces.length) {
 		return (
-			<div className='rounded-2xl border border-white/10 bg-[#0b0b0b] p-10 text-center'>
-				<p className='text-sm text-neutral-400'>
+			<div className='rounded-2xl border border-border bg-white p-10 text-center'>
+				<p className='text-sm text-[#64748B]'>
 					Không tìm thấy workspace phù hợp.
 				</p>
 			</div>
@@ -130,20 +130,20 @@ export function WorkspaceManagementTable({
 	}
 
 	return (
-		<div className='overflow-hidden rounded-2xl border border-white/10 bg-[#0b0b0b] shadow-[0_1px_0_rgba(255,255,255,0.03)_inset]'>
-			<div className='flex flex-col gap-1 border-b border-white/10 px-4 py-4 sm:px-5'>
-				<h2 className='text-sm font-semibold text-white'>
+		<div className='overflow-hidden rounded-2xl border border-border bg-white shadow-sm'>
+			<div className='flex flex-col gap-1 border-b border-border px-4 py-4 sm:px-5'>
+				<h2 className='text-sm font-semibold text-[#0F172A]'>
 					Danh sách workspace
 				</h2>
-				<p className='text-xs text-neutral-500'>
+				<p className='text-xs text-[#64748B]'>
 					{totalRows} workspace theo bộ lọc hiện tại
 				</p>
 			</div>
 
 			<div className='overflow-x-auto'>
 				<table className='w-full min-w-[1180px] border-collapse'>
-					<thead className='sticky top-0 z-10 bg-[#0b0b0b]'>
-						<tr className='border-b border-white/10 text-left text-xs uppercase tracking-[0.12em] text-neutral-500'>
+					<thead className='sticky top-0 z-10 bg-[#F8FAFC]'>
+						<tr className='border-b border-border text-left text-xs uppercase tracking-[0.12em] text-[#475569]'>
 							<th className='px-5 py-3 font-medium'>Workspace</th>
 							<th className='px-4 py-3 font-medium'>Owner</th>
 							<th className='px-4 py-3 font-medium'>Gói</th>
@@ -157,27 +157,24 @@ export function WorkspaceManagementTable({
 						</tr>
 					</thead>
 
-					<tbody className='divide-y divide-white/5'>
+					<tbody className='divide-y divide-[#EEF2F6]'>
 						{table.getRowModel().rows.map((row) => {
 							const workspace = row.original;
 
 							return (
 								<tr
 									key={workspace.id}
-									className='text-sm text-neutral-200 transition hover:bg-white/[0.03]'
+									className='text-sm text-[#1E293B] transition hover:bg-[#F8FAFC]'
 								>
 									<td className='px-5 py-4'>
 										<div className='flex items-center gap-3'>
-											<div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-[#171717] text-sm font-semibold text-white'>
+											<div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#BFDBFE] bg-[#EFF6FF] text-sm font-semibold text-[#2563EB]'>
 												{getInitials(workspace.name)}
 											</div>
 
-											<div className='min-w-0 space-y-0.5'>
-												<p className='truncate font-medium text-white'>
+											<div className='min-w-0'>
+												<p className='truncate font-medium text-[#0F172A]'>
 													{workspace.name}
-												</p>
-												<p className='truncate text-xs text-neutral-500'>
-													/{workspace.slug}
 												</p>
 											</div>
 										</div>
@@ -185,11 +182,11 @@ export function WorkspaceManagementTable({
 
 									<td className='px-4 py-4'>
 										<div className='space-y-0.5'>
-											<p className='font-medium text-white'>
+											<p className='font-medium text-[#0F172A]'>
 												{workspace.ownerName ??
 													"Chưa có owner"}
 											</p>
-											<p className='text-xs text-neutral-500'>
+											<p className='text-xs text-[#64748B]'>
 												{workspace.ownerEmail ?? "-"}
 											</p>
 										</div>
@@ -220,7 +217,7 @@ export function WorkspaceManagementTable({
 									</td>
 
 									<td className='px-4 py-4'>
-										<div className='grid grid-cols-2 gap-1.5 text-xs text-neutral-400'>
+										<div className='grid grid-cols-2 gap-1.5 text-xs text-[#64748B]'>
 											<span>{workspace.membersCount} member</span>
 											<span>{workspace.projectsCount} project</span>
 											<span>{workspace.boardsCount} board</span>
@@ -228,16 +225,16 @@ export function WorkspaceManagementTable({
 										</div>
 									</td>
 
-									<td className='px-4 py-4 text-neutral-300'>
+									<td className='px-4 py-4 text-[#334155]'>
 										<div className='inline-flex items-center gap-2'>
-											<CalendarDays className='h-4 w-4 text-neutral-500' />
+											<CalendarDays className='h-4 w-4 text-[#64748B]' />
 											{formatDate(workspace.createdAt)}
 										</div>
 									</td>
 
-									<td className='px-4 py-4 text-neutral-300'>
+									<td className='px-4 py-4 text-[#334155]'>
 										<div className='inline-flex items-center gap-2'>
-											<Clock3 className='h-4 w-4 text-neutral-500' />
+											<Clock3 className='h-4 w-4 text-[#64748B]' />
 											{formatDateTime(
 												workspace.updatedAt,
 											)}
@@ -248,20 +245,20 @@ export function WorkspaceManagementTable({
 										<div className='flex justify-end'>
 											<DropdownMenu>
 												<DropdownMenuTrigger asChild>
-													<button className='inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-[#171717] text-neutral-300 transition hover:bg-white/5 hover:text-white'>
+													<button className='inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[#CBD5E1] bg-white text-[#475569] transition hover:bg-[#F8FAFC] hover:text-[#0F172A]'>
 														<Ellipsis className='h-4 w-4' />
 													</button>
 												</DropdownMenuTrigger>
 
 												<DropdownMenuContent
 													align='end'
-													className='w-60 rounded-2xl border border-white/10 bg-[#0f0f0f] p-2 text-white'
+													className='w-60 rounded-2xl border border-border bg-white p-2 text-[#1E293B] shadow-xl'
 												>
 													<DropdownMenuItem
 														onClick={() =>
 															onView(workspace)
 														}
-														className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-white/5 focus:text-white'
+														className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
 													>
 														<Eye className='mr-2 h-4 w-4' />
 														Xem chi tiết
@@ -270,7 +267,7 @@ export function WorkspaceManagementTable({
 													{workspace.status ===
 														"DELETED" && (
 														<>
-															<DropdownMenuSeparator className='my-1 bg-white/10' />
+															<DropdownMenuSeparator className='my-1 bg-border' />
 
 															<DropdownMenuItem
 																disabled

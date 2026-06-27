@@ -25,7 +25,10 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-
+import {
+	adminActionButtonClass,
+	adminFieldLabelClass,
+} from "../shared/theme";
 
 type Props = {
 	search: string;
@@ -62,19 +65,21 @@ export function UserFilterBar({
 }: Props) {
 	const hasActiveFilter =
 		status !== "all" || role !== "all" || Boolean(createdAt);
+	const selectClass =
+		"h-10 w-full rounded-xl border border-input bg-white px-3 text-sm text-foreground outline-none hover:border-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/15";
 
 	return (
 		<div className='flex items-center gap-3'>
-			<InputGroup className='h-10 w-full max-w-xl rounded-xl border-white/10 bg-[#111111] text-white'>
+			<InputGroup className='h-10 w-full max-w-xl rounded-xl border border-input bg-white text-foreground shadow-sm'>
 				<InputGroupAddon>
-					<Search className='h-4 w-4 text-neutral-500' />
+					<Search className='h-4 w-4 text-[#64748B]' />
 				</InputGroupAddon>
 
 				<InputGroupInput
 					value={search}
 					onChange={(e) => onSearchChange(e.target.value)}
 					placeholder='Tìm theo tên hoặc email'
-					className='text-white placeholder:text-neutral-500'
+					className='text-foreground placeholder:text-[#94A3B8]'
 				/>
 			</InputGroup>
 
@@ -83,9 +88,9 @@ export function UserFilterBar({
 					<Button
 						type='button'
 						variant='outline'
-						className={`h-10 rounded-xl border-white/10 bg-[#111111] px-4 text-white hover:bg-white/5 ${
+						className={`h-10 rounded-xl border-[#CBD5E1] bg-white px-4 text-[#334155] hover:bg-[#F8FAFC] ${
 							hasActiveFilter
-								? "border-sky-500/40 text-sky-400"
+								? "border-[#BFDBFE] bg-[#EFF6FF] text-[#2563EB]"
 								: ""
 						}`}
 					>
@@ -95,74 +100,60 @@ export function UserFilterBar({
 
 				<PopoverContent
 					align='end'
-					className='w-[380px] rounded-2xl border border-white/10 bg-[#0b0b0b] p-4 text-white'
+					className='w-[380px] rounded-2xl border border-border bg-white p-4 text-foreground shadow-xl'
 				>
 					<div className='space-y-4'>
 						<div>
-							<p className='text-sm font-semibold text-white'>
+							<p className='text-sm font-semibold text-[#0F172A]'>
 								Bộ lọc người dùng
 							</p>
-							<p className='mt-1 text-xs text-neutral-500'>
-								Lọc theo trạng thái, vai trò hệ thống và ngày
-								tạo.
+							<p className='mt-1 text-xs text-[#64748B]'>
+								Lọc theo trạng thái, vai trò hệ thống và ngày tạo.
 							</p>
 						</div>
 
 						<div className='space-y-2'>
-							<label className='text-xs font-medium uppercase tracking-[0.14em] text-neutral-500'>
-								Trạng thái
-							</label>
-
+							<label className={adminFieldLabelClass}>Trạng thái</label>
 							<Select value={status} onValueChange={(val) => onStatusChange(val)}>
-					<SelectTrigger className="h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-sky-500/50">
-						<SelectValue />
-					</SelectTrigger>
-					<SelectContent>
-								<SelectItem value="all">Tất cả</SelectItem>
-								<SelectItem value="ACTIVE">Hoạt động</SelectItem>
-								<SelectItem value="LOCKED">Bị khóa</SelectItem>
-							</SelectContent>
-				</Select>
+								<SelectTrigger className={selectClass}>
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value='all'>Tất cả</SelectItem>
+									<SelectItem value='ACTIVE'>Hoạt động</SelectItem>
+									<SelectItem value='LOCKED'>Bị khóa</SelectItem>
+								</SelectContent>
+							</Select>
 						</div>
 
 						<div className='space-y-2'>
-							<label className='text-xs font-medium uppercase tracking-[0.14em] text-neutral-500'>
-								Vai trò hệ thống
-							</label>
-
+							<label className={adminFieldLabelClass}>Vai trò hệ thống</label>
 							<Select value={role} onValueChange={(val) => onRoleChange(val)}>
-					<SelectTrigger className="h-10 w-full rounded-xl border border-white/10 bg-[#111111] px-3 text-sm text-white outline-none focus:border-sky-500/50">
-						<SelectValue />
-					</SelectTrigger>
-					<SelectContent>
-								<SelectItem value="all">Tất cả</SelectItem>
-								<SelectItem value="SYSTEM_ADMIN">
-									System Admin
-								</SelectItem>
-								<SelectItem value="USER">User</SelectItem>
-							</SelectContent>
-				</Select>
+								<SelectTrigger className={selectClass}>
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value='all'>Tất cả</SelectItem>
+									<SelectItem value='SYSTEM_ADMIN'>System Admin</SelectItem>
+									<SelectItem value='USER'>User</SelectItem>
+								</SelectContent>
+							</Select>
 						</div>
 
 						<div className='space-y-2'>
-							<label className='text-xs font-medium uppercase tracking-[0.14em] text-neutral-500'>
-								Ngày tạo
-							</label>
-
-							<div className='rounded-xl border border-white/10 bg-[#111111] p-2'>
-								<div className='mb-2 flex items-center justify-between rounded-lg bg-white/5 px-3 py-2 text-sm'>
-									<div className='flex items-center gap-2 text-neutral-300'>
-										<CalendarDays className='h-4 w-4 text-neutral-500' />
+							<label className={adminFieldLabelClass}>Ngày tạo</label>
+							<div className='rounded-xl border border-border bg-[#F8FAFC] p-2'>
+								<div className='mb-2 flex items-center justify-between rounded-lg border border-border bg-white px-3 py-2 text-sm'>
+									<div className='flex items-center gap-2 text-[#334155]'>
+										<CalendarDays className='h-4 w-4 text-[#64748B]' />
 										{formatDate(createdAt)}
 									</div>
 
 									{createdAt && (
 										<button
 											type='button'
-											onClick={() =>
-												onCreatedAtChange(undefined)
-											}
-											className='text-xs text-neutral-500 hover:text-white'
+											onClick={() => onCreatedAtChange(undefined)}
+											className='text-xs text-[#64748B] hover:text-[#0F172A]'
 										>
 											Xóa
 										</button>
@@ -173,7 +164,7 @@ export function UserFilterBar({
 									mode='single'
 									selected={createdAt}
 									onSelect={onCreatedAtChange}
-									className='w-full rounded-lg border border-white/10 bg-[#0b0b0b] p-3
+									className='w-full rounded-lg border border-border bg-white p-3
 										[&_.rdp-months]:w-full
 										[&_.rdp-month]:w-full
 										[&_.rdp-table]:w-full
@@ -194,7 +185,7 @@ export function UserFilterBar({
 							type='button'
 							variant='outline'
 							onClick={onReset}
-							className='h-10 w-full rounded-xl border-white/10 bg-[#111111] text-white hover:bg-white/5'
+							className={`w-full ${adminActionButtonClass}`}
 						>
 							<RotateCcw className='mr-2 h-4 w-4' />
 							Đặt lại bộ lọc

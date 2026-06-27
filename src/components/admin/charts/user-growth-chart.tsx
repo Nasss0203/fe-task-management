@@ -30,19 +30,19 @@ type Props = {
 
 export function UserGrowthChart({ data, period, onPeriodChange }: Props) {
 	return (
-		<div className='rounded-2xl border border-neutral-800 bg-neutral-950/80 p-5'>
+		<div className='rounded-2xl border border-border bg-white p-5 shadow-sm'>
 			<div className='mb-4 flex items-center justify-between gap-4'>
 				<div>
-					<h2 className='text-lg font-semibold text-white'>
+					<h2 className='text-lg font-semibold text-[#0F172A]'>
 						Tăng trưởng người dùng
 					</h2>
-					<p className='text-sm text-neutral-400'>
+					<p className='text-sm text-[#64748B]'>
 						Xu hướng đăng ký tài khoản mới.
 					</p>
 				</div>
 
 				<Select value={period} onValueChange={(val) => onPeriodChange(val as UserGrowthPeriod)}>
-					<SelectTrigger className="rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-white outline-none">
+					<SelectTrigger className="rounded-lg border border-input bg-white px-3 py-2 text-sm text-[#1E293B] outline-none focus:border-primary focus:ring-2 focus:ring-primary/15">
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>
@@ -56,7 +56,7 @@ export function UserGrowthChart({ data, period, onPeriodChange }: Props) {
 
 			<div className='h-70'>
 				{data.length === 0 ? (
-					<div className='flex h-full items-center justify-center rounded-xl border border-dashed border-neutral-800 text-sm text-neutral-500'>
+					<div className='flex h-full items-center justify-center rounded-xl border border-dashed border-border text-sm text-[#64748B]'>
 						Chưa có dữ liệu tăng trưởng người dùng
 					</div>
 				) : (
@@ -64,21 +64,23 @@ export function UserGrowthChart({ data, period, onPeriodChange }: Props) {
 						<LineChart data={data}>
 							<CartesianGrid
 								strokeDasharray='3 3'
-								stroke='#262626'
+								stroke='#E2E8F0'
 							/>
-							<XAxis dataKey='name' stroke='#737373' />
-							<YAxis stroke='#737373' allowDecimals={false} />
+							<XAxis dataKey='name' stroke='#64748B' />
+							<YAxis stroke='#64748B' allowDecimals={false} />
 							<Tooltip
 								contentStyle={{
-									background: "#0a0a0a",
-									border: "1px solid #262626",
+									background: "#ffffff",
+									border: "1px solid #E2E8F0",
 									borderRadius: 12,
+									color: "#1E293B",
+									boxShadow: "0 10px 20px -12px rgba(15, 23, 42, 0.25)",
 								}}
 							/>
 							<Line
 								type='monotone'
 								dataKey='users'
-								stroke='#ffffff'
+								stroke='#2563EB'
 								strokeWidth={2}
 								dot={{ r: 4 }}
 							/>

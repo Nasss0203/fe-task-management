@@ -61,8 +61,8 @@ export function BillingSubscriptionManagementTable({
 }: Props) {
 	if (!subscriptions.length) {
 		return (
-			<div className='rounded-2xl border border-white/10 bg-[#0b0b0b] p-10 text-center'>
-				<p className='text-sm text-neutral-400'>
+			<div className='rounded-2xl border border-border bg-white p-10 text-center'>
+				<p className='text-sm text-[#64748B]'>
 					Không có subscription phù hợp.
 				</p>
 			</div>
@@ -70,19 +70,19 @@ export function BillingSubscriptionManagementTable({
 	}
 
 	return (
-		<div className='overflow-hidden rounded-2xl border border-white/10 bg-[#0b0b0b] shadow-[0_1px_0_rgba(255,255,255,0.03)_inset]'>
-			<div className='flex items-start justify-between gap-4 border-b border-white/10 px-5 py-4'>
+		<div className='overflow-hidden rounded-2xl border border-border bg-white shadow-sm'>
+			<div className='flex items-start justify-between gap-4 border-b border-border px-5 py-4'>
 				<div>
-					<h2 className='text-lg font-semibold text-white'>
+					<h2 className='text-lg font-semibold text-[#0F172A]'>
 						Theo dõi subscriptions
 					</h2>
-					<p className='mt-1 text-sm text-neutral-400'>
+					<p className='mt-1 text-sm text-[#64748B]'>
 						Quan sát trạng thái active, trial, expired, canceled và
 						gia hạn thủ công khi cần.
 					</p>
 				</div>
 
-				<div className='rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-neutral-300'>
+				<div className='rounded-full border border-border bg-[#F8FAFC] px-3 py-1 text-sm text-[#475569]'>
 					{subscriptions.length} subscriptions
 				</div>
 			</div>
@@ -90,7 +90,7 @@ export function BillingSubscriptionManagementTable({
 			<div className='overflow-x-auto'>
 				<table className='w-full min-w-[1240px] border-collapse'>
 					<thead>
-						<tr className='border-b border-white/10 text-left text-xs uppercase tracking-[0.12em] text-neutral-500'>
+						<tr className='border-b border-border bg-[#F8FAFC] text-left text-xs uppercase tracking-[0.12em] text-[#475569]'>
 							<th className='px-5 py-3 font-medium'>User</th>
 							<th className='px-4 py-3 font-medium'>Plan</th>
 							<th className='px-4 py-3 font-medium'>Trạng thái</th>
@@ -105,18 +105,18 @@ export function BillingSubscriptionManagementTable({
 						</tr>
 					</thead>
 
-					<tbody className='divide-y divide-white/5'>
+					<tbody className='divide-y divide-[#EEF2F6]'>
 						{subscriptions.map((subscription) => (
 							<tr
 								key={subscription.rowId}
-								className='text-sm text-neutral-200 transition hover:bg-white/[0.03]'
+								className='text-sm text-[#1E293B] transition hover:bg-[#F8FAFC]'
 							>
 								<td className='px-5 py-4'>
 									<div className='space-y-1'>
-										<p className='font-medium text-white'>
+										<p className='font-medium text-[#0F172A]'>
 											{subscription.userName}
 										</p>
-										<p className='text-xs text-neutral-500'>
+										<p className='text-xs text-[#64748B]'>
 											{subscription.userEmail}
 										</p>
 									</div>
@@ -124,10 +124,10 @@ export function BillingSubscriptionManagementTable({
 
 								<td className='px-4 py-4'>
 									<div className='space-y-1'>
-										<p className='font-medium text-white'>
+										<p className='font-medium text-[#0F172A]'>
 											{subscription.planName}
 										</p>
-										<p className='text-xs text-neutral-500'>
+										<p className='text-xs text-[#64748B]'>
 											{subscription.planCode}
 										</p>
 									</div>
@@ -145,33 +145,33 @@ export function BillingSubscriptionManagementTable({
 									</span>
 								</td>
 
-								<td className='px-4 py-4 text-neutral-300'>
+								<td className='px-4 py-4 text-[#334155]'>
 									{getCycleLabel(subscription.billingCycle)}
 								</td>
 
 								<td className='px-4 py-4'>
-									<span className='inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-neutral-200'>
-										<CreditCard className='h-3.5 w-3.5 text-neutral-400' />
+									<span className='inline-flex items-center gap-2 rounded-full border border-border bg-[#F8FAFC] px-3 py-1 text-xs font-medium text-[#334155]'>
+										<CreditCard className='h-3.5 w-3.5 text-[#64748B]' />
 										{getPaymentMethodLabel(
 											subscription.paymentMethod,
 										)}
 									</span>
 								</td>
 
-								<td className='px-4 py-4 text-white'>
+								<td className='px-4 py-4 font-medium text-[#0F172A]'>
 									{formatCurrency(subscription.amount)}
 								</td>
 
 								<td className='px-4 py-4'>
-									<div className='inline-flex items-center gap-2 text-neutral-300'>
-										<Clock3 className='h-4 w-4 text-neutral-500' />
+									<div className='inline-flex items-center gap-2 text-[#334155]'>
+										<Clock3 className='h-4 w-4 text-[#64748B]' />
 										<span>
 											{formatDate(subscription.renewAt)}
 										</span>
 									</div>
 								</td>
 
-								<td className='px-4 py-4 text-neutral-300'>
+								<td className='px-4 py-4 text-[#334155]'>
 									{subscription.couponCode ?? "-"}
 								</td>
 
@@ -179,20 +179,20 @@ export function BillingSubscriptionManagementTable({
 									<div className='flex justify-end'>
 										<DropdownMenu>
 											<DropdownMenuTrigger asChild>
-												<button className='inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-[#171717] text-neutral-300 transition hover:bg-white/5 hover:text-white'>
+												<button className='inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[#CBD5E1] bg-white text-[#475569] transition hover:bg-[#F8FAFC] hover:text-[#0F172A]'>
 													<Ellipsis className='h-4 w-4' />
 												</button>
 											</DropdownMenuTrigger>
 
 											<DropdownMenuContent
 												align='end'
-												className='w-60 rounded-2xl border border-white/10 bg-[#0f0f0f] p-2 text-white'
+												className='w-60 rounded-2xl border border-border bg-white p-2 text-[#1E293B] shadow-xl'
 											>
 												<DropdownMenuItem
 													onClick={() =>
 														onView(subscription)
 													}
-													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-white/5 focus:text-white'
+													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
 												>
 													<Eye className='mr-2 h-4 w-4' />
 													Xem chi tiết
@@ -204,7 +204,7 @@ export function BillingSubscriptionManagementTable({
 															subscription.id,
 														)
 													}
-													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-white/5 focus:text-white'
+													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
 												>
 													<RefreshCcw className='mr-2 h-4 w-4' />
 													Gia hạn thủ công
@@ -216,13 +216,13 @@ export function BillingSubscriptionManagementTable({
 															subscription.id,
 														)
 													}
-													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-white/5 focus:text-white'
+													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
 												>
 													<Sparkles className='mr-2 h-4 w-4' />
 													Cấp trial 14 ngày
 												</DropdownMenuItem>
 
-												<DropdownMenuSeparator className='my-1 bg-white/10' />
+												<DropdownMenuSeparator className='my-1 bg-border' />
 
 												<DropdownMenuItem
 													onClick={() =>
@@ -233,7 +233,7 @@ export function BillingSubscriptionManagementTable({
 													disabled={
 														isUpdatingSubscription
 													}
-													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-white/5 focus:text-white'
+													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
 												>
 													<XCircle className='mr-2 h-4 w-4' />
 													{subscription.status ===

@@ -76,26 +76,26 @@ export function RecentWorkspacesTable({
 	};
 
 	return (
-		<div className='rounded-2xl border border-neutral-800 bg-neutral-950/80 p-5'>
+		<div className='rounded-2xl border border-border bg-white p-5 shadow-sm'>
 			<div className='mb-4 flex items-start justify-between gap-4'>
 				<div>
-					<h2 className='text-lg font-semibold text-white'>
+					<h2 className='text-lg font-semibold text-[#0F172A]'>
 						Workspace gần đây
 					</h2>
-					<p className='text-sm text-neutral-400'>
+					<p className='text-sm text-[#64748B]'>
 						Workspace mới tạo hoặc vừa cập nhật.
 					</p>
 				</div>
 			</div>
 
 			<div className='mb-4 grid gap-3 md:grid-cols-[1fr_160px_180px_auto_auto]'>
-				<div className='flex items-center gap-2 rounded-xl border border-neutral-800 bg-neutral-900/70 px-3'>
-					<Search className='h-4 w-4 text-neutral-500' />
+				<div className='flex items-center gap-2 rounded-xl border border-input bg-white px-3'>
+					<Search className='h-4 w-4 text-[#64748B]' />
 					<input
 						value={search}
 						onChange={(event) => setSearch(event.target.value)}
 						placeholder='Tìm workspace hoặc slug...'
-						className='h-10 w-full bg-transparent text-sm text-white outline-none placeholder:text-neutral-500'
+						className='h-10 w-full bg-transparent text-sm text-[#1E293B] outline-none placeholder:text-[#94A3B8]'
 						onKeyDown={(event) => {
 							if (event.key === "Enter") {
 								handleApplyFilter();
@@ -105,7 +105,7 @@ export function RecentWorkspacesTable({
 				</div>
 
 				<Select value={plan || "all"} onValueChange={(val) => setPlan(val === "all" ? "" : (val as PlanTypeWorkspace))}>
-					<SelectTrigger className="h-10 rounded-xl border border-neutral-800 bg-neutral-900/70 px-3 text-sm text-white outline-none">
+					<SelectTrigger className="h-10 rounded-xl border border-input bg-white px-3 text-sm text-[#1E293B] outline-none focus:border-primary focus:ring-2 focus:ring-primary/15">
 						<SelectValue placeholder="Tất cả gói" />
 					</SelectTrigger>
 					<SelectContent>
@@ -119,13 +119,13 @@ export function RecentWorkspacesTable({
 					type='date'
 					value={createdAt}
 					onChange={(event) => setCreatedAt(event.target.value)}
-					className='h-10 rounded-xl border border-neutral-800 bg-neutral-900/70 px-3 text-sm text-white outline-none'
+					className='h-10 rounded-xl border border-input bg-white px-3 text-sm text-[#1E293B] outline-none focus:border-primary focus:ring-2 focus:ring-primary/15'
 				/>
 
 				<button
 					type='button'
 					onClick={handleApplyFilter}
-					className='h-10 rounded-xl bg-white px-4 text-sm font-medium text-black hover:bg-neutral-200'
+					className='h-10 rounded-xl bg-[#2563EB] px-4 text-sm font-medium text-white hover:bg-[#1D4ED8]'
 				>
 					Lọc
 				</button>
@@ -133,7 +133,7 @@ export function RecentWorkspacesTable({
 				<button
 					type='button'
 					onClick={handleResetFilter}
-					className='flex h-10 items-center justify-center gap-2 rounded-xl border border-neutral-800 px-4 text-sm text-neutral-300 hover:bg-neutral-900 hover:text-white'
+					className='flex h-10 items-center justify-center gap-2 rounded-xl border border-[#CBD5E1] bg-white px-4 text-sm text-[#334155] hover:bg-[#F8FAFC] hover:text-[#0F172A]'
 				>
 					<X className='h-4 w-4' />
 					Đặt lại

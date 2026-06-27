@@ -17,22 +17,22 @@ type Props = {
 const rateChartConfig = {
 	active: {
 		label: "Đang hoạt động",
-		color: "#34d399",
+		color: "#22C55E",
 	},
 	locked: {
 		label: "Bị khóa",
-		color: "#fb7185",
+		color: "#EF4444",
 	},
 	inactive: {
 		label: "Không hoạt động",
-		color: "#737373",
+		color: "#CBD5E1",
 	},
 } satisfies ChartConfig;
 
 const rateColorMap = {
-	active: "#34d399",
-	locked: "#fb7185",
-	inactive: "#737373",
+	active: "#22C55E",
+	locked: "#EF4444",
+	inactive: "#CBD5E1",
 } as const;
 
 const formatPercent = (value: number) => `${Math.round(value)}%`;
@@ -68,46 +68,46 @@ export function UserManagementInsightCharts({ overview }: Props) {
 			label: "Người dùng mới 7 ngày",
 			value: newUsers,
 			icon: UserPlus,
-			color: "text-sky-300",
+			color: "text-[#3B82F6]",
 		},
 		{
 			label: "Hoạt động hôm nay",
 			value: activeToday,
 			icon: Activity,
-			color: "text-emerald-300",
+			color: "text-[#22C55E]",
 		},
 		{
 			label: "Tỷ lệ hoạt động",
 			value: formatPercent(activeRate),
 			icon: TrendingUp,
-			color: "text-emerald-300",
+			color: "text-[#22C55E]",
 		},
 		{
 			label: "Tỷ lệ bị khóa",
 			value: formatPercent(lockedRate),
 			icon: Lock,
-			color: "text-rose-300",
+			color: "text-[#EF4444]",
 		},
 	];
 
 	return (
-		<section className='rounded-2xl border border-white/10 bg-[#0b0b0b] p-5 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset]'>
+		<section className='rounded-2xl border border-border bg-white p-5 shadow-sm'>
 			<div className='mb-5'>
-				<h2 className='text-base font-semibold text-white'>
+				<h2 className='text-base font-semibold text-[#0F172A]'>
 					Tổng quan tài khoản
 				</h2>
-				<p className='mt-1 text-sm text-neutral-500'>
+				<p className='mt-1 text-sm text-[#64748B]'>
 					Phân bổ trạng thái và các chỉ số hoạt động gần đây.
 				</p>
 			</div>
 
 			{rateData.length === 0 ? (
-				<div className='flex h-[260px] items-center justify-center rounded-xl border border-dashed border-white/10 text-sm text-neutral-500'>
+				<div className='flex h-[260px] items-center justify-center rounded-xl border border-dashed border-border text-sm text-[#64748B]'>
 					Chưa có dữ liệu tài khoản.
 				</div>
 			) : (
 				<div className='grid items-center gap-6 lg:grid-cols-[360px_1fr]'>
-					<div className='flex flex-col items-center border-white/10 lg:border-r lg:pr-6'>
+					<div className='flex flex-col items-center border-border lg:border-r lg:pr-6'>
 						<div className='relative'>
 								<ChartContainer
 									config={rateChartConfig}
@@ -152,10 +152,10 @@ export function UserManagementInsightCharts({ overview }: Props) {
 								</ChartContainer>
 
 							<div className='pointer-events-none absolute inset-0 flex flex-col items-center justify-center'>
-								<span className='text-3xl font-semibold text-white'>
+								<span className='text-3xl font-semibold text-[#0F172A]'>
 									{totalUsers}
 								</span>
-								<span className='text-xs text-neutral-500'>
+								<span className='text-xs text-[#64748B]'>
 									tài khoản
 								</span>
 							</div>
@@ -165,7 +165,7 @@ export function UserManagementInsightCharts({ overview }: Props) {
 							{rateData.map((item) => (
 								<div
 									key={item.key}
-									className='flex items-center gap-2 text-sm text-neutral-400'
+									className='flex items-center gap-2 text-sm text-[#64748B]'
 								>
 									<span
 										className='h-2.5 w-2.5 rounded-full'
@@ -177,7 +177,7 @@ export function UserManagementInsightCharts({ overview }: Props) {
 										}}
 									/>
 									<span>{item.name}</span>
-									<span className='font-medium text-white'>
+									<span className='font-medium text-[#0F172A]'>
 										{formatPercent(
 											getRate(item.value, totalUsers),
 										)}
@@ -194,18 +194,18 @@ export function UserManagementInsightCharts({ overview }: Props) {
 							return (
 								<div
 									key={item.label}
-									className='flex min-h-24 items-center justify-between rounded-xl border border-white/10 bg-[#101010] p-4'
+									className='flex min-h-24 items-center justify-between rounded-xl border border-border bg-[#F8FAFC] p-4'
 								>
 									<div>
-										<p className='text-sm text-neutral-400'>
+										<p className='text-sm text-[#64748B]'>
 											{item.label}
 										</p>
-										<p className='mt-2 text-2xl font-semibold text-white'>
+										<p className='mt-2 text-2xl font-semibold text-[#0F172A]'>
 											{item.value}
 										</p>
 									</div>
 
-									<div className='flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03]'>
+									<div className='flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-white'>
 										<Icon
 											className={`h-5 w-5 ${item.color}`}
 										/>

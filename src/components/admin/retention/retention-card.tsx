@@ -19,14 +19,14 @@ type Props = {
 
 const getBadgeClassName = (level: RetentionMetricItem["level"]) => {
 	if (level === "success") {
-		return "border-green-500/40 text-green-400";
+		return "border-[#BBF7D0] bg-[#F0FDF4] text-[#15803D]";
 	}
 
 	if (level === "warning") {
-		return "border-yellow-500/40 text-yellow-400";
+		return "border-[#FDE68A] bg-[#FFFBEB] text-[#A16207]";
 	}
 
-	return "border-red-500/40 text-red-400";
+	return "border-[#FECACA] bg-[#FEF2F2] text-[#B91C1C]";
 };
 
 const getBadgeLabel = (level: RetentionMetricItem["level"]) => {
@@ -79,14 +79,14 @@ export function RetentionCard({ items }: Props) {
 			: "success";
 
 	return (
-		<Card className='rounded-2xl border border-neutral-800 bg-neutral-950/80 text-white'>
+		<Card className='rounded-2xl border border-border bg-white text-[#1E293B] shadow-sm'>
 			<CardHeader>
 				<div className='flex items-start justify-between gap-4'>
 					<div>
-						<CardTitle className='text-lg font-semibold text-white'>
+						<CardTitle className='text-lg font-semibold text-[#0F172A]'>
 							Retention & Churn
 						</CardTitle>
-						<CardDescription className='text-sm text-neutral-400'>
+						<CardDescription className='text-sm text-[#64748B]'>
 							Chỉ số giữ chân, churn và sức khỏe sử dụng.
 						</CardDescription>
 					</div>
@@ -102,7 +102,7 @@ export function RetentionCard({ items }: Props) {
 
 			<CardContent className='space-y-6'>
 				{items.length === 0 ? (
-					<div className='flex h-[180px] items-center justify-center rounded-xl border border-dashed border-neutral-800 text-sm text-neutral-500'>
+					<div className='flex h-[180px] items-center justify-center rounded-xl border border-dashed border-border text-sm text-[#64748B]'>
 						Chưa có dữ liệu retention
 					</div>
 				) : (
@@ -110,11 +110,11 @@ export function RetentionCard({ items }: Props) {
 						<div key={item.key} className='space-y-4'>
 							<div className='space-y-2'>
 								<div className='flex items-center justify-between'>
-									<span className='text-sm font-medium text-neutral-300'>
+									<span className='text-sm font-medium text-[#334155]'>
 										{getMetricLabel(item.label)}
 									</span>
 
-									<span className='text-xl font-semibold text-white'>
+									<span className='text-xl font-semibold text-[#0F172A]'>
 										{item.value.toFixed(1)}
 										{item.suffix}
 									</span>
@@ -122,13 +122,13 @@ export function RetentionCard({ items }: Props) {
 
 								<Progress value={item.value} />
 
-								<p className='text-sm text-neutral-500'>
+								<p className='text-sm text-[#64748B]'>
 									{getMetricDescription(item.description)}
 								</p>
 							</div>
 
 							{index < items.length - 1 && (
-								<Separator className='bg-neutral-800' />
+								<Separator className='bg-border' />
 							)}
 						</div>
 					))

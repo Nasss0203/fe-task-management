@@ -26,16 +26,29 @@ export function NavMain({
 			<SidebarGroupContent className='flex flex-col gap-2'>
 				<SidebarMenu>
 					{items.map((item) => {
-						const isActive = pathname === item.url || (item.url !== "/admin" && pathname?.startsWith(item.url));
+						const isActive =
+							pathname === item.url ||
+							(item.url !== "/admin" &&
+								pathname?.startsWith(item.url));
 						return (
 							<SidebarMenuItem key={item.title}>
-								<SidebarMenuButton 
-									asChild 
-									isActive={isActive} 
-									className={isActive ? "bg-accent text-accent-foreground font-medium" : "text-muted-foreground"}
+								<SidebarMenuButton
+									asChild
+									isActive={isActive}
+									className={
+										isActive
+											? "bg-[#EFF6FF] font-medium text-[#2563EB]"
+											: "text-[#475569] hover:bg-[#F1F5F9] hover:text-[#0F172A]"
+									}
 								>
 									<Link href={item.url}>
-										<item.icon className={isActive ? "text-primary" : ""} />
+										<item.icon
+											className={
+												isActive
+													? "text-[#2563EB]"
+													: "text-[#64748B]"
+											}
+										/>
 										<span>{item.title}</span>
 									</Link>
 								</SidebarMenuButton>

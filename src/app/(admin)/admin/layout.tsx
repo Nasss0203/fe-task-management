@@ -12,6 +12,7 @@ const layout = ({
 	return (
 		<AdminRouteGuard>
 			<SidebarProvider
+				className='admin-light-theme'
 				style={
 					{
 						"--sidebar-width": "calc(var(--spacing) * 72)",

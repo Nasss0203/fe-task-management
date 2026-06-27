@@ -21,27 +21,31 @@ export const getAdminUserOverviewApi = async (): Promise<
 export const findAllAdminUsersApi = async (
 	query?: AdminFindAllUserQuery,
 ): Promise<ApiResponse<AdminUserPaginationResponse>> => {
+	const { page, pageSize, ...serverQuery } = query ?? {};
 	const response = await instance.get<
 		ApiResponse<AdminUser[] | AdminUserPaginationResponse>
 	>(
 		"/admin/users",
 		{
-			params: query,
+			params: serverQuery,
 		},
 	);
 
 	if (Array.isArray(response.data.data)) {
 		const total = response.data.data.length;
-		const pageSize = query?.pageSize ?? total;
+		const normalizedPageSize = pageSize ?? total;
 
 		return {
 			...response.data,
 			data: {
 				data: response.data.data,
 				total,
-				page: query?.page ?? 1,
-				pageSize,
-				totalPages: pageSize > 0 ? Math.ceil(total / pageSize) : 0,
+				page: page ?? 1,
+				pageSize: normalizedPageSize,
+				totalPages:
+					normalizedPageSize > 0
+						? Math.ceil(total / normalizedPageSize)
+						: 0,
 			},
 		};
 	}

@@ -1,13 +1,13 @@
 export function getWorkspaceStatusClass(status: string) {
 	switch (status) {
 		case "ACTIVE":
-			return "border-emerald-500/20 bg-emerald-500/10 text-emerald-400";
+			return "border-[#BBF7D0] bg-[#F0FDF4] text-[#15803D]";
 		case "LOCKED":
-			return "border-rose-500/20 bg-rose-500/10 text-rose-400";
+			return "border-[#FECACA] bg-[#FEF2F2] text-[#B91C1C]";
 		case "DELETED":
-			return "border-amber-500/20 bg-amber-500/10 text-amber-400";
+			return "border-[#FDE68A] bg-[#FFFBEB] text-[#A16207]";
 		default:
-			return "border-white/10 bg-white/5 text-neutral-300";
+			return "border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]";
 	}
 }
 
@@ -27,13 +27,13 @@ export function getWorkspaceStatusLabel(status: string) {
 export function getWorkspacePlanClass(plan: string) {
 	switch (plan) {
 		case "FREE":
-			return "border-white/10 bg-white/5 text-neutral-300";
+			return "border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]";
 		case "PRO":
-			return "border-sky-500/20 bg-sky-500/10 text-sky-400";
+			return "border-[#DDD6FE] bg-[#F5F3FF] text-[#7C3AED]";
 		case "ENTERPRISE":
-			return "border-violet-500/20 bg-violet-500/10 text-violet-400";
+			return "border-[#DDD6FE] bg-[#F5F3FF] text-[#7C3AED]";
 		default:
-			return "border-white/10 bg-white/5 text-neutral-300";
+			return "border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]";
 	}
 }
 
@@ -53,11 +53,11 @@ export function getWorkspacePlanLabel(plan: string) {
 export function getWorkspaceMemberRoleClass(role: string) {
 	switch (role) {
 		case "OWNER":
-			return "border-amber-500/20 bg-amber-500/10 text-amber-400";
+			return "border-[#FDE68A] bg-[#FFFBEB] text-[#A16207]";
 		case "ADMIN":
-			return "border-sky-500/20 bg-sky-500/10 text-sky-400";
+			return "border-[#BFDBFE] bg-[#EFF6FF] text-[#1D4ED8]";
 		default:
-			return "border-white/10 bg-white/5 text-neutral-300";
+			return "border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]";
 	}
 }
 

@@ -17,14 +17,14 @@ type Props = {
 
 const getBadgeClassName = (level: SystemHealthItem["level"]) => {
 	if (level === "success") {
-		return "border-green-500/40 text-green-400";
+		return "border-[#BBF7D0] bg-[#F0FDF4] text-[#15803D]";
 	}
 
 	if (level === "warning") {
-		return "border-yellow-500/40 text-yellow-400";
+		return "border-[#FDE68A] bg-[#FFFBEB] text-[#A16207]";
 	}
 
-	return "border-red-500/40 text-red-400";
+	return "border-[#FECACA] bg-[#FEF2F2] text-[#B91C1C]";
 };
 
 const getBadgeLabel = (level: SystemHealthItem["level"]) => {
@@ -76,14 +76,14 @@ export function SystemHealth({ items }: Props) {
 			: "success";
 
 	return (
-		<Card className='rounded-2xl border border-neutral-800 bg-neutral-950/80 text-white'>
+		<Card className='rounded-2xl border border-border bg-white text-[#1E293B] shadow-sm'>
 			<CardHeader>
 				<div className='flex items-start justify-between gap-4'>
 					<div>
-						<CardTitle className='text-lg font-semibold text-white'>
+						<CardTitle className='text-lg font-semibold text-[#0F172A]'>
 							Sức khỏe hệ thống
 						</CardTitle>
-						<CardDescription className='text-sm text-neutral-400'>
+						<CardDescription className='text-sm text-[#64748B]'>
 							Chỉ báo nhanh cho các dịch vụ hệ thống.
 						</CardDescription>
 					</div>
@@ -99,18 +99,18 @@ export function SystemHealth({ items }: Props) {
 
 			<CardContent className='space-y-4'>
 				{items.length === 0 ? (
-					<div className='flex h-40 items-center justify-center rounded-xl border border-dashed border-neutral-800 text-sm text-neutral-500'>
+					<div className='flex h-40 items-center justify-center rounded-xl border border-dashed border-border text-sm text-[#64748B]'>
 						Chưa có dữ liệu sức khỏe hệ thống
 					</div>
 				) : (
 					items.map((item, index) => (
 						<div key={item.key} className='space-y-4'>
-							<div className='flex items-start justify-between gap-4 rounded-xl border border-neutral-800 bg-neutral-900/40 p-4'>
+							<div className='flex items-start justify-between gap-4 rounded-xl border border-border bg-[#F8FAFC] p-4'>
 								<div className='min-w-0'>
-									<p className='text-sm font-medium text-neutral-100'>
+									<p className='text-sm font-medium text-[#0F172A]'>
 										{getHealthLabel(item.label)}
 									</p>
-									<p className='mt-1 text-xs leading-5 text-neutral-500'>
+									<p className='mt-1 text-xs leading-5 text-[#64748B]'>
 										{getHealthDescription(
 											item.description,
 										)}
@@ -118,7 +118,7 @@ export function SystemHealth({ items }: Props) {
 								</div>
 
 								<div className='flex shrink-0 items-center gap-2'>
-									<span className='text-sm font-semibold text-white'>
+									<span className='text-sm font-semibold text-[#0F172A]'>
 										{getHealthValue(item.value)}
 									</span>
 
@@ -134,7 +134,7 @@ export function SystemHealth({ items }: Props) {
 							</div>
 
 							{index < items.length - 1 && (
-								<Separator className='hidden bg-neutral-800' />
+								<Separator className='hidden bg-border' />
 							)}
 						</div>
 					))

@@ -45,14 +45,14 @@ export function NavUser({
 					<DropdownMenuTrigger asChild>
 						<SidebarMenuButton
 							size='lg'
-							className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
+							className='rounded-2xl border border-border bg-[#F8FAFC] text-[#0F172A] data-[state=open]:bg-[#F1F5F9]'
 						>
-							<Avatar className='h-8 w-8 rounded-lg grayscale'>
+							<Avatar className='h-8 w-8 rounded-lg'>
 								<AvatarImage
 									src={user.avatar}
 									alt={user.name}
 								/>
-								<AvatarFallback className='rounded-lg'>
+								<AvatarFallback className='rounded-lg bg-[#EFF6FF] text-[#2563EB]'>
 									CN
 								</AvatarFallback>
 							</Avatar>

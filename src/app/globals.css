@@ -195,6 +195,147 @@
 	--sidebar-ring: oklch(0.6 0.18 260);
 }
 
+.admin-light-theme {
+	color-scheme: light;
+	--background: #f8fafc;
+	--foreground: #0f172a;
+	--card: #ffffff;
+	--card-foreground: #0f172a;
+	--popover: #ffffff;
+	--popover-foreground: #1e293b;
+	--primary: #2563eb;
+	--primary-foreground: #ffffff;
+	--secondary: #f8fafc;
+	--secondary-foreground: #334155;
+	--muted: #f1f5f9;
+	--muted-foreground: #64748b;
+	--accent: #f1f5f9;
+	--accent-foreground: #0f172a;
+	--destructive: #b91c1c;
+	--info: #1d4ed8;
+	--success: #15803d;
+	--warning: #a16207;
+	--danger: #b91c1c;
+	--border: #e2e8f0;
+	--input: #cbd5e1;
+	--ring: #3b82f6;
+	--surface: #ffffff;
+	--surface-foreground: #1e293b;
+	--chart-1: #2563eb;
+	--chart-2: #7c3aed;
+	--chart-3: #22c55e;
+	--chart-4: #eab308;
+	--chart-5: #ef4444;
+	--sidebar: #ffffff;
+	--sidebar-foreground: #475569;
+	--sidebar-primary: #2563eb;
+	--sidebar-primary-foreground: #ffffff;
+	--sidebar-accent: #f1f5f9;
+	--sidebar-accent-foreground: #0f172a;
+	--sidebar-border: #e2e8f0;
+	--sidebar-ring: #3b82f6;
+}
+
+.admin-light-theme ::selection {
+	background-color: #dbeafe;
+	color: #0f172a;
+}
+
+.admin-light-theme [class*="bg-[#0b0b0b]"],
+.admin-light-theme [class*="bg-[#0f0f0f]"],
+.admin-light-theme [class*="bg-[#101010]"],
+.admin-light-theme [class*="bg-[#111111]"],
+.admin-light-theme [class*="bg-[#171717]"],
+.admin-light-theme [class*="bg-neutral-950"],
+.admin-light-theme [class*="bg-neutral-900"],
+.admin-light-theme [class*="bg-neutral-800"] {
+	background-color: #ffffff !important;
+}
+
+.admin-light-theme [class*="border-white/"],
+.admin-light-theme [class*="border-neutral-800"] {
+	border-color: #e2e8f0 !important;
+}
+
+.admin-light-theme [class*="text-black"] {
+	color: #0f172a !important;
+}
+
+.admin-light-theme [class*="text-neutral-100"],
+.admin-light-theme [class*="text-neutral-200"],
+.admin-light-theme [class*="text-neutral-300"] {
+	color: #334155 !important;
+}
+
+.admin-light-theme [class*="text-neutral-400"],
+.admin-light-theme [class*="text-neutral-500"] {
+	color: #64748b !important;
+}
+
+.admin-light-theme [class*="bg-[#0b0b0b]"][class*="text-white"],
+.admin-light-theme [class*="bg-[#0f0f0f]"][class*="text-white"],
+.admin-light-theme [class*="bg-[#101010]"][class*="text-white"],
+.admin-light-theme [class*="bg-[#111111]"][class*="text-white"],
+.admin-light-theme [class*="bg-[#171717]"][class*="text-white"],
+.admin-light-theme [class*="bg-neutral-950"][class*="text-white"],
+.admin-light-theme [class*="bg-neutral-900"][class*="text-white"],
+.admin-light-theme [class*="bg-neutral-800"][class*="text-white"],
+.admin-light-theme [class*="bg-white/5"][class*="text-white"],
+.admin-light-theme [class*="bg-white/10"][class*="text-white"] {
+	color: #334155 !important;
+}
+
+.admin-light-theme [class*="bg-white/5"],
+.admin-light-theme [class*="bg-white/10"] {
+	background-color: #f8fafc !important;
+}
+
+.admin-light-theme h1[class*="text-white"],
+.admin-light-theme h2[class*="text-white"],
+.admin-light-theme h3[class*="text-white"] {
+	color: #0f172a !important;
+}
+
+[data-slot="drawer-content"][class*="max-w-130"] {
+	background-color: #ffffff !important;
+	color: #1e293b !important;
+	border-color: #e2e8f0 !important;
+}
+
+[data-slot="drawer-content"][class*="max-w-130"] [class*="bg-[#0b0b0b]"],
+[data-slot="drawer-content"][class*="max-w-130"] [class*="bg-[#111111]"],
+[data-slot="drawer-content"][class*="max-w-130"] [class*="bg-[#171717]"],
+[data-slot="drawer-content"][class*="max-w-130"] [class*="bg-white/5"] {
+	background-color: #f8fafc !important;
+}
+
+[data-slot="drawer-content"][class*="max-w-130"] [class*="border-white/"] {
+	border-color: #e2e8f0 !important;
+}
+
+[data-slot="drawer-content"][class*="max-w-130"] [class*="text-white"],
+[data-slot="drawer-content"][class*="max-w-130"] [class*="text-neutral-100"],
+[data-slot="drawer-content"][class*="max-w-130"] [class*="text-neutral-200"] {
+	color: #0f172a !important;
+}
+
+[data-slot="drawer-content"][class*="max-w-130"] [class*="text-neutral-300"],
+[data-slot="drawer-content"][class*="max-w-130"] [class*="text-neutral-400"] {
+	color: #334155 !important;
+}
+
+[data-slot="drawer-content"][class*="max-w-130"] [class*="text-neutral-500"] {
+	color: #64748b !important;
+}
+
+[data-slot="drawer-content"][class*="max-w-130"] input,
+[data-slot="drawer-content"][class*="max-w-130"] textarea,
+[data-slot="drawer-content"][class*="max-w-130"] button[role="combobox"] {
+	background-color: #ffffff !important;
+	border-color: #cbd5e1 !important;
+	color: #1e293b !important;
+}
+
 /* 
   Calendar
 */

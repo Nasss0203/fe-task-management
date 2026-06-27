@@ -1,21 +1,15 @@
 "use client";
 
 import {
-	IconActivity,
 	IconBuilding,
 	IconCreditCard,
 	IconDashboard,
-	IconFileText,
-	IconHelp,
 	IconInnerShadowTop,
-	IconSearch,
-	IconSettings,
 	IconUsers,
 } from "@tabler/icons-react";
 import * as React from "react";
 
 import { NavMain } from "@/components/nav/admin/nav-main-admin";
-import { NavSecondary } from "@/components/nav/admin/nav-secondary-admin";
 import { NavUser } from "@/components/nav/admin/nav-user-admin";
 import {
 	Sidebar,
@@ -54,44 +48,6 @@ const data = {
 			url: "/admin/plans-billing",
 			icon: IconCreditCard,
 		},
-		{
-			title: "Audit Logs",
-			url: "/admin/audit-logs",
-			icon: IconFileText,
-		},
-		{
-			title: "Support",
-			url: "/admin/support",
-			icon: IconHelp,
-		},
-		{
-			title: "Monitoring",
-			url: "/admin/monitoring",
-			icon: IconActivity,
-		},
-		{
-			title: "Settings",
-			url: "/admin/settings",
-			icon: IconSettings,
-		},
-	],
-
-	navSecondary: [
-		{
-			title: "Settings",
-			url: "#",
-			icon: IconSettings,
-		},
-		{
-			title: "Get Help",
-			url: "#",
-			icon: IconHelp,
-		},
-		{
-			title: "Search",
-			url: "#",
-			icon: IconSearch,
-		},
 	],
 };
 
@@ -100,12 +56,12 @@ export function AppSidebarAdmin({
 }: React.ComponentProps<typeof Sidebar>) {
 	return (
 		<Sidebar collapsible='offcanvas' {...props}>
-			<SidebarHeader>
+			<SidebarHeader className='border-b border-sidebar-border px-3 py-3'>
 				<SidebarMenu>
 					<SidebarMenuItem>
 						<SidebarMenuButton
 							asChild
-							className='data-[slot=sidebar-menu-button]:p-1.5!'
+							className='text-[#0F172A] hover:bg-[#F1F5F9] data-[slot=sidebar-menu-button]:p-1.5!'
 						>
 							<a href='#'>
 								<IconInnerShadowTop className='size-5!' />
@@ -117,11 +73,10 @@ export function AppSidebarAdmin({
 					</SidebarMenuItem>
 				</SidebarMenu>
 			</SidebarHeader>
-			<SidebarContent>
+			<SidebarContent className='px-1 py-3'>
 				<NavMain items={data.navMain} />
-				<NavSecondary items={data.navSecondary} className='mt-auto' />
 			</SidebarContent>
-			<SidebarFooter>
+			<SidebarFooter className='border-t border-sidebar-border px-3 py-3'>
 				<NavUser user={data.user} />
 			</SidebarFooter>
 		</Sidebar>

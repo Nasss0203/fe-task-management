@@ -19,7 +19,7 @@ export const recentWorkspacesColumns: ColumnDef<WorkspaceItem>[] = [
 		header: "Workspace",
 		cell: ({ row }) => (
 			<div>
-				<div className='font-medium text-white'>
+				<div className='font-medium text-[#0F172A]'>
 					{row.original.name}
 				</div>
 				<div className='mt-1 max-w-75 truncate text-xs text-muted-foreground'>
@@ -41,11 +41,11 @@ export const recentWorkspacesColumns: ColumnDef<WorkspaceItem>[] = [
 
 			return (
 				<div className='space-y-1'>
-					<p className='font-medium text-neutral-200'>
+					<p className='font-medium text-[#0F172A]'>
 						{ownerName ?? "Chưa có owner"}
 					</p>
 					{ownerEmail && (
-						<p className='text-xs text-neutral-500'>
+						<p className='text-xs text-[#64748B]'>
 							{ownerEmail}
 						</p>
 					)}

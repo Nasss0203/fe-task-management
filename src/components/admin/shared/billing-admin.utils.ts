@@ -57,13 +57,13 @@ export function getInitials(value: string) {
 export function getPlanStatusClass(status: PlanStatus) {
 	switch (status) {
 		case "ACTIVE":
-			return "border-emerald-500/20 bg-emerald-500/10 text-emerald-400";
+			return "border-[#BBF7D0] bg-[#F0FDF4] text-[#15803D]";
 		case "DISABLED":
-			return "border-rose-500/20 bg-rose-500/10 text-rose-400";
+			return "border-[#FECACA] bg-[#FEF2F2] text-[#B91C1C]";
 		case "DRAFT":
-			return "border-amber-500/20 bg-amber-500/10 text-amber-400";
+			return "border-[#FDE68A] bg-[#FFFBEB] text-[#A16207]";
 		default:
-			return "border-white/10 bg-white/5 text-neutral-300";
+			return "border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]";
 	}
 }
 
@@ -83,15 +83,15 @@ export function getPlanStatusLabel(status: PlanStatus) {
 export function getSubscriptionStatusClass(status: SubscriptionStatus) {
 	switch (status) {
 		case "ACTIVE":
-			return "border-emerald-500/20 bg-emerald-500/10 text-emerald-400";
+			return "border-[#BBF7D0] bg-[#F0FDF4] text-[#15803D]";
 		case "TRIAL":
-			return "border-sky-500/20 bg-sky-500/10 text-sky-400";
+			return "border-[#BFDBFE] bg-[#EFF6FF] text-[#1D4ED8]";
 		case "EXPIRED":
-			return "border-amber-500/20 bg-amber-500/10 text-amber-400";
+			return "border-[#FDE68A] bg-[#FFFBEB] text-[#A16207]";
 		case "CANCELED":
-			return "border-rose-500/20 bg-rose-500/10 text-rose-400";
+			return "border-[#FECACA] bg-[#FEF2F2] text-[#B91C1C]";
 		default:
-			return "border-white/10 bg-white/5 text-neutral-300";
+			return "border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]";
 	}
 }
 
@@ -113,13 +113,13 @@ export function getSubscriptionStatusLabel(status: SubscriptionStatus) {
 export function getCouponStatusClass(status: CouponStatus) {
 	switch (status) {
 		case "ACTIVE":
-			return "border-emerald-500/20 bg-emerald-500/10 text-emerald-400";
+			return "border-[#BBF7D0] bg-[#F0FDF4] text-[#15803D]";
 		case "INACTIVE":
-			return "border-neutral-500/20 bg-neutral-500/10 text-neutral-300";
+			return "border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]";
 		case "EXPIRED":
-			return "border-amber-500/20 bg-amber-500/10 text-amber-400";
+			return "border-[#FDE68A] bg-[#FFFBEB] text-[#A16207]";
 		default:
-			return "border-white/10 bg-white/5 text-neutral-300";
+			return "border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]";
 	}
 }
 
@@ -152,15 +152,15 @@ export function getCouponTypeLabel(type: CouponType) {
 export function getPaymentStatusClass(status: PaymentStatus) {
 	switch (status) {
 		case "PAID":
-			return "text-emerald-400";
+			return "text-[#15803D]";
 		case "FAILED":
-			return "text-rose-400";
+			return "text-[#B91C1C]";
 		case "REFUNDED":
-			return "text-amber-400";
+			return "text-[#A16207]";
 		case "PENDING":
-			return "text-sky-400";
+			return "text-[#1D4ED8]";
 		default:
-			return "text-neutral-300";
+			return "text-[#475569]";
 	}
 }
 

@@ -13,8 +13,8 @@ import {
 	ChartTooltipContent,
 	type ChartConfig,
 } from "@/components/ui/chart";
-import { Pie, PieChart } from "recharts";
 import type { WorkspacePlanItem } from "@/services/admin/dashboard/type";
+import { Pie, PieChart } from "recharts";
 
 type Props = {
 	data: WorkspacePlanItem[];
@@ -26,11 +26,11 @@ const chartConfig = {
 	},
 	free: {
 		label: "Free",
-		color: "#ffffff",
+		color: "#CBD5E1",
 	},
 	pro: {
 		label: "Pro",
-		color: "#a3a3a3",
+		color: "#7C3AED",
 	},
 } satisfies ChartConfig;
 
@@ -53,20 +53,26 @@ export function WorkspacePlanChart({ data }: Props) {
 		});
 
 	return (
-		<Card className='rounded-2xl border border-neutral-800 bg-neutral-950/80 p-0 text-white'>
-			<CardHeader className='pb-0'>
-				<CardTitle className='text-lg font-semibold text-white'>
+		<Card className='rounded-2xl border border-border bg-white p-0 text-[#1E293B] shadow-sm'>
+			<CardHeader
+				className='pt-6 pb-1'
+				style={{ paddingLeft: 28, paddingRight: 28 }}
+			>
+				<CardTitle className='text-lg font-semibold text-[#0F172A]'>
 					Workspace Free / Pro
 				</CardTitle>
-				<CardDescription className='text-sm text-neutral-400'>
+				<CardDescription className='text-sm text-[#64748B]'>
 					Phân bổ workspace theo gói dịch vụ.
 				</CardDescription>
 			</CardHeader>
 
-			<CardContent className='pb-5'>
+			<CardContent
+				className='pb-6'
+				style={{ paddingLeft: 28, paddingRight: 28 }}
+			>
 				<div className='h-[280px]'>
 					{chartData.length === 0 ? (
-						<div className='flex h-full items-center justify-center rounded-xl border border-dashed border-neutral-800 text-sm text-neutral-500'>
+						<div className='flex h-full items-center justify-center rounded-xl border border-dashed border-border text-sm text-[#64748B]'>
 							Chưa có dữ liệu gói workspace
 						</div>
 					) : (
@@ -98,13 +104,13 @@ export function WorkspacePlanChart({ data }: Props) {
 					)}
 				</div>
 
-				<div className='mt-3 space-y-2'>
+				<div className='mt-3 space-y-2 px-1'>
 					{chartData.map((item) => (
 						<div
 							key={item.plan}
 							className='flex items-center justify-between text-sm'
 						>
-							<div className='flex items-center gap-2 text-neutral-300'>
+							<div className='flex items-center gap-2 text-[#334155]'>
 								<span
 									className='h-2.5 w-2.5 rounded-full'
 									style={{
@@ -114,7 +120,7 @@ export function WorkspacePlanChart({ data }: Props) {
 								{item.name}
 							</div>
 
-							<span className='text-white'>{item.value}</span>
+							<span className='text-[#0F172A]'>{item.value}</span>
 						</div>
 					))}
 				</div>
