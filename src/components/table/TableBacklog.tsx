@@ -17,20 +17,6 @@ import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
-import {
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
 import { useTask, useTaskPriority, useTaskStatus } from "@/features/task/hooks/useTask";
@@ -46,8 +32,6 @@ import DropdownTaskPriority from "@/components/dropdown/DropdownTaskPriority";
 import { DrawerItemView } from "@/components/drawer/DrawerItemView";
 import DropdownTaskContextMenu from "@/components/dropdown/DropdownTaskContextMenu";
 import MoveToSprintDialog from "@/components/dialog/MoveToSprintDialog";
-import DialogAddTask from "@/components/dialog/DialogAddTask";
-import { useUser } from "@/features/auth/hooks/useUser";
 
 type TableBacklogProps = {
 	tasks: TaskItem[];
@@ -65,19 +49,65 @@ type getColumnsBacklogProps = {
 		id: string;
 		name: string;
 	}[];
-	onChangeStatus: (taskId: string, statusId: string) => void;
-	onChangePriority: (taskId: string, priorityId: string | null) => void;
 	onOpenDetail: (taskId: string) => void;
 	workspaceId: string;
 	projectId: string;
+};
+
+const BACKLOG_GRID_MIN_WIDTH = 824;
+const BACKLOG_WITH_SPRINT_GRID_MIN_WIDTH = 984;
+
+const getBacklogGridTemplateColumns = (showSprint: boolean) =>
+	[
+		"48px",
+		"minmax(280px, 2fr)",
+		showSprint ? "minmax(140px, 1fr)" : null,
+		"minmax(140px, 1fr)",
+		"minmax(140px, 1fr)",
+		"minmax(160px, 1fr)",
+		"56px",
+	]
+		.filter(Boolean)
+		.join(" ");
+
+type TaskItemWithInlineRelations = TaskItem & {
+	status?: { name?: string | null } | null;
+	priority?: { name?: string | null } | null;
+};
+
+const getTaskStatusName = (
+	task: TaskItem,
+	taskStatus: getColumnsBacklogProps["taskStatus"],
+) => {
+	const taskWithRelations = task as TaskItemWithInlineRelations;
+
+	return (
+		task.statusName ??
+		taskWithRelations.status?.name ??
+		taskStatus.find((status) => status.id === task.statusId)?.name ??
+		""
+	);
+};
+
+const getTaskPriorityName = (
+	task: TaskItem,
+	taskPriority: getColumnsBacklogProps["taskPriority"],
+) => {
+	const taskWithRelations = task as TaskItemWithInlineRelations;
+
+	return (
+		task.priorityName ??
+		taskWithRelations.priority?.name ??
+		taskPriority.find((priority) => priority.id === task.priorityId)
+			?.name ??
+		""
+	);
 };
 
 const getColumnsBacklog = ({
 	showSprint,
 	taskPriority,
 	taskStatus,
-	onChangePriority,
-	onChangeStatus,
 	onOpenDetail,
 	workspaceId,
 	projectId,
@@ -156,7 +186,7 @@ const getColumnsBacklog = ({
 						taskId={task.id}
 						projectId={projectId}
 						workspaceId={workspaceId}
-						statusName={task.statusName ?? (task as any).status?.name ?? taskStatus.find((s) => s.id === task.statusId)?.name ?? ""}
+						statusName={getTaskStatusName(task, taskStatus)}
 					/>
 				</div>
 			);
@@ -175,7 +205,7 @@ const getColumnsBacklog = ({
 						taskId={task.id}
 						projectId={projectId}
 						workspaceId={workspaceId}
-						priorityName={task.priorityName ?? (task as any).priority?.name ?? taskPriority.find((p) => p.id === task.priorityId)?.name ?? ""}
+						priorityName={getTaskPriorityName(task, taskPriority)}
 					/>
 				</div>
 			);
@@ -223,7 +253,6 @@ const TableBacklog = ({
 	const { currentProjectId, currentWorkspaceId } = useProjectSelectionStore();
 	const workspaceId = currentWorkspaceId as string;
 	const projectId = currentProjectId as string;
-	const { user } = useUser();
 
 	const [pagination, setPagination] = useState<PaginationState>({
 		pageIndex: 0,
@@ -239,7 +268,7 @@ const TableBacklog = ({
 	const [isCreating, setIsCreating] = useState(false);
 
 	const { items } = useTableDnd();
-	const { updateTask, bulkUpdateTasks, bulkMoveToSprint, createTask } = useTask(
+	const { bulkUpdateTasks, bulkMoveToSprint, createTask } = useTask(
 		workspaceId,
 		projectId,
 	);
@@ -265,34 +294,15 @@ const TableBacklog = ({
 				workspaceId,
 				projectId,
 				onOpenDetail: setActiveDrawerTaskId,
-				onChangeStatus: async (taskId, statusId) => {
-					await updateTask.mutateAsync({
-						id: taskId,
-						workspaceId,
-						projectId,
-						statusId,
-					});
-				},
-				onChangePriority: async (taskId, priorityId) => {
-					await updateTask.mutateAsync({
-						id: taskId,
-						workspaceId,
-						projectId,
-						priorityId,
-					});
-				},
 			}),
 		[
 			showSprint,
 			taskStatus,
 			taskPriority,
-			updateTask,
 			workspaceId,
 			projectId,
-			containerId,
 		],
 	);
-	// eslint-disable-next-line react-hooks/incompatible-library
 	const table = useReactTable({
 		data: tasks,
 		columns,
@@ -357,6 +367,22 @@ const TableBacklog = ({
 			containerId,
 		},
 	});
+	const gridTemplateColumns = getBacklogGridTemplateColumns(showSprint);
+	const minWidth = showSprint
+		? BACKLOG_WITH_SPRINT_GRID_MIN_WIDTH
+		: BACKLOG_GRID_MIN_WIDTH;
+	const tableRows = table.getRowModel().rows;
+	const taskOrder = new Map(taskIds.map((taskId, index) => [taskId, index]));
+	const orderedRows = taskIds.length
+		? [...tableRows].sort((a, b) => {
+				const aIndex =
+					taskOrder.get(a.original.id) ?? Number.MAX_SAFE_INTEGER;
+				const bIndex =
+					taskOrder.get(b.original.id) ?? Number.MAX_SAFE_INTEGER;
+
+				return aIndex - bIndex;
+			})
+		: tableRows;
 
 	return (
 		<>
@@ -367,21 +393,27 @@ const TableBacklog = ({
 				)}
 			>
 				<div className='relative max-h-[520px] overflow-auto'>
-					<table className='w-full caption-bottom text-sm'>
-						<TableHeader>
+					<div
+						role='table'
+						className='w-full text-sm'
+						style={{ minWidth }}
+					>
+						<div
+							role='rowgroup'
+							className='sticky top-0 z-20 bg-muted/30 backdrop-blur-md'
+						>
 							{table.getHeaderGroups().map((headerGroup) => (
-								<TableRow
+								<div
 									key={headerGroup.id}
-									className='h-12 hover:bg-transparent border-b border-border bg-muted/30'
+									role='row'
+									className='grid h-12 border-b border-border'
+									style={{ gridTemplateColumns }}
 								>
 									{headerGroup.headers.map((header) => (
-										<TableHead
+										<div
 											key={header.id}
-											className='sticky top-0 z-20 h-10 bg-muted/30 whitespace-nowrap px-3 text-xs font-semibold text-muted-foreground shadow-[inset_0_-1px_0_rgba(255,255,255,0.05)] backdrop-blur-md'
-											style={{
-												width: header.getSize(),
-												minWidth: header.getSize(),
-											}}
+											role='columnheader'
+											className='flex h-12 min-w-0 items-center whitespace-nowrap px-3 text-xs font-semibold text-muted-foreground shadow-[inset_0_-1px_0_rgba(255,255,255,0.05)]'
 										>
 											{header.isPlaceholder
 												? null
@@ -390,21 +422,22 @@ const TableBacklog = ({
 															.header,
 														header.getContext(),
 													)}
-										</TableHead>
+										</div>
 									))}
-								</TableRow>
+								</div>
 							))}
-						</TableHeader>
+						</div>
 
-						<TableBody
+						<div
 							ref={ref}
+							role='rowgroup'
 							className={cn(
 								"min-h-20",
 								isDropTarget && "bg-sky-500/5",
 							)}
 						>
-							{table.getRowModel().rows.length ? (
-								table.getRowModel().rows.map((row) => {
+							{orderedRows.length ? (
+								orderedRows.map((row, rowIndex) => {
 									const index = taskIds.indexOf(
 										row.original.id,
 									);
@@ -412,24 +445,44 @@ const TableBacklog = ({
 										<TableRowDnd
 											key={row.id}
 											row={row}
-											index={index >= 0 ? index : 0}
+											index={
+												index >= 0
+													? index
+													: rowIndex
+											}
 											containerId={containerId}
+											gridTemplateColumns={
+												gridTemplateColumns
+											}
 										/>
 									);
 								})
 							) : (
-								<TableRow>
-									<TableCell
-										colSpan={columns.length}
-										className='h-20 text-center text-sm text-muted-foreground'
+								<div
+									role='row'
+									className='grid border-b border-border/70'
+									style={{ gridTemplateColumns }}
+								>
+									<div
+										role='cell'
+										className='flex h-20 items-center justify-center text-sm text-muted-foreground'
+										style={{ gridColumn: "1 / -1" }}
 									>
 										Thả task vào đây
-									</TableCell>
-								</TableRow>
+									</div>
+								</div>
 							)}
 							{containerId === "backlog" && (
-								<TableRow className="border-b-0 hover:bg-transparent">
-									<TableCell colSpan={columns.length} className="p-0 border-0 border-b-0">
+								<div
+									role='row'
+									className='grid border-b-0'
+									style={{ gridTemplateColumns }}
+								>
+									<div
+										role='cell'
+										className='min-w-0'
+										style={{ gridColumn: "1 / -1" }}
+									>
 										{isQuickAdding ? (
 											<div className="flex w-full items-center gap-2 p-2 px-4">
 												<Plus className="size-4 text-muted-foreground" />
@@ -466,11 +519,11 @@ const TableBacklog = ({
 												nhiệm vụ mới
 											</button>
 										)}
-									</TableCell>
-								</TableRow>
+									</div>
+								</div>
 							)}
-						</TableBody>
-					</table>
+						</div>
+					</div>
 				</div>
 			</div>
 

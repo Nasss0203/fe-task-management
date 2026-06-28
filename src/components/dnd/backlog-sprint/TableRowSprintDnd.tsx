@@ -1,6 +1,5 @@
 "use client";
 
-import { TableCell, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { flexRender, type Row } from "@tanstack/react-table";
@@ -9,12 +8,14 @@ type TableRowDndProps<TData extends { id: string }> = {
 	row: Row<TData>;
 	index: number;
 	containerId: string;
+	gridTemplateColumns: string;
 };
 
 const TableRowDnd = <TData extends { id: string }>({
 	row,
 	index,
 	containerId,
+	gridTemplateColumns,
 }: TableRowDndProps<TData>) => {
 	const { ref, isDragging } = useSortable({
 		id: row.original.id,
@@ -29,21 +30,26 @@ const TableRowDnd = <TData extends { id: string }>({
 	});
 
 	return (
-		<TableRow
+		<div
 			ref={ref}
+			role='row'
 			className={cn(
-				"h-14 border-b border-border/70 transition-colors hover:bg-muted/35 data-[state=selected]:bg-muted",
+				"grid min-h-14 border-b border-border/70 transition-colors hover:bg-muted/35 data-[state=selected]:bg-muted",
 				isDragging && "opacity-40",
 			)}
 			data-state={row.getIsSelected() && "selected"}
-			style={{ touchAction: "none" }}
+			style={{ gridTemplateColumns, touchAction: "none" }}
 		>
 			{row.getVisibleCells().map((cell) => (
-				<TableCell key={cell.id} className="whitespace-nowrap px-3 py-2 text-sm text-foreground">
+				<div
+					key={cell.id}
+					role='cell'
+					className='flex min-w-0 items-center whitespace-nowrap px-3 py-2 text-sm text-foreground'
+				>
 					{flexRender(cell.column.columnDef.cell, cell.getContext())}
-				</TableCell>
+				</div>
 			))}
-		</TableRow>
+		</div>
 	);
 };
 
