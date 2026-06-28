@@ -353,8 +353,6 @@ export default function AdminDashboardPage() {
 		workspaces.isLoading ||
 		allWorkspaces.isLoading ||
 		userOverview.isLoading ||
-		userGrowth.isLoading ||
-		workspaceGrowth.isLoading ||
 		workspacePlan.isLoading ||
 		retentionMetrics.isLoading ||
 		systemHealth.isLoading ||
@@ -407,6 +405,7 @@ export default function AdminDashboardPage() {
 						data={userGrowth.isError ? [] : userGrowthItems}
 						period={userGrowthPeriod}
 						onPeriodChange={setUserGrowthPeriod}
+						isLoading={userGrowth.isFetching}
 					/>
 
 					<WorkspaceGrowthChart
@@ -415,6 +414,7 @@ export default function AdminDashboardPage() {
 						}
 						period={workspaceGrowthPeriod}
 						onPeriodChange={setWorkspaceGrowthPeriod}
+						isLoading={workspaceGrowth.isFetching}
 					/>
 				</div>
 

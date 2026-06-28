@@ -26,9 +26,10 @@ type Props = {
 	data: UserGrowthItem[];
 	period: UserGrowthPeriod;
 	onPeriodChange: (period: UserGrowthPeriod) => void;
+	isLoading?: boolean;
 };
 
-export function UserGrowthChart({ data, period, onPeriodChange }: Props) {
+export function UserGrowthChart({ data, period, onPeriodChange, isLoading }: Props) {
 	return (
 		<div className='rounded-2xl border border-border bg-white p-5 shadow-sm'>
 			<div className='mb-4 flex items-center justify-between gap-4'>
@@ -46,16 +47,26 @@ export function UserGrowthChart({ data, period, onPeriodChange }: Props) {
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>
-					<SelectItem value="7d">7 ngày</SelectItem>
-					<SelectItem value="30d">30 ngày</SelectItem>
-					<SelectItem value="60d">60 ngày</SelectItem>
-					<SelectItem value="1y">1 năm</SelectItem>
-				</SelectContent>
+						<SelectItem value="7d">7 ngày</SelectItem>
+						<SelectItem value="30d">30 ngày</SelectItem>
+						<SelectItem value="60d">60 ngày</SelectItem>
+						<SelectItem value="1y">1 năm</SelectItem>
+					</SelectContent>
 				</Select>
 			</div>
 
-			<div className='h-70'>
-				{data.length === 0 ? (
+			<div className='h-70 relative'>
+				{isLoading ? (
+					<div className='flex h-full items-center justify-center rounded-xl bg-muted/30 animate-pulse'>
+						<div className='flex flex-col items-center gap-2 text-sm text-[#64748B]'>
+							<svg className='animate-spin h-5 w-5 text-primary' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'>
+								<circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
+								<path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8v8z' />
+							</svg>
+							Đang tải dữ liệu...
+						</div>
+					</div>
+				) : data.length === 0 ? (
 					<div className='flex h-full items-center justify-center rounded-xl border border-dashed border-border text-sm text-[#64748B]'>
 						Chưa có dữ liệu tăng trưởng người dùng
 					</div>
