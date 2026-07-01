@@ -20,6 +20,9 @@ import {
 import type { PaginationState } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { useUser } from "@/features/auth/hooks/useUser";
+import { SystemRole } from "@/services/auth/type";
+import type { CreateSystemAdminDto } from "@/services/admin/user/type";
 
 const formatQueryDate = (date?: Date) => {
 	if (!date) return undefined;
@@ -32,6 +35,7 @@ const formatQueryDate = (date?: Date) => {
 };
 
 export default function AdminUsersPage() {
+	const { user } = useUser();
 	const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
 	
 	const [search, setSearch] = useState("");
@@ -59,10 +63,11 @@ export default function AdminUsersPage() {
 		billingPlans,
 		lockUser,
 		unlockUser,
-		updateSystemRole,
+		createSystemAdmin,
 		grantSubscription,
 		revokeSubscription,
 	} = useAdminUsers(userQuery);
+	const isSuperAdmin = user?.systemRole === SystemRole.SUPER_ADMIN;
 
 	const overview = userOverview.data?.data;
 	const userPage = users.data?.data;
@@ -123,31 +128,37 @@ export default function AdminUsersPage() {
 		setSelectedUser(user);
 	};
 
-	const handleToggleLock = (userId: string) => {
+	const handleToggleLock = async (userId: string) => {
 		const user = userItems.find((item) => item.id === userId);
 		if (!user) return;
 
-		if (user.status === "LOCKED") {
-			unlockUser.mutate(userId);
-			return;
+		const isSystemAdmin = user.systemRole === "SYSTEM_ADMIN";
+		const isLocked = user.status === "LOCKED";
+
+		try {
+			if (isLocked) {
+				await unlockUser.mutateAsync(userId);
+			} else {
+				await lockUser.mutateAsync(userId);
+			}
+
+			toast.success(
+				isSystemAdmin
+					? isLocked
+						? "Đã khôi phục tài khoản System Admin."
+						: "Đã thu hồi tài khoản System Admin và toàn bộ phiên đăng nhập."
+					: isLocked
+						? "Đã mở khóa tài khoản."
+						: "Đã khóa tài khoản.",
+			);
+		} catch (error) {
+			console.error("change user active status failed", error);
+			toast.error(
+				isSystemAdmin
+					? "Không thể cập nhật trạng thái System Admin."
+					: "Không thể cập nhật trạng thái tài khoản.",
+			);
 		}
-
-		lockUser.mutate(userId);
-	};
-
-	const handleToggleAdmin = (userId: string) => {
-		const user = userItems.find((item) => item.id === userId);
-		if (!user) return;
-
-		if (user.systemRole === "SUPER_ADMIN") return;
-
-		const nextRole: AdminSystemRole =
-			user.systemRole === "SYSTEM_ADMIN" ? "USER" : "SYSTEM_ADMIN";
-
-		updateSystemRole.mutate({
-			userId,
-			systemRole: nextRole,
-		});
 	};
 
 	const handleResetStatus = (userId: string) => {
@@ -205,9 +216,21 @@ export default function AdminUsersPage() {
 		resetToFirstPage();
 	};
 
+	const handleCreateSystemAdmin = async (data: CreateSystemAdminDto) => {
+		const response = await createSystemAdmin.mutateAsync(data);
+
+		toast.success("Đã tạo tài khoản System Admin", {
+			description: `Thông tin đăng nhập ${response.data.email} đã được gửi tới ${response.data.recipientEmail}.`,
+		});
+	};
+
 	return (
 		<div className='space-y-5 p-4 sm:p-6'>
-			<UserAdminHeader />
+			<UserAdminHeader
+				isSuperAdmin={isSuperAdmin}
+				isCreatingSystemAdmin={createSystemAdmin.isPending}
+				onCreateSystemAdmin={handleCreateSystemAdmin}
+			/>
 
 			<UsersOverview overview={overview} />
 
@@ -250,9 +273,11 @@ export default function AdminUsersPage() {
 							onPaginationChange={setPagination}
 							onView={handleViewUser}
 							onToggleLock={handleToggleLock}
-							onToggleAdmin={handleToggleAdmin}
 							onResetStatus={handleResetStatus}
 							onChangePlan={handleChangePlan}
+							isChangingStatus={
+								lockUser.isPending || unlockUser.isPending
+							}
 							isChangingPlan={
 								grantSubscription.isPending ||
 								revokeSubscription.isPending

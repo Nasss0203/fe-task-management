@@ -2,10 +2,10 @@
 
 import {
 	findAllAdminUsersApi,
+	createSystemAdminApi,
 	getAdminUserOverviewApi,
 	lockAdminUserApi,
 	unlockAdminUserApi,
-	updateAdminUserSystemRoleApi,
 } from "@/services/admin/user/user-admin.service";
 import {
 	getAdminBillingPlansApi,
@@ -75,13 +75,13 @@ export const useAdminUsers = (query?: AdminFindAllUserQuery) => {
 		onSuccess: invalidateUsers,
 	});
 
-	const unlockUser = useMutation({
-		mutationFn: unlockAdminUserApi,
+	const createSystemAdmin = useMutation({
+		mutationFn: createSystemAdminApi,
 		onSuccess: invalidateUsers,
 	});
 
-	const updateSystemRole = useMutation({
-		mutationFn: updateAdminUserSystemRoleApi,
+	const unlockUser = useMutation({
+		mutationFn: unlockAdminUserApi,
 		onSuccess: invalidateUsers,
 	});
 
@@ -100,8 +100,8 @@ export const useAdminUsers = (query?: AdminFindAllUserQuery) => {
 		users,
 		billingPlans,
 		lockUser,
+		createSystemAdmin,
 		unlockUser,
-		updateSystemRole,
 		grantSubscription,
 		revokeSubscription,
 	};

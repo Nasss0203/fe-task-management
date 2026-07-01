@@ -1,6 +1,24 @@
-import { ShieldCheck } from "lucide-react";
+"use client";
 
-export function UserAdminHeader() {
+import { CreateSystemAdminDialog } from "@/components/admin/dialog/create-system-admin-dialog";
+import { Button } from "@/components/ui/button";
+import type { CreateSystemAdminDto } from "@/services/admin/user/type";
+import { ShieldCheck, UserPlus } from "lucide-react";
+import { useState } from "react";
+
+type UserAdminHeaderProps = {
+	isSuperAdmin: boolean;
+	isCreatingSystemAdmin: boolean;
+	onCreateSystemAdmin: (data: CreateSystemAdminDto) => Promise<void>;
+};
+
+export function UserAdminHeader({
+	isSuperAdmin,
+	isCreatingSystemAdmin,
+	onCreateSystemAdmin,
+}: UserAdminHeaderProps) {
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
+
 	return (
 		<div className='flex flex-col gap-4 border-b border-border pb-5 md:flex-row md:items-start md:justify-between'>
 			<div className='space-y-2'>
@@ -12,14 +30,31 @@ export function UserAdminHeader() {
 					Quản lý người dùng
 				</h1>
 				<p className='max-w-3xl text-sm leading-6 text-[#64748B]'>
-					Quản lý trạng thái tài khoản, phân quyền system admin và theo dõi tăng trưởng, hoạt động của user trên toàn hệ thống.
+					Quản lý trạng thái tài khoản, phân quyền system admin và
+					theo dõi tăng trưởng, hoạt động của user trên toàn hệ thống.
 				</p>
 			</div>
 
-			<div className='inline-flex w-fit items-center gap-2 rounded-full border border-[#BFDBFE] bg-[#EFF6FF] px-3 py-1.5 text-xs font-medium text-[#1D4ED8]'>
-				<ShieldCheck className='h-4 w-4' />
-				Super Admin
+			<div className='flex w-fit items-center gap-2'>
+				{isSuperAdmin ? (
+					<Button onClick={() => setIsDialogOpen(true)}>
+						<UserPlus data-icon='inline-start' />
+						Tạo System Admin
+					</Button>
+				) : null}
+
+				<div className='inline-flex items-center gap-2 rounded-full border border-sky-500/20 bg-sky-500/10 px-3 py-1.5 text-xs font-medium text-sky-300'>
+					<ShieldCheck className='h-4 w-4' />
+					{isSuperAdmin ? "Super Admin" : "System Admin"}
+				</div>
 			</div>
+
+			<CreateSystemAdminDialog
+				open={isDialogOpen}
+				onOpenChange={setIsDialogOpen}
+				onSubmit={onCreateSystemAdmin}
+				isPending={isCreatingSystemAdmin}
+			/>
 		</div>
 	);
 }

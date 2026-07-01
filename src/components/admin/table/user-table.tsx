@@ -20,6 +20,7 @@ import {
 	Lock,
 	RotateCcw,
 	ShieldCheck,
+	ShieldOff,
 	Unlock,
 } from "lucide-react";
 import {
@@ -40,9 +41,9 @@ type Props = {
 	onPaginationChange: OnChangeFn<PaginationState>;
 	onView: (user: AdminUser) => void;
 	onToggleLock: (userId: string) => void;
-	onToggleAdmin: (userId: string) => void;
 	onResetStatus: (userId: string) => void;
 	onChangePlan: (user: AdminUser) => void;
+	isChangingStatus?: boolean;
 	isChangingPlan?: boolean;
 	canGrantPro?: boolean;
 };
@@ -55,9 +56,9 @@ export function UserTable({
 	onPaginationChange,
 	onView,
 	onToggleLock,
-	onToggleAdmin,
 	onResetStatus,
 	onChangePlan,
+	isChangingStatus = false,
 	isChangingPlan = false,
 	canGrantPro = true,
 }: Props) {
@@ -85,277 +86,287 @@ export function UserTable({
 
 	return (
 		<>
-		<div className='overflow-x-auto'>
-			<table className='w-full min-w-320 border-separate border-spacing-y-3'>
-				<thead>
-					<tr className='text-left text-sm text-[#475569]'>
-						<th className='px-4 py-2 font-medium'>User</th>
-						<th className='px-4 py-2 font-medium'>Email</th>
-						<th className='px-4 py-2 font-medium'>Trạng thái</th>
-						<th className='px-4 py-2 font-medium'>
-							Vai trò hệ thống
-						</th>
-						<th className='px-4 py-2 font-medium'>Gói</th>
-						<th className='px-4 py-2 font-medium'>
-							Không gian làm việc
-						</th>
-						<th className='px-4 py-2 font-medium'>Ngày tạo</th>
-						<th className='px-4 py-2 font-medium'>
-							Hoạt động gần nhất
-						</th>
-						<th className='px-4 py-2 font-medium text-right'>
-							Actions
-						</th>
-					</tr>
-				</thead>
+			<div className='overflow-x-auto'>
+				<table className='w-full min-w-320 border-separate border-spacing-y-3'>
+					<thead>
+						<tr className='text-left text-sm text-[#475569]'>
+							<th className='px-4 py-2 font-medium'>User</th>
+							<th className='px-4 py-2 font-medium'>Email</th>
+							<th className='px-4 py-2 font-medium'>
+								Trạng thái
+							</th>
+							<th className='px-4 py-2 font-medium'>
+								Vai trò hệ thống
+							</th>
+							<th className='px-4 py-2 font-medium'>Gói</th>
+							<th className='px-4 py-2 font-medium'>
+								Không gian làm việc
+							</th>
+							<th className='px-4 py-2 font-medium'>Ngày tạo</th>
+							<th className='px-4 py-2 font-medium'>
+								Hoạt động gần nhất
+							</th>
+							<th className='px-4 py-2 font-medium text-right'>
+								Actions
+							</th>
+						</tr>
+					</thead>
 
-				<tbody>
-					{table.getRowModel().rows.map((row) => {
-						const user = row.original;
-						const isSuperAdmin = user.systemRole === "SUPER_ADMIN";
-						const isSystemAdmin =
-							user.systemRole === "SYSTEM_ADMIN";
+					<tbody>
+						{table.getRowModel().rows.map((row) => {
+							const user = row.original;
+							const isSuperAdmin =
+								user.systemRole === "SUPER_ADMIN";
+							const isSystemAdmin =
+								user.systemRole === "SYSTEM_ADMIN";
 
-						return (
-							<tr
-								key={user.id}
-								className='text-sm text-[#1E293B]'
-							>
-								<td className='rounded-l-3xl border-y border-l border-[#EEF2F6] bg-white px-4 py-4'>
-									<div className='flex items-center gap-3'>
-										{user.avatarUrl ? (
-											<img
-												src={user.avatarUrl}
-												alt={user.fullName}
-												className='h-11 w-11 rounded-full border border-border object-cover'
-											/>
-										) : (
-											<div className='flex h-11 w-11 items-center justify-center rounded-full border border-[#BFDBFE] bg-[#EFF6FF] text-sm font-semibold text-[#2563EB]'>
-												{getInitials(user.fullName)}
+							return (
+								<tr
+									key={user.id}
+									className='text-sm text-[#1E293B]'
+								>
+									<td className='rounded-l-3xl border-y border-l border-[#EEF2F6] bg-white px-4 py-4'>
+										<div className='flex items-center gap-3'>
+											{user.avatarUrl ? (
+												<img
+													src={user.avatarUrl}
+													alt={user.fullName}
+													className='h-11 w-11 rounded-full border border-border object-cover'
+												/>
+											) : (
+												<div className='flex h-11 w-11 items-center justify-center rounded-full border border-[#BFDBFE] bg-[#EFF6FF] text-sm font-semibold text-[#2563EB]'>
+													{getInitials(user.fullName)}
+												</div>
+											)}
+
+											<div>
+												<p className='font-medium text-[#0F172A]'>
+													{user.fullName}
+												</p>
 											</div>
-										)}
+										</div>
+									</td>
 
-										<div>
+									<td className='border-y border-[#EEF2F6] bg-white px-4 py-4 text-[#334155]'>
+										{user.email}
+									</td>
+
+									<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
+										<span
+											className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${getStatusClass(
+												user.status,
+											)}`}
+										>
+											{getStatusLabel(user.status)}
+										</span>
+									</td>
+
+									<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
+										<span
+											className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${
+												user.plan === "pro"
+													? "border-[#DDD6FE] bg-[#F5F3FF] text-[#7C3AED]"
+													: "border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]"
+											}`}
+										>
+											{user.plan === "pro"
+												? "Pro"
+												: "Free"}
+										</span>
+									</td>
+
+									<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
+										<span
+											className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${getSystemRoleClass(
+												user.systemRole,
+											)}`}
+										>
+											{getSystemRoleLabel(
+												user.systemRole,
+											)}
+										</span>
+									</td>
+
+									<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
+										<div className='space-y-0.5'>
 											<p className='font-medium text-[#0F172A]'>
-												{user.fullName}
+												{user.workspaces.length}{" "}
+												workspace
+											</p>
+
+											<p className='text-xs text-[#64748B]'>
+												{user.workspaces.length === 0
+													? "Không có workspace"
+													: user.workspaces
+															.slice(0, 2)
+															.map(
+																(workspace) =>
+																	workspace.role,
+															)
+															.join(" • ")}
+
+												{user.workspaces.length > 2
+													? " • ..."
+													: ""}
 											</p>
 										</div>
-									</div>
-								</td>
+									</td>
 
-								<td className='border-y border-[#EEF2F6] bg-white px-4 py-4 text-[#334155]'>
-									{user.email}
-								</td>
+									<td className='border-y border-[#EEF2F6] bg-white px-4 py-4 text-[#334155]'>
+										{formatDate(user.createdAt)}
+									</td>
 
-								<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
-									<span
-										className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${getStatusClass(
-											user.status,
-										)}`}
-									>
-										{getStatusLabel(user.status)}
-									</span>
-								</td>
-
-								<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
-									<span
-										className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${
-											user.plan === "pro"
-												? "border-[#DDD6FE] bg-[#F5F3FF] text-[#7C3AED]"
-												: "border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]"
-										}`}
-									>
-										{user.plan === "pro" ? "Pro" : "Free"}
-									</span>
-								</td>
-
-								<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
-									<span
-										className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${getSystemRoleClass(
-											user.systemRole,
-										)}`}
-									>
-										{getSystemRoleLabel(user.systemRole)}
-									</span>
-								</td>
-
-								<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
-									<div className='space-y-0.5'>
-										<p className='font-medium text-[#0F172A]'>
-											{user.workspaces.length} workspace
-										</p>
-
-										<p className='text-xs text-[#64748B]'>
-											{user.workspaces.length === 0
-												? "Không có workspace"
-												: user.workspaces
-														.slice(0, 2)
-														.map(
-															(workspace) =>
-																workspace.role,
+									<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
+										<div className='inline-flex items-center gap-2 text-[#334155]'>
+											<Clock3 className='h-4 w-4 text-[#64748B]' />
+											<span>
+												{user.lastActive
+													? formatRelativeTime(
+															user.lastActive,
 														)
-														.join(" • ")}
+													: "Chưa có hoạt động"}
+											</span>
+										</div>
+									</td>
 
-											{user.workspaces.length > 2
-												? " • ..."
-												: ""}
-										</p>
-									</div>
-								</td>
+									<td className='rounded-r-3xl border-y border-r border-[#EEF2F6] bg-white px-4 py-4'>
+										<div className='flex justify-end'>
+											<DropdownMenu>
+												<DropdownMenuTrigger asChild>
+													<button className='inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#CBD5E1] bg-white text-[#475569] transition hover:bg-[#F8FAFC] hover:text-[#0F172A]'>
+														<Ellipsis className='h-4 w-4' />
+													</button>
+												</DropdownMenuTrigger>
 
-								<td className='border-y border-[#EEF2F6] bg-white px-4 py-4 text-[#334155]'>
-									{formatDate(user.createdAt)}
-								</td>
-
-								<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
-									<div className='inline-flex items-center gap-2 text-[#334155]'>
-										<Clock3 className='h-4 w-4 text-[#64748B]' />
-										<span>
-											{user.lastActive
-												? formatRelativeTime(
-														user.lastActive,
-													)
-												: "Chưa có hoạt động"}
-										</span>
-									</div>
-								</td>
-
-								<td className='rounded-r-3xl border-y border-r border-[#EEF2F6] bg-white px-4 py-4'>
-									<div className='flex justify-end'>
-										<DropdownMenu>
-											<DropdownMenuTrigger asChild>
-												<button className='inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#CBD5E1] bg-white text-[#475569] transition hover:bg-[#F8FAFC] hover:text-[#0F172A]'>
-													<Ellipsis className='h-4 w-4' />
-												</button>
-											</DropdownMenuTrigger>
-
-											<DropdownMenuContent
-												align='end'
-												className='w-60 rounded-2xl border border-border bg-white p-2 text-[#1E293B] shadow-xl'
-											>
-												<DropdownMenuItem
-													onSelect={(e) => {
-														e.preventDefault();
-														onView(user);
-													}}
-													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
+												<DropdownMenuContent
+													align='end'
+													className='w-60 rounded-2xl border border-border bg-white p-2 text-[#1E293B] shadow-xl'
 												>
-													<Eye className='mr-2 h-4 w-4' />
-													Xem chi tiết
-												</DropdownMenuItem>
+													<DropdownMenuItem
+														onSelect={(e) => {
+															e.preventDefault();
+															onView(user);
+														}}
+														className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
+													>
+														<Eye className='mr-2 h-4 w-4' />
+														Xem chi tiết
+													</DropdownMenuItem>
 
-												<DropdownMenuItem
-													onClick={() => onView(user)}
-													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
-												>
-													<History className='mr-2 h-4 w-4' />
-													Xem lịch sử hoạt động
-												</DropdownMenuItem>
+													<DropdownMenuItem
+														onClick={() =>
+															onView(user)
+														}
+														className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
+													>
+														<History className='mr-2 h-4 w-4' />
+														Xem lịch sử hoạt động
+													</DropdownMenuItem>
 
-												{!isSuperAdmin && (
-													<>
-														<DropdownMenuSeparator className='my-1 bg-border' />
+													{!isSuperAdmin && (
+														<>
+															<DropdownMenuSeparator className='my-1 bg-border' />
 
-														<DropdownMenuItem
-															disabled={
-																isChangingPlan ||
-																(user.plan !==
-																	"pro" &&
-																	!canGrantPro)
-															}
-															onClick={() =>
-																onChangePlan(
-																	user,
-																)
-															}
-															className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A] disabled:cursor-not-allowed disabled:opacity-50'
-														>
-															<Crown className='mr-2 h-4 w-4' />
-															{isChangingPlan
-																? "Đang cập nhật..."
-																: user.plan ===
-																	  "pro"
-																	? "Chuyển về Free"
-																	: "Cấp Pro"}
-														</DropdownMenuItem>
-
-														<DropdownMenuSeparator className='my-1 bg-border' />
-
-														<DropdownMenuItem
-															onClick={() =>
-																onToggleLock(
-																	user.id,
-																)
-															}
-															className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
-														>
-															{user.status ===
-															"LOCKED" ? (
-																<>
-																	<Unlock className='mr-2 h-4 w-4' />
-																	Mở khóa tài
-																	khoản
-																</>
-															) : (
-																<>
-																	<Lock className='mr-2 h-4 w-4' />
-																	Khóa tài
-																	khoản
-																</>
-															)}
-														</DropdownMenuItem>
-
-														{user.status ===
-															"LOCKED" && (
 															<DropdownMenuItem
+																disabled={
+																	isChangingPlan ||
+																	(user.plan !==
+																		"pro" &&
+																		!canGrantPro)
+																}
 																onClick={() =>
-																	onResetStatus(
+																	onChangePlan(
+																		user,
+																	)
+																}
+																className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A] disabled:cursor-not-allowed disabled:opacity-50'
+															>
+																<Crown className='mr-2 h-4 w-4' />
+																{isChangingPlan
+																	? "Đang cập nhật..."
+																	: user.plan ===
+																		  "pro"
+																		? "Chuyển về Free"
+																		: "Cấp Pro"}
+															</DropdownMenuItem>
+
+															<DropdownMenuSeparator className='my-1 bg-border' />
+
+															<DropdownMenuItem
+																disabled={
+																	isChangingStatus
+																}
+																onClick={() =>
+																	onToggleLock(
 																		user.id,
 																	)
 																}
 																className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
 															>
-																<RotateCcw className='mr-2 h-4 w-4' />
-																Reset trạng thái
+																{isSystemAdmin ? (
+																	user.status ===
+																	"LOCKED" ? (
+																		<ShieldCheck className='mr-2 h-4 w-4' />
+																	) : (
+																		<ShieldOff className='mr-2 h-4 w-4' />
+																	)
+																) : user.status ===
+																  "LOCKED" ? (
+																	<>
+																		<Unlock className='mr-2 h-4 w-4' />
+																	</>
+																) : (
+																	<>
+																		<Lock className='mr-2 h-4 w-4' />
+																	</>
+																)}
+																{isChangingStatus
+																	? "Đang cập nhật..."
+																	: isSystemAdmin
+																		? user.status ===
+																			"LOCKED"
+																			? "Khôi phục System Admin"
+																			: "Thu hồi System Admin"
+																		: user.status ===
+																			  "LOCKED"
+																			? "Mở khóa tài khoản"
+																			: "Khóa tài khoản"}
 															</DropdownMenuItem>
-														)}
-													</>
-												)}
 
-												{!isSuperAdmin && (
-													<>
-														<DropdownMenuSeparator className='my-1 bg-border' />
-
-														<DropdownMenuItem
-															onClick={() =>
-																onToggleAdmin(
-																	user.id,
-																)
-															}
-															className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
-														>
-															<ShieldCheck className='mr-2 h-4 w-4' />
-															{isSystemAdmin
-																? "Thu hồi System Admin"
-																: "Gán System Admin"}
-														</DropdownMenuItem>
-													</>
-												)}
-											</DropdownMenuContent>
-										</DropdownMenu>
-									</div>
-								</td>
-							</tr>
-						);
-					})}
-				</tbody>
-			</table>
-		</div>
-		<PanigationTable
-			table={table}
-			totalRows={totalRows}
-			itemLabel='người dùng'
-		/>
+															{user.status ===
+																"LOCKED" &&
+																!isSystemAdmin && (
+																	<DropdownMenuItem
+																		onClick={() =>
+																			onResetStatus(
+																				user.id,
+																			)
+																		}
+																		className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
+																	>
+																		<RotateCcw className='mr-2 h-4 w-4' />
+																		Reset
+																		trạng
+																		thái
+																	</DropdownMenuItem>
+																)}
+														</>
+													)}
+												</DropdownMenuContent>
+											</DropdownMenu>
+										</div>
+									</td>
+								</tr>
+							);
+						})}
+					</tbody>
+				</table>
+			</div>
+			<PanigationTable
+				table={table}
+				totalRows={totalRows}
+				itemLabel='người dùng'
+			/>
 		</>
 	);
 }
