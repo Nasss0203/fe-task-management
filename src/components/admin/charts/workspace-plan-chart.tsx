@@ -54,7 +54,7 @@ export function WorkspacePlanChart({ data }: Props) {
 
 	return (
 		<Card className='rounded-2xl border border-neutral-800 bg-neutral-950/80 p-0 text-white'>
-			<CardHeader className='pb-0'>
+			<CardHeader className='pt-4 pb-0'>
 				<CardTitle className='text-lg font-semibold text-white'>
 					Workspace Free / Pro
 				</CardTitle>

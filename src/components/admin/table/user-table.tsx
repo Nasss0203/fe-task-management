@@ -20,6 +20,7 @@ import {
 	Lock,
 	RotateCcw,
 	ShieldCheck,
+	ShieldOff,
 	Unlock,
 } from "lucide-react";
 import {
@@ -40,9 +41,9 @@ type Props = {
 	onPaginationChange: OnChangeFn<PaginationState>;
 	onView: (user: AdminUser) => void;
 	onToggleLock: (userId: string) => void;
-	onToggleAdmin: (userId: string) => void;
 	onResetStatus: (userId: string) => void;
 	onChangePlan: (user: AdminUser) => void;
+	isChangingStatus?: boolean;
 	isChangingPlan?: boolean;
 	canGrantPro?: boolean;
 };
@@ -55,9 +56,9 @@ export function UserTable({
 	onPaginationChange,
 	onView,
 	onToggleLock,
-	onToggleAdmin,
 	onResetStatus,
 	onChangePlan,
+	isChangingStatus = false,
 	isChangingPlan = false,
 	canGrantPro = true,
 }: Props) {
@@ -284,32 +285,43 @@ export function UserTable({
 
 														<DropdownMenuSeparator className='my-1 bg-white/10' />
 
-														<DropdownMenuItem
-															onClick={() =>
+												<DropdownMenuItem
+													disabled={isChangingStatus}
+													onClick={() =>
 																onToggleLock(
 																	user.id,
 																)
 															}
 															className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-white/5 focus:text-white'
 														>
-															{user.status ===
-															"LOCKED" ? (
-																<>
-																	<Unlock className='mr-2 h-4 w-4' />
-																	Mở khóa tài
-																	khoản
-																</>
-															) : (
-																<>
-																	<Lock className='mr-2 h-4 w-4' />
-																	Khóa tài
-																	khoản
-																</>
-															)}
-														</DropdownMenuItem>
+													{isSystemAdmin ? (
+														user.status === "LOCKED" ? (
+															<ShieldCheck className='mr-2 h-4 w-4' />
+														) : (
+															<ShieldOff className='mr-2 h-4 w-4' />
+														)
+													) : user.status === "LOCKED" ? (
+														<>
+															<Unlock className='mr-2 h-4 w-4' />
+														</>
+													) : (
+														<>
+															<Lock className='mr-2 h-4 w-4' />
+														</>
+													)}
+													{isChangingStatus
+														? "Đang cập nhật..."
+														: isSystemAdmin
+															? user.status === "LOCKED"
+																? "Khôi phục System Admin"
+																: "Thu hồi System Admin"
+															: user.status === "LOCKED"
+																? "Mở khóa tài khoản"
+																: "Khóa tài khoản"}
+												</DropdownMenuItem>
 
-														{user.status ===
-															"LOCKED" && (
+												{user.status === "LOCKED" &&
+													!isSystemAdmin && (
 															<DropdownMenuItem
 																onClick={() =>
 																	onResetStatus(
@@ -322,26 +334,6 @@ export function UserTable({
 																Reset trạng thái
 															</DropdownMenuItem>
 														)}
-													</>
-												)}
-
-												{!isSuperAdmin && (
-													<>
-														<DropdownMenuSeparator className='my-1 bg-white/10' />
-
-														<DropdownMenuItem
-															onClick={() =>
-																onToggleAdmin(
-																	user.id,
-																)
-															}
-															className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-white/5 focus:text-white'
-														>
-															<ShieldCheck className='mr-2 h-4 w-4' />
-															{isSystemAdmin
-																? "Thu hồi System Admin"
-																: "Gán System Admin"}
-														</DropdownMenuItem>
 													</>
 												)}
 											</DropdownMenuContent>

@@ -57,3 +57,15 @@ export type AdminUserOverviewResponseDto = {
 	newUsersLast7Days: number;
 	activeToday: number;
 };
+
+export type CreateSystemAdminDto = {
+	name: string;
+	recipientEmail: string;
+};
+
+export type CreateSystemAdminResponse = {
+	id: string;
+	email: string;
+	username: string;
+	recipientEmail: string;
+};

@@ -2,11 +2,23 @@ import instance from "@/services/axios";
 import type { ApiResponse } from "@/services/admin/dashboard/type";
 import type {
 	AdminFindAllUserQuery,
-	AdminSystemRole,
 	AdminUser,
 	AdminUserPaginationResponse,
 	AdminUserOverviewResponseDto,
+	CreateSystemAdminDto,
+	CreateSystemAdminResponse,
 } from "./type";
+
+export const createSystemAdminApi = async (
+	payload: CreateSystemAdminDto,
+): Promise<ApiResponse<CreateSystemAdminResponse>> => {
+	const response = await instance.post<ApiResponse<CreateSystemAdminResponse>>(
+		"/admin/system-admins",
+		payload,
+	);
+
+	return response.data;
+};
 
 export const getAdminUserOverviewApi = async (): Promise<
 	ApiResponse<AdminUserOverviewResponseDto>
@@ -64,23 +76,6 @@ export const unlockAdminUserApi = async (
 ): Promise<ApiResponse<null>> => {
 	const response = await instance.patch<ApiResponse<null>>(
 		`/admin/users/${userId}/unlock`,
-	);
-
-	return response.data;
-};
-
-export const updateAdminUserSystemRoleApi = async ({
-	userId,
-	systemRole,
-}: {
-	userId: string;
-	systemRole: AdminSystemRole;
-}): Promise<ApiResponse<null>> => {
-	const response = await instance.patch<ApiResponse<null>>(
-		`/admin/users/${userId}/system-role`,
-		{
-			systemRole,
-		},
 	);
 
 	return response.data;
