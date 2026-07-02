@@ -103,12 +103,31 @@ export const createPageBlockApi = async (
 export const updatePageBlockApi = async (
 	data: PageBlockItem,
 ): Promise<PageBlockItem> => {
-	const response = await instance.patch<PageBlockMutationResponse>(
-		`/pageBlock/${data.id}`,
-		data,
-	);
-
-	return unwrapPageBlock(response.data);
+	const payload = {
+		page_id: data.page_id,
+		type: data.type,
+		title: data.title,
+		position_x: data.position_x,
+		position_y: data.position_y,
+		width: data.width,
+		height: data.height,
+		order_index: data.order_index,
+		content: data.content,
+		style_config: data.style_config,
+		data_config: data.data_config,
+		created_by: data.created_by,
+		is_open: data.is_open,
+	};
+	try {
+		const response = await instance.patch<PageBlockMutationResponse>(
+			`/pageBlock/${data.id}`,
+			payload,
+		);
+		return unwrapPageBlock(response.data);
+	} catch (error: any) {
+		console.error("VALIDATION ERROR DETAILS: ", error.response?.data?.message || error.message);
+		throw error;
+	}
 };
 
 export const deletePageBlockApi = async ({
