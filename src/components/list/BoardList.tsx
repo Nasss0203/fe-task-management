@@ -12,15 +12,24 @@ import DropdownTaskPriority from "@/components/dropdown/DropdownTaskPriority";
 import { TaskNameCell, TaskAssigneeCell } from "@/components/table/columns/column-task";
 import DropdownTaskContextMenu from "@/components/dropdown/DropdownTaskContextMenu";
 import { DrawerItemView } from "@/components/drawer/DrawerItemView";
-import type { TaskItem } from "@/services/task/type";
+import type { TaskItem, TaskPositionContextInput } from "@/services/task/type";
 
 type BoardListProps = {
 	workspaceId: string;
 	projectId: string;
+	positionContext?: TaskPositionContextInput;
 };
 
-const BoardList = ({ workspaceId, projectId }: BoardListProps) => {
-	const { taskQuery, createTask } = useTask(workspaceId, projectId);
+const BoardList = ({
+	workspaceId,
+	projectId,
+	positionContext,
+}: BoardListProps) => {
+	const { taskQuery, createTask } = useTask(
+		workspaceId,
+		projectId,
+		positionContext,
+	);
 	const { data: taskStatusData } = useTaskStatus(workspaceId, projectId);
 	const taskStatus = React.useMemo(() => taskStatusData?.data ?? [], [taskStatusData?.data]);
 	const { user } = useUser();
@@ -43,6 +52,7 @@ const BoardList = ({ workspaceId, projectId }: BoardListProps) => {
 				statusId: taskStatus[0].id,
 				workspaceId,
 				projectId,
+				...(positionContext ? { positionContext } : {}),
 			});
 			setQuickAddTitle("");
 		} catch (error) {

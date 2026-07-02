@@ -6,13 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { useSprints } from "@/features/sprint/hooks/useSprint";
-import { useTask, useTaskMoveSprint } from "@/features/task/hooks/useTask";
-import { sprintReportService } from "@/services/sprint_report/sprint_report.service";
-import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
-import { useParams } from "next/navigation";
+import {
+	useReorderTaskPosition,
+	useTask,
+	useTaskMoveSprint,
+} from "@/features/task/hooks/useTask";
+import type { TaskPositionContextInput } from "@/services/task/type";
 import { useMemo } from "react";
-import { BarChart2 } from "lucide-react";
 import { ProviderSprintDnd } from "@/components/dnd/backlog-sprint/ProviderSprintDnd";
 import SprintProjectSection from "../spints/SprintProjectSection";
 import BacklogSection from "./BacklogSection";
@@ -29,40 +29,47 @@ const ProjectBacklogView = ({
 	const { sprintsQuery } = useSprints({ workspaceId, projectId });
 	const sprints = sprintsQuery.data?.data ?? [];
 
-	const { taskQuery } = useTask(workspaceId, projectId);
-	const allTasks = taskQuery.data?.data ?? [];
-	const { slug } = useParams();
-
-
+	const backlogPositionContext = useMemo<TaskPositionContextInput>(
+		() => ({
+			context: "backlog",
+			contextId: projectId,
+		}),
+		[projectId],
+	);
+	const { findTaskBacklog } = useTask(
+		workspaceId,
+		projectId,
+		backlogPositionContext,
+	);
+	const backlogTasks = findTaskBacklog.data?.data ?? [];
 
 	const initialItems = useMemo(() => {
 		const items: Record<string, string[]> = { backlog: [] };
 
 		// Khởi tạo từng sprint container
 		for (const sprint of sprints) {
-			items[`sprint:${sprint.id}`] = [];
+			items[`sprint:${sprint.id}`] = (sprint.tasks ?? []).map(
+				(task) => task.id,
+			);
 		}
 
 		// Phân loại task vào đúng container
-		for (const task of allTasks) {
-			if (task.sprintId) {
-				const key = `sprint:${task.sprintId}`;
-				if (items[key]) {
-					items[key].push(task.id);
-				}
-			} else {
-				items["backlog"].push(task.id);
-			}
+		for (const task of backlogTasks) {
+			items.backlog.push(task.id);
 		}
 
 		return items;
-	}, [allTasks, sprints]);
+	}, [backlogTasks, sprints]);
 
 	const { taskMoveSprint, removeTaskSprint, taskSprintToSprint } =
 		useTaskMoveSprint({
 			workspaceId,
 			projectId,
 		});
+	const reorderTaskPosition = useReorderTaskPosition({
+		workspaceId,
+		projectId,
+	});
 
 	const SPRINT_PREFIX = "sprint:";
 	const BACKLOG_ID = "backlog";
@@ -73,46 +80,74 @@ const ProjectBacklogView = ({
 		return containerId.replace(SPRINT_PREFIX, "");
 	};
 
-	const handleTaskMove = ({
+	const getPositionContext = (
+		containerId: string,
+	): TaskPositionContextInput | null => {
+		if (containerId === BACKLOG_ID) {
+			return {
+				context: "backlog",
+				contextId: projectId,
+			};
+		}
+
+		const sprintId = getSprintId(containerId);
+
+		return sprintId
+			? {
+					context: "sprint",
+					contextId: sprintId,
+				}
+			: null;
+	};
+
+	const handleTaskMove = async ({
 		taskId,
 		fromContainerId,
 		toContainerId,
+		previousTaskId,
+		nextTaskId,
 	}: {
 		taskId: string;
 		fromContainerId: string;
 		toContainerId: string;
+		previousTaskId: string | null;
+		nextTaskId: string | null;
 	}) => {
-		if (fromContainerId === toContainerId) return;
-
 		const sourceSprintId = getSprintId(fromContainerId);
 		const targetSprintId = getSprintId(toContainerId);
+		const targetContext = getPositionContext(toContainerId);
 
 		const isMoveToBacklog = toContainerId === BACKLOG_ID;
 		const isMoveFromBacklog = fromContainerId === BACKLOG_ID;
 
-		// sprint -> backlog
-		if (sourceSprintId && isMoveToBacklog) {
-			removeTaskSprint.mutate({ taskId });
-			return;
+		if (fromContainerId !== toContainerId) {
+			if (sourceSprintId && isMoveToBacklog) {
+				await removeTaskSprint.mutateAsync({ taskId });
+			}
+
+			if (isMoveFromBacklog && targetSprintId) {
+				await taskMoveSprint.mutateAsync({
+					taskId,
+					sprintId: targetSprintId,
+				});
+			}
+
+			if (sourceSprintId && targetSprintId) {
+				await taskSprintToSprint.mutateAsync({
+					taskId,
+					sourceSprintId,
+					targetSprintId,
+				});
+			}
 		}
 
-		// backlog -> sprint
-		if (isMoveFromBacklog && targetSprintId) {
-			taskMoveSprint.mutate({
+		if (targetContext) {
+			await reorderTaskPosition.mutateAsync({
 				taskId,
-				sprintId: targetSprintId,
+				...targetContext,
+				previousTaskId,
+				nextTaskId,
 			});
-			return;
-		}
-
-		// sprint -> sprint
-		if (sourceSprintId && targetSprintId) {
-			taskSprintToSprint.mutate({
-				taskId,
-				sourceSprintId,
-				targetSprintId,
-			});
-			return;
 		}
 	};
 	return (
@@ -136,6 +171,12 @@ const ProjectBacklogView = ({
 			<ProviderSprintDnd
 				onTaskMove={handleTaskMove}
 				initialItems={initialItems}
+				isMutating={
+					taskMoveSprint.isPending ||
+					removeTaskSprint.isPending ||
+					taskSprintToSprint.isPending ||
+					reorderTaskPosition.isPending
+				}
 			>
 				<div className='flex flex-col gap-5'>
 					{sprints.map((sprint) => (

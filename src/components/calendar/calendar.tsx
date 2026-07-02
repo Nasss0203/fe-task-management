@@ -59,7 +59,7 @@ function CalendarApp({ workspaceId, projectId }: CalendarAppProps) {
 			const startString = formatScheduleXDate(task.startAt) || formatScheduleXDate(task.dueAt) || formatScheduleXDate(task.createdAt) || formatScheduleXDate(new Date().toISOString());
 			const endString = formatScheduleXDate(task.dueAt) || startString;
 
-			let start = parseToTemporal(startString!);
+			const start = parseToTemporal(startString!);
 			let end = parseToTemporal(endString!);
 
 			// Ensure timed events have a duration (e.g., 1 hour) if start == end

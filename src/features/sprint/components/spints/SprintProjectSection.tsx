@@ -16,6 +16,7 @@ import { useState } from "react";
 import TableBacklog from "@/components/table/TableBacklog";
 import TaskAssignees from "@/features/task/components/task/TaskAssignees";
 import type { SprintItem } from "@/services/sprint/type";
+import type { TaskPositionContextInput } from "@/services/task/type";
 import { SprintSectionHeader } from "@/features/sprint/components/SprintSectionHeader";
 
 type SprintTaskItem = NonNullable<SprintItem["tasks"]>[number];
@@ -179,6 +180,10 @@ const SprintProjectSection = ({
 }: SprintProjectSectionProps) => {
 	const tasks = sprint.tasks ?? [];
 	const [open, setOpen] = useState<boolean>(true);
+	const sprintPositionContext: TaskPositionContextInput = {
+		context: "sprint",
+		contextId: sprint.id,
+	};
 
 	return (
 		<Card className='flex flex-col gap-0 overflow-hidden rounded-xl border border-border bg-card shadow-sm !py-0'>
@@ -193,7 +198,11 @@ const SprintProjectSection = ({
 
 			{open && (
 				<div className='relative overflow-auto border-t-0'>
-					<TableBacklog tasks={tasks} containerId={containerId} />
+					<TableBacklog
+						tasks={tasks}
+						containerId={containerId}
+						positionContext={sprintPositionContext}
+					/>
 				</div>
 			)}
 		</Card>

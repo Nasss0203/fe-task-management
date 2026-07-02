@@ -40,6 +40,10 @@ export const TaskNameCell = ({ taskId, workspaceId, projectId, initialTitle }: a
 	const [isEditing, setIsEditing] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
 
+	React.useEffect(() => {
+		setTitle(initialTitle);
+	}, [taskId, initialTitle]);
+
 	const handleSave = () => {
 		setIsEditing(false);
 		if (title.trim() && title !== initialTitle) {

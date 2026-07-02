@@ -13,7 +13,8 @@ import {
 
 import { useSprints } from "@/features/sprint/hooks/useSprint";
 import { useTask } from "@/features/task/hooks/useTask";
-import { useState } from "react";
+import type { TaskPositionContextInput } from "@/services/task/type";
+import { useMemo, useState } from "react";
 import TableBacklog from "@/components/table/TableBacklog";
 import type { BacklogRenderContext } from "./types";
 import { cn } from "@/lib/utils";
@@ -35,10 +36,17 @@ const BacklogSection = ({
 }: BacklogSectionProps) => {
 	const [open, setOpen] = useState<boolean>(true);
 	const isProjectContext = context === "project";
+	const backlogPositionContext = useMemo<TaskPositionContextInput>(
+		() => ({
+			context: "backlog",
+			contextId: projectId,
+		}),
+		[projectId],
+	);
 	const { findTaskBacklog } = useTask(
 		workspaceId,
 		projectId,
-		undefined,
+		backlogPositionContext,
 	);
 	const taskBacklog = findTaskBacklog.data?.data ?? [];
 
@@ -118,7 +126,11 @@ const BacklogSection = ({
 
 			{open && (
 				<div className='relative overflow-auto border-t-0'>
-					<TableBacklog tasks={taskBacklog} containerId={containerId} />
+					<TableBacklog
+						tasks={taskBacklog}
+						containerId={containerId}
+						positionContext={backlogPositionContext}
+					/>
 				</div>
 			)}
 		</Card>

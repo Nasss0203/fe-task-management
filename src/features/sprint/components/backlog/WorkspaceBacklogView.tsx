@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 import { useTask } from "@/features/task/hooks/useTask";
+import type { TaskPositionContextInput } from "@/services/task/type";
 import SprintFilter from "../spints/SprintFilter";
 import SprintWorkspaceSection from "../spints/SprintWorkspaceSection";
 import TableBacklog from "@/components/table/TableBacklog";
@@ -24,9 +25,16 @@ const WorkspaceBacklogView = ({
 }: WorkspaceBacklogViewProps) => {
 	const [selectedSprintId, setSelectedSprintId] = useState<string>("all");
 	const [isBacklogOpen, setIsBacklogOpen] = useState(true);
+	const backlogPositionContext: TaskPositionContextInput | undefined = projectId
+		? {
+				context: "backlog",
+				contextId: projectId,
+			}
+		: undefined;
 	const { findTaskBacklog } = useTask(
 		workspaceId as string,
 		projectId as string,
+		backlogPositionContext,
 	);
 	const taskBacklog = findTaskBacklog.data?.data ?? [];
 
@@ -87,7 +95,12 @@ const WorkspaceBacklogView = ({
 
 				{isBacklogOpen && (
 					<div className='relative overflow-auto border-t-0'>
-						<TableBacklog tasks={taskBacklog} containerId="backlog" showSprint={false} />
+						<TableBacklog
+							tasks={taskBacklog}
+							containerId="backlog"
+							showSprint={false}
+							positionContext={backlogPositionContext}
+						/>
 					</div>
 				)}
 			</Card>

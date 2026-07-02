@@ -105,7 +105,18 @@ const ProjectSidebarItem = ({
 							workspaceId={workspace.id}
 							code={PERMISSIONS.TASK_CREATE}
 						>
-							<DialogAddTask></DialogAddTask>
+							<DialogAddTask
+								workspaceId={workspace.id}
+								projectId={projectId}
+								positionContext={
+									projectId
+										? {
+												context: "backlog",
+												contextId: projectId,
+											}
+										: undefined
+								}
+							></DialogAddTask>
 						</RequirePermission>
 					</div>
 				</div>

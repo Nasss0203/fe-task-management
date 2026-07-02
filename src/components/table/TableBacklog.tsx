@@ -20,7 +20,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 
 import { useTask, useTaskPriority, useTaskStatus } from "@/features/task/hooks/useTask";
-import type { TaskItem } from "@/services/task/type";
+import type { TaskItem, TaskPositionContextInput } from "@/services/task/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useTableDnd } from "@/components/dnd/backlog-sprint/ProviderSprintDnd";
 import TableRowDnd from "@/components/dnd/backlog-sprint/TableRowSprintDnd";
@@ -37,6 +37,7 @@ type TableBacklogProps = {
 	tasks: TaskItem[];
 	containerId: string;
 	showSprint?: boolean;
+	positionContext?: TaskPositionContextInput;
 };
 
 type getColumnsBacklogProps = {
@@ -249,6 +250,7 @@ const TableBacklog = ({
 	tasks,
 	containerId,
 	showSprint = false,
+	positionContext,
 }: TableBacklogProps) => {
 	const { currentProjectId, currentWorkspaceId } = useProjectSelectionStore();
 	const workspaceId = currentWorkspaceId as string;
@@ -350,6 +352,7 @@ const TableBacklog = ({
 				statusId: taskStatus[0].id,
 				workspaceId,
 				projectId,
+				...(positionContext ? { positionContext } : {}),
 			});
 			setQuickAddTitle("");
 		} catch (error) {

@@ -11,6 +11,7 @@ import {
 	findAllTaskApi,
 	moveTaskSprintToSprintApi,
 	moveTaskToSprintApi,
+	reorderTaskPositionApi,
 	removeTaskFormSprintApi,
 	restoreTaskApi,
 	updateTaskApi,
@@ -20,6 +21,7 @@ import {
 	FindAllTaskBacklogResponse,
 	FindAllTaskResponse,
 	FindBacklogTasksFilters,
+	ReorderTaskPositionDto,
 	TASK_KEY,
 	UpdateTaskDto,
 } from "@/services/task/type";
@@ -28,6 +30,11 @@ import { useTaskFilterStore } from "@/stores/use-task-filter";
 
 type UpdateTaskInput = Omit<UpdateTaskDto, "id"> & {
 	id: string;
+	workspaceId?: string;
+	projectId?: string;
+};
+
+type ReorderTaskPositionInput = ReorderTaskPositionDto & {
 	workspaceId?: string;
 	projectId?: string;
 };
@@ -273,6 +280,45 @@ export const useTaskPriority = (workspaceId?: string, projectId?: string) => {
 		queryKey: ["task-priority", workspaceId, projectId],
 		queryFn: () => findAllTaskPriorityApi(workspaceId!, projectId!),
 		enabled: !!workspaceId && !!projectId,
+	});
+};
+
+export const useReorderTaskPosition = ({
+	workspaceId,
+	projectId,
+}: {
+	workspaceId: string;
+	projectId: string;
+}) => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({
+			workspaceId: _workspaceId,
+			projectId: _projectId,
+			...body
+		}: ReorderTaskPositionInput) => {
+			void _workspaceId;
+			void _projectId;
+
+			return reorderTaskPositionApi(body);
+		},
+		onSuccess: async () => {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [SPRINT_KEY.SPRINT, workspaceId, projectId],
+				}),
+			]);
+		},
 	});
 };
 

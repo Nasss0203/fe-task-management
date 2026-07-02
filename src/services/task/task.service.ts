@@ -8,6 +8,8 @@ import {
 	FindDeletedTaskResponse,
 	FindAllTaskResponse,
 	FindBacklogTasksFilters,
+	ReorderTaskPositionDto,
+	ReorderTaskPositionResponse,
 	UpdateTaskDto,
 	UpdateTaskResponse,
 } from "./type";
@@ -51,6 +53,14 @@ const serializeBacklogFilters = (filters?: FindBacklogTasksFilters) => {
 
 	if (filters.search?.trim()) {
 		params.search = filters.search.trim();
+	}
+
+	if (filters.context) {
+		params.context = filters.context;
+	}
+
+	if (filters.contextId) {
+		params.contextId = filters.contextId;
 	}
 
 	if (filters.page) {
@@ -203,6 +213,17 @@ export const restoreTaskApi = async ({
 		{
 			params: { workspaceId },
 		},
+	);
+
+	return response.data;
+};
+
+export const reorderTaskPositionApi = async (
+	data: ReorderTaskPositionDto,
+): Promise<ReorderTaskPositionResponse> => {
+	const response = await instance.patch<ReorderTaskPositionResponse>(
+		"/task-position/reorder",
+		data,
 	);
 
 	return response.data;

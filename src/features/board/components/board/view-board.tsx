@@ -29,6 +29,10 @@ const BoardView = ({ board }: BoardViewProps) => (
 	<ProviderDragDrop
 		workspaceId={board.workspaceId}
 		projectId={board.projectId}
+		positionContext={{
+			context: "kanban",
+			contextId: board.id,
+		}}
 	/>
 );
 
@@ -38,6 +42,10 @@ const TableView = ({ board }: BoardViewProps) => (
 	<BoardTable
 		projectId={board.projectId}
 		workspaceId={board.workspaceId}
+		positionContext={{
+			context: "list",
+			contextId: board.id,
+		}}
 	></BoardTable>
 );
 
@@ -47,6 +55,10 @@ const ListView = ({ board }: BoardViewProps) => (
 	<BoardList
 		projectId={board.projectId}
 		workspaceId={board.workspaceId}
+		positionContext={{
+			context: "list",
+			contextId: board.id,
+		}}
 	/>
 );
 

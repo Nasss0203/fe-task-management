@@ -1,7 +1,11 @@
 "use client";
 
 import { useSprints } from "@/features/sprint/hooks/useSprint";
-import { useTask, useTaskStatus } from "@/features/task/hooks/useTask";
+import {
+	useReorderTaskPosition,
+	useTask,
+	useTaskStatus,
+} from "@/features/task/hooks/useTask";
 import { useUser } from "@/features/auth/hooks/useUser";
 import { move } from "@dnd-kit/helpers";
 import { DragDropProvider } from "@dnd-kit/react";
@@ -9,6 +13,7 @@ import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { DrawerItemView } from "@/components/drawer/DrawerItemView";
 import ColumnDnd from "./column-dnd";
 import ItemsDnd from "./items-dnd";
+import type { TaskPositionContextInput } from "@/services/task/type";
 
 type DndColumns = Record<string, string[]>;
 
@@ -17,6 +22,7 @@ type ProviderDragDropProps = {
 	projectId: string;
 	className?: string;
 	sprintId?: string;
+	positionContext?: TaskPositionContextInput;
 };
 
 function cloneItems(items: DndColumns): DndColumns {
@@ -49,17 +55,44 @@ function findPositionInColumn(
 	return index + 1;
 }
 
+function findTaskNeighborsInColumn(
+	items: DndColumns,
+	statusId: string,
+	taskId: string,
+) {
+	const taskIds = items[statusId] ?? [];
+	const taskIndex = taskIds.indexOf(taskId);
+
+	if (taskIndex < 0) {
+		return null;
+	}
+
+	return {
+		previousTaskId: taskIndex > 0 ? taskIds[taskIndex - 1] : null,
+		nextTaskId:
+			taskIndex < taskIds.length - 1 ? taskIds[taskIndex + 1] : null,
+	};
+}
+
 const ProviderDragDrop = ({
 	workspaceId,
 	projectId,
 	sprintId,
 	className,
+	positionContext,
 }: ProviderDragDropProps) => {
 	const {
 		taskQuery,
 		createTask,
-		updateTask: { mutate: updateTaskMutate },
-	} = useTask(workspaceId, projectId);
+		updateTask: {
+			mutate: updateTaskMutate,
+			mutateAsync: updateTaskMutateAsync,
+		},
+	} = useTask(workspaceId, projectId, positionContext);
+	const reorderTaskPosition = useReorderTaskPosition({
+		workspaceId,
+		projectId,
+	});
 	const { user } = useUser();
 
 	useSprints({
@@ -143,6 +176,7 @@ const ProviderDragDrop = ({
 			projectId,
 			title: "Test update task hoàn tất",
 			statusId,
+			...(positionContext ? { positionContext } : {}),
 		});
 	};
 
@@ -197,18 +231,38 @@ const ProviderDragDrop = ({
 						return;
 					}
 
-					updateTaskMutate(
-						{
-							id: taskId,
-							statusId: nextStatusId,
-							position: nextPosition,
-						},
-						{
-							onError: () => {
-								syncItems(snapshotRef.current);
-							},
-						},
+					const neighbors = findTaskNeighborsInColumn(
+						nextItems,
+						nextStatusId,
+						taskId,
 					);
+
+					if (!neighbors) {
+						syncItems(snapshotRef.current);
+						return;
+					}
+
+					void (async () => {
+						try {
+							await updateTaskMutateAsync({
+								id: taskId,
+								statusId: nextStatusId,
+								position: nextPosition,
+							});
+
+							if (positionContext) {
+								await reorderTaskPosition.mutateAsync({
+									taskId,
+									...positionContext,
+									previousTaskId:
+										neighbors.previousTaskId,
+									nextTaskId: neighbors.nextTaskId,
+								});
+							}
+						} catch {
+							syncItems(snapshotRef.current);
+						}
+					})();
 				}}
 			>
 				<div className='inline-flex w-full flex-row gap-3'>
