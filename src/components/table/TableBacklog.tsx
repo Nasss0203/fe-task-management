@@ -375,17 +375,7 @@ const TableBacklog = ({
 		? BACKLOG_WITH_SPRINT_GRID_MIN_WIDTH
 		: BACKLOG_GRID_MIN_WIDTH;
 	const tableRows = table.getRowModel().rows;
-	const taskOrder = new Map(taskIds.map((taskId, index) => [taskId, index]));
-	const orderedRows = taskIds.length
-		? [...tableRows].sort((a, b) => {
-				const aIndex =
-					taskOrder.get(a.original.id) ?? Number.MAX_SAFE_INTEGER;
-				const bIndex =
-					taskOrder.get(b.original.id) ?? Number.MAX_SAFE_INTEGER;
-
-				return aIndex - bIndex;
-			})
-		: tableRows;
+	const displayIds = taskIds.length > 0 ? taskIds : tableRows.map((r) => r.original.id);
 
 	return (
 		<>
@@ -439,25 +429,34 @@ const TableBacklog = ({
 								isDropTarget && "bg-sky-500/5",
 							)}
 						>
-							{orderedRows.length ? (
-								orderedRows.map((row, rowIndex) => {
-									const index = taskIds.indexOf(
-										row.original.id,
+							{displayIds.length ? (
+								displayIds.map((taskId, index) => {
+									const row = tableRows.find(
+										(r) => r.original.id === taskId,
 									);
+									
+									if (row) {
+										return (
+											<TableRowDnd
+												key={row.id}
+												row={row}
+												index={index}
+												containerId={containerId}
+												gridTemplateColumns={
+													gridTemplateColumns
+												}
+											/>
+										);
+									}
+									
+									// Render a placeholder if the row data is not yet available (e.g. during drag across containers)
 									return (
-										<TableRowDnd
-											key={row.id}
-											row={row}
-											index={
-												index >= 0
-													? index
-													: rowIndex
-											}
-											containerId={containerId}
-											gridTemplateColumns={
-												gridTemplateColumns
-											}
-										/>
+										<div style={{ display: 'contents' }} key={`placeholder-${taskId}`}>
+											<div
+												className='grid min-h-14 border-b border-border/70 bg-muted/20 opacity-50'
+												style={{ gridTemplateColumns }}
+											/>
+										</div>
 									);
 								})
 							) : (

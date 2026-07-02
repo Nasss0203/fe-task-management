@@ -30,25 +30,27 @@ const TableRowDnd = <TData extends { id: string }>({
 	});
 
 	return (
-		<div
-			ref={ref}
-			role='row'
-			className={cn(
-				"grid min-h-14 border-b border-border/70 transition-colors hover:bg-muted/35 data-[state=selected]:bg-muted",
-				isDragging && "opacity-40",
-			)}
-			data-state={row.getIsSelected() && "selected"}
-			style={{ gridTemplateColumns, touchAction: "none" }}
-		>
-			{row.getVisibleCells().map((cell) => (
-				<div
-					key={cell.id}
-					role='cell'
-					className='flex min-w-0 items-center whitespace-nowrap px-3 py-2 text-sm text-foreground'
-				>
-					{flexRender(cell.column.columnDef.cell, cell.getContext())}
-				</div>
-			))}
+		<div style={{ display: 'contents' }}>
+			<div
+				ref={ref}
+				role='row'
+				className={cn(
+					"grid min-h-14 border-b border-border/70 bg-background hover:bg-muted/35 data-[state=selected]:bg-muted",
+					isDragging ? "opacity-40 shadow-md" : "transition-transform transition-colors duration-200",
+				)}
+				data-state={row.getIsSelected() && "selected"}
+				style={{ gridTemplateColumns, touchAction: "none" }}
+			>
+				{row.getVisibleCells().map((cell) => (
+					<div
+						key={cell.id}
+						role='cell'
+						className='flex min-w-0 items-center whitespace-nowrap px-3 py-2 text-sm text-foreground'
+					>
+						{flexRender(cell.column.columnDef.cell, cell.getContext())}
+					</div>
+				))}
+			</div>
 		</div>
 	);
 };
