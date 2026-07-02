@@ -39,7 +39,7 @@ export function MyTasks({ workspaceSlug, tasks }: MyTasksProps) {
 				{tasks?.map((task) => (
 					<Link
 						key={task.id}
-						href={`/dashboard/${workspaceSlug}/tasks/${task.id}`}
+						href={`/dashboard/${workspaceSlug}/projects/${task.project.id}`}
 						className='group flex flex-col gap-3 rounded-xl border border-border/50 bg-background/80 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md'
 					>
 						<div className='flex items-start justify-between'>

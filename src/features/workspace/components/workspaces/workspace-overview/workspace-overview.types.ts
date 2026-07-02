@@ -122,4 +122,5 @@ export type WorkspaceOverviewDeadline = {
   deadline: string;
   daysRemaining: number;
   isUrgent: boolean;
+  projectId: string;
 };

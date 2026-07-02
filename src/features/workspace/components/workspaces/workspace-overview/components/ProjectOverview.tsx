@@ -28,12 +28,7 @@ export function ProjectOverview({
 				<h3 className='text-lg font-semibold text-foreground'>
 					Dự án hoạt động
 				</h3>
-				<Link
-					href={`/dashboard/${workspaceSlug}/projects`}
-					className='text-xs font-medium text-muted-foreground hover:text-foreground transition-colors'
-				>
-					Xem tất cả
-				</Link>
+
 			</div>
 
 			<div className='space-y-4'>
