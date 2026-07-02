@@ -15,7 +15,7 @@ import { useAssign } from "@/features/assign/hooks/useAssign";
 
 type TaskItem = {
 	id: string;
-	title: string;
+	title: string | null;
 	assigneeName: string | null;
 	assignees?: {
 		userId: string;
@@ -46,8 +46,8 @@ export const TaskNameCell = ({ taskId, workspaceId, projectId, initialTitle }: a
 
 	const handleSave = () => {
 		setIsEditing(false);
-		if (title.trim() && title !== initialTitle) {
-			updateTask.mutate({ id: taskId, title });
+		if (title !== initialTitle) {
+			updateTask.mutate({ id: taskId, title: title || null });
 		} else {
 			setTitle(initialTitle);
 		}
@@ -78,7 +78,7 @@ export const TaskNameCell = ({ taskId, workspaceId, projectId, initialTitle }: a
 			className="text-[13px] font-medium text-foreground truncate cursor-text w-full hover:bg-accent/50 rounded transition-colors h-7 flex items-center px-1 -ml-1"
 			onClick={() => setIsEditing(true)}
 		>
-			{title}
+			{title || <span className="text-muted-foreground italic">Untitled</span>}
 		</div>
 	);
 };

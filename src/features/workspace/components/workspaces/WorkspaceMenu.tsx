@@ -1,8 +1,9 @@
 "use client";
 
-import { Archive, Cog, Pencil, Star, Trash2, UserPlus, LayoutTemplate } from "lucide-react";
+import { Cog, LayoutTemplate, Pencil, Trash2, UserPlus } from "lucide-react";
 import { useState } from "react";
 
+import { AddPeopleDialog } from "@/components/dialog/AddPeopleDialog";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -14,20 +15,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { PERMISSIONS } from "@/constants/permissions";
 import { RequirePermission } from "@/features/permission/components/RequirePermission";
-import { AddPeopleDialog } from "@/components/dialog/AddPeopleDialog";
 import { SaveTemplateDialog } from "@/features/workspace-template/components/SaveTemplateDialog";
 
 type WorkspaceMenuProps = {
 	workspaceId: string;
 	workspaceName?: string;
 	inviteLink?: string;
-
 	onAddPeople?: () => void;
 	onStartRename?: () => void;
 	onOpenSettings?: () => void;
-	onArchive?: () => void;
 	onDelete?: () => void;
-	onStar?: () => void;
 };
 
 export function WorkspaceMenu({
@@ -37,9 +34,7 @@ export function WorkspaceMenu({
 	onAddPeople,
 	onStartRename,
 	onOpenSettings,
-	onArchive,
 	onDelete,
-	onStar,
 }: WorkspaceMenuProps) {
 	const [openAddPeople, setOpenAddPeople] = useState(false);
 	const [openSaveTemplate, setOpenSaveTemplate] = useState(false);
@@ -80,11 +75,6 @@ export function WorkspaceMenu({
 							</DropdownMenuItem>
 						</RequirePermission>
 
-						<DropdownMenuItem onClick={onStar} className='gap-3'>
-							<Star className='h-4 w-4' />
-							<span>Thêm vào danh sách đánh dấu</span>
-						</DropdownMenuItem>
-
 						<RequirePermission
 							workspaceId={workspaceId}
 							code={PERMISSIONS.WORKSPACE_MEMBER_ADD}
@@ -97,7 +87,7 @@ export function WorkspaceMenu({
 								}}
 							>
 								<UserPlus className='h-4 w-4' />
-								<span>Thêm người</span>
+								<span>Mời thêm thành viên</span>
 							</DropdownMenuItem>
 						</RequirePermission>
 
@@ -129,11 +119,6 @@ export function WorkspaceMenu({
 						workspaceId={workspaceId}
 						code={PERMISSIONS.WORKSPACE_DELETE}
 					>
-						<DropdownMenuItem onClick={onArchive} className='gap-3'>
-							<Archive className='h-4 w-4' />
-							<span>Lưu trữ không gian</span>
-						</DropdownMenuItem>
-
 						<DropdownMenuItem
 							onClick={onDelete}
 							className='gap-3 text-red-500 focus:text-red-500'

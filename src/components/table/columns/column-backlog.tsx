@@ -106,8 +106,8 @@ export const getColumnsBacklog = ({
 		header: "Task",
 		cell: ({ row }) => (
 			<div className='flex min-w-0 flex-col py-1'>
-				<span className='truncate text-[14px] font-medium text-foreground cursor-pointer hover:underline' title={row.original.title} onClick={() => onOpenDetail?.(row.original.id)}>
-					{row.original.title}
+				<span className='truncate text-[14px] font-medium text-foreground cursor-pointer hover:underline' title={row.original.title ?? 'Untitled'} onClick={() => onOpenDetail?.(row.original.id)}>
+					{row.original.title || <span className="text-muted-foreground italic">Untitled</span>}
 				</span>
 				{row.original.description ? (
 					<span className='truncate text-[12px] text-muted-foreground' title={row.original.description}>

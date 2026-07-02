@@ -46,6 +46,7 @@ export function NavMain() {
 	);
 	const renameInputRef = useRef<HTMLInputElement>(null);
 	const skipRenameBlurRef = useRef(false);
+	const isRenameComposingRef = useRef(false);
 	const workspaceNameDrafts = useWorkspaceNameDraftStore(
 		(state) => state.drafts,
 	);
@@ -198,6 +199,10 @@ export function NavMain() {
 											className='min-w-0 flex-1'
 											onSubmit={(event) => {
 												event.preventDefault();
+												if (isRenameComposingRef.current) {
+													return;
+												}
+
 												void commitRenameWorkspace(
 													workspace,
 												);
@@ -215,6 +220,16 @@ export function NavMain() {
 														event.target.value,
 													)
 												}
+												onCompositionStart={() => {
+													isRenameComposingRef.current = true;
+												}}
+												onCompositionEnd={(event) => {
+													isRenameComposingRef.current = false;
+													setWorkspaceNameDraft(
+														workspace.id,
+														event.currentTarget.value,
+													);
+												}}
 												onClick={(event) =>
 													event.stopPropagation()
 												}
@@ -222,6 +237,10 @@ export function NavMain() {
 													event.stopPropagation()
 												}
 												onBlur={() => {
+													if (isRenameComposingRef.current) {
+														return;
+													}
+
 													if (
 														skipRenameBlurRef.current
 													) {
@@ -235,6 +254,13 @@ export function NavMain() {
 													);
 												}}
 												onKeyDown={(event) => {
+													if (
+														event.nativeEvent.isComposing ||
+														isRenameComposingRef.current
+													) {
+														return;
+													}
+
 													if (
 														event.key === "Escape"
 													) {

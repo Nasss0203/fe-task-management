@@ -136,7 +136,9 @@ const ProjectDropdown = ({ project, workspace, onRenameProject }: ProjectDropdow
 							<DropdownMenuItem
 								onSelect={() => {
 									if (onRenameProject) {
-										onRenameProject();
+										window.setTimeout(() => {
+											onRenameProject();
+										}, 150);
 									} else {
 										toast.info(
 											"Đổi tên dự án sẽ được hỗ trợ khi backend cập nhật.",

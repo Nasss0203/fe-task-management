@@ -45,7 +45,7 @@ import type { TaskPositionContextInput } from "@/services/task/type";
 
 type TaskItem = {
 	id: string;
-	title: string;
+	title: string | null;
 	assigneeName: string | null;
 	priorityName: string | null;
 	statusName: string;

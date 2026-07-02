@@ -21,6 +21,7 @@ export const WorkspaceTopHeader = ({
 	const inputRef = useRef<HTMLInputElement>(null);
 	const skipBlurRef = useRef(false);
 	const ignoreBlurUntilRef = useRef(0);
+	const isNameComposingRef = useRef(false);
 	const draftName = useWorkspaceNameDraftStore(
 		(state) => state.drafts[workspaceId],
 	);
@@ -106,7 +107,18 @@ export const WorkspaceTopHeader = ({
 								onChange={(event) =>
 									setDraft(workspaceId, event.target.value)
 								}
+								onCompositionStart={() => {
+									isNameComposingRef.current = true;
+								}}
+								onCompositionEnd={(event) => {
+									isNameComposingRef.current = false;
+									setDraft(workspaceId, event.currentTarget.value);
+								}}
 								onBlur={() => {
+									if (isNameComposingRef.current) {
+										return;
+									}
+
 									if (Date.now() < ignoreBlurUntilRef.current) {
 										window.requestAnimationFrame(() => {
 											inputRef.current?.focus();
@@ -122,6 +134,13 @@ export const WorkspaceTopHeader = ({
 									void commitName();
 								}}
 								onKeyDown={(event) => {
+									if (
+										event.nativeEvent.isComposing ||
+										isNameComposingRef.current
+									) {
+										return;
+									}
+
 									if (event.key === "Enter") {
 										event.preventDefault();
 										event.currentTarget.blur();

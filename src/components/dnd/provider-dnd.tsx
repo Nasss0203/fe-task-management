@@ -1,19 +1,19 @@
 "use client";
 
+import { DrawerItemView } from "@/components/drawer/DrawerItemView";
+import { useUser } from "@/features/auth/hooks/useUser";
 import { useSprints } from "@/features/sprint/hooks/useSprint";
 import {
 	useReorderTaskPosition,
 	useTask,
 	useTaskStatus,
 } from "@/features/task/hooks/useTask";
-import { useUser } from "@/features/auth/hooks/useUser";
+import type { TaskPositionContextInput } from "@/services/task/type";
 import { move } from "@dnd-kit/helpers";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
-import { DrawerItemView } from "@/components/drawer/DrawerItemView";
 import ColumnDnd from "./column-dnd";
 import ItemsDnd from "./items-dnd";
-import type { TaskPositionContextInput } from "@/services/task/type";
 
 type DndColumns = Record<string, string[]>;
 
@@ -174,7 +174,7 @@ const ProviderDragDrop = ({
 		createTask({
 			workspaceId,
 			projectId,
-			title: "Test update task hoàn tất",
+			title: "",
 			statusId,
 			...(positionContext ? { positionContext } : {}),
 		});
@@ -254,8 +254,7 @@ const ProviderDragDrop = ({
 								await reorderTaskPosition.mutateAsync({
 									taskId,
 									...positionContext,
-									previousTaskId:
-										neighbors.previousTaskId,
+									previousTaskId: neighbors.previousTaskId,
 									nextTaskId: neighbors.nextTaskId,
 								});
 							}

@@ -71,7 +71,7 @@ const getSprintTaskColumns = (): ColumnDef<SprintTaskItem>[] => [
 			return (
 				<div className='flex min-w-0 flex-col'>
 					<span className='truncate font-medium text-foreground'>
-						{task.title}
+						{task.title || <span className="text-muted-foreground italic">Untitled</span>}
 					</span>
 
 					<span className='text-xs text-muted-foreground'>

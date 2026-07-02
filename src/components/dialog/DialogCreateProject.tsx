@@ -3,7 +3,7 @@
 import { useProject } from "@/features/project/hooks/useProject";
 import { ProjectDto } from "@/services/project/type";
 import axios from "axios";
-import { Ellipsis, Plus, LayoutGrid, ListTodo, Calendar, Table2, Image as ImageIcon, Presentation, FileUp, Files, Kanban } from "lucide-react";
+import { Ellipsis, Plus, LayoutGrid, ListTodo, Calendar, Table2, Image as ImageIcon, Presentation, FileUp, Files, Kanban, X } from "lucide-react";
 import { useRef, useState, KeyboardEvent } from "react";
 import { FaRegStar, FaStar } from "react-icons/fa";
 import { toast } from "sonner";
@@ -15,6 +15,7 @@ import {
 	DialogTitleV2,
 	DialogTriggerV2,
 	DialogV2,
+	DialogCloseV2,
 } from "./dialog-custom";
 
 type Props = {
@@ -172,6 +173,9 @@ const DialogCreateProject = ({ workspaceId, workspaceName }: Props) => {
 							<div className='flex items-center gap-3 text-muted-foreground'>
 								<FaRegStar className="cursor-pointer hover:text-foreground transition-colors" />
 								<Ellipsis className="cursor-pointer hover:text-foreground transition-colors" size={18} />
+								<DialogCloseV2 asChild>
+									<X className="cursor-pointer hover:text-foreground transition-colors outline-none" size={18} />
+								</DialogCloseV2>
 							</div>
 						</div>
 					</DialogTitleV2>

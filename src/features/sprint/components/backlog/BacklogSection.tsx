@@ -18,6 +18,8 @@ import { useMemo, useState } from "react";
 import TableBacklog from "@/components/table/TableBacklog";
 import type { BacklogRenderContext } from "./types";
 import { cn } from "@/lib/utils";
+import { usePermission } from "@/features/permission/hooks/usePermission";
+import { PERMISSIONS } from "@/constants/permissions";
 
 
 
@@ -34,6 +36,7 @@ const BacklogSection = ({
 	workspaceId,
 	containerId,
 }: BacklogSectionProps) => {
+	const { can } = usePermission(workspaceId);
 	const [open, setOpen] = useState<boolean>(true);
 	const isProjectContext = context === "project";
 	const backlogPositionContext = useMemo<TaskPositionContextInput>(
@@ -92,7 +95,7 @@ const BacklogSection = ({
 				</div>
 
 				<div className='flex items-center gap-2'>
-					{isProjectContext && (
+					{isProjectContext && can(PERMISSIONS.SPRINT_CREATE) && (
 						<Button
 							variant='outline'
 							size='sm'

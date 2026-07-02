@@ -17,6 +17,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { useNotifications } from "@/features/notification/hooks/useNotifications";
+import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";
 import { useAcceptWorkspaceInvite } from "@/features/workspace/hooks/useWorkspaceInvite";
 import { NotificationType } from "@/services/notification/type";
 import { WorkspaceInviteStatus } from "@/services/workspace-invite/type";
@@ -60,6 +61,28 @@ export function InboxPopover() {
 	const [inviteStatuses, setInviteStatuses] = useState<
 		Record<string, WorkspaceInviteStatus>
 	>({});
+
+	const { workspaceFindAll } = useWorkspace();
+	const workspaces = workspaceFindAll.data?.data || [];
+
+	const getFrontendActionUrl = (backendUrl: string | null | undefined) => {
+		if (!backendUrl) return "";
+
+		const match = backendUrl.match(
+			/\/workspaces\/([^\/]+)\/projects\/([^\/]+)\/tasks\/([^\/]+)/,
+		);
+
+		if (match) {
+			const workspaceId = match[1];
+			const projectId = match[2];
+			const workspace = workspaces.find((w) => w.id === workspaceId);
+			if (workspace && workspace.slug) {
+				return `/dashboard/${workspace.slug}/projects/${projectId}`;
+			}
+		}
+
+		return backendUrl;
+	};
 
 	const { myNotificationsQuery } = useNotifications({
 		limit: 10,
@@ -226,7 +249,7 @@ export function InboxPopover() {
 												className='h-8 px-3 text-xs'
 												onClick={() =>
 													router.push(
-														notification.actionUrl!,
+														getFrontendActionUrl(notification.actionUrl),
 													)
 												}
 											>
@@ -244,7 +267,7 @@ export function InboxPopover() {
 													className='h-8 px-3 text-xs'
 													onClick={() =>
 														router.push(
-															notification.actionUrl!,
+															getFrontendActionUrl(notification.actionUrl),
 														)
 													}
 												>
