@@ -14,18 +14,24 @@ import {
 	UpdateTaskResponse,
 } from "./type";
 
+type TaskPagePayload =
+	| FindAllTaskResponse
+	| FindAllTaskBacklogResponse;
+type TaskPageApiResponse = TaskPagePayload | { data: TaskPagePayload };
 type BacklogApiResponse =
 	| FindAllTaskBacklogResponse
 	| { data: FindAllTaskBacklogResponse };
+type TaskApiResponse = TaskPageApiResponse;
 
-const isBacklogPage = (
-	payload: BacklogApiResponse,
-): payload is FindAllTaskBacklogResponse => Array.isArray(payload.data);
+const isTaskPage = (
+	payload: TaskPageApiResponse,
+): payload is TaskPagePayload =>
+	Array.isArray((payload as TaskPagePayload).data);
 
-const normalizeBacklogResponse = (
-	payload: BacklogApiResponse,
+const normalizeTaskPageResponse = (
+	payload: TaskPageApiResponse,
 ): FindAllTaskBacklogResponse => {
-	const page = isBacklogPage(payload) ? payload : payload.data;
+	const page = isTaskPage(payload) ? payload : payload.data;
 	const data = Array.isArray(page.data) ? page.data : [];
 
 	return {
@@ -36,6 +42,10 @@ const normalizeBacklogResponse = (
 		totalPages: page.totalPages ?? 1,
 	};
 };
+
+const normalizeBacklogResponse = (
+	payload: BacklogApiResponse,
+): FindAllTaskBacklogResponse => normalizeTaskPageResponse(payload);
 
 const serializeBacklogFilters = (filters?: FindBacklogTasksFilters) => {
 	if (!filters) return undefined;
@@ -79,14 +89,14 @@ export const findAllTaskApi = async (
 	projectId: string,
 	filters?: FindBacklogTasksFilters,
 ): Promise<FindAllTaskResponse> => {
-	const response = await instance.get<FindAllTaskResponse>(
+	const response = await instance.get<TaskApiResponse>(
 		`/tasks/workspace/${workspaceId}/project/${projectId}`,
 		{
 			params: serializeBacklogFilters(filters),
 		},
 	);
 
-	return response.data;
+	return normalizeTaskPageResponse(response.data);
 };
 
 export const createTaskApi = async (

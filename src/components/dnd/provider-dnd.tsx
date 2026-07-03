@@ -1,7 +1,6 @@
 "use client";
 
 import { DrawerItemView } from "@/components/drawer/DrawerItemView";
-import { useUser } from "@/features/auth/hooks/useUser";
 import { useSprints } from "@/features/sprint/hooks/useSprint";
 import {
 	useReorderTaskPosition,
@@ -93,7 +92,6 @@ const ProviderDragDrop = ({
 		workspaceId,
 		projectId,
 	});
-	const { user } = useUser();
 
 	useSprints({
 		workspaceId,
@@ -104,7 +102,9 @@ const ProviderDragDrop = ({
 	const taskStatusQuery = useTaskStatus(workspaceId, projectId);
 
 	const taskList = useMemo(() => {
-		return taskQuery.data?.data ?? [];
+		const tasks = taskQuery.data?.data;
+
+		return Array.isArray(tasks) ? tasks : [];
 	}, [taskQuery.data?.data]);
 
 	const statusList = useMemo(() => {

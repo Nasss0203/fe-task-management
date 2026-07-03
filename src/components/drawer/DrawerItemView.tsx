@@ -49,7 +49,7 @@ export function DrawerItemView({
 					<div className='flex h-full min-h-0 flex-col'>
 						<TaskDetailHeader
 							taskLabel={`Task #${task.projectSeq ?? task.id.slice(0, 6)}`}
-							title={task.title ?? null}
+							title={task.title ?? "Untitled"}
 						/>
 
 						<div className='min-h-0 flex-1 overflow-y-auto bg-background px-5 py-6 sm:px-6'>

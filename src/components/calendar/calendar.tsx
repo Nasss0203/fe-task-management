@@ -40,7 +40,11 @@ const formatScheduleXDate = (isoString?: string | null) => {
 
 function CalendarApp({ workspaceId, projectId }: CalendarAppProps) {
 	const { taskQuery } = useTask(workspaceId, projectId);
-	const tasks = Array.isArray(taskQuery?.data?.data) ? taskQuery.data.data : [];
+	const tasks = useMemo(() => {
+		const data = taskQuery.data?.data;
+
+		return Array.isArray(data) ? data : [];
+	}, [taskQuery.data?.data]);
 
 	const [activeDrawerTaskId, setActiveDrawerTaskId] = useState<string | null>(null);
 
@@ -71,7 +75,7 @@ function CalendarApp({ workspaceId, projectId }: CalendarAppProps) {
 
 			return {
 				id: task.id,
-				title: task.title,
+				title: task.title ?? "Untitled",
 				start,
 				end,
 				description: task.description || "",

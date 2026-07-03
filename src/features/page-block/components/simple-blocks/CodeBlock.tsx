@@ -1,6 +1,7 @@
 import { PageBlockItem } from "@/services/page_block/type";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import CodeMirror from "@uiw/react-codemirror";
+import type { Extension } from "@codemirror/state";
 import { javascript } from "@codemirror/lang-javascript";
 import { html } from "@codemirror/lang-html";
 import { python } from "@codemirror/lang-python";
@@ -27,19 +28,22 @@ type CodeBlockProps = {
 	onUpdate: (block: PageBlockItem) => void;
 };
 
-const getContentObject = (block: PageBlockItem) => {
+const getContentObject = (block: PageBlockItem): Record<string, unknown> => {
 	if (
 		block.content &&
 		typeof block.content === "object" &&
 		!Array.isArray(block.content)
 	) {
-		return block.content;
+		return block.content as Record<string, unknown>;
 	}
 
 	return {};
 };
 
-const LANGUAGES: Record<string, { name: string; ext: any }> = {
+const getLanguage = (contentObj: Record<string, unknown>) =>
+	typeof contentObj.language === "string" ? contentObj.language : "typescript";
+
+const LANGUAGES: Record<string, { name: string; ext: Extension }> = {
 	typescript: { name: "TypeScript", ext: javascript({ jsx: true, typescript: true }) },
 	javascript: { name: "JavaScript", ext: javascript({ jsx: true }) },
 	html: { name: "HTML", ext: html() },
@@ -55,8 +59,8 @@ const LANGUAGES: Record<string, { name: string; ext: any }> = {
 };
 
 const CodeBlock = ({ block, code, onUpdate }: CodeBlockProps) => {
-	const contentObj = getContentObject(block);
-	const initialLang = (contentObj.language as string) || "typescript";
+	const contentObj = useMemo(() => getContentObject(block), [block]);
+	const initialLang = getLanguage(contentObj);
 
 	const [value, setValue] = useState(code);
 	const [lang, setLang] = useState(initialLang);
@@ -69,8 +73,8 @@ const CodeBlock = ({ block, code, onUpdate }: CodeBlockProps) => {
 	}, [code]);
 
 	useEffect(() => {
-		setLang((contentObj.language as string) || "typescript");
-	}, [contentObj.language]);
+		setLang(getLanguage(contentObj));
+	}, [contentObj]);
 
 	const handleSave = () => {
 		const currentValue = valueRef.current;
