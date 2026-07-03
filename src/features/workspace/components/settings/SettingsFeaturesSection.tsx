@@ -1,5 +1,6 @@
 import { Switch } from "@/components/ui/switch";
 import type { WorkspaceFeatureItem } from "@/services/workspace-feature/type";
+import { Info } from "lucide-react";
 
 interface SettingsFeaturesSectionProps {
 	sprintFeature?: WorkspaceFeatureItem;
@@ -22,9 +23,11 @@ export function SettingsFeaturesSection({
 }: SettingsFeaturesSectionProps) {
 	return (
 		<div className='max-w-3xl space-y-4'>
-			<div className='rounded-md border border-blue-500/20 bg-blue-500/10 p-4 text-sm text-blue-800 dark:text-blue-200'>
-				Cài đặt tính năng quyết định những gì workspace này có thể
-				sử dụng nếu gói đăng ký cho phép.
+			<div className='rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground flex items-center gap-3 shadow-xs'>
+				<Info className="size-4.5 text-blue-500 shrink-0" />
+				<span>
+					Cài đặt tính năng quyết định những gì workspace này có thể sử dụng nếu gói đăng ký cho phép.
+				</span>
 			</div>
 
 			<div className='rounded-md border border-border bg-muted/50'>

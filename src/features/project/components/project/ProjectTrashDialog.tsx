@@ -82,10 +82,10 @@ const ProjectTrashDialog = ({
 				router.push(`/dashboard/${workspace.slug}`);
 			}
 
-			toast.success("Project đã được chuyển vào thùng rác.");
+			toast.success("Đã chuyển dự án vào thùng rác.");
 		} catch (error) {
 			console.error("deleteProjectFromDialog failed", error);
-			toast.error("Không thể chuyển project vào thùng rác.");
+			toast.error("Không thể chuyển dự án vào thùng rác.");
 		}
 	};
 

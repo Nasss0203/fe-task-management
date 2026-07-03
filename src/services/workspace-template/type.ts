@@ -29,6 +29,7 @@ export interface SaveWorkspaceAsTemplateDto {
 	description?: string;
 	category?: string;
 	visibility?: "PRIVATE" | "WORKSPACE" | "PUBLIC";
+	includeSampleTasks?: boolean;
 }
 
 export interface UpdateWorkspaceTemplateDto {

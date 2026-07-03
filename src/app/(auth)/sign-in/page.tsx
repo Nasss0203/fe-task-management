@@ -11,9 +11,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useLogin, useResendVerification } from "@/features/auth/hooks/useAuth";
+import {
+	getApiErrorCode,
+	getFriendlyApiErrorMessage,
+} from "@/lib/api-error-message";
 import { SystemRole } from "@/services/auth/type";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { AxiosError } from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
@@ -26,11 +29,6 @@ const authInputClassName =
 
 const submitButtonClassName =
 	"h-12 w-full rounded-xl text-sm font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/30";
-
-type ApiErrorResponse = {
-	code?: string;
-	message?: string;
-};
 
 export default function SignIn() {
 	const router = useRouter();
@@ -60,9 +58,7 @@ export default function SignIn() {
 				}
 			},
 			onError: (err: unknown) => {
-				const responseData = (err as AxiosError<ApiErrorResponse>).response
-					?.data;
-				const errorCode = responseData?.code;
+				const errorCode = getApiErrorCode(err);
 
 				if (errorCode === "EMAIL_NOT_VERIFIED") {
 					toast.error("Tài khoản chưa được xác minh", {
@@ -92,7 +88,10 @@ export default function SignIn() {
 				}
 
 				toast.error("Đăng nhập thất bại", {
-					description: responseData?.message || "Sai email hoặc mật khẩu",
+					description: getFriendlyApiErrorMessage(
+						err,
+						"Sai email hoặc mật khẩu.",
+					),
 				});
 			},
 		});

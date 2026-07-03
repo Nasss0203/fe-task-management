@@ -50,10 +50,10 @@ const WorkspaceDropdown = ({
 
 		try {
 			await navigator.clipboard.writeText(targetUrl);
-			toast.success("Da sao chep lien ket workspace.");
+			toast.success("Đã sao chép liên kết không gian làm việc.");
 		} catch (error) {
 			console.error("copyWorkspaceLink failed", error);
-			toast.error("Khong the sao chep lien ket workspace.");
+			toast.error("Không thể sao chép liên kết không gian làm việc.");
 		}
 	};
 

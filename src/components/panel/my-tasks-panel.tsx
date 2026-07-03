@@ -52,7 +52,7 @@ export function MyTasksPanel({ items }: Props) {
 							<div className='space-y-3'>
 								<div className='flex items-start justify-between gap-3'>
 									<p className='line-clamp-2 text-[13px] font-medium leading-6 text-foreground'>
-										{task.title}
+										{task.title || <span className="text-muted-foreground italic">Untitled</span>}
 									</p>
 
 									<PriorityBadge priorityName={task.priority} />

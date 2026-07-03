@@ -3,6 +3,7 @@
 import { ChevronRight, BarChart2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 import {
 	Collapsible,
@@ -12,13 +13,16 @@ import {
 
 import DialogAddTask from "@/components/dialog/DialogAddTask";
 import ProjectDropdown from "@/features/project/components/project/ProjectDropdown";
+import { useProject } from "@/features/project/hooks/useProject";
 import { PERMISSIONS } from "@/constants/permissions";
 import { RequirePermission } from "@/features/permission/components/RequirePermission";
 import { useSprints } from "@/features/sprint/hooks/useSprint";
 import type { ProjectItems } from "@/services/project/type";
 import type { SprintItem } from "@/services/sprint/type";
 import type { WorkspaceItem } from "@/services/workspace/type";
+import { useProjectNameDraftStore } from "@/stores/use-project-name-draft";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
+import { toast } from "sonner";
 import {
 	SidebarMenuSubButtonV2,
 	SidebarMenuSubItemV2,
@@ -42,6 +46,18 @@ const ProjectSidebarItem = ({
 	const { setCurrentProjectId } = useProjectSelectionStore();
 	const projectId = project.id ?? "";
 	const projectName = project.name ?? "Untitled project";
+	const draftName = useProjectNameDraftStore(
+		(state) => state.drafts[projectId],
+	);
+	const setDraft = useProjectNameDraftStore((state) => state.setDraft);
+	const clearDraft = useProjectNameDraftStore((state) => state.clearDraft);
+	const value = draftName ?? projectName;
+	const [isEditingName, setIsEditingName] = useState(false);
+	const inputRef = useRef<HTMLInputElement>(null);
+	const skipBlurRef = useRef(false);
+	const ignoreBlurUntilRef = useRef(0);
+	const isNameComposingRef = useRef(false);
+	const { updateProject } = useProject(workspace.id);
 	const canFetchSprints = canUseSprint && Boolean(projectId);
 	const { sprintsQuery } = useSprints({
 		projectId,
@@ -56,6 +72,70 @@ const ProjectSidebarItem = ({
 	const projectHref = projectId
 		? `/dashboard/${workspace.slug}/projects/${projectId}`
 		: `/dashboard/${workspace.slug}`;
+
+	useEffect(() => {
+		if (!isEditingName) return;
+
+		const frame = window.requestAnimationFrame(() => {
+			inputRef.current?.focus();
+			inputRef.current?.select();
+		});
+
+		return () => window.cancelAnimationFrame(frame);
+	}, [isEditingName]);
+
+	const startRenameProject = () => {
+		if (!projectId) return;
+
+		skipBlurRef.current = false;
+		ignoreBlurUntilRef.current = Date.now() + 300;
+		setDraft(projectId, value);
+		setIsEditingName(true);
+	};
+
+	const cancelRenameProject = () => {
+		if (!projectId) return;
+
+		skipBlurRef.current = true;
+		setDraft(projectId, projectName);
+		setIsEditingName(false);
+	};
+
+	const commitRenameProject = async () => {
+		if (!projectId) return;
+
+		const name = value.trim();
+
+		if (!name) {
+			toast.error("Tên dự án không được để trống.");
+			setDraft(projectId, projectName);
+			inputRef.current?.focus();
+			return;
+		}
+
+		if (name === projectName) {
+			clearDraft(projectId);
+			setIsEditingName(false);
+			return;
+		}
+
+		try {
+			await updateProject.mutateAsync({
+				workspaceId: workspace.id,
+				projectId,
+				data: {
+					name,
+				},
+			});
+
+			clearDraft(projectId);
+			setIsEditingName(false);
+			toast.success("Đã đổi tên dự án.");
+		} catch (error) {
+			console.error("renameProjectFromSidebar failed", error);
+			toast.error("Không thể đổi tên dự án.");
+		}
+	};
 
 	return (
 		<Collapsible asChild className='group/project'>
@@ -75,37 +155,114 @@ const ProjectSidebarItem = ({
 						<div className='size-5 shrink-0' />
 					)}
 
-					<SidebarMenuSubButtonV2
-						asChild
-						isActive={pathname === projectHref}
-						className='h-7 flex-1 justify-start px-1 pr-14 text-sm font-medium text-foreground hover:bg-transparent'
-					>
-						<Link
-							href={projectHref}
-							className='min-w-0'
-							onClick={() => {
-								if (!projectId) return;
+					{isEditingName ? (
+						<form
+							className='h-7 min-w-0 flex-1 px-1 pr-14'
+							onSubmit={(event) => {
+								event.preventDefault();
+								if (isNameComposingRef.current) {
+									return;
+								}
 
-								handleSelectProject(workspace.id, projectId);
+								void commitRenameProject();
 							}}
 						>
-							<span className='line-clamp-1'>
-								{projectName}
-							</span>
-						</Link>
-					</SidebarMenuSubButtonV2>
+							<input
+								ref={inputRef}
+								value={value}
+								disabled={updateProject.isPending}
+								onChange={(event) =>
+									setDraft(projectId, event.target.value)
+								}
+								onCompositionStart={() => {
+									isNameComposingRef.current = true;
+								}}
+								onCompositionEnd={(event) => {
+									isNameComposingRef.current = false;
+									setDraft(projectId, event.currentTarget.value);
+								}}
+								onClick={(event) => event.stopPropagation()}
+								onPointerDown={(event) =>
+									event.stopPropagation()
+								}
+								onBlur={() => {
+									if (isNameComposingRef.current) {
+										return;
+									}
+
+									if (Date.now() < ignoreBlurUntilRef.current) {
+										window.requestAnimationFrame(() => {
+											inputRef.current?.focus();
+										});
+										return;
+									}
+
+									if (skipBlurRef.current) {
+										skipBlurRef.current = false;
+										return;
+									}
+
+									void commitRenameProject();
+								}}
+								onKeyDown={(event) => {
+									if (
+										event.nativeEvent.isComposing ||
+										isNameComposingRef.current
+									) {
+										return;
+									}
+
+									if (event.key === "Escape") {
+										event.preventDefault();
+										cancelRenameProject();
+									}
+								}}
+								className='h-6 w-full min-w-0 rounded border border-blue-500/60 bg-background px-2 text-sm text-foreground outline-none ring-2 ring-blue-500/20'
+							/>
+						</form>
+					) : (
+						<SidebarMenuSubButtonV2
+							asChild
+							isActive={pathname === projectHref}
+							className='h-7 flex-1 justify-start px-1 pr-14 text-sm font-medium text-foreground hover:bg-transparent'
+						>
+							<Link
+								href={projectHref}
+								className='min-w-0'
+								onClick={() => {
+									if (!projectId) return;
+
+									handleSelectProject(workspace.id, projectId);
+								}}
+							>
+								<span className='line-clamp-1'>{value}</span>
+							</Link>
+						</SidebarMenuSubButtonV2>
+					)}
 
 					<div className='pointer-events-none absolute right-1 top-1/2 z-20 flex -translate-y-1/2 items-center gap-0.5 opacity-0 transition-opacity group-hover/project-item:pointer-events-auto group-hover/project-item:opacity-100 group-focus-within/project-item:pointer-events-auto group-focus-within/project-item:opacity-100'>
 						<ProjectDropdown
 							project={project}
 							workspace={workspace}
+							onRenameProject={startRenameProject}
 						/>
 
 						<RequirePermission
 							workspaceId={workspace.id}
 							code={PERMISSIONS.TASK_CREATE}
 						>
-							<DialogAddTask></DialogAddTask>
+							<DialogAddTask
+								workspaceId={workspace.id}
+								projectId={projectId}
+								positionContext={
+									projectId
+										? {
+												context: "backlog",
+												contextId: projectId,
+											}
+										: undefined
+								}
+							></DialogAddTask>
 						</RequirePermission>
 					</div>
 				</div>

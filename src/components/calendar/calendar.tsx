@@ -40,7 +40,11 @@ const formatScheduleXDate = (isoString?: string | null) => {
 
 function CalendarApp({ workspaceId, projectId }: CalendarAppProps) {
 	const { taskQuery } = useTask(workspaceId, projectId);
-	const tasks = Array.isArray(taskQuery?.data?.data) ? taskQuery.data.data : [];
+	const tasks = useMemo(() => {
+		const data = taskQuery.data?.data;
+
+		return Array.isArray(data) ? data : [];
+	}, [taskQuery.data?.data]);
 
 	const [activeDrawerTaskId, setActiveDrawerTaskId] = useState<string | null>(null);
 
@@ -59,7 +63,7 @@ function CalendarApp({ workspaceId, projectId }: CalendarAppProps) {
 			const startString = formatScheduleXDate(task.startAt) || formatScheduleXDate(task.dueAt) || formatScheduleXDate(task.createdAt) || formatScheduleXDate(new Date().toISOString());
 			const endString = formatScheduleXDate(task.dueAt) || startString;
 
-			let start = parseToTemporal(startString!);
+			const start = parseToTemporal(startString!);
 			let end = parseToTemporal(endString!);
 
 			// Ensure timed events have a duration (e.g., 1 hour) if start == end
@@ -71,7 +75,7 @@ function CalendarApp({ workspaceId, projectId }: CalendarAppProps) {
 
 			return {
 				id: task.id,
-				title: task.title,
+				title: task.title ?? "Untitled",
 				start,
 				end,
 				description: task.description || "",

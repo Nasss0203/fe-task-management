@@ -29,6 +29,10 @@ const BoardView = ({ board }: BoardViewProps) => (
 	<ProviderDragDrop
 		workspaceId={board.workspaceId}
 		projectId={board.projectId}
+		positionContext={{
+			context: "kanban",
+			contextId: board.id,
+		}}
 	/>
 );
 
@@ -38,6 +42,10 @@ const TableView = ({ board }: BoardViewProps) => (
 	<BoardTable
 		projectId={board.projectId}
 		workspaceId={board.workspaceId}
+		positionContext={{
+			context: "list",
+			contextId: board.id,
+		}}
 	></BoardTable>
 );
 
@@ -47,9 +55,12 @@ const ListView = ({ board }: BoardViewProps) => (
 	<BoardList
 		projectId={board.projectId}
 		workspaceId={board.workspaceId}
+		positionContext={{
+			context: "list",
+			contextId: board.id,
+		}}
 	/>
 );
-
 
 const Backlog = ({ context = "workspace" }: BoardViewProps) => (
 	<BoardBacklog context={context} />
@@ -91,19 +102,19 @@ export const BOARD_VIEW_CONFIG: Partial<
 		enabled: true,
 	},
 	TABLE: {
-		label: "Table",
+		label: "Bảng tính",
 		icon: Table2,
 		component: TableView,
 		enabled: true,
 	},
 	LIST: {
-		label: "List",
+		label: "Danh sách",
 		icon: List,
 		component: ListView,
 		enabled: true,
 	},
 	CALENDAR: {
-		label: "Calendar",
+		label: "Lịch",
 		icon: CalendarDays,
 		component: CalendarView,
 		enabled: true,

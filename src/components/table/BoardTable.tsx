@@ -41,10 +41,11 @@ import { DrawerItemView } from "@/components/drawer/DrawerItemView";
 import { useUser } from "@/features/auth/hooks/useUser";
 import { useTaskStatus } from "@/features/task/hooks/useTask";
 import { Plus } from "lucide-react";
+import type { TaskPositionContextInput } from "@/services/task/type";
 
 type TaskItem = {
 	id: string;
-	title: string;
+	title: string | null;
 	assigneeName: string | null;
 	priorityName: string | null;
 	statusName: string;
@@ -133,9 +134,11 @@ const DragAlongCell = ({ cell }: { cell: Cell<TaskItem, unknown> }) => {
 const BoardTable = ({
 	workspaceId,
 	projectId,
+	positionContext,
 }: {
 	workspaceId: string;
 	projectId: string;
+	positionContext?: TaskPositionContextInput;
 }) => {
 	const [activeDrawerTaskId, setActiveDrawerTaskId] = React.useState<string | null>(null);
 
@@ -145,7 +148,11 @@ const BoardTable = ({
 		onOpenDetail: setActiveDrawerTaskId,
 	});
 
-	const { taskQuery, createTask } = useTask(workspaceId, projectId);
+	const { taskQuery, createTask } = useTask(
+		workspaceId,
+		projectId,
+		positionContext,
+	);
 	const { data: taskStatusData } = useTaskStatus(workspaceId, projectId);
 	const taskStatus = React.useMemo(() => taskStatusData?.data ?? [], [taskStatusData?.data]);
 	const { user } = useUser();
@@ -168,6 +175,7 @@ const BoardTable = ({
 				statusId: taskStatus[0].id,
 				workspaceId,
 				projectId,
+				...(positionContext ? { positionContext } : {}),
 			});
 			setQuickAddTitle("");
 		} catch (error) {

@@ -57,11 +57,10 @@ export function NeedsAttention({ workspaceSlug, items }: NeedsAttentionProps) {
 					const Icon = getIcon(item.type);
 
 					return (
-						<Link
+						<div
 							key={item.id}
-							href={meta.href}
 							className={cn(
-								"flex items-center gap-3 rounded-xl border p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-md",
+								"flex items-center gap-3 rounded-xl border p-3 transition-all duration-300",
 								getToneStyles(meta.tone),
 							)}
 						>
@@ -76,7 +75,7 @@ export function NeedsAttention({ workspaceSlug, items }: NeedsAttentionProps) {
 									{meta.buildText(item)}
 								</span>
 							</div>
-						</Link>
+						</div>
 					);
 				})}
 			</div>

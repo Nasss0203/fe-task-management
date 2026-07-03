@@ -77,6 +77,8 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 			...(assigneeFilter !== ALL_FILTER_VALUE && {
 				assigneeId: assigneeFilter,
 			}),
+			context: "backlog" as const,
+			contextId: projectId,
 			page: pagination.pageIndex + 1,
 			pageSize: pagination.pageSize,
 		}),
@@ -85,6 +87,7 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 			statusFilter,
 			priorityFilter,
 			assigneeFilter,
+			projectId,
 			pagination.pageIndex,
 			pagination.pageSize,
 		],

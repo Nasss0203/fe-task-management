@@ -155,8 +155,16 @@ export function useTaskDetailFields(task: TaskItem) {
 		}
 	};
 
+	const handleTitleChange = async (title: string) => {
+		await updateTaskMutate({
+			id: task.id,
+			title: title.trim() || null,
+		});
+	};
+
 	return {
 		isUpdatingTask,
+		updateTitle: handleTitleChange,
 		updateDescription: handleDescriptionChange,
 		status: {
 			open: statusOpen,

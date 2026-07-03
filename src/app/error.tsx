@@ -33,16 +33,14 @@ export default function Error({
 					quay về trang chủ.
 				</p>
 
-				{error.message && (
-					<div className='mt-6 w-full rounded-lg border border-border bg-muted/40 p-4 text-left shadow-sm'>
-						<p className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5'>
-							Chi tiết lỗi:
-						</p>
-						<p className='font-mono text-xs text-foreground break-all whitespace-pre-wrap leading-relaxed'>
-							{error.message}
-						</p>
-					</div>
-				)}
+				<div className='mt-6 w-full rounded-lg border border-border bg-muted/40 p-4 text-left shadow-sm'>
+					<p className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5'>
+						Trạng thái:
+					</p>
+					<p className='text-sm text-foreground leading-relaxed'>
+						Không thể tải nội dung lúc này. Vui lòng thử lại sau ít phút.
+					</p>
+				</div>
 
 				<div className='mt-8 flex flex-col sm:flex-row gap-3 w-full justify-center'>
 					<Button

@@ -237,7 +237,7 @@ export const ItemView = React.forwardRef<HTMLDivElement, ItemViewProps>(
 								/>
 							) : (
 								<div className='truncate text-sm font-extrabold'>
-									{localName}
+									{localName || <span className="text-muted-foreground italic font-normal">Untitled</span>}
 								</div>
 							)}
 						</div>

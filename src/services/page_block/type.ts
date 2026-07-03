@@ -83,7 +83,6 @@ export interface CreatePageBlockPayload {
 	content?: PageBlockJson;
 	style_config?: Record<string, unknown> | null;
 	data_config?: PageBlockDataConfig | null;
-	created_by?: string;
 	is_open?: boolean;
 }
 

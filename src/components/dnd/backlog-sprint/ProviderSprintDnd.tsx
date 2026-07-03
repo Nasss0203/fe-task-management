@@ -18,6 +18,8 @@ type TaskMovePayload = {
 	taskId: string;
 	fromContainerId: string;
 	toContainerId: string;
+	previousTaskId: string | null;
+	nextTaskId: string | null;
 };
 
 type TableDndContextValue = {
@@ -35,7 +37,7 @@ export const useTableDnd = () => useContext(TableDndContext);
 type ProviderSprintDndProps = {
 	children: React.ReactNode;
 	initialItems: DndColumns;
-	onTaskMove: (payload: TaskMovePayload) => void;
+	onTaskMove: (payload: TaskMovePayload) => void | Promise<void>;
 	isMutating?: boolean;
 };
 
@@ -52,6 +54,25 @@ function findContainerByTaskId(items: DndColumns, taskId: string) {
 	return null;
 }
 
+function findTaskNeighbors(
+	items: DndColumns,
+	containerId: string,
+	taskId: string,
+) {
+	const taskIds = items[containerId] ?? [];
+	const taskIndex = taskIds.indexOf(taskId);
+
+	if (taskIndex < 0) {
+		return null;
+	}
+
+	return {
+		previousTaskId: taskIndex > 0 ? taskIds[taskIndex - 1] : null,
+		nextTaskId:
+			taskIndex < taskIds.length - 1 ? taskIds[taskIndex + 1] : null,
+	};
+}
+
 export function ProviderSprintDnd({
 	children,
 	initialItems,
@@ -61,7 +82,6 @@ export function ProviderSprintDnd({
 	const [items, setItems] = useState<DndColumns>(initialItems);
 	const itemsRef = useRef<DndColumns>(initialItems);
 	const snapshotRef = useRef<DndColumns>({});
-	const skipNextSyncRef = useRef(false);
 
 	useEffect(() => {
 		if (isMutating) return;
@@ -125,10 +145,40 @@ export function ProviderSprintDnd({
 						return;
 					}
 
-					if (fromContainerId !== toContainerId) {
-						skipNextSyncRef.current = true;
-						onTaskMove({ taskId, fromContainerId, toContainerId });
+					const previousIndex =
+						snapshot[fromContainerId]?.indexOf(taskId) ?? -1;
+					const nextIndex =
+						nextItems[toContainerId]?.indexOf(taskId) ?? -1;
+
+					if (
+						fromContainerId === toContainerId &&
+						previousIndex === nextIndex
+					) {
+						return;
 					}
+
+					const neighbors = findTaskNeighbors(
+						nextItems,
+						toContainerId,
+						taskId,
+					);
+
+					if (!neighbors) {
+						syncItems(snapshot);
+						return;
+					}
+
+					void Promise.resolve(
+						onTaskMove({
+							taskId,
+							fromContainerId,
+							toContainerId,
+							previousTaskId: neighbors.previousTaskId,
+							nextTaskId: neighbors.nextTaskId,
+						}),
+					).catch(() => {
+						syncItems(snapshot);
+					});
 				}}
 			>
 				{children}

@@ -24,14 +24,16 @@ const DropdownMenu = ({
 
 			<DropdownMenuContentV2 className='w-52' align='center' side='left'>
 				<DropdownMenuGroupV2>
-					<DropdownMenuLabelV2>Settings</DropdownMenuLabelV2>
+					<DropdownMenuLabelV2>Cài đặt</DropdownMenuLabelV2>
 
-					<DropdownMenuItemV2 onSelect={onConvert}>
-						<div className='flex items-center gap-2'>
-							<RefreshCw size={16} />
-							<div>Chuyen doi</div>
-						</div>
-					</DropdownMenuItemV2>
+					{onConvert && (
+						<DropdownMenuItemV2 onSelect={onConvert}>
+							<div className='flex items-center gap-2'>
+								<RefreshCw size={16} />
+								<div>Chuyển đổi</div>
+							</div>
+						</DropdownMenuItemV2>
+					)}
 
 					<DropdownMenuItemV2
 						onSelect={onRemoveFromPage}
@@ -39,7 +41,7 @@ const DropdownMenu = ({
 					>
 						<div className='flex items-center gap-2'>
 							<Trash2 size={16} />
-							<div>Remove from page</div>
+							<div>Xóa khỏi trang</div>
 						</div>
 					</DropdownMenuItemV2>
 				</DropdownMenuGroupV2>

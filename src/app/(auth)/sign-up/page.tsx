@@ -11,8 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useRegister } from "@/features/auth/hooks/useAuth";
+import { getFriendlyApiErrorMessage } from "@/lib/api-error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -40,10 +40,6 @@ const authInputClassName =
 const submitButtonClassName =
 	"h-12 w-full rounded-xl text-sm font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/30";
 
-type ApiErrorResponse = {
-	message?: string;
-};
-
 export default function SignUp() {
 	const router = useRouter();
 	const { mutate, isPending } = useRegister();
@@ -62,17 +58,15 @@ export default function SignUp() {
 				toast.success("Đăng ký thành công!", {
 					description:
 						"Vui lòng kiểm tra email của bạn để xác minh tài khoản.",
-					position: "bottom-right",
 				});
 				router.push("/verify-email");
 			},
 			onError: (err: unknown) => {
-				const responseData = (err as AxiosError<ApiErrorResponse>).response
-					?.data;
-
 				toast.error("Đăng ký thất bại", {
-					description: responseData?.message || "Đã xảy ra lỗi.",
-					position: "bottom-right",
+					description: getFriendlyApiErrorMessage(
+						err,
+						"Không thể đăng ký tài khoản. Vui lòng kiểm tra lại thông tin.",
+					),
 				});
 			},
 		});

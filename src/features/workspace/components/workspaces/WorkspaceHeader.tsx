@@ -21,6 +21,7 @@ export const WorkspaceTopHeader = ({
 	const inputRef = useRef<HTMLInputElement>(null);
 	const skipBlurRef = useRef(false);
 	const ignoreBlurUntilRef = useRef(0);
+	const isNameComposingRef = useRef(false);
 	const draftName = useWorkspaceNameDraftStore(
 		(state) => state.drafts[workspaceId],
 	);
@@ -57,7 +58,7 @@ export const WorkspaceTopHeader = ({
 		const name = value.trim();
 
 		if (!name) {
-			toast.error("Ten workspace khong duoc de trong.");
+			toast.error("Tên không gian làm việc không được để trống.");
 			setDraft(workspaceId, workspaceName);
 			inputRef.current?.focus();
 			return;
@@ -78,10 +79,10 @@ export const WorkspaceTopHeader = ({
 			});
 			clearDraft(workspaceId);
 			setIsEditingName(false);
-			toast.success("Workspace da duoc doi ten.");
+			toast.success("Đã đổi tên không gian làm việc.");
 		} catch (error) {
 			console.error("renameWorkspaceFromHeader failed", error);
-			toast.error("Khong the doi ten workspace.");
+			toast.error("Không thể đổi tên không gian làm việc.");
 		}
 	};
 
@@ -106,7 +107,18 @@ export const WorkspaceTopHeader = ({
 								onChange={(event) =>
 									setDraft(workspaceId, event.target.value)
 								}
+								onCompositionStart={() => {
+									isNameComposingRef.current = true;
+								}}
+								onCompositionEnd={(event) => {
+									isNameComposingRef.current = false;
+									setDraft(workspaceId, event.currentTarget.value);
+								}}
 								onBlur={() => {
+									if (isNameComposingRef.current) {
+										return;
+									}
+
 									if (Date.now() < ignoreBlurUntilRef.current) {
 										window.requestAnimationFrame(() => {
 											inputRef.current?.focus();
@@ -122,6 +134,13 @@ export const WorkspaceTopHeader = ({
 									void commitName();
 								}}
 								onKeyDown={(event) => {
+									if (
+										event.nativeEvent.isComposing ||
+										isNameComposingRef.current
+									) {
+										return;
+									}
+
 									if (event.key === "Enter") {
 										event.preventDefault();
 										event.currentTarget.blur();

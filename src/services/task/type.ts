@@ -7,12 +7,26 @@ export const TASK_KEY = {
 
 export type TaskFilterValue = string | string[];
 export type PaginationQueryValue = number | string;
+export type TaskPositionContext = "kanban" | "sprint" | "backlog" | "list";
+
+export type TaskPositionContextInput = {
+	context: TaskPositionContext;
+	contextId: string;
+};
+
+export type ReorderTaskPositionDto = TaskPositionContextInput & {
+	taskId: string;
+	previousTaskId?: string | null;
+	nextTaskId?: string | null;
+};
 
 export type FindBacklogTasksFilters = {
 	search?: string;
 	assigneeId?: TaskFilterValue;
 	statusId?: TaskFilterValue;
 	priorityId?: TaskFilterValue;
+	context?: TaskPositionContext;
+	contextId?: string;
 	page?: PaginationQueryValue;
 	pageSize?: PaginationQueryValue;
 };
@@ -41,7 +55,7 @@ export interface TaskItem {
 	sprintName?: string | null;
 
 	projectSeq: number | null;
-	title: string;
+	title: string | null;
 	description: string | null;
 
 	statusId: string;
@@ -68,6 +82,7 @@ export interface TaskItem {
 	updatedAt?: string;
 	deletedAt?: string | null;
 	deletedBy?: string | null;
+	position: string | null;
 }
 
 export type TaskBacklogItem = TaskItem;
@@ -91,11 +106,12 @@ export interface CreateTaskDto {
 	assigneeIds?: string[];
 
 	initialComment?: string | null;
+	positionContext?: TaskPositionContextInput | null;
 }
 
 export type UpdateTaskDto = {
 	id: string;
-	title?: string;
+	title?: string | null;
 	description?: string | null;
 	statusId?: string;
 	priorityId?: string | null;
@@ -116,6 +132,10 @@ export interface FindOneTaskResponse {
 
 export interface FindAllTaskResponse {
 	data: TaskItem[];
+	total?: number;
+	page?: number;
+	pageSize?: number;
+	totalPages?: number;
 }
 
 export interface UpdateTaskResponse {
@@ -136,4 +156,16 @@ export interface FindAllTaskBacklogResponse {
 
 export interface FindDeletedTaskResponse {
 	data: TaskItem[];
+}
+
+export interface ReorderTaskPositionResponse {
+	data: {
+		id: string;
+		taskId: string;
+		context: TaskPositionContext;
+		contextId: string;
+		position: number;
+		createdAt: string;
+		updatedAt: string;
+	};
 }

@@ -47,7 +47,7 @@ export default function RootLayout({
 						</RealtimeProviderWrapper>
 					</Providers>
 
-					<Toaster richColors position='top-right' />
+					<Toaster position='top-right' />
 				</ThemeProvider>
 			</body>
 		</html>

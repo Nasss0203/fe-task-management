@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/field";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useResetPassword } from "@/features/auth/hooks/useAuth";
+import { getFriendlyApiErrorMessage } from "@/lib/api-error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, CheckCircle2, XCircle } from "lucide-react";
 import Link from "next/link";
@@ -59,9 +60,14 @@ function ResetPasswordContent() {
 			{ token, newPassword: data.password },
 			{
 				onSuccess: () => setStatus("success"),
-				onError: (err: any) => {
+				onError: (err: unknown) => {
 					setStatus("error");
-					setErrorMsg(err?.response?.data?.message || "Đã xảy ra lỗi khi đặt lại mật khẩu.");
+					setErrorMsg(
+						getFriendlyApiErrorMessage(
+							err,
+							"Không thể đặt lại mật khẩu. Vui lòng thử lại.",
+						),
+					);
 				},
 			}
 		);

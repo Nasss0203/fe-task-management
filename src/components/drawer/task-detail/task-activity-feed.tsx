@@ -139,9 +139,10 @@ export function TaskActivityFeed({ activities, isLoading }: TaskActivityFeedProp
                 <span className="text-muted-foreground">{meta.text}</span>
                 {showNewValue && (
                   <span className="font-semibold text-foreground ml-1">
-                    "{newValueString}"
+                    &quot;{newValueString}&quot;
                   </span>
                 )}
+                {/* eslint-disable-next-line react/no-unescaped-entities */}
                 {showOldValue && (
                   <span className="text-muted-foreground ml-1 line-through text-xs">
                     (từ "{oldValueString}")

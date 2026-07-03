@@ -51,6 +51,7 @@ const mapDashboardTaskToTaskItem = (task: DashboardTaskResponseDto): TaskItem =>
 		estimateMinutes: task.estimateMinutes,
 		createdAt: new Date().toISOString(),
 		updatedAt: new Date().toISOString(),
+		position: null,
 	};
 };
 

@@ -1,11 +1,11 @@
 "use client";
 
 import { useProject } from "@/features/project/hooks/useProject";
+import { getFriendlyApiErrorMessage } from "@/lib/api-error-message";
 import { ProjectDto } from "@/services/project/type";
-import axios from "axios";
-import { Ellipsis, Plus, LayoutGrid, ListTodo, Calendar, Table2, Image as ImageIcon, Presentation, FileUp, Files, Kanban } from "lucide-react";
+import { Ellipsis, Plus, ListTodo, Calendar, Table2, FileUp, Files, Kanban, X } from "lucide-react";
 import { useRef, useState, KeyboardEvent } from "react";
-import { FaRegStar, FaStar } from "react-icons/fa";
+import { FaRegStar } from "react-icons/fa";
 import { toast } from "sonner";
 
 import { BoardViewType } from "@/services/board/type";
@@ -15,37 +15,12 @@ import {
 	DialogTitleV2,
 	DialogTriggerV2,
 	DialogV2,
+	DialogCloseV2,
 } from "./dialog-custom";
 
 type Props = {
 	workspaceId: string;
 	workspaceName: string;
-};
-
-type ApiErrorResponse = {
-	message?: string | string[] | { message?: string };
-};
-
-const getCreateProjectErrorMessage = (error: unknown) => {
-	if (!axios.isAxiosError<ApiErrorResponse>(error)) {
-		return "Create project failed. Please try again.";
-	}
-
-	const message = error.response?.data?.message;
-
-	if (Array.isArray(message)) {
-		return message.join(", ");
-	}
-
-	if (typeof message === "object" && message?.message) {
-		return message.message;
-	}
-
-	if (typeof message === "string") {
-		return message;
-	}
-
-	return "Create project failed. Please try again.";
 };
 
 const DialogCreateProject = ({ workspaceId, workspaceName }: Props) => {
@@ -87,7 +62,12 @@ const DialogCreateProject = ({ workspaceId, workspaceName }: Props) => {
 			setOpen(false);
 		} catch (error) {
 			createdByBoardRef.current = false;
-			toast.error(getCreateProjectErrorMessage(error));
+			toast.error(
+				getFriendlyApiErrorMessage(
+					error,
+					"Không thể tạo dự án. Vui lòng thử lại.",
+				),
+			);
 		}
 	};
 
@@ -155,133 +135,163 @@ const DialogCreateProject = ({ workspaceId, workspaceName }: Props) => {
 
 			<DialogContentV2
 				showCloseButton={false}
-				className='flex! flex-col! min-h-[60vh] max-h-[90vh] sm:max-w-4xl'
+				className='flex! flex-col! max-h-[85vh] sm:max-w-3xl overflow-hidden border border-border/50 bg-background/95 backdrop-blur-xl p-0 shadow-2xl sm:rounded-2xl text-foreground'
 			>
-				<DialogHeaderV2 className='shrink-0'>
-					<DialogTitleV2>
-						<div className='flex items-center justify-between'>
-							<div className='flex items-center gap-3 flex-1'>
-								<div className='font-normal text-sm text-muted-foreground'>
-									Thêm vào
-								</div>
-								<div className='text-sm font-medium outline-none border-none flex-1 bg-transparent'>
-									{workspaceName}
-								</div>
-							</div>
+				{/* Top Bar / Header with gradient */}
+				<div className='relative overflow-hidden border-b border-border/40 bg-muted/20 px-6 py-3.5 shrink-0'>
+					<div className='absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-transparent' />
+					<div className='relative'>
+						<DialogHeaderV2 className='mb-0'>
+							<DialogTitleV2>
+								<div className='flex items-center justify-between'>
+									<div className='flex items-center gap-2 flex-1'>
+										<span className='font-normal text-xs text-muted-foreground uppercase tracking-wider'>
+											Thêm vào
+										</span>
+										<span className='text-xs font-semibold px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground'>
+											{workspaceName}
+										</span>
+									</div>
 
-							<div className='flex items-center gap-3 text-muted-foreground'>
-								<FaRegStar className="cursor-pointer hover:text-foreground transition-colors" />
-								<Ellipsis className="cursor-pointer hover:text-foreground transition-colors" size={18} />
-							</div>
+									<div className='flex items-center text-muted-foreground'>
+										<DialogCloseV2 asChild>
+											<button type="button" className="p-1 rounded-md hover:bg-muted transition-colors outline-none cursor-pointer">
+												<X size={16} />
+											</button>
+										</DialogCloseV2>
+									</div>
+								</div>
+							</DialogTitleV2>
+						</DialogHeaderV2>
+					</div>
+				</div>
+
+				<div className='flex-1 overflow-auto px-6 md:px-12 py-6'>
+					<div className='space-y-6'>
+						{/* Title input with subtle bottom focus line */}
+						<div className="relative group/input pb-2 border-b border-border/50 focus-within:border-primary/50 transition-colors">
+							<textarea
+								autoFocus
+								value={projectName}
+								onChange={(e) => setProjectName(e.target.value)}
+								onKeyDown={handleKeyDown}
+								placeholder='Tên dự án mới...'
+								rows={1}
+								onInput={(e) => {
+									const target = e.currentTarget;
+									target.style.height = "auto";
+									target.style.height = `${target.scrollHeight}px`;
+								}}
+								className='w-full resize-none overflow-hidden border-none bg-transparent text-2xl md:text-3xl font-extrabold outline-none ring-0 placeholder:text-muted-foreground/25 focus:outline-none focus:ring-0 leading-none text-foreground'
+							/>
 						</div>
-					</DialogTitleV2>
-				</DialogHeaderV2>
 
-				<div className='flex-1 overflow-auto mt-8'>
-					<div className='mx-10 md:mx-20'>
-						<textarea
-							autoFocus
-							value={projectName}
-							onChange={(e) => setProjectName(e.target.value)}
-							onKeyDown={handleKeyDown}
-							placeholder='New Project'
-							rows={1}
-							onInput={(e) => {
-								const target = e.currentTarget;
-								target.style.height = "auto";
-								target.style.height = `${target.scrollHeight}px`;
-							}}
-							className='w-full resize-none overflow-hidden border-none bg-transparent text-5xl font-extrabold outline-none ring-0 placeholder:text-muted-foreground/30 focus:outline-none focus:ring-0 leading-tight'
-						/>
-
-						{/* Quick Actions - Grid Style */}
+						{/* Grid Actions container */}
 						<div
-							className={`mt-10 transition-all duration-500 ease-in-out ${projectName.trim()
-								? "opacity-100 translate-y-0"
-								: "opacity-40 translate-y-2 pointer-events-none"
-								}`}
+							className={`transition-all duration-500 ease-in-out ${
+								projectName.trim()
+									? "opacity-100 translate-y-0"
+									: "opacity-45 translate-y-1.5 pointer-events-none"
+							}`}
 						>
-
-							<div className="space-y-6">
-								{/* Database Section */}
+							<div className="space-y-8">
+								{/* Database View types */}
 								<div>
-									<h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Cơ sở dữ liệu</h4>
-									<div className='grid grid-cols-2 md:grid-cols-3 gap-3 w-full'>
+									<h4 className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4">
+										Chọn kiểu hiển thị mặc định
+									</h4>
+									<div className='grid grid-cols-2 md:grid-cols-4 gap-4 w-full'>
+										{/* Board view card */}
 										<button
 											onClick={() => handleSelectBoard(BoardViewType.BOARD)}
 											disabled={!projectName.trim() || isPending}
-											className='flex flex-col items-start gap-3 p-4 rounded-xl border border-border/50 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all text-sm text-foreground group w-full text-left'
+											className='flex flex-col items-start gap-3.5 p-4 rounded-2xl border border-border/80 bg-card hover:border-blue-500/50 hover:bg-blue-500/5 hover:shadow-md transition-all duration-300 text-foreground group w-full text-left cursor-pointer'
 										>
-											<div className="p-2 rounded-lg bg-amber-500/10 text-amber-500 group-hover:scale-110 transition-transform">
-												<Kanban size={20} />
+											<div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-500 group-hover:scale-105 transition-transform duration-300">
+												<Kanban size={18} />
 											</div>
 											<div>
-												<div className="font-semibold text-base mb-1">Board</div>
-												<div className="text-xs text-muted-foreground">Quản lý công việc theo dạng bảng Kanban</div>
+												<div className="font-bold text-sm mb-1">Board</div>
+												<div className="text-[11px] text-muted-foreground leading-normal">
+													Quản lý công việc theo dạng bảng Kanban sinh động.
+												</div>
 											</div>
 										</button>
 
+										{/* Table view card */}
 										<button
 											onClick={() => handleSelectBoard(BoardViewType.TABLE)}
 											disabled={!projectName.trim() || isPending}
-											className='flex flex-col items-start gap-3 p-4 rounded-xl border border-border/50 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all text-sm text-foreground group w-full text-left'
+											className='flex flex-col items-start gap-3.5 p-4 rounded-2xl border border-border/80 bg-card hover:border-emerald-500/50 hover:bg-emerald-500/5 hover:shadow-md transition-all duration-300 text-foreground group w-full text-left cursor-pointer'
 										>
-											<div className="p-2 rounded-lg bg-amber-500/10 text-amber-500 group-hover:scale-110 transition-transform">
-												<Table2 size={20} />
+											<div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-500 group-hover:scale-105 transition-transform duration-300">
+												<Table2 size={18} />
 											</div>
 											<div>
-												<div className="font-semibold text-base mb-1 flex items-center gap-2">Table</div>
-												<div className="text-xs text-muted-foreground">Hiển thị dữ liệu dạng bảng lưới</div>
+												<div className="font-bold text-sm mb-1">Table</div>
+												<div className="text-[11px] text-muted-foreground leading-normal">
+													Hiển thị và cập nhật nhanh dữ liệu dạng bảng lưới.
+												</div>
 											</div>
 										</button>
 
+										{/* List view card */}
 										<button
 											onClick={() => handleSelectBoard(BoardViewType.LIST)}
 											disabled={!projectName.trim() || isPending}
-											className='flex flex-col items-start gap-3 p-4 rounded-xl border border-border/50 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all text-sm text-foreground group w-full text-left'
+											className='flex flex-col items-start gap-3.5 p-4 rounded-2xl border border-border/80 bg-card hover:border-indigo-500/50 hover:bg-indigo-500/5 hover:shadow-md transition-all duration-300 text-foreground group w-full text-left cursor-pointer'
 										>
-											<div className="p-2 rounded-lg bg-amber-500/10 text-amber-500 group-hover:scale-110 transition-transform">
-												<ListTodo size={20} />
+											<div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-500 group-hover:scale-105 transition-transform duration-300">
+												<ListTodo size={18} />
 											</div>
 											<div>
-												<div className="font-semibold text-base mb-1 flex items-center gap-2">List</div>
-												<div className="text-xs text-muted-foreground">Danh sách công việc đơn giản</div>
+												<div className="font-bold text-sm mb-1">List</div>
+												<div className="text-[11px] text-muted-foreground leading-normal">
+													Danh sách các đầu công việc tối giản, trực quan.
+												</div>
 											</div>
 										</button>
 
+										{/* Calendar view card */}
 										<button
 											onClick={() => handleSelectBoard(BoardViewType.CALENDAR)}
 											disabled={!projectName.trim() || isPending}
-											className='flex flex-col items-start gap-3 p-4 rounded-xl border border-border/50 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all text-sm text-foreground group w-full text-left'
+											className='flex flex-col items-start gap-3.5 p-4 rounded-2xl border border-border/80 bg-card hover:border-rose-500/50 hover:bg-rose-500/5 hover:shadow-md transition-all duration-300 text-foreground group w-full text-left cursor-pointer'
 										>
-											<div className="p-2 rounded-lg bg-amber-500/10 text-amber-500 group-hover:scale-110 transition-transform">
-												<Calendar size={20} />
+											<div className="p-2.5 rounded-xl bg-rose-500/10 text-rose-500 group-hover:scale-105 transition-transform duration-300">
+												<Calendar size={18} />
 											</div>
 											<div>
-												<div className="font-semibold text-base mb-1 flex items-center gap-2">Calendar</div>
-												<div className="text-xs text-muted-foreground">Quản lý theo lịch biểu trình</div>
+												<div className="font-bold text-sm mb-1">Calendar</div>
+												<div className="text-[11px] text-muted-foreground leading-normal">
+													Quản lý công việc và thời hạn theo lịch biểu quan sát.
+												</div>
 											</div>
 										</button>
 									</div>
 								</div>
 
 								{/* Tools Section */}
-								<div>
-									<h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Công cụ khác</h4>
-									<div className='flex gap-4 w-full'>
+								<div className="border-t border-border/40 pt-6">
+									<h4 className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-3">
+										Công cụ nâng cao
+									</h4>
+									<div className='flex flex-wrap gap-3 w-full'>
 										<button
+											type="button"
 											disabled
-											className='flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm text-muted-foreground hover:bg-muted transition-colors opacity-60 cursor-not-allowed'
+											className='flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs border border-dashed border-border bg-muted/10 text-muted-foreground hover:bg-muted/20 transition-all opacity-60 cursor-not-allowed'
 										>
-											<Files size={16} />
-											<span className="font-medium">Từ thư viện mẫu</span>
+											<Files size={14} />
+											<span className="font-semibold">Sử dụng mẫu dự án</span>
 										</button>
 										<button
+											type="button"
 											disabled
-											className='flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm text-muted-foreground hover:bg-muted transition-colors opacity-60 cursor-not-allowed'
+											className='flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs border border-dashed border-border bg-muted/10 text-muted-foreground hover:bg-muted/20 transition-all opacity-60 cursor-not-allowed'
 										>
-											<FileUp size={16} />
-											<span className="font-medium">Nhập (Import)</span>
+											<FileUp size={14} />
+											<span className="font-semibold">Nhập dữ liệu (Import)</span>
 										</button>
 									</div>
 								</div>

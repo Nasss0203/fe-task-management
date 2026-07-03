@@ -92,9 +92,33 @@ export const findPageBlocksByPageApi = async (
 export const createPageBlockApi = async (
 	data: CreatePageBlockPayload,
 ): Promise<PageBlockItem> => {
+	const payload: CreatePageBlockPayload = {
+		page_id: data.page_id,
+		type: data.type,
+		...(data.title !== undefined && { title: data.title }),
+		...(data.position_x !== undefined && { position_x: data.position_x }),
+		...(data.position_y !== undefined && { position_y: data.position_y }),
+		...(data.width !== undefined && { width: data.width }),
+		...(data.height !== undefined && { height: data.height }),
+		...(data.order_index !== undefined && {
+			order_index: data.order_index,
+		}),
+		...(data.insert_after_block_id && {
+			insert_after_block_id: data.insert_after_block_id,
+		}),
+		...(data.content !== undefined && { content: data.content }),
+		...(data.style_config !== undefined && {
+			style_config: data.style_config,
+		}),
+		...(data.data_config !== undefined && {
+			data_config: data.data_config,
+		}),
+		...(data.is_open !== undefined && { is_open: data.is_open }),
+	};
+
 	const response = await instance.post<PageBlockMutationResponse>(
 		"/pageBlock",
-		data,
+		payload,
 	);
 
 	return unwrapPageBlock(response.data);
@@ -103,12 +127,30 @@ export const createPageBlockApi = async (
 export const updatePageBlockApi = async (
 	data: PageBlockItem,
 ): Promise<PageBlockItem> => {
-	const response = await instance.patch<PageBlockMutationResponse>(
-		`/pageBlock/${data.id}`,
-		data,
-	);
-
-	return unwrapPageBlock(response.data);
+	const payload = {
+		page_id: data.page_id,
+		type: data.type,
+		title: data.title,
+		position_x: data.position_x,
+		position_y: data.position_y,
+		width: data.width,
+		height: data.height,
+		order_index: data.order_index,
+		content: data.content,
+		style_config: data.style_config,
+		data_config: data.data_config,
+		is_open: data.is_open,
+	};
+	try {
+		const response = await instance.patch<PageBlockMutationResponse>(
+			`/pageBlock/${data.id}`,
+			payload,
+		);
+		return unwrapPageBlock(response.data);
+	} catch (error) {
+		console.error("updatePageBlock failed", error);
+		throw error;
+	}
 };
 
 export const deletePageBlockApi = async ({

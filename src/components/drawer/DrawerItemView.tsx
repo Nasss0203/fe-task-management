@@ -40,7 +40,7 @@ export function DrawerItemView({
 			<Drawer direction='right' open={open} onOpenChange={onOpenChange}>
 				<DrawerContent className='data-[vaul-drawer-direction=right]:inset-y-0 data-[vaul-drawer-direction=right]:right-0 data-[vaul-drawer-direction=right]:w-full data-[vaul-drawer-direction=right]:sm:max-w-190 overflow-hidden border-l border-border bg-background p-0 text-foreground'>
 					<DrawerHeader className='sr-only'>
-						<DrawerTitle>{task.title}</DrawerTitle>
+						<DrawerTitle>{task.title ?? 'Untitled'}</DrawerTitle>
 						<DrawerDescription>
 							Task detail drawer
 						</DrawerDescription>
@@ -50,6 +50,8 @@ export function DrawerItemView({
 						<TaskDetailHeader
 							taskLabel={`Task #${task.projectSeq ?? task.id.slice(0, 6)}`}
 							title={task.title}
+							isUpdating={detail.isUpdatingTask}
+							onTitleSave={detail.updateTitle}
 						/>
 
 						<div className='min-h-0 flex-1 overflow-y-auto bg-background px-5 py-6 sm:px-6'>

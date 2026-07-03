@@ -65,6 +65,7 @@ const RestPage = () => {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const skipBlurRef = useRef(false);
 	const ignoreBlurUntilRef = useRef(0);
+	const isNameComposingRef = useRef(false);
 
 	useEffect(() => {
 		if (!isEditingName) return;
@@ -182,7 +183,18 @@ const RestPage = () => {
 						onChange={(event) =>
 							setDraft(projectId, event.target.value)
 						}
+						onCompositionStart={() => {
+							isNameComposingRef.current = true;
+						}}
+						onCompositionEnd={(event) => {
+							isNameComposingRef.current = false;
+							setDraft(projectId, event.currentTarget.value);
+						}}
 						onBlur={() => {
+							if (isNameComposingRef.current) {
+								return;
+							}
+
 							if (Date.now() < ignoreBlurUntilRef.current) {
 								window.requestAnimationFrame(() => {
 									inputRef.current?.focus();
@@ -198,6 +210,13 @@ const RestPage = () => {
 							void commitName();
 						}}
 						onKeyDown={(event) => {
+							if (
+								event.nativeEvent.isComposing ||
+								isNameComposingRef.current
+							) {
+								return;
+							}
+
 							if (event.key === "Enter") {
 								event.preventDefault();
 								event.currentTarget.blur();

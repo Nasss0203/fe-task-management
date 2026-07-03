@@ -22,7 +22,7 @@ export const UseTemplateModal = ({ template, isOpen, onClose }: UseTemplateModal
 	const handleUseTemplate = () => {
 		if (!template) return;
 		if (!workspaceName.trim()) {
-			toast.error("Please enter a workspace name");
+			toast.error("Vui lòng nhập tên không gian làm việc.");
 			return;
 		}
 
@@ -33,12 +33,12 @@ export const UseTemplateModal = ({ template, isOpen, onClose }: UseTemplateModal
 			},
 			{
 				onSuccess: () => {
-					toast.success("Workspace created successfully from template!");
+					toast.success("Đã tạo không gian làm việc từ mẫu.");
 					setWorkspaceName("");
 					onClose();
 				},
 				onError: () => {
-					toast.error("Failed to create workspace");
+					toast.error("Không thể tạo không gian làm việc.");
 				},
 			}
 		);
@@ -50,29 +50,29 @@ export const UseTemplateModal = ({ template, isOpen, onClose }: UseTemplateModal
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
-					<DialogTitle>Use Template</DialogTitle>
+					<DialogTitle>Dùng mẫu</DialogTitle>
 					<DialogDescription>
-						Create a new workspace using the configuration from <b>{template.name}</b>.
+						Tạo không gian làm việc mới từ cấu hình của mẫu <b>{template.name}</b>.
 					</DialogDescription>
 				</DialogHeader>
 				<div className="grid gap-4 py-4">
 					<div className="grid gap-2">
-						<Label htmlFor="name">Workspace Name</Label>
+						<Label htmlFor="name">Tên không gian làm việc</Label>
 						<Input
 							id="name"
 							value={workspaceName}
 							onChange={(e) => setWorkspaceName(e.target.value)}
-							placeholder="Enter workspace name"
+							placeholder="Nhập tên không gian làm việc"
 							autoFocus
 						/>
 					</div>
 				</div>
 				<DialogFooter>
 					<Button variant="outline" onClick={onClose} disabled={createWorkspace.isPending}>
-						Cancel
+						Hủy
 					</Button>
 					<Button onClick={handleUseTemplate} disabled={createWorkspace.isPending}>
-						{createWorkspace.isPending ? "Creating..." : "Create Workspace"}
+						{createWorkspace.isPending ? "Đang tạo..." : "Tạo không gian làm việc"}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

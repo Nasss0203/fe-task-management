@@ -5,12 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import {
 	Card,
 	CardContent,
-	CardDescription,
 	CardFooter,
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import {
 	useVerifyVnpayReturn,
 } from "@/features/billing/hooks/usePlan";
@@ -26,7 +24,6 @@ import {
 	Clock3,
 	CreditCard,
 	Loader2,
-	ReceiptText,
 	RefreshCcw,
 	ShieldCheck,
 	Sparkles,
@@ -200,8 +197,7 @@ function PaymentReturnContent() {
 
 				setStatus("failed");
 				setMessage(
-					result.message ??
-						"Thanh toán chưa hoàn tất hoặc đã bị hủy.",
+					"Thanh toán chưa hoàn tất hoặc đã bị hủy.",
 				);
 			} catch (error) {
 				if (!isMounted) return;

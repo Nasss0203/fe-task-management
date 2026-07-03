@@ -79,6 +79,7 @@ const SprintWorkspaceSection = ({
 		return sprints.flatMap((sprint) =>
 			(sprint.tasks ?? []).map((task) => ({
 				...task,
+				title: task.title ?? "Untitled",
 				sprintId: sprint.id,
 				sprintName: sprint.name,
 				projectId: sprint.projectId || task.projectId,

@@ -130,17 +130,7 @@ export function NavUser() {
 								<DropdownMenuSeparator />
 							</>
 						)}
-						<DropdownMenuGroup>
-							<DropdownMenuItem>
-								<BadgeCheck />
-								Account
-							</DropdownMenuItem>
-							<DropdownMenuItem>
-								<CreditCard />
-								Billing
-							</DropdownMenuItem>
-						</DropdownMenuGroup>
-						<DropdownMenuSeparator />
+
 						<DropdownMenuItem
 							disabled={logout.isPending}
 							onSelect={() => logout.mutate()}

@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { SPRINT_KEY } from "@/services/sprint/type";
 import { findAllTaskPriorityApi } from "@/services/task-priority/task-priority.serivce";
 import { findAllTaskStatusApi } from "@/services/task-status/task-status.service";
@@ -11,6 +12,7 @@ import {
 	findAllTaskApi,
 	moveTaskSprintToSprintApi,
 	moveTaskToSprintApi,
+	reorderTaskPositionApi,
 	removeTaskFormSprintApi,
 	restoreTaskApi,
 	updateTaskApi,
@@ -20,6 +22,7 @@ import {
 	FindAllTaskBacklogResponse,
 	FindAllTaskResponse,
 	FindBacklogTasksFilters,
+	ReorderTaskPositionDto,
 	TASK_KEY,
 	UpdateTaskDto,
 } from "@/services/task/type";
@@ -28,6 +31,11 @@ import { useTaskFilterStore } from "@/stores/use-task-filter";
 
 type UpdateTaskInput = Omit<UpdateTaskDto, "id"> & {
 	id: string;
+	workspaceId?: string;
+	projectId?: string;
+};
+
+type ReorderTaskPositionInput = ReorderTaskPositionDto & {
 	workspaceId?: string;
 	projectId?: string;
 };
@@ -113,7 +121,14 @@ export const useTask = (
 	const queryClient = useQueryClient();
 	const filtersByProject = useTaskFilterStore((state) => state.filtersByProject);
 	const globalFilters = filtersByProject[projectId] || {};
-	const activeFilters = filtersProp ?? globalFilters;
+
+	const activeFilters = useMemo(() => {
+		return {
+			...globalFilters,
+			...filtersProp,
+		};
+	}, [globalFilters, filtersProp]);
+
 	const includeTrash = options?.includeTrash === true;
 	const taskQuery = useQuery({
 		queryKey: [TASK_KEY.TASKS, workspaceId, projectId, activeFilters],
@@ -208,14 +223,14 @@ export const useTask = (
 
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({
-				queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId], // ← đổi thành TASK_BACKLOG
+				queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
 			});
 
 			await queryClient.invalidateQueries({
-				queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId], // giữ nguyên cho sprint tasks
+				queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
 			});
 			await queryClient.invalidateQueries({
-				queryKey: [SPRINT_KEY.SPRINT, workspaceId, projectId], 
+				queryKey: [SPRINT_KEY.SPRINT, workspaceId, projectId],
 			});
 		},
 	});
@@ -276,6 +291,39 @@ export const useTaskPriority = (workspaceId?: string, projectId?: string) => {
 	});
 };
 
+export const useReorderTaskPosition = ({
+	workspaceId,
+	projectId,
+}: {
+	workspaceId: string;
+	projectId: string;
+}) => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({
+			workspaceId: _workspaceId,
+			projectId: _projectId,
+			...body
+		}: ReorderTaskPositionInput) => {
+			void _workspaceId;
+			void _projectId;
+
+			return reorderTaskPositionApi(body);
+		},
+		onSuccess: async () => {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
+				}),
+			]);
+		},
+	});
+};
+
 export const useTaskMoveSprint = ({
 	workspaceId,
 	projectId,
@@ -309,7 +357,6 @@ export const useTaskMoveSprint = ({
 		]);
 	};
 
-	// Helper: cancel inflight queries + lấy snapshot
 	const cancelAndSnapshot = async (): Promise<TaskCacheSnapshot> => {
 		await Promise.all([
 			queryClient.cancelQueries({ queryKey: taskKey }),
@@ -322,7 +369,6 @@ export const useTaskMoveSprint = ({
 		};
 	};
 
-	// Helper: rollback khi lỗi
 	const rollback = (ctx?: TaskCacheSnapshot) => {
 		if (ctx?.previousTasks)
 			queryClient.setQueryData(taskKey, ctx.previousTasks);
@@ -342,7 +388,6 @@ export const useTaskMoveSprint = ({
 		onMutate: async ({ taskId, sprintId }) => {
 			const ctx = await cancelAndSnapshot();
 
-			// Cập nhật cache ngay → initialItems không bị stale → không snap back
 			queryClient.setQueryData<FindAllTaskResponse>(taskKey, (old) =>
 				old
 					? {

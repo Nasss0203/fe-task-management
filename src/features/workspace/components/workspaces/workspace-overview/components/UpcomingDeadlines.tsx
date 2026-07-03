@@ -35,11 +35,7 @@ export function UpcomingDeadlines({
 				{items?.map((item) => (
 					<Link
 						key={item.id}
-						href={
-							item.type === "task"
-								? `/dashboard/${workspaceSlug}/tasks/${item.id}`
-								: `/dashboard/${workspaceSlug}/tasks`
-						}
+						href={`/dashboard/${workspaceSlug}/projects/${item.projectId}`}
 						className={cn(
 							"flex items-center justify-between rounded-xl border border-border/50 bg-background/80 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md",
 							item.isUrgent &&

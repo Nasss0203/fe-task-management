@@ -182,7 +182,7 @@ export default function AdminUsersPage() {
 					note: "Granted from admin user management",
 				});
 				toast.success(
-					"Đã cấp Pro cho user và toàn bộ workspace sở hữu.",
+					"Đã cấp Pro cho người dùng và toàn bộ không gian làm việc sở hữu.",
 				);
 			} else {
 				await revokeSubscription.mutateAsync({
@@ -190,7 +190,7 @@ export default function AdminUsersPage() {
 					note: "Revoked from admin user management",
 				});
 				toast.success(
-					"Đã chuyển user và toàn bộ workspace sở hữu về Free.",
+					"Đã chuyển người dùng và toàn bộ không gian làm việc sở hữu về Free.",
 				);
 			}
 
@@ -204,7 +204,7 @@ export default function AdminUsersPage() {
 			);
 		} catch (error) {
 			console.error("change user billing subscription failed", error);
-			toast.error("Không thể cập nhật gói của user.");
+			toast.error("Không thể cập nhật gói của người dùng.");
 		}
 	};
 

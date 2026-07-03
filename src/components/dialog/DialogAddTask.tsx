@@ -34,14 +34,21 @@ import TaskStatusSelect from "@/features/task/components/task/TaskStatusSelect";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "../ui/separator";
+import type { TaskPositionContextInput } from "@/services/task/type";
 
 type DialogAddTaskProps = {
 	trigger?: React.ReactNode;
 	workspaceId?: string;
 	projectId?: string;
+	positionContext?: TaskPositionContextInput;
 };
 
-const DialogAddTask = ({ trigger, workspaceId: propWorkspaceId, projectId: propProjectId }: DialogAddTaskProps = {}) => {
+const DialogAddTask = ({
+	trigger,
+	workspaceId: propWorkspaceId,
+	projectId: propProjectId,
+	positionContext,
+}: DialogAddTaskProps = {}) => {
 	const { currentProjectId, currentWorkspaceId } = useProjectSelectionStore();
 
 	const projectId = propProjectId || (currentProjectId as string);
@@ -126,6 +133,7 @@ const DialogAddTask = ({ trigger, workspaceId: propWorkspaceId, projectId: propP
 						? dateRange.from.toISOString()
 						: null,
 				initialComment: null,
+				...(positionContext ? { positionContext } : {}),
 			});
 
 			resetForm();

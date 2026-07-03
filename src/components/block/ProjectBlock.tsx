@@ -10,6 +10,7 @@ import { Button } from "../ui/button";
 import { ProjectTaskFilter } from "../filter/ProjectTaskFilter";
 import DialogAddTask from "../dialog/DialogAddTask";
 import { Plus } from "lucide-react";
+import type { TaskPositionContextInput } from "@/services/task/type";
 
 export type AvailableTabItem = {
 	icon: LucideIcon;
@@ -47,6 +48,24 @@ const ProjectBlock = ({
 		: null;
 
 	const { createBoard, findBoard } = useBoards();
+	const activePositionContext: TaskPositionContextInput | undefined =
+		activeBoard?.viewType === BoardViewType.BOARD
+			? {
+					context: "kanban",
+					contextId: activeBoard.id,
+				}
+			: activeBoard?.viewType === BoardViewType.TABLE ||
+					activeBoard?.viewType === BoardViewType.LIST
+				? {
+						context: "list",
+						contextId: activeBoard.id,
+					}
+				: activeBoard?.viewType === BoardViewType.BACKLOG
+					? {
+							context: "backlog",
+							contextId: projectId,
+						}
+					: undefined;
 
 	const handleCreateBoard = async (viewType: BoardViewType, label: string) => {
 		if (!blockId) return;
@@ -104,6 +123,9 @@ const ProjectBlock = ({
 							<div className="flex items-center gap-2">
 								<ProjectTaskFilter workspaceId={workspaceId} projectId={projectId} />
 								<DialogAddTask 
+									workspaceId={workspaceId}
+									projectId={projectId}
+									positionContext={activePositionContext}
 									trigger={
 										<Button size="sm" className="h-8 gap-1.5 px-3 rounded-md text-xs font-medium shadow-sm">
 											<Plus className="size-3.5" />
