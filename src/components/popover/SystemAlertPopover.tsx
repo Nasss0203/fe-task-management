@@ -16,7 +16,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { useNotifications } from "@/features/notification/hooks/useNotifications";
+import {
+	useMarkAllNotificationsAsRead,
+	useNotifications,
+	useUnreadNotificationCount,
+} from "@/features/notification/hooks/useNotifications";
 import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";
 import { useAcceptWorkspaceInvite } from "@/features/workspace/hooks/useWorkspaceInvite";
 import { NotificationType } from "@/services/notification/type";
@@ -55,9 +59,12 @@ const getNotificationIcon = (type: NotificationType) => {
 	}
 };
 
-export function InboxPopover() {
+export function SystemAlertPopover() {
 	const router = useRouter();
 	const acceptInvite = useAcceptWorkspaceInvite();
+	const { markAllNotificationsAsRead } = useMarkAllNotificationsAsRead();
+	const { unreadNotificationCountQuery } = useUnreadNotificationCount();
+	const [showAll, setShowAll] = useState(false);
 	const [inviteStatuses, setInviteStatuses] = useState<
 		Record<string, WorkspaceInviteStatus>
 	>({});
@@ -85,11 +92,13 @@ export function InboxPopover() {
 	};
 
 	const { myNotificationsQuery } = useNotifications({
-		limit: 10,
-		category: "human",
+		limit: showAll ? 50 : 10,
 	});
 
 	const notifications = myNotificationsQuery.data?.data ?? [];
+	const hasUnread =
+		(unreadNotificationCountQuery.data?.data.count ?? 0) > 0 ||
+		notifications.some((notification) => !notification.readAt);
 	console.log("🚀 ~ notifications~", notifications);
 
 	const handleAcceptInvite = (inviteToken: string | undefined) => {
@@ -99,15 +108,11 @@ export function InboxPopover() {
 		}
 
 		acceptInvite.mutate(inviteToken, {
-			onSuccess: (response) => {
-				const nextStatus =
-					response.data.status ?? WorkspaceInviteStatus.ACCEPTED;
-
+			onSuccess: () => {
 				setInviteStatuses((prev) => ({
 					...prev,
-					[inviteToken]: nextStatus,
+					[inviteToken]: WorkspaceInviteStatus.ACCEPTED,
 				}));
-
 				toast.success("Workspace invite accepted");
 				router.push("/dashboard");
 			},
@@ -117,17 +122,36 @@ export function InboxPopover() {
 		});
 	};
 
+	const handleMarkAllAsRead = () => {
+		markAllNotificationsAsRead.mutate(undefined, {
+			onSuccess: () => {
+				toast.success("Đã đánh dấu tất cả thông báo là đã đọc");
+			},
+			onError: () => {
+				toast.error("Không thể đánh dấu đã đọc");
+			},
+		});
+	};
+
 	return (
 		<div className='w-[420px] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md'>
 			<div className='flex items-center justify-between border-b px-4 py-3'>
 				<div>
-					<h3 className='text-sm font-semibold'>Hộp thư đến</h3>
+					<h3 className='text-sm font-semibold'>Cảnh báo hệ thống</h3>
 					<p className='text-xs text-muted-foreground'>
-						Những việc cần bạn xử lý
+						Cập nhật tiến độ & cảnh báo
 					</p>
 				</div>
 
-				<Button variant='ghost' size='sm' className='h-8 px-2 text-xs'>
+				<Button
+					variant='ghost'
+					size='sm'
+					className='h-8 px-2 text-xs'
+					disabled={
+						!hasUnread || markAllNotificationsAsRead.isPending
+					}
+					onClick={handleMarkAllAsRead}
+				>
 					Đánh dấu đã đọc
 				</Button>
 			</div>
@@ -297,6 +321,8 @@ export function InboxPopover() {
 				<Button
 					variant='ghost'
 					className='h-9 w-full justify-center text-sm'
+					disabled={showAll}
+					onClick={() => setShowAll(true)}
 				>
 					Xem tất cả
 				</Button>
