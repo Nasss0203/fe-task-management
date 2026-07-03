@@ -58,7 +58,7 @@ export const WorkspaceTopHeader = ({
 		const name = value.trim();
 
 		if (!name) {
-			toast.error("Ten workspace khong duoc de trong.");
+			toast.error("Tên không gian làm việc không được để trống.");
 			setDraft(workspaceId, workspaceName);
 			inputRef.current?.focus();
 			return;
@@ -79,10 +79,10 @@ export const WorkspaceTopHeader = ({
 			});
 			clearDraft(workspaceId);
 			setIsEditingName(false);
-			toast.success("Workspace da duoc doi ten.");
+			toast.success("Đã đổi tên không gian làm việc.");
 		} catch (error) {
 			console.error("renameWorkspaceFromHeader failed", error);
-			toast.error("Khong the doi ten workspace.");
+			toast.error("Không thể đổi tên không gian làm việc.");
 		}
 	};
 

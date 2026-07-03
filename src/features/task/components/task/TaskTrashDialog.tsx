@@ -47,12 +47,12 @@ const TaskTrashDialog = ({
 
 			toast.success(
 				taskCount === 1
-					? "Task đã được chuyển vào thùng rác."
-					: `${taskCount} task đã được chuyển vào thùng rác.`,
+					? "Đã chuyển công việc vào thùng rác."
+					: `Đã chuyển ${taskCount} công việc vào thùng rác.`,
 			);
 		} catch (error) {
 			console.error("deleteTaskFromDialog failed", error);
-			toast.error("Không thể chuyển task vào thùng rác.");
+			toast.error("Không thể chuyển công việc vào thùng rác.");
 		}
 	};
 

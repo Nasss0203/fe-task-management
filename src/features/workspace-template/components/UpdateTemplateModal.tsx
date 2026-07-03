@@ -40,7 +40,7 @@ export const UpdateTemplateModal = ({ template, isOpen, onClose }: UpdateTemplat
 	const handleUpdate = () => {
 		if (!template) return;
 		if (!formData.name?.trim()) {
-			toast.error("Please enter a template name");
+			toast.error("Vui lòng nhập tên mẫu.");
 			return;
 		}
 
@@ -48,11 +48,11 @@ export const UpdateTemplateModal = ({ template, isOpen, onClose }: UpdateTemplat
 			{ id: template.id, data: formData },
 			{
 				onSuccess: () => {
-					toast.success("Template updated successfully!");
+					toast.success("Đã cập nhật mẫu.");
 					onClose();
 				},
 				onError: () => {
-					toast.error("Failed to update template");
+					toast.error("Không thể cập nhật mẫu.");
 				},
 			}
 		);
@@ -62,38 +62,38 @@ export const UpdateTemplateModal = ({ template, isOpen, onClose }: UpdateTemplat
 		<Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
-					<DialogTitle>Update Template</DialogTitle>
+					<DialogTitle>Cập nhật Mẫu</DialogTitle>
 					<DialogDescription>
-						Modify the details of your workspace template.
+						Chỉnh sửa thông tin chi tiết của mẫu không gian làm việc.
 					</DialogDescription>
 				</DialogHeader>
 				<div className="grid gap-4 py-4">
 					<div className="grid gap-2">
-						<Label htmlFor="update-name">Template Name</Label>
+						<Label htmlFor="update-name">Tên mẫu</Label>
 						<Input
 							id="update-name"
 							value={formData.name}
 							onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-							placeholder="e.g. Software Development"
+							placeholder="Ví dụ: Phát triển phần mềm"
 						/>
 					</div>
 					<div className="grid gap-2">
-						<Label htmlFor="update-description">Description</Label>
+						<Label htmlFor="update-description">Mô tả</Label>
 						<Input
 							id="update-description"
 							value={formData.description}
 							onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-							placeholder="Optional description"
+							placeholder="Mô tả tùy chọn"
 						/>
 					</div>
 					<div className="grid gap-2">
-						<Label htmlFor="update-category">Category</Label>
+						<Label htmlFor="update-category">Danh mục</Label>
 						<Select
 							value={formData.category}
 							onValueChange={(v) => setFormData({ ...formData, category: v })}
 						>
 							<SelectTrigger>
-								<SelectValue placeholder="Select category" />
+								<SelectValue placeholder="Chọn danh mục" />
 							</SelectTrigger>
 							<SelectContent>
 								<SelectItem value="Software">Software Development</SelectItem>
@@ -106,28 +106,28 @@ export const UpdateTemplateModal = ({ template, isOpen, onClose }: UpdateTemplat
 						</Select>
 					</div>
 					<div className="grid gap-2">
-						<Label htmlFor="update-visibility">Visibility</Label>
+						<Label htmlFor="update-visibility">Quyền riêng tư</Label>
 						<Select
 							value={formData.visibility}
 							onValueChange={(v: "PRIVATE" | "WORKSPACE" | "PUBLIC") => setFormData({ ...formData, visibility: v })}
 						>
 							<SelectTrigger>
-								<SelectValue placeholder="Select visibility" />
+								<SelectValue placeholder="Chọn quyền riêng tư" />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem value="PRIVATE">Private (Only you)</SelectItem>
-								<SelectItem value="WORKSPACE">Workspace (Members only)</SelectItem>
-								<SelectItem value="PUBLIC">Public (Everyone)</SelectItem>
+								<SelectItem value="PRIVATE">Riêng tư (Chỉ mình bạn)</SelectItem>
+								<SelectItem value="WORKSPACE">Không gian làm việc (Chỉ thành viên)</SelectItem>
+								<SelectItem value="PUBLIC">Công khai (Tất cả mọi người)</SelectItem>
 							</SelectContent>
 						</Select>
 					</div>
 				</div>
 				<DialogFooter>
 					<Button variant="outline" onClick={onClose} disabled={updateWorkspaceTemplate.isPending}>
-						Cancel
+						Hủy
 					</Button>
 					<Button onClick={handleUpdate} disabled={updateWorkspaceTemplate.isPending}>
-						{updateWorkspaceTemplate.isPending ? "Updating..." : "Update Template"}
+						{updateWorkspaceTemplate.isPending ? "Đang cập nhật..." : "Cập nhật Mẫu"}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

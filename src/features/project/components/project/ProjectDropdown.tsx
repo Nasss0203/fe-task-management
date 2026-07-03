@@ -22,13 +22,11 @@ import {
 import { ProjectItems } from "@/services/project/type";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-	Columns3,
 	Ellipsis,
 	ExternalLink,
 	Eye,
 	Link2,
 	Pencil,
-	PlayCircle,
 	Trash2,
 } from "lucide-react";
 import Link from "next/link";
@@ -99,7 +97,7 @@ const ProjectDropdown = ({ project, workspace, onRenameProject }: ProjectDropdow
 				queryKey: [PAGE_KEY.PAGE, workspace.id],
 			});
 
-			toast.success("Dự án đã hiển thị trong trang.");
+			toast.success("Đã hiển thị dự án trong trang.");
 		} catch (error) {
 			console.error("showProjectInPage failed", error);
 			toast.error("Không thể hiển thị dự án trong trang.");
@@ -141,7 +139,7 @@ const ProjectDropdown = ({ project, workspace, onRenameProject }: ProjectDropdow
 										}, 150);
 									} else {
 										toast.info(
-											"Đổi tên dự án sẽ được hỗ trợ khi backend cập nhật.",
+											"Tính năng đổi tên dự án chưa sẵn sàng.",
 										);
 									}
 								}}
@@ -185,26 +183,6 @@ const ProjectDropdown = ({ project, workspace, onRenameProject }: ProjectDropdow
 					<DropdownMenuSeparator className='my-1 bg-muted' />
 
 					<DropdownMenuGroup>
-						<RequirePermission
-							workspaceId={workspace.id}
-							code={PERMISSIONS.SPRINT_CREATE}
-						>
-							<DropdownMenuItem className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'>
-								<PlayCircle size={15} />
-								<span>Tạo sprint mới</span>
-							</DropdownMenuItem>
-						</RequirePermission>
-
-						<RequirePermission
-							workspaceId={workspace.id}
-							code={PERMISSIONS.BOARD_CREATE}
-						>
-							<DropdownMenuItem className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm focus:focus:bg-accent focus:text-accent-foreground focus:text-foreground'>
-								<Columns3 size={15} />
-								<span>Thêm board / view</span>
-							</DropdownMenuItem>
-						</RequirePermission>
-
 						{!isProjectVisibleInPage && (
 							<RequirePermission
 								workspaceId={workspace.id}

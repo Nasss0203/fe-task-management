@@ -103,8 +103,8 @@ export function AddPeopleDialog({
 				onSuccess: () => {
 					toast.success(
 						selectedRecipients.length > 1
-							? `Sent ${selectedRecipients.length} invitations`
-							: "Invitation sent",
+							? `Đã gửi ${selectedRecipients.length} lời mời.`
+							: "Đã gửi lời mời.",
 					);
 					setQuery("");
 					setRole(RoleName.MEMBER);
@@ -112,7 +112,7 @@ export function AddPeopleDialog({
 					onOpenChange(false);
 				},
 				onError: () => {
-					toast.error("Failed to send invitation");
+					toast.error("Không thể gửi lời mời.");
 				},
 			},
 		);

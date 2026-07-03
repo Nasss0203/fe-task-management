@@ -307,10 +307,14 @@ const BlockList = ({ blocks, page }: BlockListProps) => {
 												</CreateBlockMenu>
 
 												<DropdownMenu
-													onConvert={() =>
-														handleUpdateDataConfigPageblock(
-															block,
-														)
+													onConvert={
+														block.type ===
+														PageBlockType.DATABASE_VIEW
+															? () =>
+																	handleUpdateDataConfigPageblock(
+																		block,
+																	)
+															: undefined
 													}
 													onRemoveFromPage={() =>
 														handleDeleteBlock(block)

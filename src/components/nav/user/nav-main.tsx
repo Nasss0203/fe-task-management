@@ -128,7 +128,7 @@ export function NavMain() {
 		if (!editingWorkspaceId) return;
 
 		if (!name) {
-			toast.error("Ten workspace khong duoc de trong.");
+			toast.error("Tên không gian làm việc không được để trống.");
 			setWorkspaceNameDraft(workspace.id, workspace.name);
 			renameInputRef.current?.focus();
 			return;
@@ -148,12 +148,12 @@ export function NavMain() {
 				},
 			});
 
-			toast.success("Workspace da duoc doi ten.");
+			toast.success("Đã đổi tên không gian làm việc.");
 			clearWorkspaceNameDraft(workspace.id);
 			cancelRenameWorkspace();
 		} catch (error) {
 			console.error("renameWorkspaceInline failed", error);
-			toast.error("Khong the doi ten workspace.");
+			toast.error("Không thể đổi tên không gian làm việc.");
 		}
 	};
 

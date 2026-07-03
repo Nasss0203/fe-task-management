@@ -26,7 +26,7 @@ export function useTaskAttachments(task: TaskItem) {
 		const validFiles: File[] = [];
 		for (const file of files) {
 			if (file.size > MAX_FILE_SIZE) {
-				toast.error(`File ${file.name} is larger than 5MB`);
+				toast.error(`Tệp ${file.name} vượt quá giới hạn 5MB.`);
 				continue;
 			}
 			validFiles.push(file);
@@ -47,14 +47,14 @@ export function useTaskAttachments(task: TaskItem) {
 			const failed = results.filter((r) => r.status === "rejected").length;
 			
 			if (succeeded > 0) {
-				toast.success(`Successfully uploaded ${succeeded} file(s)`);
+				toast.success(`Đã tải lên ${succeeded} tệp.`);
 				queryClient.invalidateQueries({ queryKey: ["task-attachments", task.id] });
 			}
 			if (failed > 0) {
-				toast.error(`Failed to upload ${failed} file(s)`);
+				toast.error(`Không thể tải lên ${failed} tệp.`);
 			}
 		} catch (error) {
-			toast.error("An error occurred during upload");
+			toast.error("Đã xảy ra lỗi khi tải tệp lên.");
 		} finally {
 			setIsUploading(false);
 		}
@@ -63,11 +63,11 @@ export function useTaskAttachments(task: TaskItem) {
 	const { mutate: deleteAttachment } = useMutation({
 		mutationFn: deleteAttachmentApi,
 		onSuccess: () => {
-			toast.success("Attachment deleted successfully");
+			toast.success("Đã xóa tệp đính kèm.");
 			queryClient.invalidateQueries({ queryKey: ["task-attachments", task.id] });
 		},
 		onError: () => {
-			toast.error("Failed to delete attachment");
+			toast.error("Không thể xóa tệp đính kèm.");
 		},
 	});
 
@@ -84,7 +84,7 @@ export function useTaskAttachments(task: TaskItem) {
 			link.click();
 			document.body.removeChild(link);
 		} catch (error) {
-			toast.error("Failed to get download link");
+			toast.error("Không thể lấy liên kết tải xuống.");
 		}
 	};
 

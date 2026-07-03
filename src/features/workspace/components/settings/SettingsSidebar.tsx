@@ -19,7 +19,7 @@ export function SettingsSidebar({
 					Workspace settings
 				</div>
 				<div className='mt-3 flex items-center gap-3'>
-					<div className='flex size-8 items-center justify-center rounded bg-blue-600 text-sm font-bold'>
+					<div className='flex size-8 items-center justify-center rounded bg-primary text-primary-foreground text-sm font-bold'>
 						{workspaceName.charAt(0).toUpperCase()}
 					</div>
 					<div className='min-w-0'>
@@ -43,10 +43,10 @@ export function SettingsSidebar({
 							key={item.key}
 							type='button'
 							onClick={() => onSectionChange(item.key)}
-							className={`flex h-9 items-center gap-3 rounded-md px-3 text-left text-sm transition ${
+							className={`flex h-9 items-center gap-3 rounded-md px-3 text-left text-sm transition cursor-pointer ${
 								isActive
-									? "bg-blue-500/15 text-blue-300"
-									: "text-foreground hover:hover:bg-accent hover:hover:text-foreground"
+									? "bg-accent text-accent-foreground font-semibold shadow-xs"
+									: "text-foreground hover:bg-accent/50 hover:text-foreground"
 							}`}
 						>
 							<Icon className='size-4' />

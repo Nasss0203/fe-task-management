@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import type { WorkspaceMemberItem } from "@/services/member/type";
+import { getFriendlyApiErrorMessage } from "@/lib/api-error-message";
 import { RequirePermission } from "@/features/permission/components/RequirePermission";
 import { PERMISSIONS } from "@/constants/permissions";
 import { useMember } from "@/features/member/hooks/useMember";
@@ -52,10 +53,15 @@ export function SettingsAccessSection({
 			{ userId, role_name: roleName },
 			{
 				onSuccess: () => {
-					toast.success("Member role updated successfully");
+					toast.success("Đã cập nhật vai trò thành viên.");
 				},
-				onError: (error: any) => {
-					toast.error(error?.response?.data?.message || "Failed to update member role");
+				onError: (error: unknown) => {
+					toast.error(
+						getFriendlyApiErrorMessage(
+							error,
+							"Không thể cập nhật vai trò thành viên.",
+						),
+					);
 				},
 			}
 		);
@@ -64,10 +70,12 @@ export function SettingsAccessSection({
 	const handleRemoveMember = (userId: string) => {
 		removeMember.mutate(userId, {
 			onSuccess: () => {
-				toast.success("Member removed successfully");
+				toast.success("Đã xóa thành viên khỏi không gian làm việc.");
 			},
-			onError: (error: any) => {
-				toast.error(error?.response?.data?.message || "Failed to remove member");
+			onError: (error: unknown) => {
+				toast.error(
+					getFriendlyApiErrorMessage(error, "Không thể xóa thành viên."),
+				);
 			},
 		});
 	};

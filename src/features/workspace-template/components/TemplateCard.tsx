@@ -6,8 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CalendarDays, LayoutTemplate, Lock, Users, Globe, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 import { useUser } from "@/features/auth/hooks/useUser";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { UpdateTemplateModal } from "./UpdateTemplateModal";
 import { useState } from "react";
 import { useWorkspaceTemplate } from "../hooks/useWorkspaceTemplate";
@@ -22,16 +24,23 @@ export const TemplateCard = ({ template, onUseTemplate }: TemplateCardProps) => 
 	const { user } = useUser();
 	const isOwner = user?.id === template.createdBy;
 	const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 	const { deleteWorkspaceTemplate } = useWorkspaceTemplate();
 
 	const handleDelete = () => {
-		if (window.confirm("Are you sure you want to delete this template? This action cannot be undone.")) {
-			deleteWorkspaceTemplate.mutate(template.id, {
-				onSuccess: () => {
-					toast.success("Template deleted successfully");
-				}
-			});
-		}
+		setIsDeleteDialogOpen(true);
+	};
+
+	const confirmDelete = () => {
+		deleteWorkspaceTemplate.mutate(template.id, {
+			onSuccess: () => {
+				toast.success("Đã xóa mẫu.");
+				setIsDeleteDialogOpen(false);
+			},
+			onError: () => {
+				toast.error("Không thể xóa mẫu.");
+			}
+		});
 	};
 
 	const getVisibilityIcon = () => {
@@ -47,6 +56,19 @@ export const TemplateCard = ({ template, onUseTemplate }: TemplateCardProps) => 
 		}
 	};
 
+	const getVisibilityLabel = () => {
+		switch (template.visibility) {
+			case "PUBLIC":
+				return "Công khai";
+			case "WORKSPACE":
+				return "Không gian làm việc";
+			case "PRIVATE":
+				return "Riêng tư";
+			default:
+				return template.visibility;
+		}
+	};
+
 	return (
 		<Card className="flex flex-col h-full overflow-hidden hover:shadow-lg transition-shadow duration-200 border-border/50">
 			<div className="h-32 bg-gradient-to-r from-blue-500/20 to-purple-500/20 flex items-center justify-center border-b">
@@ -58,7 +80,7 @@ export const TemplateCard = ({ template, onUseTemplate }: TemplateCardProps) => 
 						<CardTitle className="text-lg line-clamp-2">{template.name}</CardTitle>
 						{template.isSystem && (
 							<Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20 flex-shrink-0">
-								System
+								Hệ thống
 							</Badge>
 						)}
 					</div>
@@ -72,18 +94,18 @@ export const TemplateCard = ({ template, onUseTemplate }: TemplateCardProps) => 
 							<DropdownMenuContent align="end">
 								<DropdownMenuItem onClick={() => setIsUpdateModalOpen(true)} className="gap-2">
 									<Pencil className="h-4 w-4" />
-									Edit Template
+									Chỉnh sửa mẫu
 								</DropdownMenuItem>
 								<DropdownMenuItem onClick={handleDelete} className="gap-2 text-red-500 focus:text-red-500">
 									<Trash2 className="h-4 w-4" />
-									Delete
+									Xóa
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
 					)}
 				</div>
 				<CardDescription className="line-clamp-3 text-sm">
-					{template.description || "No description provided. This template can be used to quick-start your workspace."}
+					{template.description || "Chưa có mô tả. Mẫu này có thể dùng để tạo nhanh không gian làm việc của bạn."}
 				</CardDescription>
 			</CardHeader>
 			<CardContent className="pb-4">
@@ -91,11 +113,11 @@ export const TemplateCard = ({ template, onUseTemplate }: TemplateCardProps) => 
 					<div className="flex items-center gap-4">
 						<div className="flex items-center">
 							{getVisibilityIcon()}
-							<span className="capitalize">{template.visibility.toLowerCase()}</span>
+							<span>{getVisibilityLabel()}</span>
 						</div>
 						<div className="flex items-center">
 							<CalendarDays className="w-3 h-3 mr-1" />
-							<span>{format(new Date(template.createdAt), "MMM d, yyyy")}</span>
+							<span>{format(new Date(template.createdAt), "d MMM, yyyy", { locale: vi })}</span>
 						</div>
 					</div>
 					{template.category && (
@@ -107,15 +129,34 @@ export const TemplateCard = ({ template, onUseTemplate }: TemplateCardProps) => 
 			</CardContent>
 			<CardFooter className="pt-0">
 				<Button className="w-full" onClick={() => onUseTemplate(template)}>
-					Use Template
+					Dùng mẫu này
 				</Button>
 			</CardFooter>
 
-			<UpdateTemplateModal 
-				template={template} 
-				isOpen={isUpdateModalOpen} 
-				onClose={() => setIsUpdateModalOpen(false)} 
+			<UpdateTemplateModal
+				template={template}
+				isOpen={isUpdateModalOpen}
+				onClose={() => setIsUpdateModalOpen(false)}
 			/>
+
+			<Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+				<DialogContent className="sm:max-w-[425px]">
+					<DialogHeader>
+						<DialogTitle>Xóa mẫu không gian làm việc</DialogTitle>
+						<DialogDescription>
+							Bạn có chắc chắn muốn xóa mẫu này? Hành động này không thể hoàn tác và mẫu sẽ bị gỡ khỏi hệ thống.
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter className="mt-4 gap-2">
+						<Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} disabled={deleteWorkspaceTemplate.isPending}>
+							Hủy
+						</Button>
+						<Button variant="destructive" onClick={confirmDelete} disabled={deleteWorkspaceTemplate.isPending}>
+							{deleteWorkspaceTemplate.isPending ? "Đang xóa..." : "Xóa"}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</Card>
 	);
 };

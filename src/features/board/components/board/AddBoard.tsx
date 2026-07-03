@@ -129,9 +129,9 @@ export default function AddBoard({
 				<button
 					type='button'
 					onClick={handleOpenAddBoard}
-					className='flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-muted text-white transition hover:bg-neutral-600'
+					className='flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg bg-muted/60 hover:bg-accent text-muted-foreground hover:text-foreground transition-all duration-200 border border-border/40 hover:border-border/80'
 				>
-					<Plus className='size-4' />
+					<Plus className='size-4.5' />
 				</button>
 			</PopoverTriggerV2>
 

@@ -99,11 +99,10 @@ export function SystemAlertPopover() {
 	const hasUnread =
 		(unreadNotificationCountQuery.data?.data.count ?? 0) > 0 ||
 		notifications.some((notification) => !notification.readAt);
-	console.log("🚀 ~ notifications~", notifications);
 
 	const handleAcceptInvite = (inviteToken: string | undefined) => {
 		if (!inviteToken) {
-			toast.error("Invite token not found");
+			toast.error("Không tìm thấy mã lời mời.");
 			return;
 		}
 
@@ -113,11 +112,11 @@ export function SystemAlertPopover() {
 					...prev,
 					[inviteToken]: WorkspaceInviteStatus.ACCEPTED,
 				}));
-				toast.success("Workspace invite accepted");
+				toast.success("Đã chấp nhận lời mời vào không gian làm việc.");
 				router.push("/dashboard");
 			},
 			onError: () => {
-				toast.error("Failed to accept workspace invite");
+				toast.error("Không thể chấp nhận lời mời.");
 			},
 		});
 	};
@@ -125,10 +124,10 @@ export function SystemAlertPopover() {
 	const handleMarkAllAsRead = () => {
 		markAllNotificationsAsRead.mutate(undefined, {
 			onSuccess: () => {
-				toast.success("Đã đánh dấu tất cả thông báo là đã đọc");
+				toast.success("Đã đánh dấu tất cả thông báo là đã đọc.");
 			},
 			onError: () => {
-				toast.error("Không thể đánh dấu đã đọc");
+				toast.error("Không thể đánh dấu thông báo là đã đọc.");
 			},
 		});
 	};

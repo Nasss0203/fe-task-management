@@ -48,10 +48,10 @@ const WorkspaceTrashDialog = ({
 				router.push("/dashboard/trash/workspaces");
 			}
 
-			toast.success("Workspace đã được chuyển vào thùng rác.");
+			toast.success("Đã chuyển không gian làm việc vào thùng rác.");
 		} catch (error) {
 			console.error("trashWorkspace failed", error);
-			toast.error("Không thể chuyển workspace vào thùng rác.");
+			toast.error("Không thể chuyển không gian làm việc vào thùng rác.");
 		}
 	};
 

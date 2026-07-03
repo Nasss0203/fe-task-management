@@ -107,7 +107,7 @@ const ProjectSidebarItem = ({
 		const name = value.trim();
 
 		if (!name) {
-			toast.error("Ten du an khong duoc de trong.");
+			toast.error("Tên dự án không được để trống.");
 			setDraft(projectId, projectName);
 			inputRef.current?.focus();
 			return;
@@ -130,10 +130,10 @@ const ProjectSidebarItem = ({
 
 			clearDraft(projectId);
 			setIsEditingName(false);
-			toast.success("Du an da duoc doi ten.");
+			toast.success("Đã đổi tên dự án.");
 		} catch (error) {
 			console.error("renameProjectFromSidebar failed", error);
-			toast.error("Khong the doi ten du an.");
+			toast.error("Không thể đổi tên dự án.");
 		}
 	};
 

@@ -1,4 +1,5 @@
 "use client";
+import { getFriendlyApiErrorMessage } from "@/lib/api-error-message";
 import { toast } from "sonner";
 import {
 	completeSprintApi,
@@ -61,10 +62,10 @@ export const useSprints = ({
 				queryKey: [SPRINT_KEY.SPRINTS],
 			});
 		},
-		onError: (err: any) => {
-			console.error("createSprint failed", err);
-			toast.error(err?.response?.data?.message || "Failed to create sprint");
-		},
+	onError: (err: unknown) => {
+		console.error("createSprint failed", err);
+		toast.error(getFriendlyApiErrorMessage(err, "Không thể tạo sprint."));
+	},
 	});
 
 	const startSprint = useMutation({
@@ -78,10 +79,10 @@ export const useSprints = ({
 				queryKey: [SPRINT_KEY.SPRINTS],
 			});
 		},
-		onError: (err: any) => {
-			console.error("startSprint failed", err);
-			toast.error(err?.response?.data?.message || "Failed to start sprint");
-		},
+	onError: (err: unknown) => {
+		console.error("startSprint failed", err);
+		toast.error(getFriendlyApiErrorMessage(err, "Không thể bắt đầu sprint."));
+	},
 	});
 
 	const completed = useMutation({
@@ -98,10 +99,10 @@ export const useSprints = ({
 				queryKey: [TASK_KEY.TASK_BACKLOG],
 			});
 		},
-		onError: (err: any) => {
-			console.error("completedSprint failed", err);
-			toast.error(err?.response?.data?.message || "Failed to complete sprint");
-		},
+	onError: (err: unknown) => {
+		console.error("completedSprint failed", err);
+		toast.error(getFriendlyApiErrorMessage(err, "Không thể hoàn thành sprint."));
+	},
 	});
 
 	const updateSprint = useMutation({
@@ -117,10 +118,10 @@ export const useSprints = ({
 				queryKey: [TASK_KEY.TASK_BACKLOG],
 			});
 		},
-		onError: (err: any) => {
-			console.error("updateSprint failed", err);
-			toast.error(err?.response?.data?.message || "Failed to update sprint");
-		},
+	onError: (err: unknown) => {
+		console.error("updateSprint failed", err);
+		toast.error(getFriendlyApiErrorMessage(err, "Không thể cập nhật sprint."));
+	},
 	});
 
 	const deleteSprint = useMutation({
@@ -136,10 +137,10 @@ export const useSprints = ({
 				queryKey: [TASK_KEY.TASK_BACKLOG],
 			});
 		},
-		onError: (err: any) => {
-			console.error("deleteSprint failed", err);
-			toast.error(err?.response?.data?.message || "Failed to delete sprint");
-		},
+	onError: (err: unknown) => {
+		console.error("deleteSprint failed", err);
+		toast.error(getFriendlyApiErrorMessage(err, "Không thể xóa sprint."));
+	},
 	});
 
 	const cancelSprint = useMutation({
@@ -155,10 +156,10 @@ export const useSprints = ({
 				queryKey: [TASK_KEY.TASK_BACKLOG],
 			});
 		},
-		onError: (err: any) => {
-			console.error("cancelSprint failed", err);
-			toast.error(err?.response?.data?.message || "Failed to cancel sprint");
-		},
+	onError: (err: unknown) => {
+		console.error("cancelSprint failed", err);
+		toast.error(getFriendlyApiErrorMessage(err, "Không thể hủy sprint."));
+	},
 	});
 
 	return {

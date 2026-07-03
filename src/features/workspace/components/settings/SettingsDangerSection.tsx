@@ -36,28 +36,30 @@ export function SettingsDangerSection({
 	return (
 		<div className='max-w-3xl space-y-4'>
 			{/* Danger zone header */}
-			<div className='rounded-md border border-red-500/20 bg-red-500/5 p-5'>
-				<div className='flex items-start gap-3'>
-					<Lock className='mt-0.5 size-5 text-red-300' />
-					<div className='min-w-0 flex-1'>
-						<div className='text-sm font-semibold text-red-200'>
+			<div className='rounded-xl border border-border bg-card p-5 shadow-sm'>
+				<div className='flex items-start gap-4.5'>
+					<div className="p-2 rounded-xl bg-red-500/10 text-red-500 dark:text-red-400 shrink-0">
+						<Lock className='size-5' />
+					</div>
+					<div className='min-w-0 flex-1 space-y-1'>
+						<div className='text-sm font-bold text-foreground'>
 							Thùng rác workspace
 						</div>
-						<div className='mt-1 text-sm text-red-200/70'>
+						<div className='text-sm text-muted-foreground leading-normal'>
 							Chuyển workspace này vào thùng rác.
-							Việc xóa dự án có thể được xử lý sau.
+							Việc xóa các dự án có thể được xử lý sau.
 						</div>
 					</div>
 					{canDeleteWorkspace ? (
 						<button
 							type='button'
 							onClick={onMoveToTrash}
-							className='rounded-md border border-red-500/30 px-3 py-2 text-sm font-medium text-red-300 transition hover:bg-red-500/10'
+							className='rounded-xl border border-red-200 hover:border-red-500/30 bg-card px-4.5 py-2.5 text-xs font-semibold text-red-600 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-950/10 transition-all duration-200 cursor-pointer shadow-xs hover:shadow-sm'
 						>
 							Chuyển vào thùng rác
 						</button>
 					) : (
-						<span className='text-xs text-neutral-600'>Chỉ Owner mới có thể xóa workspace.</span>
+						<span className='text-xs text-muted-foreground bg-muted px-3 py-2 rounded-lg border border-border/40'>Chỉ Owner mới có thể xóa workspace.</span>
 					)}
 				</div>
 			</div>

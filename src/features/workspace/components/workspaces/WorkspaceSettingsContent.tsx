@@ -119,10 +119,10 @@ const WorkspaceSettingsContent = ({
 				workspaceId: workspace.id,
 				projectId,
 			});
-			toast.success("Project da duoc khoi phuc.");
+			toast.success("Đã khôi phục dự án.");
 		} catch (error) {
 			console.error("restoreProjectFromSettings failed", error);
-			toast.error("Khong the khoi phuc project.");
+			toast.error("Không thể khôi phục dự án.");
 		}
 	};
 
@@ -133,10 +133,10 @@ const WorkspaceSettingsContent = ({
 			await restoreTask.mutateAsync({
 				taskId,
 			});
-			toast.success("Task da duoc khoi phuc.");
+			toast.success("Đã khôi phục công việc.");
 		} catch (error) {
 			console.error("restoreTaskFromSettings failed", error);
-			toast.error("Khong the khoi phuc task.");
+			toast.error("Không thể khôi phục công việc.");
 		}
 	};
 

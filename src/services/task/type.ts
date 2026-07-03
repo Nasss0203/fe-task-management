@@ -111,7 +111,7 @@ export interface CreateTaskDto {
 
 export type UpdateTaskDto = {
 	id: string;
-	title?: string;
+	title?: string | null;
 	description?: string | null;
 	statusId?: string;
 	priorityId?: string | null;

@@ -90,11 +90,10 @@ export function InboxPopover() {
 	});
 
 	const notifications = myNotificationsQuery.data?.data ?? [];
-	console.log("🚀 ~ notifications~", notifications);
 
 	const handleAcceptInvite = (inviteToken: string | undefined) => {
 		if (!inviteToken) {
-			toast.error("Invite token not found");
+			toast.error("Không tìm thấy mã lời mời.");
 			return;
 		}
 
@@ -108,11 +107,11 @@ export function InboxPopover() {
 					[inviteToken]: nextStatus,
 				}));
 
-				toast.success("Workspace invite accepted");
+				toast.success("Đã chấp nhận lời mời vào không gian làm việc.");
 				router.push("/dashboard");
 			},
 			onError: () => {
-				toast.error("Failed to accept workspace invite");
+				toast.error("Không thể chấp nhận lời mời.");
 			},
 		});
 	};

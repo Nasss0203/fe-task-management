@@ -1,3 +1,4 @@
+import axios from "axios";
 import instance from "../axios";
 import {
 	CreateProjectResponse,
@@ -21,11 +22,37 @@ export const findProjectByWorkspaceIdApi = async (
 export const CreateProjectApi = async (
 	data: ProjectDto,
 ): Promise<CreateProjectResponse> => {
-	const response = await instance.post<CreateProjectResponse>(
-		"/projects",
-		data,
-	);
-	return response.data;
+	const payload: ProjectDto = {
+		workspace_id: data.workspace_id,
+		name: data.name,
+		...(data.visibility && { visibility: data.visibility }),
+		...(data.create_default_board !== undefined && {
+			create_default_board: data.create_default_board,
+		}),
+		...(data.default_board_view_type && {
+			default_board_view_type: data.default_board_view_type,
+		}),
+	};
+
+	try {
+		const response = await instance.post<CreateProjectResponse>(
+			"/projects",
+			payload,
+		);
+		return response.data;
+	} catch (error) {
+		if (
+			process.env.NODE_ENV === "development" &&
+			axios.isAxiosError(error)
+		) {
+			console.info("create project error response", {
+				status: error.response?.status,
+				data: error.response?.data,
+			});
+		}
+
+		throw error;
+	}
 };
 
 export const updateProjectApi = async ({

@@ -92,9 +92,33 @@ export const findPageBlocksByPageApi = async (
 export const createPageBlockApi = async (
 	data: CreatePageBlockPayload,
 ): Promise<PageBlockItem> => {
+	const payload: CreatePageBlockPayload = {
+		page_id: data.page_id,
+		type: data.type,
+		...(data.title !== undefined && { title: data.title }),
+		...(data.position_x !== undefined && { position_x: data.position_x }),
+		...(data.position_y !== undefined && { position_y: data.position_y }),
+		...(data.width !== undefined && { width: data.width }),
+		...(data.height !== undefined && { height: data.height }),
+		...(data.order_index !== undefined && {
+			order_index: data.order_index,
+		}),
+		...(data.insert_after_block_id && {
+			insert_after_block_id: data.insert_after_block_id,
+		}),
+		...(data.content !== undefined && { content: data.content }),
+		...(data.style_config !== undefined && {
+			style_config: data.style_config,
+		}),
+		...(data.data_config !== undefined && {
+			data_config: data.data_config,
+		}),
+		...(data.is_open !== undefined && { is_open: data.is_open }),
+	};
+
 	const response = await instance.post<PageBlockMutationResponse>(
 		"/pageBlock",
-		data,
+		payload,
 	);
 
 	return unwrapPageBlock(response.data);
@@ -115,7 +139,6 @@ export const updatePageBlockApi = async (
 		content: data.content,
 		style_config: data.style_config,
 		data_config: data.data_config,
-		created_by: data.created_by,
 		is_open: data.is_open,
 	};
 	try {
@@ -124,8 +147,8 @@ export const updatePageBlockApi = async (
 			payload,
 		);
 		return unwrapPageBlock(response.data);
-	} catch (error: any) {
-		console.error("VALIDATION ERROR DETAILS: ", error.response?.data?.message || error.message);
+	} catch (error) {
+		console.error("updatePageBlock failed", error);
 		throw error;
 	}
 };

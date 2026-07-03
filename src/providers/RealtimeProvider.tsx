@@ -26,7 +26,7 @@ export function NotificationRealtimeProvider({ accessToken, children }: Props) {
 		const socket = connectRealtimeSocket(accessToken);
 
 		const handleNotificationCreated = (notification: NotificationItem) => {
-			toast.info(notification.title || "New notification", {
+			toast.info(notification.title || "Bạn có thông báo mới.", {
 				description: notification.message ?? undefined,
 			});
 

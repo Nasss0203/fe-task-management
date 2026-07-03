@@ -88,7 +88,7 @@ const DeletedWorkspacesPage = () => {
 				selectedIds.map((id) => restoreWorkspace.mutateAsync(id)),
 			);
 			toast.success(
-				`${selectedIds.length} không gian làm việc đã được khôi phục.`,
+				`Đã khôi phục ${selectedIds.length} không gian làm việc.`,
 			);
 			setSelectedIds([]);
 		} catch (error) {
@@ -124,7 +124,7 @@ const DeletedWorkspacesPage = () => {
 	const handleRestore = async (workspaceId: string) => {
 		try {
 			await restoreWorkspace.mutateAsync(workspaceId);
-			toast.success("Không gian làm việc đã được khôi phục.");
+			toast.success("Đã khôi phục không gian làm việc.");
 		} catch (error) {
 			console.error("restoreWorkspace failed", error);
 			toast.error("Không thể khôi phục không gian làm việc.");
@@ -348,7 +348,7 @@ const DeletedWorkspacesPage = () => {
 										{
 											onSuccess: () => {
 												toast.success(
-													"Đã xóa không gian làm việc khỏi thùng rác",
+													"Đã xóa không gian làm việc khỏi thùng rác.",
 												);
 												setWorkspaceToRemove(null);
 											},

@@ -283,7 +283,7 @@ export default function AdminPlansBillingPage() {
 					note: "Resumed from admin billing subscriptions",
 				});
 				setSubscriptionOverrides(null);
-				toast.success("Đã kích hoạt lại subscription.");
+				toast.success("Đã kích hoạt lại gói đăng ký.");
 				return;
 			}
 
@@ -293,10 +293,10 @@ export default function AdminPlansBillingPage() {
 				note: "Canceled from admin billing subscriptions",
 			});
 			setSubscriptionOverrides(null);
-			toast.success("Đã hủy subscription.");
+			toast.success("Đã hủy gói đăng ký.");
 		} catch (error) {
 			console.error("cancel admin billing subscription failed", error);
-			toast.error("Không thể hủy subscription.");
+			toast.error("Không thể hủy gói đăng ký.");
 		}
 	};
 

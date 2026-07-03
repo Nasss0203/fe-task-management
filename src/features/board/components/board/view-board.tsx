@@ -62,7 +62,6 @@ const ListView = ({ board }: BoardViewProps) => (
 	/>
 );
 
-
 const Backlog = ({ context = "workspace" }: BoardViewProps) => (
 	<BoardBacklog context={context} />
 );
@@ -103,19 +102,19 @@ export const BOARD_VIEW_CONFIG: Partial<
 		enabled: true,
 	},
 	TABLE: {
-		label: "Table",
+		label: "Bảng tính",
 		icon: Table2,
 		component: TableView,
 		enabled: true,
 	},
 	LIST: {
-		label: "List",
+		label: "Danh sách",
 		icon: List,
 		component: ListView,
 		enabled: true,
 	},
 	CALENDAR: {
-		label: "Calendar",
+		label: "Lịch",
 		icon: CalendarDays,
 		component: CalendarView,
 		enabled: true,

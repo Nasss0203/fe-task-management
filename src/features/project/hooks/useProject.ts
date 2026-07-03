@@ -29,7 +29,9 @@ export const useProject = (workspaceId?: string) => {
 			});
 		},
 		onError: (err) => {
-			console.error("createProject failed", err);
+			if (process.env.NODE_ENV === "development") {
+				console.info("createProject failed", err);
+			}
 		},
 	});
 

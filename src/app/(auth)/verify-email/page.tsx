@@ -9,6 +9,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { useVerifyEmail } from "@/features/auth/hooks/useAuth";
+import { getFriendlyApiErrorMessage } from "@/lib/api-error-message";
 import { ArrowLeft, CheckCircle2, Mail, XCircle } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -18,26 +19,29 @@ function VerifyEmailContent() {
 	const searchParams = useSearchParams();
 	const token = searchParams.get("token");
 	const { mutate } = useVerifyEmail();
-	const [status, setStatus] = useState<"loading" | "success" | "error" | "check-email">(() => {
-		return token ? "loading" : "check-email";
-	});
+	const [status, setStatus] = useState<"loading" | "success" | "error">(
+		"loading",
+	);
 	const [errorMsg, setErrorMsg] = useState("");
 	const hasFetched = useRef(false);
+	const currentStatus = token ? status : "check-email";
 
 	useEffect(() => {
-		if (!token) {
-			setStatus("check-email");
-			return;
-		}
+		if (!token) return;
 		if (hasFetched.current) return;
 		hasFetched.current = true;
 		mutate(
 			{ token },
 			{
 				onSuccess: () => setStatus("success"),
-				onError: (err: any) => {
+				onError: (err: unknown) => {
 					setStatus("error");
-					setErrorMsg(err?.response?.data?.message || "Đã xảy ra lỗi khi xác nhận email.");
+					setErrorMsg(
+						getFriendlyApiErrorMessage(
+							err,
+							"Không thể xác nhận email. Liên kết có thể đã hết hạn.",
+						),
+					);
 				},
 			}
 		);
@@ -56,11 +60,11 @@ function VerifyEmailContent() {
 			<Card className='relative w-full overflow-hidden border-white/70 bg-white/[0.92] py-0 shadow-[0_36px_90px_-48px_rgba(15,23,42,0.38)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/[0.72]'>
 				<div
 					aria-hidden='true'
-					className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${gradientBar[status]}`}
+					className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${gradientBar[currentStatus]}`}
 				/>
 
 				{/* check-email state */}
-				{status === "check-email" && (
+				{currentStatus === "check-email" && (
 					<>
 						<CardHeader className='gap-3 px-6 pb-0 pt-8 sm:px-8'>
 							<div className='flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-foreground'>
@@ -89,7 +93,7 @@ function VerifyEmailContent() {
 				)}
 
 				{/* loading state */}
-				{status === "loading" && (
+				{currentStatus === "loading" && (
 					<CardContent className='flex flex-col items-center gap-5 px-6 py-12 text-center sm:px-8'>
 						<div className='h-10 w-10 animate-spin rounded-full border-[3px] border-primary/20 border-t-primary' />
 						<div>
@@ -104,7 +108,7 @@ function VerifyEmailContent() {
 				)}
 
 				{/* success state */}
-				{status === "success" && (
+				{currentStatus === "success" && (
 					<CardContent className='flex flex-col items-center gap-5 px-6 py-10 text-center sm:px-8'>
 						<div className='flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/15 dark:text-emerald-300'>
 							<CheckCircle2 className='h-7 w-7' />
@@ -124,7 +128,7 @@ function VerifyEmailContent() {
 				)}
 
 				{/* error state */}
-				{status === "error" && (
+				{currentStatus === "error" && (
 					<CardContent className='flex flex-col items-center gap-5 px-6 py-10 text-center sm:px-8'>
 						<div className='flex h-14 w-14 items-center justify-center rounded-2xl bg-destructive/10 text-destructive dark:bg-destructive/20'>
 							<XCircle className='h-7 w-7' />
