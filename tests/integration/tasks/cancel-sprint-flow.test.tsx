@@ -121,7 +121,7 @@ describe("Cancel Sprint Integration Flow", () => {
 
     await waitFor(() => {
       expect(cancelSprintApi).toHaveBeenCalled();
-      expect(toast.error).toHaveBeenCalledWith("Server error");
+      expect(toast.error).toHaveBeenCalledWith("Không thể hủy sprint.");
     });
 
     // Cache not invalidated

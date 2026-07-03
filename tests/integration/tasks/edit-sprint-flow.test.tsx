@@ -107,7 +107,7 @@ describe("Edit Sprint Integration Flow", () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith("Server error updating sprint");
+      expect(toast.error).toHaveBeenCalledWith("Không thể cập nhật sprint.");
     });
 
     expect(invalidateSpy).not.toHaveBeenCalled();

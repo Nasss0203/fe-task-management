@@ -120,7 +120,7 @@ describe("useSprints hook", () => {
         expect(result.current.cancelSprint.isError).toBe(true);
       });
 
-      expect(toast.error).toHaveBeenCalledWith("Cannot cancel sprint");
+      expect(toast.error).toHaveBeenCalledWith("Không thể hủy sprint.");
       expect(toast.success).not.toHaveBeenCalled();
       expect(invalidateSpy).not.toHaveBeenCalled();
       

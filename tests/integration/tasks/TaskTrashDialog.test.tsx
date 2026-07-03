@@ -62,7 +62,7 @@ describe("TaskTrashDialog Integration", () => {
 
     expect(defaultProps.onOpenChange).toHaveBeenCalledWith(false);
     expect(defaultProps.onDeleted).toHaveBeenCalled();
-    expect(toast.success).toHaveBeenCalledWith("Task đã được chuyển vào thùng rác.");
+    expect(toast.success).toHaveBeenCalledWith("Đã chuyển công việc vào thùng rác.");
   });
 
   it("3. Xử lý lỗi khi delete thất bại", async () => {
@@ -78,7 +78,7 @@ describe("TaskTrashDialog Integration", () => {
     await user.click(confirmButton);
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith("Không thể chuyển task vào thùng rác.");
+      expect(toast.error).toHaveBeenCalledWith("Không thể chuyển công việc vào thùng rác.");
     });
 
     expect(defaultProps.onOpenChange).not.toHaveBeenCalled();
@@ -112,6 +112,6 @@ describe("TaskTrashDialog Integration", () => {
       expect(mockDeleteTask).toHaveBeenCalledWith({ taskId: "task-2" });
     });
 
-    expect(toast.success).toHaveBeenCalledWith("2 task đã được chuyển vào thùng rác.");
+    expect(toast.success).toHaveBeenCalledWith("Đã chuyển 2 công việc vào thùng rác.");
   });
 });

@@ -98,7 +98,7 @@ describe("Complete Sprint Integration Flow", () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith("Server error completing sprint");
+      expect(toast.error).toHaveBeenCalledWith("Không thể hoàn thành sprint.");
     });
 
     expect(invalidateSpy).not.toHaveBeenCalled();

@@ -28,6 +28,12 @@ vi.mock("@/features/task/hooks/useTask", () => ({
   useTask: vi.fn(),
 }));
 
+vi.mock("@/features/permission/hooks/usePermission", () => ({
+  usePermission: () => ({
+    can: () => true,
+  }),
+}));
+
 describe("Create Sprint Integration Flow", () => {
   const defaultProps = {
     workspaceId: "workspace-1",
@@ -92,7 +98,7 @@ describe("Create Sprint Integration Flow", () => {
     await user.click(createButton);
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith("Server error creating sprint");
+      expect(toast.error).toHaveBeenCalledWith("Không thể tạo sprint.");
     });
 
     expect(invalidateSpy).not.toHaveBeenCalled();

@@ -116,7 +116,7 @@ describe("Delete Sprint Integration Flow", () => {
     await user.click(confirmButton);
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith("Server error");
+      expect(toast.error).toHaveBeenCalledWith("Không thể xóa sprint.");
     });
 
     // Cache not invalidated

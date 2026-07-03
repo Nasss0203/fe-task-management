@@ -99,7 +99,7 @@ describe("Start Sprint Integration Flow", () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith("Server error starting sprint");
+      expect(toast.error).toHaveBeenCalledWith("Không thể bắt đầu sprint.");
     });
 
     expect(invalidateSpy).not.toHaveBeenCalled();
