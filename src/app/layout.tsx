@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/config/theme-provider";
 import { RealtimeProviderWrapper } from "@/providers/RealtimeProviderWrapper";
 import type { Metadata } from "next";
 import { Montserrat, JetBrains_Mono } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import Providers from "../config/providers";
 import "./globals.css";
 
@@ -48,6 +49,7 @@ export default function RootLayout({
 					</Providers>
 
 					<Toaster position='top-right' />
+					<SpeedInsights />
 				</ThemeProvider>
 			</body>
 		</html>
