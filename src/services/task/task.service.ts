@@ -1,6 +1,7 @@
 import instance from "../axios";
 import {
 	BulkUpdateTasksDto,
+	CreateSubtaskDto,
 	CreateTaskDto,
 	CreateTaskResponse,
 	DeleteTaskResponse,
@@ -8,6 +9,7 @@ import {
 	FindDeletedTaskResponse,
 	FindAllTaskResponse,
 	FindBacklogTasksFilters,
+	FindOneTaskResponse,
 	ReorderTaskPositionDto,
 	ReorderTaskPositionResponse,
 	UpdateTaskDto,
@@ -103,6 +105,29 @@ export const createTaskApi = async (
 	data: CreateTaskDto,
 ): Promise<CreateTaskResponse> => {
 	const response = await instance.post<CreateTaskResponse>(`/tasks`, data);
+
+	return response.data;
+};
+
+export const createSubtaskApi = async ({
+	parentTaskId,
+	data,
+}: {
+	parentTaskId: string;
+	data: CreateSubtaskDto;
+}): Promise<CreateTaskResponse> => {
+	const response = await instance.post<CreateTaskResponse>(
+		`/tasks/${parentTaskId}/subtasks`,
+		data,
+	);
+
+	return response.data;
+};
+
+export const findOneTaskApi = async (
+	taskId: string,
+): Promise<FindOneTaskResponse> => {
+	const response = await instance.get<FindOneTaskResponse>(`/tasks/${taskId}`);
 
 	return response.data;
 };

@@ -11,15 +11,21 @@ import {
 	Paperclip,
 	MoreHorizontal,
 	Pencil,
+	Plus,
 	Trash2,
+	Calendar,
+	GripVertical,
+	X,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
 import { Textarea } from "../../ui/textarea";
-import type { LocalComment, LocalSubtask } from "./task-detail-types";
 import { getInitials } from "./task-detail-utils";
 import { type TaskCommentItem } from "@/services/comment/type";
+import { type TaskItem, TASK_KEY } from "@/services/task/type";
+import { getTaskStatusKey, getTaskStatusStyle } from "@/lib/task-status-style";
 import { format } from "date-fns";
 import {
 	DropdownMenu,
@@ -28,8 +34,19 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import * as React from "react";
+import { useUpdateTask, useDeleteTask, useTaskStatus } from "@/features/task/hooks/useTask";
+import { useQueryClient } from "@tanstack/react-query";
 
 type TaskDetailTabsProps = {
+	workspaceId: string;
+	projectId: string;
+	parentTaskId: string;
+	subtasks: TaskItem[];
+	subtaskDraft: string;
+	onSubtaskDraftChange: (value: string) => void;
+	onCreateSubtask: () => void | Promise<void>;
+	isCreatingSubtask?: boolean;
+	isLoadingSubtasks?: boolean;
 	comments: TaskCommentItem[];
 	currentUsername: string;
 	currentUserAvatar?: string | null;
@@ -50,39 +67,165 @@ type TaskDetailTabsProps = {
 	isLoadingActivities?: boolean;
 };
 
-function SubtaskCard({ item }: { item: LocalSubtask }) {
+function SubtaskCard({
+	item,
+	workspaceId,
+	projectId,
+	parentTaskId,
+}: {
+	item: TaskItem;
+	workspaceId: string;
+	projectId: string;
+	parentTaskId: string;
+}) {
+	const queryClient = useQueryClient();
+	const { mutateAsync: updateTask, isPending: isUpdating } = useUpdateTask(workspaceId, projectId);
+	const { mutateAsync: deleteTask, isPending: isDeleting } = useDeleteTask(workspaceId, projectId);
+	const { data: statusData } = useTaskStatus(workspaceId, projectId);
+
+	const statuses = React.useMemo(() => statusData?.data ?? [], [statusData]);
+
+	const isDone = getTaskStatusKey(
+		item.statusName,
+		Boolean(item.completedAt),
+	) === "done";
+
+	const handleToggle = async (e: React.MouseEvent) => {
+		e.stopPropagation();
+		if (isUpdating || statuses.length === 0) return;
+
+		const doneStatus = statuses.find(
+			(s) => s.isDone || getTaskStatusKey(s.name, s.isDone) === "done"
+		) || statuses[statuses.length - 1];
+
+		const todoStatus = statuses.find(
+			(s) => !s.isDone && getTaskStatusKey(s.name, s.isDone) === "todo"
+		) || statuses.find((s) => !s.isDone) || statuses[0];
+
+		const targetStatus = isDone ? todoStatus : doneStatus;
+
+		try {
+			await updateTask({
+				id: item.id,
+				statusId: targetStatus.id,
+			});
+			void queryClient.invalidateQueries({
+				queryKey: [TASK_KEY.TASK, parentTaskId],
+			});
+		} catch (err) {
+			console.error("Failed to toggle subtask status:", err);
+		}
+	};
+
+	const handleDelete = async (e: React.MouseEvent) => {
+		e.stopPropagation();
+		if (isDeleting) return;
+
+		try {
+			await deleteTask({ taskId: item.id });
+			void queryClient.invalidateQueries({
+				queryKey: [TASK_KEY.TASK, parentTaskId],
+			});
+		} catch (err) {
+			console.error("Failed to delete subtask:", err);
+		}
+	};
+
+	const isOverdue = React.useMemo(() => {
+		if (!item.dueAt) return false;
+		try {
+			return new Date(item.dueAt) < new Date();
+		} catch {
+			return false;
+		}
+	}, [item.dueAt]);
+
 	return (
-		<div className='rounded-2xl border border-border bg-card px-4 py-4 shadow-xs'>
-			<div className='flex items-start gap-3'>
-				<div
+		<div className="group flex items-center justify-between gap-3 rounded-lg border border-border/40 bg-card px-3 py-2 hover:bg-muted/30 transition-all duration-200">
+			<div className="flex items-center gap-2.5 min-w-0 flex-1">
+				<button
+					type="button"
+					onClick={handleToggle}
+					disabled={isUpdating}
 					className={cn(
-						"mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border",
-						item.done
-							? "border-primary bg-primary text-primary-foreground"
-							: "border-input bg-background text-transparent",
+						"flex size-[18px] shrink-0 items-center justify-center rounded-full border cursor-pointer transition-all duration-200",
+						isDone
+							? "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
+							: "border-muted-foreground/30 bg-background text-transparent hover:border-primary/50"
 					)}
 				>
-					<Check className='size-3.5' />
-				</div>
-				<div className='min-w-0 flex-1'>
-					<div
+					<Check className={cn("size-3 stroke-[3]", isDone ? "opacity-100 scale-100" : "opacity-0 scale-50", "transition-all duration-200")} />
+				</button>
+
+				<div className="flex items-center gap-2 min-w-0 flex-1">
+					<span
 						className={cn(
-							"text-sm font-semibold text-foreground",
-							item.done && "text-muted-foreground line-through",
+							"text-[13px] font-medium text-foreground transition-all duration-200 truncate",
+							isDone && "text-muted-foreground/60 line-through"
 						)}
 					>
-						{item.title}
-					</div>
-					<div className='mt-3 rounded-xl border border-border bg-muted/50 px-3 py-3 text-sm leading-6 text-muted-foreground'>
-						{item.note}
-					</div>
+						{item.title || "Tác vụ con không tên"}
+					</span>
+
+					{item.dueAt && (
+						<span
+							className={cn(
+								"inline-flex items-center gap-0.5 text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-muted text-muted-foreground shrink-0",
+								isOverdue && !isDone && "bg-destructive/10 text-destructive dark:bg-destructive/20"
+							)}
+						>
+							<Calendar className="size-2.5" />
+							{format(new Date(item.dueAt), "dd/MM")}
+						</span>
+					)}
 				</div>
+			</div>
+
+			<div className="flex items-center gap-2 shrink-0">
+				{item.assignees && item.assignees.length > 0 && (
+					<div className="flex -space-x-1 items-center">
+						{item.assignees.slice(0, 3).map((assignee) => (
+							<Avatar key={assignee.userId} className="size-[18px] border border-background">
+								<AvatarImage
+									src={assignee.avatarUrl ?? undefined}
+									alt={assignee.fullName ?? assignee.username ?? "Assignee"}
+								/>
+								<AvatarFallback className="bg-muted text-[8px] font-bold text-foreground flex items-center justify-center">
+									{getInitials(assignee.fullName ?? assignee.username ?? "?")}
+								</AvatarFallback>
+							</Avatar>
+						))}
+						{item.assignees.length > 3 && (
+							<span className="text-[9px] font-semibold text-muted-foreground pl-1">
+								+{item.assignees.length - 3}
+							</span>
+						)}
+					</div>
+				)}
+
+				<button
+					type="button"
+					onClick={handleDelete}
+					disabled={isDeleting}
+					className="opacity-0 group-hover:opacity-100 p-1 hover:bg-muted rounded-md text-muted-foreground hover:text-destructive transition-all cursor-pointer"
+				>
+					<X className="size-3.5" />
+				</button>
 			</div>
 		</div>
 	);
 }
 
 export function TaskDetailTabs({
+	workspaceId,
+	projectId,
+	parentTaskId,
+	subtasks,
+	subtaskDraft,
+	onSubtaskDraftChange,
+	onCreateSubtask,
+	isCreatingSubtask = false,
+	isLoadingSubtasks = false,
 	comments,
 	currentUsername,
 	currentUserAvatar,
@@ -102,7 +245,26 @@ export function TaskDetailTabs({
 	activities = [],
 	isLoadingActivities = false,
 }: TaskDetailTabsProps) {
+	const completedCount = React.useMemo(() => {
+		return subtasks.filter((subtask) => {
+			return getTaskStatusKey(subtask.statusName, Boolean(subtask.completedAt)) === "done";
+		}).length;
+	}, [subtasks]);
+
+	const totalCount = subtasks.length;
+	const completionPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+
 	if (!comments) return null;
+
+	const handleSubtaskSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+
+		if (!subtaskDraft.trim() || isCreatingSubtask) {
+			return;
+		}
+
+		void onCreateSubtask();
+	};
 
 	return (
 		<Tabs defaultValue='subtasks' className='gap-0'>
@@ -138,7 +300,62 @@ export function TaskDetailTabs({
 				</TabsTrigger>
 			</TabsList>
 
-			<TabsContent value='subtasks' className='pt-6'></TabsContent>
+			<TabsContent value='subtasks' className='pt-6'>
+				<div className='space-y-4'>
+					{totalCount > 0 && (
+						<div className="space-y-1.5 mb-4">
+							<div className="flex justify-between items-center text-xs text-muted-foreground">
+								<span className="font-medium text-foreground">{completedCount}/{totalCount} hoàn thành</span>
+								<span className="font-semibold">{Math.round(completionPercentage)}%</span>
+							</div>
+							<div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+								<div 
+									className="h-full bg-primary rounded-full transition-all duration-300 ease-out" 
+									style={{ width: `${completionPercentage}%` }}
+								/>
+							</div>
+						</div>
+					)}
+
+					<form
+						onSubmit={handleSubtaskSubmit}
+						className="flex items-center gap-2 border-b border-border/40 py-1.5 focus-within:border-primary/50 transition-colors"
+					>
+						<Plus className="size-4 text-muted-foreground/60 shrink-0" />
+						<Input
+							value={subtaskDraft}
+							onChange={(event) =>
+								onSubtaskDraftChange(event.target.value)
+							}
+							placeholder="Thêm tác vụ con... (Nhấn Enter để lưu)"
+							disabled={isCreatingSubtask}
+							className="h-8 w-full border-none bg-transparent p-0 shadow-none focus-visible:ring-0 text-[13px] placeholder:text-muted-foreground/50"
+						/>
+					</form>
+
+					{isLoadingSubtasks ? (
+						<div className="py-8 text-center text-xs text-muted-foreground/75 font-medium">
+							Đang tải tác vụ con...
+						</div>
+					) : subtasks.length ? (
+						<div className='space-y-1.5'>
+							{subtasks.map((subtask) => (
+								<SubtaskCard
+									key={subtask.id}
+									item={subtask}
+									workspaceId={workspaceId}
+									projectId={projectId}
+									parentTaskId={parentTaskId}
+								/>
+							))}
+						</div>
+					) : (
+						<div className="py-8 text-center text-xs text-muted-foreground/75 font-medium">
+							Chưa có tác vụ con.
+						</div>
+					)}
+				</div>
+			</TabsContent>
 
 			<TabsContent value='comments' className='pt-6'>
 				<div className='space-y-5'>
