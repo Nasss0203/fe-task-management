@@ -59,3 +59,15 @@ export const discardAiGenerationApi = async (
   );
   return response.data.data;
 };
+
+export const generateTaskSubtasksApi = async (
+  taskId: string
+): Promise<any[]> => {
+  const response = await instance.post<ApiResponse<any[]>>(
+    `/ai/tasks/${taskId}/subtasks`,
+    {},
+    { timeout: 60000 }
+  );
+  return response.data.data;
+};
+

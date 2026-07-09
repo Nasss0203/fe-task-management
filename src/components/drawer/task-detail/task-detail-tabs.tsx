@@ -16,6 +16,8 @@ import {
 	Calendar,
 	GripVertical,
 	X,
+	Sparkles,
+	Loader2,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -35,7 +37,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import * as React from "react";
 import { useUpdateTask, useDeleteTask, useTaskStatus } from "@/features/task/hooks/useTask";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { generateTaskSubtasksApi } from "@/services/ai-assistant/ai-assistant.service";
+import { toast } from "sonner";
 
 type TaskDetailTabsProps = {
 	workspaceId: string;
@@ -245,6 +249,7 @@ export function TaskDetailTabs({
 	activities = [],
 	isLoadingActivities = false,
 }: TaskDetailTabsProps) {
+	const queryClient = useQueryClient();
 	const completedCount = React.useMemo(() => {
 		return subtasks.filter((subtask) => {
 			return getTaskStatusKey(subtask.statusName, Boolean(subtask.completedAt)) === "done";
@@ -255,6 +260,19 @@ export function TaskDetailTabs({
 	const completionPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
 	if (!comments) return null;
+
+	const { mutate: generateSubtasks, isPending: isGenerating } = useMutation({
+		mutationFn: () => generateTaskSubtasksApi(parentTaskId),
+		onSuccess: () => {
+			toast.success("Đã tạo các tác vụ con bằng AI thành công!");
+			void queryClient.invalidateQueries({
+				queryKey: [TASK_KEY.TASK, parentTaskId],
+			});
+		},
+		onError: (error: any) => {
+			toast.error(error.response?.data?.message || "Tạo tác vụ con thất bại");
+		},
+	});
 
 	const handleSubtaskSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -302,18 +320,42 @@ export function TaskDetailTabs({
 
 			<TabsContent value='subtasks' className='pt-6'>
 				<div className='space-y-4'>
+					<div className="flex justify-between items-center text-xs text-muted-foreground mb-1">
+						{totalCount > 0 ? (
+							<span className="font-medium text-foreground">{completedCount}/{totalCount} hoàn thành</span>
+						) : (
+							<span className="font-medium text-foreground">Tác vụ con ({totalCount})</span>
+						)}
+						<div className="flex items-center gap-2">
+							{totalCount > 0 && <span className="font-semibold">{Math.round(completionPercentage)}%</span>}
+							<Button
+								type="button"
+								variant="ghost"
+								onClick={() => generateSubtasks()}
+								disabled={isGenerating}
+								className="h-7 gap-1.5 px-2.5 text-primary hover:text-primary hover:bg-primary/10 text-xs rounded-md border border-primary/20 bg-primary/5 font-medium transition-all duration-200"
+							>
+								{isGenerating ? (
+									<>
+										<Loader2 className="size-3.5 animate-spin" />
+										Đang tạo...
+									</>
+								) : (
+									<>
+										<Sparkles className="size-3.5 text-primary" />
+										Gợi ý bằng AI
+									</>
+								)}
+							</Button>
+						</div>
+					</div>
+
 					{totalCount > 0 && (
-						<div className="space-y-1.5 mb-4">
-							<div className="flex justify-between items-center text-xs text-muted-foreground">
-								<span className="font-medium text-foreground">{completedCount}/{totalCount} hoàn thành</span>
-								<span className="font-semibold">{Math.round(completionPercentage)}%</span>
-							</div>
-							<div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-								<div 
-									className="h-full bg-primary rounded-full transition-all duration-300 ease-out" 
-									style={{ width: `${completionPercentage}%` }}
-								/>
-							</div>
+						<div className="h-1 w-full bg-muted rounded-full overflow-hidden mb-4">
+							<div 
+								className="h-full bg-primary rounded-full transition-all duration-300 ease-out" 
+								style={{ width: `${completionPercentage}%` }}
+							/>
 						</div>
 					)}
 

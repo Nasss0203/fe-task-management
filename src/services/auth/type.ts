@@ -16,6 +16,15 @@ export interface AuthResponse {
 	};
 }
 
+export interface VerifyEmailResponse {
+	data?: {
+		access_token?: string;
+		refresh_token?: string;
+		success?: boolean;
+	};
+	success?: boolean;
+}
+
 export interface LogoutResponse {
 	data?: {
 		success: boolean;
