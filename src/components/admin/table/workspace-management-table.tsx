@@ -18,6 +18,7 @@ import {
 	Eye,
 	RefreshCcw,
 } from "lucide-react";
+import type { ReactNode } from "react";
 
 type Props = {
 	workspaces: WorkspaceItem[];
@@ -26,6 +27,7 @@ type Props = {
 	totalRows: number;
 	onPaginationChange: OnChangeFn<PaginationState>;
 	onView: (workspace: WorkspaceItem) => void;
+	toolbar?: ReactNode;
 };
 
 const getInitials = (name: string) => {
@@ -106,6 +108,7 @@ export function WorkspaceManagementTable({
 	totalRows,
 	onPaginationChange,
 	onView,
+	toolbar,
 }: Props) {
 	const table = useReactTable({
 		data: workspaces,
@@ -119,28 +122,23 @@ export function WorkspaceManagementTable({
 		},
 	});
 
-	if (!workspaces.length) {
-		return (
-			<div className='rounded-2xl border border-border bg-white p-10 text-center'>
-				<p className='text-sm text-[#64748B]'>
-					Không tìm thấy workspace phù hợp.
-				</p>
-			</div>
-		);
-	}
-
 	return (
 		<div className='overflow-hidden rounded-2xl border border-border bg-white shadow-sm'>
-			<div className='flex flex-col gap-1 border-b border-border px-4 py-4 sm:px-5'>
-				<h2 className='text-sm font-semibold text-[#0F172A]'>
-					Danh sách workspace
-				</h2>
-				<p className='text-xs text-[#64748B]'>
-					{totalRows} workspace theo bộ lọc hiện tại
-				</p>
+			<div className='flex flex-col gap-3 border-b border-border px-4 py-4 sm:px-5 lg:flex-row lg:items-center'>
+				<div className='shrink-0'>
+					<h2 className='text-sm font-semibold text-[#0F172A]'>
+						Danh sách workspace
+					</h2>
+					<p className='text-xs text-[#64748B]'>
+						{totalRows} workspace theo bộ lọc hiện tại
+					</p>
+				</div>
+				{toolbar ? <div className='w-full lg:max-w-xl'>{toolbar}</div> : null}
 			</div>
 
-			<div className='overflow-x-auto'>
+			{workspaces.length ? (
+				<>
+				<div className='overflow-x-auto'>
 				<table className='w-full min-w-[1180px] border-collapse'>
 					<thead className='sticky top-0 z-10 bg-[#F8FAFC]'>
 						<tr className='border-b border-border text-left text-xs uppercase tracking-[0.12em] text-[#475569]'>
@@ -287,13 +285,21 @@ export function WorkspaceManagementTable({
 						})}
 					</tbody>
 				</table>
-			</div>
+				</div>
 
-			<PanigationTable
-				table={table}
-				totalRows={totalRows}
-				itemLabel='workspace'
-			/>
+				<PanigationTable
+					table={table}
+					totalRows={totalRows}
+					itemLabel='workspace'
+				/>
+				</>
+			) : (
+				<div className='p-10 text-center'>
+					<p className='text-sm text-[#64748B]'>
+						Không tìm thấy workspace phù hợp.
+					</p>
+				</div>
+			)}
 		</div>
 	);
 }

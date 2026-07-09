@@ -1,30 +1,20 @@
 import {
-	BadgePercent,
 	BriefcaseBusiness,
 	CreditCard,
 	TrendingUp,
 	Users,
-	Wallet,
 } from "lucide-react";
-import type {
-	BillingCoupon,
-	BillingPlan,
-	WorkspaceSubscription,
-} from "../shared/billing-admin.types";
+import type { BillingPlan, WorkspaceSubscription } from "../shared/billing-admin.types";
 import { formatCurrency } from "../shared/billing-admin.utils";
 
 type Props = {
 	plans: BillingPlan[];
 	subscriptions: WorkspaceSubscription[];
-	coupons: BillingCoupon[];
 };
 
-export function BillingOverviewCards({ plans, subscriptions, coupons }: Props) {
+export function BillingOverviewCards({ plans, subscriptions }: Props) {
 	const activePlans = plans.filter((item) => item.status === "ACTIVE").length;
 	const activeSubscriptions = subscriptions.filter(
-		(item) => item.status === "ACTIVE" || item.status === "TRIAL",
-	).length;
-	const activeCoupons = coupons.filter(
 		(item) => item.status === "ACTIVE",
 	).length;
 	const paidCustomers = subscriptions.filter((item) => item.amount > 0).length;
@@ -36,10 +26,6 @@ export function BillingOverviewCards({ plans, subscriptions, coupons }: Props) {
 			(item.billingCycle === "YEARLY" ? item.amount / 12 : item.amount)
 		);
 	}, 0);
-
-	const trialSubscriptions = subscriptions.filter(
-		(item) => item.status === "TRIAL",
-	).length;
 
 	const expiredSubscriptions = subscriptions.filter(
 		(item) => item.status === "EXPIRED",
@@ -66,7 +52,7 @@ export function BillingOverviewCards({ plans, subscriptions, coupons }: Props) {
 		{
 			title: "Subscription active",
 			value: activeSubscriptions,
-			helper: `${trialSubscriptions} trial đang chạy`,
+			helper: "Subscription đang chạy",
 			icon: CreditCard,
 			iconClass:
 				"bg-[#F0FDF4] text-[#22C55E] border border-[#BBF7D0]",
@@ -78,26 +64,17 @@ export function BillingOverviewCards({ plans, subscriptions, coupons }: Props) {
 			icon: Users,
 			iconClass: "bg-[#EFF6FF] text-[#3B82F6] border border-[#BFDBFE]",
 		},
-		{
-			title: "Coupon đang chạy",
-			value: activeCoupons,
-			helper: "Mã còn hiệu lực",
-			icon: BadgePercent,
-			iconClass:
-				"bg-[#FFFBEB] text-[#EAB308] border border-[#FDE68A]",
-		},
 	];
 
 	const quickStats = [
 		{ label: "Gói đang bán", value: activePlans, icon: BriefcaseBusiness },
-		{ label: "Trial đang chạy", value: trialSubscriptions, icon: Wallet },
 		{ label: "Subscription hết hạn", value: expiredSubscriptions, icon: CreditCard },
 		{ label: "Tổng volume đã thanh toán", value: formatCurrency(paidVolume), icon: TrendingUp },
 	];
 
 	return (
 		<div className='space-y-3'>
-			<div className='grid gap-3 md:grid-cols-2 xl:grid-cols-4'>
+			<div className='grid gap-3 md:grid-cols-2 xl:grid-cols-3'>
 				{cards.map((card) => {
 					const Icon = card.icon;
 
@@ -130,7 +107,7 @@ export function BillingOverviewCards({ plans, subscriptions, coupons }: Props) {
 				})}
 			</div>
 
-			<div className='grid gap-3 md:grid-cols-2 xl:grid-cols-4'>
+			<div className='grid gap-3 md:grid-cols-3'>
 				{quickStats.map((item) => {
 					const Icon = item.icon;
 

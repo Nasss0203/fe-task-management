@@ -355,7 +355,6 @@ export default function AdminDashboardPage() {
 		userOverview.isLoading ||
 		workspacePlan.isLoading ||
 		retentionMetrics.isLoading ||
-		systemHealth.isLoading ||
 		recentActivities.isLoading
 	) {
 		return <div className='text-muted-foreground p-6'>Đang tải dashboard...</div>;
@@ -474,6 +473,13 @@ export default function AdminDashboardPage() {
 				<div className='space-y-4'>
 					<SystemHealth
 						items={systemHealth.isError ? [] : systemHealthItems}
+						isLoading={systemHealth.isLoading}
+						isError={systemHealth.isError}
+						isFetching={systemHealth.isFetching}
+						updatedAt={systemHealth.dataUpdatedAt}
+						onRefresh={() => {
+							void systemHealth.refetch();
+						}}
 					/>
 
 					<RecentActivity

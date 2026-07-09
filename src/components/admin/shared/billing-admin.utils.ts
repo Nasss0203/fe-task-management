@@ -188,8 +188,6 @@ export function getBillingSearchPlaceholder(section: BillingSection) {
 			return "Tìm theo tên gói hoặc mã gói";
 		case "SUBSCRIPTIONS":
 			return "Tìm theo workspace, owner hoặc plan";
-		case "COUPONS":
-			return "Tìm theo mã coupon hoặc mô tả";
 		default:
 			return "Tìm kiếm";
 	}

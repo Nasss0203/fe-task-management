@@ -53,13 +53,12 @@ export function BillingPlanManagementTable({
 			</div>
 
 			<div className='overflow-x-auto'>
-				<table className='w-full min-w-[1280px] border-collapse'>
+				<table className='w-full min-w-[1180px] border-collapse'>
 					<thead>
 						<tr className='border-b border-border bg-[#F8FAFC] text-left text-xs uppercase tracking-[0.12em] text-[#475569]'>
 							<th className='px-5 py-3 font-medium'>Gói</th>
 							<th className='px-4 py-3 font-medium'>Giá</th>
 							<th className='px-4 py-3 font-medium'>Subscription</th>
-							<th className='px-4 py-3 font-medium'>Trial</th>
 							<th className='px-4 py-3 font-medium'>Giới hạn</th>
 							<th className='px-4 py-3 font-medium'>Tính năng</th>
 							<th className='px-4 py-3 font-medium'>Trạng thái</th>
@@ -105,12 +104,6 @@ export function BillingPlanManagementTable({
 
 								<td className='px-4 py-4 font-medium text-[#0F172A]'>
 									{plan.activeSubscriptions}
-								</td>
-
-								<td className='px-4 py-4 text-[#334155]'>
-									{plan.trialDays > 0
-										? `${plan.trialDays} ngày`
-										: "Không"}
 								</td>
 
 								<td className='px-4 py-4'>

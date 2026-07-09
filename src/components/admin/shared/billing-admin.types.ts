@@ -1,4 +1,4 @@
-export type BillingSection = "PLANS" | "SUBSCRIPTIONS" | "COUPONS";
+export type BillingSection = "PLANS" | "SUBSCRIPTIONS";
 
 export type PlanStatus = "ACTIVE" | "DISABLED" | "DRAFT";
 

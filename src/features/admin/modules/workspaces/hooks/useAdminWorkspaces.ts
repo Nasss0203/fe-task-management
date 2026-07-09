@@ -18,7 +18,10 @@ export const useAdminWorkspaces = (query?: AdminFindAllWorkspaceQuery) => {
 		queryKey: [ADMIN_WORKSPACES_KEY.WORKSPACE_LIST, query],
 		queryFn: () => findAllWorkspaceManagementApi(query),
 		retry: false,
-		refetchOnWindowFocus: false,
+		refetchInterval: 30_000,
+		refetchIntervalInBackground: true,
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: true,
 		enabled: canAccessAdmin,
 	});
 

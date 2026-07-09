@@ -158,18 +158,6 @@ export default function AdminWorkspacesPage() {
 
 			<WorkspaceOverviewCards workspaces={workspaceItems} />
 
-			<WorkspaceFilterBar
-				search={search}
-				status={status}
-				plan={plan}
-				createdAt={createdAt}
-				onSearchChange={handleSearchChange}
-				onStatusChange={handleStatusChange}
-				onPlanChange={handlePlanChange}
-				onCreatedAtChange={handleCreatedAtChange}
-				onReset={handleResetFilters}
-			/>
-
 			{workspaces.isLoading ? (
 				<div className={adminEmptyStateClass}>
 					<p className='text-sm text-muted-foreground'>
@@ -204,6 +192,19 @@ export default function AdminWorkspacesPage() {
 					}
 					onPaginationChange={setPagination}
 					onView={handleViewWorkspace}
+					toolbar={
+						<WorkspaceFilterBar
+							search={search}
+							status={status}
+							plan={plan}
+							createdAt={createdAt}
+							onSearchChange={handleSearchChange}
+							onStatusChange={handleStatusChange}
+							onPlanChange={handlePlanChange}
+							onCreatedAtChange={handleCreatedAtChange}
+							onReset={handleResetFilters}
+						/>
+					}
 				/>
 			)}
 

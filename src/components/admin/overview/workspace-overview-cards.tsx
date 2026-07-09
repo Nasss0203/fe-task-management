@@ -1,5 +1,5 @@
 import type { WorkspaceItem } from "@/services/admin/workspace/type";
-import { ArchiveX, Building2, Crown, ShieldCheck } from "lucide-react";
+import { Building2, Crown, ShieldCheck } from "lucide-react";
 
 type Props = {
 	workspaces: WorkspaceItem[];
@@ -8,9 +8,6 @@ type Props = {
 export function WorkspaceOverviewCards({ workspaces }: Props) {
 	const total = workspaces.length;
 	const active = workspaces.filter((item) => item.status === "ACTIVE").length;
-	const deleted = workspaces.filter(
-		(item) => item.status === "DELETED",
-	).length;
 	const pro = workspaces.filter((item) => item.plan === "pro").length;
 
 	const totalProjects = workspaces.reduce(
@@ -51,14 +48,6 @@ export function WorkspaceOverviewCards({ workspaces }: Props) {
 			icon: Crown,
 			iconClass: "bg-[#F5F3FF] text-[#7C3AED] border border-[#DDD6FE]",
 		},
-		{
-			title: "Đã xóa mềm",
-			value: deleted,
-			helper: "Cần restore qua API riêng",
-			icon: ArchiveX,
-			iconClass:
-				"bg-[#FFFBEB] text-[#EAB308] border border-[#FDE68A]",
-		},
 	];
 
 	const quickStats = [
@@ -70,7 +59,7 @@ export function WorkspaceOverviewCards({ workspaces }: Props) {
 
 	return (
 		<div className='space-y-3'>
-			<div className='grid gap-3 md:grid-cols-2 xl:grid-cols-4'>
+			<div className='grid gap-3 md:grid-cols-3'>
 				{cards.map((card) => {
 					const Icon = card.icon;
 

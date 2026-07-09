@@ -1,19 +1,33 @@
-import { RotateCcw, Search } from "lucide-react";
-import type { BillingSection } from "../shared/billing-admin.types";
-import { getBillingSearchPlaceholder } from "../shared/billing-admin.utils";
+"use client";
+
+import { Button } from "@/components/ui/button";
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupInput,
+} from "@/components/ui/input-group";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 import {
 	Select,
 	SelectContent,
+	SelectGroup,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { cn } from "@/lib/utils";
+import { RotateCcw, Search, SlidersHorizontal } from "lucide-react";
+import type { BillingSection } from "../shared/billing-admin.types";
+import { getBillingSearchPlaceholder } from "../shared/billing-admin.utils";
 import {
 	adminActionButtonClass,
 	adminFieldLabelClass,
-	adminInputClass,
 	adminPanelCompactClass,
-	adminSearchIconClass,
 } from "../shared/theme";
 
 type Props = {
@@ -33,8 +47,10 @@ type Props = {
 const SECTION_ITEMS: { value: BillingSection; label: string }[] = [
 	{ value: "SUBSCRIPTIONS", label: "Subscriptions" },
 	{ value: "PLANS", label: "Gói dịch vụ" },
-	{ value: "COUPONS", label: "Coupons" },
 ];
+
+const selectClass =
+	"h-10 w-full rounded-xl border border-input bg-white px-3 text-sm text-foreground outline-none hover:border-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/15";
 
 export function BillingFilterBar({
 	section,
@@ -57,139 +73,162 @@ export function BillingFilterBar({
 					{ value: "DISABLED", label: "Đã tắt" },
 					{ value: "DRAFT", label: "Bản nháp" },
 				]
-			: section === "SUBSCRIPTIONS"
-				? [
-						{ value: "all", label: "Tất cả" },
-						{ value: "ACTIVE", label: "Active" },
-						{ value: "TRIAL", label: "Trial" },
-						{ value: "EXPIRED", label: "Expired" },
-						{ value: "CANCELED", label: "Canceled" },
-					]
-				: [
-						{ value: "all", label: "Tất cả" },
-						{ value: "ACTIVE", label: "Đang chạy" },
-						{ value: "INACTIVE", label: "Đã tắt" },
-						{ value: "EXPIRED", label: "Hết hạn" },
-					];
+			: [
+					{ value: "all", label: "Tất cả" },
+					{ value: "ACTIVE", label: "Active" },
+					{ value: "EXPIRED", label: "Expired" },
+					{ value: "CANCELED", label: "Canceled" },
+				];
 
 	const kindOptions =
 		section === "PLANS"
 			? [
 					{ value: "all", label: "Tất cả" },
-					{ value: "with_trial", label: "Có trial" },
-					{ value: "no_trial", label: "Không trial" },
 					{ value: "enterprise", label: "Enterprise-ready" },
 				]
-			: section === "SUBSCRIPTIONS"
-				? [
-						{ value: "all", label: "Tất cả" },
-						{ value: "MONTHLY", label: "Thanh toán tháng" },
-						{ value: "YEARLY", label: "Thanh toán năm" },
-					]
-				: [
-						{ value: "all", label: "Tất cả" },
-						{ value: "PERCENT", label: "Giảm %" },
-						{ value: "FIXED", label: "Giảm cố định" },
-						{ value: "TRIAL_DAYS", label: "Ngày trial" },
-					];
+			: [
+					{ value: "all", label: "Tất cả" },
+					{ value: "MONTHLY", label: "Thanh toán tháng" },
+					{ value: "YEARLY", label: "Thanh toán năm" },
+				];
 
-	const kindLabel =
-		section === "PLANS"
-			? "Loại gói"
-			: section === "SUBSCRIPTIONS"
-				? "Chu kỳ thanh toán"
-				: "Loại coupon";
-	const selectClass =
-		"h-10 w-full rounded-xl border border-input bg-white px-3 text-sm text-foreground outline-none hover:border-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/15";
+	const kindLabel = section === "PLANS" ? "Loại gói" : "Chu kỳ thanh toán";
+	const hasActiveFilter =
+		status !== "all" || kind !== "all" || createdAt !== "all";
 
 	return (
-		<div className={`space-y-4 ${adminPanelCompactClass} p-4`}>
-			<div className='flex flex-wrap gap-2'>
+		<div className={cn(adminPanelCompactClass, "p-4 md:p-5")}>
+			<div className='flex flex-col gap-3 lg:flex-row lg:items-center'>
+			<ToggleGroup
+				type='single'
+				variant='outline'
+				spacing={2}
+				value={section}
+				onValueChange={(value) => {
+					if (value) onSectionChange(value as BillingSection);
+				}}
+			>
 				{SECTION_ITEMS.map((item) => (
-					<button
+					<ToggleGroupItem
 						key={item.value}
-						onClick={() => onSectionChange(item.value)}
-						className={`rounded-xl border px-4 py-2 text-sm font-medium transition ${
-							section === item.value
-								? "border-[#BFDBFE] bg-[#EFF6FF] text-[#2563EB]"
-								: "border-[#CBD5E1] bg-white text-[#334155] hover:bg-[#F8FAFC]"
-						}`}
+						value={item.value}
+						className='h-10 rounded-xl border-[#CBD5E1] bg-white px-4 text-[#334155] hover:bg-[#F8FAFC] hover:text-[#0F172A] data-[state=on]:border-primary/20 data-[state=on]:bg-primary/10 data-[state=on]:text-primary'
 					>
 						{item.label}
-					</button>
+					</ToggleGroupItem>
 				))}
-			</div>
+			</ToggleGroup>
 
-			<div className='grid grid-cols-1 gap-4 lg:grid-cols-12 lg:items-end'>
-				<div className='lg:col-span-4'>
-					<label className={adminFieldLabelClass}>Tìm kiếm</label>
-					<div className='relative'>
-						<Search className={adminSearchIconClass} />
-						<input
-							value={search}
-							onChange={(e) => onSearchChange(e.target.value)}
-							placeholder={getBillingSearchPlaceholder(section)}
-							className={`${adminInputClass} pl-10 pr-4`}
-						/>
-					</div>
-				</div>
+			<div className='flex w-full items-center gap-3 lg:max-w-xl'>
+				<InputGroup className='h-10 w-full max-w-xl rounded-xl border border-input bg-white text-foreground shadow-sm'>
+					<InputGroupInput
+						value={search}
+						onChange={(event) => onSearchChange(event.target.value)}
+						placeholder={getBillingSearchPlaceholder(section)}
+						className='text-foreground placeholder:text-muted-foreground'
+					/>
+					<InputGroupAddon>
+						<Search className='size-4 text-muted-foreground' />
+					</InputGroupAddon>
+				</InputGroup>
 
-				<div className='lg:col-span-2'>
-					<label className={adminFieldLabelClass}>Trạng thái</label>
-					<Select value={status} onValueChange={(val) => onStatusChange(val)}>
-						<SelectTrigger className={selectClass}>
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent>
-							{statusOptions.map((item) => (
-								<SelectItem key={item.value} value={item.value}>
-									{item.label}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</div>
+				<Popover>
+					<PopoverTrigger asChild>
+						<Button
+							type='button'
+							variant='outline'
+							size='icon'
+							aria-label='Mở bộ lọc billing'
+							className={cn(
+								"size-10 rounded-xl border-[#CBD5E1] bg-white text-[#334155] hover:bg-[#F8FAFC] hover:text-[#0F172A]",
+								hasActiveFilter &&
+									"border-primary/20 bg-primary/10 text-primary",
+							)}
+						>
+							<SlidersHorizontal />
+						</Button>
+					</PopoverTrigger>
 
-				<div className='lg:col-span-2'>
-					<label className={adminFieldLabelClass}>{kindLabel}</label>
-					<Select value={kind} onValueChange={(val) => onKindChange(val)}>
-						<SelectTrigger className={selectClass}>
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent>
-							{kindOptions.map((item) => (
-								<SelectItem key={item.value} value={item.value}>
-									{item.label}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</div>
-
-				<div className='lg:col-span-2'>
-					<label className={adminFieldLabelClass}>Thời gian</label>
-					<Select value={createdAt} onValueChange={(val) => onCreatedAtChange(val)}>
-						<SelectTrigger className={selectClass}>
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value='all'>Tất cả</SelectItem>
-							<SelectItem value='7d'>7 ngày gần đây</SelectItem>
-							<SelectItem value='30d'>30 ngày gần đây</SelectItem>
-							<SelectItem value='90d'>90 ngày gần đây</SelectItem>
-						</SelectContent>
-					</Select>
-				</div>
-
-				<div className='lg:col-span-2'>
-					<button
-						onClick={onReset}
-						className={`inline-flex w-full items-center justify-center gap-2 ${adminActionButtonClass}`}
+					<PopoverContent
+						align='end'
+						className='w-[calc(100vw-2rem)] rounded-2xl border border-border bg-white p-4 text-foreground shadow-xl sm:w-[380px]'
 					>
-						<RotateCcw className='h-4 w-4' />
-						Đặt lại
-					</button>
-				</div>
+						<div className='flex flex-col gap-4'>
+							<div>
+								<p className='text-sm font-semibold text-foreground'>
+									Bộ lọc {section === "PLANS" ? "gói dịch vụ" : "subscription"}
+								</p>
+								<p className='mt-1 text-xs text-muted-foreground'>
+									Lọc theo trạng thái, {kindLabel.toLowerCase()} và thời gian.
+								</p>
+							</div>
+
+							<div className='flex flex-col gap-2'>
+								<label className={adminFieldLabelClass}>Trạng thái</label>
+								<Select value={status} onValueChange={onStatusChange}>
+									<SelectTrigger className={selectClass}>
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectGroup>
+											{statusOptions.map((item) => (
+												<SelectItem key={item.value} value={item.value}>
+													{item.label}
+												</SelectItem>
+											))}
+										</SelectGroup>
+									</SelectContent>
+								</Select>
+							</div>
+
+							<div className='flex flex-col gap-2'>
+								<label className={adminFieldLabelClass}>{kindLabel}</label>
+								<Select value={kind} onValueChange={onKindChange}>
+									<SelectTrigger className={selectClass}>
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectGroup>
+											{kindOptions.map((item) => (
+												<SelectItem key={item.value} value={item.value}>
+													{item.label}
+												</SelectItem>
+											))}
+										</SelectGroup>
+									</SelectContent>
+								</Select>
+							</div>
+
+							<div className='flex flex-col gap-2'>
+								<label className={adminFieldLabelClass}>Thời gian</label>
+								<Select value={createdAt} onValueChange={onCreatedAtChange}>
+									<SelectTrigger className={selectClass}>
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectGroup>
+											<SelectItem value='all'>Tất cả</SelectItem>
+											<SelectItem value='7d'>7 ngày gần đây</SelectItem>
+											<SelectItem value='30d'>30 ngày gần đây</SelectItem>
+											<SelectItem value='90d'>90 ngày gần đây</SelectItem>
+										</SelectGroup>
+									</SelectContent>
+								</Select>
+							</div>
+
+							<Button
+								type='button'
+								variant='outline'
+								onClick={onReset}
+								className={cn("w-full", adminActionButtonClass)}
+							>
+								<RotateCcw data-icon='inline-start' />
+								Đặt lại bộ lọc
+							</Button>
+						</div>
+					</PopoverContent>
+				</Popover>
+			</div>
 			</div>
 		</div>
 	);

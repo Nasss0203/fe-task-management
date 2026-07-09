@@ -1,5 +1,5 @@
 import type { AdminUserOverviewResponseDto } from "@/services/admin/user/type";
-import { Lock, ShieldCheck, UserCheck, Users } from "lucide-react";
+import { Lock, UserCheck, Users } from "lucide-react";
 
 type Props = {
 	overview?: AdminUserOverviewResponseDto;
@@ -14,7 +14,6 @@ export function UsersOverview({ overview }: Props) {
 	const totalUsers = overview?.totalUsers ?? 0;
 	const activeUsers = overview?.activeUsers ?? 0;
 	const lockedUsers = overview?.lockedUsers ?? 0;
-	const systemAdmins = overview?.systemAdmins ?? 0;
 
 	const cards = [
 		{
@@ -39,17 +38,10 @@ export function UsersOverview({ overview }: Props) {
 			icon: Lock,
 			iconClass: "bg-[#FEF2F2] text-[#EF4444] border border-[#FECACA]",
 		},
-		{
-			title: "Quản trị viên hệ thống",
-			value: systemAdmins,
-			helper: "Có quyền vận hành admin",
-			icon: ShieldCheck,
-			iconClass: "bg-[#EFF6FF] text-[#3B82F6] border border-[#BFDBFE]",
-		},
 	];
 
 	return (
-		<div className='grid gap-3 md:grid-cols-2 xl:grid-cols-4'>
+		<div className='grid gap-3 md:grid-cols-3'>
 			{cards.map((card) => {
 				const Icon = card.icon;
 
