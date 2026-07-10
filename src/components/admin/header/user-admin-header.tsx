@@ -10,12 +10,14 @@ type UserAdminHeaderProps = {
 	isSuperAdmin: boolean;
 	isCreatingSystemAdmin: boolean;
 	onCreateSystemAdmin: (data: CreateSystemAdminDto) => Promise<void>;
+	showCreateSystemAdmin?: boolean;
 };
 
 export function UserAdminHeader({
 	isSuperAdmin,
 	isCreatingSystemAdmin,
 	onCreateSystemAdmin,
+	showCreateSystemAdmin = true,
 }: UserAdminHeaderProps) {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -30,13 +32,13 @@ export function UserAdminHeader({
 					Quản lý người dùng
 				</h1>
 				<p className='max-w-3xl text-sm leading-6 text-[#64748B]'>
-					Quản lý trạng thái tài khoản, phân quyền system admin và
-					theo dõi tăng trưởng, hoạt động của user trên toàn hệ thống.
+					Quản lý trạng thái tài khoản và theo dõi tăng trưởng, hoạt
+					động của user trên toàn hệ thống.
 				</p>
 			</div>
 
 			<div className='flex w-fit items-center gap-2'>
-				{isSuperAdmin ? (
+				{isSuperAdmin && showCreateSystemAdmin ? (
 					<Button onClick={() => setIsDialogOpen(true)}>
 						<UserPlus data-icon='inline-start' />
 						Tạo System Admin

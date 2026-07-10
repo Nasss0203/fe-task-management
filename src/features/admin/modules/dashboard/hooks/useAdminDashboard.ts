@@ -109,8 +109,13 @@ export const useAdminDashboard = (
 	const systemHealth = useQuery({
 		queryKey: [ADMIN_DASHBOARD_KEY.SYSTEM_HEALTH],
 		queryFn: getSystemHealthApi,
-		retry: false,
-		refetchOnWindowFocus: false,
+		retry: 2,
+		retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 5000),
+		refetchInterval: 30_000,
+		refetchIntervalInBackground: true,
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: true,
+		staleTime: 10_000,
 		enabled: canAccessAdmin,
 	});
 

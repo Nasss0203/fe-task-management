@@ -5,6 +5,7 @@ import {
 	IconCreditCard,
 	IconDashboard,
 	IconInnerShadowTop,
+	IconShieldCheck,
 	IconUsers,
 } from "@tabler/icons-react";
 import * as React from "react";
@@ -37,6 +38,11 @@ const data = {
 			title: "Users",
 			url: "/admin/users",
 			icon: IconUsers,
+		},
+		{
+			title: "Admin",
+			url: "/admin/admin",
+			icon: IconShieldCheck,
 		},
 		{
 			title: "Workspaces",

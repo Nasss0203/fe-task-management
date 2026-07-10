@@ -10,8 +10,6 @@ import {
 	CreditCard,
 	Ellipsis,
 	Eye,
-	RefreshCcw,
-	Sparkles,
 	XCircle,
 } from "lucide-react";
 import type { WorkspaceSubscription } from "../shared/billing-admin.types";
@@ -45,8 +43,6 @@ const getPaymentMethodLabel = (paymentMethod: string) => {
 type Props = {
 	subscriptions: WorkspaceSubscription[];
 	onView: (subscription: WorkspaceSubscription) => void;
-	onManualRenew: (subscriptionId: string) => void;
-	onGrantTrial: (subscriptionId: string) => void;
 	onToggleStatus: (subscriptionId: string) => void;
 	isUpdatingSubscription?: boolean;
 };
@@ -54,8 +50,6 @@ type Props = {
 export function BillingSubscriptionManagementTable({
 	subscriptions,
 	onView,
-	onManualRenew,
-	onGrantTrial,
 	onToggleStatus,
 	isUpdatingSubscription = false,
 }: Props) {
@@ -77,7 +71,7 @@ export function BillingSubscriptionManagementTable({
 						Theo dõi subscriptions
 					</h2>
 					<p className='mt-1 text-sm text-[#64748B]'>
-						Quan sát trạng thái active, trial, expired, canceled và
+						Quan sát trạng thái active, expired, canceled và
 						gia hạn thủ công khi cần.
 					</p>
 				</div>
@@ -88,7 +82,7 @@ export function BillingSubscriptionManagementTable({
 			</div>
 
 			<div className='overflow-x-auto'>
-				<table className='w-full min-w-[1240px] border-collapse'>
+				<table className='w-full min-w-[1120px] border-collapse'>
 					<thead>
 						<tr className='border-b border-border bg-[#F8FAFC] text-left text-xs uppercase tracking-[0.12em] text-[#475569]'>
 							<th className='px-5 py-3 font-medium'>User</th>
@@ -98,7 +92,6 @@ export function BillingSubscriptionManagementTable({
 							<th className='px-4 py-3 font-medium'>Thanh toán</th>
 							<th className='px-4 py-3 font-medium'>Amount</th>
 							<th className='px-4 py-3 font-medium'>Gia hạn</th>
-							<th className='px-4 py-3 font-medium'>Coupon</th>
 							<th className='px-5 py-3 text-right font-medium'>
 								Actions
 							</th>
@@ -171,10 +164,6 @@ export function BillingSubscriptionManagementTable({
 									</div>
 								</td>
 
-								<td className='px-4 py-4 text-[#334155]'>
-									{subscription.couponCode ?? "-"}
-								</td>
-
 								<td className='px-5 py-4'>
 									<div className='flex justify-end'>
 										<DropdownMenu>
@@ -196,30 +185,6 @@ export function BillingSubscriptionManagementTable({
 												>
 													<Eye className='mr-2 h-4 w-4' />
 													Xem chi tiết
-												</DropdownMenuItem>
-
-												<DropdownMenuItem
-													onClick={() =>
-														onManualRenew(
-															subscription.id,
-														)
-													}
-													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
-												>
-													<RefreshCcw className='mr-2 h-4 w-4' />
-													Gia hạn thủ công
-												</DropdownMenuItem>
-
-												<DropdownMenuItem
-													onClick={() =>
-														onGrantTrial(
-															subscription.id,
-														)
-													}
-													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
-												>
-													<Sparkles className='mr-2 h-4 w-4' />
-													Cấp trial 14 ngày
 												</DropdownMenuItem>
 
 												<DropdownMenuSeparator className='my-1 bg-border' />

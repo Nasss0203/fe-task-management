@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -9,10 +10,17 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 import type { SystemHealthItem } from "@/services/admin/dashboard/type";
+import { RefreshCw } from "lucide-react";
 
 type Props = {
 	items: SystemHealthItem[];
+	isLoading?: boolean;
+	isError?: boolean;
+	isFetching?: boolean;
+	updatedAt?: number;
+	onRefresh?: () => void;
 };
 
 const getBadgeClassName = (level: SystemHealthItem["level"]) => {
@@ -47,6 +55,7 @@ const getHealthLabel = (label: string) => {
 const getHealthValue = (value: string) => {
 	const valueMap: Record<string, string> = {
 		Healthy: "Ổn định",
+		Configured: "Đã cấu hình",
 		"Not Configured": "Chưa cấu hình",
 		development: "development",
 		production: "production",
@@ -59,8 +68,10 @@ const getHealthDescription = (description: string) => {
 	const descriptionMap: Record<string, string> = {
 		"Backend API is reachable.": "Backend API đang phản hồi.",
 		"Database connection is available.": "Kết nối database khả dụng.",
+		"Mail service configuration is available.":
+			"Cấu hình dịch vụ email đã sẵn sàng.",
 		"Mail service configuration is missing or incomplete.":
-			"Cấu hình dịch vụ email đang thiếu hoặc chưa hoàn chỉnh.",
+			"Backend health endpoint đang báo dịch vụ email chưa sẵn sàng. Nếu .env backend đã có cấu hình, hãy restart backend và kiểm tra frontend đang trỏ đúng API.",
 		"Current backend runtime environment.":
 			"Môi trường runtime hiện tại của backend.",
 	};
@@ -68,12 +79,36 @@ const getHealthDescription = (description: string) => {
 	return descriptionMap[description] ?? description;
 };
 
-export function SystemHealth({ items }: Props) {
+export function SystemHealth({
+	items,
+	isLoading = false,
+	isError = false,
+	isFetching = false,
+	updatedAt = 0,
+	onRefresh,
+}: Props) {
 	const overallLevel = items.some((item) => item.level === "danger")
 		? "danger"
 		: items.some((item) => item.level === "warning")
 			? "warning"
 			: "success";
+	const overallLabel = isError
+		? "Không kết nối"
+		: isFetching
+			? "Đang cập nhật"
+			: getBadgeLabel(overallLevel);
+	const overallClassName = isError
+		? getBadgeClassName("danger")
+		: isFetching
+			? "border-border bg-muted text-muted-foreground"
+			: getBadgeClassName(overallLevel);
+	const lastUpdatedLabel = updatedAt
+		? new Date(updatedAt).toLocaleTimeString("vi-VN", {
+				hour: "2-digit",
+				minute: "2-digit",
+				second: "2-digit",
+			})
+		: null;
 
 	return (
 		<Card className='rounded-2xl border border-border bg-white text-[#1E293B] shadow-sm'>
@@ -86,19 +121,48 @@ export function SystemHealth({ items }: Props) {
 						<CardDescription className='text-sm text-[#64748B]'>
 							Chỉ báo nhanh cho các dịch vụ hệ thống.
 						</CardDescription>
+						<p className='mt-1 text-xs text-muted-foreground'>
+							{lastUpdatedLabel
+								? `Cập nhật lúc ${lastUpdatedLabel} · tự động mỗi 30 giây`
+								: "Đang chờ lần kiểm tra đầu tiên"}
+						</p>
 					</div>
 
-					<Badge
-						variant='outline'
-						className={getBadgeClassName(overallLevel)}
-					>
-						{getBadgeLabel(overallLevel)}
-					</Badge>
+					<div className='flex shrink-0 items-center gap-2'>
+						<Badge variant='outline' className={overallClassName}>
+							{overallLabel}
+						</Badge>
+
+						<Button
+							type='button'
+							variant='outline'
+							size='icon'
+							onClick={onRefresh}
+							disabled={isFetching}
+							aria-label='Làm mới sức khỏe hệ thống'
+							className='size-9 rounded-xl'
+						>
+							<RefreshCw className={cn(isFetching && "animate-spin")} />
+						</Button>
+					</div>
 				</div>
 			</CardHeader>
 
 			<CardContent className='space-y-4'>
-				{items.length === 0 ? (
+				{isLoading ? (
+					<div className='flex h-40 items-center justify-center rounded-xl border border-dashed border-border text-sm text-muted-foreground'>
+						Đang kiểm tra các dịch vụ hệ thống...
+					</div>
+				) : isError ? (
+					<div className='flex h-40 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-destructive/40 bg-destructive/5 px-6 text-center'>
+						<p className='text-sm font-medium text-destructive'>
+							Không thể kết nối dịch vụ kiểm tra sức khỏe
+						</p>
+						<p className='text-xs text-muted-foreground'>
+							Hệ thống sẽ tự thử lại hoặc bạn có thể nhấn nút làm mới.
+						</p>
+					</div>
+				) : items.length === 0 ? (
 					<div className='flex h-40 items-center justify-center rounded-xl border border-dashed border-border text-sm text-[#64748B]'>
 						Chưa có dữ liệu sức khỏe hệ thống
 					</div>

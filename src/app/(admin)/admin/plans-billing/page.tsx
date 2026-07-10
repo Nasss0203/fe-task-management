@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 
 import { BillingInsightCharts } from "@/components/admin/charts/billing-insight-charts";
-import { BillingCouponDetailPanel } from "@/components/admin/detail/billing-coupon-detail-panel";
 import { BillingPlanDetailPanel } from "@/components/admin/detail/billing-plan-detail-panel";
 import { BillingSubscriptionDetailPanel } from "@/components/admin/detail/billing-subscription-detail-panel";
 
@@ -11,10 +10,7 @@ import { BillingFilterBar } from "@/components/admin/filters/billing-filter-bar"
 import { BillingAdminHeader } from "@/components/admin/header/billing-admin-header";
 import { BillingOverviewCards } from "@/components/admin/overview/billing-overview-cards";
 
-import { adminCoupons } from "@/components/admin/shared/billing-admin.mock-data";
-
 import type {
-	BillingCoupon,
 	BillingPlan,
 	BillingSection,
 	WorkspaceSubscription,
@@ -22,18 +18,11 @@ import type {
 
 import { matchesBillingDateFilter } from "@/components/admin/shared/billing-admin.utils";
 
-import { BillingCouponManagementTable } from "@/components/admin/table/billing-coupon-management-table";
 import { BillingPlanManagementTable } from "@/components/admin/table/billing-plan-management-table";
 import { BillingSubscriptionManagementTable } from "@/components/admin/table/billing-subscription-management-table";
 import { useAdminBilling } from "@/features/admin/modules/billing/hooks/useAdminBilling";
 import { toAdminBillingPlanPayload } from "@/services/admin/billing/billing-admin.service";
 import { toast } from "sonner";
-
-function addDays(date: string, days: number) {
-	const next = new Date(date);
-	next.setDate(next.getDate() + days);
-	return next.toISOString();
-}
 
 export default function AdminPlansBillingPage() {
 	const {
@@ -50,15 +39,9 @@ export default function AdminPlansBillingPage() {
 	const [subscriptionOverrides, setSubscriptionOverrides] = useState<
 		WorkspaceSubscription[] | null
 	>(null);
-	const [coupons, setCoupons] = useState<BillingCoupon[]>(adminCoupons);
-
 	const [selectedPlan, setSelectedPlan] = useState<BillingPlan | null>(null);
 	const [selectedSubscription, setSelectedSubscription] =
 		useState<WorkspaceSubscription | null>(null);
-	const [selectedCoupon, setSelectedCoupon] = useState<BillingCoupon | null>(
-		null,
-	);
-
 	const [search, setSearch] = useState("");
 	const [status, setStatus] = useState("all");
 	const [kind, setKind] = useState("all");
@@ -83,8 +66,6 @@ export default function AdminPlansBillingPage() {
 
 			const matchesKind =
 				kind === "all" ||
-				(kind === "with_trial" && plan.trialDays > 0) ||
-				(kind === "no_trial" && plan.trialDays === 0) ||
 				(kind === "enterprise" && plan.storageLimitGb >= 100);
 
 			const matchesDate = matchesBillingDateFilter(
@@ -120,69 +101,11 @@ export default function AdminPlansBillingPage() {
 		});
 	}, [subscriptions, search, status, kind, createdAt]);
 
-	const filteredCoupons = useMemo(() => {
-		return coupons.filter((coupon) => {
-			const keyword = search.toLowerCase();
-
-			const matchesSearch =
-				coupon.code.toLowerCase().includes(keyword) ||
-				coupon.description.toLowerCase().includes(keyword);
-
-			const matchesStatus = status === "all" || coupon.status === status;
-			const matchesKind = kind === "all" || coupon.type === kind;
-			const matchesDate = matchesBillingDateFilter(
-				coupon.startAt,
-				createdAt,
-			);
-
-			return matchesSearch && matchesStatus && matchesKind && matchesDate;
-		});
-	}, [coupons, search, status, kind, createdAt]);
-
 	const handleResetFilters = () => {
 		setSearch("");
 		setStatus("all");
 		setKind("all");
 		setCreatedAt("all");
-	};
-
-	const handleCreatePlan = () => {
-		setSelectedPlan({
-			id: `plan_${Date.now()}`,
-			name: "",
-			code: "",
-			slug: "",
-			description: "",
-			status: "DRAFT",
-			billingInterval: "MONTH",
-			currency: "VND",
-			monthlyPrice: 0,
-			yearlyPrice: 0,
-			workspaceLimit: 1,
-			membersLimit: 5,
-			projectsLimit: 5,
-			storageLimitGb: 5,
-			features: [],
-			trialDays: 0,
-			activeSubscriptions: 0,
-			updatedAt: new Date().toISOString(),
-		});
-	};
-
-	const handleCreateCoupon = () => {
-		setSelectedCoupon({
-			id: `coupon_${Date.now()}`,
-			code: "",
-			type: "PERCENT",
-			value: 10,
-			status: "ACTIVE",
-			usageCount: 0,
-			maxUsage: 100,
-			startAt: new Date().toISOString(),
-			endAt: new Date().toISOString(),
-			description: "",
-			appliesTo: ["PRO"],
-		});
 	};
 
 	const handleSavePlan = async (plan: BillingPlan) => {
@@ -237,39 +160,6 @@ export default function AdminPlansBillingPage() {
 		setSelectedSubscription(null);
 	};
 
-	const handleManualRenew = (subscriptionId: string) => {
-		setSubscriptionOverrides((prev) =>
-			(prev ?? subscriptions).map((item) =>
-				item.id === subscriptionId
-					? {
-							...item,
-							status: "ACTIVE",
-							renewAt:
-								item.billingCycle === "MONTHLY"
-									? addDays(item.renewAt, 30)
-									: addDays(item.renewAt, 365),
-						}
-					: item,
-			),
-		);
-	};
-
-	const handleGrantTrial = (subscriptionId: string) => {
-		setSubscriptionOverrides((prev) =>
-			(prev ?? subscriptions).map((item) =>
-				item.id === subscriptionId
-					? {
-							...item,
-							status: "TRIAL",
-							trialEndsAt: addDays(new Date().toISOString(), 14),
-							renewAt: addDays(new Date().toISOString(), 14),
-							amount: 0,
-						}
-					: item,
-			),
-		);
-	};
-
 	const handleToggleSubscriptionStatus = async (subscriptionId: string) => {
 		const subscription = subscriptions.find(
 			(item) => item.id === subscriptionId,
@@ -300,42 +190,13 @@ export default function AdminPlansBillingPage() {
 		}
 	};
 
-	const handleSaveCoupon = (coupon: BillingCoupon) => {
-		setCoupons((prev) => {
-			const exists = prev.some((item) => item.id === coupon.id);
-			if (!exists) return [coupon, ...prev];
-			return prev.map((item) => (item.id === coupon.id ? coupon : item));
-		});
-		setSelectedCoupon(null);
-	};
-
-	const handleToggleCouponStatus = (couponId: string) => {
-		setCoupons((prev) =>
-			prev.map((coupon) =>
-				coupon.id === couponId
-					? {
-							...coupon,
-							status:
-								coupon.status === "ACTIVE"
-									? "INACTIVE"
-									: "ACTIVE",
-						}
-					: coupon,
-			),
-		);
-	};
-
 	return (
 		<div className='space-y-5 p-4 sm:p-6'>
-			<BillingAdminHeader
-				onCreatePlan={handleCreatePlan}
-				onCreateCoupon={handleCreateCoupon}
-			/>
+			<BillingAdminHeader />
 
 			<BillingOverviewCards
 				plans={plans}
 				subscriptions={subscriptions}
-				coupons={coupons}
 			/>
 
 			<BillingInsightCharts subscriptions={subscriptions} />
@@ -366,21 +227,11 @@ export default function AdminPlansBillingPage() {
 				<BillingSubscriptionManagementTable
 					subscriptions={filteredSubscriptions}
 					onView={setSelectedSubscription}
-					onManualRenew={handleManualRenew}
-					onGrantTrial={handleGrantTrial}
 					onToggleStatus={handleToggleSubscriptionStatus}
 					isUpdatingSubscription={
 						cancelSubscription.isPending ||
 						resumeSubscription.isPending
 					}
-				/>
-			)}
-
-			{section === "COUPONS" && (
-				<BillingCouponManagementTable
-					coupons={filteredCoupons}
-					onView={setSelectedCoupon}
-					onToggleStatus={handleToggleCouponStatus}
 				/>
 			)}
 
@@ -398,16 +249,8 @@ export default function AdminPlansBillingPage() {
 				plans={plans}
 				onClose={() => setSelectedSubscription(null)}
 				onSave={handleSaveSubscription}
-				onManualRenew={handleManualRenew}
-				onGrantTrial={handleGrantTrial}
 			/>
 
-			<BillingCouponDetailPanel
-				key={selectedCoupon?.id ?? "billing-coupon"}
-				coupon={selectedCoupon}
-				onClose={() => setSelectedCoupon(null)}
-				onSave={handleSaveCoupon}
-			/>
 		</div>
 	);
 }

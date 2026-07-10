@@ -208,7 +208,7 @@ export function BillingPlanDetailPanel({
 
 						<div className='rounded-2xl border border-white/10 bg-[#111111] p-4'>
 							<h3 className='mb-4 text-sm font-semibold uppercase tracking-wide text-neutral-500'>
-								Giá và trial
+								Giá
 							</h3>
 
 							<div className='space-y-4'>
@@ -300,32 +300,6 @@ export function BillingPlanDetailPanel({
 									/>
 								</div>
 
-								<div>
-									<label className='mb-2 block text-sm text-neutral-400'>
-										Trial (ngày)
-									</label>
-									<input
-										type='number'
-										value={getNumberInputValue(
-											form.trialDays,
-										)}
-										onChange={(e) =>
-											setForm((prev) =>
-												prev
-													? {
-															...prev,
-															trialDays:
-																parseNumberInput(
-																	e.target
-																		.value,
-																),
-														}
-													: prev,
-											)
-										}
-										className='h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none'
-									/>
-								</div>
 							</div>
 						</div>
 

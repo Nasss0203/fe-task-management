@@ -42,10 +42,6 @@ const subscriptionChartConfig = {
 		label: "Active",
 		color: "#22C55E",
 	},
-	trial: {
-		label: "Trial",
-		color: "#3B82F6",
-	},
 	expired: {
 		label: "Expired",
 		color: "#EAB308",
@@ -58,7 +54,6 @@ const subscriptionChartConfig = {
 
 const statusColorMap = {
 	active: "#22C55E",
-	trial: "#3B82F6",
 	expired: "#EAB308",
 	canceled: "#EF4444",
 };
@@ -106,11 +101,6 @@ const getSubscriptionBreakdown = (subscriptions: WorkspaceSubscription[]) => [
 		value: subscriptions.filter((item) => item.status === "ACTIVE").length,
 	},
 	{
-		key: "trial",
-		name: "Trial",
-		value: subscriptions.filter((item) => item.status === "TRIAL").length,
-	},
-	{
 		key: "expired",
 		name: "Expired",
 		value: subscriptions.filter((item) => item.status === "EXPIRED").length,
@@ -125,7 +115,10 @@ const getSubscriptionBreakdown = (subscriptions: WorkspaceSubscription[]) => [
 export function BillingInsightCharts({ subscriptions }: Props) {
 	const revenueTrend = getRevenueTrend(subscriptions);
 	const subscriptionBreakdown = getSubscriptionBreakdown(subscriptions);
-	const totalSubscriptions = subscriptions.length;
+	const totalSubscriptions = subscriptionBreakdown.reduce(
+		(sum, item) => sum + item.value,
+		0,
+	);
 
 	return (
 		<section className='grid gap-4 xl:grid-cols-5'>
@@ -222,7 +215,7 @@ export function BillingInsightCharts({ subscriptions }: Props) {
 						Trạng thái subscription
 					</h2>
 					<p className='mt-1 text-sm text-[#64748B]'>
-						Phân bổ active, trial, expired và canceled.
+						Phân bổ active, expired và canceled.
 					</p>
 				</div>
 

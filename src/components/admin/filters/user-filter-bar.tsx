@@ -40,6 +40,7 @@ type Props = {
 	onRoleChange: (value: string) => void;
 	onCreatedAtChange: (value: Date | undefined) => void;
 	onReset: () => void;
+	showRoleFilter?: boolean;
 };
 
 const formatDate = (date?: Date) => {
@@ -62,9 +63,12 @@ export function UserFilterBar({
 	onRoleChange,
 	onCreatedAtChange,
 	onReset,
+	showRoleFilter = true,
 }: Props) {
 	const hasActiveFilter =
-		status !== "all" || role !== "all" || Boolean(createdAt);
+		status !== "all" ||
+		(showRoleFilter && role !== "all") ||
+		Boolean(createdAt);
 	const selectClass =
 		"h-10 w-full rounded-xl border border-input bg-white px-3 text-sm text-foreground outline-none hover:border-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/15";
 
@@ -126,7 +130,11 @@ export function UserFilterBar({
 							</Select>
 						</div>
 
-						<div className='space-y-2'>
+						<div
+							className={
+								showRoleFilter ? "space-y-2" : "hidden"
+							}
+						>
 							<label className={adminFieldLabelClass}>Vai trò hệ thống</label>
 							<Select value={role} onValueChange={(val) => onRoleChange(val)}>
 								<SelectTrigger className={selectClass}>
@@ -134,7 +142,6 @@ export function UserFilterBar({
 								</SelectTrigger>
 								<SelectContent>
 									<SelectItem value='all'>Tất cả</SelectItem>
-									<SelectItem value='SYSTEM_ADMIN'>System Admin</SelectItem>
 									<SelectItem value='USER'>User</SelectItem>
 								</SelectContent>
 							</Select>

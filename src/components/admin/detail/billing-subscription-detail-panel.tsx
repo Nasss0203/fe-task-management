@@ -38,8 +38,6 @@ type Props = {
 	plans: BillingPlan[];
 	onClose: () => void;
 	onSave: (subscription: WorkspaceSubscription) => void;
-	onManualRenew: (subscriptionId: string) => void;
-	onGrantTrial: (subscriptionId: string) => void;
 };
 
 export function BillingSubscriptionDetailPanel({
@@ -47,8 +45,6 @@ export function BillingSubscriptionDetailPanel({
 	plans,
 	onClose,
 	onSave,
-	onManualRenew,
-	onGrantTrial,
 }: Props) {
 	const [open, setOpen] = useState(Boolean(subscription));
 	const [form, setForm] = useState<WorkspaceSubscription | null>(
@@ -102,8 +98,7 @@ export function BillingSubscriptionDetailPanel({
 								Chi tiết subscription
 							</DrawerTitle>
 							<DrawerDescription className='mt-1 text-sm text-neutral-400'>
-								Xem payment history, đổi plan, cấp trial và gia
-								hạn thủ công.
+								Xem payment history, đổi plan và gia hạn thủ công.
 							</DrawerDescription>
 						</div>
 
@@ -286,34 +281,10 @@ export function BillingSubscriptionDetailPanel({
 										</SelectTrigger>
 										<SelectContent>
 											<SelectItem value="ACTIVE">Active</SelectItem>
-											<SelectItem value="TRIAL">Trial</SelectItem>
 											<SelectItem value="EXPIRED">Expired</SelectItem>
 											<SelectItem value="CANCELED">Canceled</SelectItem>
 										</SelectContent>
 									</Select>
-								</div>
-
-								<div>
-									<label className='mb-2 block text-sm text-neutral-400'>
-										Coupon code
-									</label>
-									<input
-										value={form.couponCode ?? ""}
-										onChange={(e) =>
-											setForm((prev) =>
-												prev
-													? {
-															...prev,
-															couponCode:
-																e.target
-																	.value ||
-																null,
-														}
-													: prev,
-											)
-										}
-										className='h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-3 text-sm text-white outline-none'
-									/>
 								</div>
 
 								<div>
@@ -365,28 +336,6 @@ export function BillingSubscriptionDetailPanel({
 									className='h-11 w-full rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-white hover:bg-white/10'
 								>
 									Lưu subscription
-								</button>
-							</div>
-						</div>
-
-						<div className='rounded-2xl border border-white/10 bg-[#111111] p-4'>
-							<h3 className='mb-4 text-sm font-semibold uppercase tracking-wide text-neutral-500'>
-								Support actions
-							</h3>
-
-							<div className='space-y-3'>
-								<button
-									onClick={() => onManualRenew(form.id)}
-									className='h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-4 text-sm font-medium text-white hover:bg-white/5'
-								>
-									Gia hạn thủ công
-								</button>
-
-								<button
-									onClick={() => onGrantTrial(form.id)}
-									className='h-11 w-full rounded-2xl border border-white/10 bg-[#0b0b0b] px-4 text-sm font-medium text-white hover:bg-white/5'
-								>
-									Cấp trial 14 ngày
 								</button>
 							</div>
 						</div>

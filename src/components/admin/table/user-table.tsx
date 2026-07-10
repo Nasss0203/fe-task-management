@@ -16,7 +16,6 @@ import {
 	Crown,
 	Ellipsis,
 	Eye,
-	History,
 	Lock,
 	RotateCcw,
 	ShieldCheck,
@@ -87,7 +86,7 @@ export function UserTable({
 	return (
 		<>
 			<div className='overflow-x-auto'>
-				<table className='w-full min-w-320 border-separate border-spacing-y-3'>
+				<table className='w-full min-w-280 border-separate border-spacing-y-3'>
 					<thead>
 						<tr className='text-left text-sm text-[#475569]'>
 							<th className='px-4 py-2 font-medium'>User</th>
@@ -95,14 +94,11 @@ export function UserTable({
 							<th className='px-4 py-2 font-medium'>
 								Trạng thái
 							</th>
-							<th className='px-4 py-2 font-medium'>
+							<th className='w-40 px-4 py-2 font-medium'>
 								Vai trò hệ thống
 							</th>
-							<th className='px-4 py-2 font-medium'>Gói</th>
-							<th className='px-4 py-2 font-medium'>
-								Không gian làm việc
-							</th>
-							<th className='px-4 py-2 font-medium'>Ngày tạo</th>
+							<th className='w-28 px-4 py-2 text-center font-medium'>Gói</th>
+							<th className='w-40 px-4 py-2 font-medium'>Ngày tạo</th>
 							<th className='px-4 py-2 font-medium'>
 								Hoạt động gần nhất
 							</th>
@@ -161,7 +157,19 @@ export function UserTable({
 										</span>
 									</td>
 
-									<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
+									<td className='w-40 border-y border-[#EEF2F6] bg-white px-4 py-4'>
+										<span
+											className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${getSystemRoleClass(
+												user.systemRole,
+											)}`}
+										>
+											{getSystemRoleLabel(
+												user.systemRole,
+											)}
+										</span>
+									</td>
+
+									<td className='w-28 border-y border-[#EEF2F6] bg-white px-4 py-4 text-center'>
 										<span
 											className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${
 												user.plan === "pro"
@@ -175,44 +183,7 @@ export function UserTable({
 										</span>
 									</td>
 
-									<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
-										<span
-											className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${getSystemRoleClass(
-												user.systemRole,
-											)}`}
-										>
-											{getSystemRoleLabel(
-												user.systemRole,
-											)}
-										</span>
-									</td>
-
-									<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
-										<div className='space-y-0.5'>
-											<p className='font-medium text-[#0F172A]'>
-												{user.workspaces.length}{" "}
-												workspace
-											</p>
-
-											<p className='text-xs text-[#64748B]'>
-												{user.workspaces.length === 0
-													? "Không có workspace"
-													: user.workspaces
-															.slice(0, 2)
-															.map(
-																(workspace) =>
-																	workspace.role,
-															)
-															.join(" • ")}
-
-												{user.workspaces.length > 2
-													? " • ..."
-													: ""}
-											</p>
-										</div>
-									</td>
-
-									<td className='border-y border-[#EEF2F6] bg-white px-4 py-4 text-[#334155]'>
+									<td className='w-40 border-y border-[#EEF2F6] bg-white px-4 py-4 text-[#334155]'>
 										{formatDate(user.createdAt)}
 									</td>
 
@@ -251,16 +222,6 @@ export function UserTable({
 													>
 														<Eye className='mr-2 h-4 w-4' />
 														Xem chi tiết
-													</DropdownMenuItem>
-
-													<DropdownMenuItem
-														onClick={() =>
-															onView(user)
-														}
-														className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
-													>
-														<History className='mr-2 h-4 w-4' />
-														Xem lịch sử hoạt động
 													</DropdownMenuItem>
 
 													{!isSuperAdmin && (

@@ -15,6 +15,8 @@ import {
 	updateWorkspaceLayoutModeApi,
 	removeWorkspaceFromUserTrashApi,
 } from "@/services/workspace/workspace.service";
+import { ADMIN_DASHBOARD_KEY } from "@/features/admin/modules/dashboard/hooks/useAdminDashboard";
+import { ADMIN_WORKSPACES_KEY } from "@/features/admin/modules/workspaces/hooks/useAdminWorkspaces";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
@@ -22,6 +24,24 @@ import { useProjectSelectionStore } from "@/stores/use-project-selection";
 export const useWorkspace = () => {
 	const queryClient = useQueryClient();
 	const router = useRouter();
+
+	const invalidateWorkspaceCaches = async () => {
+		await Promise.all([
+			queryClient.invalidateQueries({
+				queryKey: [WORKSPACE_KEY.WORKSPACE],
+			}),
+			queryClient.invalidateQueries({
+				queryKey: [WORKSPACE_KEY.WORKSPACE_TRASH],
+			}),
+			queryClient.invalidateQueries({
+				queryKey: [ADMIN_WORKSPACES_KEY.WORKSPACE_LIST],
+			}),
+			queryClient.invalidateQueries({
+				queryKey: [ADMIN_DASHBOARD_KEY.ALL_WORKSPACES],
+			}),
+		]);
+	};
+
 	const createWorkspace = useMutation({
 		mutationFn: async (data: WorkspaceDto) => {
 			const result = await createWorkspaceApi(data);
@@ -106,14 +126,7 @@ export const useWorkspace = () => {
 	const softDeleteWorkspace = useMutation({
 		mutationFn: softDeleteWorkspaceApi,
 		onSuccess: async () => {
-			await Promise.all([
-				queryClient.invalidateQueries({
-					queryKey: [WORKSPACE_KEY.WORKSPACE],
-				}),
-				queryClient.invalidateQueries({
-					queryKey: [WORKSPACE_KEY.WORKSPACE_TRASH],
-				}),
-			]);
+			await invalidateWorkspaceCaches();
 		},
 		onError: (err) => {
 			console.error("softDeleteWorkspaceApi failed", err);
@@ -123,14 +136,7 @@ export const useWorkspace = () => {
 	const restoreWorkspace = useMutation({
 		mutationFn: restoreWorkspaceApi,
 		onSuccess: async () => {
-			await Promise.all([
-				queryClient.invalidateQueries({
-					queryKey: [WORKSPACE_KEY.WORKSPACE],
-				}),
-				queryClient.invalidateQueries({
-					queryKey: [WORKSPACE_KEY.WORKSPACE_TRASH],
-				}),
-			]);
+			await invalidateWorkspaceCaches();
 		},
 		onError: (err) => {
 			console.error("restoreWorkspaceApi failed", err);
@@ -140,14 +146,7 @@ export const useWorkspace = () => {
 	const removeWorkspaceFromUserTrash = useMutation({
 		mutationFn: removeWorkspaceFromUserTrashApi,
 		onSuccess: async () => {
-			await Promise.all([
-				queryClient.invalidateQueries({
-					queryKey: [WORKSPACE_KEY.WORKSPACE_TRASH],
-				}),
-				queryClient.invalidateQueries({
-					queryKey: [WORKSPACE_KEY.WORKSPACE],
-				}),
-			]);
+			await invalidateWorkspaceCaches();
 		},
 		onError: (err) => {
 			console.error("removeWorkspaceFromUserTrashApi failed", err);
