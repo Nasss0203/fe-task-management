@@ -51,6 +51,7 @@ export interface TaskItem {
 	id: string;
 	workspaceId: string;
 	projectId: string;
+	parentTaskId?: string | null;
 	sprintId: string | null;
 	sprintName?: string | null;
 
@@ -83,6 +84,7 @@ export interface TaskItem {
 	deletedAt?: string | null;
 	deletedBy?: string | null;
 	position: string | null;
+	subtasks?: TaskItem[];
 }
 
 export type TaskBacklogItem = TaskItem;
@@ -107,6 +109,18 @@ export interface CreateTaskDto {
 
 	initialComment?: string | null;
 	positionContext?: TaskPositionContextInput | null;
+}
+
+export interface CreateSubtaskDto {
+	title: string;
+	description?: string | null;
+	statusId: string;
+	priorityId?: string | null;
+	startAt?: string | null;
+	dueAt?: string | null;
+	estimateMinutes?: number | null;
+	assigneeIds?: string[];
+	initialComment?: string | null;
 }
 
 export type UpdateTaskDto = {

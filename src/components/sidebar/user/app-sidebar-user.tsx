@@ -13,6 +13,7 @@ import {
 	Search,
 	LayoutTemplate,
 	CheckSquare,
+	Sparkles,
 } from "lucide-react";
 import * as React from "react";
 
@@ -52,6 +53,11 @@ const homeItems: NavHomeItem[] = [
 		name: "Khám phá mẫu",
 		url: "/dashboard/templates",
 		icon: LayoutTemplate,
+	},
+	{
+		name: "AI Assistant",
+		url: "/dashboard/ai-assistant",
+		icon: Sparkles,
 	},
 ];
 

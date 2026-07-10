@@ -5,11 +5,13 @@ import { findAllTaskStatusApi } from "@/services/task-status/task-status.service
 import { TaskStatusResponse } from "@/services/task-status/type";
 import {
 	bulkUpdateTasksApi,
+	createSubtaskApi,
 	createTaskApi,
 	deleteTaskApi,
 	findAllBacklogTaskApi,
 	findDeletedTasksApi,
 	findAllTaskApi,
+	findOneTaskApi,
 	moveTaskSprintToSprintApi,
 	moveTaskToSprintApi,
 	reorderTaskPositionApi,
@@ -19,6 +21,7 @@ import {
 } from "@/services/task/task.service";
 import {
 	BulkUpdateTasksDto,
+	CreateSubtaskDto,
 	FindAllTaskBacklogResponse,
 	FindAllTaskResponse,
 	FindBacklogTasksFilters,
@@ -40,9 +43,82 @@ type ReorderTaskPositionInput = ReorderTaskPositionDto & {
 	projectId?: string;
 };
 
+type CreateSubtaskInput = CreateSubtaskDto & {
+	parentTaskId: string;
+	workspaceId?: string;
+	projectId?: string;
+};
+
 type TaskCacheSnapshot = {
 	previousTasks: FindAllTaskResponse | undefined;
 	previousBacklog: FindAllTaskBacklogResponse | undefined;
+};
+
+export const useTaskDetailQuery = (taskId?: string) => {
+	return useQuery({
+		queryKey: [TASK_KEY.TASK, taskId],
+		queryFn: () => findOneTaskApi(taskId!),
+		enabled: !!taskId,
+	});
+};
+
+export const useCreateSubtask = ({
+	workspaceId,
+	projectId,
+}: {
+	workspaceId: string;
+	projectId: string;
+}) => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({
+			parentTaskId,
+			workspaceId: _workspaceId,
+			projectId: _projectId,
+			...data
+		}: CreateSubtaskInput) => {
+			void _workspaceId;
+			void _projectId;
+
+			return createSubtaskApi({
+				parentTaskId,
+				data,
+			});
+		},
+		onSuccess: (response, variables) => {
+			const createdSubtask = response.data;
+
+			queryClient.setQueryData(
+				[TASK_KEY.TASK, variables.parentTaskId],
+				(old: Awaited<ReturnType<typeof findOneTaskApi>> | undefined) =>
+					old
+						? {
+								...old,
+								data: {
+									...old.data,
+									subtasks: [
+										...(old.data.subtasks ?? []),
+										createdSubtask,
+									],
+								},
+							}
+						: old,
+			);
+
+			void Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: [TASK_KEY.TASK, variables.parentTaskId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
+				}),
+			]);
+		},
+	});
 };
 
 export const useUpdateTask = (workspaceId: string, projectId: string) => {

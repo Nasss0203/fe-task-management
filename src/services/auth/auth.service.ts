@@ -5,6 +5,7 @@ import {
 	LoginDto,
 	LogoutResponse,
 	RegisterDto,
+	VerifyEmailResponse,
 } from "./type";
 
 export const loginApi = async (data: LoginDto): Promise<AuthResponse> => {
@@ -40,8 +41,13 @@ export const logoutApi = async (
 	return response.data;
 };
 
-export const verifyEmailApi = async (data: { token: string }) => {
-	const response = await instance.post("/auth/verify-email", data);
+export const verifyEmailApi = async (
+	data: { token: string },
+): Promise<VerifyEmailResponse> => {
+	const response = await instance.post<VerifyEmailResponse>(
+		"/auth/verify-email",
+		data,
+	);
 	return response.data;
 };
 

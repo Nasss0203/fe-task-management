@@ -17,6 +17,7 @@ import {
 import { NotificationBell } from "@/components/popover/NotificationBell";
 import React from "react";
 
+// Force rebuild for AI Assistant sidebar item
 const layout = ({
   children,
 }: Readonly<{

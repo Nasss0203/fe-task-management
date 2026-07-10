@@ -34,13 +34,14 @@ export function DrawerItemView({
 	task,
 }: DrawerItemViewProps) {
 	const detail = useTaskDetail(task);
+	const currentTask = detail.task;
 
 	return (
 		<>
 			<Drawer direction='right' open={open} onOpenChange={onOpenChange}>
 				<DrawerContent className='data-[vaul-drawer-direction=right]:inset-y-0 data-[vaul-drawer-direction=right]:right-0 data-[vaul-drawer-direction=right]:w-full data-[vaul-drawer-direction=right]:sm:max-w-190 overflow-hidden border-l border-border bg-background p-0 text-foreground'>
 					<DrawerHeader className='sr-only'>
-						<DrawerTitle>{task.title ?? 'Untitled'}</DrawerTitle>
+						<DrawerTitle>{currentTask.title ?? 'Untitled'}</DrawerTitle>
 						<DrawerDescription>
 							Task detail drawer
 						</DrawerDescription>
@@ -48,8 +49,8 @@ export function DrawerItemView({
 
 					<div className='flex h-full min-h-0 flex-col'>
 						<TaskDetailHeader
-							taskLabel={`Task #${task.projectSeq ?? task.id.slice(0, 6)}`}
-							title={task.title}
+							taskLabel={`Task #${currentTask.projectSeq ?? currentTask.id.slice(0, 6)}`}
+							title={currentTask.title}
 							isUpdating={detail.isUpdatingTask}
 							onTitleSave={detail.updateTitle}
 						/>
@@ -135,10 +136,11 @@ export function DrawerItemView({
 									/>
 
 									<TaskDescriptionField
-										description={task.description}
+										description={currentTask.description}
 										onSave={detail.updateDescription}
 										isUpdating={detail.isUpdatingTask}
 									/>
+
 
 									<TaskAttachmentsField
 										attachmentsHook={detail.attachmentsHook}
@@ -146,6 +148,21 @@ export function DrawerItemView({
 								</div>
 
 								<TaskDetailTabs
+									workspaceId={currentTask.workspaceId}
+									projectId={currentTask.projectId}
+									parentTaskId={currentTask.id}
+									subtasks={detail.subtasks.items}
+									subtaskDraft={detail.subtasks.draft}
+									onSubtaskDraftChange={
+										detail.subtasks.onDraftChange
+									}
+									onCreateSubtask={detail.subtasks.onCreate}
+									isCreatingSubtask={
+										detail.subtasks.isCreating
+									}
+									isLoadingSubtasks={
+										detail.subtasks.isLoading
+									}
 									comments={detail.comments.items}
 									currentUsername={
 										detail.comments.currentUsername
@@ -179,11 +196,11 @@ export function DrawerItemView({
 									<span className='font-semibold'>
 										{detail.display.priorityName}
 									</span>
-									{task.estimateMinutes ? (
+									{currentTask.estimateMinutes ? (
 										<span>
 											{" "}
 											| Estimate: {
-												task.estimateMinutes
+												currentTask.estimateMinutes
 											}{" "}
 											minutes
 										</span>

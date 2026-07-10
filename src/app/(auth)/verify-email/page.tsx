@@ -10,12 +10,25 @@ import {
 } from "@/components/ui/card";
 import { useVerifyEmail } from "@/features/auth/hooks/useAuth";
 import { getFriendlyApiErrorMessage } from "@/lib/api-error-message";
+import { SystemRole } from "@/services/auth/type";
 import { ArrowLeft, CheckCircle2, Mail, XCircle } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 
+const getPostVerifyRedirectPath = (systemRole?: SystemRole) => {
+	if (
+		systemRole === SystemRole.SYSTEM_ADMIN ||
+		systemRole === SystemRole.SUPER_ADMIN
+	) {
+		return "/admin";
+	}
+
+	return "/dashboard";
+};
+
 function VerifyEmailContent() {
+	const router = useRouter();
 	const searchParams = useSearchParams();
 	const token = searchParams.get("token");
 	const { mutate } = useVerifyEmail();
@@ -33,7 +46,14 @@ function VerifyEmailContent() {
 		mutate(
 			{ token },
 			{
-				onSuccess: () => setStatus("success"),
+				onSuccess: (userData) => {
+					if (userData) {
+						router.replace(getPostVerifyRedirectPath(userData.systemRole));
+						return;
+					}
+
+					setStatus("success");
+				},
 				onError: (err: unknown) => {
 					setStatus("error");
 					setErrorMsg(
@@ -45,7 +65,7 @@ function VerifyEmailContent() {
 				},
 			}
 		);
-	}, [token, mutate]);
+	}, [token, mutate, router]);
 
 	// Gradient bar color by status
 	const gradientBar: Record<string, string> = {

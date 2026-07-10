@@ -11,26 +11,50 @@ import {
 	loginApi,
 	registerApi,
 } from "@/services/auth/auth.service";
-import { LoginDto, RegisterDto } from "@/services/auth/type";
+import { GetMeResponse, LoginDto, RegisterDto } from "@/services/auth/type";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+
+type AuthSessionResponse = {
+	data?: {
+		access_token?: string;
+		refresh_token?: string;
+	};
+};
+
+const persistAuthSession = async (
+	result: AuthSessionResponse,
+): Promise<GetMeResponse | undefined> => {
+	const accessToken = result.data?.access_token;
+
+	if (!accessToken) {
+		return undefined;
+	}
+
+	if (typeof window !== "undefined") {
+		setStoredAccessToken(accessToken);
+
+		if (result.data?.refresh_token) {
+			await setSessionCookie(result.data.refresh_token);
+		}
+	}
+
+	const me = await getMeApi();
+	const userData = me.data;
+	setStoredUser(userData);
+
+	return userData;
+};
 
 export const useLogin = () => {
 	return useMutation({
 		mutationFn: async (data: LoginDto) => {
 			const result = await loginApi(data);
+			const userData = await persistAuthSession(result);
 
-			if (typeof window !== "undefined") {
-				setStoredAccessToken(result.data.access_token);
-
-				if (result.data.refresh_token) {
-					await setSessionCookie(result.data.refresh_token);
-				}
+			if (!userData) {
+				throw new Error("No access token returned from login");
 			}
-
-			const me = await getMeApi();
-			const userData = me.data;
-			setStoredUser(userData);
 
 			return userData;
 		},
@@ -73,7 +97,8 @@ export const useVerifyEmail = () => {
 	return useMutation({
 		mutationFn: async (data: { token: string }) => {
 			const { verifyEmailApi } = await import("@/services/auth/auth.service");
-			return verifyEmailApi(data);
+			const result = await verifyEmailApi(data);
+			return persistAuthSession(result);
 		},
 	});
 };
