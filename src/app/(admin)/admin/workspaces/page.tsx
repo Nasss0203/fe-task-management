@@ -153,7 +153,7 @@ export default function AdminWorkspacesPage() {
 	};
 
 	return (
-		<div className='space-y-5 p-4 sm:p-6'>
+		<div className='space-y-5 p-4 sm:p-6 w-full max-w-full min-w-0'>
 			<WorkspaceAdminHeader />
 
 			<WorkspaceOverviewCards workspaces={workspaceItems} />

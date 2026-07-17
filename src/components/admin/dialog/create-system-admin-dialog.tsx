@@ -115,7 +115,7 @@ export function CreateSystemAdminDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent>
+			<DialogContent className='admin-light-theme'>
 				<DialogHeader>
 					<div className='flex items-center gap-2'>
 						<ShieldCheck className='text-primary' />

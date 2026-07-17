@@ -66,3 +66,26 @@ export const resetPasswordApi = async (data: { token: string; newPassword: strin
 	return response.data;
 };
 
+export const verifyActivationTokenApi = async (
+	token: string,
+): Promise<{ data: { email: string; username: string } }> => {
+	const response = await instance.get<{ data: { email: string; username: string } }>(
+		"/auth/verify-activation-token",
+		{
+			params: { token },
+		},
+	);
+	return response.data;
+};
+
+export const activateAdminApi = async (
+	data: { token: string; password: string },
+): Promise<VerifyEmailResponse> => {
+	const response = await instance.post<VerifyEmailResponse>(
+		"/auth/activate-admin",
+		data,
+	);
+	return response.data;
+};
+
+

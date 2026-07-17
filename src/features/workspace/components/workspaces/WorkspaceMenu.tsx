@@ -1,6 +1,6 @@
 "use client";
 
-import { Cog, LayoutTemplate, Pencil, Trash2, UserPlus } from "lucide-react";
+import { LayoutTemplate, Pencil, Trash2, UserPlus } from "lucide-react";
 import { useState } from "react";
 
 import { AddPeopleDialog } from "@/components/dialog/AddPeopleDialog";
@@ -90,14 +90,6 @@ export function WorkspaceMenu({
 								<span>Mời thêm thành viên</span>
 							</DropdownMenuItem>
 						</RequirePermission>
-
-						<DropdownMenuItem
-							onClick={onOpenSettings}
-							className='gap-3'
-						>
-							<Cog className='h-4 w-4' />
-							<span>Cài đặt không gian</span>
-						</DropdownMenuItem>
 
 						<RequirePermission
 							workspaceId={workspaceId}

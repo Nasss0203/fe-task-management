@@ -12,7 +12,7 @@ import {
 	registerApi,
 } from "@/services/auth/auth.service";
 import { GetMeResponse, LoginDto, RegisterDto } from "@/services/auth/type";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 type AuthSessionResponse = {
@@ -126,6 +126,29 @@ export const useResetPassword = () => {
 		mutationFn: async (data: { token: string; newPassword: string }) => {
 			const { resetPasswordApi } = await import("@/services/auth/auth.service");
 			return resetPasswordApi(data);
+		},
+	});
+};
+
+export const useVerifyActivationToken = (token: string) => {
+	return useQuery({
+		queryKey: ["verify-activation-token", token],
+		queryFn: async () => {
+			const { verifyActivationTokenApi } = await import("@/services/auth/auth.service");
+			const response = await verifyActivationTokenApi(token);
+			return response.data;
+		},
+		enabled: !!token,
+		retry: false,
+	});
+};
+
+export const useActivateAdmin = () => {
+	return useMutation({
+		mutationFn: async (data: { token: string; password: string }) => {
+			const { activateAdminApi } = await import("@/services/auth/auth.service");
+			const result = await activateAdminApi(data);
+			return persistAuthSession(result);
 		},
 	});
 };

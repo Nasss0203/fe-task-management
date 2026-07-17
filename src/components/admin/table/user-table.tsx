@@ -85,24 +85,24 @@ export function UserTable({
 
 	return (
 		<>
-			<div className='overflow-x-auto'>
-				<table className='w-full min-w-280 border-separate border-spacing-y-3'>
+			<div className='overflow-x-auto px-4 md:px-5'>
+				<table className='w-full min-w-[1000px] border-separate border-spacing-y-2'>
 					<thead>
 						<tr className='text-left text-sm text-[#475569]'>
-							<th className='px-4 py-2 font-medium'>User</th>
-							<th className='px-4 py-2 font-medium'>Email</th>
-							<th className='px-4 py-2 font-medium'>
+							<th className='px-4 py-2 font-medium whitespace-nowrap'>User</th>
+							<th className='px-4 py-2 font-medium whitespace-nowrap'>Email</th>
+							<th className='px-4 py-2 font-medium whitespace-nowrap'>
 								Trạng thái
 							</th>
-							<th className='w-40 px-4 py-2 font-medium'>
+							<th className='w-40 px-4 py-2 font-medium whitespace-nowrap'>
 								Vai trò hệ thống
 							</th>
-							<th className='w-28 px-4 py-2 text-center font-medium'>Gói</th>
-							<th className='w-40 px-4 py-2 font-medium'>Ngày tạo</th>
-							<th className='px-4 py-2 font-medium'>
+							<th className='w-28 px-4 py-2 text-center font-medium whitespace-nowrap'>Gói</th>
+							<th className='w-40 px-4 py-2 font-medium whitespace-nowrap'>Ngày tạo</th>
+							<th className='px-4 py-2 font-medium whitespace-nowrap'>
 								Hoạt động gần nhất
 							</th>
-							<th className='px-4 py-2 font-medium text-right'>
+							<th className='px-4 py-2 font-medium text-right whitespace-nowrap'>
 								Actions
 							</th>
 						</tr>
@@ -121,33 +121,35 @@ export function UserTable({
 									key={user.id}
 									className='text-sm text-[#1E293B]'
 								>
-									<td className='rounded-l-3xl border-y border-l border-[#EEF2F6] bg-white px-4 py-4'>
+									<td className='rounded-l-3xl border-y border-l border-[#EEF2F6] bg-white px-4 py-2 whitespace-nowrap'>
 										<div className='flex items-center gap-3'>
 											{user.avatarUrl ? (
 												<img
 													src={user.avatarUrl}
 													alt={user.fullName}
-													className='h-11 w-11 rounded-full border border-border object-cover'
+													className='h-8 w-8 rounded-full border border-border object-cover'
 												/>
 											) : (
-												<div className='flex h-11 w-11 items-center justify-center rounded-full border border-[#BFDBFE] bg-[#EFF6FF] text-sm font-semibold text-[#2563EB]'>
+												<div className='flex h-8 w-8 items-center justify-center rounded-full border border-[#BFDBFE] bg-[#EFF6FF] text-xs font-semibold text-[#2563EB]'>
 													{getInitials(user.fullName)}
 												</div>
 											)}
 
-											<div>
-												<p className='font-medium text-[#0F172A]'>
+											<div className='min-w-0 flex-1'>
+												<p className='font-medium text-[#0F172A] text-xs sm:text-sm truncate max-w-[140px]' title={user.fullName}>
 													{user.fullName}
 												</p>
 											</div>
 										</div>
 									</td>
 
-									<td className='border-y border-[#EEF2F6] bg-white px-4 py-4 text-[#334155]'>
-										{user.email}
+									<td className='border-y border-[#EEF2F6] bg-white px-4 py-2 text-[#334155] text-xs sm:text-sm whitespace-nowrap'>
+										<div className='max-w-[180px] truncate' title={user.email}>
+											{user.email}
+										</div>
 									</td>
 
-									<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
+									<td className='border-y border-[#EEF2F6] bg-white px-4 py-2 whitespace-nowrap'>
 										<span
 											className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${getStatusClass(
 												user.status,
@@ -157,7 +159,7 @@ export function UserTable({
 										</span>
 									</td>
 
-									<td className='w-40 border-y border-[#EEF2F6] bg-white px-4 py-4'>
+									<td className='w-40 border-y border-[#EEF2F6] bg-white px-4 py-2 whitespace-nowrap'>
 										<span
 											className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${getSystemRoleClass(
 												user.systemRole,
@@ -169,7 +171,7 @@ export function UserTable({
 										</span>
 									</td>
 
-									<td className='w-28 border-y border-[#EEF2F6] bg-white px-4 py-4 text-center'>
+									<td className='w-28 border-y border-[#EEF2F6] bg-white px-4 py-2 text-center whitespace-nowrap'>
 										<span
 											className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${
 												user.plan === "pro"
@@ -183,12 +185,12 @@ export function UserTable({
 										</span>
 									</td>
 
-									<td className='w-40 border-y border-[#EEF2F6] bg-white px-4 py-4 text-[#334155]'>
+									<td className='w-40 border-y border-[#EEF2F6] bg-white px-4 py-2 text-[#334155] text-xs sm:text-sm whitespace-nowrap'>
 										{formatDate(user.createdAt)}
 									</td>
 
-									<td className='border-y border-[#EEF2F6] bg-white px-4 py-4'>
-										<div className='inline-flex items-center gap-2 text-[#334155]'>
+									<td className='border-y border-[#EEF2F6] bg-white px-4 py-2 whitespace-nowrap'>
+										<div className='inline-flex items-center gap-2 text-[#334155] text-xs sm:text-sm'>
 											<Clock3 className='h-4 w-4 text-[#64748B]' />
 											<span>
 												{user.lastActive
@@ -200,11 +202,11 @@ export function UserTable({
 										</div>
 									</td>
 
-									<td className='rounded-r-3xl border-y border-r border-[#EEF2F6] bg-white px-4 py-4'>
+									<td className='rounded-r-3xl border-y border-r border-[#EEF2F6] bg-white px-4 py-2 whitespace-nowrap'>
 										<div className='flex justify-end'>
 											<DropdownMenu>
 												<DropdownMenuTrigger asChild>
-													<button className='inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#CBD5E1] bg-white text-[#475569] transition hover:bg-[#F8FAFC] hover:text-[#0F172A]'>
+													<button className='inline-flex h-8 w-8 items-center justify-center rounded-xl border border-[#CBD5E1] bg-white text-[#475569] transition hover:bg-[#F8FAFC] hover:text-[#0F172A]'>
 														<Ellipsis className='h-4 w-4' />
 													</button>
 												</DropdownMenuTrigger>
@@ -323,11 +325,13 @@ export function UserTable({
 					</tbody>
 				</table>
 			</div>
-			<PanigationTable
-				table={table}
-				totalRows={totalRows}
-				itemLabel='người dùng'
-			/>
+			<div className='px-4 md:px-5'>
+				<PanigationTable
+					table={table}
+					totalRows={totalRows}
+					itemLabel='người dùng'
+				/>
+			</div>
 		</>
 	);
 }

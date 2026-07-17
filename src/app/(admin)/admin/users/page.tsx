@@ -224,7 +224,7 @@ export default function AdminUsersPage() {
 	};
 
 	return (
-		<div className='space-y-5 p-4 sm:p-6'>
+		<div className='space-y-5 p-4 sm:p-6 w-full max-w-full min-w-0'>
 			<UserAdminHeader
 				isSuperAdmin={isSuperAdmin}
 				isCreatingSystemAdmin={createSystemAdmin.isPending}
@@ -238,19 +238,21 @@ export default function AdminUsersPage() {
 				overview={overview}
 			/>
 
-			<div className={`${adminPanelCompactClass} p-4 md:p-5`}>
-				<UserFilterBar
-					search={search}
-					status={status}
-					role={role}
-					createdAt={createdAt}
-					onSearchChange={handleSearchChange}
-					onStatusChange={handleStatusChange}
-					onRoleChange={handleRoleChange}
-					onCreatedAtChange={handleCreatedAtChange}
-					onReset={handleResetFilters}
-					showRoleFilter={false}
-				/>
+			<div className={`${adminPanelCompactClass} py-4 md:py-5 w-full max-w-full min-w-0 overflow-hidden`}>
+				<div className='px-4 md:px-5'>
+					<UserFilterBar
+						search={search}
+						status={status}
+						role={role}
+						createdAt={createdAt}
+						onSearchChange={handleSearchChange}
+						onStatusChange={handleStatusChange}
+						onRoleChange={handleRoleChange}
+						onCreatedAtChange={handleCreatedAtChange}
+						onReset={handleResetFilters}
+						showRoleFilter={false}
+					/>
+				</div>
 
 				<div className='mt-4'>
 					{users.isLoading ? (

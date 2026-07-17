@@ -12,6 +12,8 @@ import * as React from "react";
 
 import { NavMain } from "@/components/nav/admin/nav-main-admin";
 import { NavUser } from "@/components/nav/admin/nav-user-admin";
+import { useUser } from "@/features/auth/hooks/useUser";
+import { SystemRole } from "@/services/auth/type";
 import {
 	Sidebar,
 	SidebarContent,
@@ -23,11 +25,6 @@ import {
 } from "@/components/ui/sidebar";
 
 const data = {
-	user: {
-		name: "shadcn",
-		email: "m@example.com",
-		avatar: "/avatars/shadcn.jpg",
-	},
 	navMain: [
 		{
 			title: "Dashboard",
@@ -60,6 +57,17 @@ const data = {
 export function AppSidebarAdmin({
 	...props
 }: React.ComponentProps<typeof Sidebar>) {
+	const { user } = useUser();
+
+	const filteredNavMain = React.useMemo(() => {
+		return data.navMain.filter((item) => {
+			if (item.url === "/admin/admin") {
+				return user?.systemRole === SystemRole.SUPER_ADMIN;
+			}
+			return true;
+		});
+	}, [user]);
+
 	return (
 		<Sidebar collapsible='offcanvas' {...props}>
 			<SidebarHeader className='border-b border-sidebar-border px-3 py-3'>
@@ -80,10 +88,10 @@ export function AppSidebarAdmin({
 				</SidebarMenu>
 			</SidebarHeader>
 			<SidebarContent className='px-1 py-3'>
-				<NavMain items={data.navMain} />
+				<NavMain items={filteredNavMain} />
 			</SidebarContent>
 			<SidebarFooter className='border-t border-sidebar-border px-3 py-3'>
-				<NavUser user={data.user} />
+				<NavUser />
 			</SidebarFooter>
 		</Sidebar>
 	);

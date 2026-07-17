@@ -138,18 +138,18 @@ export function WorkspaceManagementTable({
 
 			{workspaces.length ? (
 				<>
-				<div className='overflow-x-auto'>
-				<table className='w-full min-w-[1180px] border-collapse'>
+				<div className='overflow-x-auto px-4 sm:px-5'>
+				<table className='w-full min-w-[1050px] border-collapse'>
 					<thead className='sticky top-0 z-10 bg-[#F8FAFC]'>
 						<tr className='border-b border-border text-left text-xs uppercase tracking-[0.12em] text-[#475569]'>
-							<th className='px-5 py-3 font-medium'>Workspace</th>
-							<th className='px-4 py-3 font-medium'>Owner</th>
-							<th className='px-4 py-3 font-medium'>Gói</th>
-							<th className='px-4 py-3 font-medium'>Trạng thái</th>
-							<th className='px-4 py-3 font-medium'>Thống kê</th>
-							<th className='px-4 py-3 font-medium'>Ngày tạo</th>
-							<th className='px-4 py-3 font-medium'>Cập nhật</th>
-							<th className='px-5 py-3 text-right font-medium'>
+							<th className='px-5 py-3 font-medium whitespace-nowrap'>Workspace</th>
+							<th className='px-4 py-3 font-medium whitespace-nowrap'>Owner</th>
+							<th className='px-4 py-3 font-medium whitespace-nowrap'>Gói</th>
+							<th className='px-4 py-3 font-medium whitespace-nowrap'>Trạng thái</th>
+							<th className='px-4 py-3 font-medium whitespace-nowrap'>Thống kê</th>
+							<th className='px-4 py-3 font-medium whitespace-nowrap'>Ngày tạo</th>
+							<th className='px-4 py-3 font-medium whitespace-nowrap'>Cập nhật</th>
+							<th className='px-5 py-3 text-right font-medium whitespace-nowrap'>
 								Actions
 							</th>
 						</tr>
@@ -164,33 +164,33 @@ export function WorkspaceManagementTable({
 									key={workspace.id}
 									className='text-sm text-[#1E293B] transition hover:bg-[#F8FAFC]'
 								>
-									<td className='px-5 py-4'>
+									<td className='px-5 py-2 whitespace-nowrap'>
 										<div className='flex items-center gap-3'>
-											<div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#BFDBFE] bg-[#EFF6FF] text-sm font-semibold text-[#2563EB]'>
+											<div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#BFDBFE] bg-[#EFF6FF] text-xs font-semibold text-[#2563EB]'>
 												{getInitials(workspace.name)}
 											</div>
 
-											<div className='min-w-0'>
-												<p className='truncate font-medium text-[#0F172A]'>
+											<div className='min-w-0 flex-1'>
+												<p className='truncate font-medium text-[#0F172A] text-xs sm:text-sm max-w-[140px]' title={workspace.name}>
 													{workspace.name}
 												</p>
 											</div>
 										</div>
 									</td>
 
-									<td className='px-4 py-4'>
-										<div className='space-y-0.5'>
-											<p className='font-medium text-[#0F172A]'>
+									<td className='px-4 py-2 whitespace-nowrap'>
+										<div className='space-y-0.5 min-w-0 max-w-[160px]'>
+											<p className='font-medium text-[#0F172A] text-xs sm:text-sm truncate' title={workspace.ownerName ?? ""}>
 												{workspace.ownerName ??
 													"Chưa có owner"}
 											</p>
-											<p className='text-xs text-[#64748B]'>
+											<p className='text-xs text-[#64748B] truncate' title={workspace.ownerEmail ?? ""}>
 												{workspace.ownerEmail ?? "-"}
 											</p>
 										</div>
 									</td>
 
-									<td className='px-4 py-4'>
+									<td className='px-4 py-2 whitespace-nowrap'>
 										<span
 											className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${getWorkspacePlanClass(
 												workspace.plan,
@@ -202,7 +202,7 @@ export function WorkspaceManagementTable({
 										</span>
 									</td>
 
-									<td className='px-4 py-4'>
+									<td className='px-4 py-2 whitespace-nowrap'>
 										<span
 											className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${getWorkspaceStatusClass(
 												workspace.status,
@@ -214,7 +214,7 @@ export function WorkspaceManagementTable({
 										</span>
 									</td>
 
-									<td className='px-4 py-4'>
+									<td className='px-4 py-2 whitespace-nowrap'>
 										<div className='grid grid-cols-2 gap-1.5 text-xs text-[#64748B]'>
 											<span>{workspace.membersCount} member</span>
 											<span>{workspace.projectsCount} project</span>
@@ -223,14 +223,14 @@ export function WorkspaceManagementTable({
 										</div>
 									</td>
 
-									<td className='px-4 py-4 text-[#334155]'>
+									<td className='px-4 py-2 text-[#334155] text-xs sm:text-sm whitespace-nowrap'>
 										<div className='inline-flex items-center gap-2'>
 											<CalendarDays className='h-4 w-4 text-[#64748B]' />
 											{formatDate(workspace.createdAt)}
 										</div>
 									</td>
 
-									<td className='px-4 py-4 text-[#334155]'>
+									<td className='px-4 py-2 text-[#334155] text-xs sm:text-sm whitespace-nowrap'>
 										<div className='inline-flex items-center gap-2'>
 											<Clock3 className='h-4 w-4 text-[#64748B]' />
 											{formatDateTime(
@@ -239,11 +239,11 @@ export function WorkspaceManagementTable({
 										</div>
 									</td>
 
-									<td className='px-5 py-4'>
+									<td className='px-5 py-2 whitespace-nowrap'>
 										<div className='flex justify-end'>
 											<DropdownMenu>
 												<DropdownMenuTrigger asChild>
-													<button className='inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[#CBD5E1] bg-white text-[#475569] transition hover:bg-[#F8FAFC] hover:text-[#0F172A]'>
+													<button className='inline-flex h-8 w-8 items-center justify-center rounded-xl border border-[#CBD5E1] bg-white text-[#475569] transition hover:bg-[#F8FAFC] hover:text-[#0F172A]'>
 														<Ellipsis className='h-4 w-4' />
 													</button>
 												</DropdownMenuTrigger>
@@ -287,11 +287,13 @@ export function WorkspaceManagementTable({
 				</table>
 				</div>
 
-				<PanigationTable
-					table={table}
-					totalRows={totalRows}
-					itemLabel='workspace'
-				/>
+				<div className='px-4 sm:px-5'>
+					<PanigationTable
+						table={table}
+						totalRows={totalRows}
+						itemLabel='workspace'
+					/>
+				</div>
 				</>
 			) : (
 				<div className='p-10 text-center'>

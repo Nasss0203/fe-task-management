@@ -17,7 +17,8 @@ import type {
 	CreateSystemAdminDto,
 } from "@/services/admin/user/type";
 import type { PaginationState } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 const formatQueryDate = (date?: Date) => {
@@ -32,6 +33,14 @@ const formatQueryDate = (date?: Date) => {
 
 export default function AdminSystemAdminsPage() {
 	const { user } = useUser();
+	const router = useRouter();
+
+	useEffect(() => {
+		if (user && user.systemRole !== SystemRole.SUPER_ADMIN) {
+			router.replace("/admin");
+		}
+	}, [user, router]);
+
 	const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
 	const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 	const [search, setSearch] = useState("");
@@ -203,7 +212,7 @@ export default function AdminSystemAdminsPage() {
 	};
 
 	return (
-		<div className='space-y-5 p-4 sm:p-6'>
+		<div className='space-y-5 p-4 sm:p-6 w-full max-w-full min-w-0'>
 			<div className='border-b border-border pb-5'>
 				<SystemAdminHeader
 					isSuperAdmin={isSuperAdmin}

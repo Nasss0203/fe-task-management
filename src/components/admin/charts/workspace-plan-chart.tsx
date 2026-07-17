@@ -53,9 +53,9 @@ export function WorkspacePlanChart({ data }: Props) {
 		});
 
 	return (
-		<Card className='rounded-2xl border border-neutral-800 bg-neutral-950/80 p-0 text-white'>
+		<Card className='rounded-2xl border border-border bg-white p-0 shadow-sm'>
 			<CardHeader className='pt-4 pb-0'>
-				<CardTitle className='text-lg font-semibold text-white'>
+				<CardTitle className='text-lg font-semibold text-[#0F172A]'>
 					Workspace Free / Pro
 				</CardTitle>
 				<CardDescription className='text-sm text-[#64748B]'>
@@ -102,24 +102,27 @@ export function WorkspacePlanChart({ data }: Props) {
 				</div>
 
 				<div className='mt-3 space-y-2 px-1'>
-					{chartData.map((item) => (
-						<div
-							key={item.plan}
-							className='flex items-center justify-between text-sm'
-						>
-							<div className='flex items-center gap-2 text-[#334155]'>
-								<span
-									className='h-2.5 w-2.5 rounded-full'
-									style={{
-										backgroundColor: item.fill,
-									}}
-								/>
-								{item.name}
-							</div>
+					{chartData.map((item) => {
+						const planKey = item.plan as "free" | "pro";
+						return (
+							<div
+								key={item.plan}
+								className='flex items-center justify-between text-sm'
+							>
+								<div className='flex items-center gap-2 text-[#334155]'>
+									<span
+										className='h-2.5 w-2.5 rounded-full'
+										style={{
+											backgroundColor: chartConfig[planKey]?.color,
+										}}
+									/>
+									{item.name}
+								</div>
 
-							<span className='text-[#0F172A]'>{item.value}</span>
-						</div>
-					))}
+								<span className='text-[#0F172A]'>{item.value}</span>
+							</div>
+						);
+					})}
 				</div>
 			</CardContent>
 		</Card>

@@ -21,11 +21,11 @@ const layout = ({
 				}
 			>
 				<AppSidebarAdmin variant='sidebar' />
-				<SidebarInset>
+				<SidebarInset className='min-w-0'>
 					<SiteHeader />
-					<div className='flex flex-1 flex-col'>
-						<div className='@container/main flex flex-1 flex-col gap-2'>
-							<div className='flex flex-col gap-4 p-4 '>
+					<div className='flex flex-1 flex-col min-w-0'>
+						<div className='@container/main flex flex-1 flex-col gap-2 min-w-0'>
+							<div className='flex flex-col gap-4 p-4 min-w-0'>
 								{children}
 							</div>
 						</div>
