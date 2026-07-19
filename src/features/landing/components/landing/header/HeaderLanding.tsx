@@ -88,7 +88,7 @@ const HeaderLanding = () => {
 	};
 
 	return (
-		<header className='sticky top-4 z-50 mx-auto flex w-full max-w-6xl items-center justify-between rounded-full border border-border bg-background/70 px-6 py-3 backdrop-blur-xl shadow-sm animate-in fade-in slide-in-from-top-4 duration-1000'>
+		<header className='sticky top-4 z-50 mx-auto flex w-full max-w-6xl items-center justify-between rounded-full border border-border bg-background/70 px-6 py-3 backdrop-blur-xl shadow-sm'>
 			<Link href='/' className='flex items-center gap-2 shrink-0'>
 				<div className='flex h-9 w-9 items-center justify-center rounded-xl bg-secondary ring-1 ring-border'>
 					<LayoutGrid className='h-5 w-5 text-foreground' />

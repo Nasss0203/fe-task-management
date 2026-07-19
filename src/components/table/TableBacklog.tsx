@@ -1,6 +1,10 @@
 "use client";
 
-import { useDroppable } from "@dnd-kit/react";
+import { useDroppable } from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import {
   ColumnDef,
   PaginationState,
@@ -412,12 +416,11 @@ const TableBacklog = ({
     }
   };
 
-  const { ref, isDropTarget } = useDroppable({
+  const { setNodeRef, isOver } = useDroppable({
     id: containerId,
-    type: "task-table",
-    accept: ["item"],
     data: {
       containerId,
+      type: "task-table",
     },
   });
   const gridTemplateColumns = getBacklogGridTemplateColumns(showSprint);
@@ -425,13 +428,17 @@ const TableBacklog = ({
     ? BACKLOG_WITH_SPRINT_GRID_MIN_WIDTH
     : BACKLOG_GRID_MIN_WIDTH;
   const tableRows = table.getRowModel().rows;
+  const tableRowsById = useMemo(
+    () => new Map(tableRows.map((row) => [row.original.id, row])),
+    [tableRows],
+  );
   const displayIds =
     taskIds.length > 0 ? taskIds : tableRows.map((r) => r.original.id);
 
   return (
     <>
       <div
-        className={cn("border-t-0", isDropTarget && "ring-1 ring-sky-400/60")}
+        className={cn("border-t-0", isOver && "ring-1 ring-sky-400/60")}
       >
         <div className="relative max-h-[520px] overflow-auto">
           <div role="table" className="w-full text-sm" style={{ minWidth }}>
@@ -465,39 +472,43 @@ const TableBacklog = ({
             </div>
 
             <div
-              ref={ref}
+              ref={setNodeRef}
               role="rowgroup"
-              className={cn("min-h-20", isDropTarget && "bg-sky-500/5")}
+              className={cn("min-h-20", isOver && "bg-sky-500/5")}
             >
               {displayIds.length ? (
-                displayIds.map((taskId, index) => {
-                  const row = tableRows.find((r) => r.original.id === taskId);
+                <SortableContext
+                  items={displayIds}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {displayIds.map((taskId, index) => {
+                    const row = tableRowsById.get(taskId);
 
-                  if (row) {
+                    if (row) {
+                      return (
+                        <TableRowDnd
+                          key={row.id}
+                          row={row}
+                          index={index}
+                          containerId={containerId}
+                          gridTemplateColumns={gridTemplateColumns}
+                        />
+                      );
+                    }
+
+                    // Render a placeholder if the row data is not yet available (e.g. during drag across containers)
                     return (
-                      <TableRowDnd
-                        key={row.id}
-                        row={row}
-                        index={index}
-                        containerId={containerId}
-                        gridTemplateColumns={gridTemplateColumns}
-                      />
-                    );
-                  }
-
-                  // Render a placeholder if the row data is not yet available (e.g. during drag across containers)
-                  return (
-                    <div
-                      style={{ display: "contents" }}
-                      key={`placeholder-${taskId}`}
-                    >
                       <div
+                        key={`placeholder-${taskId}`}
+                        role="row"
                         className="grid min-h-14 border-b border-border/70 bg-muted/20 opacity-50"
                         style={{ gridTemplateColumns }}
-                      />
-                    </div>
-                  );
-                })
+                      >
+                        <div role="cell" style={{ gridColumn: "1 / -1" }} />
+                      </div>
+                    );
+                  })}
+                </SortableContext>
               ) : (
                 <div
                   role="row"

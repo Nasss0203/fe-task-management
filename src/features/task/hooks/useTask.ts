@@ -391,9 +391,19 @@ export const useReorderTaskPosition = ({
 			await Promise.all([
 				queryClient.invalidateQueries({
 					queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
+					refetchType: "active",
 				}),
 				queryClient.invalidateQueries({
 					queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
+					refetchType: "active",
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
+					refetchType: "active",
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [SPRINT_KEY.SPRINT, workspaceId, projectId],
+					refetchType: "active",
 				}),
 			]);
 		},

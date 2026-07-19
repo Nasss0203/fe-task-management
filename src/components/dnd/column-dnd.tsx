@@ -2,7 +2,7 @@
 
 import { getTaskStatusStyle } from "@/lib/task-status-style";
 import { cn } from "@/lib/utils";
-import { useDroppable } from "@dnd-kit/react";
+import { useDroppable } from "@dnd-kit/core";
 import { Ellipsis, Plus } from "lucide-react";
 
 type Props = {
@@ -24,10 +24,12 @@ export default function ColumnDnd({
 	onAddTask,
 	className,
 }: Props) {
-	const { ref, isDropTarget } = useDroppable({
+	const { setNodeRef, isOver } = useDroppable({
 		id,
-		type: "column",
-		accept: ["item"],
+		data: {
+			type: "column",
+			containerId: id,
+		},
 	});
 
 	const s = getTaskStatusStyle(statusName, isDone);
@@ -35,11 +37,11 @@ export default function ColumnDnd({
 	return (
 		<div className='flex flex-col'>
 			<div
-				ref={ref}
+				ref={setNodeRef}
 				className={cn(
 					"w-80 rounded-md p-4 flex flex-col gap-y-3 group",
 					s.columnBackground,
-					isDropTarget && cn("ring-2", s.ring),
+					isOver && cn("ring-2", s.ring),
 					className,
 				)}
 			>

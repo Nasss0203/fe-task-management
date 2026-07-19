@@ -15,7 +15,7 @@ const WorkManagement = () => {
 	return (
 		<div className='mx-auto mt-32 max-w-6xl px-4'>
 			<div className='grid gap-16 lg:grid-cols-2 lg:items-center'>
-				<div className='animate-in fade-in slide-in-from-left-8 duration-1000'>
+				<div>
 					<h2 className='text-4xl font-semibold leading-tight tracking-tight text-foreground sm:text-5xl'>
 						Quản lý công việc song song với kiến thức của bạn.
 					</h2>
@@ -48,7 +48,7 @@ const WorkManagement = () => {
 								</div>
 
 								{view.active && (
-									<div className='mt-4 animate-in fade-in slide-in-from-top-2 duration-500'>
+									<div className='mt-4'>
 										<p className='text-base leading-relaxed text-muted-foreground'>
 											{view.description}
 										</p>
@@ -59,7 +59,7 @@ const WorkManagement = () => {
 					</div>
 				</div>
 
-				<div className='relative animate-in fade-in slide-in-from-right-8 duration-1000'>
+				<div className='relative'>
 					<div className='aspect-video rounded-3xl border border-border bg-card shadow-2xl backdrop-blur-sm overflow-hidden flex'>
                         {/* Sidebar */}
 						<div className='w-1/4 border-r border-border bg-muted/30 p-4 space-y-4'>

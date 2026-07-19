@@ -82,7 +82,7 @@ const productivityCards = [
 const FeatureHighlight = () => {
 	return (
 		<div className='mx-auto mt-32 max-w-6xl'>
-			<div className='text-center animate-in fade-in slide-in-from-bottom-4 duration-1000'>
+			<div className='text-center'>
 				<h2 className='text-4xl font-semibold leading-tight tracking-tight text-foreground sm:text-5xl'>
 					Viết, lập kế hoạch và thực hiện tại một nơi.
 				</h2>
@@ -97,7 +97,7 @@ const FeatureHighlight = () => {
 				{productivityCards.map((card, i) => (
 					<div
 						key={card.title}
-						className={`group overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-all hover:border-primary/50 hover:shadow-md animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-${i * 100} ${card.className}`}
+						className={`group overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-all hover:border-primary/50 hover:shadow-md ${card.className}`}
 					>
 						<div className='p-8'>
 							<card.icon className='mb-4 h-6 w-6 text-primary' />

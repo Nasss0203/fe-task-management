@@ -62,6 +62,14 @@ function CalendarApp({ workspaceId, projectId }: CalendarAppProps) {
 		return tasks.map((task: TaskItem) => {
 			const startString = formatScheduleXDate(task.startAt) || formatScheduleXDate(task.dueAt) || formatScheduleXDate(task.createdAt) || formatScheduleXDate(new Date().toISOString());
 			const endString = formatScheduleXDate(task.dueAt) || startString;
+			const assigneeNames =
+				task.assignees
+					?.map((assignee) => assignee.fullName || assignee.username || "User")
+					.filter(Boolean) ?? [];
+			const assigneeLabel =
+				assigneeNames.length > 0
+					? `Assigned: ${assigneeNames.join(", ")}`
+					: "";
 
 			const start = parseToTemporal(startString!);
 			let end = parseToTemporal(endString!);
@@ -75,11 +83,18 @@ function CalendarApp({ workspaceId, projectId }: CalendarAppProps) {
 
 			return {
 				id: task.id,
-				title: task.title ?? "Untitled",
+				title:
+					assigneeNames.length > 0
+						? `${task.title ?? "Untitled"} • ${assigneeNames[0]}`
+						: (task.title ?? "Untitled"),
 				start,
 				end,
-				description: task.description || "",
-				people: task.assignees?.map(a => a.fullName || a.username || "User") || [],
+				description: assigneeLabel
+					? task.description
+						? `${assigneeLabel}\n${task.description}`
+						: assigneeLabel
+					: (task.description || ""),
+				people: assigneeNames,
 			};
 		});
 	}, [tasks]);

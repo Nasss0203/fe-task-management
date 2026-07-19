@@ -1,7 +1,8 @@
 "use client";
 
 import type { TaskItem } from "@/services/task/type";
-import { useSortable } from "@dnd-kit/react/sortable";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import * as React from "react";
 import { ItemView } from "./item-view";
 
@@ -36,13 +37,20 @@ const ItemsDnd = ({
 	onUpdateName,
 	onOpenDetail,
 }: ItemsDndProps) => {
-	const { ref, isDragging, handleRef } = useSortable({
+	const {
+		setNodeRef,
+		attributes,
+		listeners,
+		transform,
+		transition,
+		isDragging,
+	} = useSortable({
 		id,
-		index,
-		group: column,
-		type: "item",
-		accept: ["item"],
-		disabled: false,
+		data: {
+			type: "item",
+			containerId: column,
+			index,
+		},
 	});
 	const [preventOpenDetail, setPreventOpenDetail] = React.useState(false);
 	const wasDraggingRef = React.useRef(false);
@@ -65,7 +73,16 @@ const ItemsDnd = ({
 	}, [isDragging]);
 
 	return (
-		<div ref={ref} style={{ opacity: isDragging ? 0.4 : 1, transform: 'translate3d(0,0,0)' }}>
+		<div
+			ref={setNodeRef}
+			{...attributes}
+			{...listeners}
+			style={{
+				opacity: isDragging ? 0.4 : 1,
+				transform: CSS.Transform.toString(transform),
+				transition,
+			}}
+		>
 			<ItemView
 				id={id}
 				task={task}

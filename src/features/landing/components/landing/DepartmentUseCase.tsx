@@ -23,7 +23,7 @@ const engineeringPoints = [
 
 const DepartmentUseCase = () => {
 	return (
-		<div className='mx-auto mt-32 max-w-6xl px-4 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300'>
+		<div className='mx-auto mt-32 max-w-6xl px-4'>
 			<div className='grid gap-12 lg:grid-cols-2 lg:items-start'>
 				<div>
 					<h2 className='text-4xl font-semibold leading-tight tracking-tight text-foreground sm:text-5xl'>

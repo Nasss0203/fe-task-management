@@ -1,7 +1,16 @@
 "use client";
 
-import { move } from "@dnd-kit/helpers";
-import { DragDropProvider } from "@dnd-kit/react";
+import {
+	DndContext,
+	type DragEndEvent,
+	type DragOverEvent,
+	type DragStartEvent,
+	PointerSensor,
+	closestCorners,
+	useSensor,
+	useSensors,
+} from "@dnd-kit/core";
+import { arrayMove } from "@dnd-kit/sortable";
 import {
 	createContext,
 	useCallback,
@@ -54,6 +63,71 @@ function findContainerByTaskId(items: DndColumns, taskId: string) {
 	return null;
 }
 
+function findContainerId(items: DndColumns, id: string) {
+	if (id in items) {
+		return id;
+	}
+
+	for (const [containerId, taskIds] of Object.entries(items)) {
+		if (taskIds.includes(id)) return containerId;
+	}
+
+	return null;
+}
+
+function reorderItems(items: DndColumns, activeId: string, overId: string) {
+	const activeContainerId = findContainerId(items, activeId);
+	const overContainerId = findContainerId(items, overId);
+
+	if (!activeContainerId || !overContainerId) {
+		return items;
+	}
+
+	if (activeContainerId === overContainerId) {
+		const activeIndex = items[activeContainerId].indexOf(activeId);
+		const overIndex =
+			overId in items
+				? items[overContainerId].length - 1
+				: items[overContainerId].indexOf(overId);
+
+		if (activeIndex < 0 || overIndex < 0 || activeIndex === overIndex) {
+			return items;
+		}
+
+		return {
+			...items,
+			[activeContainerId]: arrayMove(
+				items[activeContainerId],
+				activeIndex,
+				overIndex,
+			),
+		};
+	}
+
+	const activeIndex = items[activeContainerId].indexOf(activeId);
+
+	if (activeIndex < 0) {
+		return items;
+	}
+
+	const nextSourceItems = items[activeContainerId].filter((id) => id !== activeId);
+	const overIndex =
+		overId in items
+			? items[overContainerId].length
+			: items[overContainerId].indexOf(overId);
+	const insertionIndex = overIndex < 0 ? items[overContainerId].length : overIndex;
+
+	return {
+		...items,
+		[activeContainerId]: nextSourceItems,
+		[overContainerId]: [
+			...items[overContainerId].slice(0, insertionIndex),
+			activeId,
+			...items[overContainerId].slice(insertionIndex),
+		],
+	};
+}
+
 function findTaskNeighbors(
 	items: DndColumns,
 	containerId: string,
@@ -82,6 +156,7 @@ export function ProviderSprintDnd({
 	const [items, setItems] = useState<DndColumns>(initialItems);
 	const itemsRef = useRef<DndColumns>(initialItems);
 	const snapshotRef = useRef<DndColumns>({});
+	const lastPreviewKeyRef = useRef<string | null>(null);
 
 	useEffect(() => {
 		if (isMutating) return;
@@ -106,83 +181,108 @@ export function ProviderSprintDnd({
 		[items, getIndexInContainer],
 	);
 
+	const sensors = useSensors(
+		useSensor(PointerSensor, {
+			activationConstraint: {
+				distance: 8,
+			},
+		}),
+	);
+
+	const handleDragStart = (_event: DragStartEvent) => {
+		snapshotRef.current = cloneItems(itemsRef.current);
+		lastPreviewKeyRef.current = null;
+	};
+
+	const handleDragOver = (event: DragOverEvent) => {
+		const { active, over } = event;
+
+		if (!over) {
+			return;
+		}
+
+		const previewKey = `${String(active.id)}:${String(over.id)}`;
+
+		if (lastPreviewKeyRef.current === previewKey) {
+			return;
+		}
+
+		const nextItems = reorderItems(
+			itemsRef.current,
+			String(active.id),
+			String(over.id),
+		);
+
+		if (nextItems !== itemsRef.current) {
+			lastPreviewKeyRef.current = previewKey;
+			syncItems(nextItems);
+		}
+	};
+
+	const handleDragEnd = (event: DragEndEvent) => {
+		const { active, over } = event;
+		lastPreviewKeyRef.current = null;
+
+		if (!over) {
+			syncItems(snapshotRef.current);
+			return;
+		}
+
+		const taskId = String(active.id);
+		const snapshot = snapshotRef.current;
+		const nextItems = reorderItems(
+			itemsRef.current,
+			taskId,
+			String(over.id),
+		);
+		syncItems(nextItems);
+
+		const fromContainerId = findContainerByTaskId(snapshot, taskId);
+		const toContainerId = findContainerByTaskId(nextItems, taskId);
+
+		if (!fromContainerId || !toContainerId) {
+			syncItems(snapshot);
+			return;
+		}
+
+		const previousIndex = snapshot[fromContainerId]?.indexOf(taskId) ?? -1;
+		const nextIndex = nextItems[toContainerId]?.indexOf(taskId) ?? -1;
+
+		if (fromContainerId === toContainerId && previousIndex === nextIndex) {
+			return;
+		}
+
+		const neighbors = findTaskNeighbors(nextItems, toContainerId, taskId);
+
+		if (!neighbors) {
+			syncItems(snapshot);
+			return;
+		}
+
+		void Promise.resolve(
+			onTaskMove({
+				taskId,
+				fromContainerId,
+				toContainerId,
+				previousTaskId: neighbors.previousTaskId,
+				nextTaskId: neighbors.nextTaskId,
+			}),
+		).catch(() => {
+			syncItems(snapshot);
+		});
+	};
+
 	return (
 		<TableDndContext.Provider value={contextValue}>
-			<DragDropProvider
-				onDragStart={() => {
-					snapshotRef.current = cloneItems(itemsRef.current);
-				}}
-				onDragOver={(event) => {
-					const { source } = event.operation;
-					if (!source) return;
-					const nextItems = move(itemsRef.current, event);
-					syncItems(nextItems);
-				}}
-				onDragEnd={(event) => {
-					const { source } = event.operation;
-					if (!source) return;
-
-					if (event.canceled) {
-						syncItems(snapshotRef.current);
-						return;
-					}
-
-					const taskId = String(source.id);
-					const snapshot = snapshotRef.current;
-					const nextItems = itemsRef.current;
-
-					const fromContainerId = findContainerByTaskId(
-						snapshot,
-						taskId,
-					);
-					const toContainerId = findContainerByTaskId(
-						nextItems,
-						taskId,
-					);
-
-					if (!fromContainerId || !toContainerId) {
-						syncItems(snapshot);
-						return;
-					}
-
-					const previousIndex =
-						snapshot[fromContainerId]?.indexOf(taskId) ?? -1;
-					const nextIndex =
-						nextItems[toContainerId]?.indexOf(taskId) ?? -1;
-
-					if (
-						fromContainerId === toContainerId &&
-						previousIndex === nextIndex
-					) {
-						return;
-					}
-
-					const neighbors = findTaskNeighbors(
-						nextItems,
-						toContainerId,
-						taskId,
-					);
-
-					if (!neighbors) {
-						syncItems(snapshot);
-						return;
-					}
-
-					void Promise.resolve(
-						onTaskMove({
-							taskId,
-							fromContainerId,
-							toContainerId,
-							previousTaskId: neighbors.previousTaskId,
-							nextTaskId: neighbors.nextTaskId,
-						}),
-					).catch(() => {
-						syncItems(snapshot);
-					});
-				}}
+			<DndContext
+				collisionDetection={closestCorners}
+				sensors={sensors}
+				onDragStart={handleDragStart}
+				onDragOver={handleDragOver}
+				onDragEnd={handleDragEnd}
 			>
 				{children}
-			</DragDropProvider>
+			</DndContext>
 		</TableDndContext.Provider>
 	);
 }

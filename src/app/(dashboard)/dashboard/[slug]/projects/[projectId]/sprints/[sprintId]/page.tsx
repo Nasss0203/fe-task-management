@@ -1,10 +1,10 @@
 "use client";
 
+import { useBoards } from "@/features/board/hooks/useBoards";
+import { usePage } from "@/features/page/hooks/usePage";
 import BacklogSprint from "@/features/sprint/components/backlog/BacklogSprint";
 import Sprint from "@/features/sprint/components/spints/Sprint";
 import { useSprints } from "@/features/sprint/hooks/useSprints";
-import { useBoards } from "@/features/board/hooks/useBoards";
-import { usePage } from "@/features/page/hooks/usePage";
 import { BoardItem } from "@/services/board/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useParams } from "next/navigation";
@@ -60,12 +60,15 @@ const SprintPage = () => {
 				</p>
 			</div>
 
-			<div className="grid min-h-0 flex-1 grid-cols-1 gap-4 overflow-hidden 2xl:grid-cols-2">
-				<div className="flex min-h-0 flex-col overflow-hidden">
-					<BacklogSprint projectId={projectId} workspaceId={workspaceId} />
+			<div className='grid min-h-0 flex-1 grid-cols-1 gap-4 overflow-hidden xl:grid-cols-2'>
+				<div className='flex min-h-0 flex-col overflow-hidden'>
+					<BacklogSprint
+						projectId={projectId}
+						workspaceId={workspaceId}
+					/>
 				</div>
 
-				<div className="flex min-h-0 flex-col overflow-hidden">
+				<div className='flex min-h-0 flex-col overflow-hidden'>
 					<Sprint
 						boards={boards}
 						projectId={projectId}

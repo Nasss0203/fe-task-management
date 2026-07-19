@@ -2,18 +2,16 @@
 
 import {
 	AudioWaveform,
+	CheckSquare,
 	Command,
 	Frame,
 	GalleryVerticalEnd,
 	Home,
+	LayoutTemplate,
 	ListTodo,
 	Mail,
 	Map,
 	PieChart,
-	Search,
-	LayoutTemplate,
-	CheckSquare,
-	Sparkles,
 } from "lucide-react";
 import * as React from "react";
 
@@ -25,15 +23,14 @@ import {
 	SidebarContent,
 	SidebarFooter,
 	SidebarHeader,
-	SidebarRail,
 	SidebarMenu,
-	SidebarMenuItem,
 	SidebarMenuButton,
+	SidebarMenuItem,
+	SidebarRail,
 } from "@/components/ui/sidebar";
 import NavHome, { type NavHomeItem } from "../../nav/user/nav-home";
 
 const homeItems: NavHomeItem[] = [
-
 	{
 		name: "Trang chủ",
 		url: "/dashboard",
@@ -54,11 +51,11 @@ const homeItems: NavHomeItem[] = [
 		url: "/dashboard/templates",
 		icon: LayoutTemplate,
 	},
-	{
-		name: "AI Assistant",
-		url: "/dashboard/ai-assistant",
-		icon: Sparkles,
-	},
+	// {
+	// 	name: "AI Assistant",
+	// 	url: "/dashboard/ai-assistant",
+	// 	icon: Sparkles,
+	// },
 ];
 
 const data = {
@@ -112,12 +109,17 @@ export function AppSidebarUser({
 			<SidebarHeader>
 				<SidebarMenu>
 					<SidebarMenuItem>
-						<SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent">
-							<div className="bg-blue-600 text-white flex aspect-square size-8 items-center justify-center rounded-lg">
-								<CheckSquare className="size-5" />
+						<SidebarMenuButton
+							size='lg'
+							className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent'
+						>
+							<div className='bg-blue-600 text-white flex aspect-square size-8 items-center justify-center rounded-lg'>
+								<CheckSquare className='size-5' />
 							</div>
-							<div className="grid flex-1 text-left text-sm leading-tight">
-								<span className="truncate font-bold text-lg">TaskFlow</span>
+							<div className='grid flex-1 text-left text-sm leading-tight'>
+								<span className='truncate font-bold text-lg'>
+									TaskFlow
+								</span>
 							</div>
 						</SidebarMenuButton>
 					</SidebarMenuItem>

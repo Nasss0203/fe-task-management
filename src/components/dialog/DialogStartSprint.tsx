@@ -152,7 +152,7 @@ export function StartSprintDialog({
 						type='button'
 						variant='outline'
 						size='sm'
-						className="h-8 rounded-lg border-border bg-background text-[12px] font-medium hover:hover:bg-accent hover:text-accent-foreground hover:border-neutral-600 transition-all hover:text-foreground"
+						className='h-8 rounded-lg border-border bg-background text-[12px] font-medium hover:hover:bg-accent hover:text-accent-foreground hover:border-neutral-600 transition-all hover:text-foreground'
 					>
 						Start sprint
 					</Button>
@@ -161,11 +161,11 @@ export function StartSprintDialog({
 
 			<DialogContent
 				className={cn(
-					"max-w-140 border border-border bg-popover p-0 text-foreground shadow-2xl",
+					"2xl:max-w-140 xl:max-w-120 max-h-[90vh] overflow-y-auto border border-border bg-popover p-0 text-foreground shadow-2xl",
 					"sm:max-w-140",
 				)}
 			>
-				<div className='border-b border-border px-6 py-4'>
+				<div className='border-b border-border px-6 py-3'>
 					<DialogHeader>
 						<DialogTitle className='text-base font-semibold text-foreground'>
 							Start sprint
@@ -173,8 +173,8 @@ export function StartSprintDialog({
 					</DialogHeader>
 				</div>
 
-				<div className='px-6 py-5'>
-					<div className='space-y-4'>
+				<div className='px-6 py-2'>
+					<div className='space-y-3'>
 						<p className='text-sm text-foreground'>
 							<span className='font-semibold text-foreground'>
 								{workItemCount}
@@ -333,7 +333,7 @@ export function StartSprintDialog({
 								onChange={(e) => setGoal(e.target.value)}
 								placeholder='What should this sprint accomplish?'
 								className={cn(
-									"min-h-27.5 resize-none rounded-md border-border bg-background text-sm text-foreground",
+									"min-h-20 resize-none rounded-md border-border bg-background text-sm text-foreground",
 									"placeholder:text-muted-foreground",
 									"focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500",
 								)}
@@ -341,14 +341,14 @@ export function StartSprintDialog({
 						</div>
 					</div>
 
-					<div className='mt-6 flex justify-end gap-2 border-t border-border pt-4'>
+					<div className='mt-4 flex justify-end gap-2'>
 						<Button
 							type='button'
 							variant='ghost'
 							onClick={() => setOpen(false)}
 							className='h-8 rounded-md px-4 text-xs font-semibold text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground'
 						>
-							Cancel
+							Hủy bỏ
 						</Button>
 
 						<Button
@@ -364,7 +364,9 @@ export function StartSprintDialog({
 							}
 							className='h-8 rounded-md bg-blue-600 px-4 text-xs font-semibold text-white hover:bg-blue-500 disabled:opacity-50'
 						>
-							{startSprint.isPending ? "Starting..." : "Start"}
+							{startSprint.isPending
+								? "Đang bắt đầu..."
+								: "Bắt đầu"}
 						</Button>
 					</div>
 				</div>

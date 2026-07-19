@@ -426,6 +426,15 @@
 		border-color: var(--border);
 	}
 
+	.sx__time-grid-event {
+		min-height: 32px;
+	}
+
+	.sx__time-grid-event .sx__event {
+		min-height: 32px;
+		padding-block: 4px;
+	}
+
 	.sx__forward-backward-navigation {
 		display: flex;
 		align-items: center;

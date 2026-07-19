@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 const Banner = () => {
 	return (
 		<div className='mx-auto grid max-w-7xl items-center gap-16 pt-20 lg:grid-cols-2 lg:pt-32 pb-20'>
-			<div className='flex flex-col items-start text-left animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-in-out'>
+			<div className='flex flex-col items-start text-left'>
 				<div className='mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-xs font-semibold text-primary backdrop-blur-md transition-colors hover:bg-primary/10'>
 					<Rocket className='h-4 w-4' />
 					Công việc & Ghi chú, cuối cùng cũng hợp nhất
@@ -35,7 +35,7 @@ const Banner = () => {
 				</div>
 			</div>
 
-			<div className='relative hidden lg:block animate-in fade-in zoom-in duration-1000 delay-300'>
+			<div className='relative hidden lg:block'>
 				<div className='absolute -inset-2 rounded-[2.5rem] bg-gradient-to-br from-primary/20 via-transparent to-blue-500/20 opacity-60 blur-3xl dark:opacity-30 transition-opacity'></div>
 				
 				<div className='relative aspect-square rounded-[2rem] border border-border/50 bg-card/60 shadow-2xl backdrop-blur-xl flex flex-col overflow-hidden'>
@@ -85,7 +85,7 @@ const Banner = () => {
 						</div>
 						
 						{/* Floating cursor mockup (micro detail) */}
-						<div className="absolute bottom-10 right-10 flex items-center gap-2 drop-shadow-lg animate-in slide-in-from-bottom-4 duration-1000 delay-700">
+						<div className="absolute bottom-10 right-10 flex items-center gap-2 drop-shadow-lg">
 							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-primary translate-y-1">
 								<path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87a.5.5 0 0 0 .35-.85L5.5 3.21Z" fill="currentColor"/>
 							</svg>
