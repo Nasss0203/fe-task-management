@@ -26,3 +26,9 @@ export type CreateBoarDto = {
 	workspaceId: string;
 	blockId?: string;
 };
+
+export type DeleteBoardDto = {
+	boardId: string;
+	projectId: string;
+	workspaceId: string;
+};

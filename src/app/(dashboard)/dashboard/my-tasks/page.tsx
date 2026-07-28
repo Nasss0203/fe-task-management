@@ -2,14 +2,12 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDashboard } from "@/features/dashboard/hooks/useDashboard";
-import { cn } from "@/lib/utils";
 import type { DashboardTaskResponseDto, DashboardWorkspaceResponseDto } from "@/services/dashboard/type";
-import { BriefcaseBusiness, ChevronDown, Eye, ListTodo, Star, UserRound } from "lucide-react";
+import { BriefcaseBusiness, Eye, ListTodo, Star, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { DrawerItemView } from "@/components/drawer/DrawerItemView";
 import type { TaskItem } from "@/services/task/type";
-import { EmptyState } from "@/components/shared/EmptyState";
 import { LoadingForYou } from "@/features/dashboard/components/for-you/LoadingForYou";
 import { RecentSpaceCard } from "@/features/dashboard/components/for-you/RecentSpaceCard";
 import { WorkItemRow } from "@/features/dashboard/components/for-you/WorkItemRow";

@@ -22,7 +22,7 @@ export function WorkspaceProjectsSubmenu({
 	const { canUseSprint } = useWorkspaceFeatures(workspace.id);
 
 	return (
-		<SidebarMenuSubV2 className=' w-full  pr-4'>
+		<SidebarMenuSubV2 className='w-full pr-4'>
 			{projects.map((project) => (
 				<ProjectSidebarItem
 					key={project.id}

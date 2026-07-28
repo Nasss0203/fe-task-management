@@ -35,7 +35,7 @@ const layout = ({
                 orientation="vertical"
                 className="mr-2 data-[orientation=vertical]:h-4"
               />
-              <Breadcrumb>
+              <Breadcrumb className="hidden">
                 <BreadcrumbList>
                   <BreadcrumbItem className="hidden md:block">
                     <BreadcrumbLink href="#">Task management</BreadcrumbLink>

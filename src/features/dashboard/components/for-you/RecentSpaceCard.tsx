@@ -13,16 +13,19 @@ export function RecentSpaceCard({
 	doneCount: number;
 }) {
 	return (
-		<div className='group flex h-full flex-col min-w-0 overflow-hidden rounded-xl border border-border bg-card transition-all duration-200 hover:border-primary/30 hover:bg-accent/50 shadow-sm'>
-			<div className='flex h-full'>
+		<Link
+			href={`/dashboard/${workspace.slug}`}
+			className='group flex h-full min-w-0 overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all duration-200 hover:border-primary/30 hover:bg-accent/50'
+		>
+			<div className='flex h-full w-full'>
 				<div className='w-1.5 shrink-0 bg-blue-500/80 transition-colors group-hover:bg-blue-400' />
-				<div className='flex flex-1 flex-col min-w-0 p-4'>
+				<div className='flex min-w-0 flex-1 flex-col p-4'>
 					<div className='flex items-start gap-3'>
-						<div className='flex size-10 shrink-0 items-center justify-center rounded-[14px] bg-slate-100 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300'>
+						<div className='flex size-10 shrink-0 items-center justify-center rounded-[14px] bg-slate-100 text-slate-700 dark:bg-slate-800/60 dark:text-slate-300'>
 							<FolderKanban className='size-5' strokeWidth={1.5} />
 						</div>
-						<div className='min-w-0 flex-1 mt-0.5'>
-							<p className='truncate text-sm font-semibold text-foreground group-hover:text-primary transition-colors'>
+						<div className='mt-0.5 min-w-0 flex-1'>
+							<p className='truncate text-sm font-semibold text-foreground transition-colors group-hover:text-primary'>
 								{workspace.name}
 							</p>
 							<p className='mt-0.5 truncate text-xs text-muted-foreground'>
@@ -36,9 +39,10 @@ export function RecentSpaceCard({
 							Quick links
 						</p>
 						<div className='flex flex-col gap-1.5'>
-							<div className='flex items-center justify-between gap-2 rounded-md p-1 transition-colors hover:bg-muted -mx-1 px-1.5'>
+							<div className='-mx-1 flex items-center justify-between gap-2 rounded-md p-1 px-1.5 transition-colors hover:bg-muted'>
 								<Link
 									href='/dashboard/my-tasks'
+									onClick={(event) => event.stopPropagation()}
 									className='truncate text-xs font-medium text-muted-foreground hover:text-foreground transition-colors flex-1'
 								>
 									My open work items
@@ -47,9 +51,10 @@ export function RecentSpaceCard({
 									{openWorkCount}
 								</Badge>
 							</div>
-							<div className='flex items-center justify-between gap-2 rounded-md p-1 transition-colors hover:bg-muted -mx-1 px-1.5'>
+							<div className='-mx-1 flex items-center justify-between gap-2 rounded-md p-1 px-1.5 transition-colors hover:bg-muted'>
 								<Link
 									href='/dashboard/my-tasks'
+									onClick={(event) => event.stopPropagation()}
 									className='truncate text-xs font-medium text-muted-foreground hover:text-foreground transition-colors flex-1'
 								>
 									Done work items
@@ -69,6 +74,6 @@ export function RecentSpaceCard({
 					</div>
 				</div>
 			</div>
-		</div>
+		</Link>
 	);
 }

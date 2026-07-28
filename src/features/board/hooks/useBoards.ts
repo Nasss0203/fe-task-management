@@ -2,10 +2,15 @@
 
 import {
 	createBoardApi,
+	deleteBoardApi,
 	findAllBoard,
 	findBoardById,
 } from "@/services/board/board.service";
-import { BOARD_KEY, CreateBoarDto } from "@/services/board/type";
+import {
+	BOARD_KEY,
+	CreateBoarDto,
+	DeleteBoardDto,
+} from "@/services/board/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -20,8 +25,12 @@ export const useBoards = ({
 	projectId,
 	boardId,
 }: UseBoardsParams = {}) => {
-	const { currentWorkspaceId, currentProjectId, currentBoardId } =
-		useProjectSelectionStore();
+	const {
+		currentWorkspaceId,
+		currentProjectId,
+		currentBoardId,
+		setCurrentBoardId,
+	} = useProjectSelectionStore();
 
 	const queryClient = useQueryClient();
 
@@ -47,6 +56,33 @@ export const useBoards = ({
 		},
 	});
 
+	const deleteBoard = useMutation({
+		mutationFn: async (data: DeleteBoardDto) => {
+			return await deleteBoardApi(data);
+		},
+		onSuccess: async (_, variables) => {
+			if (resolvedBoardId === variables.boardId) {
+				setCurrentBoardId(null);
+			}
+
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: [
+						BOARD_KEY.BOARD,
+						variables.workspaceId,
+						variables.projectId,
+					],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [BOARD_KEY.BOARD, variables.boardId],
+				}),
+			]);
+		},
+		onError: (err) => {
+			console.error("deleteBoard failed", err);
+		},
+	});
+
 	const findBoard = useQuery({
 		queryKey: [BOARD_KEY.BOARD, resolvedWorkspaceId, resolvedProjectId],
 		queryFn: () => findAllBoard(resolvedWorkspaceId!, resolvedProjectId!),
@@ -62,6 +98,7 @@ export const useBoards = ({
 	return {
 		findBoard,
 		createBoard,
+		deleteBoard,
 		boarDetail,
 	};
 };

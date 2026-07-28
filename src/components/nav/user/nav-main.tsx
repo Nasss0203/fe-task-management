@@ -7,8 +7,6 @@ import {
 	CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
-import ProjectSidebarItem from "@/components/sidebar/user/ProjectSidebarItem";
-import { useWorkspaceFeatures } from "@/features/workspace-feature/hooks/useWorkspaceFeatures";
 import WorkspaceDropdown from "@/features/workspace/components/workspaces/DropdownWorkspace";
 import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";
 import { findProjectByWorkspaceIdApi } from "@/services/project/project.service";
@@ -31,7 +29,6 @@ import {
 	SidebarGroupV2,
 	SidebarMenuItemV2,
 	SidebarMenuSubButtonV2,
-	SidebarMenuSubV2,
 	SidebarMenuV2,
 } from "../../sidebar/user/sidebar-custom";
 import { WorkspaceProjectsSubmenu } from "./WorkspaceProjectsSubmenu";

@@ -58,6 +58,9 @@ const ProjectSidebarItem = ({
 	const ignoreBlurUntilRef = useRef(0);
 	const isNameComposingRef = useRef(false);
 	const { updateProject } = useProject(workspace.id);
+	const projectHref = projectId
+		? `/dashboard/${workspace.slug}/projects/${projectId}`
+		: `/dashboard/${workspace.slug}`;
 	const canFetchSprints = canUseSprint && Boolean(projectId);
 	const { sprintsQuery } = useSprints({
 		projectId,
@@ -68,10 +71,6 @@ const ProjectSidebarItem = ({
 	const sprints: SprintItem[] = canFetchSprints
 		? (sprintsQuery.data?.data ?? [])
 		: [];
-
-	const projectHref = projectId
-		? `/dashboard/${workspace.slug}/projects/${projectId}`
-		: `/dashboard/${workspace.slug}`;
 
 	useEffect(() => {
 		if (!isEditingName) return;
