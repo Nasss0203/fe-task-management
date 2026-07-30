@@ -41,6 +41,7 @@ const SlugPage = () => {
 	return (
 		<WorkspacePageShell
 			workspaceId={resolvedWorkspaceId}
+			workspaceSlug={params.slug}
 			workspaceName={workspace?.name}
 			page={page}
 			blocks={blocks}

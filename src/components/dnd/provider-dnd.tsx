@@ -263,7 +263,7 @@ const ProviderDragDrop = ({
 		});
 	};
 
-	const handleDragStart = (_event: DragStartEvent) => {
+	const handleDragStart = (event: DragStartEvent) => {
 		snapshotRef.current = cloneItems(itemsRef.current);
 	};
 

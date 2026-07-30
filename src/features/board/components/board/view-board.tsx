@@ -1,23 +1,17 @@
 import type { LucideIcon } from "lucide-react";
 import {
-	BarChart3,
 	CalendarDays,
-	FileText,
 	GanttChart,
-	Image,
-	LayoutDashboard,
 	LayoutList,
 	List,
-	Map,
-	Rss,
 	Table2,
 } from "lucide-react";
 
-import { BoardItem, BoardViewType } from "@/services/board/type";
-import { BacklogRenderContext } from "@/features/sprint/components/backlog/types";
 import CalendarApp from "@/components/calendar/calendar";
 import { ProviderDragDrop } from "@/components/dnd";
 import BoardTable from "@/components/table/BoardTable";
+import { BacklogRenderContext } from "@/features/sprint/components/backlog/types";
+import { BoardItem, BoardViewType } from "@/services/board/type";
 import BoardBacklog from "./BoardBacklog";
 
 type BoardViewProps = {
@@ -36,7 +30,9 @@ const BoardView = ({ board }: BoardViewProps) => (
 	/>
 );
 
-const CalendarView = ({ board }: BoardViewProps) => <CalendarApp workspaceId={board.workspaceId} projectId={board.projectId} />;
+const CalendarView = ({ board }: BoardViewProps) => (
+	<CalendarApp workspaceId={board.workspaceId} projectId={board.projectId} />
+);
 
 const TableView = ({ board }: BoardViewProps) => (
 	<BoardTable
@@ -102,7 +98,7 @@ export const BOARD_VIEW_CONFIG: Partial<
 		enabled: true,
 	},
 	TABLE: {
-		label: "Bảng tính",
+		label: "Bảng",
 		icon: Table2,
 		component: TableView,
 		enabled: true,

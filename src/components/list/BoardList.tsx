@@ -90,12 +90,13 @@ const BoardList = ({
 								>
 									{/* Left side: Status and Name */}
 								<div className='flex min-w-0 flex-1 items-center gap-3'>
-									<div className='shrink-0'>
+									<div className='w-36 shrink-0'>
 										<DropdownTaskStatus
 											taskId={task.id}
 											projectId={projectId}
 											workspaceId={workspaceId}
 											statusName={task.statusName ?? ""}
+											triggerClassName='w-full'
 										/>
 									</div>
 									<div className='flex min-w-0 flex-col gap-0.5 w-full'>

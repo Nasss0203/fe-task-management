@@ -2,6 +2,7 @@
 
 import {
 	DndContext,
+	DragOverlay,
 	type DragEndEvent,
 	type DragOverEvent,
 	type DragStartEvent,
@@ -15,7 +16,6 @@ import {
 	createContext,
 	useCallback,
 	useContext,
-	useEffect,
 	useMemo,
 	useRef,
 	useState,
@@ -33,11 +33,13 @@ type TaskMovePayload = {
 
 type TableDndContextValue = {
 	items: DndColumns;
+	isDragging: boolean;
 	getIndexInContainer: (containerId: string, taskId: string) => number;
 };
 
 const TableDndContext = createContext<TableDndContextValue>({
 	items: {},
+	isDragging: false,
 	getIndexInContainer: () => 0,
 });
 
@@ -48,12 +50,39 @@ type ProviderSprintDndProps = {
 	initialItems: DndColumns;
 	onTaskMove: (payload: TaskMovePayload) => void | Promise<void>;
 	isMutating?: boolean;
+	renderDragOverlay?: (activeTaskId: string) => React.ReactNode;
 };
 
 function cloneItems(items: DndColumns): DndColumns {
 	return Object.fromEntries(
 		Object.entries(items).map(([k, v]) => [k, [...v]]),
 	);
+}
+
+function areItemsEqual(a: DndColumns, b: DndColumns) {
+	const aKeys = Object.keys(a);
+	const bKeys = Object.keys(b);
+
+	if (aKeys.length !== bKeys.length) {
+		return false;
+	}
+
+	for (const key of aKeys) {
+		const aValues = a[key] ?? [];
+		const bValues = b[key] ?? [];
+
+		if (aValues.length !== bValues.length) {
+			return false;
+		}
+
+		for (let index = 0; index < aValues.length; index += 1) {
+			if (aValues[index] !== bValues[index]) {
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 function findContainerByTaskId(items: DndColumns, taskId: string) {
@@ -152,33 +181,104 @@ export function ProviderSprintDnd({
 	initialItems,
 	onTaskMove,
 	isMutating = false,
+	renderDragOverlay,
 }: ProviderSprintDndProps) {
-	const [items, setItems] = useState<DndColumns>(initialItems);
+	const [previewItems, setPreviewItems] = useState<DndColumns | null>(null);
+	const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
+	const items =
+		previewItems &&
+		(activeTaskId !== null || !areItemsEqual(previewItems, initialItems))
+			? previewItems
+			: initialItems;
 	const itemsRef = useRef<DndColumns>(initialItems);
 	const snapshotRef = useRef<DndColumns>({});
 	const lastPreviewKeyRef = useRef<string | null>(null);
+	const previewFrameRef = useRef<number | null>(null);
+	const pendingPreviewRef = useRef<{
+		activeId: string;
+		overId: string;
+	} | null>(null);
 
-	useEffect(() => {
-		if (isMutating) return;
-		itemsRef.current = initialItems;
-		setItems(initialItems);
-	}, [initialItems, isMutating]);
+	const syncItems = useCallback((next: DndColumns | null) => {
+		const resolvedItems = next ?? initialItems;
+		itemsRef.current = resolvedItems;
+		setPreviewItems(next);
+	}, [initialItems]);
 
-	const syncItems = useCallback((next: DndColumns) => {
+	const resetPreview = useCallback(() => {
+		lastPreviewKeyRef.current = null;
+		syncItems(null);
+	}, [syncItems]);
+
+	const setPreview = useCallback((next: DndColumns) => {
 		itemsRef.current = next;
-		setItems(next);
+		setPreviewItems(next);
 	}, []);
+
+	const cancelPendingPreview = useCallback(() => {
+		pendingPreviewRef.current = null;
+
+		if (previewFrameRef.current !== null) {
+			cancelAnimationFrame(previewFrameRef.current);
+			previewFrameRef.current = null;
+		}
+	}, []);
+
+	const flushPreview = useCallback(() => {
+		previewFrameRef.current = null;
+		const pendingPreview = pendingPreviewRef.current;
+
+		if (!pendingPreview) {
+			return;
+		}
+
+		pendingPreviewRef.current = null;
+
+		const previewKey = `${pendingPreview.activeId}:${pendingPreview.overId}`;
+
+		if (lastPreviewKeyRef.current === previewKey) {
+			return;
+		}
+
+		const nextItems = reorderItems(
+			itemsRef.current,
+			pendingPreview.activeId,
+			pendingPreview.overId,
+		);
+
+		if (nextItems !== itemsRef.current) {
+			lastPreviewKeyRef.current = previewKey;
+			setPreview(nextItems);
+		}
+	}, [setPreview]);
+
+	const schedulePreview = useCallback(
+		(activeId: string, overId: string) => {
+			pendingPreviewRef.current = { activeId, overId };
+
+			if (previewFrameRef.current !== null) {
+				return;
+			}
+
+			previewFrameRef.current = requestAnimationFrame(flushPreview);
+		},
+		[flushPreview],
+	);
 
 	const getIndexInContainer = useCallback(
 		(containerId: string, taskId: string) => {
-			return itemsRef.current[containerId]?.indexOf(taskId) ?? 0;
+			return items[containerId]?.indexOf(taskId) ?? 0;
 		},
-		[],
+		[items],
 	);
 
 	const contextValue = useMemo(
-		() => ({ items, getIndexInContainer }),
-		[items, getIndexInContainer],
+		() => ({
+			items,
+			isDragging: activeTaskId !== null,
+			getIndexInContainer,
+		}),
+		[activeTaskId, items, getIndexInContainer],
 	);
 
 	const sensors = useSensors(
@@ -190,41 +290,45 @@ export function ProviderSprintDnd({
 	);
 
 	const handleDragStart = (_event: DragStartEvent) => {
-		snapshotRef.current = cloneItems(itemsRef.current);
+		if (isMutating) {
+			return;
+		}
+
+		cancelPendingPreview();
+		itemsRef.current = items;
+		snapshotRef.current = cloneItems(items);
 		lastPreviewKeyRef.current = null;
+		setActiveTaskId(String(_event.active.id));
 	};
 
 	const handleDragOver = (event: DragOverEvent) => {
+		if (isMutating) {
+			return;
+		}
+
 		const { active, over } = event;
 
 		if (!over) {
 			return;
 		}
 
-		const previewKey = `${String(active.id)}:${String(over.id)}`;
-
-		if (lastPreviewKeyRef.current === previewKey) {
-			return;
-		}
-
-		const nextItems = reorderItems(
-			itemsRef.current,
-			String(active.id),
-			String(over.id),
-		);
-
-		if (nextItems !== itemsRef.current) {
-			lastPreviewKeyRef.current = previewKey;
-			syncItems(nextItems);
-		}
+		schedulePreview(String(active.id), String(over.id));
 	};
 
 	const handleDragEnd = (event: DragEndEvent) => {
+		if (isMutating) {
+			setActiveTaskId(null);
+			cancelPendingPreview();
+			resetPreview();
+			return;
+		}
+
 		const { active, over } = event;
-		lastPreviewKeyRef.current = null;
+		setActiveTaskId(null);
+		cancelPendingPreview();
 
 		if (!over) {
-			syncItems(snapshotRef.current);
+			resetPreview();
 			return;
 		}
 
@@ -235,7 +339,7 @@ export function ProviderSprintDnd({
 			taskId,
 			String(over.id),
 		);
-		syncItems(nextItems);
+		setPreview(nextItems);
 
 		const fromContainerId = findContainerByTaskId(snapshot, taskId);
 		const toContainerId = findContainerByTaskId(nextItems, taskId);
@@ -249,6 +353,7 @@ export function ProviderSprintDnd({
 		const nextIndex = nextItems[toContainerId]?.indexOf(taskId) ?? -1;
 
 		if (fromContainerId === toContainerId && previousIndex === nextIndex) {
+			resetPreview();
 			return;
 		}
 
@@ -272,6 +377,12 @@ export function ProviderSprintDnd({
 		});
 	};
 
+	const handleDragCancel = () => {
+		setActiveTaskId(null);
+		cancelPendingPreview();
+		resetPreview();
+	};
+
 	return (
 		<TableDndContext.Provider value={contextValue}>
 			<DndContext
@@ -279,9 +390,15 @@ export function ProviderSprintDnd({
 				sensors={sensors}
 				onDragStart={handleDragStart}
 				onDragOver={handleDragOver}
+				onDragCancel={handleDragCancel}
 				onDragEnd={handleDragEnd}
 			>
 				{children}
+				<DragOverlay>
+					{activeTaskId && renderDragOverlay
+						? renderDragOverlay(activeTaskId)
+						: null}
+				</DragOverlay>
 			</DndContext>
 		</TableDndContext.Provider>
 	);

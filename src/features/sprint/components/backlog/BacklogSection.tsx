@@ -104,7 +104,7 @@ const BacklogSection = ({
               Backlog
             </span>
             <span className="text-[12px] font-medium text-muted-foreground">
-              {backlogTotal} items
+              {backlogTotal} công việc
             </span>
           </div>
         </div>
@@ -117,7 +117,7 @@ const BacklogSection = ({
               className="h-8 rounded-lg border-border bg-background text-[12px] font-medium hover:hover:bg-accent hover:text-accent-foreground hover:border-neutral-600 transition-all hover:text-foreground"
               onClick={handleCreateSprint}
             >
-              {createSprint.isPending ? "Creating..." : "Create sprint"}
+              {createSprint.isPending ? "Đang tạo..." : "Tạo sprint"}
             </Button>
           )}
 
@@ -137,10 +137,10 @@ const BacklogSection = ({
               className="bg-popover border-border rounded-xl min-w-[160px]"
             >
               <DropdownMenuItem className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">
-                Collapse
+                Thu gọn
               </DropdownMenuItem>
               <DropdownMenuItem className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">
-                Export tasks
+                Xuất công việc
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

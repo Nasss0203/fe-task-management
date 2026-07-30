@@ -35,11 +35,11 @@ type StartSprintDialogProps = {
 const CUSTOM_DURATION = "custom";
 
 const durationOptions = [
-	{ label: "1 week", value: "1" },
-	{ label: "2 weeks", value: "2" },
-	{ label: "3 weeks", value: "3" },
-	{ label: "4 weeks", value: "4" },
-	{ label: "Custom", value: CUSTOM_DURATION },
+	{ label: "1 tuần", value: "1" },
+	{ label: "2 tuần", value: "2" },
+	{ label: "3 tuần", value: "3" },
+	{ label: "4 tuần", value: "4" },
+	{ label: "Tùy chỉnh", value: CUSTOM_DURATION },
 ];
 
 const formatDateInput = (date: Date) => {
@@ -154,7 +154,7 @@ export function StartSprintDialog({
 						size='sm'
 						className='h-8 rounded-lg border-border bg-background text-[12px] font-medium hover:hover:bg-accent hover:text-accent-foreground hover:border-neutral-600 transition-all hover:text-foreground'
 					>
-						Start sprint
+						Bắt đầu sprint
 					</Button>
 				)}
 			</DialogTrigger>
@@ -168,7 +168,7 @@ export function StartSprintDialog({
 				<div className='border-b border-border px-6 py-3'>
 					<DialogHeader>
 						<DialogTitle className='text-base font-semibold text-foreground'>
-							Start sprint
+							Bắt đầu sprint
 						</DialogTitle>
 					</DialogHeader>
 				</div>
@@ -179,19 +179,17 @@ export function StartSprintDialog({
 							<span className='font-semibold text-foreground'>
 								{workItemCount}
 							</span>{" "}
-							work item{workItemCount > 1 ? "s" : ""} will be
-							included in this sprint.
+							công việc sẽ được đưa vào sprint này.
 						</p>
 
 						<p className='text-xs font-medium text-muted-foreground'>
-							Required fields are marked with an asterisk{" "}
+							Các trường bắt buộc được đánh dấu bằng dấu{" "}
 							<span className='text-red-400'>*</span>
 						</p>
 
 						<div className='space-y-1.5'>
 							<Label className='text-xs font-semibold text-foreground'>
-								Sprint name{" "}
-								<span className='text-red-400'>*</span>
+								Tên sprint <span className='text-red-400'>*</span>
 							</Label>
 
 							<Input
@@ -207,20 +205,17 @@ export function StartSprintDialog({
 
 						<div className='space-y-1.5'>
 							<Label className='text-xs font-semibold text-foreground'>
-								Duration <span className='text-red-400'>*</span>
+								Thời lượng <span className='text-red-400'>*</span>
 							</Label>
 
-							<Select
-								value={duration}
-								onValueChange={handleDurationChange}
-							>
+							<Select value={duration} onValueChange={handleDurationChange}>
 								<SelectTrigger
 									className={cn(
 										"h-9 rounded-md border-border bg-background text-sm text-foreground",
 										"focus:border-blue-500 focus:ring-1 focus:ring-blue-500",
 									)}
 								>
-									<SelectValue placeholder='Select duration' />
+									<SelectValue placeholder='Chọn thời lượng' />
 								</SelectTrigger>
 
 								<SelectContent className='border-border bg-popover text-foreground'>
@@ -240,16 +235,13 @@ export function StartSprintDialog({
 						<div className='grid grid-cols-2 gap-3'>
 							<div className='space-y-1.5'>
 								<Label className='text-xs font-semibold text-foreground'>
-									Start date{" "}
-									<span className='text-red-400'>*</span>
+									Ngày bắt đầu <span className='text-red-400'>*</span>
 								</Label>
 
 								<Input
 									type='date'
 									value={startDate}
-									onChange={(e) =>
-										handleStartDateChange(e.target.value)
-									}
+									onChange={(e) => handleStartDateChange(e.target.value)}
 									className={cn(
 										"h-9 rounded-md border-border bg-background text-sm text-foreground",
 										"focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500",
@@ -259,16 +251,13 @@ export function StartSprintDialog({
 
 							<div className='space-y-1.5'>
 								<Label className='text-xs font-semibold text-foreground'>
-									Start time{" "}
-									<span className='text-red-400'>*</span>
+									Giờ bắt đầu <span className='text-red-400'>*</span>
 								</Label>
 
 								<Input
 									type='time'
 									value={startTime}
-									onChange={(e) =>
-										setStartTime(e.target.value)
-									}
+									onChange={(e) => setStartTime(e.target.value)}
 									className={cn(
 										"h-9 rounded-md border-border bg-background text-sm text-foreground",
 										"focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500",
@@ -280,8 +269,7 @@ export function StartSprintDialog({
 						<div className='grid grid-cols-2 gap-3'>
 							<div className='space-y-1.5'>
 								<Label className='text-xs font-semibold text-foreground'>
-									End date{" "}
-									<span className='text-red-400'>*</span>
+									Ngày kết thúc <span className='text-red-400'>*</span>
 								</Label>
 
 								<Input
@@ -300,15 +288,14 @@ export function StartSprintDialog({
 
 								{isInvalidDateRange && (
 									<p className='text-xs text-red-400'>
-										End date must be after start date.
+										Ngày kết thúc phải sau ngày bắt đầu.
 									</p>
 								)}
 							</div>
 
 							<div className='space-y-1.5'>
 								<Label className='text-xs font-semibold text-foreground'>
-									End time{" "}
-									<span className='text-red-400'>*</span>
+									Giờ kết thúc <span className='text-red-400'>*</span>
 								</Label>
 
 								<Input
@@ -325,13 +312,13 @@ export function StartSprintDialog({
 
 						<div className='space-y-1.5'>
 							<Label className='text-xs font-semibold text-foreground'>
-								Sprint goal
+								Mục tiêu sprint
 							</Label>
 
 							<Textarea
 								value={goal}
 								onChange={(e) => setGoal(e.target.value)}
-								placeholder='What should this sprint accomplish?'
+								placeholder='Sprint này cần hoàn thành điều gì?'
 								className={cn(
 									"min-h-20 resize-none rounded-md border-border bg-background text-sm text-foreground",
 									"placeholder:text-muted-foreground",
@@ -364,9 +351,7 @@ export function StartSprintDialog({
 							}
 							className='h-8 rounded-md bg-blue-600 px-4 text-xs font-semibold text-white hover:bg-blue-500 disabled:opacity-50'
 						>
-							{startSprint.isPending
-								? "Đang bắt đầu..."
-								: "Bắt đầu"}
+							{startSprint.isPending ? "Đang bắt đầu..." : "Bắt đầu"}
 						</Button>
 					</div>
 				</div>

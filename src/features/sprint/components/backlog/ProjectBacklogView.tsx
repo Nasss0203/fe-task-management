@@ -7,11 +7,11 @@ import { Input } from "@/components/ui/input";
 
 import { useSprints } from "@/features/sprint/hooks/useSprint";
 import {
-  useReorderTaskPosition,
-  useTask,
-  useTaskMoveSprint,
+	useReorderTaskPosition,
+	useTask,
+	useTaskMoveSprint,
 } from "@/features/task/hooks/useTask";
-import type { TaskPositionContextInput } from "@/services/task/type";
+import type { TaskItem, TaskPositionContextInput } from "@/services/task/type";
 import { useMemo, useState } from "react";
 import { ProviderSprintDnd } from "@/components/dnd/backlog-sprint/ProviderSprintDnd";
 import SprintProjectSection from "../spints/SprintProjectSection";
@@ -55,6 +55,21 @@ const ProjectBacklogView = ({
     () => backlogPageData?.data ?? [],
     [backlogPageData?.data],
   );
+  const taskLookup = useMemo(() => {
+    const allTasks = new Map<string, TaskItem>();
+
+    for (const sprint of sprints) {
+      for (const task of sprint.tasks ?? []) {
+        allTasks.set(task.id, task);
+      }
+    }
+
+    for (const task of backlogTasks) {
+      allTasks.set(task.id, task);
+    }
+
+    return allTasks;
+  }, [backlogTasks, sprints]);
 
   const initialItems = useMemo(() => {
     const items: Record<string, string[]> = { backlog: [] };
@@ -187,6 +202,35 @@ const ProjectBacklogView = ({
           taskSprintToSprint.isPending ||
           reorderTaskPosition.isPending
         }
+        renderDragOverlay={(activeTaskId) => {
+          const task = taskLookup.get(activeTaskId);
+
+          if (!task) {
+            return (
+              <div className="min-w-[320px] rounded-xl border border-border/80 bg-background/95 px-4 py-3 shadow-2xl backdrop-blur-sm">
+                <div className="text-sm font-medium text-foreground">
+                  Dragging task
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div className="min-w-[320px] rounded-xl border border-border/80 bg-background/95 px-4 py-3 shadow-2xl backdrop-blur-sm">
+              <div className="truncate text-sm font-semibold text-foreground">
+                {task.title || "Untitled"}
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                TM-{task.projectSeq ?? "-"}
+              </div>
+              <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+                <span>{task.statusName ?? "No status"}</span>
+                <span>•</span>
+                <span>{task.priorityName ?? "No priority"}</span>
+              </div>
+            </div>
+          );
+        }}
       >
         <div className="flex flex-col gap-5">
           {sprints.map((sprint) => (

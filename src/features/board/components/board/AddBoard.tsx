@@ -9,11 +9,6 @@ import {
 	Table2,
 } from "lucide-react";
 
-import { useBoards } from "@/features/board/hooks/useBoards";
-import { useWorkspaceFeatures } from "@/features/workspace-feature/hooks/useWorkspaceFeatures";
-import { BoardItem, BoardViewType } from "@/services/board/type";
-import { useProjectSelectionStore } from "@/stores/use-project-selection";
-import { isBoardViewEnabled } from "./view-board";
 import {
 	PopoverContentV2,
 	PopoverHeaderV2,
@@ -21,6 +16,11 @@ import {
 	PopoverTriggerV2,
 	PopoverV2,
 } from "@/components/popover/popover-custom";
+import { useBoards } from "@/features/board/hooks/useBoards";
+import { useWorkspaceFeatures } from "@/features/workspace-feature/hooks/useWorkspaceFeatures";
+import { BoardItem, BoardViewType } from "@/services/board/type";
+import { useProjectSelectionStore } from "@/stores/use-project-selection";
+import { isBoardViewEnabled } from "./view-board";
 
 type AddBoardProps = {
 	blockId?: string;
@@ -36,7 +36,7 @@ const BOARD_VIEW_ITEMS: {
 	enabled?: boolean;
 }[] = [
 	{
-		label: "Bảng tính",
+		label: "Bảng",
 		value: BoardViewType.TABLE,
 		icon: Table2,
 		enabled: true,

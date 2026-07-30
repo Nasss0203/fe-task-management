@@ -42,7 +42,9 @@ const TableRowDnd = <TData extends { id: string }>({
 			role='row'
 			className={cn(
 				"grid min-h-14 border-b border-border/70 bg-background hover:bg-muted/35 data-[state=selected]:bg-muted",
-				isDragging ? "opacity-40 shadow-md" : "transition-transform transition-colors duration-200",
+				isDragging
+					? "opacity-15 shadow-md"
+					: "transition-colors duration-150",
 			)}
 			data-state={row.getIsSelected() && "selected"}
 			style={{

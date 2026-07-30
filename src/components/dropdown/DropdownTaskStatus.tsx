@@ -21,6 +21,7 @@ type DropdownTaskStatusProps = {
 	projectId: string;
 	statusName: string;
 	taskId: string;
+	triggerClassName?: string;
 };
 
 const DropdownTaskStatus = ({
@@ -28,6 +29,7 @@ const DropdownTaskStatus = ({
 	workspaceId,
 	statusName,
 	taskId,
+	triggerClassName,
 }: DropdownTaskStatusProps) => {
 	const taskStatusQuery = useTaskStatus(workspaceId, projectId);
 	const { mutateAsync } = useUpdateTask(workspaceId, projectId);
@@ -64,15 +66,26 @@ const DropdownTaskStatus = ({
 
 	return (
 		<DropdownMenuV2>
-			<DropdownMenuTriggerV2 className='cursor-pointer outline-none'>
-				<div className='flex items-center gap-2 w-fit rounded-md border border-transparent hover:bg-accent/50 px-2 py-1 transition-colors'>
+			<DropdownMenuTriggerV2
+				className={cn("cursor-pointer outline-none", triggerClassName)}
+			>
+				<div
+					className={cn(
+						"flex items-center gap-2 rounded-md border border-transparent px-2 py-1 transition-colors hover:bg-accent/50",
+						triggerClassName ? "w-full justify-between" : "w-fit",
+					)}
+				>
+					<div className='flex min-w-0 items-center gap-2'>
 					<span
 						className={cn(
 							"size-2 rounded-full",
 							currentStyle.dot,
 						)}
 					/>
-					<span className="text-[13px] font-medium text-foreground">{currentStatus?.name ?? statusName ?? "Status"}</span>
+						<span className="truncate text-[13px] font-medium text-foreground">
+							{currentStatus?.name ?? statusName ?? "Status"}
+						</span>
+					</div>
 					<ChevronDown className="h-3 w-3 text-muted-foreground" />
 				</div>
 			</DropdownMenuTriggerV2>

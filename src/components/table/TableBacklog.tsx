@@ -62,6 +62,7 @@ type TableBacklogProps = {
 
 type getColumnsBacklogProps = {
   showSprint: boolean;
+  isDragging: boolean;
   taskStatus: {
     id: string;
     name: string;
@@ -77,6 +78,22 @@ type getColumnsBacklogProps = {
 
 const BACKLOG_GRID_MIN_WIDTH = 824;
 const BACKLOG_WITH_SPRINT_GRID_MIN_WIDTH = 984;
+
+const SelectionIndicator = ({
+  checked = false,
+  indeterminate = false,
+}: {
+  checked?: boolean;
+  indeterminate?: boolean;
+}) => (
+  <div className="flex h-4 w-4 items-center justify-center rounded-[4px] border border-border bg-background">
+    {checked ? (
+      <div className="h-2.5 w-2.5 rounded-[2px] bg-blue-500" />
+    ) : indeterminate ? (
+      <div className="h-0.5 w-2 rounded-full bg-blue-500" />
+    ) : null}
+  </div>
+);
 
 const getBacklogGridTemplateColumns = (showSprint: boolean) =>
   [
@@ -126,6 +143,7 @@ const getTaskPriorityName = (
 
 const getColumnsBacklog = ({
   showSprint,
+  isDragging,
   taskPriority,
   taskStatus,
   onOpenDetail,
@@ -136,23 +154,36 @@ const getColumnsBacklog = ({
     id: "select",
     size: 48,
     header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="border-border data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
-      />
+      isDragging ? (
+        <SelectionIndicator
+          checked={table.getIsAllPageRowsSelected()}
+          indeterminate={
+            !table.getIsAllPageRowsSelected() && table.getIsSomePageRowsSelected()
+          }
+        />
+      ) : (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+          className="border-border data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+        />
+      )
     ),
     cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select task"
-        className="border-border data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
-      />
+      isDragging ? (
+        <SelectionIndicator checked={row.getIsSelected()} />
+      ) : (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select task"
+          className="border-border data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+        />
+      )
     ),
     enableSorting: false,
     enableHiding: false,
@@ -295,7 +326,7 @@ const TableBacklog = ({
   const [quickAddTitle, setQuickAddTitle] = useState("");
   const [isCreating, setIsCreating] = useState(false);
 
-  const { items } = useTableDnd();
+  const { items, isDragging } = useTableDnd();
   const { bulkUpdateTasks, bulkMoveToSprint, createTask } = useTask(
     workspaceId,
     projectId,
@@ -317,13 +348,14 @@ const TableBacklog = ({
     () =>
       getColumnsBacklog({
         showSprint,
+        isDragging,
         taskStatus,
         taskPriority,
         workspaceId,
         projectId,
         onOpenDetail: setActiveDrawerTaskId,
       }),
-    [showSprint, taskStatus, taskPriority, workspaceId, projectId],
+    [showSprint, isDragging, taskStatus, taskPriority, workspaceId, projectId],
   );
 
   const pagination = serverPagination
@@ -432,8 +464,7 @@ const TableBacklog = ({
     () => new Map(tableRows.map((row) => [row.original.id, row])),
     [tableRows],
   );
-  const displayIds =
-    taskIds.length > 0 ? taskIds : tableRows.map((r) => r.original.id);
+  const displayIds = taskIds;
 
   return (
     <>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -38,17 +38,17 @@ type EditSprintDialogProps = {
 const CUSTOM_DURATION = "custom";
 
 const durationOptions = [
-	{ label: "1 week", value: "1" },
-	{ label: "2 weeks", value: "2" },
-	{ label: "3 weeks", value: "3" },
-	{ label: "4 weeks", value: "4" },
-	{ label: "Custom", value: CUSTOM_DURATION },
+	{ label: "1 tuần", value: "1" },
+	{ label: "2 tuần", value: "2" },
+	{ label: "3 tuần", value: "3" },
+	{ label: "4 tuần", value: "4" },
+	{ label: "Tùy chỉnh", value: CUSTOM_DURATION },
 ];
 
 const formatDateInput = (date: Date | null | undefined) => {
 	if (!date) return "";
 	const d = new Date(date);
-	if (isNaN(d.getTime())) return "";
+	if (Number.isNaN(d.getTime())) return "";
 	const year = d.getFullYear();
 	const month = String(d.getMonth() + 1).padStart(2, "0");
 	const day = String(d.getDate()).padStart(2, "0");
@@ -59,11 +59,11 @@ const formatDateInput = (date: Date | null | undefined) => {
 const formatTimeInput = (date: Date | null | undefined) => {
 	if (!date) return "09:00";
 	const d = new Date(date);
-	if (isNaN(d.getTime())) return "09:00";
+	if (Number.isNaN(d.getTime())) return "09:00";
 	const hours = String(d.getHours()).padStart(2, "0");
 	const mins = String(d.getMinutes()).padStart(2, "0");
 	return `${hours}:${mins}`;
-}
+};
 
 const addWeeksToDate = (date: string, weeks: number) => {
 	if (!date) return "";
@@ -146,14 +146,21 @@ export function EditSprintDialog({
 			return;
 		}
 
-		const data: any = {
+		const data: {
+			goal?: string;
+			endAt: string | null;
+			name?: string;
+			startAt?: string | null;
+		} = {
 			goal: goal.trim() || undefined,
 			endAt: endDate ? toISOStringDateTime(endDate, startTime) : null,
 		};
 
 		if (!isSprintActive) {
 			data.name = name.trim();
-			data.startAt = startDate ? toISOStringDateTime(startDate, startTime) : null;
+			data.startAt = startDate
+				? toISOStringDateTime(startDate, startTime)
+				: null;
 		}
 
 		updateSprint.mutate(
@@ -181,9 +188,9 @@ export function EditSprintDialog({
 						type='button'
 						variant='outline'
 						size='sm'
-						className="h-8 rounded-lg border-border bg-background text-[12px] font-medium hover:hover:bg-accent hover:text-accent-foreground hover:border-neutral-600 transition-all hover:text-foreground"
+						className='h-8 rounded-lg border-border bg-background text-[12px] font-medium hover:hover:bg-accent hover:text-accent-foreground hover:border-neutral-600 transition-all hover:text-foreground'
 					>
-						Edit sprint
+						Chỉnh sửa sprint
 					</Button>
 				)}
 			</DialogTrigger>
@@ -197,7 +204,7 @@ export function EditSprintDialog({
 				<div className='border-b border-border px-6 py-4'>
 					<DialogHeader>
 						<DialogTitle className='text-base font-semibold text-foreground'>
-							Edit sprint
+							Chỉnh sửa sprint
 						</DialogTitle>
 					</DialogHeader>
 				</div>
@@ -205,14 +212,13 @@ export function EditSprintDialog({
 				<div className='px-6 py-5'>
 					<div className='space-y-4'>
 						<p className='text-xs font-medium text-muted-foreground'>
-							Required fields are marked with an asterisk{" "}
+							Các trường bắt buộc được đánh dấu bằng dấu{" "}
 							<span className='text-red-400'>*</span>
 						</p>
 
 						<div className='space-y-1.5'>
 							<Label className='text-xs font-semibold text-foreground'>
-								Sprint name{" "}
-								<span className='text-red-400'>*</span>
+								Tên sprint <span className='text-red-400'>*</span>
 							</Label>
 
 							<Input
@@ -223,27 +229,24 @@ export function EditSprintDialog({
 									"h-9 rounded-md border-border bg-background text-sm text-foreground",
 									"placeholder:text-muted-foreground",
 									"focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500",
-									isSprintActive && "opacity-50 cursor-not-allowed"
+									isSprintActive && "cursor-not-allowed opacity-50",
 								)}
 							/>
 						</div>
 
 						<div className='space-y-1.5'>
 							<Label className='text-xs font-semibold text-foreground'>
-								Duration
+								Thời lượng
 							</Label>
 
-							<Select
-								value={duration}
-								onValueChange={handleDurationChange}
-							>
+							<Select value={duration} onValueChange={handleDurationChange}>
 								<SelectTrigger
 									className={cn(
 										"h-9 rounded-md border-border bg-background text-sm text-foreground",
 										"focus:border-blue-500 focus:ring-1 focus:ring-blue-500",
 									)}
 								>
-									<SelectValue placeholder='Select duration' />
+									<SelectValue placeholder='Chọn thời lượng' />
 								</SelectTrigger>
 
 								<SelectContent className='border-border bg-popover text-foreground'>
@@ -263,40 +266,36 @@ export function EditSprintDialog({
 						<div className='grid grid-cols-2 gap-3'>
 							<div className='space-y-1.5'>
 								<Label className='text-xs font-semibold text-foreground'>
-									Start date
+									Ngày bắt đầu
 								</Label>
 
 								<Input
 									type='date'
 									value={startDate}
 									disabled={isSprintActive}
-									onChange={(e) =>
-										handleStartDateChange(e.target.value)
-									}
+									onChange={(e) => handleStartDateChange(e.target.value)}
 									className={cn(
 										"h-9 rounded-md border-border bg-background text-sm text-foreground",
 										"focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500",
-										isSprintActive && "opacity-50 cursor-not-allowed"
+										isSprintActive && "cursor-not-allowed opacity-50",
 									)}
 								/>
 							</div>
 
 							<div className='space-y-1.5'>
 								<Label className='text-xs font-semibold text-foreground'>
-									Start time
+									Giờ bắt đầu
 								</Label>
 
 								<Input
 									type='time'
 									value={startTime}
 									disabled={isSprintActive}
-									onChange={(e) =>
-										setStartTime(e.target.value)
-									}
+									onChange={(e) => setStartTime(e.target.value)}
 									className={cn(
 										"h-9 rounded-md border-border bg-background text-sm text-foreground",
 										"focus-visible:border-blue-500 focus-visible:ring-1 focus-visible:ring-blue-500",
-										isSprintActive && "opacity-50 cursor-not-allowed"
+										isSprintActive && "cursor-not-allowed opacity-50",
 									)}
 								/>
 							</div>
@@ -305,7 +304,7 @@ export function EditSprintDialog({
 						<div className='grid grid-cols-2 gap-3'>
 							<div className='space-y-1.5'>
 								<Label className='text-xs font-semibold text-foreground'>
-									End date
+									Ngày kết thúc
 								</Label>
 
 								<Input
@@ -324,14 +323,14 @@ export function EditSprintDialog({
 
 								{isInvalidDateRange && (
 									<p className='text-xs text-red-400'>
-										End date must be after start date.
+										Ngày kết thúc phải sau ngày bắt đầu.
 									</p>
 								)}
 							</div>
 
 							<div className='space-y-1.5'>
 								<Label className='text-xs font-semibold text-foreground'>
-									End time
+									Giờ kết thúc
 								</Label>
 
 								<Input
@@ -348,13 +347,13 @@ export function EditSprintDialog({
 
 						<div className='space-y-1.5'>
 							<Label className='text-xs font-semibold text-foreground'>
-								Sprint goal
+								Mục tiêu sprint
 							</Label>
 
 							<Textarea
 								value={goal}
 								onChange={(e) => setGoal(e.target.value)}
-								placeholder='What should this sprint accomplish?'
+								placeholder='Sprint này cần hoàn thành điều gì?'
 								className={cn(
 									"min-h-27.5 resize-none rounded-md border-border bg-background text-sm text-foreground",
 									"placeholder:text-muted-foreground",
@@ -371,7 +370,7 @@ export function EditSprintDialog({
 							onClick={() => setOpen(false)}
 							className='h-8 rounded-md px-4 text-xs font-semibold text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground'
 						>
-							Cancel
+							Hủy bỏ
 						</Button>
 
 						<Button
@@ -384,7 +383,9 @@ export function EditSprintDialog({
 							}
 							className='h-8 rounded-md bg-blue-600 px-4 text-xs font-semibold text-white hover:bg-blue-500 disabled:opacity-50'
 						>
-							{updateSprint.isPending ? "Updating..." : "Update sprint"}
+							{updateSprint.isPending
+								? "Đang cập nhật..."
+								: "Cập nhật sprint"}
 						</Button>
 					</div>
 				</div>

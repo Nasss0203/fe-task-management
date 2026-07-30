@@ -72,7 +72,7 @@ export function SprintSectionHeader({
 							{sprint.name}
 						</span>
 						<span className='text-[12px] font-medium text-muted-foreground'>
-							({tasks.length} work items)
+							({tasks.length} công việc)
 						</span>
 					</div>
 				</div>
@@ -118,7 +118,7 @@ export function SprintSectionHeader({
 								className="h-8 gap-2 text-primary hover:text-primary/90"
 							>
 								<BarChart2 className="w-4 h-4" />
-								<span className="hidden sm:inline">View Report</span>
+								<span className="hidden sm:inline">Xem báo cáo</span>
 							</Button>
 						</Link>
 					</RequirePermission>
@@ -151,7 +151,7 @@ export function SprintSectionHeader({
 								isSprintActive={normalizedStatus === SprintStatus.ACTIVE}
 								trigger={
 									<DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">
-										Edit sprint
+										Chỉnh sửa sprint
 									</DropdownMenuItem>
 								}
 							/>
@@ -168,7 +168,7 @@ export function SprintSectionHeader({
 									sprintName={sprint.name}
 									trigger={
 										<DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer text-orange-500 focus:text-orange-600">
-											Cancel sprint
+											Hủy sprint
 										</DropdownMenuItem>
 									}
 								/>
@@ -186,7 +186,7 @@ export function SprintSectionHeader({
 									sprintName={sprint.name}
 									trigger={
 										<DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer text-red-500 focus:text-red-600">
-											Delete sprint
+											Xóa sprint
 										</DropdownMenuItem>
 									}
 								/>

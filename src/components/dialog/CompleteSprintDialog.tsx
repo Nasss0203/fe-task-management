@@ -90,7 +90,7 @@ export function CompleteSprintDialog({
 						size='sm'
 						className="h-8 rounded-lg border-border bg-background text-[12px] font-medium hover:hover:bg-accent hover:text-accent-foreground hover:border-neutral-600 transition-all hover:text-foreground"
 					>
-						Complete
+						Hoàn thành
 					</Button>
 				)}
 			</DialogTrigger>
@@ -104,7 +104,7 @@ export function CompleteSprintDialog({
 				<div className='border-b border-border px-6 py-4'>
 					<DialogHeader>
 						<DialogTitle className='text-base font-semibold text-foreground'>
-							Complete {defaultSprintName}
+							Hoàn thành {defaultSprintName}
 						</DialogTitle>
 					</DialogHeader>
 				</div>
@@ -112,33 +112,32 @@ export function CompleteSprintDialog({
 				<div className='px-6 py-5'>
 					<div className='space-y-4'>
 						<p className='text-sm text-foreground'>
-							This sprint contains{" "}
+							Sprint này có{" "}
 							<span className='font-semibold text-foreground'>
 								{completedWorkItemCount}
 							</span>{" "}
-							completed work item
-							{completedWorkItemCount > 1 ? "s" : ""} and{" "}
+							công việc đã hoàn thành và{" "}
 							<span className='font-semibold text-foreground'>
 								{openWorkItemCount}
 							</span>{" "}
-							open work item{openWorkItemCount > 1 ? "s" : ""}.
+							công việc đang mở.
 						</p>
 
 						<ul className='ml-5 list-disc space-y-2 text-sm text-muted-foreground'>
 							<li>
-								Completed work items include everything in the
-								last column on the board.
+								Công việc đã hoàn thành là toàn bộ công việc ở
+								cột cuối cùng trên board.
 							</li>
 							<li>
-								Open work items include everything from any
-								other column on the board.
+								Công việc đang mở là toàn bộ công việc ở các
+								cột còn lại trên board.
 							</li>
 						</ul>
 
 						{openWorkItemCount > 0 && (
 							<div className='space-y-1.5 pt-1'>
 								<Label className='text-xs font-semibold text-foreground'>
-									Move open work items to
+									Chuyển các công việc đang mở tới
 								</Label>
 
 								<Select
@@ -146,13 +145,13 @@ export function CompleteSprintDialog({
 									onValueChange={setMoveOpenItemsTo}
 								>
 									<SelectTrigger
-										className={cn(
-											"h-9 rounded-md border-border bg-background text-sm text-foreground",
-											"focus:border-blue-500 focus:ring-1 focus:ring-blue-500",
-										)}
-									>
-										<SelectValue placeholder='Select destination' />
-									</SelectTrigger>
+									className={cn(
+										"h-9 rounded-md border-border bg-background text-sm text-foreground",
+										"focus:border-blue-500 focus:ring-1 focus:ring-blue-500",
+									)}
+								>
+									<SelectValue placeholder='Chọn nơi chuyển đến' />
+								</SelectTrigger>
 
 									<SelectContent className='border-border bg-popover text-foreground'>
 										<SelectItem
@@ -174,7 +173,7 @@ export function CompleteSprintDialog({
 							onClick={() => setOpen(false)}
 							className='h-8 rounded-md px-4 text-xs font-semibold text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground'
 						>
-							Cancel
+							Hủy bỏ
 						</Button>
 
 						<Button
@@ -184,8 +183,8 @@ export function CompleteSprintDialog({
 							className='h-8 rounded-md bg-blue-600 px-4 text-xs font-semibold text-white hover:bg-blue-500 disabled:opacity-50'
 						>
 							{completed.isPending
-								? "Completing..."
-								: "Complete sprint"}
+								? "Đang hoàn thành..."
+								: "Hoàn thành sprint"}
 						</Button>
 					</div>
 				</div>

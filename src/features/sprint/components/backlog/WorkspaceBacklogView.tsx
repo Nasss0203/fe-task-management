@@ -62,7 +62,7 @@ const WorkspaceBacklogView = ({
         <div className="flex items-center gap-3">
           <div className="relative w-65">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search task" className="h-10 pl-9" />
+            <Input placeholder="Tìm kiếm công việc" className="h-10 pl-9" />
           </div>
 
           <Button variant="outline" size="icon" className="h-10 w-10">
@@ -98,11 +98,11 @@ const WorkspaceBacklogView = ({
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <span className="text-[14px] font-semibold text-foreground">
-                  Backlog tasks
+                  Công việc backlog
                 </span>
               </div>
               <p className="text-[12px] text-muted-foreground">
-                {backlogPageData?.total ?? taskBacklog.length} items in backlog
+                {backlogPageData?.total ?? taskBacklog.length} công việc trong backlog
               </p>
             </div>
           </div>

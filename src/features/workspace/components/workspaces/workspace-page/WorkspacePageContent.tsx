@@ -7,15 +7,20 @@ import { PageItem } from "@/services/page/type";
 import { PageBlockItem } from "@/services/page_block/type";
 
 type WorkspacePageContentProps = {
+	workspaceSlug: string;
 	page?: PageItem;
 	blocks: PageBlockItem[];
 };
 
-const WorkspacePageContent = ({ page, blocks }: WorkspacePageContentProps) => {
+const WorkspacePageContent = ({
+	workspaceSlug,
+	page,
+	blocks,
+}: WorkspacePageContentProps) => {
 	return (
 		<div className='min-h-0 flex-1 overflow-y-auto px-10 py-3 pb-10'>
 			<TabsContent value='summary' className='mt-0'>
-				<WorkspaceOverview workspaceSlug={page?.slug as string} />
+				<WorkspaceOverview workspaceSlug={workspaceSlug} />
 			</TabsContent>
 
 			<TabsContent value='pages' className='mt-0'>

@@ -64,10 +64,10 @@ export function CreateSprintDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>Create sprint</DialogTitle>
-				</DialogHeader>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Tạo sprint</DialogTitle>
+					</DialogHeader>
 
 				<div className='space-y-4'>
 					<div className='space-y-2'>
@@ -96,14 +96,14 @@ export function CreateSprintDialog({
 						onClick={() => onOpenChange(false)}
 						disabled={isSubmitting}
 					>
-						Cancel
+						Hủy bỏ
 					</Button>
 
 					<Button
 						onClick={handleSubmit}
 						disabled={isSubmitting || !name.trim()}
 					>
-						{isSubmitting ? "Creating..." : "Create sprint"}
+						{isSubmitting ? "Đang tạo..." : "Tạo sprint"}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

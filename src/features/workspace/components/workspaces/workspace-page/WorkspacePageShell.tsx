@@ -11,6 +11,7 @@ import WorkspacePageTabs from "./WorkspacePageTabs";
 
 type WorkspacePageShellProps = {
 	workspaceId: string;
+	workspaceSlug: string;
 	workspaceName?: string;
 	page?: PageItem;
 	blocks: PageBlockItem[];
@@ -19,6 +20,7 @@ type WorkspacePageShellProps = {
 
 const WorkspacePageShell = ({
 	workspaceId,
+	workspaceSlug,
 	workspaceName,
 	page,
 	blocks,
@@ -52,7 +54,11 @@ const WorkspacePageShell = ({
 
 			<WorkspacePageTabs />
 
-			<WorkspacePageContent page={page} blocks={blocks} />
+			<WorkspacePageContent
+				workspaceSlug={workspaceSlug}
+				page={page}
+				blocks={blocks}
+			/>
 		</Tabs>
 	);
 };
