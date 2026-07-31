@@ -113,11 +113,13 @@ export function SprintSectionHeader({
 					>
 						<Link href={`/dashboard/${slug}/projects/${projectId}/sprints/${sprint.id}/report`}>
 							<Button
+								aria-label="View Report"
 								variant="outline"
 								size="sm"
 								className="h-8 gap-2 text-primary hover:text-primary/90"
 							>
 								<BarChart2 className="w-4 h-4" />
+								<span className="sr-only">View Report</span>
 								<span className="hidden sm:inline">Xem báo cáo</span>
 							</Button>
 						</Link>
@@ -167,7 +169,8 @@ export function SprintSectionHeader({
 									sprintId={sprint.id}
 									sprintName={sprint.name}
 									trigger={
-										<DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer text-orange-500 focus:text-orange-600">
+										<DropdownMenuItem aria-label="Cancel sprint" onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer text-orange-500 focus:text-orange-600">
+											<span className="sr-only">Cancel sprint</span>
 											Hủy sprint
 										</DropdownMenuItem>
 									}
@@ -185,7 +188,8 @@ export function SprintSectionHeader({
 									sprintId={sprint.id}
 									sprintName={sprint.name}
 									trigger={
-										<DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer text-red-500 focus:text-red-600">
+										<DropdownMenuItem aria-label="Delete sprint" onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer text-red-500 focus:text-red-600">
+											<span className="sr-only">Delete sprint</span>
 											Xóa sprint
 										</DropdownMenuItem>
 									}

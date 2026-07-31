@@ -83,6 +83,7 @@ export function CompleteSprintDialog({
 					trigger
 				) : (
 					<Button
+						aria-label="Complete"
 						type='button'
 						variant='outline'
 						size='sm'
@@ -101,7 +102,10 @@ export function CompleteSprintDialog({
 			>
 				<div className='border-b border-border px-6 py-4'>
 					<DialogHeader>
-						<DialogTitle className='text-base font-semibold text-foreground'>
+						<DialogTitle
+							aria-label={`Complete ${defaultSprintName}`}
+							className='text-base font-semibold text-foreground'
+						>
 							Hoàn thành {defaultSprintName}
 						</DialogTitle>
 					</DialogHeader>
@@ -175,6 +179,7 @@ export function CompleteSprintDialog({
 						</Button>
 
 						<Button
+							aria-label="Complete sprint"
 							type='button'
 							onClick={() => {
 								void handleComplete();

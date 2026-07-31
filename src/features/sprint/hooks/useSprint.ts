@@ -91,39 +91,19 @@ export const useSprints = ({
 
 			return result;
 		},
-		onSuccess: async (_, variables) => {
+		onSuccess: async () => {
 			await Promise.all([
 				queryClient.invalidateQueries({
-					queryKey: [
-						SPRINT_KEY.SPRINTS,
-						variables.workspaceId,
-						variables.projectId,
-					],
-					refetchType: "active",
+					queryKey: [SPRINT_KEY.SPRINTS],
 				}),
 				queryClient.invalidateQueries({
-					queryKey: [
-						SPRINT_KEY.SPRINT,
-						variables.workspaceId,
-						variables.projectId,
-					],
-					refetchType: "active",
+					queryKey: [SPRINT_KEY.SPRINT],
 				}),
 				queryClient.invalidateQueries({
-					queryKey: [
-						TASK_KEY.TASKS,
-						variables.workspaceId,
-						variables.projectId,
-					],
-					refetchType: "active",
+					queryKey: [TASK_KEY.TASKS],
 				}),
 				queryClient.invalidateQueries({
-					queryKey: [
-						TASK_KEY.TASK_BACKLOG,
-						variables.workspaceId,
-						variables.projectId,
-					],
-					refetchType: "active",
+					queryKey: [TASK_KEY.TASK_BACKLOG],
 				}),
 			]);
 		},

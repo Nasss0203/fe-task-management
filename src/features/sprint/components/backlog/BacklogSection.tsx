@@ -112,6 +112,7 @@ const BacklogSection = ({
         <div className="flex items-center gap-2">
           {isProjectContext && can(PERMISSIONS.SPRINT_CREATE) && (
             <Button
+              aria-label="Create sprint"
               variant="outline"
               size="sm"
               className="h-8 rounded-lg border-border bg-background text-[12px] font-medium hover:hover:bg-accent hover:text-accent-foreground hover:border-neutral-600 transition-all hover:text-foreground"
