@@ -149,6 +149,7 @@ export function StartSprintDialog({
 					trigger
 				) : (
 					<Button
+						aria-label="Start sprint"
 						type='button'
 						variant='outline'
 						size='sm'
@@ -167,7 +168,10 @@ export function StartSprintDialog({
 			>
 				<div className='border-b border-border px-6 py-3'>
 					<DialogHeader>
-						<DialogTitle className='text-base font-semibold text-foreground'>
+						<DialogTitle
+							aria-label="Start sprint"
+							className='text-base font-semibold text-foreground'
+						>
 							Bắt đầu sprint
 						</DialogTitle>
 					</DialogHeader>
@@ -339,6 +343,7 @@ export function StartSprintDialog({
 						</Button>
 
 						<Button
+							aria-label="Start"
 							type='button'
 							onClick={handleStart}
 							disabled={

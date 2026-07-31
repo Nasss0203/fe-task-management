@@ -152,7 +152,7 @@ export function SprintSectionHeader({
 								defaultEndAt={sprint.endAt}
 								isSprintActive={normalizedStatus === SprintStatus.ACTIVE}
 								trigger={
-									<DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">
+									<DropdownMenuItem aria-label="Edit sprint" onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">
 										Chỉnh sửa sprint
 									</DropdownMenuItem>
 								}

@@ -185,6 +185,7 @@ export function EditSprintDialog({
 					trigger
 				) : (
 					<Button
+						aria-label="Edit sprint"
 						type='button'
 						variant='outline'
 						size='sm'
@@ -203,7 +204,10 @@ export function EditSprintDialog({
 			>
 				<div className='border-b border-border px-6 py-4'>
 					<DialogHeader>
-						<DialogTitle className='text-base font-semibold text-foreground'>
+						<DialogTitle
+							aria-label="Edit sprint"
+							className='text-base font-semibold text-foreground'
+						>
 							Chỉnh sửa sprint
 						</DialogTitle>
 					</DialogHeader>
@@ -374,6 +378,7 @@ export function EditSprintDialog({
 						</Button>
 
 						<Button
+							aria-label="Update sprint"
 							type='button'
 							onClick={handleUpdate}
 							disabled={
