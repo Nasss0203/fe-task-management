@@ -2,6 +2,7 @@ import { io, type Socket } from "socket.io-client";
 
 let socket: Socket | null = null;
 let socketToken: string | null = null;
+let lastConnectErrorMessage: string | null = null;
 
 const socketUrl =
 	process.env.NEXT_PUBLIC_SOCKET_URL ??
@@ -25,18 +26,26 @@ export const connectRealtimeSocket = (accessToken: string) => {
 
 	socketToken = accessToken;
 	socket = io(`${socketUrl}${realtimeNamespace}`, {
-		transports: ["websocket"],
+		transports: ["polling", "websocket"],
+		reconnectionAttempts: 3,
+		reconnectionDelay: 1000,
+		reconnectionDelayMax: 5000,
+		timeout: 10000,
 		auth: {
 			token: accessToken,
 		},
 	});
 
 	socket.on("connect", () => {
+		lastConnectErrorMessage = null;
 		console.log("Socket connected FE:", socket?.id);
 	});
 
 	socket.on("connect_error", (error) => {
-		console.error("Socket connect error:", error.message);
+		if (lastConnectErrorMessage === error.message) return;
+
+		lastConnectErrorMessage = error.message;
+		console.warn("Socket connect error:", error.message);
 	});
 
 	socket.on("disconnect", (reason) => {
@@ -55,4 +64,5 @@ export const disconnectRealtimeSocket = () => {
 	}
 
 	socketToken = null;
+	lastConnectErrorMessage = null;
 };
