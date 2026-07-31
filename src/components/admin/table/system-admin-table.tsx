@@ -38,21 +38,11 @@ export function SystemAdminTable({
 	isChangingPlan = false,
 	canGrantPro = true,
 }: Props) {
-	if (isLoading) {
-		return (
-			<div className={adminEmptyStateClass}>
-				<p className='text-sm text-muted-foreground'>
-					Đang tải danh sách System Admin...
-				</p>
-			</div>
-		);
-	}
-
-	if (isError) {
+	if (isError && !isLoading) {
 		return (
 			<div className={adminEmptyStateClass}>
 				<p className='text-sm text-danger'>
-					Không thể tải danh sách System Admin.
+					Khong the tai danh sach System Admin.
 				</p>
 			</div>
 		);
@@ -72,6 +62,8 @@ export function SystemAdminTable({
 			isChangingStatus={isChangingStatus}
 			isChangingPlan={isChangingPlan}
 			canGrantPro={canGrantPro}
+			isLoading={isLoading}
+			skeletonRowCount={pagination.pageSize}
 		/>
 	);
 }

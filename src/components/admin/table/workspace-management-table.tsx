@@ -8,6 +8,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { WorkspaceItem } from "@/services/admin/workspace/type";
 import type { OnChangeFn, PaginationState } from "@tanstack/react-table";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
@@ -19,6 +20,11 @@ import {
 	RefreshCcw,
 } from "lucide-react";
 import type { ReactNode } from "react";
+import {
+	adminMenuContentClass,
+	adminMenuItemClass,
+	adminMenuSeparatorClass,
+} from "../shared/theme";
 
 type Props = {
 	workspaces: WorkspaceItem[];
@@ -28,6 +34,8 @@ type Props = {
 	onPaginationChange: OnChangeFn<PaginationState>;
 	onView: (workspace: WorkspaceItem) => void;
 	toolbar?: ReactNode;
+	isLoading?: boolean;
+	skeletonRowCount?: number;
 };
 
 const getInitials = (name: string) => {
@@ -88,18 +96,51 @@ const getWorkspaceStatusLabel = (status: WorkspaceItem["status"]) => {
 	return "Đã xóa mềm";
 };
 
-const getWorkspacePlanClass = (plan: WorkspaceItem["plan"]) => {
-	if (plan === "pro") {
-		return "border-[#DDD6FE] bg-[#F5F3FF] text-[#7C3AED]";
-	}
-
-	return "border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]";
-};
-
-const getWorkspacePlanLabel = (plan: WorkspaceItem["plan"]) => {
-	if (plan === "pro") return "Pro";
-	return "Free";
-};
+function WorkspaceTableSkeletonRows({ rowCount }: { rowCount: number }) {
+	return (
+		<>
+			{Array.from({ length: rowCount }).map((_, index) => (
+				<tr
+					key={`workspace-table-skeleton-${index}`}
+					className='text-sm text-[#1E293B]'
+				>
+					<td className='px-5 py-2 whitespace-nowrap'>
+						<div className='flex items-center gap-3'>
+							<Skeleton className='h-8 w-8 rounded-full' />
+							<Skeleton className='h-4 w-36' />
+						</div>
+					</td>
+					<td className='px-4 py-2 whitespace-nowrap'>
+						<div className='space-y-2'>
+							<Skeleton className='h-4 w-32' />
+							<Skeleton className='h-3 w-40' />
+						</div>
+					</td>
+					<td className='px-4 py-2 whitespace-nowrap'>
+						<Skeleton className='h-7 w-32 rounded-full' />
+					</td>
+					<td className='px-4 py-2 whitespace-nowrap'>
+						<div className='inline-flex items-center gap-2'>
+							<Skeleton className='h-4 w-4 rounded-full' />
+							<Skeleton className='h-4 w-24' />
+						</div>
+					</td>
+					<td className='px-4 py-2 whitespace-nowrap'>
+						<div className='inline-flex items-center gap-2'>
+							<Skeleton className='h-4 w-4 rounded-full' />
+							<Skeleton className='h-4 w-32' />
+						</div>
+					</td>
+					<td className='px-5 py-2 whitespace-nowrap'>
+						<div className='flex justify-end'>
+							<Skeleton className='h-8 w-8 rounded-xl' />
+						</div>
+					</td>
+				</tr>
+			))}
+		</>
+	);
+}
 
 export function WorkspaceManagementTable({
 	workspaces,
@@ -109,6 +150,8 @@ export function WorkspaceManagementTable({
 	onPaginationChange,
 	onView,
 	toolbar,
+	isLoading = false,
+	skeletonRowCount = pagination.pageSize,
 }: Props) {
 	const table = useReactTable({
 		data: workspaces,
@@ -136,17 +179,15 @@ export function WorkspaceManagementTable({
 				{toolbar ? <div className='w-full lg:max-w-xl'>{toolbar}</div> : null}
 			</div>
 
-			{workspaces.length ? (
+			{isLoading || workspaces.length ? (
 				<>
 				<div className='overflow-x-auto px-4 sm:px-5'>
-				<table className='w-full min-w-[1050px] border-collapse'>
+				<table className='w-full min-w-[820px] border-collapse'>
 					<thead className='sticky top-0 z-10 bg-[#F8FAFC]'>
 						<tr className='border-b border-border text-left text-xs uppercase tracking-[0.12em] text-[#475569]'>
 							<th className='px-5 py-3 font-medium whitespace-nowrap'>Workspace</th>
 							<th className='px-4 py-3 font-medium whitespace-nowrap'>Owner</th>
-							<th className='px-4 py-3 font-medium whitespace-nowrap'>Gói</th>
 							<th className='px-4 py-3 font-medium whitespace-nowrap'>Trạng thái</th>
-							<th className='px-4 py-3 font-medium whitespace-nowrap'>Thống kê</th>
 							<th className='px-4 py-3 font-medium whitespace-nowrap'>Ngày tạo</th>
 							<th className='px-4 py-3 font-medium whitespace-nowrap'>Cập nhật</th>
 							<th className='px-5 py-3 text-right font-medium whitespace-nowrap'>
@@ -156,7 +197,10 @@ export function WorkspaceManagementTable({
 					</thead>
 
 					<tbody className='divide-y divide-[#EEF2F6]'>
-						{table.getRowModel().rows.map((row) => {
+						{isLoading ? (
+							<WorkspaceTableSkeletonRows rowCount={skeletonRowCount} />
+						) : (
+							table.getRowModel().rows.map((row) => {
 							const workspace = row.original;
 
 							return (
@@ -192,18 +236,6 @@ export function WorkspaceManagementTable({
 
 									<td className='px-4 py-2 whitespace-nowrap'>
 										<span
-											className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${getWorkspacePlanClass(
-												workspace.plan,
-											)}`}
-										>
-											{getWorkspacePlanLabel(
-												workspace.plan,
-											)}
-										</span>
-									</td>
-
-									<td className='px-4 py-2 whitespace-nowrap'>
-										<span
 											className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${getWorkspaceStatusClass(
 												workspace.status,
 											)}`}
@@ -212,15 +244,6 @@ export function WorkspaceManagementTable({
 												workspace.status,
 											)}
 										</span>
-									</td>
-
-									<td className='px-4 py-2 whitespace-nowrap'>
-										<div className='grid grid-cols-2 gap-1.5 text-xs text-[#64748B]'>
-											<span>{workspace.membersCount} member</span>
-											<span>{workspace.projectsCount} project</span>
-											<span>{workspace.boardsCount} board</span>
-											<span>{workspace.tasksCount} task</span>
-										</div>
 									</td>
 
 									<td className='px-4 py-2 text-[#334155] text-xs sm:text-sm whitespace-nowrap'>
@@ -250,13 +273,13 @@ export function WorkspaceManagementTable({
 
 												<DropdownMenuContent
 													align='end'
-													className='w-60 rounded-2xl border border-border bg-white p-2 text-[#1E293B] shadow-xl'
+													className={`w-60 ${adminMenuContentClass}`}
 												>
 													<DropdownMenuItem
 														onClick={() =>
 															onView(workspace)
 														}
-														className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
+														className={adminMenuItemClass}
 													>
 														<Eye className='mr-2 h-4 w-4' />
 														Xem chi tiết
@@ -265,11 +288,13 @@ export function WorkspaceManagementTable({
 													{workspace.status ===
 														"DELETED" && (
 														<>
-															<DropdownMenuSeparator className='my-1 bg-border' />
+															<DropdownMenuSeparator
+																className={adminMenuSeparatorClass}
+															/>
 
 															<DropdownMenuItem
 																disabled
-																className='cursor-not-allowed rounded-xl px-3 py-2 text-sm opacity-50'
+																className={`${adminMenuItemClass} cursor-not-allowed opacity-50`}
 															>
 																<RefreshCcw className='mr-2 h-4 w-4' />
 																Chưa có API restore
@@ -282,7 +307,8 @@ export function WorkspaceManagementTable({
 									</td>
 								</tr>
 							);
-						})}
+						})
+						)}
 					</tbody>
 				</table>
 				</div>

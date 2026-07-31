@@ -6,6 +6,11 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Ellipsis, Eye, Power } from "lucide-react";
+import {
+	adminMenuContentClass,
+	adminMenuItemClass,
+	adminMenuSeparatorClass,
+} from "../shared/theme";
 import type { BillingPlan } from "../shared/billing-admin.types";
 import {
 	formatCurrency,
@@ -169,23 +174,25 @@ export function BillingPlanManagementTable({
 
 											<DropdownMenuContent
 												align='end'
-												className='w-56 rounded-2xl border border-border bg-white p-2 text-[#1E293B] shadow-xl'
+												className={`w-56 ${adminMenuContentClass}`}
 											>
 												<DropdownMenuItem
 													onClick={() => onView(plan)}
-													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
+													className={adminMenuItemClass}
 												>
 													<Eye className='mr-2 h-4 w-4' />
 													Xem / chỉnh sửa
 												</DropdownMenuItem>
 
-												<DropdownMenuSeparator className='my-1 bg-border' />
+												<DropdownMenuSeparator
+													className={adminMenuSeparatorClass}
+												/>
 
 												<DropdownMenuItem
 													onClick={() =>
 														onToggleStatus(plan.id)
 													}
-													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
+													className={adminMenuItemClass}
 												>
 													<Power className='mr-2 h-4 w-4' />
 													{plan.status === "ACTIVE"

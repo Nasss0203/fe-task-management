@@ -12,6 +12,11 @@ import {
 	Eye,
 	XCircle,
 } from "lucide-react";
+import {
+	adminMenuContentClass,
+	adminMenuItemClass,
+	adminMenuSeparatorClass,
+} from "../shared/theme";
 import type { WorkspaceSubscription } from "../shared/billing-admin.types";
 import {
 	formatCurrency,
@@ -175,19 +180,21 @@ export function BillingSubscriptionManagementTable({
 
 											<DropdownMenuContent
 												align='end'
-												className='w-60 rounded-2xl border border-border bg-white p-2 text-[#1E293B] shadow-xl'
+												className={`w-60 ${adminMenuContentClass}`}
 											>
 												<DropdownMenuItem
 													onClick={() =>
 														onView(subscription)
 													}
-													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
+													className={adminMenuItemClass}
 												>
 													<Eye className='mr-2 h-4 w-4' />
 													Xem chi tiết
 												</DropdownMenuItem>
 
-												<DropdownMenuSeparator className='my-1 bg-border' />
+												<DropdownMenuSeparator
+													className={adminMenuSeparatorClass}
+												/>
 
 												<DropdownMenuItem
 													onClick={() =>
@@ -198,7 +205,7 @@ export function BillingSubscriptionManagementTable({
 													disabled={
 														isUpdatingSubscription
 													}
-													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
+													className={adminMenuItemClass}
 												>
 													<XCircle className='mr-2 h-4 w-4' />
 													{subscription.status ===

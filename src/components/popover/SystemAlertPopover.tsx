@@ -136,10 +136,7 @@ export function SystemAlertPopover() {
 		<div className='w-[420px] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md'>
 			<div className='flex items-center justify-between border-b px-4 py-3'>
 				<div>
-					<h3 className='text-sm font-semibold'>Cảnh báo hệ thống</h3>
-					<p className='text-xs text-muted-foreground'>
-						Cập nhật tiến độ & cảnh báo
-					</p>
+					<h3 className='text-sm font-semibold'>Thông báo</h3>
 				</div>
 
 				<Button
@@ -273,7 +270,9 @@ export function SystemAlertPopover() {
 												className='h-8 px-3 text-xs'
 												onClick={() =>
 													router.push(
-														getFrontendActionUrl(notification.actionUrl),
+														getFrontendActionUrl(
+															notification.actionUrl,
+														),
 													)
 												}
 											>
@@ -291,7 +290,9 @@ export function SystemAlertPopover() {
 													className='h-8 px-3 text-xs'
 													onClick={() =>
 														router.push(
-															getFrontendActionUrl(notification.actionUrl),
+															getFrontendActionUrl(
+																notification.actionUrl,
+															),
 														)
 													}
 												>

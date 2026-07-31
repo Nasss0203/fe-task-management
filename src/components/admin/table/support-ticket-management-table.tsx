@@ -175,13 +175,13 @@ export function SupportTicketManagementTable({
 
 											<DropdownMenuContent
 												align='end'
-												className='w-60 rounded-2xl border border-white/10 bg-[#0f0f0f] p-2 text-white'
+												className='w-60 rounded-2xl border-0 bg-[#0f0f0f] p-1.5 text-white shadow-[0_18px_45px_rgba(0,0,0,0.35)]'
 											>
 												<DropdownMenuItem
 													onClick={() =>
 														onView(ticket)
 													}
-													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-white/5 focus:text-white'
+													className='cursor-pointer rounded-xl px-3 py-2.5 text-sm transition-colors focus:bg-white/5 focus:text-white'
 												>
 													<Eye className='mr-2 h-4 w-4' />
 													Xem chi tiết
@@ -191,7 +191,7 @@ export function SupportTicketManagementTable({
 													onClick={() =>
 														onSendEmail(ticket.id)
 													}
-													className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-white/5 focus:text-white'
+													className='cursor-pointer rounded-xl px-3 py-2.5 text-sm transition-colors focus:bg-white/5 focus:text-white'
 												>
 													<Mail className='mr-2 h-4 w-4' />
 													Gửi email hỗ trợ
@@ -199,14 +199,14 @@ export function SupportTicketManagementTable({
 
 												{ticket.canImpersonate && (
 													<>
-														<DropdownMenuSeparator className='my-1 bg-white/10' />
+														<DropdownMenuSeparator className='my-0 h-0 bg-transparent' />
 														<DropdownMenuItem
 															onClick={() =>
 																onImpersonate(
 																	ticket.id,
 																)
 															}
-															className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-white/5 focus:text-white'
+															className='cursor-pointer rounded-xl px-3 py-2.5 text-sm transition-colors focus:bg-white/5 focus:text-white'
 														>
 															<LogIn className='mr-2 h-4 w-4' />
 															Giả lập vào

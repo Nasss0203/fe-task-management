@@ -51,6 +51,8 @@ type Props = {
 	totalRows: number;
 	onPaginationChange: OnChangeFn<PaginationState>;
 	onQueryChange: (query: AdminFindAllWorkspaceQuery) => void;
+	isLoading?: boolean;
+	skeletonRowCount?: number;
 };
 
 const selectClass =
@@ -82,6 +84,8 @@ export function RecentWorkspacesTable({
 	totalRows,
 	onPaginationChange,
 	onQueryChange,
+	isLoading = false,
+	skeletonRowCount = pagination.pageSize,
 }: Props) {
 	const [search, setSearch] = useState(query.search ?? "");
 	const [plan, setPlan] = useState<PlanTypeWorkspace | "">(query.plan ?? "");
@@ -271,7 +275,12 @@ export function RecentWorkspacesTable({
 				</div>
 			</div>
 
-			<DataTable columns={recentWorkspacesColumns} data={items} />
+			<DataTable
+				columns={recentWorkspacesColumns}
+				data={items}
+				isLoading={isLoading}
+				skeletonRowCount={skeletonRowCount}
+			/>
 
 			<PanigationTable
 				table={table}

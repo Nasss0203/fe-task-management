@@ -256,8 +256,29 @@ export default function AdminUsersPage() {
 
 				<div className='mt-4'>
 					{users.isLoading ? (
-						<div className={adminEmptyStateClass}>
-							<p className='text-sm text-muted-foreground'>
+						<div>
+							<UserTable
+								users={[]}
+								pagination={pagination}
+								pageCount={userPage?.totalPages ?? 1}
+								totalRows={userPage?.total ?? 0}
+								onPaginationChange={setPagination}
+								onView={handleViewUser}
+								onToggleLock={handleToggleLock}
+								onResetStatus={handleResetStatus}
+								onChangePlan={handleChangePlan}
+								isChangingStatus={
+									lockUser.isPending || unlockUser.isPending
+								}
+								isChangingPlan={
+									grantSubscription.isPending ||
+									revokeSubscription.isPending
+								}
+								canGrantPro={Boolean(proPlan)}
+								isLoading
+								skeletonRowCount={pagination.pageSize}
+							/>
+							<p className='hidden'>
 								Đang tải danh sách người dùng...
 							</p>
 						</div>

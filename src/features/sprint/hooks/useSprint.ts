@@ -91,13 +91,41 @@ export const useSprints = ({
 
 			return result;
 		},
-		onSuccess: async () => {
-			await queryClient.invalidateQueries({
-				queryKey: [SPRINT_KEY.SPRINTS],
-			});
-			await queryClient.invalidateQueries({
-				queryKey: [TASK_KEY.TASK_BACKLOG],
-			});
+		onSuccess: async (_, variables) => {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: [
+						SPRINT_KEY.SPRINTS,
+						variables.workspaceId,
+						variables.projectId,
+					],
+					refetchType: "active",
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [
+						SPRINT_KEY.SPRINT,
+						variables.workspaceId,
+						variables.projectId,
+					],
+					refetchType: "active",
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [
+						TASK_KEY.TASKS,
+						variables.workspaceId,
+						variables.projectId,
+					],
+					refetchType: "active",
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [
+						TASK_KEY.TASK_BACKLOG,
+						variables.workspaceId,
+						variables.projectId,
+					],
+					refetchType: "active",
+				}),
+			]);
 		},
 	onError: (err: unknown) => {
 		console.error("completedSprint failed", err);

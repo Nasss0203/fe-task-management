@@ -38,34 +38,6 @@ const getCreatedFrom = (value: string) => {
 	return date.toISOString();
 };
 
-const matchesSearch = (workspace: WorkspaceItem, value: string) => {
-	const keyword = value.trim().toLowerCase();
-	if (!keyword) return true;
-
-	return [
-		workspace.name,
-		workspace.slug,
-		workspace.ownerName,
-		workspace.ownerEmail,
-	]
-		.filter(Boolean)
-		.some((item) => item!.toLowerCase().includes(keyword));
-};
-
-const matchesCreatedAt = (workspace: WorkspaceItem, value: string) => {
-	const createdFrom = getCreatedFrom(value);
-	if (!createdFrom) return true;
-
-	const createdAtTime = new Date(workspace.createdAt).getTime();
-	const createdFromTime = new Date(createdFrom).getTime();
-
-	return (
-		!Number.isNaN(createdAtTime) &&
-		!Number.isNaN(createdFromTime) &&
-		createdAtTime >= createdFromTime
-	);
-};
-
 export default function AdminWorkspacesPage() {
 	const [selectedWorkspace, setSelectedWorkspace] =
 		useState<WorkspaceItem | null>(null);
@@ -81,40 +53,20 @@ export default function AdminWorkspacesPage() {
 
 	const workspaceQuery = useMemo<AdminFindAllWorkspaceQuery>(() => {
 		return {
+			search: search.trim() || undefined,
+			status:
+				status === "all" ? undefined : (status as WorkspaceStatus),
+			plan: plan === "all" ? undefined : (plan as PlanTypeWorkspace),
+			createdFrom: getCreatedFrom(createdAt),
 			page: pagination.pageIndex + 1,
 			pageSize: pagination.pageSize,
 		};
-	}, [pagination]);
+	}, [createdAt, pagination, plan, search, status]);
 
 	const { workspaces } = useAdminWorkspaces(workspaceQuery);
 
 	const workspacePage = workspaces.data?.data;
 	const workspaceItems = workspacePage?.data ?? [];
-	const filteredWorkspaceItems = useMemo(() => {
-		return workspaceItems.filter((workspace) => {
-			const matchSearch = matchesSearch(workspace, search);
-			const matchStatus =
-				status === "all" ||
-				workspace.status === (status as WorkspaceStatus);
-			const matchPlan =
-				plan === "all" || workspace.plan === (plan as PlanTypeWorkspace);
-			const matchCreatedAt = matchesCreatedAt(workspace, createdAt);
-
-			return matchSearch && matchStatus && matchPlan && matchCreatedAt;
-		});
-	}, [workspaceItems, search, status, plan, createdAt]);
-	const visibleWorkspaceItems = useMemo(() => {
-		const start = pagination.pageIndex * pagination.pageSize;
-		const end = start + pagination.pageSize;
-
-		return filteredWorkspaceItems.slice(start, end);
-	}, [filteredWorkspaceItems, pagination]);
-
-	const hasFilters =
-		Boolean(search.trim()) ||
-		status !== "all" ||
-		plan !== "all" ||
-		createdAt !== "all";
 
 	const resetToFirstPage = () => {
 		setPagination((current) => ({ ...current, pageIndex: 0 }));
@@ -159,8 +111,31 @@ export default function AdminWorkspacesPage() {
 			<WorkspaceOverviewCards workspaces={workspaceItems} />
 
 			{workspaces.isLoading ? (
-				<div className={adminEmptyStateClass}>
-					<p className='text-sm text-muted-foreground'>
+				<div>
+					<WorkspaceManagementTable
+						workspaces={[]}
+						pagination={pagination}
+						pageCount={workspacePage?.totalPages ?? 1}
+						totalRows={workspacePage?.total ?? 0}
+						onPaginationChange={setPagination}
+						onView={handleViewWorkspace}
+						isLoading
+						skeletonRowCount={pagination.pageSize}
+						toolbar={
+							<WorkspaceFilterBar
+								search={search}
+								status={status}
+								plan={plan}
+								createdAt={createdAt}
+								onSearchChange={handleSearchChange}
+								onStatusChange={handleStatusChange}
+								onPlanChange={handlePlanChange}
+								onCreatedAtChange={handleCreatedAtChange}
+								onReset={handleResetFilters}
+							/>
+						}
+					/>
+					<p className='hidden'>
 						Đang tải danh sách workspace...
 					</p>
 				</div>
@@ -172,24 +147,10 @@ export default function AdminWorkspacesPage() {
 				</div>
 			) : (
 				<WorkspaceManagementTable
-					workspaces={visibleWorkspaceItems}
+					workspaces={workspaceItems}
 					pagination={pagination}
-					pageCount={
-						hasFilters
-							? Math.max(
-									Math.ceil(
-										filteredWorkspaceItems.length /
-											pagination.pageSize,
-									),
-									1,
-								)
-							: (workspacePage?.totalPages ?? 1)
-					}
-					totalRows={
-						hasFilters
-							? filteredWorkspaceItems.length
-							: (workspacePage?.total ?? 0)
-					}
+					pageCount={workspacePage?.totalPages ?? 1}
+					totalRows={workspacePage?.total ?? 0}
 					onPaginationChange={setPagination}
 					onView={handleViewWorkspace}
 					toolbar={

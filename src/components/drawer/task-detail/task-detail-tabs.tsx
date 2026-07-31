@@ -1,45 +1,46 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { TaskActivityFeed } from "./task-activity-feed";
-import { ActivityResponseDto } from "@/services/activity/type";
-import {
-	AtSign,
-	Check,
-	Link2,
-	MessageSquareText,
-	Paperclip,
-	MoreHorizontal,
-	Pencil,
-	Plus,
-	Trash2,
-	Calendar,
-	GripVertical,
-	X,
-	Sparkles,
-	Loader2,
-} from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
-import { Textarea } from "../../ui/textarea";
-import { getInitials } from "./task-detail-utils";
-import { type TaskCommentItem } from "@/services/comment/type";
-import { type TaskItem, TASK_KEY } from "@/services/task/type";
-import { getTaskStatusKey, getTaskStatusStyle } from "@/lib/task-status-style";
-import { format } from "date-fns";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import * as React from "react";
-import { useUpdateTask, useDeleteTask, useTaskStatus } from "@/features/task/hooks/useTask";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { Input } from "@/components/ui/input";
+import {
+	useDeleteTask,
+	useTaskStatus,
+	useUpdateTask,
+} from "@/features/task/hooks/useTask";
+import { getTaskStatusKey } from "@/lib/task-status-style";
+import { cn } from "@/lib/utils";
+import { ActivityResponseDto } from "@/services/activity/type";
 import { generateTaskSubtasksApi } from "@/services/ai-assistant/ai-assistant.service";
+import { type TaskCommentItem } from "@/services/comment/type";
+import { type TaskItem, TASK_KEY } from "@/services/task/type";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
+import {
+	AtSign,
+	Calendar,
+	Check,
+	Link2,
+	MessageSquareText,
+	MoreHorizontal,
+	Paperclip,
+	Pencil,
+	Plus,
+	Trash2,
+	X,
+} from "lucide-react";
+import * as React from "react";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
+import { Textarea } from "../../ui/textarea";
+import { TaskActivityFeed } from "./task-activity-feed";
+import { getInitials } from "./task-detail-utils";
 
 type TaskDetailTabsProps = {
 	workspaceId: string;
@@ -83,28 +84,38 @@ function SubtaskCard({
 	parentTaskId: string;
 }) {
 	const queryClient = useQueryClient();
-	const { mutateAsync: updateTask, isPending: isUpdating } = useUpdateTask(workspaceId, projectId);
-	const { mutateAsync: deleteTask, isPending: isDeleting } = useDeleteTask(workspaceId, projectId);
+	const { mutateAsync: updateTask, isPending: isUpdating } = useUpdateTask(
+		workspaceId,
+		projectId,
+	);
+	const { mutateAsync: deleteTask, isPending: isDeleting } = useDeleteTask(
+		workspaceId,
+		projectId,
+	);
 	const { data: statusData } = useTaskStatus(workspaceId, projectId);
 
 	const statuses = React.useMemo(() => statusData?.data ?? [], [statusData]);
 
-	const isDone = getTaskStatusKey(
-		item.statusName,
-		Boolean(item.completedAt),
-	) === "done";
+	const isDone =
+		getTaskStatusKey(item.statusName, Boolean(item.completedAt)) === "done";
 
 	const handleToggle = async (e: React.MouseEvent) => {
 		e.stopPropagation();
 		if (isUpdating || statuses.length === 0) return;
 
-		const doneStatus = statuses.find(
-			(s) => s.isDone || getTaskStatusKey(s.name, s.isDone) === "done"
-		) || statuses[statuses.length - 1];
+		const doneStatus =
+			statuses.find(
+				(s) =>
+					s.isDone || getTaskStatusKey(s.name, s.isDone) === "done",
+			) || statuses[statuses.length - 1];
 
-		const todoStatus = statuses.find(
-			(s) => !s.isDone && getTaskStatusKey(s.name, s.isDone) === "todo"
-		) || statuses.find((s) => !s.isDone) || statuses[0];
+		const todoStatus =
+			statuses.find(
+				(s) =>
+					!s.isDone && getTaskStatusKey(s.name, s.isDone) === "todo",
+			) ||
+			statuses.find((s) => !s.isDone) ||
+			statuses[0];
 
 		const targetStatus = isDone ? todoStatus : doneStatus;
 
@@ -145,27 +156,35 @@ function SubtaskCard({
 	}, [item.dueAt]);
 
 	return (
-		<div className="group flex items-center justify-between gap-3 rounded-lg border border-border/40 bg-card px-3 py-2 hover:bg-muted/30 transition-all duration-200">
-			<div className="flex items-center gap-2.5 min-w-0 flex-1">
+		<div className='group flex items-center justify-between gap-3 rounded-lg border border-border/40 bg-card px-3 py-2 hover:bg-muted/30 transition-all duration-200'>
+			<div className='flex items-center gap-2.5 min-w-0 flex-1'>
 				<button
-					type="button"
+					type='button'
 					onClick={handleToggle}
 					disabled={isUpdating}
 					className={cn(
 						"flex size-[18px] shrink-0 items-center justify-center rounded-full border cursor-pointer transition-all duration-200",
 						isDone
 							? "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
-							: "border-muted-foreground/30 bg-background text-transparent hover:border-primary/50"
+							: "border-muted-foreground/30 bg-background text-transparent hover:border-primary/50",
 					)}
 				>
-					<Check className={cn("size-3 stroke-[3]", isDone ? "opacity-100 scale-100" : "opacity-0 scale-50", "transition-all duration-200")} />
+					<Check
+						className={cn(
+							"size-3 stroke-[3]",
+							isDone
+								? "opacity-100 scale-100"
+								: "opacity-0 scale-50",
+							"transition-all duration-200",
+						)}
+					/>
 				</button>
 
-				<div className="flex items-center gap-2 min-w-0 flex-1">
+				<div className='flex items-center gap-2 min-w-0 flex-1'>
 					<span
 						className={cn(
 							"text-[13px] font-medium text-foreground transition-all duration-200 truncate",
-							isDone && "text-muted-foreground/60 line-through"
+							isDone && "text-muted-foreground/60 line-through",
 						)}
 					>
 						{item.title || "Tác vụ con không tên"}
@@ -175,32 +194,45 @@ function SubtaskCard({
 						<span
 							className={cn(
 								"inline-flex items-center gap-0.5 text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-muted text-muted-foreground shrink-0",
-								isOverdue && !isDone && "bg-destructive/10 text-destructive dark:bg-destructive/20"
+								isOverdue &&
+									!isDone &&
+									"bg-destructive/10 text-destructive dark:bg-destructive/20",
 							)}
 						>
-							<Calendar className="size-2.5" />
+							<Calendar className='size-2.5' />
 							{format(new Date(item.dueAt), "dd/MM")}
 						</span>
 					)}
 				</div>
 			</div>
 
-			<div className="flex items-center gap-2 shrink-0">
+			<div className='flex items-center gap-2 shrink-0'>
 				{item.assignees && item.assignees.length > 0 && (
-					<div className="flex -space-x-1 items-center">
+					<div className='flex -space-x-1 items-center'>
 						{item.assignees.slice(0, 3).map((assignee) => (
-							<Avatar key={assignee.userId} className="size-[18px] border border-background">
+							<Avatar
+								key={assignee.userId}
+								className='size-[18px] border border-background'
+							>
 								<AvatarImage
 									src={assignee.avatarUrl ?? undefined}
-									alt={assignee.fullName ?? assignee.username ?? "Assignee"}
+									alt={
+										assignee.fullName ??
+										assignee.username ??
+										"Assignee"
+									}
 								/>
-								<AvatarFallback className="bg-muted text-[8px] font-bold text-foreground flex items-center justify-center">
-									{getInitials(assignee.fullName ?? assignee.username ?? "?")}
+								<AvatarFallback className='bg-muted text-[8px] font-bold text-foreground flex items-center justify-center'>
+									{getInitials(
+										assignee.fullName ??
+											assignee.username ??
+											"?",
+									)}
 								</AvatarFallback>
 							</Avatar>
 						))}
 						{item.assignees.length > 3 && (
-							<span className="text-[9px] font-semibold text-muted-foreground pl-1">
+							<span className='text-[9px] font-semibold text-muted-foreground pl-1'>
 								+{item.assignees.length - 3}
 							</span>
 						)}
@@ -208,12 +240,12 @@ function SubtaskCard({
 				)}
 
 				<button
-					type="button"
+					type='button'
 					onClick={handleDelete}
 					disabled={isDeleting}
-					className="opacity-0 group-hover:opacity-100 p-1 hover:bg-muted rounded-md text-muted-foreground hover:text-destructive transition-all cursor-pointer"
+					className='opacity-0 group-hover:opacity-100 p-1 hover:bg-muted rounded-md text-muted-foreground hover:text-destructive transition-all cursor-pointer'
 				>
-					<X className="size-3.5" />
+					<X className='size-3.5' />
 				</button>
 			</div>
 		</div>
@@ -252,12 +284,18 @@ export function TaskDetailTabs({
 	const queryClient = useQueryClient();
 	const completedCount = React.useMemo(() => {
 		return subtasks.filter((subtask) => {
-			return getTaskStatusKey(subtask.statusName, Boolean(subtask.completedAt)) === "done";
+			return (
+				getTaskStatusKey(
+					subtask.statusName,
+					Boolean(subtask.completedAt),
+				) === "done"
+			);
 		}).length;
 	}, [subtasks]);
 
 	const totalCount = subtasks.length;
-	const completionPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+	const completionPercentage =
+		totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
 	if (!comments) return null;
 
@@ -270,7 +308,9 @@ export function TaskDetailTabs({
 			});
 		},
 		onError: (error: any) => {
-			toast.error(error.response?.data?.message || "Tạo tác vụ con thất bại");
+			toast.error(
+				error.response?.data?.message || "Tạo tác vụ con thất bại",
+			);
 		},
 	});
 
@@ -320,15 +360,23 @@ export function TaskDetailTabs({
 
 			<TabsContent value='subtasks' className='pt-6'>
 				<div className='space-y-4'>
-					<div className="flex justify-between items-center text-xs text-muted-foreground mb-1">
+					<div className='flex justify-between items-center text-xs text-muted-foreground mb-1'>
 						{totalCount > 0 ? (
-							<span className="font-medium text-foreground">{completedCount}/{totalCount} hoàn thành</span>
+							<span className='font-medium text-foreground'>
+								{completedCount}/{totalCount} hoàn thành
+							</span>
 						) : (
-							<span className="font-medium text-foreground">Tác vụ con ({totalCount})</span>
+							<span className='font-medium text-foreground'>
+								Tác vụ con ({totalCount})
+							</span>
 						)}
-						<div className="flex items-center gap-2">
-							{totalCount > 0 && <span className="font-semibold">{Math.round(completionPercentage)}%</span>}
-							<Button
+						<div className='flex items-center gap-2'>
+							{totalCount > 0 && (
+								<span className='font-semibold'>
+									{Math.round(completionPercentage)}%
+								</span>
+							)}
+							{/* <Button
 								type="button"
 								variant="ghost"
 								onClick={() => generateSubtasks()}
@@ -346,14 +394,14 @@ export function TaskDetailTabs({
 										Gợi ý bằng AI
 									</>
 								)}
-							</Button>
+							</Button> */}
 						</div>
 					</div>
 
 					{totalCount > 0 && (
-						<div className="h-1 w-full bg-muted rounded-full overflow-hidden mb-4">
-							<div 
-								className="h-full bg-primary rounded-full transition-all duration-300 ease-out" 
+						<div className='h-1 w-full bg-muted rounded-full overflow-hidden mb-4'>
+							<div
+								className='h-full bg-primary rounded-full transition-all duration-300 ease-out'
 								style={{ width: `${completionPercentage}%` }}
 							/>
 						</div>
@@ -361,22 +409,22 @@ export function TaskDetailTabs({
 
 					<form
 						onSubmit={handleSubtaskSubmit}
-						className="flex items-center gap-2 border-b border-border/40 py-1.5 focus-within:border-primary/50 transition-colors"
+						className='flex items-center gap-2 border-b border-border/40 py-1.5 focus-within:border-primary/50 transition-colors'
 					>
-						<Plus className="size-4 text-muted-foreground/60 shrink-0" />
+						<Plus className='size-4 text-muted-foreground/60 shrink-0' />
 						<Input
 							value={subtaskDraft}
 							onChange={(event) =>
 								onSubtaskDraftChange(event.target.value)
 							}
-							placeholder="Thêm tác vụ con... (Nhấn Enter để lưu)"
+							placeholder='Thêm tác vụ con...'
 							disabled={isCreatingSubtask}
-							className="h-8 w-full border-none bg-transparent p-0 shadow-none focus-visible:ring-0 text-[13px] placeholder:text-muted-foreground/50"
+							className='h-8 w-full border-none bg-transparent p-0 shadow-none focus-visible:ring-0 text-[13px] placeholder:text-muted-foreground/50 placeholder:px-3'
 						/>
 					</form>
 
 					{isLoadingSubtasks ? (
-						<div className="py-8 text-center text-xs text-muted-foreground/75 font-medium">
+						<div className='py-8 text-center text-xs text-muted-foreground/75 font-medium'>
 							Đang tải tác vụ con...
 						</div>
 					) : subtasks.length ? (
@@ -392,7 +440,7 @@ export function TaskDetailTabs({
 							))}
 						</div>
 					) : (
-						<div className="py-8 text-center text-xs text-muted-foreground/75 font-medium">
+						<div className='py-8 text-center text-xs text-muted-foreground/75 font-medium'>
 							Chưa có tác vụ con.
 						</div>
 					)}
@@ -415,10 +463,15 @@ export function TaskDetailTabs({
 												comment.authorAvatarUrl ??
 												undefined
 											}
-											alt={comment.authorName ?? 'Unknown User'}
+											alt={
+												comment.authorName ??
+												"Unknown User"
+											}
 										/>
 										<AvatarFallback className='bg-muted text-xs font-semibold text-foreground'>
-											{getInitials(comment.authorName ?? 'Unknown')}
+											{getInitials(
+												comment.authorName ?? "Unknown",
+											)}
 										</AvatarFallback>
 									</Avatar>
 
@@ -426,10 +479,16 @@ export function TaskDetailTabs({
 										<div className='flex flex-wrap items-center justify-between gap-2 text-sm'>
 											<div className='flex items-center gap-2'>
 												<span className='font-semibold text-foreground'>
-													{comment.authorName ?? 'Unknown User'}
+													{comment.authorName ??
+														"Unknown User"}
 												</span>
 												<span className='text-muted-foreground'>
-													{format(new Date(comment.createdAt), "MMM d, yyyy h:mm a")}
+													{format(
+														new Date(
+															comment.createdAt,
+														),
+														"MMM d, yyyy h:mm a",
+													)}
 												</span>
 												{comment.isEdited && (
 													<span className='text-muted-foreground text-xs italic'>
@@ -437,9 +496,12 @@ export function TaskDetailTabs({
 													</span>
 												)}
 											</div>
-											{currentUserId === comment.authorId && (
+											{currentUserId ===
+												comment.authorId && (
 												<DropdownMenu>
-													<DropdownMenuTrigger asChild>
+													<DropdownMenuTrigger
+														asChild
+													>
 														<Button
 															variant='ghost'
 															size='icon'
@@ -448,17 +510,31 @@ export function TaskDetailTabs({
 															<MoreHorizontal className='h-4 w-4 text-muted-foreground' />
 														</Button>
 													</DropdownMenuTrigger>
-													<DropdownMenuContent align='end' className='w-40'>
+													<DropdownMenuContent
+														align='end'
+														className='w-40'
+													>
 														<DropdownMenuItem
-															onClick={() => onEditComment?.(comment.id, comment.content)}
+															onClick={() =>
+																onEditComment?.(
+																	comment.id,
+																	comment.content,
+																)
+															}
 														>
 															<Pencil className='mr-2 h-4 w-4' />
 															Chỉnh sửa
 														</DropdownMenuItem>
 														<DropdownMenuItem
 															className='text-destructive focus:bg-destructive/10 focus:text-destructive'
-															onClick={() => onDeleteComment?.(comment.id)}
-															disabled={isDeletingComment}
+															onClick={() =>
+																onDeleteComment?.(
+																	comment.id,
+																)
+															}
+															disabled={
+																isDeletingComment
+															}
 														>
 															<Trash2 className='mr-2 h-4 w-4' />
 															Xóa
@@ -468,7 +544,13 @@ export function TaskDetailTabs({
 											)}
 										</div>
 
-										<p className={cn('mt-2 whitespace-pre-wrap text-sm leading-7 text-muted-foreground', editingCommentId === comment.id && 'opacity-50')}>
+										<p
+											className={cn(
+												"mt-2 whitespace-pre-wrap text-sm leading-7 text-muted-foreground",
+												editingCommentId ===
+													comment.id && "opacity-50",
+											)}
+										>
 											{comment.content}
 										</p>
 									</div>
@@ -543,8 +625,7 @@ export function TaskDetailTabs({
 
 							{composerOpen ? (
 								<div className='flex items-center justify-between gap-3 border-t border-border px-4 py-3'>
-									<div className='text-xs text-muted-foreground'>
-									</div>
+									<div className='text-xs text-muted-foreground'></div>
 									<div className='flex items-center gap-2'>
 										<Button
 											type='button'
@@ -559,13 +640,20 @@ export function TaskDetailTabs({
 											type='button'
 											size='sm'
 											onClick={onSaveComment}
-											disabled={!commentDraft.trim() || isSavingComment || isUpdatingComment}
+											disabled={
+												!commentDraft.trim() ||
+												isSavingComment ||
+												isUpdatingComment
+											}
 											className='rounded-xl'
 										>
-											{editingCommentId 
-												? (isUpdatingComment ? "Đang cập nhật..." : "Cập nhật") 
-												: (isSavingComment ? "Đang lưu..." : "Lưu")
-											}
+											{editingCommentId
+												? isUpdatingComment
+													? "Đang cập nhật..."
+													: "Cập nhật"
+												: isSavingComment
+													? "Đang lưu..."
+													: "Lưu"}
 										</Button>
 									</div>
 								</div>
@@ -576,7 +664,10 @@ export function TaskDetailTabs({
 			</TabsContent>
 
 			<TabsContent value='activities' className='pt-6'>
-				<TaskActivityFeed activities={activities} isLoading={isLoadingActivities} />
+				<TaskActivityFeed
+					activities={activities}
+					isLoading={isLoadingActivities}
+				/>
 			</TabsContent>
 		</Tabs>
 	);

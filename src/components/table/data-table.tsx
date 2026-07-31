@@ -8,6 +8,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
 	ColumnDef,
 	flexRender,
@@ -18,11 +19,15 @@ import {
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
 	data: TData[];
+	isLoading?: boolean;
+	skeletonRowCount?: number;
 }
 
 export function DataTable<TData, TValue>({
 	columns,
 	data,
+	isLoading = false,
+	skeletonRowCount = 10,
 }: DataTableProps<TData, TValue>) {
 	const table = useReactTable({
 		data,
@@ -57,7 +62,37 @@ export function DataTable<TData, TValue>({
 				</TableHeader>
 
 				<TableBody>
-					{table.getRowModel().rows?.length ? (
+					{isLoading ? (
+						Array.from({ length: skeletonRowCount }).map((_, rowIndex) => (
+							<TableRow
+								key={`data-table-skeleton-${rowIndex}`}
+								className='border-none bg-muted/50 hover:bg-muted/50'
+							>
+								{columns.map((_, cellIndex) => (
+									<TableCell
+										key={`data-table-skeleton-${rowIndex}-${cellIndex}`}
+										className={`px-4 py-4 ${
+											cellIndex === 0 ? "rounded-l-xl" : ""
+										} ${
+											cellIndex === columns.length - 1
+												? "rounded-r-xl"
+												: ""
+										}`}
+									>
+										<Skeleton
+											className={
+												cellIndex === 0
+													? "h-5 w-40"
+													: cellIndex === columns.length - 1
+														? "h-5 w-24"
+														: "h-5 w-28"
+											}
+										/>
+									</TableCell>
+								))}
+							</TableRow>
+						))
+					) : table.getRowModel().rows?.length ? (
 						table.getRowModel().rows.map((row) => (
 							<TableRow
 								key={row.id}

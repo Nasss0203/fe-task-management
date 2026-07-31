@@ -207,8 +207,14 @@ export default function AdminDashboardPage() {
 
 	const summary = dashboardSummary.data?.data;
 	const workspacePage = workspaces.data?.data;
-	const workspaceItems = workspacePage?.data ?? [];
-	const allWorkspaceItems = getWorkspaceItems(allWorkspaces.data?.data);
+	const workspaceItems = useMemo(
+		() => workspacePage?.data ?? [],
+		[workspacePage?.data],
+	);
+	const allWorkspaceItems = useMemo(
+		() => getWorkspaceItems(allWorkspaces.data?.data),
+		[allWorkspaces.data?.data],
+	);
 	const isFilteringWorkspaces = hasWorkspaceFilters(workspaceFilters);
 	const recentWorkspaceItems = useMemo(() => {
 		if (!isFilteringWorkspaces) {
@@ -223,11 +229,20 @@ export default function AdminDashboardPage() {
 		workspaceItems,
 	]);
 	const visibleWorkspaceItems = useMemo(() => {
+		if (!isFilteringWorkspaces) {
+			return workspaceItems;
+		}
+
 		const start = workspacePagination.pageIndex * workspacePagination.pageSize;
 		const end = start + workspacePagination.pageSize;
 
 		return recentWorkspaceItems.slice(start, end);
-	}, [recentWorkspaceItems, workspacePagination]);
+	}, [
+		isFilteringWorkspaces,
+		recentWorkspaceItems,
+		workspaceItems,
+		workspacePagination,
+	]);
 	const overview = userOverview.data?.data;
 	const userGrowthItems = userGrowth.data?.data ?? [];
 	const workspaceGrowthItems = workspaceGrowth.data?.data ?? [];
@@ -350,8 +365,6 @@ export default function AdminDashboardPage() {
 
 	if (
 		dashboardSummary.isLoading ||
-		workspaces.isLoading ||
-		allWorkspaces.isLoading ||
 		userOverview.isLoading ||
 		workspacePlan.isLoading ||
 		retentionMetrics.isLoading ||
@@ -467,6 +480,11 @@ export default function AdminDashboardPage() {
 								createdAt: nextQuery.createdAt,
 							});
 						}}
+						isLoading={
+							workspaces.isLoading ||
+							(isFilteringWorkspaces && allWorkspaces.isLoading)
+						}
+						skeletonRowCount={workspacePagination.pageSize}
 					/>
 				</div>
 

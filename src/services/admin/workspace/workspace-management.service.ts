@@ -28,10 +28,7 @@ const normalizeWorkspacePlan = (
 const serializeWorkspaceQuery = (query?: AdminFindAllWorkspaceQuery) => {
 	if (!query) return undefined;
 
-	return {
-		...query,
-		plan: query.plan?.toUpperCase(),
-	};
+	return query;
 };
 
 const normalizeWorkspace = (workspace: WorkspaceApiItem): WorkspaceItem => {
@@ -92,7 +89,7 @@ export const updateWorkspacePlanManagementApi = async ({
 	const response = await instance.patch<ApiResponse<null>>(
 		`/admin/workspaces/${workspaceId}/plan`,
 		{
-			planType: planType.toUpperCase(),
+			planType,
 		},
 	);
 

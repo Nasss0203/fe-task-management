@@ -1,10 +1,12 @@
 "use client";
 
-import * as React from "react";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { useTaskAttachments } from "@/features/task/hooks/useTaskAttachments";
 import { getTaskStatusStyle } from "@/lib/task-status-style";
+import { cn } from "@/lib/utils";
+import type { AttachmentItem } from "@/services/attachment/type";
 import type { TaskStatusItem } from "@/services/task-status/type";
+import { format } from "date-fns";
 import {
 	CalendarDays,
 	Check,
@@ -12,29 +14,25 @@ import {
 	Circle,
 	Download,
 	FileText,
+	Loader2,
 	Paperclip,
 	Plus,
 	Tag,
-	Loader2,
 	Trash2,
 } from "lucide-react";
+import * as React from "react";
 import type { DateRange } from "react-day-picker";
-import { Badge } from "../../ui/badge";
-import { Button } from "@/components/ui/button";
 import { Calendar } from "../../ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
 import { Textarea } from "../../ui/textarea";
 import { DetailRow } from "./task-detail-row";
 import {
-	formatDateLabel,
-	getPriorityBadgeClass,
-	normalizeText,
 	formatBytes,
-	getFileExtension,
+	formatDateLabel,
 	getAttachmentPreviewUrl,
+	getFileExtension,
+	normalizeText,
 } from "./task-detail-utils";
-import type { AttachmentItem } from "@/services/attachment/type";
-import { useTaskAttachments } from "@/features/task/hooks/useTaskAttachments";
 
 type TaskStatusFieldProps = {
 	currentStatusName: string;
@@ -131,14 +129,21 @@ function AttachmentCard({
 		<div className='group relative flex h-16 min-w-0 items-center gap-3 rounded-xl border border-border bg-card px-3 shadow-xs transition-colors hover:bg-accent/40'>
 			<div className='flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted text-muted-foreground'>
 				{previewUrl ? (
-					<img src={previewUrl} alt={attachment.fileName} className='size-full object-cover' />
+					<img
+						src={previewUrl}
+						alt={attachment.fileName}
+						className='size-full object-cover'
+					/>
 				) : (
 					<FileText className='size-4' />
 				)}
 			</div>
 
 			<div className='min-w-0 flex-1 pr-14'>
-				<div className='truncate text-sm font-medium text-foreground' title={attachment.fileName}>
+				<div
+					className='truncate text-sm font-medium text-foreground'
+					title={attachment.fileName}
+				>
 					{attachment.fileName}
 				</div>
 
@@ -154,7 +159,9 @@ function AttachmentCard({
 					type='button'
 					variant='ghost'
 					size='icon-xs'
-					onClick={() => onDownload(attachment.id, attachment.fileName)}
+					onClick={() =>
+						onDownload(attachment.id, attachment.fileName)
+					}
 					className='text-muted-foreground hover:bg-background hover:text-foreground'
 				>
 					<Download className='size-3.5' />
@@ -228,7 +235,7 @@ export function TaskStatusField({
 							const active =
 								status.id === selectedStatusId ||
 								normalizeText(status.name) ===
-								normalizeText(currentStatusName);
+									normalizeText(currentStatusName);
 
 							return (
 								<button
@@ -240,7 +247,7 @@ export function TaskStatusField({
 									className={cn(
 										"flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
 										active &&
-										"bg-accent text-accent-foreground",
+											"bg-accent text-accent-foreground",
 									)}
 								>
 									<span
@@ -317,7 +324,7 @@ export function TaskPriorityField({
 							className={cn(
 								"flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
 								noPriorityActive &&
-								"bg-accent text-accent-foreground",
+									"bg-accent text-accent-foreground",
 							)}
 						>
 							<Circle
@@ -336,7 +343,7 @@ export function TaskPriorityField({
 							const active =
 								priority.id === selectedPriorityId ||
 								normalizeText(priority.name) ===
-								normalizeText(currentPriorityName);
+									normalizeText(currentPriorityName);
 
 							return (
 								<button
@@ -348,7 +355,7 @@ export function TaskPriorityField({
 									className={cn(
 										"flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
 										active &&
-										"bg-accent text-accent-foreground",
+											"bg-accent text-accent-foreground",
 									)}
 								>
 									<Circle
@@ -391,7 +398,10 @@ export function TaskScheduleField({
 		}
 		const newRange = { ...range };
 		if (newRange.from && startDate) {
-			newRange.from.setHours(startDate.getHours(), startDate.getMinutes());
+			newRange.from.setHours(
+				startDate.getHours(),
+				startDate.getMinutes(),
+			);
 		}
 		if (newRange.to && dueDate) {
 			newRange.to.setHours(dueDate.getHours(), dueDate.getMinutes());
@@ -399,15 +409,15 @@ export function TaskScheduleField({
 		void onSelect(newRange);
 	};
 
-	const handleTimeChange = (type: 'from' | 'to', timeString: string) => {
-		const [hours, minutes] = timeString.split(':').map(Number);
+	const handleTimeChange = (type: "from" | "to", timeString: string) => {
+		const [hours, minutes] = timeString.split(":").map(Number);
 		const newRange = { from: startDate, to: dueDate };
-		if (type === 'from' && newRange.from) {
+		if (type === "from" && newRange.from) {
 			const newFrom = new Date(newRange.from);
 			newFrom.setHours(hours || 0, minutes || 0);
 			newRange.from = newFrom;
 		}
-		if (type === 'to' && newRange.to) {
+		if (type === "to" && newRange.to) {
 			const newTo = new Date(newRange.to);
 			newTo.setHours(hours || 0, minutes || 0);
 			newRange.to = newTo;
@@ -427,8 +437,8 @@ export function TaskScheduleField({
 						<span
 							className={cn(
 								!startDate &&
-								!dueDate &&
-								"text-muted-foreground",
+									!dueDate &&
+									"text-muted-foreground",
 							)}
 						>
 							{formatScheduleLabel(startDate, dueDate)}
@@ -453,24 +463,34 @@ export function TaskScheduleField({
 						onSelect={handleSelect}
 						className='bg-popover p-4'
 					/>
-					<div className="flex items-center gap-2 px-3 pb-3 pt-2 border-t">
-						<div className="flex flex-col gap-1 flex-1">
-							<label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Thời gian bắt đầu</label>
+					<div className='flex items-center gap-2 px-3 pb-3 pt-2 border-t'>
+						<div className='flex flex-col gap-1 flex-1'>
+							<label className='text-[10px] font-medium text-muted-foreground uppercase tracking-wider'>
+								Thời gian bắt đầu
+							</label>
 							<input
-								type="time"
-								value={startDate ? format(startDate, "HH:mm") : ""}
-								onChange={(e) => handleTimeChange('from', e.target.value)}
-								className="flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+								type='time'
+								value={
+									startDate ? format(startDate, "HH:mm") : ""
+								}
+								onChange={(e) =>
+									handleTimeChange("from", e.target.value)
+								}
+								className='flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50'
 								disabled={!startDate}
 							/>
 						</div>
-						<div className="flex flex-col gap-1 flex-1">
-							<label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Thời gian kết thúc</label>
+						<div className='flex flex-col gap-1 flex-1'>
+							<label className='text-[10px] font-medium text-muted-foreground uppercase tracking-wider'>
+								Thời gian kết thúc
+							</label>
 							<input
-								type="time"
+								type='time'
 								value={dueDate ? format(dueDate, "HH:mm") : ""}
-								onChange={(e) => handleTimeChange('to', e.target.value)}
-								className="flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+								onChange={(e) =>
+									handleTimeChange("to", e.target.value)
+								}
+								className='flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50'
 								disabled={!dueDate}
 							/>
 						</div>
@@ -504,7 +524,7 @@ export function TaskDueDateField({
 
 	const handleTimeChange = (timeString: string) => {
 		if (!dueDate) return;
-		const [hours, minutes] = timeString.split(':').map(Number);
+		const [hours, minutes] = timeString.split(":").map(Number);
 		const newDate = new Date(dueDate);
 		newDate.setHours(hours || 0, minutes || 0);
 		void onSelect(newDate);
@@ -541,14 +561,18 @@ export function TaskDueDateField({
 						onSelect={handleSelect}
 						className='bg-popover p-4'
 					/>
-					<div className="flex items-center gap-2 px-3 pb-3 pt-2 border-t">
-						<div className="flex flex-col gap-1 flex-1">
-							<label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Thời gian hạn chót</label>
+					<div className='flex items-center gap-2 px-3 pb-3 pt-2 border-t'>
+						<div className='flex flex-col gap-1 flex-1'>
+							<label className='text-[10px] font-medium text-muted-foreground uppercase tracking-wider'>
+								Thời gian hạn chót
+							</label>
 							<input
-								type="time"
+								type='time'
 								value={dueDate ? format(dueDate, "HH:mm") : ""}
-								onChange={(e) => handleTimeChange(e.target.value)}
-								className="flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+								onChange={(e) =>
+									handleTimeChange(e.target.value)
+								}
+								className='flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50'
 								disabled={!dueDate}
 							/>
 						</div>
@@ -563,23 +587,25 @@ export function TaskTagsField({
 	contextTag,
 	priorityName,
 }: TaskTagsFieldProps) {
-	return (
-		<DetailRow icon={Tag} label='Thẻ'>
-			<div className='flex flex-wrap gap-2'>
-				<Badge className='rounded-md border border-border bg-accent px-3 py-1 text-sm font-medium text-accent-foreground shadow-none'>
-					{contextTag}
-				</Badge>
-				<Badge
-					className={cn(
-						"rounded-md border px-3 py-1 text-sm font-medium shadow-none",
-						getPriorityBadgeClass(priorityName),
-					)}
-				>
-					{priorityName}
-				</Badge>
-			</div>
-		</DetailRow>
-	);
+	// return (
+	// 	<DetailRow icon={Tag} label='Thẻ'>
+	// 		<div className='flex flex-wrap gap-2'>
+	// 			<Badge className='rounded-md border border-border bg-accent px-3 py-1 text-sm font-medium text-accent-foreground shadow-none'>
+	// 				{contextTag}
+	// 			</Badge>
+	// 			<Badge
+	// 				className={cn(
+	// 					"rounded-md border px-3 py-1 text-sm font-medium shadow-none",
+	// 					getPriorityBadgeClass(priorityName),
+	// 				)}
+	// 			>
+	// 				{priorityName}
+	// 			</Badge>
+	// 		</div>
+	// 	</DetailRow>
+	// );
+
+	return undefined;
 }
 
 export function TaskDescriptionField({
@@ -651,7 +677,14 @@ export function TaskDescriptionField({
 export function TaskAttachmentsField({
 	attachmentsHook,
 }: TaskAttachmentsFieldProps) {
-	const { attachments, isLoadingAttachments, isUploading, handleUpload, handleDownload, deleteAttachment } = attachmentsHook;
+	const {
+		attachments,
+		isLoadingAttachments,
+		isUploading,
+		handleUpload,
+		handleDownload,
+		deleteAttachment,
+	} = attachmentsHook;
 	const fileInputRef = React.useRef<HTMLInputElement>(null);
 
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -697,7 +730,11 @@ export function TaskAttachmentsField({
 						onClick={() => fileInputRef.current?.click()}
 						className='h-8 rounded-lg px-3 text-xs'
 					>
-						{isUploading ? <Loader2 className='size-3.5 animate-spin mr-1' /> : <Plus className='size-3.5 mr-1' />}
+						{isUploading ? (
+							<Loader2 className='size-3.5 animate-spin mr-1' />
+						) : (
+							<Plus className='size-3.5 mr-1' />
+						)}
 						Thêm tệp
 					</Button>
 					<input
@@ -710,8 +747,9 @@ export function TaskAttachmentsField({
 				</div>
 
 				{isLoadingAttachments ? (
-					<div className="flex h-16 items-center justify-center rounded-xl border border-dashed border-border bg-card/60 text-sm text-muted-foreground">
-						<Loader2 className="mr-2 size-4 animate-spin" /> Đang tải tệp đính kèm...
+					<div className='flex h-16 items-center justify-center rounded-xl border border-dashed border-border bg-card/60 text-sm text-muted-foreground'>
+						<Loader2 className='mr-2 size-4 animate-spin' /> Đang
+						tải tệp đính kèm...
 					</div>
 				) : (
 					<div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
@@ -735,7 +773,11 @@ export function TaskAttachmentsField({
 							) : (
 								<Plus className='size-4' />
 							)}
-							<span>{isUploading ? "Đang tải lên..." : "Thêm tệp đính kèm"}</span>
+							<span>
+								{isUploading
+									? "Đang tải lên..."
+									: "Thêm tệp đính kèm"}
+							</span>
 						</button>
 					</div>
 				)}

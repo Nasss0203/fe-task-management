@@ -41,7 +41,9 @@ export function DrawerItemView({
 			<Drawer direction='right' open={open} onOpenChange={onOpenChange}>
 				<DrawerContent className='data-[vaul-drawer-direction=right]:inset-y-0 data-[vaul-drawer-direction=right]:right-0 data-[vaul-drawer-direction=right]:w-full data-[vaul-drawer-direction=right]:sm:max-w-190 overflow-hidden border-l border-border bg-background p-0 text-foreground'>
 					<DrawerHeader className='sr-only'>
-						<DrawerTitle>{currentTask.title ?? 'Untitled'}</DrawerTitle>
+						<DrawerTitle>
+							{currentTask.title ?? "Untitled"}
+						</DrawerTitle>
 						<DrawerDescription>
 							Task detail drawer
 						</DrawerDescription>
@@ -141,7 +143,6 @@ export function DrawerItemView({
 										isUpdating={detail.isUpdatingTask}
 									/>
 
-
 									<TaskAttachmentsField
 										attachmentsHook={detail.attachmentsHook}
 									/>
@@ -181,17 +182,27 @@ export function DrawerItemView({
 									onCancelComment={detail.comments.onCancel}
 									onSaveComment={detail.comments.onSave}
 									isSavingComment={detail.comments.isSaving}
-									currentUserId={detail.comments.currentUserId}
-									editingCommentId={detail.comments.editingCommentId}
+									currentUserId={
+										detail.comments.currentUserId
+									}
+									editingCommentId={
+										detail.comments.editingCommentId
+									}
 									onEditComment={detail.comments.onEdit}
 									onDeleteComment={detail.comments.onDelete}
-									isUpdatingComment={detail.comments.isUpdating}
-									isDeletingComment={detail.comments.isDeleting}
+									isUpdatingComment={
+										detail.comments.isUpdating
+									}
+									isDeletingComment={
+										detail.comments.isDeleting
+									}
 									activities={detail.activities.activities}
-									isLoadingActivities={detail.activities.isLoading}
+									isLoadingActivities={
+										detail.activities.isLoading
+									}
 								/>
 
-								<div className='rounded-2xl border border-dashed border-border bg-card/60 px-4 py-3 text-xs leading-6 text-muted-foreground'>
+								{/* <div className='rounded-2xl border border-dashed border-border bg-card/60 px-4 py-3 text-xs leading-6 text-muted-foreground'>
 									Current priority:{" "}
 									<span className='font-semibold'>
 										{detail.display.priorityName}
@@ -205,7 +216,7 @@ export function DrawerItemView({
 											minutes
 										</span>
 									) : null}
-								</div>
+								</div> */}
 							</div>
 						</div>
 					</div>

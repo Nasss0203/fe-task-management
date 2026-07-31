@@ -62,20 +62,18 @@ export function CompleteSprintDialog({
 	const router = useRouter();
 	const { slug } = useParams();
 
-	const handleComplete = () => {
-		completed.mutate(
-			{
+	const handleComplete = async () => {
+		try {
+			await completed.mutateAsync({
 				workspaceId,
 				projectId,
 				sprintId,
-			},
-			{
-				onSuccess: () => {
-					setOpen(false);
-					router.push(`/dashboard/${slug}/projects/${projectId}`);
-				},
-			},
-		);
+			});
+			setOpen(false);
+			router.push(`/dashboard/${slug}/projects/${projectId}`);
+		} catch (error) {
+			console.error("completeSprint dialog submit failed", error);
+		}
 	};
 
 	return (
@@ -178,7 +176,9 @@ export function CompleteSprintDialog({
 
 						<Button
 							type='button'
-							onClick={handleComplete}
+							onClick={() => {
+								void handleComplete();
+							}}
 							disabled={completed.isPending}
 							className='h-8 rounded-md bg-blue-600 px-4 text-xs font-semibold text-white hover:bg-blue-500 disabled:opacity-50'
 						>

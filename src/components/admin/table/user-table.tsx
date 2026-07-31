@@ -8,6 +8,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { AdminUser } from "@/services/admin/user/type";
 import type { OnChangeFn, PaginationState } from "@tanstack/react-table";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
@@ -31,6 +32,11 @@ import {
 	getSystemRoleClass,
 	getSystemRoleLabel,
 } from "../shared/users.utils";
+import {
+	adminMenuContentClass,
+	adminMenuItemClass,
+	adminMenuSeparatorClass,
+} from "../shared/theme";
 
 type Props = {
 	users: AdminUser[];
@@ -45,7 +51,55 @@ type Props = {
 	isChangingStatus?: boolean;
 	isChangingPlan?: boolean;
 	canGrantPro?: boolean;
+	isLoading?: boolean;
+	skeletonRowCount?: number;
 };
+
+function UserTableSkeletonRows({ rowCount }: { rowCount: number }) {
+	return (
+		<>
+			{Array.from({ length: rowCount }).map((_, index) => (
+				<tr
+					key={`user-table-skeleton-${index}`}
+					className='text-sm text-[#1E293B]'
+				>
+					<td className='rounded-l-3xl border-y border-l border-[#EEF2F6] bg-white px-4 py-2 whitespace-nowrap'>
+						<div className='flex items-center gap-3'>
+							<Skeleton className='h-8 w-8 rounded-full' />
+							<Skeleton className='h-4 w-32' />
+						</div>
+					</td>
+					<td className='border-y border-[#EEF2F6] bg-white px-4 py-2 whitespace-nowrap'>
+						<Skeleton className='h-4 w-44' />
+					</td>
+					<td className='border-y border-[#EEF2F6] bg-white px-4 py-2 whitespace-nowrap'>
+						<Skeleton className='h-7 w-24 rounded-full' />
+					</td>
+					<td className='w-40 border-y border-[#EEF2F6] bg-white px-4 py-2 whitespace-nowrap'>
+						<Skeleton className='h-7 w-28 rounded-full' />
+					</td>
+					<td className='w-28 border-y border-[#EEF2F6] bg-white px-4 py-2 text-center whitespace-nowrap'>
+						<Skeleton className='mx-auto h-7 w-16 rounded-full' />
+					</td>
+					<td className='w-40 border-y border-[#EEF2F6] bg-white px-4 py-2 whitespace-nowrap'>
+						<Skeleton className='h-4 w-24' />
+					</td>
+					<td className='border-y border-[#EEF2F6] bg-white px-4 py-2 whitespace-nowrap'>
+						<div className='inline-flex items-center gap-2'>
+							<Skeleton className='h-4 w-4 rounded-full' />
+							<Skeleton className='h-4 w-32' />
+						</div>
+					</td>
+					<td className='rounded-r-3xl border-y border-r border-[#EEF2F6] bg-white px-4 py-2 whitespace-nowrap'>
+						<div className='flex justify-end'>
+							<Skeleton className='h-8 w-8 rounded-xl' />
+						</div>
+					</td>
+				</tr>
+			))}
+		</>
+	);
+}
 
 export function UserTable({
 	users,
@@ -60,6 +114,8 @@ export function UserTable({
 	isChangingStatus = false,
 	isChangingPlan = false,
 	canGrantPro = true,
+	isLoading = false,
+	skeletonRowCount = pagination.pageSize,
 }: Props) {
 	const table = useReactTable({
 		data: users,
@@ -73,7 +129,7 @@ export function UserTable({
 		},
 	});
 
-	if (!users.length) {
+	if (!isLoading && !users.length) {
 		return (
 			<div className='rounded-3xl border border-border bg-white p-10 text-center'>
 				<p className='text-sm text-[#64748B]'>
@@ -109,7 +165,10 @@ export function UserTable({
 					</thead>
 
 					<tbody>
-						{table.getRowModel().rows.map((row) => {
+						{isLoading ? (
+							<UserTableSkeletonRows rowCount={skeletonRowCount} />
+						) : (
+							table.getRowModel().rows.map((row) => {
 							const user = row.original;
 							const isSuperAdmin =
 								user.systemRole === "SUPER_ADMIN";
@@ -213,14 +272,14 @@ export function UserTable({
 
 												<DropdownMenuContent
 													align='end'
-													className='w-60 rounded-2xl border border-border bg-white p-2 text-[#1E293B] shadow-xl'
+													className={`w-60 ${adminMenuContentClass}`}
 												>
 													<DropdownMenuItem
 														onSelect={(e) => {
 															e.preventDefault();
 															onView(user);
 														}}
-														className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
+														className={adminMenuItemClass}
 													>
 														<Eye className='mr-2 h-4 w-4' />
 														Xem chi tiết
@@ -228,7 +287,9 @@ export function UserTable({
 
 													{!isSuperAdmin && (
 														<>
-															<DropdownMenuSeparator className='my-1 bg-border' />
+															<DropdownMenuSeparator
+																className={adminMenuSeparatorClass}
+															/>
 
 															<DropdownMenuItem
 																disabled={
@@ -242,7 +303,7 @@ export function UserTable({
 																		user,
 																	)
 																}
-																className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A] disabled:cursor-not-allowed disabled:opacity-50'
+																className={`${adminMenuItemClass} disabled:cursor-not-allowed disabled:opacity-50`}
 															>
 																<Crown className='mr-2 h-4 w-4' />
 																{isChangingPlan
@@ -253,7 +314,9 @@ export function UserTable({
 																		: "Cấp Pro"}
 															</DropdownMenuItem>
 
-															<DropdownMenuSeparator className='my-1 bg-border' />
+															<DropdownMenuSeparator
+																className={adminMenuSeparatorClass}
+															/>
 
 															<DropdownMenuItem
 																disabled={
@@ -264,7 +327,7 @@ export function UserTable({
 																		user.id,
 																	)
 																}
-																className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
+																className={adminMenuItemClass}
 															>
 																{isSystemAdmin ? (
 																	user.status ===
@@ -305,7 +368,7 @@ export function UserTable({
 																				user.id,
 																			)
 																		}
-																		className='cursor-pointer rounded-xl px-3 py-2 text-sm focus:bg-[#F1F5F9] focus:text-[#0F172A]'
+																		className={adminMenuItemClass}
 																	>
 																		<RotateCcw className='mr-2 h-4 w-4' />
 																		Reset
@@ -321,7 +384,8 @@ export function UserTable({
 									</td>
 								</tr>
 							);
-						})}
+						})
+						)}
 					</tbody>
 				</table>
 			</div>
