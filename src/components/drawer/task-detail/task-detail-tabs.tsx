@@ -487,7 +487,7 @@ export function TaskDetailTabs({
 														new Date(
 															comment.createdAt,
 														),
-														"MMM d, yyyy h:mm a",
+														"dd/MM/yyyy HH:mm",
 													)}
 												</span>
 												{comment.isEdited && (

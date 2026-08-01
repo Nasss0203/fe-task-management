@@ -21,10 +21,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { RotateCcw, Search, SlidersHorizontal } from "lucide-react";
-import {
-	adminActionButtonClass,
-	adminFieldLabelClass,
-} from "../shared/theme";
+import { adminActionButtonClass } from "../shared/theme";
 
 type Props = {
 	search: string;
@@ -39,7 +36,9 @@ type Props = {
 };
 
 const selectClass =
-	"h-10 w-full rounded-xl border border-input bg-white px-3 text-sm text-foreground outline-none hover:border-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/15";
+	"h-9 w-full rounded-xl border border-input bg-white px-3 text-sm text-foreground outline-none hover:border-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/15";
+const compactLabelClass =
+	"text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground";
 
 export function WorkspaceFilterBar({
 	search,
@@ -88,20 +87,20 @@ export function WorkspaceFilterBar({
 
 					<PopoverContent
 						align='end'
-						className='w-[calc(100vw-2rem)] rounded-2xl border border-border bg-white p-4 text-foreground shadow-xl sm:w-[380px]'
+						className='w-[calc(100vw-2rem)] rounded-2xl border border-border bg-white p-3 text-foreground shadow-xl sm:w-[300px]'
 					>
-						<div className='flex flex-col gap-4'>
+						<div className='flex flex-col gap-3'>
 							<div>
 								<p className='text-sm font-semibold text-foreground'>
 									Bộ lọc workspace
 								</p>
 								<p className='mt-1 text-xs text-muted-foreground'>
-									Lọc theo trạng thái, gói dịch vụ và ngày tạo.
+									Trạng thái, gói dịch vụ và ngày tạo.
 								</p>
 							</div>
 
-							<div className='flex flex-col gap-2'>
-								<label className={adminFieldLabelClass}>Trạng thái</label>
+							<div className='flex flex-col gap-1.5'>
+								<label className={compactLabelClass}>Trạng thái</label>
 								<Select value={status} onValueChange={onStatusChange}>
 									<SelectTrigger className={selectClass}>
 										<SelectValue />
@@ -110,14 +109,14 @@ export function WorkspaceFilterBar({
 										<SelectGroup>
 											<SelectItem value='all'>Tất cả</SelectItem>
 											<SelectItem value='ACTIVE'>Đang hoạt động</SelectItem>
-											<SelectItem value='DELETED'>Đã xóa mềm</SelectItem>
+											<SelectItem value='DELETED'>Đã xóa</SelectItem>
 										</SelectGroup>
 									</SelectContent>
 								</Select>
 							</div>
 
-							<div className='flex flex-col gap-2'>
-								<label className={adminFieldLabelClass}>Gói dịch vụ</label>
+							<div className='flex flex-col gap-1.5'>
+								<label className={compactLabelClass}>Gói dịch vụ</label>
 								<Select value={plan} onValueChange={onPlanChange}>
 									<SelectTrigger className={selectClass}>
 										<SelectValue />
@@ -132,8 +131,8 @@ export function WorkspaceFilterBar({
 								</Select>
 							</div>
 
-							<div className='flex flex-col gap-2'>
-								<label className={adminFieldLabelClass}>Ngày tạo</label>
+							<div className='flex flex-col gap-1.5'>
+								<label className={compactLabelClass}>Ngày tạo</label>
 								<Select value={createdAt} onValueChange={onCreatedAtChange}>
 									<SelectTrigger className={selectClass}>
 										<SelectValue />
@@ -153,7 +152,7 @@ export function WorkspaceFilterBar({
 								type='button'
 								variant='outline'
 								onClick={onReset}
-								className={cn("w-full", adminActionButtonClass)}
+								className={cn("h-9 w-full", adminActionButtonClass)}
 							>
 								<RotateCcw data-icon='inline-start' />
 								Đặt lại bộ lọc

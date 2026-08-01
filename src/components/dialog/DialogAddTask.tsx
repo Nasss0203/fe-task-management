@@ -106,6 +106,8 @@ const DialogAddTask = ({
 		if (creatingRef.current) return;
 
 		const finalTitle = title.trim();
+		const startAt = dateRange?.to ? dateRange.from : null;
+		const dueAt = dateRange?.to ?? dateRange?.from ?? null;
 
 		if (!finalTitle) {
 			titleRef.current?.focus();
@@ -126,12 +128,8 @@ const DialogAddTask = ({
 				title: finalTitle,
 				statusId,
 				assigneeIds,
-				startAt: dateRange?.from ? dateRange.from.toISOString() : null,
-				dueAt: dateRange?.to
-					? dateRange.to.toISOString()
-					: dateRange?.from
-						? dateRange.from.toISOString()
-						: null,
+				startAt: startAt ? startAt.toISOString() : null,
+				dueAt: dueAt ? dueAt.toISOString() : null,
 				initialComment: null,
 				...(positionContext ? { positionContext } : {}),
 			});

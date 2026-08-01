@@ -70,7 +70,7 @@ export default function WorkspaceOverview({
 		);
 	}
 
-	const currentMetrics = getMetricCards(data, workspaceSlug);
+	const currentMetrics = getMetricCards(data);
 	const taskStatus = data.taskStatus ?? { total: 0, items: [] };
 
 	return (
@@ -80,13 +80,13 @@ export default function WorkspaceOverview({
 		>
 			{/* Metric Cards Row */}
 			<div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-				{currentMetrics.map(({ key, href, ...metric }, i) => (
+				{currentMetrics.map(({ key, ...metric }, i) => (
 					<div
 						key={key}
 						className='animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both'
 						style={{ animationDelay: `${i * 100}ms` }}
 					>
-						<MetricCard {...metric} link={href} />
+						<MetricCard {...metric} />
 					</div>
 				))}
 			</div>

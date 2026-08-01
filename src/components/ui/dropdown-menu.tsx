@@ -1,10 +1,14 @@
 "use client";
 
 import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+
+const isAdminPath = (pathname: string | null) =>
+	pathname === "/admin" || pathname?.startsWith("/admin/");
 
 function DropdownMenu({
 	...props
@@ -39,6 +43,9 @@ function DropdownMenuContent({
 	sideOffset = 4,
 	...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
+	const pathname = usePathname();
+	const isAdminRoute = isAdminPath(pathname);
+
 	return (
 		<DropdownMenuPrimitive.Portal>
 			<DropdownMenuPrimitive.Content
@@ -46,6 +53,8 @@ function DropdownMenuContent({
 				sideOffset={sideOffset}
 				className={cn(
 					"bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md",
+					isAdminRoute &&
+						"admin-light-theme border-[#E2E8F0]! bg-white! text-[#1E293B]! shadow-[0_16px_40px_rgba(15,23,42,0.14)]!",
 					className,
 				)}
 				{...props}

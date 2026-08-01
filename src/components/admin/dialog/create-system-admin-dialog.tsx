@@ -61,6 +61,13 @@ type ApiErrorBody = {
 	message?: string | string[];
 };
 
+const lightDialogFieldLabelClass = "text-sm font-medium text-[#334155]";
+const lightDialogFieldDescriptionClass = "text-sm leading-normal text-[#64748B]";
+const lightDialogInputClass =
+	"h-10 border-[#CBD5E1] bg-[#F8FAFC] text-[#0F172A] shadow-sm placeholder:text-[#94A3B8] focus-visible:border-[#2563EB] focus-visible:ring-[#2563EB]/20";
+const lightDialogInputGroupClass =
+	"h-10 border-[#CBD5E1] bg-[#F8FAFC] text-[#0F172A] shadow-sm has-[[data-slot=input-group-control]:focus-visible]:border-[#2563EB] has-[[data-slot=input-group-control]:focus-visible]:ring-[#2563EB]/20";
+
 export function CreateSystemAdminDialog({
 	open,
 	onOpenChange,
@@ -115,13 +122,15 @@ export function CreateSystemAdminDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className='admin-light-theme'>
+			<DialogContent className='admin-light-theme border-[#E2E8F0] bg-white text-[#0F172A] shadow-[0_24px_60px_rgba(15,23,42,0.22)]'>
 				<DialogHeader>
 					<div className='flex items-center gap-2'>
-						<ShieldCheck className='text-primary' />
-						<DialogTitle>Tạo tài khoản System Admin</DialogTitle>
+						<ShieldCheck className='text-[#2563EB]' />
+						<DialogTitle className='text-[#0F172A]'>
+							Tạo tài khoản System Admin
+						</DialogTitle>
 					</div>
-					<DialogDescription>
+					<DialogDescription className='text-[#64748B]'>
 						Hệ thống sẽ sinh mật khẩu tạm và gửi thông tin đăng nhập tới
 						email người nhận.
 					</DialogDescription>
@@ -138,26 +147,40 @@ export function CreateSystemAdminDialog({
 							control={form.control}
 							render={({ field, fieldState }) => (
 								<Field data-invalid={fieldState.invalid}>
-									<FieldLabel htmlFor='system-admin-name'>
+									<FieldLabel
+										htmlFor='system-admin-name'
+										className={lightDialogFieldLabelClass}
+									>
 										Tên tài khoản
 									</FieldLabel>
-									<InputGroup>
+									<InputGroup className={lightDialogInputGroupClass}>
 										<InputGroupInput
 											{...field}
 											id='system-admin-name'
 											aria-invalid={fieldState.invalid}
 											placeholder='VD: operations'
 											autoComplete='off'
+											className='text-[#0F172A] placeholder:text-[#94A3B8]'
 										/>
-										<InputGroupAddon align='inline-end'>
-											<InputGroupText>@systemadmin.com</InputGroupText>
+										<InputGroupAddon
+											align='inline-end'
+											className='text-[#64748B]'
+										>
+											<InputGroupText className='text-[#475569]'>
+												@systemadmin.com
+											</InputGroupText>
 										</InputGroupAddon>
 									</InputGroup>
-									<FieldDescription>
+									<FieldDescription
+										className={lightDialogFieldDescriptionClass}
+									>
 										Đây là email dùng để đăng nhập hệ thống.
 									</FieldDescription>
 									{fieldState.invalid ? (
-										<FieldError errors={[fieldState.error]} />
+										<FieldError
+											errors={[fieldState.error]}
+											className='text-[#B91C1C]'
+										/>
 									) : null}
 								</Field>
 							)}
@@ -168,7 +191,10 @@ export function CreateSystemAdminDialog({
 							control={form.control}
 							render={({ field, fieldState }) => (
 								<Field data-invalid={fieldState.invalid}>
-									<FieldLabel htmlFor='system-admin-recipient-email'>
+									<FieldLabel
+										htmlFor='system-admin-recipient-email'
+										className={lightDialogFieldLabelClass}
+									>
 										Email người nhận
 									</FieldLabel>
 									<Input
@@ -178,12 +204,18 @@ export function CreateSystemAdminDialog({
 										aria-invalid={fieldState.invalid}
 										placeholder='VD: admin@example.com'
 										autoComplete='email'
+										className={lightDialogInputClass}
 									/>
-									<FieldDescription>
+									<FieldDescription
+										className={lightDialogFieldDescriptionClass}
+									>
 										Thông tin tài khoản và mật khẩu tạm sẽ được gửi tới email này.
 									</FieldDescription>
 									{fieldState.invalid ? (
-										<FieldError errors={[fieldState.error]} />
+										<FieldError
+											errors={[fieldState.error]}
+											className='text-[#B91C1C]'
+										/>
 									) : null}
 								</Field>
 							)}
@@ -193,7 +225,12 @@ export function CreateSystemAdminDialog({
 
 				<DialogFooter>
 					<DialogClose asChild>
-						<Button type='button' variant='outline' disabled={isPending}>
+						<Button
+							type='button'
+							variant='outline'
+							disabled={isPending}
+							className='border-[#CBD5E1] bg-white text-[#334155] hover:bg-[#F8FAFC] hover:text-[#0F172A] disabled:bg-[#F8FAFC] disabled:text-[#94A3B8]'
+						>
 							Hủy
 						</Button>
 					</DialogClose>
@@ -201,6 +238,7 @@ export function CreateSystemAdminDialog({
 						type='submit'
 						form='create-system-admin-form'
 						disabled={isPending}
+						className='bg-[#2563EB] text-white hover:bg-[#1D4ED8] disabled:bg-[#93C5FD] disabled:text-white'
 					>
 						{isPending ? (
 							<LoaderCircle className='animate-spin' data-icon='inline-start' />

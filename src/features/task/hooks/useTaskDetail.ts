@@ -28,7 +28,6 @@ export function useTaskDetail(task: TaskItem) {
 		fields.status.current?.name ?? currentTask.statusName ?? "No status";
 	const priorityName =
 		fields.priority.current?.name ?? currentTask.priorityName ?? "No priority";
-	const currentPriorityColor = fields.priority.current?.color ?? "#71717A";
 	const attachmentsHook = useTaskAttachments(currentTask);
 	const contextTag = React.useMemo(
 		() =>
@@ -80,7 +79,6 @@ export function useTaskDetail(task: TaskItem) {
 		display: {
 			currentStatusName,
 			priorityName,
-			currentPriorityColor,
 		},
 		attachmentsHook,
 		contextTag,

@@ -102,7 +102,7 @@ export function NavUser() {
 							onSelect={() => logout.mutate()}
 						>
 							<IconLogout />
-							Log out
+							Đăng xuất
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
+	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { useSprints } from "@/features/sprint/hooks/useSprint";
 import { cn } from "@/lib/utils";
+import { Trash2 } from "lucide-react";
 
 type DeleteSprintDialogProps = {
 	sprintName?: string;
@@ -60,53 +62,63 @@ export function DeleteSprintDialog({
 						type='button'
 						variant='outline'
 						size='sm'
-						className="h-8 rounded-lg border-border bg-background text-[12px] font-medium hover:hover:bg-accent hover:text-accent-foreground hover:border-neutral-600 transition-all hover:text-foreground text-red-500 hover:text-red-600"
+						className='h-8 rounded-lg border-red-500/30 bg-background text-[12px] font-semibold text-red-600 transition-all hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300'
 					>
-						Delete sprint
+						Xóa sprint
 					</Button>
 				)}
 			</DialogTrigger>
 
 			<DialogContent
 				className={cn(
-					"max-w-140 border border-border bg-popover p-0 text-foreground shadow-2xl",
-					"sm:max-w-[400px]",
+					"max-w-140 overflow-hidden border border-border bg-background p-0 text-foreground shadow-2xl",
+					"sm:max-w-[420px]",
 				)}
 			>
-				<div className='border-b border-border px-6 py-4'>
-					<DialogHeader>
-						<DialogTitle className='text-base font-semibold text-foreground'>
-							Delete sprint
+				<div className='border-b border-border px-6 py-5'>
+					<DialogHeader className='pr-8'>
+						<div className='mb-3 flex size-10 items-center justify-center rounded-full bg-red-500/10 text-red-600 dark:text-red-400'>
+							<Trash2 className='size-5' />
+						</div>
+						<DialogTitle className='text-lg font-semibold text-foreground'>
+							Xóa sprint
 						</DialogTitle>
+						<DialogDescription className='text-sm leading-6 text-muted-foreground'>
+							Hành động này sẽ xóa sprint khỏi dự án và không thể hoàn tác.
+						</DialogDescription>
 					</DialogHeader>
 				</div>
 
 				<div className='px-6 py-5'>
-					<div className='space-y-4'>
-						<p className='text-sm text-muted-foreground'>
-							Are you sure you want to delete the sprint{" "}
-							<span className="font-semibold text-foreground">{sprintName}</span>?
-							This action cannot be undone.
+					<div className='rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3'>
+						<p className='text-sm leading-6 text-foreground'>
+							Bạn có chắc chắn muốn xóa sprint{" "}
+							<span className='font-semibold text-foreground'>"{sprintName}"</span>
+							?
+						</p>
+						<p className='mt-1 text-xs font-medium text-red-600 dark:text-red-400'>
+							Vui lòng kiểm tra lại trước khi xác nhận.
 						</p>
 					</div>
 
-					<div className='mt-6 flex justify-end gap-2 border-t border-border pt-4'>
+					<div className='mt-5 flex justify-end gap-2'>
 						<Button
 							type='button'
-							variant='ghost'
+							variant='outline'
 							onClick={() => setOpen(false)}
-							className='h-8 rounded-md px-4 text-xs font-semibold text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground'
+							disabled={deleteSprint.isPending}
+							className='h-9 rounded-lg px-4 text-sm font-semibold disabled:opacity-60'
 						>
-							Cancel
+							Hủy
 						</Button>
 
 						<Button
 							type='button'
 							onClick={handleDelete}
 							disabled={deleteSprint.isPending}
-							className='h-8 rounded-md bg-red-600 px-4 text-xs font-semibold text-white hover:bg-red-500 disabled:opacity-50'
+							className='h-9 rounded-lg bg-red-600 px-4 text-sm font-semibold text-white shadow-sm hover:bg-red-700 disabled:opacity-60 dark:bg-red-600 dark:hover:bg-red-500'
 						>
-							{deleteSprint.isPending ? "Deleting..." : "Delete sprint"}
+							{deleteSprint.isPending ? "Đang xóa..." : "Xóa sprint"}
 						</Button>
 					</div>
 				</div>

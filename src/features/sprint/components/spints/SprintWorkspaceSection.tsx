@@ -22,12 +22,6 @@ import DropdownTaskContextMenu from "@/components/dropdown/DropdownTaskContextMe
 import { DrawerItemView } from "@/components/drawer/DrawerItemView";
 import { cn } from "@/lib/utils";
 import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
 	TableBody,
 	TableCell,
 	TableHead,
@@ -289,27 +283,6 @@ const SprintWorkspaceSection = ({
 						</div>
 					</div>
 
-					<div className='flex items-center gap-2'>
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button
-									variant='ghost'
-									size='icon'
-									className='size-8 text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground transition-colors'
-								>
-									<MoreHorizontal className='size-4' />
-								</Button>
-							</DropdownMenuTrigger>
-
-							<DropdownMenuContent align='end' className="bg-popover border-border rounded-xl min-w-[160px]">
-								<DropdownMenuItem className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">Export tasks</DropdownMenuItem>
-								<DropdownMenuItem className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">Move selected</DropdownMenuItem>
-								<DropdownMenuItem className='text-xs text-rose-500 focus:bg-rose-500/10 focus:text-rose-400 cursor-pointer'>
-									Clear selected
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
-					</div>
 				</div>
 
 				{isOpen && (

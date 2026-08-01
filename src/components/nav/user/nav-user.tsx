@@ -111,7 +111,7 @@ export function NavUser() {
 										onSelect={() => router.push(upgradeHref)}
 									>
 										<Sparkles />
-										Upgrade to Pro
+										Nâng cấp Pro
 									</DropdownMenuItem>
 								</DropdownMenuGroup>
 								<DropdownMenuSeparator />
@@ -136,7 +136,7 @@ export function NavUser() {
 							onSelect={() => logout.mutate()}
 						>
 							<LogOut />
-							Log out
+							Đăng xuất
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

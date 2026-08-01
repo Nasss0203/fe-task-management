@@ -144,12 +144,12 @@ export default function AdminSystemAdminsPage() {
 
 			toast.success(
 				isLocked
-					? "Da khoi phuc tai khoan System Admin."
-					: "Da thu hoi tai khoan System Admin va toan bo phien dang nhap.",
+					? "Đã khôi phục tài khoản System Admin."
+					: "Đã thu hồi tài khoản System Admin và toàn bộ phiên đăng nhập.",
 			);
 		} catch (error) {
 			console.error("change system admin status failed", error);
-			toast.error("Khong the cap nhat trang thai System Admin.");
+			toast.error("Không thể cập nhật trạng thái System Admin.");
 		}
 	};
 
@@ -163,7 +163,7 @@ export default function AdminSystemAdminsPage() {
 		try {
 			if (nextPlan === "pro") {
 				if (!proPlan) {
-					toast.error("Khong tim thay goi Pro dang hoat dong.");
+					toast.error("Không tìm thấy gói Pro đang hoạt động.");
 					return;
 				}
 
@@ -173,13 +173,13 @@ export default function AdminSystemAdminsPage() {
 					months: 1,
 					note: "Granted from admin management",
 				});
-				toast.success("Da cap Pro cho System Admin.");
+				toast.success("Đã cấp Pro cho System Admin.");
 			} else {
 				await revokeSubscription.mutateAsync({
 					userId: user.id,
 					note: "Revoked from admin management",
 				});
-				toast.success("Da chuyen System Admin ve Free.");
+				toast.success("Đã chuyển System Admin về Free.");
 			}
 
 			setSelectedUser((current) =>
@@ -192,7 +192,7 @@ export default function AdminSystemAdminsPage() {
 			);
 		} catch (error) {
 			console.error("change system admin billing subscription failed", error);
-			toast.error("Khong the cap nhat goi cua System Admin.");
+			toast.error("Không thể cập nhật gói của System Admin.");
 		}
 	};
 
@@ -206,8 +206,8 @@ export default function AdminSystemAdminsPage() {
 	const handleCreateSystemAdmin = async (data: CreateSystemAdminDto) => {
 		const response = await createSystemAdmin.mutateAsync(data);
 
-		toast.success("Da tao tai khoan System Admin", {
-			description: `Thong tin dang nhap ${response.data.email} da duoc gui toi ${response.data.recipientEmail}.`,
+		toast.success("Đã tạo tài khoản System Admin", {
+			description: `Thông tin đăng nhập ${response.data.email} đã được gửi tới ${response.data.recipientEmail}.`,
 		});
 	};
 

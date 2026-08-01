@@ -134,14 +134,14 @@ export function AddPeopleDialog({
 			<DialogContent className='w-[calc(100vw-2rem)] max-w-[420px] gap-0 rounded-sm border border-border bg-background p-0 shadow-2xl sm:max-w-[420px] [&>button]:right-5 [&>button]:top-5'>
 				<div className='flex items-center justify-between px-5 pb-3 pt-5'>
 					<DialogTitle className='text-lg font-semibold text-foreground'>
-						Add people to {workspaceName}
+						Thêm thành viên vào {workspaceName}
 					</DialogTitle>
 				</div>
 
 				<div className='px-5 pb-5'>
 					<div className='space-y-2'>
 						<Label className='text-xs text-muted-foreground'>
-							Names or emails{" "}
+							Tên hoặc email{" "}
 							<span className='text-red-400'>*</span>
 						</Label>
 
@@ -179,8 +179,8 @@ export function AddPeopleDialog({
 										}
 										placeholder={
 											selectedRecipients.length === 0
-												? "e.g., Maria, maria@company.com"
-												: "add more people..."
+												? "VD: Maria, maria@company.com"
+												: "thêm người khác..."
 										}
 										className='h-8 min-w-40 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground'
 									/>
@@ -190,14 +190,14 @@ export function AddPeopleDialog({
 									<div className='absolute left-0 right-0 top-full z-50 mt-1 max-h-[252px] overflow-y-auto rounded-sm border border-border bg-background py-1 shadow-xl'>
 										{searchInviteUsers.isFetching && (
 											<div className='px-3 py-3 text-sm text-muted-foreground'>
-												Searching...
+												Đang tìm kiếm...
 											</div>
 										)}
 
 										{!searchInviteUsers.isFetching &&
 											suggestions.length === 0 && (
 												<div className='px-3 py-3 text-sm text-muted-foreground'>
-													No people found.
+													Không tìm thấy người phù hợp.
 												</div>
 											)}
 
@@ -251,15 +251,15 @@ export function AddPeopleDialog({
 													<div className='shrink-0 text-xs text-muted-foreground'>
 														{item.status ===
 															InviteSuggestionStatus.CAN_INVITE &&
-															"Invite"}
+															"Mời"}
 
 														{item.status ===
 															InviteSuggestionStatus.MEMBER &&
-															"Already member"}
+															"Đã là thành viên"}
 
 														{item.status ===
 															InviteSuggestionStatus.PENDING_INVITE &&
-															"Invited"}
+															"Đã mời"}
 													</div>
 												</button>
 											);
@@ -279,7 +279,7 @@ export function AddPeopleDialog({
 							disabled={!inviteLink}
 						>
 							<Copy className='size-4' />
-							{copied ? "Copied" : "Copy link"}
+							{copied ? "Đã sao chép" : "Sao chép liên kết"}
 						</Button>
 
 						<div className='flex items-center gap-2'>
@@ -288,7 +288,7 @@ export function AddPeopleDialog({
 								variant='ghost'
 								onClick={() => onOpenChange(false)}
 							>
-								Cancel
+								Hủy
 							</Button>
 
 							<Button
@@ -299,7 +299,7 @@ export function AddPeopleDialog({
 									inviteMembers.isPending
 								}
 							>
-								{inviteMembers.isPending ? "Adding..." : "Add"}
+								{inviteMembers.isPending ? "Đang thêm..." : "Thêm"}
 							</Button>
 						</div>
 					</div>

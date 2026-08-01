@@ -38,8 +38,11 @@ function getPriorityBadgeClass(priority?: string) {
 	switch (normalizedPriority) {
 		case "high":
 		case "cao":
-			return "bg-red-500 text-white";
+		case "urgent":
+		case "khancap":
+			return "bg-rose-500 text-white";
 		case "medium":
+		case "normal":
 		case "trungbinh":
 			return "bg-amber-500 text-white";
 		case "low":
@@ -57,9 +60,9 @@ function formatShortDateLabel(value?: string | null) {
 
 	if (Number.isNaN(date.getTime())) return null;
 
-	return new Intl.DateTimeFormat("en-GB", {
+	return new Intl.DateTimeFormat("vi-VN", {
 		day: "2-digit",
-		month: "short",
+		month: "2-digit",
 	}).format(date);
 }
 

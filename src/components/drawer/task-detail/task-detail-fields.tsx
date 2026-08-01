@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { getUserFacingPriorityStyle } from "@/components/shared/priority-badge";
 import { useTaskAttachments } from "@/features/task/hooks/useTaskAttachments";
 import { getTaskStatusStyle } from "@/lib/task-status-style";
 import { cn } from "@/lib/utils";
@@ -45,7 +46,6 @@ type TaskStatusFieldProps = {
 };
 
 type TaskPriorityFieldProps = {
-	currentPriorityColor: string;
 	currentPriorityName: string;
 	isUpdatingTask: boolean;
 	open: boolean;
@@ -108,6 +108,10 @@ function formatScheduleLabel(startDate?: Date, dueDate?: Date) {
 
 	if (startDate) {
 		return formatDateLabel(startDate);
+	}
+
+	if (dueDate) {
+		return formatDateLabel(dueDate);
 	}
 
 	return "Thiết lập thời gian";
@@ -273,7 +277,6 @@ export function TaskStatusField({
 }
 
 export function TaskPriorityField({
-	currentPriorityColor,
 	currentPriorityName,
 	isUpdatingTask,
 	open,
@@ -286,6 +289,8 @@ export function TaskPriorityField({
 	const noPriorityActive =
 		!selectedPriorityId &&
 		normalizeText(currentPriorityName) === normalizeText(noPriorityLabel);
+	const currentPriorityStyle =
+		getUserFacingPriorityStyle(currentPriorityName);
 
 	return (
 		<DetailRow icon={Tag} label='Độ ưu tiên'>
@@ -296,12 +301,11 @@ export function TaskPriorityField({
 						disabled={isUpdatingTask}
 						className='inline-flex items-center gap-2 rounded-full border border-transparent px-0 py-1 text-left text-[15px] font-semibold text-foreground transition-colors hover:text-foreground/80 disabled:opacity-60 cursor-pointer'
 					>
-						<Circle
-							className='size-3.5'
-							style={{
-								color: currentPriorityColor,
-							}}
-							strokeWidth={2.6}
+						<span
+							className={cn(
+								"size-2.5 shrink-0 rounded-full",
+								currentPriorityStyle.dot,
+							)}
 						/>
 						<span>{currentPriorityName}</span>
 						<ChevronDown className='size-4 text-muted-foreground' />
@@ -327,10 +331,7 @@ export function TaskPriorityField({
 									"bg-accent text-accent-foreground",
 							)}
 						>
-							<Circle
-								className='size-3.5 shrink-0 text-muted-foreground'
-								strokeWidth={2.6}
-							/>
+							<span className='size-2.5 shrink-0 rounded-full bg-slate-400' />
 							<div className='flex-1 font-medium text-foreground'>
 								{noPriorityLabel}
 							</div>
@@ -340,6 +341,9 @@ export function TaskPriorityField({
 						</button>
 
 						{priorities.map((priority) => {
+							const priorityStyle = getUserFacingPriorityStyle(
+								priority.name,
+							);
 							const active =
 								priority.id === selectedPriorityId ||
 								normalizeText(priority.name) ===
@@ -358,12 +362,11 @@ export function TaskPriorityField({
 											"bg-accent text-accent-foreground",
 									)}
 								>
-									<Circle
-										className='size-3.5 shrink-0'
-										style={{
-											color: priority.color,
-										}}
-										strokeWidth={2.6}
+									<span
+										className={cn(
+											"size-2.5 shrink-0 rounded-full",
+											priorityStyle.dot,
+										)}
 									/>
 									<div className='flex-1 font-medium text-foreground'>
 										{priority.name}

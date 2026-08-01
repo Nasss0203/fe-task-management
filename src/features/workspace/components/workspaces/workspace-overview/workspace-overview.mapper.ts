@@ -14,14 +14,13 @@ import {
   WorkspaceOverviewAttentionItem
 } from "./workspace-overview.types";
 
-export const getMetricCards = (data: WorkspaceOverviewApiData, workspaceSlug: string) => [
+export const getMetricCards = (data: WorkspaceOverviewApiData) => [
   {
     key: 'projects',
     label: 'Dự án',
     count: data.metrics.projects.count,
     subText: `+${data.metrics.projects.newThisWeek} trong tuần này`,
     icon: FolderKanban,
-    href: `/dashboard/${workspaceSlug}/projects`,
     tone: 'blue',
   },
   {
@@ -30,7 +29,6 @@ export const getMetricCards = (data: WorkspaceOverviewApiData, workspaceSlug: st
     count: data.metrics.openTasks.count,
     subText: `${data.metrics.openTasks.assignedToMe} task của bạn`,
     icon: FileText,
-    href: `/dashboard/${workspaceSlug}/tasks?status=open`,
     tone: 'purple',
   },
   {
@@ -39,7 +37,6 @@ export const getMetricCards = (data: WorkspaceOverviewApiData, workspaceSlug: st
     count: data.metrics.overdueTasks.count,
     subText: `${data.metrics.overdueTasks.assignedToMe} task của bạn`,
     icon: AlertCircle,
-    href: `/dashboard/${workspaceSlug}/tasks?filter=overdue`,
     tone: 'red',
   },
   {
@@ -48,7 +45,6 @@ export const getMetricCards = (data: WorkspaceOverviewApiData, workspaceSlug: st
     count: data.metrics.members.count,
     subText: `${data.metrics.members.activeRecently} người hoạt động gần đây`,
     icon: Users,
-    href: `/dashboard/${workspaceSlug}/members`,
     tone: 'green',
   },
 ];

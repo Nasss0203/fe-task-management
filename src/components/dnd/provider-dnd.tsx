@@ -259,6 +259,8 @@ const ProviderDragDrop = ({
 			projectId,
 			title: "",
 			statusId,
+			startAt: null,
+			dueAt: null,
 			...(positionContext ? { positionContext } : {}),
 		});
 	};

@@ -48,6 +48,13 @@ export function SprintSectionHeader({
 	const completedCount = tasks.filter((task: any) => task.status?.isDone === true).length;
 	const openCount = tasks.filter((task: any) => task.status?.isDone !== true).length;
 	const { slug } = useParams();
+	const canEditSprint = normalizedStatus === SprintStatus.ACTIVE;
+	const canCancelSprint = normalizedStatus === SprintStatus.ACTIVE;
+	const canDeleteSprint =
+		normalizedStatus !== SprintStatus.ACTIVE &&
+		normalizedStatus !== SprintStatus.COMPLETED;
+	const hasSprintMenuActions =
+		canEditSprint || canCancelSprint || canDeleteSprint;
 
 	return (
 		<div className='flex items-center justify-between gap-4 border-b border-border bg-transparent px-4 py-3'>
@@ -126,6 +133,7 @@ export function SprintSectionHeader({
 					</RequirePermission>
 				) : null}
 
+				{hasSprintMenuActions && (
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button
@@ -138,7 +146,8 @@ export function SprintSectionHeader({
 					</DropdownMenuTrigger>
 
 					<DropdownMenuContent align='end' className="bg-popover border-border rounded-xl min-w-[160px]">
-						<RequirePermission
+						{canEditSprint && (
+							<RequirePermission
 							workspaceId={workspaceId}
 							code={PERMISSIONS.SPRINT_UPDATE}
 						>
@@ -152,13 +161,14 @@ export function SprintSectionHeader({
 								defaultEndAt={sprint.endAt}
 								isSprintActive={normalizedStatus === SprintStatus.ACTIVE}
 								trigger={
-									<DropdownMenuItem aria-label="Edit sprint" onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">
+									<DropdownMenuItem aria-label="Chỉnh sửa sprint" onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">
 										Chỉnh sửa sprint
 									</DropdownMenuItem>
 								}
 							/>
-						</RequirePermission>
-						{normalizedStatus === SprintStatus.ACTIVE && (
+							</RequirePermission>
+						)}
+						{canCancelSprint && (
 							<RequirePermission
 								workspaceId={workspaceId}
 								code={PERMISSIONS.SPRINT_CANCEL}
@@ -169,15 +179,15 @@ export function SprintSectionHeader({
 									sprintId={sprint.id}
 									sprintName={sprint.name}
 									trigger={
-										<DropdownMenuItem aria-label="Cancel sprint" onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer text-orange-500 focus:text-orange-600">
-											<span className="sr-only">Cancel sprint</span>
+										<DropdownMenuItem aria-label="Hủy sprint" onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer text-orange-500 focus:text-orange-600">
+											<span className="sr-only">Hủy sprint</span>
 											Hủy sprint
 										</DropdownMenuItem>
 									}
 								/>
 							</RequirePermission>
 						)}
-						{normalizedStatus !== SprintStatus.ACTIVE && normalizedStatus !== SprintStatus.COMPLETED && (
+						{canDeleteSprint && (
 							<RequirePermission
 								workspaceId={workspaceId}
 								code={PERMISSIONS.SPRINT_DELETE}
@@ -188,8 +198,8 @@ export function SprintSectionHeader({
 									sprintId={sprint.id}
 									sprintName={sprint.name}
 									trigger={
-										<DropdownMenuItem aria-label="Delete sprint" onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer text-red-500 focus:text-red-600">
-											<span className="sr-only">Delete sprint</span>
+										<DropdownMenuItem aria-label="Xóa sprint" onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer text-red-500 focus:text-red-600">
+											<span className="sr-only">Xóa sprint</span>
 											Xóa sprint
 										</DropdownMenuItem>
 									}
@@ -198,6 +208,7 @@ export function SprintSectionHeader({
 						)}
 					</DropdownMenuContent>
 				</DropdownMenu>
+				)}
 			</div>
 		</div>
 	);

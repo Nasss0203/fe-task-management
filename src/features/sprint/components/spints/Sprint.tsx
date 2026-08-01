@@ -26,6 +26,8 @@ const Sprint = ({ projectId, workspaceId, sprintId }: SprintProps) => {
 	const currentSprint = sprintsQuery.data?.data.find(
 		(sprint) => sprint.id === sprintId,
 	);
+	const isSprintPlanned = currentSprint?.status === "PLANNED";
+	const isSprintActive = currentSprint?.status === "ACTIVE";
 	const statusMeta = getStatusMeta(currentSprint?.status);
 
 	const hasDates = currentSprint?.startAt && currentSprint?.endAt;
@@ -71,7 +73,7 @@ const Sprint = ({ projectId, workspaceId, sprintId }: SprintProps) => {
 									</button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align='end' className='w-48 border-border bg-popover text-popover-foreground'>
-									{currentSprint?.status === "PLANNED" && (
+									{isSprintPlanned && (
 										<StartSprintDialog
 											defaultSprintName={currentSprint?.name}
 											workspaceId={workspaceId}
@@ -86,7 +88,8 @@ const Sprint = ({ projectId, workspaceId, sprintId }: SprintProps) => {
 											}
 										/>
 									)}
-									<EditSprintDialog
+									{isSprintActive && (
+										<EditSprintDialog
 										workspaceId={workspaceId}
 										projectId={projectId}
 										sprintId={sprintId}
@@ -94,15 +97,16 @@ const Sprint = ({ projectId, workspaceId, sprintId }: SprintProps) => {
 										defaultGoal={currentSprint?.goal || ""}
 										defaultStartAt={currentSprint?.startAt}
 										defaultEndAt={currentSprint?.endAt}
-										isSprintActive={currentSprint?.status === "ACTIVE"}
+										isSprintActive={isSprintActive}
 										trigger={
 											<DropdownMenuItem onSelect={(e) => e.preventDefault()} className='gap-2 focus:bg-accent focus:text-accent-foreground cursor-pointer'>
 												<Settings2 size={14} />
 												<span>Cấu hình sprint</span>
 											</DropdownMenuItem>
 										}
-									/>
-									{currentSprint?.status === "ACTIVE" && (
+										/>
+									)}
+									{isSprintActive && (
 										<>
 											<DropdownMenuSeparator className='bg-border' />
 											<CompleteSprintDialog

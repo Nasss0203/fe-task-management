@@ -77,9 +77,6 @@ export function DrawerItemView({
 									/>
 
 									<TaskPriorityField
-										currentPriorityColor={
-											detail.display.currentPriorityColor
-										}
 										currentPriorityName={
 											detail.display.priorityName
 										}

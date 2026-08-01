@@ -42,7 +42,7 @@ export function SystemAdminTable({
 		return (
 			<div className={adminEmptyStateClass}>
 				<p className='text-sm text-danger'>
-					Khong the tai danh sach System Admin.
+					Không thể tải danh sách System Admin.
 				</p>
 			</div>
 		);

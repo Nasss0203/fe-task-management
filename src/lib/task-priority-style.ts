@@ -44,6 +44,8 @@ export const getTaskPriorityKey = (
 	switch (normalizeTaskPriorityName(priorityName)) {
 		case "high":
 		case "cao":
+		case "urgent":
+		case "khancap":
 			return "high";
 		case "medium":
 		case "normal":

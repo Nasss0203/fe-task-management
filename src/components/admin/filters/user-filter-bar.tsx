@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
 	InputGroup,
 	InputGroupAddon,
@@ -44,13 +43,23 @@ type Props = {
 };
 
 const formatDate = (date?: Date) => {
-	if (!date) return "Tất cả ngày tạo";
+	if (!date) return "";
 
-	return date.toLocaleDateString("vi-VN", {
-		day: "2-digit",
-		month: "2-digit",
-		year: "numeric",
-	});
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, "0");
+	const day = String(date.getDate()).padStart(2, "0");
+
+	return `${year}-${month}-${day}`;
+};
+
+const parseDate = (value: string) => {
+	if (!value) return undefined;
+
+	const [year, month, day] = value.split("-").map(Number);
+
+	if (!year || !month || !day) return undefined;
+
+	return new Date(year, month - 1, day);
 };
 
 export function UserFilterBar({
@@ -70,7 +79,7 @@ export function UserFilterBar({
 		(showRoleFilter && role !== "all") ||
 		Boolean(createdAt);
 	const selectClass =
-		"h-10 w-full rounded-xl border border-input bg-white px-3 text-sm text-foreground outline-none hover:border-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/15";
+		"h-9 w-full rounded-xl border border-input bg-white px-3 text-sm text-foreground outline-none hover:border-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/15";
 
 	return (
 		<div className='flex items-center gap-3'>
@@ -104,19 +113,20 @@ export function UserFilterBar({
 
 				<PopoverContent
 					align='end'
-					className='w-[380px] rounded-2xl border border-border bg-white p-4 text-foreground shadow-xl'
+					className='w-[300px] rounded-2xl border border-border bg-white p-3 text-foreground shadow-xl'
 				>
-					<div className='space-y-4'>
+					<div className='space-y-3'>
 						<div>
 							<p className='text-sm font-semibold text-[#0F172A]'>
 								Bộ lọc người dùng
 							</p>
 							<p className='mt-1 text-xs text-[#64748B]'>
-								Lọc theo trạng thái, vai trò hệ thống và ngày tạo.
+								Lọc theo trạng thái
+								{showRoleFilter ? ", vai trò hệ thống" : ""} và ngày tạo.
 							</p>
 						</div>
 
-						<div className='space-y-2'>
+						<div className='space-y-1.5'>
 							<label className={adminFieldLabelClass}>Trạng thái</label>
 							<Select value={status} onValueChange={(val) => onStatusChange(val)}>
 								<SelectTrigger className={selectClass}>
@@ -132,7 +142,7 @@ export function UserFilterBar({
 
 						<div
 							className={
-								showRoleFilter ? "space-y-2" : "hidden"
+								showRoleFilter ? "space-y-1.5" : "hidden"
 							}
 						>
 							<label className={adminFieldLabelClass}>Vai trò hệ thống</label>
@@ -147,44 +157,30 @@ export function UserFilterBar({
 							</Select>
 						</div>
 
-						<div className='space-y-2'>
+						<div className='space-y-1.5'>
 							<label className={adminFieldLabelClass}>Ngày tạo</label>
-							<div className='rounded-xl border border-border bg-[#F8FAFC] p-2'>
-								<div className='mb-2 flex items-center justify-between rounded-lg border border-border bg-white px-3 py-2 text-sm'>
-									<div className='flex items-center gap-2 text-[#334155]'>
-										<CalendarDays className='h-4 w-4 text-[#64748B]' />
-										{formatDate(createdAt)}
-									</div>
-
-									{createdAt && (
-										<button
-											type='button'
-											onClick={() => onCreatedAtChange(undefined)}
-											className='text-xs text-[#64748B] hover:text-[#0F172A]'
-										>
-											Xóa
-										</button>
-									)}
+							<div className='flex items-center gap-2'>
+								<div className='relative min-w-0 flex-1'>
+									<CalendarDays className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B]' />
+									<input
+										type='date'
+										value={formatDate(createdAt)}
+										onChange={(event) =>
+											onCreatedAtChange(parseDate(event.target.value))
+										}
+										className='h-9 w-full rounded-xl border border-input bg-white pl-9 pr-3 text-sm text-[#334155] outline-none transition hover:border-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/15'
+									/>
 								</div>
 
-								<Calendar
-									mode='single'
-									selected={createdAt}
-									onSelect={onCreatedAtChange}
-									className='w-full rounded-lg border border-border bg-white p-3
-										[&_.rdp-months]:w-full
-										[&_.rdp-month]:w-full
-										[&_.rdp-table]:w-full
-										[&_.rdp-caption]:w-full
-										[&_.rdp-head_row]:grid
-										[&_.rdp-head_row]:grid-cols-7
-										[&_.rdp-row]:grid
-										[&_.rdp-row]:grid-cols-7
-										[&_.rdp-cell]:flex
-										[&_.rdp-cell]:justify-center
-										[&_.rdp-head_cell]:text-center'
-									captionLayout='dropdown'
-								/>
+								{createdAt && (
+									<button
+										type='button'
+										onClick={() => onCreatedAtChange(undefined)}
+										className='h-9 shrink-0 rounded-xl border border-border bg-white px-3 text-xs font-medium text-[#64748B] transition hover:bg-[#F8FAFC] hover:text-[#0F172A]'
+									>
+										Xóa
+									</button>
+								)}
 							</div>
 						</div>
 
@@ -192,7 +188,7 @@ export function UserFilterBar({
 							type='button'
 							variant='outline'
 							onClick={onReset}
-							className={`w-full ${adminActionButtonClass}`}
+							className={`h-9 w-full ${adminActionButtonClass}`}
 						>
 							<RotateCcw className='mr-2 h-4 w-4' />
 							Đặt lại bộ lọc

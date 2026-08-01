@@ -33,9 +33,9 @@ const formatDate = (value?: string | null) => {
 		return "-";
 	}
 
-	return new Intl.DateTimeFormat("en-GB", {
+	return new Intl.DateTimeFormat("vi-VN", {
 		day: "2-digit",
-		month: "short",
+		month: "2-digit",
 	}).format(date);
 };
 

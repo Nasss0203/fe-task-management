@@ -59,9 +59,14 @@ function CalendarApp({ workspaceId, projectId }: CalendarAppProps) {
 			return Temporal.PlainDate.from(dateStr);
 		};
 
-		return tasks.map((task: TaskItem) => {
-			const startString = formatScheduleXDate(task.startAt) || formatScheduleXDate(task.dueAt) || formatScheduleXDate(task.createdAt) || formatScheduleXDate(new Date().toISOString());
-			const endString = formatScheduleXDate(task.dueAt) || startString;
+		return tasks.flatMap((task: TaskItem) => {
+			const taskStart = formatScheduleXDate(task.startAt);
+			const taskDue = formatScheduleXDate(task.dueAt);
+			const startString = taskStart || taskDue;
+
+			if (!startString) return [];
+
+			const endString = taskDue || startString;
 			const assigneeNames =
 				task.assignees
 					?.map((assignee) => assignee.fullName || assignee.username || "User")
@@ -81,7 +86,7 @@ function CalendarApp({ workspaceId, projectId }: CalendarAppProps) {
 				}
 			}
 
-			return {
+			return [{
 				id: task.id,
 				title:
 					assigneeNames.length > 0
@@ -95,7 +100,7 @@ function CalendarApp({ workspaceId, projectId }: CalendarAppProps) {
 						: assigneeLabel
 					: (task.description || ""),
 				people: assigneeNames,
-			};
+			}];
 		});
 	}, [tasks]);
 
@@ -133,8 +138,8 @@ function CalendarApp({ workspaceId, projectId }: CalendarAppProps) {
 	}, [tasks, activeDrawerTaskId]);
 
 	return (
-		<div className="h-[calc(100vh-180px)] flex flex-col min-h-0 overflow-hidden">
-			<div className="flex-1 min-h-0 [&_.sx-react-calendar-wrapper]:h-full">
+		<div className="relative isolate z-0 h-[calc(100vh-180px)] flex flex-col min-h-0 overflow-hidden">
+			<div className="relative isolate z-0 flex-1 min-h-0 [&_.sx-react-calendar-wrapper]:h-full">
 				<ScheduleXCalendar calendarApp={calendar} />
 			</div>
 

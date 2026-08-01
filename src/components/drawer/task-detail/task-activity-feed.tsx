@@ -1,5 +1,5 @@
 import { ActivityResponseDto, ActivityAction } from "@/services/activity/type";
-import { formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import {
   Pencil,
@@ -80,6 +80,27 @@ const isUUID = (str: string) => {
   return /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(str);
 };
 
+const ISO_DATE_TIME_PATTERN =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
+
+const formatActivityValue = (value: unknown) => {
+  const valueString = String(value);
+
+  if (!ISO_DATE_TIME_PATTERN.test(valueString)) {
+    return valueString;
+  }
+
+  const date = new Date(valueString);
+
+  if (Number.isNaN(date.getTime())) {
+    return valueString;
+  }
+
+  const hasTime = date.getHours() !== 0 || date.getMinutes() !== 0;
+
+  return format(date, hasTime ? "dd/MM/yyyy HH:mm" : "dd/MM/yyyy");
+};
+
 export function TaskActivityFeed({ activities, isLoading }: TaskActivityFeedProps) {
   if (isLoading) {
     return (
@@ -103,11 +124,23 @@ export function TaskActivityFeed({ activities, isLoading }: TaskActivityFeedProp
         const meta = getActivityMeta(activity.action);
         const Icon = meta.icon;
 
-        const newValueString = activity.newValue ? String(activity.newValue) : "";
-        const oldValueString = activity.oldValue ? String(activity.oldValue) : "";
+        const newValueString =
+          activity.newValue !== null && activity.newValue !== undefined
+            ? formatActivityValue(activity.newValue)
+            : "";
+        const oldValueString =
+          activity.oldValue !== null && activity.oldValue !== undefined
+            ? formatActivityValue(activity.oldValue)
+            : "";
         
-        const showNewValue = !!activity.newValue && !isUUID(newValueString);
-        const showOldValue = !!activity.oldValue && !isUUID(oldValueString);
+        const showNewValue =
+          activity.newValue !== null &&
+          activity.newValue !== undefined &&
+          !isUUID(newValueString);
+        const showOldValue =
+          activity.oldValue !== null &&
+          activity.oldValue !== undefined &&
+          !isUUID(oldValueString);
 
         return (
           <div

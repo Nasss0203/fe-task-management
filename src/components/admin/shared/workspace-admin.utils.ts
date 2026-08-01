@@ -18,7 +18,7 @@ export function getWorkspaceStatusLabel(status: string) {
 		case "LOCKED":
 			return "Bị khóa";
 		case "DELETED":
-			return "Đã xóa mềm";
+			return "Đã xóa";
 		default:
 			return status;
 	}

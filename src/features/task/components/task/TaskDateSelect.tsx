@@ -26,8 +26,8 @@ export const TaskDateSelect = ({ value, onChange }: TaskDateSelectProps) => {
 	const hasTimeFrom = value?.from && (value.from.getHours() !== 0 || value.from.getMinutes() !== 0);
 	const hasTimeTo = value?.to && (value.to.getHours() !== 0 || value.to.getMinutes() !== 0);
 
-	const formatStrFrom = hasTimeFrom ? "MMM dd, yyyy HH:mm" : "MMM dd, yyyy";
-	const formatStrTo = hasTimeTo ? "MMM dd, yyyy HH:mm" : "MMM dd, yyyy";
+	const formatStrFrom = hasTimeFrom ? "dd/MM/yyyy HH:mm" : "dd/MM/yyyy";
+	const formatStrTo = hasTimeTo ? "dd/MM/yyyy HH:mm" : "dd/MM/yyyy";
 
 	const label = value?.from
 		? value.to

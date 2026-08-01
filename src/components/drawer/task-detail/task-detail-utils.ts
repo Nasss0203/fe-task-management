@@ -1,5 +1,6 @@
 import type { TaskItem } from "@/services/task/type";
 import type { AttachmentItem } from "@/services/attachment/type";
+import { format } from "date-fns";
 
 export const normalizeText = (value?: string | null) =>
 	(value ?? "")
@@ -27,13 +28,16 @@ export const getPriorityBadgeClass = (priorityName?: string | null) => {
 	switch (normalizeText(priorityName)) {
 		case "high":
 		case "cao":
+		case "urgent":
+		case "khancap":
 			return "border-destructive/20 bg-destructive/10 text-destructive";
 		case "medium":
+		case "normal":
 		case "trungbinh":
-			return "border-border bg-accent text-accent-foreground";
+			return "border-amber-500/20 bg-amber-500/10 text-amber-700";
 		case "low":
 		case "thap":
-			return "border-border bg-secondary text-secondary-foreground";
+			return "border-emerald-500/20 bg-emerald-500/10 text-emerald-700";
 		default:
 			return "border-border bg-muted text-muted-foreground";
 	}
@@ -56,21 +60,7 @@ export const formatDateLabel = (value?: string | Date | null) => {
 
 	const hasTime = date.getHours() !== 0 || date.getMinutes() !== 0;
 
-	if (hasTime) {
-		return new Intl.DateTimeFormat("en-GB", {
-			day: "numeric",
-			month: "long",
-			year: "numeric",
-			hour: "2-digit",
-			minute: "2-digit",
-		}).format(date);
-	}
-
-	return new Intl.DateTimeFormat("en-GB", {
-		day: "numeric",
-		month: "long",
-		year: "numeric",
-	}).format(date);
+	return format(date, hasTime ? "dd/MM/yyyy HH:mm" : "dd/MM/yyyy");
 };
 
 export const formatDateTime = (value?: string | null) => {
@@ -80,22 +70,11 @@ export const formatDateTime = (value?: string | null) => {
 
 	if (Number.isNaN(date.getTime())) return "No activity yet";
 
-	return new Intl.DateTimeFormat("en-GB", {
-		day: "numeric",
-		month: "short",
-		year: "numeric",
-		hour: "2-digit",
-		minute: "2-digit",
-	}).format(date);
+	return format(date, "dd/MM/yyyy HH:mm");
 };
 
 export const formatCommentTime = (date: Date) =>
-	new Intl.DateTimeFormat("en-GB", {
-		day: "numeric",
-		month: "short",
-		hour: "2-digit",
-		minute: "2-digit",
-	}).format(date);
+	format(date, "dd/MM HH:mm");
 
 export const getAssigneeName = (assignee: TaskItem["assignees"][number]) =>
 	assignee.fullName?.trim() || assignee.username?.trim() || "Team member";

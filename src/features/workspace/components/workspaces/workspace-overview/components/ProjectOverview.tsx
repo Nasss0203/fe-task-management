@@ -1,7 +1,5 @@
-import { cn } from "@/lib/utils";
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
-import { getProjectHealthMeta } from "../workspace-overview.mapper";
 import { WorkspaceOverviewProject } from "../workspace-overview.types";
 import { formatDate } from "../workspace-overview.utils";
 
@@ -33,7 +31,6 @@ export function ProjectOverview({
 
 			<div className='space-y-4'>
 				{projects?.map((project) => {
-					const healthMeta = getProjectHealthMeta(project.health);
 					return (
 						<div
 							key={project.id}
@@ -49,14 +46,6 @@ export function ProjectOverview({
 											{project.name}
 										</h4>
 										<div className='mt-1 flex items-center gap-2'>
-											<span
-												className={cn(
-													"rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border",
-													healthMeta.className,
-												)}
-											>
-												{healthMeta.label}
-											</span>
 											<span className='text-[10px] text-muted-foreground'>
 												Deadline:{" "}
 												{formatDate(project.deadline)}

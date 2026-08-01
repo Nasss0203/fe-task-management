@@ -93,7 +93,7 @@ const getWorkspaceStatusClass = (status: WorkspaceItem["status"]) => {
 
 const getWorkspaceStatusLabel = (status: WorkspaceItem["status"]) => {
 	if (status === "ACTIVE") return "Đang hoạt động";
-	return "Đã xóa mềm";
+	return "Đã xóa";
 };
 
 function WorkspaceTableSkeletonRows({ rowCount }: { rowCount: number }) {
