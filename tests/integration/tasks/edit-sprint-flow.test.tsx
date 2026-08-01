@@ -21,6 +21,7 @@ vi.mock("sonner", () => ({
 
 vi.mock("next/navigation", () => ({
   useParams: () => ({ slug: "workspace1" }),
+  usePathname: () => "/dashboard/workspace1/projects/pj1",
   useRouter: () => ({ push: vi.fn(), replace: vi.fn(), back: vi.fn() }),
 }));
 
@@ -34,7 +35,7 @@ global.HTMLElement.prototype.releasePointerCapture = vi.fn();
 describe("Edit Sprint Integration Flow", () => {
   const defaultProps = {
     sprint: { id: "sp1", name: "Alpha Sprint", tasks: [] } as any,
-    status: "PLANNED",
+    status: "ACTIVE",
     projectId: "pj1",
     workspaceId: "ws1",
     open: true,
@@ -60,7 +61,7 @@ describe("Edit Sprint Integration Flow", () => {
     await user.click(dropdownTrigger);
 
     // Click Edit sprint option
-    const editOption = await screen.findByRole("menuitem", { name: /Edit sprint/i });
+    const editOption = await screen.findByRole("menuitem", { name: /Chỉnh sửa sprint/i });
     fireEvent.click(editOption);
 
     // Dialog should appear
@@ -100,7 +101,7 @@ describe("Edit Sprint Integration Flow", () => {
     const dropdownTrigger = menuButtons[menuButtons.length - 1];
     await user.click(dropdownTrigger);
 
-    const editOption = await screen.findByRole("menuitem", { name: /Edit sprint/i });
+    const editOption = await screen.findByRole("menuitem", { name: /Chỉnh sửa sprint/i });
     fireEvent.click(editOption);
 
     const submitButton = await screen.findByRole("button", { name: "Update sprint" });

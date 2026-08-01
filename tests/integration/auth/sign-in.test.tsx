@@ -10,6 +10,7 @@ import { SystemRole } from "@/services/auth/type";
 vi.mock("@/features/auth/hooks/useAuth");
 vi.mock("next/navigation", () => ({
 	useRouter: vi.fn(),
+	usePathname: () => "/sign-in",
 }));
 
 describe("SignIn Page Integration", () => {

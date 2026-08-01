@@ -22,6 +22,7 @@ vi.mock("sonner", () => ({
 
 vi.mock("next/navigation", () => ({
   useParams: () => ({ slug: "workspace1" }),
+  usePathname: () => "/dashboard/workspace1/projects/pj1",
   useRouter: () => ({ push: vi.fn(), replace: vi.fn(), back: vi.fn() }),
 }));
 
@@ -64,18 +65,18 @@ describe("Delete Sprint Integration Flow", () => {
     await user.click(dropdownTrigger);
 
     // Click Delete sprint option
-    const deleteOption = await screen.findByRole("menuitem", { name: /Delete sprint/i });
+    const deleteOption = await screen.findByRole("menuitem", { name: /Xóa sprint/i });
     fireEvent.click(deleteOption);
 
     // Dialog should appear
-    const dialogTitle = await screen.findByRole("heading", { name: /Delete sprint/i });
+    const dialogTitle = await screen.findByRole("heading", { name: /Xóa sprint/i });
     expect(dialogTitle).toBeInTheDocument();
     
     // Check warning text contains sprint name
     expect(screen.getAllByText(/Alpha Sprint/).length).toBeGreaterThan(1);
 
     // Confirm delete
-    const confirmButton = await screen.findByRole("button", { name: "Delete sprint" });
+    const confirmButton = await screen.findByRole("button", { name: "Xóa sprint" });
     await user.click(confirmButton);
 
     // Check API called
@@ -109,10 +110,10 @@ describe("Delete Sprint Integration Flow", () => {
     const dropdownTrigger = menuButtons[menuButtons.length - 1];
     await user.click(dropdownTrigger);
 
-    const deleteOption = await screen.findByRole("menuitem", { name: /Delete sprint/i });
+    const deleteOption = await screen.findByRole("menuitem", { name: /Xóa sprint/i });
     fireEvent.click(deleteOption);
 
-    const confirmButton = await screen.findByRole("button", { name: "Delete sprint" });
+    const confirmButton = await screen.findByRole("button", { name: "Xóa sprint" });
     await user.click(confirmButton);
 
     await waitFor(() => {
@@ -123,7 +124,7 @@ describe("Delete Sprint Integration Flow", () => {
     expect(invalidateSpy).not.toHaveBeenCalled();
 
     // Dialog remains open
-    expect(screen.getAllByRole("heading", { name: /Delete sprint/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("heading", { name: /Xóa sprint/i }).length).toBeGreaterThan(0);
     
     consoleErrorSpy.mockRestore();
   });

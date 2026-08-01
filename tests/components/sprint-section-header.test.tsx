@@ -20,6 +20,7 @@ vi.mock("@/features/permission/components/RequirePermission", () => ({
 
 vi.mock("next/navigation", () => ({
   useParams: () => ({ slug: "workspace-1" }),
+  usePathname: () => "/dashboard/workspace-1/projects/p1",
 }));
 
 // Mock Dialogs to avoid nested complex logic in component tests
@@ -70,8 +71,8 @@ describe("SprintSectionHeader Component", () => {
     await user.click(dropdownTrigger);
 
     await waitFor(() => {
-      expect(screen.getByText("Delete sprint")).toBeInTheDocument();
-      expect(screen.queryByText("Cancel sprint")).not.toBeInTheDocument();
+      expect(screen.getByText("Xóa sprint")).toBeInTheDocument();
+      expect(screen.queryByText("Hủy sprint")).not.toBeInTheDocument();
     });
   });
 
@@ -86,8 +87,8 @@ describe("SprintSectionHeader Component", () => {
     await user.click(dropdownTrigger);
 
     await waitFor(() => {
-      expect(screen.getByText("Cancel sprint")).toBeInTheDocument();
-      expect(screen.queryByText("Delete sprint")).not.toBeInTheDocument();
+      expect(screen.getByText("Hủy sprint")).toBeInTheDocument();
+      expect(screen.queryByText("Xóa sprint")).not.toBeInTheDocument();
     });
   });
 
@@ -102,8 +103,8 @@ describe("SprintSectionHeader Component", () => {
     await user.click(dropdownTrigger);
 
     await waitFor(() => {
-      expect(screen.queryByText("Cancel sprint")).not.toBeInTheDocument();
-      expect(screen.queryByText("Delete sprint")).not.toBeInTheDocument();
+      expect(screen.queryByText("Hủy sprint")).not.toBeInTheDocument();
+      expect(screen.queryByText("Xóa sprint")).not.toBeInTheDocument();
     });
   });
 
@@ -119,8 +120,8 @@ describe("SprintSectionHeader Component", () => {
     await user.click(dropdownTrigger);
 
     await waitFor(() => {
-      expect(screen.getByText("Delete sprint")).toBeInTheDocument();
-      expect(screen.queryByText("Cancel sprint")).not.toBeInTheDocument();
+      expect(screen.getByText("Xóa sprint")).toBeInTheDocument();
+      expect(screen.queryByText("Hủy sprint")).not.toBeInTheDocument();
     });
   });
 
@@ -137,7 +138,7 @@ describe("SprintSectionHeader Component", () => {
 
     await waitFor(() => {
       // Permission mock trả về null nếu thiếu quyền
-      expect(screen.queryByText("Delete sprint")).not.toBeInTheDocument();
+      expect(screen.queryByText("Xóa sprint")).not.toBeInTheDocument();
     });
   });
 });

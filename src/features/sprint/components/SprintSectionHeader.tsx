@@ -161,7 +161,7 @@ export function SprintSectionHeader({
 								defaultEndAt={sprint.endAt}
 								isSprintActive={normalizedStatus === SprintStatus.ACTIVE}
 								trigger={
-									<DropdownMenuItem aria-label="Chỉnh sửa sprint" onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer">
+									<DropdownMenuItem aria-label="Chỉnh sửa sprint" onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:bg-accent focus:text-foreground cursor-pointer">
 										Chỉnh sửa sprint
 									</DropdownMenuItem>
 								}
@@ -179,8 +179,7 @@ export function SprintSectionHeader({
 									sprintId={sprint.id}
 									sprintName={sprint.name}
 									trigger={
-										<DropdownMenuItem aria-label="Hủy sprint" onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer text-orange-500 focus:text-orange-600">
-											<span className="sr-only">Hủy sprint</span>
+										<DropdownMenuItem aria-label="Hủy sprint" onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:bg-accent focus:text-foreground cursor-pointer text-orange-500 focus:text-orange-600">
 											Hủy sprint
 										</DropdownMenuItem>
 									}
@@ -198,8 +197,7 @@ export function SprintSectionHeader({
 									sprintId={sprint.id}
 									sprintName={sprint.name}
 									trigger={
-										<DropdownMenuItem aria-label="Xóa sprint" onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:focus:bg-accent focus:text-foreground cursor-pointer text-red-500 focus:text-red-600">
-											<span className="sr-only">Xóa sprint</span>
+										<DropdownMenuItem aria-label="Xóa sprint" onSelect={(e) => e.preventDefault()} className="text-xs text-foreground focus:bg-accent focus:text-foreground cursor-pointer text-red-500 focus:text-red-600">
 											Xóa sprint
 										</DropdownMenuItem>
 									}

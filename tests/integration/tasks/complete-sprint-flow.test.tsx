@@ -21,6 +21,7 @@ vi.mock("sonner", () => ({
 
 vi.mock("next/navigation", () => ({
   useParams: () => ({ slug: "workspace1" }),
+  usePathname: () => "/dashboard/workspace1/projects/pj1",
   useRouter: () => ({ push: vi.fn(), replace: vi.fn(), back: vi.fn() }),
 }));
 

@@ -23,6 +23,7 @@ vi.mock("sonner", () => ({
 
 vi.mock("next/navigation", () => ({
   useParams: () => ({ slug: "workspace1" }),
+  usePathname: () => "/dashboard/workspace1/projects/pj1",
   useRouter: () => ({ push: vi.fn(), replace: vi.fn(), back: vi.fn() }),
 }));
 
@@ -65,18 +66,18 @@ describe("Cancel Sprint Integration Flow", () => {
     await user.click(dropdownTrigger);
 
     // Click Cancel sprint option
-    const cancelOption = await screen.findByRole("menuitem", { name: /Cancel sprint/i });
+    const cancelOption = await screen.findByRole("menuitem", { name: /Hủy sprint/i });
     fireEvent.click(cancelOption);
 
     // Dialog should appear
-    const dialogTitle = await screen.findByRole("heading", { name: /Cancel sprint/i });
+    const dialogTitle = await screen.findByRole("heading", { name: /Hủy sprint/i });
     expect(dialogTitle).toBeInTheDocument();
     
     // Check warning text contains sprint name
     expect(screen.getAllByText(/Alpha Sprint/).length).toBeGreaterThan(1);
 
     // Confirm cancel
-    const confirmButton = await screen.findByRole("button", { name: "Cancel sprint" });
+    const confirmButton = await screen.findByRole("button", { name: "Hủy sprint" });
     await user.click(confirmButton);
 
     // Check API called
@@ -113,10 +114,10 @@ describe("Cancel Sprint Integration Flow", () => {
     const dropdownTrigger = menuButtons[menuButtons.length - 1];
     await user.click(dropdownTrigger);
 
-    const cancelOption = await screen.findByRole("menuitem", { name: /Cancel sprint/i });
+    const cancelOption = await screen.findByRole("menuitem", { name: /Hủy sprint/i });
     fireEvent.click(cancelOption);
 
-    const confirmButton = await screen.findByRole("button", { name: "Cancel sprint" });
+    const confirmButton = await screen.findByRole("button", { name: "Hủy sprint" });
     await user.click(confirmButton);
 
     await waitFor(() => {
@@ -128,7 +129,7 @@ describe("Cancel Sprint Integration Flow", () => {
     expect(invalidateSpy).not.toHaveBeenCalled();
 
     // Dialog remains open (title still visible)
-    expect(screen.getAllByText("Cancel sprint").length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("heading", { name: /Hủy sprint/i }).length).toBeGreaterThan(0);
     
     consoleErrorSpy.mockRestore();
   });
