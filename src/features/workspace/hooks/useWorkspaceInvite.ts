@@ -1,6 +1,7 @@
 import { CreateWorkspaceInviteDto } from "@/services/workspace-invite/type";
 import {
 	acceptWorkspaceInviteApi,
+	declineWorkspaceInviteApi,
 	inviteWorkspaceMembersApi,
 	searchInviteUsersApi,
 } from "@/services/workspace-invite/workspace-invite.service";
@@ -59,3 +60,25 @@ export const useAcceptWorkspaceInvite = () => {
 		},
 	});
 };
+
+export const useDeclineWorkspaceInvite = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (token: string) => declineWorkspaceInviteApi(token),
+		onSuccess: async () => {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: [WORKSPACE_KEY.WORKSPACE],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [NOTIFICATION_KEY.MY_NOTIFICATIONS],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [NOTIFICATION_KEY.UNREAD_COUNT],
+				}),
+			]);
+		},
+	});
+};
+

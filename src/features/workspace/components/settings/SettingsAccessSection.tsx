@@ -171,6 +171,9 @@ export function SettingsAccessSection({
 									{(() => {
 										const isSelf = member.user_id === user?.id;
 										const isTargetOwner = member.role_name?.toLowerCase() === 'owner';
+										
+										if (isTargetOwner) return null;
+
 										const canManageThisMember = isCurrentUserOwner || !isTargetOwner || isSelf;
 
 										if (!canManageThisMember) return null;
@@ -197,9 +200,6 @@ export function SettingsAccessSection({
 																		</DropdownMenuItem>
 																		<DropdownMenuItem onClick={() => handleUpdateRole(member.user_id, "MEMBER")}>
 																			Member
-																		</DropdownMenuItem>
-																		<DropdownMenuItem onClick={() => handleUpdateRole(member.user_id, "VIEWER")}>
-																			Viewer
 																		</DropdownMenuItem>
 																	</DropdownMenuSubContent>
 																</DropdownMenuPortal>

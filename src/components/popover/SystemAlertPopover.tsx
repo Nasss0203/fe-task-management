@@ -93,6 +93,7 @@ export function SystemAlertPopover() {
 
 	const { myNotificationsQuery } = useNotifications({
 		limit: showAll ? 50 : 10,
+		category: "system",
 	});
 
 	const notifications = myNotificationsQuery.data?.data ?? [];
@@ -308,10 +309,10 @@ export function SystemAlertPopover() {
 					<div className='flex flex-col items-center justify-center px-4 py-10 text-center'>
 						<Archive className='mb-3 size-8 text-muted-foreground' />
 						<p className='text-sm font-medium'>
-							Không có inbox mới
+							Không có thông báo mới
 						</p>
 						<p className='mt-1 text-xs text-muted-foreground'>
-							Invite, task assign và mention sẽ hiện ở đây.
+							Các thông báo về hệ thống, task hoặc sprint sẽ hiện ở đây.
 						</p>
 					</div>
 				)}

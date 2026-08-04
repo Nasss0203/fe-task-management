@@ -16,6 +16,7 @@ import {
 	createContext,
 	useCallback,
 	useContext,
+	useEffect,
 	useMemo,
 	useRef,
 	useState,
@@ -185,11 +186,17 @@ export function ProviderSprintDnd({
 }: ProviderSprintDndProps) {
 	const [previewItems, setPreviewItems] = useState<DndColumns | null>(null);
 	const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
-	const items =
-		previewItems &&
-		(activeTaskId !== null || !areItemsEqual(previewItems, initialItems))
-			? previewItems
-			: initialItems;
+	
+	const activeTaskIdRef = useRef(activeTaskId);
+	activeTaskIdRef.current = activeTaskId;
+
+	useEffect(() => {
+		if (activeTaskIdRef.current === null) {
+			setPreviewItems(null);
+		}
+	}, [initialItems]);
+
+	const items = previewItems ?? initialItems;
 	const itemsRef = useRef<DndColumns>(initialItems);
 	const snapshotRef = useRef<DndColumns>({});
 	const lastPreviewKeyRef = useRef<string | null>(null);

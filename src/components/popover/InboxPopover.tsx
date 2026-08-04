@@ -18,7 +18,10 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useNotifications } from "@/features/notification/hooks/useNotifications";
 import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";
-import { useAcceptWorkspaceInvite } from "@/features/workspace/hooks/useWorkspaceInvite";
+import {
+	useAcceptWorkspaceInvite,
+	useDeclineWorkspaceInvite,
+} from "@/features/workspace/hooks/useWorkspaceInvite";
 import { NotificationType } from "@/services/notification/type";
 import { WorkspaceInviteStatus } from "@/services/workspace-invite/type";
 
@@ -58,6 +61,7 @@ const getNotificationIcon = (type: NotificationType) => {
 export function InboxPopover() {
 	const router = useRouter();
 	const acceptInvite = useAcceptWorkspaceInvite();
+	const declineInvite = useDeclineWorkspaceInvite();
 	const [inviteStatuses, setInviteStatuses] = useState<
 		Record<string, WorkspaceInviteStatus>
 	>({});
@@ -112,6 +116,27 @@ export function InboxPopover() {
 			},
 			onError: () => {
 				toast.error("Không thể chấp nhận lời mời.");
+			},
+		});
+	};
+
+	const handleDeclineInvite = (inviteToken: string | undefined) => {
+		if (!inviteToken) {
+			toast.error("Không tìm thấy mã lời mời.");
+			return;
+		}
+
+		declineInvite.mutate(inviteToken, {
+			onSuccess: () => {
+				setInviteStatuses((prev) => ({
+					...prev,
+					[inviteToken]: WorkspaceInviteStatus.REVOKED,
+				}));
+
+				toast.success("Đã từ chối lời mời vào không gian làm việc.");
+			},
+			onError: () => {
+				toast.error("Không thể từ chối lời mời.");
 			},
 		});
 	};
@@ -223,17 +248,13 @@ export function InboxPopover() {
 												size='sm'
 												variant='outline'
 												className='h-8 px-3 text-xs'
+												disabled={
+													declineInvite.isPending
+												}
 												onClick={() => {
-													const inviteId =
-														notification.metadata
-															?.inviteId;
-
-													if (!inviteId) return;
-
-													// declineInvite.mutate({
-													// 	inviteId,
-													// 	notificationId: notification.id,
-													// });
+													handleDeclineInvite(
+														inviteToken,
+													);
 												}}
 											>
 												Từ chối

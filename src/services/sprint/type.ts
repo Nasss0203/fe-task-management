@@ -54,11 +54,11 @@ export interface StartSprintParams extends SprintParams {
 	data?: StartSprintDto;
 }
 
-export interface CompleteSprintParams extends SprintParams {}
+export type CompleteSprintParams = SprintParams;
 
-export interface CancelSprintParams extends SprintParams {}
+export type CancelSprintParams = SprintParams;
 
-export interface DeleteSprintParams extends SprintParams {}
+export type DeleteSprintParams = SprintParams;
 
 export interface UpdateSprintDto {
 	name?: string;

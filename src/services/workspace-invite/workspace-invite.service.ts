@@ -45,3 +45,13 @@ export const acceptWorkspaceInviteApi = async (
 
 	return response.data;
 };
+
+export const declineWorkspaceInviteApi = async (
+	token: string,
+): Promise<ApiResponse<WorkspaceInviteResponse>> => {
+	const response = await instance.post<ApiResponse<WorkspaceInviteResponse>>(
+		`/workspace-invites/${encodeURIComponent(token)}/decline`,
+	);
+
+	return response.data;
+};
