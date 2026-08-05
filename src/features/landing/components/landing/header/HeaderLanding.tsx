@@ -175,8 +175,8 @@ const HeaderLanding = () => {
 							<span className='sr-only'>Toggle menu</span>
 						</Button>
 					</SheetTrigger>
-					<SheetContent side='right' className='flex flex-col gap-6 pt-12 w-80'>
-						<nav className='flex flex-col gap-4'>
+					<SheetContent side='right' className='flex flex-col gap-6 pt-16 px-6 w-[300px] sm:w-[350px] border-l shadow-2xl overflow-y-auto'>
+						<div className='flex flex-col space-y-1'>
 							{navItems.map((item) => {
 								const active = isLinkActive(item.href);
 								return (
@@ -184,29 +184,30 @@ const HeaderLanding = () => {
 										key={item.label}
 										href={item.href || "#"}
 										onClick={() => setIsOpen(false)}
-										className={`text-lg font-medium transition-colors hover:text-foreground ${
-											active ? "text-foreground" : "text-muted-foreground"
+										className={`flex items-center rounded-lg px-4 py-3 text-base font-semibold transition-all hover:bg-secondary/80 hover:text-foreground ${
+											active ? "bg-secondary text-foreground" : "text-muted-foreground"
 										}`}
 									>
 										{item.label}
 									</Link>
 								);
 							})}
+							<div className="my-2 mx-4 h-px bg-border/50" />
 							<Link
 								href='/contact'
 								onClick={() => setIsOpen(false)}
-								className={`text-lg font-medium transition-colors hover:text-foreground mt-2 ${
-									isLinkActive("/contact") ? "text-foreground" : "text-muted-foreground"
+								className={`flex items-center rounded-lg px-4 py-3 text-base font-semibold transition-all hover:bg-secondary/80 hover:text-foreground ${
+									isLinkActive("/contact") ? "bg-secondary text-foreground" : "text-muted-foreground"
 								}`}
 							>
 								Liên hệ
 							</Link>
-						</nav>
+						</div>
 
-						<div className='mt-auto flex flex-col gap-3 pb-6'>
+						<div className='mt-auto flex flex-col gap-3 pb-8'>
 							{user ? (
 								<Link href={"/dashboard"} onClick={() => setIsOpen(false)}>
-									<Button className='w-full rounded-xl bg-primary py-6 font-semibold text-primary-foreground hover:bg-primary/90 active:scale-[0.98]'>
+									<Button className='w-full rounded-xl bg-primary h-12 font-semibold text-primary-foreground hover:bg-primary/90 active:scale-[0.98] shadow-sm'>
 										Bảng điều khiển
 									</Button>
 								</Link>
@@ -215,13 +216,13 @@ const HeaderLanding = () => {
 									<Link href={"/sign-in"} onClick={() => setIsOpen(false)}>
 										<Button
 											variant='outline'
-											className='w-full rounded-xl py-6 font-medium text-foreground'
+											className='w-full rounded-xl h-12 font-semibold text-foreground border-border hover:bg-secondary/50'
 										>
 											Đăng nhập
 										</Button>
 									</Link>
 									<Link href={"/sign-up"} onClick={() => setIsOpen(false)}>
-										<Button className='w-full rounded-xl bg-foreground py-6 font-semibold text-background hover:bg-foreground/90 active:scale-[0.98]'>
+										<Button className='w-full rounded-xl bg-foreground h-12 font-semibold text-background hover:bg-foreground/90 active:scale-[0.98] shadow-sm'>
 											Đăng ký
 										</Button>
 									</Link>

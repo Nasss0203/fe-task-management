@@ -87,12 +87,12 @@ const BoardList = ({
 								<div
 									key={task.id}
 									className={cn(
-										'group flex items-center justify-between gap-4 border-b p-3 transition-all last:border-b-0 hover:bg-muted/40 border-border/50 bg-card'
+										'group flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border-b p-3 transition-all last:border-b-0 hover:bg-muted/40 border-border/50 bg-card'
 									)}
 								>
 									{/* Left side: Status and Name */}
-								<div className='flex min-w-0 flex-1 items-center gap-3'>
-									<div className='w-36 shrink-0'>
+								<div className='flex min-w-0 flex-1 items-start sm:items-center gap-3'>
+									<div className='w-28 sm:w-36 shrink-0 mt-0.5 sm:mt-0'>
 										<DropdownTaskStatus
 											taskId={task.id}
 											projectId={projectId}
@@ -101,7 +101,7 @@ const BoardList = ({
 											triggerClassName='w-full'
 										/>
 									</div>
-									<div className='flex min-w-0 flex-col gap-0.5 w-full'>
+									<div className='flex min-w-0 flex-col gap-0.5 flex-1'>
 										<div className="w-full">
 											<TaskNameCell
 												taskId={task.id}
@@ -114,11 +114,25 @@ const BoardList = ({
 											#{task.id.slice(0, 8)} • Task management project
 										</div>
 									</div>
+
+									{/* Mobile Context Menu */}
+									<div className='sm:hidden shrink-0 mt-1'>
+										<DropdownTaskContextMenu
+											taskId={task.id}
+											workspaceId={workspaceId}
+											projectId={projectId}
+											onOpenDetail={() => setActiveDrawerTaskId(task.id)}
+										>
+											<button className='rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground'>
+												<MoreHorizontal size={15} />
+											</button>
+										</DropdownTaskContextMenu>
+									</div>
 								</div>
 
 								{/* Right side: Assignee, Priority, Actions */}
-								<div className='flex shrink-0 items-center gap-4 opacity-100 sm:opacity-80 transition-opacity group-hover:opacity-100'>
-									<div className='w-32'>
+								<div className='flex shrink-0 items-center gap-3 sm:gap-4 pl-[124px] sm:pl-0 opacity-100 sm:opacity-80 transition-opacity group-hover:opacity-100'>
+									<div className='w-28 sm:w-32'>
 										<DropdownTaskPriority
 											taskId={task.id}
 											projectId={projectId}
@@ -126,7 +140,7 @@ const BoardList = ({
 											priorityName={task.priorityName}
 										/>
 									</div>
-									<div className='w-40'>
+									<div className='w-28 sm:w-40'>
 										<TaskAssigneeCell
 											taskId={task.id}
 											workspaceId={workspaceId}
@@ -134,16 +148,19 @@ const BoardList = ({
 											assignees={task.assignees}
 										/>
 									</div>
-									<DropdownTaskContextMenu
-										taskId={task.id}
-										workspaceId={workspaceId}
-										projectId={projectId}
-										onOpenDetail={() => setActiveDrawerTaskId(task.id)}
-									>
-										<button className='rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground'>
-											<MoreHorizontal size={15} />
-										</button>
-									</DropdownTaskContextMenu>
+									{/* Desktop Context Menu */}
+									<div className='hidden sm:block'>
+										<DropdownTaskContextMenu
+											taskId={task.id}
+											workspaceId={workspaceId}
+											projectId={projectId}
+											onOpenDetail={() => setActiveDrawerTaskId(task.id)}
+										>
+											<button className='rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground'>
+												<MoreHorizontal size={15} />
+											</button>
+										</DropdownTaskContextMenu>
+									</div>
 								</div>
 							</div>
 							);
