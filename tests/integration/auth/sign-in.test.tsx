@@ -20,9 +20,9 @@ describe("SignIn Page Integration", () => {
 
 	beforeEach(() => {
 		vi.clearAllMocks();
-		
+
 		(useRouter as any).mockReturnValue({ push: mockPush });
-		
+
 		(useLogin as any).mockReturnValue({
 			mutate: mockLoginMutate,
 			isPending: false,
@@ -36,7 +36,7 @@ describe("SignIn Page Integration", () => {
 
 	it("1. Render form thành công với các trường email và password", () => {
 		render(<SignIn />);
-		
+
 		expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
 		expect(screen.getByLabelText(/mật khẩu/i)).toBeInTheDocument();
 		expect(screen.getByRole("button", { name: /đăng nhập/i })).toBeInTheDocument();
@@ -45,14 +45,14 @@ describe("SignIn Page Integration", () => {
 	it("2. Hiển thị lỗi validation khi submit form thiếu dữ liệu (clear default)", async () => {
 		const user = userEvent.setup();
 		render(<SignIn />);
-		
+
 		const emailInput = screen.getByLabelText(/email/i);
 		const passwordInput = screen.getByLabelText(/mật khẩu/i);
-		
+
 		// Xóa default values
 		await user.clear(emailInput);
 		await user.clear(passwordInput);
-		
+
 		const submitButton = screen.getByRole("button", { name: /đăng nhập/i });
 		await user.click(submitButton);
 
@@ -76,16 +76,16 @@ describe("SignIn Page Integration", () => {
 		});
 
 		render(<SignIn />);
-		
+
 		const emailInput = screen.getByLabelText(/email/i);
 		const passwordInput = screen.getByLabelText(/mật khẩu/i);
-		
+
 		await user.clear(emailInput);
 		await user.clear(passwordInput);
 
 		await user.type(emailInput, "user@example.com");
 		await user.type(passwordInput, "validpassword");
-		
+
 		const submitButton = screen.getByRole("button", { name: /đăng nhập/i });
 		await user.click(submitButton);
 
@@ -106,9 +106,14 @@ describe("SignIn Page Integration", () => {
 		});
 
 		render(<SignIn />);
-		
+
+		const emailInput = screen.getByLabelText(/email/i);
+		const passwordInput = screen.getByLabelText(/mật khẩu/i);
+		await user.type(emailInput, "admin@example.com");
+		await user.type(passwordInput, "validpassword");
+
 		const submitButton = screen.getByRole("button", { name: /đăng nhập/i });
-		await user.click(submitButton); // Use default form valid data
+		await user.click(submitButton);
 
 		await waitFor(() => {
 			expect(mockLoginMutate).toHaveBeenCalledTimes(1);
@@ -124,7 +129,7 @@ describe("SignIn Page Integration", () => {
 		});
 
 		render(<SignIn />);
-		
+
 		// Because it's loading, the button text is removed, we select by form attribute or disabled state
 		const submitButton = screen.getByRole("button", { name: "" }) as HTMLButtonElement;
 		expect(submitButton).toBeDisabled();
