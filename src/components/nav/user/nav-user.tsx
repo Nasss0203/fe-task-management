@@ -43,9 +43,7 @@ export function NavUser() {
 
 	const { planInfo } = usePlan();
 	const dataPlan = planInfo.data;
-	const upgradeHref = currentWorkspaceId
-		? `/dashboard/billing/upgrade?workspaceId=${currentWorkspaceId}`
-		: "/dashboard/billing/upgrade";
+	const upgradeHref = "/dashboard/billing/upgrade";
 
 	return (
 		<SidebarMenu>

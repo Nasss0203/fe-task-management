@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { WorkspaceTemplateDto } from "@/services/workspace-template/type";
 import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";
 import { toast } from "sonner";
+import { DialogUpgradePlan } from "@/components/dialog/DialogUpgradePlan";
 
 interface UseTemplateModalProps {
 	template: WorkspaceTemplateDto | null;
@@ -17,6 +18,7 @@ interface UseTemplateModalProps {
 
 export const UseTemplateModal = ({ template, isOpen, onClose }: UseTemplateModalProps) => {
 	const [workspaceName, setWorkspaceName] = useState("");
+	const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
 	const { createWorkspace } = useWorkspace();
 
 	const handleUseTemplate = () => {
@@ -37,18 +39,23 @@ export const UseTemplateModal = ({ template, isOpen, onClose }: UseTemplateModal
 					setWorkspaceName("");
 					onClose();
 				},
-				onError: () => {
-					toast.error("Không thể tạo không gian làm việc.");
+				onError: (err: any) => {
+					if (err?.response?.data?.code === 'WORKSPACE_LIMIT_EXCEEDED') {
+						onClose();
+						setUpgradeModalOpen(true);
+					} else {
+						toast.error("Không thể tạo không gian làm việc.");
+					}
 				},
 			}
 		);
 	};
 
-	if (!template) return null;
-
 	return (
+		<>
 		<Dialog open={isOpen} onOpenChange={onClose}>
-			<DialogContent className="sm:max-w-[425px]">
+			{template && (
+				<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
 					<DialogTitle>Dùng mẫu</DialogTitle>
 					<DialogDescription>
@@ -76,6 +83,9 @@ export const UseTemplateModal = ({ template, isOpen, onClose }: UseTemplateModal
 					</Button>
 				</DialogFooter>
 			</DialogContent>
+			)}
 		</Dialog>
+		<DialogUpgradePlan open={upgradeModalOpen} onOpenChange={setUpgradeModalOpen} />
+		</>
 	);
 };

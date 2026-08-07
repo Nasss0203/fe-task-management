@@ -15,9 +15,7 @@ export function DialogUpgradePlan({ open, onOpenChange }: DialogUpgradePlanProps
 	const router = useRouter();
 	const { currentWorkspaceId } = useProjectSelectionStore();
 
-	const upgradeHref = currentWorkspaceId
-		? `/dashboard/billing/upgrade?workspaceId=${currentWorkspaceId}`
-		: "/dashboard/billing/upgrade";
+	const upgradeHref = "/dashboard/billing/upgrade";
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>

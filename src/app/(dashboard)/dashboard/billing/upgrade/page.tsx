@@ -120,11 +120,6 @@ function UpgradeBillingContent() {
 			return;
 		}
 
-		if (!targetWorkspaceId) {
-			toast.error("Vui lòng chọn không gian làm việc trước khi tạo thanh toán.");
-			return;
-		}
-
 		try {
 			const response = await createBillingPayment.mutateAsync({
 				planId: selectedPlan.id,

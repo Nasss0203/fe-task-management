@@ -17,6 +17,7 @@ import {
 	DialogV2,
 	DialogCloseV2,
 } from "./dialog-custom";
+import { DialogUpgradePlan } from "./DialogUpgradePlan";
 
 type Props = {
 	workspaceId: string;
@@ -25,6 +26,7 @@ type Props = {
 
 const DialogCreateProject = ({ workspaceId, workspaceName }: Props) => {
 	const [open, setOpen] = useState(false);
+	const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
 	const [projectName, setProjectName] = useState("");
 
 	const createdByBoardRef = useRef(false);
@@ -60,14 +62,19 @@ const DialogCreateProject = ({ workspaceId, workspaceName }: Props) => {
 			await mutateAsync(data);
 			resetState();
 			setOpen(false);
-		} catch (error) {
+		} catch (error: any) {
 			createdByBoardRef.current = false;
-			toast.error(
-				getFriendlyApiErrorMessage(
-					error,
-					"Không thể tạo dự án. Vui lòng thử lại.",
-				),
-			);
+			if (error?.response?.data?.code === 'PROJECT_LIMIT_EXCEEDED') {
+				setOpen(false);
+				setUpgradeModalOpen(true);
+			} else {
+				toast.error(
+					getFriendlyApiErrorMessage(
+						error,
+						"Không thể tạo dự án. Vui lòng thử lại.",
+					),
+				);
+			}
 		}
 	};
 
@@ -126,6 +133,7 @@ const DialogCreateProject = ({ workspaceId, workspaceName }: Props) => {
 	};
 
 	return (
+		<>
 		<DialogV2 open={open} onOpenChange={handleOpenChange}>
 			<DialogTriggerV2 asChild>
 				<div className='flex size-5 items-center justify-center rounded-sm text-muted-foreground hover:hover:bg-accent hover:text-accent-foreground hover:hover:text-foreground cursor-pointer transition-colors'>
@@ -301,6 +309,8 @@ const DialogCreateProject = ({ workspaceId, workspaceName }: Props) => {
 				</div>
 			</DialogContentV2>
 		</DialogV2>
+		<DialogUpgradePlan open={upgradeModalOpen} onOpenChange={setUpgradeModalOpen} />
+		</>
 	);
 };
 
