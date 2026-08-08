@@ -2,7 +2,6 @@
 
 import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";
 import { useWorkspaceNameDraftStore } from "@/stores/use-workspace-name-draft";
-import { Share2, Zap } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { WorkspaceMenu } from "./WorkspaceMenu";
 import { toast } from "sonner";
@@ -167,15 +166,6 @@ export const WorkspaceTopHeader = ({
 					</div>
 				</div>
 
-				<div className='flex items-center gap-2'>
-					<button className='rounded-md border border-border p-2 text-muted-foreground hover:bg-accent hover:text-foreground'>
-						<Share2 size={16} />
-					</button>
-
-					<button className='rounded-md border border-border p-2 text-muted-foreground hover:bg-accent hover:text-foreground'>
-						<Zap size={16} />
-					</button>
-				</div>
 			</div>
 		</div>
 	);

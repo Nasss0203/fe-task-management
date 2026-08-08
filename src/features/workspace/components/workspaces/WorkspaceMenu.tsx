@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { PERMISSIONS } from "@/constants/permissions";
 import { RequirePermission } from "@/features/permission/components/RequirePermission";
+import { usePermission } from "@/features/permission/hooks/usePermission";
 import { SaveTemplateDialog } from "@/features/workspace-template/components/SaveTemplateDialog";
 
 type WorkspaceMenuProps = {
@@ -23,7 +24,6 @@ type WorkspaceMenuProps = {
 	inviteLink?: string;
 	onAddPeople?: () => void;
 	onStartRename?: () => void;
-	onOpenSettings?: () => void;
 	onDelete?: () => void;
 };
 
@@ -33,11 +33,15 @@ export function WorkspaceMenu({
 	inviteLink,
 	onAddPeople,
 	onStartRename,
-	onOpenSettings,
 	onDelete,
 }: WorkspaceMenuProps) {
 	const [openAddPeople, setOpenAddPeople] = useState(false);
 	const [openSaveTemplate, setOpenSaveTemplate] = useState(false);
+	const { can, isLoading } = usePermission(workspaceId);
+
+	if (isLoading || !can(PERMISSIONS.WORKSPACE_UPDATE)) {
+		return null;
+	}
 
 	return (
 		<>
