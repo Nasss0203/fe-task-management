@@ -14,7 +14,6 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { NotificationBell } from "@/components/popover/NotificationBell";
 import React from "react";
 import { Monitor } from "lucide-react";
 
@@ -61,7 +60,6 @@ const layout = ({
                   </Breadcrumb>
                 </div>
                 <div className="flex items-center gap-2 px-4">
-                  <NotificationBell />
                   <ToggleMode></ToggleMode>
                 </div>
               </div>

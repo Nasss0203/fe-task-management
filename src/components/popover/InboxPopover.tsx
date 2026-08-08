@@ -16,7 +16,12 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { useNotifications } from "@/features/notification/hooks/useNotifications";
+import {
+	useNotifications,
+	useMarkAllNotificationsAsRead,
+	useUnreadNotificationCount,
+	useMarkNotificationAsRead,
+} from "@/features/notification/hooks/useNotifications";
 import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";
 import {
 	useAcceptWorkspaceInvite,
@@ -89,8 +94,7 @@ export function InboxPopover() {
 	};
 
 	const { myNotificationsQuery } = useNotifications({
-		limit: 10,
-		category: "human",
+		limit: 20,
 	});
 
 	const notifications = myNotificationsQuery.data?.data ?? [];
@@ -141,17 +145,37 @@ export function InboxPopover() {
 		});
 	};
 
+	const { markAllNotificationsAsRead } = useMarkAllNotificationsAsRead();
+	const { markNotificationAsRead } = useMarkNotificationAsRead();
+	const { unreadNotificationCountQuery } = useUnreadNotificationCount();
+
+	const hasUnread =
+		(unreadNotificationCountQuery.data?.data.count ?? 0) > 0 ||
+		notifications.some((notification) => !notification.readAt);
+
+	const handleMarkAllAsRead = () => {
+		markAllNotificationsAsRead.mutate(undefined);
+	};
+
 	return (
 		<div className='w-[420px] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md'>
 			<div className='flex items-center justify-between border-b px-4 py-3'>
 				<div>
-					<h3 className='text-sm font-semibold'>Hộp thư đến</h3>
+					<h3 className='text-sm font-semibold'>Thông báo</h3>
 					<p className='text-xs text-muted-foreground'>
 						Những việc cần bạn xử lý
 					</p>
 				</div>
 
-				<Button variant='ghost' size='sm' className='h-8 px-2 text-xs'>
+				<Button
+					variant='ghost'
+					size='sm'
+					className='h-8 px-2 text-xs'
+					disabled={
+						!hasUnread || markAllNotificationsAsRead.isPending
+					}
+					onClick={handleMarkAllAsRead}
+				>
 					Đánh dấu đã đọc
 				</Button>
 			</div>
@@ -202,7 +226,12 @@ export function InboxPopover() {
 						return (
 							<div
 								key={notification.id}
-								className='flex gap-3 border-b px-4 py-3 transition hover:bg-muted/60'
+								className='flex gap-3 border-b px-4 py-3 transition hover:bg-muted/60 cursor-pointer'
+								onClick={() => {
+									if (isUnread && !markNotificationAsRead.isPending) {
+										markNotificationAsRead.mutate(notification.id);
+									}
+								}}
 							>
 								<div className='mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-md bg-muted'>
 									<Icon className='size-4 text-muted-foreground' />
@@ -313,14 +342,6 @@ export function InboxPopover() {
 				)}
 			</div>
 
-			<div className='border-t p-2'>
-				<Button
-					variant='ghost'
-					className='h-9 w-full justify-center text-sm'
-				>
-					Xem tất cả
-				</Button>
-			</div>
 		</div>
 	);
 }

@@ -1,6 +1,9 @@
 import { cn } from "@/lib/utils";
 import type { DashboardTaskResponseDto } from "@/services/dashboard/type";
 import { ClipboardList } from "lucide-react";
+import { getPriorityClass, getStatusClass } from "@/features/dashboard/utils/task-style";
+import Link from "next/link";
+import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";
 
 const getDateOnly = (value?: string | null) => {
 	if (!value) return null;
@@ -26,22 +29,22 @@ const formatTaskKey = (task: DashboardTaskResponseDto, index: number) => {
 
 const getTaskStateLabel = (task: DashboardTaskResponseDto) => {
 	const dueDate = getDateOnly(task.dueAt);
-	if (!dueDate) return "No due date";
+	if (!dueDate) return "Không có hạn";
 
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
 
-	if (dueDate < today) return "Overdue";
-	if (dueDate.getTime() === today.getTime()) return "Due today";
+	if (dueDate < today) return "Quá hạn";
+	if (dueDate.getTime() === today.getTime()) return "Hôm nay";
 
-	return "Created";
+	return new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(dueDate);
 };
 
 const getTaskStateClass = (task: DashboardTaskResponseDto) => {
 	const label = getTaskStateLabel(task);
 
-	if (label === "Overdue") return "text-red-500 dark:text-red-400";
-	if (label === "Due today") return "text-blue-500 dark:text-blue-400";
+	if (label === "Quá hạn") return "text-red-500 dark:text-red-400";
+	if (label === "Hôm nay") return "text-blue-500 dark:text-blue-400";
 
 	return "text-muted-foreground";
 };
@@ -70,6 +73,10 @@ export function WorkItemRow({
 	displayName?: string;
 	onClick?: (task: DashboardTaskResponseDto) => void;
 }) {
+	const { workspaceFindAll: { data: workspacesResponse } } = useWorkspace();
+	const workspaces = workspacesResponse?.data || [];
+	const workspaceSlug = workspaces.find((w) => w.id === task.workspaceId)?.slug || task.workspaceId;
+
 	return (
 		<div
 			role="button"
@@ -92,20 +99,40 @@ export function WorkItemRow({
 				<div className='mt-1.5 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-[11px] font-medium text-muted-foreground'>
 					<span className="uppercase tracking-wider text-muted-foreground/80">{formatTaskKey(task, index)}</span>
 					<span className="text-muted-foreground/50">•</span>
-					<span className='truncate'>{task.projectName}</span>
+					{workspaceSlug ? (
+						<Link
+							href={`/dashboard/${workspaceSlug}/projects/${task.projectId}`}
+							onClick={(e) => e.stopPropagation()}
+							className="truncate hover:text-foreground transition-colors hover:underline"
+						>
+							{task.projectName}
+						</Link>
+					) : (
+						<span className='truncate'>{task.projectName}</span>
+					)}
 					<span className="text-muted-foreground/50">•</span>
-					<span className='truncate'>{task.workspaceName}</span>
+					{workspaceSlug ? (
+						<Link
+							href={`/dashboard/${workspaceSlug}`}
+							onClick={(e) => e.stopPropagation()}
+							className="truncate hover:text-foreground transition-colors hover:underline"
+						>
+							{task.workspaceName}
+						</Link>
+					) : (
+						<span className='truncate'>{task.workspaceName}</span>
+					)}
 				</div>
 			</div>
 
 			<div className='flex min-w-[200px] items-center justify-end gap-4'>
 				<div className='hidden sm:flex items-center gap-2'>
 					{task.priorityName && (
-						<span className="rounded-md border border-border bg-muted/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+						<span className={cn("rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider", getPriorityClass(task.priorityLevel))}>
 							{task.priorityName}
 						</span>
 					)}
-					<span className="rounded-md border border-border bg-muted/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-foreground">
+					<span className={cn("rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider", getStatusClass(task.statusName))}>
 						{task.statusName || "To do"}
 					</span>
 				</div>

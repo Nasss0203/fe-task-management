@@ -18,6 +18,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { useUnreadNotificationCount } from "@/features/notification/hooks/useNotifications";
 
 export type NavHomeItem = {
 	name: string;
@@ -29,6 +30,10 @@ export type NavHomeItem = {
 const NavHome = ({ home }: { home: NavHomeItem[] }) => {
 	const { isMobile } = useSidebar();
 	const pathname = usePathname();
+	const { unreadNotificationCountQuery } = useUnreadNotificationCount();
+	const unreadCount = unreadNotificationCountQuery.data?.data.count ?? 0;
+	const hasUnread = unreadCount > 0;
+	const badgeLabel = unreadCount > 9 ? "9+" : unreadCount.toString();
 
 	return (
 		<SidebarGroup className='p-0'>
@@ -43,7 +48,14 @@ const NavHome = ({ home }: { home: NavHomeItem[] }) => {
 									<PopoverTrigger asChild>
 										<SidebarMenuButton>
 											<Icon />
-											<span>{item.name}</span>
+											<div className="flex flex-1 items-center justify-between">
+												<span>{item.name}</span>
+												{hasUnread && (
+													<span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-semibold text-white">
+														{badgeLabel}
+													</span>
+												)}
+											</div>
 										</SidebarMenuButton>
 									</PopoverTrigger>
 

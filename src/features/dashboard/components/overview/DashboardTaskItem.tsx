@@ -4,9 +4,14 @@ import { cn } from "@/lib/utils";
 import type { DashboardTaskResponseDto } from "@/services/dashboard/type";
 import { clampPercent, getPriorityClass, getStatusClass } from "../../utils/task-style";
 import { formatDateTime } from "../../utils/date";
+import Link from "next/link";
+import { useWorkspace } from "@/features/workspace/hooks/useWorkspace";
 
 export function DashboardTaskItem({ task }: { task: DashboardTaskResponseDto }) {
 	const progress = clampPercent(task.progressPercent);
+	const { workspaceFindAll: { data: workspacesResponse } } = useWorkspace();
+	const workspaces = workspacesResponse?.data || [];
+	const workspaceSlug = workspaces.find((w) => w.id === task.workspaceId)?.slug || task.workspaceId;
 
 	return (
 		<div className='group rounded-xl border border-border/60 bg-background p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:border-primary/40 hover:bg-muted/20'>
@@ -30,7 +35,27 @@ export function DashboardTaskItem({ task }: { task: DashboardTaskResponseDto }) 
 						</Badge>
 					</div>
 					<p className='mt-2 truncate text-[12px] text-muted-foreground'>
-						{task.workspaceName} / {task.projectName}
+						{workspaceSlug ? (
+							<>
+								<Link
+									href={`/dashboard/${workspaceSlug}`}
+									onClick={(e) => e.stopPropagation()}
+									className="hover:text-foreground transition-colors hover:underline"
+								>
+									{task.workspaceName}
+								</Link>
+								{" / "}
+								<Link
+									href={`/dashboard/${workspaceSlug}/projects/${task.projectId}`}
+									onClick={(e) => e.stopPropagation()}
+									className="hover:text-foreground transition-colors hover:underline"
+								>
+									{task.projectName}
+								</Link>
+							</>
+						) : (
+							<>{task.workspaceName} / {task.projectName}</>
+						)}
 					</p>
 				</div>
 

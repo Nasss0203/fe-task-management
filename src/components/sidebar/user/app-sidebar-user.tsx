@@ -42,7 +42,7 @@ const homeItems: NavHomeItem[] = [
 		icon: ListTodo,
 	},
 	{
-		name: "Hộp thư đến",
+		name: "Thông báo",
 		icon: Mail,
 		type: "inbox",
 	},

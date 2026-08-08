@@ -23,6 +23,8 @@ export function useTaskDetailFields(task: TaskItem) {
 	const [scheduleOpen, setScheduleOpen] = React.useState(false);
 	const [statusOpen, setStatusOpen] = React.useState(false);
 	const [priorityOpen, setPriorityOpen] = React.useState(false);
+	const [estimateOpen, setEstimateOpen] = React.useState(false);
+
 	const [startDate, setStartDate] = React.useState<Date | undefined>(() =>
 		parseDate(task.startAt),
 	);
@@ -38,6 +40,7 @@ export function useTaskDetailFields(task: TaskItem) {
 		setScheduleOpen(false);
 		setStatusOpen(false);
 		setPriorityOpen(false);
+		setEstimateOpen(false);
 	}, [task.id]);
 
 	React.useEffect(() => {
@@ -162,10 +165,19 @@ export function useTaskDetailFields(task: TaskItem) {
 		});
 	};
 
+	const handleEstimateChange = async (minutes: number | null) => {
+		if (minutes === task.estimateMinutes) return;
+		await updateTaskMutate({
+			id: task.id,
+			estimateMinutes: minutes,
+		});
+	};
+
 	return {
 		isUpdatingTask,
 		updateTitle: handleTitleChange,
 		updateDescription: handleDescriptionChange,
+		updateEstimate: handleEstimateChange,
 		status: {
 			open: statusOpen,
 			onOpenChange: setStatusOpen,
@@ -188,6 +200,10 @@ export function useTaskDetailFields(task: TaskItem) {
 			startDate,
 			dueDate,
 			onSelect: handleScheduleSelect,
+		},
+		estimate: {
+			open: estimateOpen,
+			onOpenChange: setEstimateOpen,
 		},
 	};
 }

@@ -102,6 +102,7 @@ export default function MyTasksPage() {
 		return uniqueTasks([
 			...dashboard.priorityTasks,
 			...dashboard.recentDeadlines,
+			...(dashboard.recentCompletedTasks || []),
 		]);
 	}, [dashboard]);
 
@@ -133,6 +134,16 @@ export default function MyTasksPage() {
 			);
 		}).length;
 	};
+	const doneTasks = tasks.filter(task => {
+		const status = (task.statusName ?? "").toLowerCase();
+		return status.includes("done") || status.includes("complete") || task.completedAt;
+	});
+
+	const pendingTasks = tasks.filter(task => {
+		const status = (task.statusName ?? "").toLowerCase();
+		return !(status.includes("done") || status.includes("complete") || task.completedAt);
+	});
+
 	const viewItems: {
 		key: ViewKey;
 		label: string;
@@ -142,32 +153,14 @@ export default function MyTasksPage() {
 			{
 				key: "worked",
 				label: "Đã thực hiện",
-				count: tasks.length,
+				count: doneTasks.length,
 				icon: ListTodo,
-			},
-			{
-				key: "viewed",
-				label: "Đã xem",
-				count: dashboard.recentDeadlines.length,
-				icon: Eye,
 			},
 			{
 				key: "assigned",
 				label: "Được giao cho tôi",
-				count: tasks.length,
+				count: pendingTasks.length,
 				icon: UserRound,
-			},
-			{
-				key: "starred",
-				label: "Có gắn sao",
-				count: 0,
-				icon: Star,
-			},
-			{
-				key: "boards",
-				label: "Bảng",
-				count: dashboard.recentWorkspaces.length,
-				icon: BriefcaseBusiness,
 			},
 		];
 
@@ -248,8 +241,8 @@ export default function MyTasksPage() {
 
 							<TabsContent value='worked' className='mt-0'>
 								<div className='flex flex-col gap-1'>
-									{tasks.length ? (
-										tasks.map((task, index) => (
+									{doneTasks.length ? (
+										doneTasks.map((task, index) => (
 											<WorkItemRow
 												key={task.id}
 												task={task}
@@ -269,35 +262,10 @@ export default function MyTasksPage() {
 								</div>
 							</TabsContent>
 
-							<TabsContent value='viewed' className='mt-0'>
-								<div className='flex flex-col gap-1'>
-									{dashboard.recentDeadlines.length ? (
-										dashboard.recentDeadlines.map(
-											(task, index) => (
-												<WorkItemRow
-													key={task.id}
-													task={task}
-													index={index}
-													displayName={
-														dashboard.greeting
-															.displayName
-													}
-													onClick={handleTaskClick}
-												/>
-											),
-										)
-									) : (
-										<div className='rounded-2xl border border-dashed border-border bg-muted/20 p-8 text-center text-[13px] font-medium text-muted-foreground mt-2'>
-											Không tìm thấy mục công việc đã xem.
-										</div>
-									)}
-								</div>
-							</TabsContent>
-
 							<TabsContent value='assigned' className='mt-0'>
 								<div className='flex flex-col gap-1'>
-									{tasks.length ? (
-										tasks.map((task, index) => (
+									{pendingTasks.length ? (
+										pendingTasks.map((task, index) => (
 											<WorkItemRow
 												key={task.id}
 												task={task}
@@ -317,24 +285,7 @@ export default function MyTasksPage() {
 								</div>
 							</TabsContent>
 
-							<TabsContent value='starred' className='mt-0'>
-								<div className='rounded-2xl border border-dashed border-border bg-muted/20 p-8 text-center text-[13px] font-medium text-muted-foreground mt-2'>
-									Không tìm thấy mục công việc có gắn sao.
-								</div>
-							</TabsContent>
 
-							<TabsContent value='boards' className='mt-0'>
-								<div className='flex flex-col gap-1'>
-									{dashboard.recentWorkspaces.map(
-										(workspace) => (
-											<BoardRow
-												key={workspace.id}
-												workspace={workspace}
-											/>
-										),
-									)}
-								</div>
-							</TabsContent>
 						</div>
 					</Tabs>
 				</section>

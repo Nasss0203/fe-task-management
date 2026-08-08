@@ -5,6 +5,7 @@ import {
   countUnreadNotificationsApi,
   findMyNotificationsApi,
   markAllNotificationsAsReadApi,
+  markNotificationAsReadApi,
 } from "@/services/notification/notification.service";
 import {
   FindNotificationParams,
@@ -87,5 +88,59 @@ export const useMarkAllNotificationsAsRead = () => {
 
   return {
     markAllNotificationsAsRead,
+  };
+};
+
+export const useMarkNotificationAsRead = () => {
+  const queryClient = useQueryClient();
+
+  const markNotificationAsRead = useMutation({
+    mutationFn: markNotificationAsReadApi,
+    onSuccess: (_, notificationId) => {
+      const readAt = new Date().toISOString();
+
+      queryClient.setQueriesData<FindNotificationResponse>(
+        {
+          queryKey: [NOTIFICATION_KEY.MY_NOTIFICATIONS],
+        },
+        (old) => {
+          if (!old) return old;
+
+          return {
+            ...old,
+            data: old.data.map((notification) =>
+              notification.id === notificationId
+                ? { ...notification, readAt: notification.readAt ?? readAt }
+                : notification
+            ),
+          };
+        },
+      );
+
+      queryClient.setQueryData<UnreadNotificationCountResponse>(
+        [NOTIFICATION_KEY.UNREAD_COUNT],
+        (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            data: {
+              ...old.data,
+              count: Math.max(0, old.data.count - 1),
+            },
+          };
+        },
+      );
+
+      queryClient.invalidateQueries({
+        queryKey: [NOTIFICATION_KEY.MY_NOTIFICATIONS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [NOTIFICATION_KEY.UNREAD_COUNT],
+      });
+    },
+  });
+
+  return {
+    markNotificationAsRead,
   };
 };

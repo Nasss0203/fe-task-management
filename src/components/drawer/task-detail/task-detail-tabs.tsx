@@ -41,6 +41,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
 import { Textarea } from "../../ui/textarea";
 import { TaskActivityFeed } from "./task-activity-feed";
 import { getInitials } from "./task-detail-utils";
+import { RequirePermission } from "@/features/permission/components/RequirePermission";
+import { PERMISSIONS } from "@/constants/permissions";
 
 type TaskDetailTabsProps = {
 	workspaceId: string;
@@ -239,14 +241,20 @@ function SubtaskCard({
 					</div>
 				)}
 
-				<button
-					type='button'
-					onClick={handleDelete}
-					disabled={isDeleting}
-					className='opacity-0 group-hover:opacity-100 p-1 hover:bg-muted rounded-md text-muted-foreground hover:text-destructive transition-all cursor-pointer'
+				<RequirePermission
+					workspaceId={workspaceId}
+					code={PERMISSIONS.TASK_DELETE}
+					mode="hide"
 				>
-					<X className='size-3.5' />
-				</button>
+					<button
+						type='button'
+						onClick={handleDelete}
+						disabled={isDeleting}
+						className='opacity-0 group-hover:opacity-100 p-1 hover:bg-muted rounded-md text-muted-foreground hover:text-destructive transition-all cursor-pointer'
+					>
+						<X className='size-3.5' />
+					</button>
+				</RequirePermission>
 			</div>
 		</div>
 	);

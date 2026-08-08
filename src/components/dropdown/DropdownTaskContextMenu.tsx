@@ -6,6 +6,8 @@ import { useDeleteTask, useTaskMoveSprint } from "@/features/task/hooks/useTask"
 import { useParams } from "next/navigation";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
+import { RequirePermission } from "@/features/permission/components/RequirePermission";
+import { PERMISSIONS } from "@/constants/permissions";
 
 type Props = {
 	children: React.ReactNode;
@@ -88,14 +90,20 @@ const DropdownTaskContextMenu = ({ children, taskId, workspaceId, projectId, onR
 								</CommandItem>
 							)}
 
-							<CommandItem
-								value='delete_task'
-								onSelect={handleDelete}
-								className='cursor-pointer rounded-lg px-2 py-2 text-red-500 data-[selected=true]:bg-red-500/10 data-[selected=true]:text-red-500'
+							<RequirePermission
+								workspaceId={workspaceId}
+								code={PERMISSIONS.TASK_DELETE}
+								mode="hide"
 							>
-								<Trash size={16} className='text-red-500' />
-								<span>Xóa task</span>
-							</CommandItem>
+								<CommandItem
+									value='delete_task'
+									onSelect={handleDelete}
+									className='cursor-pointer rounded-lg px-2 py-2 text-red-500 data-[selected=true]:bg-red-500/10 data-[selected=true]:text-red-500'
+								>
+									<Trash size={16} className='text-red-500' />
+									<span>Xóa task</span>
+								</CommandItem>
+							</RequirePermission>
 						</CommandGroup>
 					</CommandList>
 				</Command>

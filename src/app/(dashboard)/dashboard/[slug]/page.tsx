@@ -22,7 +22,7 @@ const SlugPage = () => {
 
 	const page = data?.data;
 	const workspaces: WorkspaceItem[] = workspaceQuery?.data ?? [];
-	const workspace = workspaces.find((item) => item.slug === params.slug);
+	const workspace = workspaces.find((item) => item.slug === params.slug || item.id === params.slug);
 	const resolvedWorkspaceId = workspace?.id ?? workspaceId;
 	const {
 		pageBlocks: { data: pageBlocksData, isPending: isPageBlocksPending },

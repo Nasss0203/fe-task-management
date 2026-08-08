@@ -84,5 +84,7 @@ export function useTaskDetail(task: TaskItem) {
 		contextTag,
 		updateTitle: fields.updateTitle,
 		updateDescription: fields.updateDescription,
+		updateEstimate: fields.updateEstimate,
+		estimate: fields.estimate,
 	};
 }

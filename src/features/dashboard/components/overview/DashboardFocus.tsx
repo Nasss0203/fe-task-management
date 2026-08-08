@@ -9,14 +9,12 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import {
 	CalendarClock,
-	Target,
-	TimerReset,
 	TrendingDown,
 	TrendingUp,
 } from "lucide-react";
 import { useMemo } from "react";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { clampPercent, formatMinutes } from "@/features/dashboard/utils/task-style";
+import { clampPercent } from "@/features/dashboard/utils/task-style";
 import type {
 	DashboardFocusResponseDto,
 	DashboardRhythmBlockResponseDto,
@@ -47,47 +45,24 @@ export function DashboardFocus({ focus, rhythmBlocks, stats }: DashboardFocusPro
 			</CardHeader>
 			<CardContent className='grid gap-5 lg:grid-cols-[minmax(0,1fr)_240px]'>
 				<div className='flex flex-col gap-5'>
-					<div className='grid gap-3 md:grid-cols-3 xl:grid-cols-2 2xl:grid-cols-3'>
-						<div className='rounded-lg border bg-muted/35 p-4'>
-							<div className='mb-3 flex items-center justify-between gap-3'>
-								<Target className='text-muted-foreground' />
-								<span className='text-xs font-medium text-muted-foreground'>
-									Deep work
-								</span>
-							</div>
-							<p className='text-xl font-semibold'>
-								{formatMinutes(focus.deepWorkMinutes)}
-							</p>
-							<p className='mt-1 text-xs leading-5 text-muted-foreground'>
-								Thời lượng tập trung hôm nay
-							</p>
-						</div>
-
-						<div className='rounded-lg border bg-muted/35 p-4'>
-							<div className='mb-3 flex items-center justify-between gap-3'>
-								<TimerReset className='text-muted-foreground' />
-								<span className='text-xs font-medium text-muted-foreground'>
-									Review
-								</span>
-							</div>
-							<p className='text-xl font-semibold'>
-								{focus.reviewTaskCount} task
-							</p>
-							<p className='mt-1 text-xs leading-5 text-muted-foreground'>
-								Việc cần xem lại trong ngày
-							</p>
-						</div>
-
-						<div className='rounded-lg border bg-muted/35 p-4'>
-							<div className='mb-3 flex items-center justify-between gap-3'>
-								<MomentumIcon className='text-muted-foreground' />
-								<span className='text-xs font-medium text-muted-foreground'>
-									Momentum
-								</span>
+					<div className='grid gap-3 grid-cols-1'>
+						<div className='flex items-center justify-between rounded-lg border bg-muted/35 p-4'>
+							<div className='flex items-center gap-4'>
+								<div className='flex size-10 items-center justify-center rounded-full bg-background border'>
+									<MomentumIcon className='size-5 text-muted-foreground' />
+								</div>
+								<div>
+									<span className='text-sm font-semibold text-foreground'>
+										Momentum
+									</span>
+									<p className='text-xs text-muted-foreground mt-0.5'>
+										Đà hoàn thành so với nhịp mục tiêu
+									</p>
+								</div>
 							</div>
 							<p
 								className={cn(
-									"text-xl font-semibold",
+									"text-2xl font-bold",
 									focus.momentumPercent < 0
 										? "text-red-600 dark:text-red-300"
 										: "text-emerald-600 dark:text-emerald-300",
@@ -101,10 +76,6 @@ export function DashboardFocus({ focus, rhythmBlocks, stats }: DashboardFocusPro
 								) : (
 									<span className="text-muted-foreground text-sm">—</span>
 								)}
-
-							</p>
-							<p className='mt-1 text-xs leading-5 text-muted-foreground'>
-								Đà hoàn thành so với nhịp mục tiêu
 							</p>
 						</div>
 					</div>

@@ -45,7 +45,7 @@ const WorkspaceTrashDialog = ({
 			if (isCurrentWorkspace) {
 				setCurrentWorkspaceId("");
 				setCurrentProjectId(null);
-				router.push("/dashboard/trash/workspaces");
+				router.push("/dashboard");
 			}
 
 			toast.success("Đã chuyển không gian làm việc vào thùng rác.");

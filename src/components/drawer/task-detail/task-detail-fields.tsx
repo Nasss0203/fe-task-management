@@ -13,6 +13,7 @@ import {
 	Check,
 	ChevronDown,
 	Circle,
+	Clock,
 	Download,
 	FileText,
 	Loader2,
@@ -61,6 +62,14 @@ type TaskDueDateFieldProps = {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	onSelect: (selectedDate?: Date) => Promise<void> | void;
+};
+
+type TaskEstimateFieldProps = {
+	estimateMinutes: number | null | undefined;
+	isUpdatingTask: boolean;
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	onSave: (minutes: number | null) => Promise<void> | void;
 };
 
 type TaskScheduleFieldProps = {
@@ -578,6 +587,74 @@ export function TaskDueDateField({
 								className='flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50'
 								disabled={!dueDate}
 							/>
+						</div>
+					</div>
+				</PopoverContent>
+			</Popover>
+		</DetailRow>
+	);
+}
+
+export function TaskEstimateField({
+	estimateMinutes,
+	isUpdatingTask,
+	open,
+	onOpenChange,
+	onSave,
+}: TaskEstimateFieldProps) {
+	const [value, setValue] = React.useState(
+		estimateMinutes ? String(estimateMinutes) : "",
+	);
+
+	React.useEffect(() => {
+		if (open) {
+			setValue(estimateMinutes ? String(estimateMinutes) : "");
+		}
+	}, [open, estimateMinutes]);
+
+	const handleSave = () => {
+		const num = parseInt(value, 10);
+		if (isNaN(num)) {
+			onSave(null);
+		} else {
+			onSave(num);
+		}
+		onOpenChange(false);
+	};
+
+	return (
+		<DetailRow icon={Clock} label='Thời lượng'>
+			<Popover open={open} onOpenChange={onOpenChange}>
+				<PopoverTrigger asChild>
+					<button
+						type='button'
+						disabled={isUpdatingTask}
+						className='inline-flex items-center justify-start rounded-md border border-transparent px-2 py-1 text-left text-[15px] font-semibold text-foreground transition-colors hover:text-foreground/80 disabled:opacity-60 cursor-pointer'
+					>
+						{estimateMinutes ? `${estimateMinutes} phút` : "Chưa đặt"}
+					</button>
+				</PopoverTrigger>
+
+				<PopoverContent
+					align='start'
+					sideOffset={12}
+					className='w-64 rounded-2xl border border-border bg-popover p-3 shadow-md'
+				>
+					<div className='flex flex-col gap-2'>
+						<label className='text-xs font-semibold uppercase tracking-wider text-muted-foreground'>
+							Thời lượng (phút)
+						</label>
+						<div className='flex items-center gap-2'>
+							<input
+								type='number'
+								value={value}
+								onChange={(e) => setValue(e.target.value)}
+								placeholder='VD: 60'
+								className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
+							/>
+							<Button size='sm' onClick={handleSave}>
+								Lưu
+							</Button>
 						</div>
 					</div>
 				</PopoverContent>

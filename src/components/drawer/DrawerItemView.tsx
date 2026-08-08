@@ -13,6 +13,7 @@ import {
 import {
 	TaskAttachmentsField,
 	TaskDescriptionField,
+	TaskEstimateField,
 	TaskPriorityField,
 	TaskScheduleField,
 	TaskStatusField,
@@ -35,6 +36,7 @@ export function DrawerItemView({
 }: DrawerItemViewProps) {
 	const detail = useTaskDetail(task);
 	const currentTask = detail.task;
+	const isTaskDone = detail.status.current?.isDone ?? !!currentTask.completedAt;
 
 	return (
 		<>
@@ -53,7 +55,7 @@ export function DrawerItemView({
 						<TaskDetailHeader
 							taskLabel={`Task #${currentTask.projectSeq ?? currentTask.id.slice(0, 6)}`}
 							title={currentTask.title}
-							isUpdating={detail.isUpdatingTask}
+							isUpdating={detail.isUpdatingTask || isTaskDone}
 							onTitleSave={detail.updateTitle}
 						/>
 
@@ -80,7 +82,7 @@ export function DrawerItemView({
 										currentPriorityName={
 											detail.display.priorityName
 										}
-										isUpdatingTask={detail.isUpdatingTask}
+										isUpdatingTask={detail.isUpdatingTask || isTaskDone}
 										open={detail.priority.open}
 										onOpenChange={
 											detail.priority.onOpenChange
@@ -95,12 +97,20 @@ export function DrawerItemView({
 									<TaskScheduleField
 										startDate={detail.schedule.startDate}
 										dueDate={detail.schedule.dueDate}
-										isUpdatingTask={detail.isUpdatingTask}
+										isUpdatingTask={detail.isUpdatingTask || isTaskDone}
 										open={detail.schedule.open}
 										onOpenChange={
 											detail.schedule.onOpenChange
 										}
 										onSelect={detail.schedule.onSelect}
+									/>
+
+									<TaskEstimateField
+										estimateMinutes={currentTask.estimateMinutes}
+										isUpdatingTask={detail.isUpdatingTask || isTaskDone}
+										open={detail.estimate.open}
+										onOpenChange={detail.estimate.onOpenChange}
+										onSave={detail.updateEstimate}
 									/>
 
 									<TaskAssigneeField
@@ -110,7 +120,8 @@ export function DrawerItemView({
 										}
 										isUpdatingTask={
 											detail.isUpdatingTask ||
-											detail.assignee.isPending
+											detail.assignee.isPending ||
+											isTaskDone
 										}
 										selectedMembers={
 											detail.assignee.selectedMembers
@@ -137,7 +148,7 @@ export function DrawerItemView({
 									<TaskDescriptionField
 										description={currentTask.description}
 										onSave={detail.updateDescription}
-										isUpdating={detail.isUpdatingTask}
+										isUpdating={detail.isUpdatingTask || isTaskDone}
 									/>
 
 									<TaskAttachmentsField
