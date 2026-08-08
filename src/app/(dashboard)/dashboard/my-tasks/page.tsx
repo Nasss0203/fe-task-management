@@ -12,6 +12,7 @@ import { LoadingForYou } from "@/features/dashboard/components/for-you/LoadingFo
 import { RecentSpaceCard } from "@/features/dashboard/components/for-you/RecentSpaceCard";
 import { WorkItemRow } from "@/features/dashboard/components/for-you/WorkItemRow";
 import { toLocalDateInputValue, getClientTimezone } from "@/features/dashboard/utils/date";
+import { getTaskStatusKey } from "@/lib/task-status-style";
 
 type ViewKey = "worked" | "viewed" | "assigned" | "starred" | "boards";
 
@@ -25,7 +26,8 @@ function uniqueTasks(tasks: DashboardTaskResponseDto[]) {
 	});
 }
 
-
+const isDashboardTaskDone = (task: DashboardTaskResponseDto) =>
+	getTaskStatusKey(task.statusName) === "done";
 
 const mapDashboardTaskToTaskItem = (task: DashboardTaskResponseDto): TaskItem => {
 	return {
@@ -102,7 +104,6 @@ export default function MyTasksPage() {
 		return uniqueTasks([
 			...dashboard.priorityTasks,
 			...dashboard.recentDeadlines,
-			...(dashboard.recentCompletedTasks || []),
 		]);
 	}, [dashboard]);
 
@@ -126,23 +127,12 @@ export default function MyTasksPage() {
 	const recentSpaces = dashboard.recentWorkspaces.slice(0, 5);
 	const getWorkspaceDoneCount = (workspaceId: string) => {
 		return tasks.filter((task) => {
-			const status = (task.statusName ?? "").toLowerCase();
-
-			return (
-				task.workspaceId === workspaceId &&
-				(status.includes("done") || status.includes("complete"))
-			);
+			return task.workspaceId === workspaceId && isDashboardTaskDone(task);
 		}).length;
 	};
-	const doneTasks = tasks.filter(task => {
-		const status = (task.statusName ?? "").toLowerCase();
-		return status.includes("done") || status.includes("complete") || task.completedAt;
-	});
+	const doneTasks = tasks.filter(isDashboardTaskDone);
 
-	const pendingTasks = tasks.filter(task => {
-		const status = (task.statusName ?? "").toLowerCase();
-		return !(status.includes("done") || status.includes("complete") || task.completedAt);
-	});
+	const pendingTasks = tasks.filter((task) => !isDashboardTaskDone(task));
 
 	const viewItems: {
 		key: ViewKey;
