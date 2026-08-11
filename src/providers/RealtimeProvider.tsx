@@ -1,6 +1,7 @@
 "use client";
 
 import { NOTIFICATION_KEY } from "@/constants/query-key";
+import { getNotificationDisplay } from "@/lib/notification-display";
 import type { FindNotificationResponse, NotificationItem } from "@/services/notification/type";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -26,8 +27,10 @@ export function NotificationRealtimeProvider({ accessToken, children }: Props) {
 		const socket = connectRealtimeSocket(accessToken);
 
 		const handleNotificationCreated = (notification: NotificationItem) => {
-			toast.info(notification.title || "Bạn có thông báo mới.", {
-				description: notification.message ?? undefined,
+			const display = getNotificationDisplay(notification);
+
+			toast.info(display.title, {
+				description: display.message ?? undefined,
 			});
 
 			queryClient.setQueriesData<FindNotificationResponse>(
@@ -71,7 +74,7 @@ export function NotificationRealtimeProvider({ accessToken, children }: Props) {
 
 		socket.emit("project.join", { projectId: currentProjectId });
 
-		const handleTaskUpdated = (payload: any) => {
+		const handleTaskUpdated = () => {
 			queryClient.invalidateQueries({
 				queryKey: ["task-activities", currentWorkspaceId],
 			});
@@ -83,7 +86,7 @@ export function NotificationRealtimeProvider({ accessToken, children }: Props) {
 			});
 		};
 
-		const handleCommentUpdated = (payload: any) => {
+		const handleCommentUpdated = (payload: unknown) => {
 			console.log("Realtime event received - Comment Updated:", payload);
 			queryClient.invalidateQueries({
 				queryKey: ["comments"],

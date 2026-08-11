@@ -27,6 +27,8 @@ function uniqueTasks(tasks: DashboardTaskResponseDto[]) {
 }
 
 const isDashboardTaskDone = (task: DashboardTaskResponseDto) =>
+	task.statusIsDone ||
+	Boolean(task.completedAt) ||
 	getTaskStatusKey(task.statusName) === "done";
 
 const mapDashboardTaskToTaskItem = (task: DashboardTaskResponseDto): TaskItem => {
@@ -47,7 +49,7 @@ const mapDashboardTaskToTaskItem = (task: DashboardTaskResponseDto): TaskItem =>
 		assignees: [],
 		startAt: task.startAt,
 		dueAt: task.dueAt,
-		completedAt: null,
+		completedAt: task.completedAt,
 		estimateMinutes: task.estimateMinutes,
 		createdAt: new Date().toISOString(),
 		updatedAt: new Date().toISOString(),
@@ -106,6 +108,13 @@ export default function MyTasksPage() {
 			...dashboard.recentDeadlines,
 		]);
 	}, [dashboard]);
+	const completedTasks = useMemo(() => {
+		if (!dashboard) return [];
+
+		return uniqueTasks(dashboard.recentCompletedTasks ?? []).filter(
+			isDashboardTaskDone,
+		);
+	}, [dashboard]);
 
 	if (isLoading) return <LoadingForYou />;
 
@@ -125,12 +134,12 @@ export default function MyTasksPage() {
 	}
 
 	const recentSpaces = dashboard.recentWorkspaces.slice(0, 5);
-	const getWorkspaceDoneCount = (workspaceId: string) => {
-		return tasks.filter((task) => {
-			return task.workspaceId === workspaceId && isDashboardTaskDone(task);
+	const getWorkspaceDoneCount = (workspace: DashboardWorkspaceResponseDto) => {
+		return workspace.completedTaskCount ?? completedTasks.filter((task) => {
+			return task.workspaceId === workspace.id && isDashboardTaskDone(task);
 		}).length;
 	};
-	const doneTasks = tasks.filter(isDashboardTaskDone);
+	const doneTasks = completedTasks;
 
 	const pendingTasks = tasks.filter((task) => !isDashboardTaskDone(task));
 
@@ -184,9 +193,7 @@ export default function MyTasksPage() {
 									key={workspace.id}
 									workspace={workspace}
 									openWorkCount={workspace.openTaskCount}
-									doneCount={getWorkspaceDoneCount(
-										workspace.id,
-									)}
+									doneCount={getWorkspaceDoneCount(workspace)}
 								/>
 							))}
 						</div>

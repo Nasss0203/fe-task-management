@@ -57,8 +57,10 @@ export type DashboardTaskResponseDto = {
 	priorityName: string | null;
 	priorityLevel: number | null;
 	statusName: string | null;
+	statusIsDone: boolean;
 	dueAt: string | null;
 	startAt: string | null;
+	completedAt: string | null;
 	estimateMinutes: number | null;
 	progressPercent: number;
 };
@@ -73,6 +75,7 @@ export type DashboardWorkspaceResponseDto = {
 	slug: string;
 	projectCount: number;
 	openTaskCount: number;
+	completedTaskCount: number;
 	lastOpenedAt: string | null;
 };
 
@@ -95,6 +98,7 @@ export type MyDashboardResponseDto = {
 	focus: DashboardFocusResponseDto;
 	rhythmBlocks: DashboardRhythmBlockResponseDto[];
 	recentDeadlines: DashboardDeadlineResponseDto[];
+	recentCompletedTasks: DashboardTaskResponseDto[];
 	stats: DashboardStatsResponseDto;
 	priorityTasks: DashboardTaskResponseDto[];
 	recentWorkspaces: DashboardWorkspaceResponseDto[];

@@ -1,8 +1,6 @@
 "use client";
 
-import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import ProjectBacklogView from "@/features/sprint/components/backlog/ProjectBacklogView";
-import WorkspaceBacklogView from "@/features/sprint/components/backlog/WorkspaceBacklogView";
 
 export const BacklogViewType = {
 	WORKSPACE: "workspace",
@@ -15,21 +13,20 @@ export type BacklogRenderContext =
 type BoardBacklogProps = {
 	context?: BacklogRenderContext;
 	boardId?: string;
+	workspaceId: string;
+	projectId: string;
 };
 
 const BoardBacklog = ({
 	context = BacklogViewType.PROJECT,
+	workspaceId,
+	projectId,
 }: BoardBacklogProps) => {
-	const { currentProjectId, currentWorkspaceId } = useProjectSelectionStore();
-
-	const workspaceId = currentWorkspaceId;
-	const projectId = currentProjectId;
-
 	if (!workspaceId || !projectId) {
 		return null;
 	}
 
-	if (context === BacklogViewType.PROJECT) {
+	if (context === BacklogViewType.WORKSPACE) {
 		return (
 			<ProjectBacklogView
 				workspaceId={workspaceId}
@@ -39,7 +36,10 @@ const BoardBacklog = ({
 	}
 
 	return (
-		<WorkspaceBacklogView workspaceId={workspaceId} projectId={projectId} />
+		<ProjectBacklogView
+			workspaceId={workspaceId}
+			projectId={projectId}
+		/>
 	);
 };
 

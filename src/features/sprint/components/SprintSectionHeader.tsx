@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { PERMISSIONS } from "@/constants/permissions";
 import { RequirePermission } from "@/features/permission/components/RequirePermission";
+import { isTaskCompleted, isTaskVisible } from "@/lib/task-completion";
 import { cn } from "@/lib/utils";
 import type { SprintItem } from "@/services/sprint/type";
 import { ChevronDown, MoreHorizontal } from "lucide-react";
@@ -43,10 +44,11 @@ export function SprintSectionHeader({
 	open,
 	onToggle,
 }: SprintSectionHeaderProps) {
-	const tasks = sprint.tasks ?? [];
+	const allTasks = sprint.tasks ?? [];
+	const tasks = allTasks.filter(isTaskVisible);
 	const normalizedStatus = String(status).toUpperCase();
-	const completedCount = tasks.filter((task: any) => task.status?.isDone === true).length;
-	const openCount = tasks.filter((task: any) => task.status?.isDone !== true).length;
+	const completedCount = allTasks.filter(isTaskCompleted).length;
+	const openCount = tasks.length;
 	const { slug } = useParams();
 	const canEditSprint = normalizedStatus === SprintStatus.ACTIVE;
 	const canCancelSprint = normalizedStatus === SprintStatus.ACTIVE;

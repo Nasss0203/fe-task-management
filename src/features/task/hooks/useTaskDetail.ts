@@ -15,6 +15,13 @@ export function useTaskDetail(task: TaskItem) {
 	const taskDetailQuery = useTaskDetailQuery(task.id);
 	const currentTask = taskDetailQuery.data?.data ?? task;
 	const fields = useTaskDetailFields(currentTask);
+	const displayTask = React.useMemo(
+		() => ({
+			...currentTask,
+			estimateMinutes: fields.estimate.minutes,
+		}),
+		[currentTask, fields.estimate.minutes],
+	);
 	const assignee = useTaskDetailAssignees(currentTask, user);
 	const comments = useTaskDetailComments(currentTask, user);
 	const activities = useTaskDetailActivities(currentTask.workspaceId, currentTask.id);
@@ -60,7 +67,7 @@ export function useTaskDetail(task: TaskItem) {
 	};
 
 	return {
-		task: currentTask,
+		task: displayTask,
 		assignee,
 		status: fields.status,
 		priority: fields.priority,

@@ -58,8 +58,13 @@ const ListView = ({ board }: BoardViewProps) => (
 	/>
 );
 
-const Backlog = ({ context = "workspace" }: BoardViewProps) => (
-	<BoardBacklog context={context} />
+const Backlog = ({ board, context = "workspace" }: BoardViewProps) => (
+	<BoardBacklog
+		context={context}
+		boardId={board.id}
+		workspaceId={board.workspaceId}
+		projectId={board.projectId}
+	/>
 );
 
 const UnsupportedView = ({ board }: BoardViewProps) => (

@@ -6,6 +6,7 @@ import DialogAddTask from "@/components/dialog/DialogAddTask";
 
 import { useTask, useTaskStatus } from "@/features/task/hooks/useTask";
 import { useUser } from "@/features/auth/hooks/useUser";
+import { isTaskVisible } from "@/lib/task-completion";
 import { cn } from "@/lib/utils";
 import DropdownTaskStatus from "@/components/dropdown/DropdownTaskStatus";
 import DropdownTaskPriority from "@/components/dropdown/DropdownTaskPriority";
@@ -64,7 +65,7 @@ const BoardList = ({
 		}
 	};
 	const rawTasks = Array.isArray(taskQuery?.data?.data)
-		? taskQuery.data.data
+		? taskQuery.data.data.filter(isTaskVisible)
 		: [];
 
 	const [activeDrawerTaskId, setActiveDrawerTaskId] = React.useState<string | null>(null);

@@ -65,6 +65,7 @@ type TaskDueDateFieldProps = {
 };
 
 type TaskEstimateFieldProps = {
+	taskId: string;
 	estimateMinutes: number | null | undefined;
 	isUpdatingTask: boolean;
 	open: boolean;
@@ -94,6 +95,7 @@ type TaskDescriptionFieldProps = {
 
 type TaskAttachmentsFieldProps = {
 	attachmentsHook: ReturnType<typeof useTaskAttachments>;
+	isReadOnly?: boolean;
 };
 
 function getTodayBoundary() {
@@ -130,10 +132,12 @@ function AttachmentCard({
 	attachment,
 	onDownload,
 	onDelete,
+	isReadOnly = false,
 }: {
 	attachment: AttachmentItem;
 	onDownload: (id: string, name: string) => void;
 	onDelete: (id: string) => void;
+	isReadOnly?: boolean;
 }) {
 	const previewUrl = getAttachmentPreviewUrl(attachment);
 	const extension = getFileExtension(attachment.fileName);
@@ -184,6 +188,7 @@ function AttachmentCard({
 					variant='ghost'
 					size='icon-xs'
 					onClick={() => onDelete(attachment.id)}
+					disabled={isReadOnly}
 					className='text-destructive hover:bg-destructive/10 hover:text-destructive'
 				>
 					<Trash2 className='size-3.5' />
@@ -596,30 +601,69 @@ export function TaskDueDateField({
 }
 
 export function TaskEstimateField({
+	taskId,
 	estimateMinutes,
 	isUpdatingTask,
 	open,
 	onOpenChange,
 	onSave,
 }: TaskEstimateFieldProps) {
+	const optimisticMinutesRef = React.useRef<number | null | undefined>(
+		undefined,
+	);
+	const [displayMinutes, setDisplayMinutes] = React.useState(
+		estimateMinutes ?? null,
+	);
 	const [value, setValue] = React.useState(
 		estimateMinutes ? String(estimateMinutes) : "",
 	);
+	const previousTaskIdRef = React.useRef(taskId);
+
+	React.useEffect(() => {
+		if (previousTaskIdRef.current === taskId) return;
+
+		previousTaskIdRef.current = taskId;
+		optimisticMinutesRef.current = undefined;
+		setDisplayMinutes(estimateMinutes ?? null);
+		setValue(estimateMinutes ? String(estimateMinutes) : "");
+	}, [taskId, estimateMinutes]);
+
+	React.useEffect(() => {
+		const optimisticMinutes = optimisticMinutesRef.current;
+
+		if (optimisticMinutes !== undefined) {
+			if ((estimateMinutes ?? null) === optimisticMinutes) {
+				setDisplayMinutes(estimateMinutes ?? null);
+			}
+
+			return;
+		}
+
+		setDisplayMinutes(estimateMinutes ?? null);
+	}, [estimateMinutes]);
 
 	React.useEffect(() => {
 		if (open) {
-			setValue(estimateMinutes ? String(estimateMinutes) : "");
+			setValue(displayMinutes ? String(displayMinutes) : "");
 		}
-	}, [open, estimateMinutes]);
+	}, [open, displayMinutes]);
 
-	const handleSave = () => {
+	const handleSave = async () => {
 		const num = parseInt(value, 10);
-		if (isNaN(num)) {
-			onSave(null);
-		} else {
-			onSave(num);
-		}
+		const nextMinutes = isNaN(num) ? null : num;
+		const previousMinutes = displayMinutes;
+
+		optimisticMinutesRef.current = nextMinutes;
+		setDisplayMinutes(nextMinutes);
 		onOpenChange(false);
+
+		try {
+			await onSave(nextMinutes);
+			optimisticMinutesRef.current = undefined;
+		} catch {
+			optimisticMinutesRef.current = undefined;
+			setDisplayMinutes(previousMinutes);
+		}
 	};
 
 	return (
@@ -631,7 +675,7 @@ export function TaskEstimateField({
 						disabled={isUpdatingTask}
 						className='inline-flex items-center justify-start rounded-md border border-transparent px-2 py-1 text-left text-[15px] font-semibold text-foreground transition-colors hover:text-foreground/80 disabled:opacity-60 cursor-pointer'
 					>
-						{estimateMinutes ? `${estimateMinutes} phút` : "Chưa đặt"}
+						{displayMinutes ? `${displayMinutes} phút` : "Chưa đặt"}
 					</button>
 				</PopoverTrigger>
 
@@ -663,10 +707,9 @@ export function TaskEstimateField({
 	);
 }
 
-export function TaskTagsField({
-	contextTag,
-	priorityName,
-}: TaskTagsFieldProps) {
+export function TaskTagsField(_props: TaskTagsFieldProps) {
+	void _props;
+
 	// return (
 	// 	<DetailRow icon={Tag} label='Thẻ'>
 	// 		<div className='flex flex-wrap gap-2'>
@@ -756,6 +799,7 @@ export function TaskDescriptionField({
 
 export function TaskAttachmentsField({
 	attachmentsHook,
+	isReadOnly = false,
 }: TaskAttachmentsFieldProps) {
 	const {
 		attachments,
@@ -806,7 +850,7 @@ export function TaskAttachmentsField({
 					<Button
 						type='button'
 						size='sm'
-						disabled={isUploading}
+						disabled={isUploading || isReadOnly}
 						onClick={() => fileInputRef.current?.click()}
 						className='h-8 rounded-lg px-3 text-xs'
 					>
@@ -839,12 +883,13 @@ export function TaskAttachmentsField({
 								attachment={attachment}
 								onDownload={handleDownload}
 								onDelete={deleteAttachment}
+								isReadOnly={isReadOnly}
 							/>
 						))}
 
 						<button
 							type='button'
-							disabled={isUploading}
+							disabled={isUploading || isReadOnly}
 							onClick={() => fileInputRef.current?.click()}
 							className='flex h-16 items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-card text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-60'
 						>

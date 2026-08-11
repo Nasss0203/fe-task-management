@@ -14,6 +14,7 @@ import "temporal-polyfill/global";
 import { useTheme } from "next-themes";
 import { useTask } from "@/features/task/hooks/useTask";
 import { DrawerItemView } from "@/components/drawer/DrawerItemView";
+import { isTaskVisible } from "@/lib/task-completion";
 import type { TaskItem } from "@/services/task/type";
 
 type CalendarAppProps = {
@@ -43,7 +44,7 @@ function CalendarApp({ workspaceId, projectId }: CalendarAppProps) {
 	const tasks = useMemo(() => {
 		const data = taskQuery.data?.data;
 
-		return Array.isArray(data) ? data : [];
+		return Array.isArray(data) ? data.filter(isTaskVisible) : [];
 	}, [taskQuery.data?.data]);
 
 	const [activeDrawerTaskId, setActiveDrawerTaskId] = useState<string | null>(null);

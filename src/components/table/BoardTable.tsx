@@ -33,6 +33,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 
 import { useTask } from "@/features/task/hooks/useTask";
+import { isTaskVisible } from "@/lib/task-completion";
 import { cn } from "@/lib/utils";
 import PanigationTable from "@/components/panigation/PanigationTable";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
@@ -187,7 +188,7 @@ const BoardTable = ({
 		}
 	};
 	const rawTasks = Array.isArray(taskQuery?.data?.data)
-		? taskQuery.data.data
+		? taskQuery.data.data.filter(isTaskVisible)
 		: [];
 	const dataTask = React.useMemo<TaskItem[]>(
 		() =>

@@ -14,6 +14,7 @@ import { getColumnsBacklog } from "@/components/table/columns/column-backlog";
 import { Button } from "@/components/ui/button";
 import { DrawerItemView } from "@/components/drawer/DrawerItemView";
 import { useTask, useTaskStatus } from "@/features/task/hooks/useTask";
+import { isTaskVisible } from "@/lib/task-completion";
 import { TaskBulkActionBar } from "@/features/task/components/task/TaskBulkActionBar";
 import TaskTrashDialog from "@/features/task/components/task/TaskTrashDialog";
 import MoveToSprintDialog from "@/components/dialog/MoveToSprintDialog";
@@ -46,7 +47,7 @@ const SprintTaskList = ({
 	const [moveToSprintOpen, setMoveToSprintOpen] = useState(false);
 
 	const sprintTasks = useMemo<TaskItem[]>(() => {
-		return sprintsTaskQuery.data?.data?.tasks || [];
+		return (sprintsTaskQuery.data?.data?.tasks || []).filter(isTaskVisible);
 	}, [sprintsTaskQuery.data?.data?.tasks]);
 
 	const taskMap = useMemo(() => {

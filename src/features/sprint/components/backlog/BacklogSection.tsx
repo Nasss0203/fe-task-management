@@ -13,6 +13,7 @@ import {
 
 import { useSprints } from "@/features/sprint/hooks/useSprint";
 import { useTask } from "@/features/task/hooks/useTask";
+import { isTaskVisible } from "@/lib/task-completion";
 import type { TaskPositionContextInput } from "@/services/task/type";
 import { useMemo, useState } from "react";
 import TableBacklog from "@/components/table/TableBacklog";
@@ -59,7 +60,9 @@ const BacklogSection = ({
     projectId,
     filters ?? backlogPositionContext,
   );
-  const taskBacklog = tasks ?? findTaskBacklog.data?.data ?? [];
+  const taskBacklog = (tasks ?? findTaskBacklog.data?.data ?? []).filter(
+    isTaskVisible,
+  );
   const backlogTotal =
     totalCount ?? findTaskBacklog.data?.total ?? taskBacklog.length;
 

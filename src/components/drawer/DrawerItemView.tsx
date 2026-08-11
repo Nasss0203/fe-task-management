@@ -2,6 +2,7 @@
 
 import { TaskAssigneeField } from "@/features/assign/components/TaskAssigneeField";
 import { useTaskDetail } from "@/features/task/hooks/useTaskDetail";
+import { isTaskCompleted } from "@/lib/task-completion";
 import type { TaskItem } from "@/services/task/type";
 import {
 	Drawer,
@@ -36,7 +37,8 @@ export function DrawerItemView({
 }: DrawerItemViewProps) {
 	const detail = useTaskDetail(task);
 	const currentTask = detail.task;
-	const isTaskDone = detail.status.current?.isDone ?? !!currentTask.completedAt;
+	const isTaskComplete = isTaskCompleted(currentTask);
+	const isTaskLocked = detail.isUpdatingTask || isTaskComplete;
 
 	return (
 		<>
@@ -55,7 +57,7 @@ export function DrawerItemView({
 						<TaskDetailHeader
 							taskLabel={`Task #${currentTask.projectSeq ?? currentTask.id.slice(0, 6)}`}
 							title={currentTask.title}
-							isUpdating={detail.isUpdatingTask || isTaskDone}
+							isUpdating={isTaskLocked}
 							onTitleSave={detail.updateTitle}
 						/>
 
@@ -66,7 +68,7 @@ export function DrawerItemView({
 										currentStatusName={
 											detail.display.currentStatusName
 										}
-										isUpdatingTask={detail.isUpdatingTask}
+										isUpdatingTask={isTaskLocked}
 										open={detail.status.open}
 										onOpenChange={
 											detail.status.onOpenChange
@@ -82,7 +84,7 @@ export function DrawerItemView({
 										currentPriorityName={
 											detail.display.priorityName
 										}
-										isUpdatingTask={detail.isUpdatingTask || isTaskDone}
+										isUpdatingTask={isTaskLocked}
 										open={detail.priority.open}
 										onOpenChange={
 											detail.priority.onOpenChange
@@ -97,7 +99,7 @@ export function DrawerItemView({
 									<TaskScheduleField
 										startDate={detail.schedule.startDate}
 										dueDate={detail.schedule.dueDate}
-										isUpdatingTask={detail.isUpdatingTask || isTaskDone}
+										isUpdatingTask={isTaskLocked}
 										open={detail.schedule.open}
 										onOpenChange={
 											detail.schedule.onOpenChange
@@ -106,8 +108,9 @@ export function DrawerItemView({
 									/>
 
 									<TaskEstimateField
+										taskId={currentTask.id}
 										estimateMinutes={currentTask.estimateMinutes}
-										isUpdatingTask={detail.isUpdatingTask || isTaskDone}
+										isUpdatingTask={isTaskLocked}
 										open={detail.estimate.open}
 										onOpenChange={detail.estimate.onOpenChange}
 										onSave={detail.updateEstimate}
@@ -119,9 +122,8 @@ export function DrawerItemView({
 											detail.assignee.onOpenChange
 										}
 										isUpdatingTask={
-											detail.isUpdatingTask ||
-											detail.assignee.isPending ||
-											isTaskDone
+											isTaskLocked ||
+											detail.assignee.isPending
 										}
 										selectedMembers={
 											detail.assignee.selectedMembers
@@ -148,11 +150,12 @@ export function DrawerItemView({
 									<TaskDescriptionField
 										description={currentTask.description}
 										onSave={detail.updateDescription}
-										isUpdating={detail.isUpdatingTask || isTaskDone}
+										isUpdating={isTaskLocked}
 									/>
 
 									<TaskAttachmentsField
 										attachmentsHook={detail.attachmentsHook}
+										isReadOnly={isTaskComplete}
 									/>
 								</div>
 
@@ -165,6 +168,7 @@ export function DrawerItemView({
 									onSubtaskDraftChange={
 										detail.subtasks.onDraftChange
 									}
+									isReadOnly={isTaskComplete}
 									onCreateSubtask={detail.subtasks.onCreate}
 									isCreatingSubtask={
 										detail.subtasks.isCreating

@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { isTaskVisible } from "@/lib/task-completion";
 import { cn } from "@/lib/utils";
 
 import { useTask } from "@/features/task/hooks/useTask";
@@ -51,7 +52,10 @@ const WorkspaceBacklogView = ({
     backlogFilters,
   );
   const backlogPageData = findTaskBacklog.data;
-  const taskBacklog = backlogPageData?.data ?? [];
+  const taskBacklog = useMemo(
+    () => (backlogPageData?.data ?? []).filter(isTaskVisible),
+    [backlogPageData?.data],
+  );
 
   return (
     <div className="flex flex-col gap-5">

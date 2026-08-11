@@ -6,6 +6,7 @@ import {
 	useTaskStatus,
 } from "@/features/task/hooks/useTask";
 import { useDebounced } from "@/hooks/useDebounce";
+import { isTaskVisible } from "@/lib/task-completion";
 import type { TaskItem } from "@/services/task/type";
 import {
 	getCoreRowModel,
@@ -98,7 +99,7 @@ const BacklogSprint = ({ projectId, workspaceId }: BacklogSprintProps) => {
 	const { data: taskPriorityData } = useTaskPriority(workspaceId, projectId);
 	const taskBacklog = useMemo(() => {
 		const backlogData = findTaskBacklog.data?.data;
-		return Array.isArray(backlogData) ? backlogData : [];
+		return Array.isArray(backlogData) ? backlogData.filter(isTaskVisible) : [];
 	}, [findTaskBacklog.data?.data]);
 	const totalPages = findTaskBacklog.data?.totalPages ?? 1;
 

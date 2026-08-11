@@ -17,7 +17,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Ellipsis, Plus } from "lucide-react";
+import { Ellipsis, GripVertical, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,9 @@ import {
 import type { TaskItem, TaskPositionContextInput } from "@/services/task/type";
 import { useProjectSelectionStore } from "@/stores/use-project-selection";
 import { useTableDnd } from "@/components/dnd/backlog-sprint/ProviderSprintDnd";
-import TableRowDnd from "@/components/dnd/backlog-sprint/TableRowSprintDnd";
+import TableRowDnd, {
+  useSortableRowHandle,
+} from "@/components/dnd/backlog-sprint/TableRowSprintDnd";
 import { TaskAssigneeCell } from "./columns/column-task";
 import { TaskBulkActionBar } from "@/features/task/components/task/TaskBulkActionBar";
 import TaskTrashDialog from "@/features/task/components/task/TaskTrashDialog";
@@ -63,6 +65,7 @@ type TableBacklogProps = {
 type getColumnsBacklogProps = {
   showSprint: boolean;
   isDragging: boolean;
+  isDndEnabled: boolean;
   taskStatus: {
     id: string;
     name: string;
@@ -76,8 +79,8 @@ type getColumnsBacklogProps = {
   projectId: string;
 };
 
-const BACKLOG_GRID_MIN_WIDTH = 824;
-const BACKLOG_WITH_SPRINT_GRID_MIN_WIDTH = 984;
+const BACKLOG_GRID_MIN_WIDTH = 860;
+const BACKLOG_WITH_SPRINT_GRID_MIN_WIDTH = 1020;
 
 const SelectionIndicator = ({
   checked = false,
@@ -95,8 +98,12 @@ const SelectionIndicator = ({
   </div>
 );
 
-const getBacklogGridTemplateColumns = (showSprint: boolean) =>
+const getBacklogGridTemplateColumns = (
+  showSprint: boolean,
+  isDndEnabled: boolean,
+) =>
   [
+    isDndEnabled ? "36px" : null,
     "48px",
     "minmax(280px, 2fr)",
     showSprint ? "minmax(140px, 1fr)" : null,
@@ -107,6 +114,28 @@ const getBacklogGridTemplateColumns = (showSprint: boolean) =>
   ]
     .filter(Boolean)
     .join(" ");
+
+const DragHandleCell = () => {
+  const { attributes, listeners, setActivatorNodeRef, isDragging } =
+    useSortableRowHandle();
+
+  return (
+    <button
+      ref={setActivatorNodeRef}
+      type="button"
+      aria-label="Kéo thả task"
+      className={cn(
+        "flex size-7 cursor-grab items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:cursor-grabbing",
+        isDragging && "cursor-grabbing text-foreground",
+      )}
+      style={{ touchAction: "none" }}
+      {...attributes}
+      {...listeners}
+    >
+      <GripVertical className="size-4" />
+    </button>
+  );
+};
 
 type TaskItemWithInlineRelations = TaskItem & {
   status?: { name?: string | null } | null;
@@ -144,12 +173,25 @@ const getTaskPriorityName = (
 const getColumnsBacklog = ({
   showSprint,
   isDragging,
+  isDndEnabled,
   taskPriority,
   taskStatus,
   onOpenDetail,
   workspaceId,
   projectId,
 }: getColumnsBacklogProps): ColumnDef<TaskItem>[] => [
+  ...(isDndEnabled
+    ? [
+        {
+          id: "drag",
+          size: 36,
+          header: "",
+          cell: () => <DragHandleCell />,
+          enableSorting: false,
+          enableHiding: false,
+        } satisfies ColumnDef<TaskItem>,
+      ]
+    : []),
   {
     id: "select",
     size: 48,
@@ -326,7 +368,11 @@ const TableBacklog = ({
   const [quickAddTitle, setQuickAddTitle] = useState("");
   const [isCreating, setIsCreating] = useState(false);
 
-  const { items, isDragging } = useTableDnd();
+  const {
+    items,
+    isDragging,
+    isEnabled: isDndEnabled,
+  } = useTableDnd();
   const { bulkUpdateTasks, bulkMoveToSprint, createTask } = useTask(
     workspaceId,
     projectId,
@@ -334,7 +380,6 @@ const TableBacklog = ({
   const { data: taskStatusData } = useTaskStatus(workspaceId, projectId);
   const { data: taskPriorityData } = useTaskPriority(workspaceId, projectId);
 
-  const taskIds = items[containerId] ?? [];
   const taskStatus = useMemo(
     () => taskStatusData?.data ?? [],
     [taskStatusData?.data],
@@ -349,13 +394,22 @@ const TableBacklog = ({
       getColumnsBacklog({
         showSprint,
         isDragging,
+        isDndEnabled,
         taskStatus,
         taskPriority,
         workspaceId,
         projectId,
         onOpenDetail: setActiveDrawerTaskId,
       }),
-    [showSprint, isDragging, taskStatus, taskPriority, workspaceId, projectId],
+    [
+      showSprint,
+      isDragging,
+      isDndEnabled,
+      taskStatus,
+      taskPriority,
+      workspaceId,
+      projectId,
+    ],
   );
 
   const pagination = serverPagination
@@ -457,16 +511,26 @@ const TableBacklog = ({
       type: "task-table",
     },
   });
-  const gridTemplateColumns = getBacklogGridTemplateColumns(showSprint);
-  const minWidth = showSprint
+  const gridTemplateColumns = getBacklogGridTemplateColumns(
+    showSprint,
+    isDndEnabled,
+  );
+  const baseMinWidth = showSprint
     ? BACKLOG_WITH_SPRINT_GRID_MIN_WIDTH
     : BACKLOG_GRID_MIN_WIDTH;
+  const minWidth = isDndEnabled ? baseMinWidth : baseMinWidth - 36;
   const tableRows = table.getRowModel().rows;
   const tableRowsById = useMemo(
     () => new Map(tableRows.map((row) => [row.original.id, row])),
     [tableRows],
   );
-  const displayIds = taskIds;
+  const pagedTaskIds = useMemo(
+    () => tableRows.map((row) => row.original.id),
+    [tableRows],
+  );
+  const displayIds = isDndEnabled
+    ? (items[containerId] ?? pagedTaskIds)
+    : pagedTaskIds;
 
   return (
     <>
@@ -510,38 +574,71 @@ const TableBacklog = ({
               className={cn("min-h-20", isOver && "bg-sky-500/5")}
             >
               {displayIds.length ? (
-                <SortableContext
-                  items={displayIds}
-                  strategy={verticalListSortingStrategy}
-                >
-                  {displayIds.map((taskId, index) => {
+                isDndEnabled ? (
+                  <SortableContext
+                    items={displayIds}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {displayIds.map((taskId, index) => {
+                      const row = tableRowsById.get(taskId);
+
+                      if (row) {
+                        return (
+                          <TableRowDnd
+                            key={row.id}
+                            row={row}
+                            index={index}
+                            containerId={containerId}
+                            gridTemplateColumns={gridTemplateColumns}
+                          />
+                        );
+                      }
+
+                      // Render a placeholder if the row data is not yet available during cross-container dragging.
+                      return (
+                        <div
+                          key={`placeholder-${taskId}`}
+                          role="row"
+                          className="grid min-h-14 border-b border-border/70 bg-muted/20 opacity-50"
+                          style={{ gridTemplateColumns }}
+                        >
+                          <div role="cell" style={{ gridColumn: "1 / -1" }} />
+                        </div>
+                      );
+                    })}
+                  </SortableContext>
+                ) : (
+                  displayIds.map((taskId) => {
                     const row = tableRowsById.get(taskId);
 
-                    if (row) {
-                      return (
-                        <TableRowDnd
-                          key={row.id}
-                          row={row}
-                          index={index}
-                          containerId={containerId}
-                          gridTemplateColumns={gridTemplateColumns}
-                        />
-                      );
+                    if (!row) {
+                      return null;
                     }
 
-                    // Render a placeholder if the row data is not yet available (e.g. during drag across containers)
                     return (
                       <div
-                        key={`placeholder-${taskId}`}
+                        key={row.id}
                         role="row"
-                        className="grid min-h-14 border-b border-border/70 bg-muted/20 opacity-50"
+                        className="grid min-h-14 border-b border-border/70 bg-background transition-colors duration-150 hover:bg-muted/35 data-[state=selected]:bg-muted"
+                        data-state={row.getIsSelected() && "selected"}
                         style={{ gridTemplateColumns }}
                       >
-                        <div role="cell" style={{ gridColumn: "1 / -1" }} />
+                        {row.getVisibleCells().map((cell) => (
+                          <div
+                            key={cell.id}
+                            role="cell"
+                            className="flex min-w-0 items-center whitespace-nowrap px-3 py-2 text-sm text-foreground"
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </div>
+                        ))}
                       </div>
                     );
-                  })}
-                </SortableContext>
+                  })
+                )
               ) : (
                 <div
                   role="row"

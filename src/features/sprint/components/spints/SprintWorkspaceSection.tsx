@@ -20,6 +20,7 @@ import DropdownTaskPriority from "@/components/dropdown/DropdownTaskPriority";
 import { TaskNameCell, TaskAssigneeCell } from "@/components/table/columns/column-task";
 import DropdownTaskContextMenu from "@/components/dropdown/DropdownTaskContextMenu";
 import { DrawerItemView } from "@/components/drawer/DrawerItemView";
+import { isTaskVisible } from "@/lib/task-completion";
 import { cn } from "@/lib/utils";
 import {
 	TableBody,
@@ -71,14 +72,16 @@ const SprintWorkspaceSection = ({
 
 	const tasks = useMemo<SprintWorkspaceTask[]>(() => {
 		return sprints.flatMap((sprint) =>
-			(sprint.tasks ?? []).map((task) => ({
-				...task,
-				title: task.title ?? "Untitled",
-				sprintId: sprint.id,
-				sprintName: sprint.name,
-				projectId: sprint.projectId || task.projectId,
-				workspaceId: sprint.workspaceId || task.workspaceId,
-			})),
+			(sprint.tasks ?? [])
+				.filter(isTaskVisible)
+				.map((task) => ({
+					...task,
+					title: task.title ?? "Untitled",
+					sprintId: sprint.id,
+					sprintName: sprint.name,
+					projectId: sprint.projectId || task.projectId,
+					workspaceId: sprint.workspaceId || task.workspaceId,
+				})),
 		);
 	}, [sprints]);
 

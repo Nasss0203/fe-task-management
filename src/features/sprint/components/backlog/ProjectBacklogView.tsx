@@ -6,6 +6,7 @@ import {
 	useTask,
 	useTaskMoveSprint,
 } from "@/features/task/hooks/useTask";
+import { isTaskVisible } from "@/lib/task-completion";
 import type { TaskItem, TaskPositionContextInput } from "@/services/task/type";
 import { useMemo, useState } from "react";
 import { ProviderSprintDnd } from "@/components/dnd/backlog-sprint/ProviderSprintDnd";
@@ -47,20 +48,21 @@ const ProjectBacklogView = ({
   const { findTaskBacklog } = useTask(workspaceId, projectId, backlogFilters);
   const backlogPageData = findTaskBacklog.data;
   const backlogTasks = useMemo(
-    () => backlogPageData?.data ?? [],
+    () => (backlogPageData?.data ?? []).filter(isTaskVisible),
     [backlogPageData?.data],
   );
   const taskLookup = useMemo(() => {
     const allTasks = new Map<string, TaskItem>();
 
-    for (const sprint of sprints) {
-      for (const task of sprint.tasks ?? []) {
-        allTasks.set(task.id, task);
-      }
-    }
-
     for (const task of backlogTasks) {
       allTasks.set(task.id, task);
+    }
+
+    for (const sprint of sprints) {
+      for (const task of sprint.tasks ?? []) {
+        if (!isTaskVisible(task)) continue;
+        allTasks.set(task.id, task);
+      }
     }
 
     return allTasks;
@@ -68,16 +70,26 @@ const ProjectBacklogView = ({
 
   const initialItems = useMemo(() => {
     const items: Record<string, string[]> = { backlog: [] };
+    const sprintTaskIds = new Set<string>();
 
     // Khởi tạo từng sprint container
     for (const sprint of sprints) {
-      items[`sprint:${sprint.id}`] = (sprint.tasks ?? []).map(
-        (task) => task.id,
-      );
+      const taskIds: string[] = [];
+
+      for (const task of sprint.tasks ?? []) {
+        if (!isTaskVisible(task)) continue;
+
+        taskIds.push(task.id);
+        sprintTaskIds.add(task.id);
+      }
+
+      items[`sprint:${sprint.id}`] = taskIds;
     }
 
     // Phân loại task vào đúng container
     for (const task of backlogTasks) {
+      if (sprintTaskIds.has(task.id)) continue;
+
       items.backlog.push(task.id);
     }
 

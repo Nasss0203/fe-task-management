@@ -24,9 +24,26 @@ export enum BillingProvider {
 }
 
 export interface Plan {
-	name: PlanName;
+	id?: string;
+	name: PlanName | string;
 	slug: string;
+	priceAmount?: number;
+	currency?: Currency;
+	billingInterval?: BillingInterval;
+	features?: BillingPlanFeatures | null;
 	limits: PlanLimits;
+}
+
+export interface CurrentSubscription {
+	id: string;
+	status: string;
+	amount: number;
+	currency: Currency | string;
+	billingInterval: BillingInterval;
+	currentPeriodStart: string | null;
+	currentPeriodEnd: string | null;
+	cancelAtPeriodEnd: boolean;
+	cancelledAt: string | null;
 }
 
 export interface UpgradedWorkspace {
@@ -36,7 +53,7 @@ export interface UpgradedWorkspace {
 
 export interface UserPlanInfo {
 	plan: Plan;
-	subscription: null;
+	subscription: CurrentSubscription | null;
 	upgradedWorkspace: UpgradedWorkspace;
 }
 
@@ -90,7 +107,7 @@ export type BillingPlanName = "FREE" | "PRO";
 
 export type Currency = "VND";
 
-export type BillingInterval = "MONTH" | "YEAR";
+export type BillingInterval = "MONTH" | "YEAR" | "LIFETIME";
 
 export interface BillingPlanFeatures {
 	kanban: boolean;

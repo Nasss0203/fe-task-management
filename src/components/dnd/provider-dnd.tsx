@@ -7,6 +7,7 @@ import {
 	useTask,
 	useTaskStatus,
 } from "@/features/task/hooks/useTask";
+import { isTaskVisible } from "@/lib/task-completion";
 import type { TaskPositionContextInput } from "@/services/task/type";
 import {
 	DndContext,
@@ -183,7 +184,7 @@ const ProviderDragDrop = ({
 
 	const taskList = useMemo(() => {
 		const tasks = taskQuery.data?.data;
-		return Array.isArray(tasks) ? tasks : [];
+		return Array.isArray(tasks) ? tasks.filter(isTaskVisible) : [];
 	}, [taskQuery.data?.data]);
 
 	const statusList = useMemo(() => {

@@ -27,6 +27,7 @@ import {
 	useAcceptWorkspaceInvite,
 	useDeclineWorkspaceInvite,
 } from "@/features/workspace/hooks/useWorkspaceInvite";
+import { getNotificationDisplay } from "@/lib/notification-display";
 import { NotificationType } from "@/services/notification/type";
 import { WorkspaceInviteStatus } from "@/services/workspace-invite/type";
 
@@ -188,6 +189,7 @@ export function InboxPopover() {
 				) : notifications.length > 0 ? (
 					notifications.map((notification) => {
 						const Icon = getNotificationIcon(notification.type);
+						const display = getNotificationDisplay(notification);
 
 						const isUnread = !notification.readAt;
 
@@ -241,12 +243,12 @@ export function InboxPopover() {
 									<div className='flex items-start justify-between gap-3'>
 										<div className='min-w-0'>
 											<p className='truncate text-sm font-semibold'>
-												{notification.title}
+												{display.title}
 											</p>
 
-											{notification.message && (
+											{display.message && (
 												<p className='mt-1 line-clamp-2 text-xs text-muted-foreground'>
-													{notification.message}
+													{display.message}
 												</p>
 											)}
 										</div>

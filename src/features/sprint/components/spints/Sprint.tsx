@@ -1,6 +1,7 @@
 import { BoardItem } from "@/services/board/type";
 import type { TaskItem } from "@/services/task/type";
 import { useSprints } from "@/features/sprint/hooks/useSprint";
+import { isTaskCompleted } from "@/lib/task-completion";
 import { CalendarDays, MoreHorizontal, Settings2, PlayCircle, CheckCircle } from "lucide-react";
 import {
 	DropdownMenu,
@@ -38,7 +39,7 @@ const Sprint = ({ projectId, workspaceId, sprintId }: SprintProps) => {
 	const sprintData = sprintsTaskQuery.data?.data;
 	const sprintTasks: TaskItem[] = sprintData?.tasks || [];
 	const totalTasks = sprintTasks.length;
-	const completedTasks = sprintTasks.filter(t => t.completedAt || t.statusName?.toLowerCase().includes("done") || t.statusName?.toLowerCase().includes("hoàn thành")).length;
+	const completedTasks = sprintTasks.filter(isTaskCompleted).length;
 	const remainingTasks = totalTasks - completedTasks;
 	const totalEstimate = sprintTasks.reduce((sum: number, t) => sum + (t.estimateMinutes || 0), 0);
 	const totalEstimateDisplay = totalEstimate > 0 ? (totalEstimate / 60).toFixed(1) + "h" : "0h";

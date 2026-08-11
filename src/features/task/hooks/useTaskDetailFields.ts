@@ -35,6 +35,9 @@ export function useTaskDetailFields(task: TaskItem) {
 	const [selectedPriorityId, setSelectedPriorityId] = React.useState<
 		string | null
 	>(task.priorityId);
+	const [estimateMinutes, setEstimateMinutes] = React.useState<
+		number | null
+	>(task.estimateMinutes);
 
 	React.useEffect(() => {
 		setScheduleOpen(false);
@@ -58,6 +61,10 @@ export function useTaskDetailFields(task: TaskItem) {
 	React.useEffect(() => {
 		setSelectedPriorityId(task.priorityId);
 	}, [task.id, task.priorityId]);
+
+	React.useEffect(() => {
+		setEstimateMinutes(task.estimateMinutes);
+	}, [task.id, task.estimateMinutes]);
 
 	const statuses = React.useMemo<TaskStatusItem[]>(() => {
 		return [...(taskStatusQuery.data?.data ?? [])].sort(
@@ -166,11 +173,20 @@ export function useTaskDetailFields(task: TaskItem) {
 	};
 
 	const handleEstimateChange = async (minutes: number | null) => {
-		if (minutes === task.estimateMinutes) return;
-		await updateTaskMutate({
-			id: task.id,
-			estimateMinutes: minutes,
-		});
+		if (minutes === estimateMinutes) return;
+
+		const previousEstimateMinutes = estimateMinutes;
+		setEstimateMinutes(minutes);
+
+		try {
+			await updateTaskMutate({
+				id: task.id,
+				estimateMinutes: minutes,
+			});
+		} catch (error) {
+			setEstimateMinutes(previousEstimateMinutes);
+			throw error;
+		}
 	};
 
 	return {
@@ -204,6 +220,7 @@ export function useTaskDetailFields(task: TaskItem) {
 		estimate: {
 			open: estimateOpen,
 			onOpenChange: setEstimateOpen,
+			minutes: estimateMinutes,
 		},
 	};
 }

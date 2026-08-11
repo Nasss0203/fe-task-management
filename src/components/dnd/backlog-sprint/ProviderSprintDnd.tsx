@@ -35,12 +35,14 @@ type TaskMovePayload = {
 type TableDndContextValue = {
 	items: DndColumns;
 	isDragging: boolean;
+	isEnabled: boolean;
 	getIndexInContainer: (containerId: string, taskId: string) => number;
 };
 
 const TableDndContext = createContext<TableDndContextValue>({
 	items: {},
 	isDragging: false,
+	isEnabled: false,
 	getIndexInContainer: () => 0,
 });
 
@@ -60,26 +62,29 @@ function cloneItems(items: DndColumns): DndColumns {
 	);
 }
 
-function areItemsEqual(a: DndColumns, b: DndColumns) {
-	const aKeys = Object.keys(a);
-	const bKeys = Object.keys(b);
+function getTaskIdCounts(items: DndColumns) {
+	const counts = new Map<string, number>();
 
-	if (aKeys.length !== bKeys.length) {
+	for (const taskIds of Object.values(items)) {
+		for (const taskId of taskIds) {
+			counts.set(taskId, (counts.get(taskId) ?? 0) + 1);
+		}
+	}
+
+	return counts;
+}
+
+function haveSameTaskIdCounts(a: DndColumns, b: DndColumns) {
+	const aCounts = getTaskIdCounts(a);
+	const bCounts = getTaskIdCounts(b);
+
+	if (aCounts.size !== bCounts.size) {
 		return false;
 	}
 
-	for (const key of aKeys) {
-		const aValues = a[key] ?? [];
-		const bValues = b[key] ?? [];
-
-		if (aValues.length !== bValues.length) {
+	for (const [taskId, count] of aCounts) {
+		if (bCounts.get(taskId) !== count) {
 			return false;
-		}
-
-		for (let index = 0; index < aValues.length; index += 1) {
-			if (aValues[index] !== bValues[index]) {
-				return false;
-			}
 		}
 	}
 
@@ -188,11 +193,22 @@ export function ProviderSprintDnd({
 	const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
 	
 	const activeTaskIdRef = useRef(activeTaskId);
-	activeTaskIdRef.current = activeTaskId;
+
+	useEffect(() => {
+		activeTaskIdRef.current = activeTaskId;
+	}, [activeTaskId]);
 
 	useEffect(() => {
 		if (activeTaskIdRef.current === null) {
-			setPreviewItems(null);
+			setPreviewItems((currentPreviewItems) => {
+				if (!currentPreviewItems) {
+					return null;
+				}
+
+				return haveSameTaskIdCounts(currentPreviewItems, initialItems)
+					? null
+					: currentPreviewItems;
+			});
 		}
 	}, [initialItems]);
 
@@ -283,6 +299,7 @@ export function ProviderSprintDnd({
 		() => ({
 			items,
 			isDragging: activeTaskId !== null,
+			isEnabled: true,
 			getIndexInContainer,
 		}),
 		[activeTaskId, items, getIndexInContainer],

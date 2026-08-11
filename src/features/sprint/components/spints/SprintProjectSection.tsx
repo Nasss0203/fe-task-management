@@ -15,6 +15,7 @@ import { Ellipsis } from "lucide-react";
 import { useState } from "react";
 import TableBacklog from "@/components/table/TableBacklog";
 import TaskAssignees from "@/features/task/components/task/TaskAssignees";
+import { isTaskVisible } from "@/lib/task-completion";
 import type { SprintItem } from "@/services/sprint/type";
 import type { TaskPositionContextInput } from "@/services/task/type";
 import { SprintSectionHeader } from "@/features/sprint/components/SprintSectionHeader";
@@ -178,7 +179,7 @@ const SprintProjectSection = ({
 	projectId,
 	workspaceId,
 }: SprintProjectSectionProps) => {
-	const tasks = sprint.tasks ?? [];
+	const tasks = (sprint.tasks ?? []).filter(isTaskVisible);
 	const [open, setOpen] = useState<boolean>(true);
 	const sprintPositionContext: TaskPositionContextInput = {
 		context: "sprint",

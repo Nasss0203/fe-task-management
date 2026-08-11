@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { useTask, useUpdateTask, useDeleteTask, useTaskMoveSprint } from "@/features/task/hooks/useTask";
 import {
   createTaskApi,
@@ -12,7 +12,7 @@ import {
   moveTaskSprintToSprintApi,
 } from "@/services/task/task.service";
 import { createWrapper } from "../utils/test-utils";
-import { TASK_KEY } from "@/services/task/type";
+import { FindOneTaskResponse, TASK_KEY, TaskItem } from "@/services/task/type";
 import { SPRINT_KEY } from "@/services/sprint/type";
 
 // Mock API service boundary
@@ -63,6 +63,126 @@ describe("useTask and related hooks", () => {
       expect(updateTaskApi).toHaveBeenCalledWith("t1", { title: "New Title" });
       expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: [TASK_KEY.TASKS, "ws1", "pj1"] });
       expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: [TASK_KEY.TASK_BACKLOG, "ws1", "pj1"] });
+    });
+
+    it("updates the task detail cache optimistically", async () => {
+      const { wrapper, queryClient } = createWrapper();
+      const task = {
+        id: "t1",
+        workspaceId: "ws1",
+        projectId: "pj1",
+        sprintId: null,
+        projectSeq: 1,
+        title: "Task",
+        description: null,
+        statusId: "s1",
+        statusName: "Todo",
+        priorityId: null,
+        priorityName: null,
+        createdBy: "u1",
+        assignees: [],
+        startAt: null,
+        dueAt: null,
+        completedAt: null,
+        estimateMinutes: 100,
+        position: null,
+      };
+      let resolveUpdate!: (value: { data: TaskItem }) => void;
+
+      queryClient.setQueryData([TASK_KEY.TASK, "t1"], { data: task });
+      vi.mocked(updateTaskApi).mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveUpdate = resolve;
+        }),
+      );
+
+      const { result } = renderHook(() => useUpdateTask("ws1", "pj1"), { wrapper });
+
+      let mutationPromise!: Promise<unknown>;
+
+      act(() => {
+        mutationPromise = result.current.mutateAsync({
+          id: "t1",
+          estimateMinutes: 200,
+        });
+      });
+
+      await waitFor(() => {
+        expect(
+          queryClient.getQueryData<FindOneTaskResponse>([TASK_KEY.TASK, "t1"])?.data
+            .estimateMinutes,
+        ).toBe(200);
+      });
+
+      resolveUpdate({
+        data: {
+          ...task,
+          estimateMinutes: 200,
+        },
+      });
+
+      await mutationPromise;
+    });
+
+    it("creates a task detail cache from cached task lists when updating", async () => {
+      const { wrapper, queryClient } = createWrapper();
+      const task: TaskItem = {
+        id: "t1",
+        workspaceId: "ws1",
+        projectId: "pj1",
+        sprintId: null,
+        projectSeq: 1,
+        title: "Task",
+        description: null,
+        statusId: "s1",
+        statusName: "Todo",
+        priorityId: null,
+        priorityName: null,
+        createdBy: "u1",
+        assignees: [],
+        startAt: null,
+        dueAt: null,
+        completedAt: null,
+        estimateMinutes: 100,
+        position: null,
+      };
+      let resolveUpdate!: (value: { data: TaskItem }) => void;
+
+      queryClient.setQueryData([TASK_KEY.TASKS, "ws1", "pj1"], {
+        data: [task],
+      });
+      vi.mocked(updateTaskApi).mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveUpdate = resolve;
+        }),
+      );
+
+      const { result } = renderHook(() => useUpdateTask("ws1", "pj1"), { wrapper });
+
+      let mutationPromise!: Promise<unknown>;
+
+      act(() => {
+        mutationPromise = result.current.mutateAsync({
+          id: "t1",
+          estimateMinutes: 240,
+        });
+      });
+
+      await waitFor(() => {
+        expect(
+          queryClient.getQueryData<FindOneTaskResponse>([TASK_KEY.TASK, "t1"])?.data
+            .estimateMinutes,
+        ).toBe(240);
+      });
+
+      resolveUpdate({
+        data: {
+          ...task,
+          estimateMinutes: 240,
+        },
+      });
+
+      await mutationPromise;
     });
   });
 

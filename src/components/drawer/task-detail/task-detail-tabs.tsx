@@ -13,6 +13,7 @@ import {
 	useTaskStatus,
 	useUpdateTask,
 } from "@/features/task/hooks/useTask";
+import { isTaskCompleted } from "@/lib/task-completion";
 import { getTaskStatusKey } from "@/lib/task-status-style";
 import { cn } from "@/lib/utils";
 import { ActivityResponseDto } from "@/services/activity/type";
@@ -52,6 +53,7 @@ type TaskDetailTabsProps = {
 	subtaskDraft: string;
 	onSubtaskDraftChange: (value: string) => void;
 	onCreateSubtask: () => void | Promise<void>;
+	isReadOnly?: boolean;
 	isCreatingSubtask?: boolean;
 	isLoadingSubtasks?: boolean;
 	comments: TaskCommentItem[];
@@ -79,11 +81,13 @@ function SubtaskCard({
 	workspaceId,
 	projectId,
 	parentTaskId,
+	isReadOnly = false,
 }: {
 	item: TaskItem;
 	workspaceId: string;
 	projectId: string;
 	parentTaskId: string;
+	isReadOnly?: boolean;
 }) {
 	const queryClient = useQueryClient();
 	const { mutateAsync: updateTask, isPending: isUpdating } = useUpdateTask(
@@ -98,12 +102,11 @@ function SubtaskCard({
 
 	const statuses = React.useMemo(() => statusData?.data ?? [], [statusData]);
 
-	const isDone =
-		getTaskStatusKey(item.statusName, Boolean(item.completedAt)) === "done";
+	const isDone = isTaskCompleted(item);
 
 	const handleToggle = async (e: React.MouseEvent) => {
 		e.stopPropagation();
-		if (isUpdating || statuses.length === 0) return;
+		if (isReadOnly || isUpdating || statuses.length === 0) return;
 
 		const doneStatus =
 			statuses.find(
@@ -136,7 +139,7 @@ function SubtaskCard({
 
 	const handleDelete = async (e: React.MouseEvent) => {
 		e.stopPropagation();
-		if (isDeleting) return;
+		if (isReadOnly || isDeleting) return;
 
 		try {
 			await deleteTask({ taskId: item.id });
@@ -163,7 +166,7 @@ function SubtaskCard({
 				<button
 					type='button'
 					onClick={handleToggle}
-					disabled={isUpdating}
+					disabled={isReadOnly || isUpdating}
 					className={cn(
 						"flex size-[18px] shrink-0 items-center justify-center rounded-full border cursor-pointer transition-all duration-200",
 						isDone
@@ -249,7 +252,7 @@ function SubtaskCard({
 					<button
 						type='button'
 						onClick={handleDelete}
-						disabled={isDeleting}
+						disabled={isReadOnly || isDeleting}
 						className='opacity-0 group-hover:opacity-100 p-1 hover:bg-muted rounded-md text-muted-foreground hover:text-destructive transition-all cursor-pointer'
 					>
 						<X className='size-3.5' />
@@ -268,6 +271,7 @@ export function TaskDetailTabs({
 	subtaskDraft,
 	onSubtaskDraftChange,
 	onCreateSubtask,
+	isReadOnly = false,
 	isCreatingSubtask = false,
 	isLoadingSubtasks = false,
 	comments,
@@ -291,21 +295,12 @@ export function TaskDetailTabs({
 }: TaskDetailTabsProps) {
 	const queryClient = useQueryClient();
 	const completedCount = React.useMemo(() => {
-		return subtasks.filter((subtask) => {
-			return (
-				getTaskStatusKey(
-					subtask.statusName,
-					Boolean(subtask.completedAt),
-				) === "done"
-			);
-		}).length;
+		return subtasks.filter(isTaskCompleted).length;
 	}, [subtasks]);
 
 	const totalCount = subtasks.length;
 	const completionPercentage =
 		totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
-
-	if (!comments) return null;
 
 	const { mutate: generateSubtasks, isPending: isGenerating } = useMutation({
 		mutationFn: () => generateTaskSubtasksApi(parentTaskId),
@@ -325,12 +320,14 @@ export function TaskDetailTabs({
 	const handleSubtaskSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
-		if (!subtaskDraft.trim() || isCreatingSubtask) {
+		if (isReadOnly || !subtaskDraft.trim() || isCreatingSubtask) {
 			return;
 		}
 
 		void onCreateSubtask();
 	};
+
+	if (!comments) return null;
 
 	return (
 		<Tabs defaultValue='subtasks' className='gap-0'>
@@ -426,7 +423,7 @@ export function TaskDetailTabs({
 								onSubtaskDraftChange(event.target.value)
 							}
 							placeholder='Thêm tác vụ con...'
-							disabled={isCreatingSubtask}
+							disabled={isReadOnly || isCreatingSubtask}
 							className='h-8 w-full border-none bg-transparent p-0 shadow-none focus-visible:ring-0 text-[13px] placeholder:text-muted-foreground/50 placeholder:px-3'
 						/>
 					</form>
@@ -444,6 +441,7 @@ export function TaskDetailTabs({
 									workspaceId={workspaceId}
 									projectId={projectId}
 									parentTaskId={parentTaskId}
+									isReadOnly={isReadOnly}
 								/>
 							))}
 						</div>
@@ -504,8 +502,8 @@ export function TaskDetailTabs({
 													</span>
 												)}
 											</div>
-											{currentUserId ===
-												comment.authorId && (
+											{!isReadOnly &&
+												currentUserId === comment.authorId && (
 												<DropdownMenu>
 													<DropdownMenuTrigger
 														asChild
@@ -589,6 +587,7 @@ export function TaskDetailTabs({
 										type='button'
 										variant='ghost'
 										size='icon-xs'
+										disabled={isReadOnly}
 										className='text-muted-foreground hover:bg-accent hover:text-accent-foreground'
 									>
 										<Paperclip className='size-3.5' />
@@ -597,6 +596,7 @@ export function TaskDetailTabs({
 										type='button'
 										variant='ghost'
 										size='icon-xs'
+										disabled={isReadOnly}
 										className='text-muted-foreground hover:bg-accent hover:text-accent-foreground'
 									>
 										<AtSign className='size-3.5' />
@@ -605,6 +605,7 @@ export function TaskDetailTabs({
 										type='button'
 										variant='ghost'
 										size='icon-xs'
+										disabled={isReadOnly}
 										className='text-muted-foreground hover:bg-accent hover:text-accent-foreground'
 									>
 										<Link2 className='size-3.5' />
@@ -613,6 +614,7 @@ export function TaskDetailTabs({
 										type='button'
 										variant='ghost'
 										size='icon-xs'
+										disabled={isReadOnly}
 										className='text-muted-foreground hover:bg-accent hover:text-accent-foreground'
 									>
 										<MessageSquareText className='size-3.5' />
@@ -628,6 +630,7 @@ export function TaskDetailTabs({
 									onCommentDraftChange(event.target.value)
 								}
 								placeholder='Nhập nội dung cập nhật hoặc ghi chú tại đây...'
+								disabled={isReadOnly}
 								className='min-h-[120px] resize-none border-0 bg-transparent px-4 py-4 text-sm text-foreground shadow-none focus-visible:ring-0'
 							/>
 
@@ -649,6 +652,7 @@ export function TaskDetailTabs({
 											size='sm'
 											onClick={onSaveComment}
 											disabled={
+												isReadOnly ||
 												!commentDraft.trim() ||
 												isSavingComment ||
 												isUpdatingComment

@@ -25,11 +25,18 @@ import {
 	FindAllTaskBacklogResponse,
 	FindAllTaskResponse,
 	FindBacklogTasksFilters,
+	FindOneTaskResponse,
 	ReorderTaskPositionDto,
 	TASK_KEY,
+	TaskItem,
 	UpdateTaskDto,
 } from "@/services/task/type";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+	QueryKey,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 import { useTaskFilterStore } from "@/stores/use-task-filter";
 
 type UpdateTaskInput = Omit<UpdateTaskDto, "id"> & {
@@ -52,6 +59,64 @@ type CreateSubtaskInput = CreateSubtaskDto & {
 type TaskCacheSnapshot = {
 	previousTasks: FindAllTaskResponse | undefined;
 	previousBacklog: FindAllTaskBacklogResponse | undefined;
+};
+
+type UpdateTaskCacheSnapshot = {
+	previousDetail: FindOneTaskResponse | undefined;
+	previousTaskQueries: [QueryKey, FindAllTaskResponse | undefined][];
+	previousBacklogQueries: [
+		QueryKey,
+		FindAllTaskBacklogResponse | undefined,
+	][];
+};
+
+const getTaskUpdatePatch = ({
+	id: _id,
+	workspaceId: _workspaceId,
+	projectId: _projectId,
+	position: _position,
+	assigneeIds: _assigneeIds,
+	...patch
+}: UpdateTaskInput): Partial<TaskItem> => {
+	void _id;
+	void _workspaceId;
+	void _projectId;
+	void _position;
+	void _assigneeIds;
+
+	return patch;
+};
+
+const updateTaskInPage = <
+	TPage extends FindAllTaskResponse | FindAllTaskBacklogResponse,
+>(
+	page: TPage | undefined,
+	taskId: string,
+	patch: Partial<TaskItem>,
+) => {
+	if (!page) return page;
+
+	return {
+		...page,
+		data: page.data.map((task) =>
+			task.id === taskId ? { ...task, ...patch } : task,
+		),
+	};
+};
+
+const findTaskInPages = <
+	TPage extends FindAllTaskResponse | FindAllTaskBacklogResponse,
+>(
+	queries: [QueryKey, TPage | undefined][],
+	taskId: string,
+) => {
+	for (const [, page] of queries) {
+		const task = page?.data.find((item) => item.id === taskId);
+
+		if (task) return task;
+	}
+
+	return undefined;
 };
 
 export const useTaskDetailQuery = (taskId?: string) => {
@@ -134,16 +199,128 @@ export const useUpdateTask = (workspaceId: string, projectId: string) => {
 		}: UpdateTaskInput) => {
 			void inputWorkspaceId;
 			void inputProjectId;
+			void _position;
 
 			return updateTaskApi(id, body);
 		},
-		onSuccess: () => {
+		onMutate: async (variables): Promise<UpdateTaskCacheSnapshot> => {
+			const detailKey = [TASK_KEY.TASK, variables.id];
+			const taskListKey = [TASK_KEY.TASKS, workspaceId, projectId];
+			const backlogKey = [TASK_KEY.TASK_BACKLOG, workspaceId, projectId];
+
+			await Promise.all([
+				queryClient.cancelQueries({ queryKey: detailKey }),
+				queryClient.cancelQueries({ queryKey: taskListKey }),
+				queryClient.cancelQueries({ queryKey: backlogKey }),
+			]);
+
+			const snapshot: UpdateTaskCacheSnapshot = {
+				previousDetail:
+					queryClient.getQueryData<FindOneTaskResponse>(detailKey),
+				previousTaskQueries:
+					queryClient.getQueriesData<FindAllTaskResponse>({
+						queryKey: taskListKey,
+					}),
+				previousBacklogQueries:
+					queryClient.getQueriesData<FindAllTaskBacklogResponse>({
+						queryKey: backlogKey,
+					}),
+			};
+
+			const patch = getTaskUpdatePatch(variables);
+			const fallbackTask =
+				snapshot.previousDetail?.data ??
+				findTaskInPages(snapshot.previousTaskQueries, variables.id) ??
+				findTaskInPages(snapshot.previousBacklogQueries, variables.id);
+
+			queryClient.setQueryData<FindOneTaskResponse>(
+				detailKey,
+				(old) =>
+					old
+						? {
+								...old,
+								data: {
+									...old.data,
+									...patch,
+								},
+							}
+						: fallbackTask
+							? {
+									data: {
+										...fallbackTask,
+										...patch,
+									},
+								}
+							: old,
+			);
+
+			queryClient.setQueriesData<FindAllTaskResponse>(
+				{ queryKey: taskListKey },
+				(old) => updateTaskInPage(old, variables.id, patch),
+			);
+
+			queryClient.setQueriesData<FindAllTaskBacklogResponse>(
+				{ queryKey: backlogKey },
+				(old) => updateTaskInPage(old, variables.id, patch),
+			);
+
+			return snapshot;
+		},
+		onError: (_error, _variables, context) => {
+			if (!context) return;
+
+			queryClient.setQueryData(
+				[TASK_KEY.TASK, _variables.id],
+				context.previousDetail,
+			);
+
+			context.previousTaskQueries.forEach(([queryKey, data]) => {
+				queryClient.setQueryData(queryKey, data);
+			});
+
+			context.previousBacklogQueries.forEach(([queryKey, data]) => {
+				queryClient.setQueryData(queryKey, data);
+			});
+		},
+		onSuccess: (response, variables) => {
+			const updatedTask = response.data;
+			const detailKey = [TASK_KEY.TASK, variables.id];
+			const taskListKey = [TASK_KEY.TASKS, workspaceId, projectId];
+			const backlogKey = [TASK_KEY.TASK_BACKLOG, workspaceId, projectId];
+
+			queryClient.setQueryData<FindOneTaskResponse>(
+				detailKey,
+				(old) =>
+					old
+						? {
+								...old,
+								data: {
+									...old.data,
+									...updatedTask,
+								},
+							}
+						: response,
+			);
+
+			queryClient.setQueriesData<FindAllTaskResponse>(
+				{ queryKey: taskListKey },
+				(old) => updateTaskInPage(old, variables.id, updatedTask),
+			);
+
+			queryClient.setQueriesData<FindAllTaskBacklogResponse>(
+				{ queryKey: backlogKey },
+				(old) => updateTaskInPage(old, variables.id, updatedTask),
+			);
+
 			void Promise.all([
 				queryClient.invalidateQueries({
-					queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
+					queryKey: detailKey,
 				}),
 				queryClient.invalidateQueries({
-					queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
+					queryKey: taskListKey,
+				}),
+				queryClient.invalidateQueries({
+					queryKey: backlogKey,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
@@ -196,14 +373,15 @@ export const useTask = (
 ) => {
 	const queryClient = useQueryClient();
 	const filtersByProject = useTaskFilterStore((state) => state.filtersByProject);
-	const globalFilters = filtersByProject[projectId] || {};
 
 	const activeFilters = useMemo(() => {
+		const globalFilters = filtersByProject[projectId] || {};
+
 		return {
 			...globalFilters,
 			...filtersProp,
 		};
-	}, [globalFilters, filtersProp]);
+	}, [filtersByProject, filtersProp, projectId]);
 
 	const includeTrash = options?.includeTrash === true;
 	const taskQuery = useQuery({

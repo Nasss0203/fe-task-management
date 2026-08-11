@@ -1,6 +1,6 @@
 "use client";
 import { PageBlockItem } from "@/services/page_block/type";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type TextBlockProps = {
 	block: PageBlockItem;
@@ -9,14 +9,23 @@ type TextBlockProps = {
 };
 
 const TextBlock = ({ block, text, onUpdate }: TextBlockProps) => {
+	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 	const [value, setValue] = useState(text);
+
+	const resizeTextarea = () => {
+		const textarea = textareaRef.current;
+		if (!textarea) return;
+
+		textarea.style.height = "auto";
+		textarea.style.height = `${textarea.scrollHeight}px`;
+	};
 
 	useEffect(() => {
 		setValue(text);
 	}, [text]);
 
-	const rows = useMemo(() => {
-		return Math.max(value.split("\n").length, 1);
+	useEffect(() => {
+		resizeTextarea();
 	}, [value]);
 
 	const handleSave = () => {
@@ -37,12 +46,14 @@ const TextBlock = ({ block, text, onUpdate }: TextBlockProps) => {
 
 	return (
 		<textarea
+			ref={textareaRef}
 			value={value}
 			onChange={(e) => setValue(e.target.value)}
 			onBlur={handleSave}
-			rows={rows}
+			rows={1}
 			placeholder='Text'
-			className='w-full resize-none overflow-hidden bg-transparent px-3 text-sm leading-6 text-foreground outline-none'
+			wrap='soft'
+			className='block min-h-6 w-full min-w-0 resize-none overflow-hidden whitespace-pre-wrap break-words bg-transparent px-3 text-sm leading-6 text-foreground outline-none'
 		/>
 	);
 };

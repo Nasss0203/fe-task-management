@@ -103,8 +103,8 @@ export function AddPeopleDialog({
 				onSuccess: () => {
 					toast.success(
 						selectedRecipients.length > 1
-							? `Đã gửi ${selectedRecipients.length} lời mời.`
-							: "Đã gửi lời mời.",
+							? `Đã gửi ${selectedRecipients.length} lời mời tham gia ${workspaceName}.`
+							: `Đã gửi lời mời tham gia ${workspaceName}.`,
 					);
 					setQuery("");
 					setRole(RoleName.MEMBER);
