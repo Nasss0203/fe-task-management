@@ -293,8 +293,10 @@ export const useUpdateTask = (
 			const detailKey = [TASK_KEY.TASK, variables.id];
 			const taskListKey = [TASK_KEY.TASKS, workspaceId, projectId];
 			const backlogKey = [TASK_KEY.TASK_BACKLOG, workspaceId, projectId];
-			const refetchType =
-				options?.refetchOnSuccess === false ? "none" : "active";
+			const invalidateOptions =
+				options?.refetchOnSuccess === false
+					? ({ refetchType: "none" } as const)
+					: {};
 
 			queryClient.setQueryData<FindOneTaskResponse>(
 				detailKey,
@@ -323,23 +325,23 @@ export const useUpdateTask = (
 			void Promise.all([
 				queryClient.invalidateQueries({
 					queryKey: detailKey,
-					refetchType,
+					...invalidateOptions,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: taskListKey,
-					refetchType,
+					...invalidateOptions,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: backlogKey,
-					refetchType,
+					...invalidateOptions,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
-					refetchType,
+					...invalidateOptions,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: [SPRINT_KEY.SPRINT, workspaceId, projectId],
-					refetchType,
+					...invalidateOptions,
 				}),
 			]);
 		},
@@ -581,24 +583,26 @@ export const useReorderTaskPosition = ({
 			return reorderTaskPositionApi(body);
 		},
 		onSuccess: async () => {
-			const refetchType = refetchOnSuccess ? "active" : "none";
+			const invalidateOptions = refetchOnSuccess
+				? {}
+				: ({ refetchType: "none" } as const);
 
 			await Promise.all([
 				queryClient.invalidateQueries({
 					queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
-					refetchType,
+					...invalidateOptions,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
-					refetchType,
+					...invalidateOptions,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
-					refetchType,
+					...invalidateOptions,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: [SPRINT_KEY.SPRINT, workspaceId, projectId],
-					refetchType,
+					...invalidateOptions,
 				}),
 			]);
 		},
