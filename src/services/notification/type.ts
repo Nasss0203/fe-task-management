@@ -49,6 +49,8 @@ export type NotificationMetadata = {
   inviteId?: string;
   inviteToken?: string;
   inviteStatus?: WorkspaceInviteStatus;
+  inviterName?: string;
+  inviterEmail?: string | null;
   status?: WorkspaceInviteStatus;
   [key: string]: unknown;
 };

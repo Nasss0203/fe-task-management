@@ -28,7 +28,20 @@ const getStringMetadata = (
 const getWorkspaceNameFromInviteMessage = (message: string | null) => {
 	if (!message) return undefined;
 
-	const match = message.match(/^You have been invited to join\s+(.+?)\.?$/i);
+	const directInviteMatch = message.match(
+		/^You have been invited to join\s+(.+?)\.?$/i,
+	);
+	const inviterInviteMatch = message.match(
+		/^(.+?)\s+invited you to join\s+(.+?)\.?$/i,
+	);
+
+	return directInviteMatch?.[1]?.trim() ?? inviterInviteMatch?.[2]?.trim();
+};
+
+const getInviterNameFromInviteMessage = (message: string | null) => {
+	if (!message) return undefined;
+
+	const match = message.match(/^(.+?)\s+invited you to join\s+(.+?)\.?$/i);
 
 	return match?.[1]?.trim();
 };
@@ -40,12 +53,20 @@ const getWorkspaceInviteDisplay = (
 		getStringMetadata(notification.metadata, "workspaceName") ??
 		getStringMetadata(notification.metadata, "workspace_name") ??
 		getWorkspaceNameFromInviteMessage(notification.message);
+	const inviterName =
+		getStringMetadata(notification.metadata, "inviterName") ??
+		getStringMetadata(notification.metadata, "invitedByName") ??
+		getStringMetadata(notification.metadata, "invited_by_name") ??
+		getInviterNameFromInviteMessage(notification.message);
 
 	return {
 		title: "Lời mời tham gia workspace",
-		message: workspaceName
-			? `Bạn được mời tham gia workspace ${workspaceName}.`
-			: "Bạn được mời tham gia workspace này.",
+		message:
+			inviterName && workspaceName
+				? `${inviterName} đã mời bạn tham gia workspace ${workspaceName}.`
+				: workspaceName
+					? `Bạn được mời tham gia workspace ${workspaceName}.`
+					: "Bạn được mời tham gia workspace này.",
 	};
 };
 

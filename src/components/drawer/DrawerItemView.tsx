@@ -3,7 +3,9 @@
 import { TaskAssigneeField } from "@/features/assign/components/TaskAssigneeField";
 import { useTaskDetail } from "@/features/task/hooks/useTaskDetail";
 import { isTaskCompleted } from "@/lib/task-completion";
+import { getTaskStatusKey } from "@/lib/task-status-style";
 import type { TaskItem } from "@/services/task/type";
+import { useState } from "react";
 import {
 	Drawer,
 	DrawerContent,
@@ -30,19 +32,46 @@ type DrawerItemViewProps = {
 	task: TaskItem;
 };
 
+type DrawerTaskState = {
+	rootTaskId: string;
+	activeTask: TaskItem;
+};
+
 export function DrawerItemView({
 	open,
 	onOpenChange,
 	task,
 }: DrawerItemViewProps) {
-	const detail = useTaskDetail(task);
+	const [drawerTaskState, setDrawerTaskState] =
+		useState<DrawerTaskState | null>(null);
+	const activeTask =
+		drawerTaskState?.rootTaskId === task.id
+			? drawerTaskState.activeTask
+			: task;
+	const detail = useTaskDetail(activeTask);
 	const currentTask = detail.task;
-	const isTaskComplete = isTaskCompleted(currentTask);
+	const isTaskComplete =
+		isTaskCompleted(currentTask) ||
+		getTaskStatusKey(detail.display.currentStatusName) === "done";
 	const isTaskLocked = detail.isUpdatingTask || isTaskComplete;
+	const canCreateSubtasks = !currentTask.parentTaskId;
+	const handleOpenChange = (nextOpen: boolean) => {
+		if (!nextOpen) {
+			setDrawerTaskState(null);
+		}
+
+		onOpenChange(nextOpen);
+	};
+	const handleOpenSubtask = (subtask: TaskItem) => {
+		setDrawerTaskState({
+			rootTaskId: task.id,
+			activeTask: subtask,
+		});
+	};
 
 	return (
 		<>
-			<Drawer direction='right' open={open} onOpenChange={onOpenChange}>
+			<Drawer direction='right' open={open} onOpenChange={handleOpenChange}>
 				<DrawerContent className='data-[vaul-drawer-direction=right]:inset-y-0 data-[vaul-drawer-direction=right]:right-0 data-[vaul-drawer-direction=right]:w-full data-[vaul-drawer-direction=right]:sm:max-w-190 overflow-hidden border-l border-border bg-background p-0 text-foreground'>
 					<DrawerHeader className='sr-only'>
 						<DrawerTitle>
@@ -168,6 +197,8 @@ export function DrawerItemView({
 									onSubtaskDraftChange={
 										detail.subtasks.onDraftChange
 									}
+									onOpenSubtask={handleOpenSubtask}
+									canCreateSubtasks={canCreateSubtasks}
 									isReadOnly={isTaskComplete}
 									onCreateSubtask={detail.subtasks.onCreate}
 									isCreatingSubtask={

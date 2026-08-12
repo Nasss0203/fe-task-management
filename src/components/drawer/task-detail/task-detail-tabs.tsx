@@ -17,10 +17,13 @@ import { isTaskCompleted } from "@/lib/task-completion";
 import { getTaskStatusKey } from "@/lib/task-status-style";
 import { cn } from "@/lib/utils";
 import { ActivityResponseDto } from "@/services/activity/type";
-import { generateTaskSubtasksApi } from "@/services/ai-assistant/ai-assistant.service";
 import { type TaskCommentItem } from "@/services/comment/type";
-import { type TaskItem, TASK_KEY } from "@/services/task/type";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+	type FindOneTaskResponse,
+	type TaskItem,
+	TASK_KEY,
+} from "@/services/task/type";
+import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import {
 	AtSign,
@@ -36,7 +39,6 @@ import {
 	X,
 } from "lucide-react";
 import * as React from "react";
-import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
 import { Textarea } from "../../ui/textarea";
@@ -53,6 +55,8 @@ type TaskDetailTabsProps = {
 	subtaskDraft: string;
 	onSubtaskDraftChange: (value: string) => void;
 	onCreateSubtask: () => void | Promise<void>;
+	onOpenSubtask?: (task: TaskItem) => void;
+	canCreateSubtasks?: boolean;
 	isReadOnly?: boolean;
 	isCreatingSubtask?: boolean;
 	isLoadingSubtasks?: boolean;
@@ -76,17 +80,22 @@ type TaskDetailTabsProps = {
 	isLoadingActivities?: boolean;
 };
 
+const isSubtaskCompleted = (task: TaskItem) =>
+	isTaskCompleted(task) || getTaskStatusKey(task.statusName) === "done";
+
 function SubtaskCard({
 	item,
 	workspaceId,
 	projectId,
 	parentTaskId,
+	onOpenSubtask,
 	isReadOnly = false,
 }: {
 	item: TaskItem;
 	workspaceId: string;
 	projectId: string;
 	parentTaskId: string;
+	onOpenSubtask?: (task: TaskItem) => void;
 	isReadOnly?: boolean;
 }) {
 	const queryClient = useQueryClient();
@@ -102,7 +111,16 @@ function SubtaskCard({
 
 	const statuses = React.useMemo(() => statusData?.data ?? [], [statusData]);
 
-	const isDone = isTaskCompleted(item);
+	const currentStatus = React.useMemo(
+		() => statuses.find((status) => status.id === item.statusId),
+		[item.statusId, statuses],
+	);
+	const currentStatusKey = getTaskStatusKey(
+		currentStatus?.name ?? item.statusName,
+		currentStatus?.isDone,
+	);
+	const isDone =
+		isTaskCompleted(item) || currentStatusKey === "done";
 
 	const handleToggle = async (e: React.MouseEvent) => {
 		e.stopPropagation();
@@ -125,10 +143,36 @@ function SubtaskCard({
 		const targetStatus = isDone ? todoStatus : doneStatus;
 
 		try {
-			await updateTask({
+			const response = await updateTask({
 				id: item.id,
 				statusId: targetStatus.id,
 			});
+			const updatedSubtask = response.data;
+			queryClient.setQueryData<FindOneTaskResponse>(
+				[TASK_KEY.TASK, parentTaskId],
+				(old) => {
+					if (!old) return old;
+
+					return {
+						...old,
+						data: {
+							...old.data,
+							subtasks: (old.data.subtasks ?? []).map((subtask) =>
+								subtask.id === updatedSubtask.id
+									? {
+											...subtask,
+											...updatedSubtask,
+											statusName:
+												updatedSubtask.statusName ??
+												targetStatus.name ??
+												subtask.statusName,
+										}
+									: subtask,
+							),
+						},
+					};
+				},
+			);
 			void queryClient.invalidateQueries({
 				queryKey: [TASK_KEY.TASK, parentTaskId],
 			});
@@ -151,6 +195,20 @@ function SubtaskCard({
 		}
 	};
 
+	const handleOpenSubtask = () => {
+		onOpenSubtask?.(item);
+	};
+
+	const handleOpenSubtaskByKeyboard = (
+		event: React.KeyboardEvent<HTMLDivElement>,
+	) => {
+		if (event.target !== event.currentTarget) return;
+		if (event.key !== "Enter" && event.key !== " ") return;
+
+		event.preventDefault();
+		handleOpenSubtask();
+	};
+
 	const isOverdue = React.useMemo(() => {
 		if (!item.dueAt) return false;
 		try {
@@ -161,7 +219,13 @@ function SubtaskCard({
 	}, [item.dueAt]);
 
 	return (
-		<div className='group flex items-center justify-between gap-3 rounded-lg border border-border/40 bg-card px-3 py-2 hover:bg-muted/30 transition-all duration-200'>
+		<div
+			role='button'
+			tabIndex={0}
+			onClick={handleOpenSubtask}
+			onKeyDown={handleOpenSubtaskByKeyboard}
+			className='group flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-border/40 bg-card px-3 py-2 hover:bg-muted/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-all duration-200'
+		>
 			<div className='flex items-center gap-2.5 min-w-0 flex-1'>
 				<button
 					type='button'
@@ -271,6 +335,8 @@ export function TaskDetailTabs({
 	subtaskDraft,
 	onSubtaskDraftChange,
 	onCreateSubtask,
+	onOpenSubtask,
+	canCreateSubtasks = true,
 	isReadOnly = false,
 	isCreatingSubtask = false,
 	isLoadingSubtasks = false,
@@ -293,34 +359,23 @@ export function TaskDetailTabs({
 	activities = [],
 	isLoadingActivities = false,
 }: TaskDetailTabsProps) {
-	const queryClient = useQueryClient();
 	const completedCount = React.useMemo(() => {
-		return subtasks.filter(isTaskCompleted).length;
+		return subtasks.filter(isSubtaskCompleted).length;
 	}, [subtasks]);
 
 	const totalCount = subtasks.length;
 	const completionPercentage =
 		totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
-	const { mutate: generateSubtasks, isPending: isGenerating } = useMutation({
-		mutationFn: () => generateTaskSubtasksApi(parentTaskId),
-		onSuccess: () => {
-			toast.success("Đã tạo các tác vụ con bằng AI thành công!");
-			void queryClient.invalidateQueries({
-				queryKey: [TASK_KEY.TASK, parentTaskId],
-			});
-		},
-		onError: (error: any) => {
-			toast.error(
-				error.response?.data?.message || "Tạo tác vụ con thất bại",
-			);
-		},
-	});
-
 	const handleSubtaskSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
-		if (isReadOnly || !subtaskDraft.trim() || isCreatingSubtask) {
+		if (
+			!canCreateSubtasks ||
+			isReadOnly ||
+			!subtaskDraft.trim() ||
+			isCreatingSubtask
+		) {
 			return;
 		}
 
@@ -381,25 +436,6 @@ export function TaskDetailTabs({
 									{Math.round(completionPercentage)}%
 								</span>
 							)}
-							{/* <Button
-								type="button"
-								variant="ghost"
-								onClick={() => generateSubtasks()}
-								disabled={isGenerating}
-								className="h-7 gap-1.5 px-2.5 text-primary hover:text-primary hover:bg-primary/10 text-xs rounded-md border border-primary/20 bg-primary/5 font-medium transition-all duration-200"
-							>
-								{isGenerating ? (
-									<>
-										<Loader2 className="size-3.5 animate-spin" />
-										Đang tạo...
-									</>
-								) : (
-									<>
-										<Sparkles className="size-3.5 text-primary" />
-										Gợi ý bằng AI
-									</>
-								)}
-							</Button> */}
 						</div>
 					</div>
 
@@ -412,21 +448,23 @@ export function TaskDetailTabs({
 						</div>
 					)}
 
-					<form
-						onSubmit={handleSubtaskSubmit}
-						className='flex items-center gap-2 border-b border-border/40 py-1.5 focus-within:border-primary/50 transition-colors'
-					>
-						<Plus className='size-4 text-muted-foreground/60 shrink-0' />
-						<Input
-							value={subtaskDraft}
-							onChange={(event) =>
-								onSubtaskDraftChange(event.target.value)
-							}
-							placeholder='Thêm tác vụ con...'
-							disabled={isReadOnly || isCreatingSubtask}
-							className='h-8 w-full border-none bg-transparent p-0 shadow-none focus-visible:ring-0 text-[13px] placeholder:text-muted-foreground/50 placeholder:px-3'
-						/>
-					</form>
+					{canCreateSubtasks && (
+						<form
+							onSubmit={handleSubtaskSubmit}
+							className='flex items-center gap-2 border-b border-border/40 py-1.5 focus-within:border-primary/50 transition-colors'
+						>
+							<Plus className='size-4 text-muted-foreground/60 shrink-0' />
+							<Input
+								value={subtaskDraft}
+								onChange={(event) =>
+									onSubtaskDraftChange(event.target.value)
+								}
+								placeholder='Thêm tác vụ con...'
+								disabled={isReadOnly || isCreatingSubtask}
+								className='h-8 w-full border-none bg-transparent p-0 shadow-none focus-visible:ring-0 text-[13px] placeholder:text-muted-foreground/50 placeholder:px-3'
+							/>
+						</form>
+					)}
 
 					{isLoadingSubtasks ? (
 						<div className='py-8 text-center text-xs text-muted-foreground/75 font-medium'>
@@ -441,6 +479,7 @@ export function TaskDetailTabs({
 									workspaceId={workspaceId}
 									projectId={projectId}
 									parentTaskId={parentTaskId}
+									onOpenSubtask={onOpenSubtask}
 									isReadOnly={isReadOnly}
 								/>
 							))}

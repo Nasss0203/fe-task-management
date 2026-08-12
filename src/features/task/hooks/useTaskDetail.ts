@@ -50,20 +50,24 @@ export function useTaskDetail(task: TaskItem) {
 	const handleCreateSubtask = async () => {
 		const title = subtaskDraft.trim();
 
-		if (!title || !currentTask.statusId) {
+		if (currentTask.parentTaskId || !title || !currentTask.statusId) {
 			return;
 		}
 
-		await createSubtask.mutateAsync({
-			parentTaskId: currentTask.id,
-			workspaceId: currentTask.workspaceId,
-			projectId: currentTask.projectId,
-			title,
-			statusId: currentTask.statusId,
-			priorityId: currentTask.priorityId,
-		});
+		try {
+			await createSubtask.mutateAsync({
+				parentTaskId: currentTask.id,
+				workspaceId: currentTask.workspaceId,
+				projectId: currentTask.projectId,
+				title,
+				statusId: currentTask.statusId,
+				priorityId: currentTask.priorityId,
+			});
 
-		setSubtaskDraft("");
+			setSubtaskDraft("");
+		} catch (error) {
+			console.error("Failed to create subtask:", error);
+		}
 	};
 
 	return {
