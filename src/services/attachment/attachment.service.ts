@@ -26,11 +26,6 @@ export const uploadAttachmentApi = async (
 	const response = await instance.post<ApiResponse<AttachmentItem>>(
 		`/attachment/upload/${workspaceId}`,
 		formData,
-		{
-			headers: {
-				"Content-Type": "multipart/form-data",
-			},
-		},
 	);
 	return response.data;
 };

@@ -3,7 +3,6 @@
 import { TaskAssigneeField } from "@/features/assign/components/TaskAssigneeField";
 import { useTaskDetail } from "@/features/task/hooks/useTaskDetail";
 import { isTaskCompleted } from "@/lib/task-completion";
-import { getTaskStatusKey } from "@/lib/task-status-style";
 import type { TaskItem } from "@/services/task/type";
 import { useState } from "react";
 import {
@@ -50,9 +49,7 @@ export function DrawerItemView({
 			: task;
 	const detail = useTaskDetail(activeTask);
 	const currentTask = detail.task;
-	const isTaskComplete =
-		isTaskCompleted(currentTask) ||
-		getTaskStatusKey(detail.display.currentStatusName) === "done";
+	const isTaskComplete = isTaskCompleted(currentTask);
 	const isTaskLocked = detail.isUpdatingTask || isTaskComplete;
 	const canCreateSubtasks = !currentTask.parentTaskId;
 	const handleOpenChange = (nextOpen: boolean) => {
@@ -183,8 +180,8 @@ export function DrawerItemView({
 									/>
 
 									<TaskAttachmentsField
+										workspaceId={currentTask.workspaceId}
 										attachmentsHook={detail.attachmentsHook}
-										isReadOnly={isTaskComplete}
 									/>
 								</div>
 

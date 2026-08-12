@@ -4,6 +4,7 @@ import { getTaskStatusStyle } from "@/lib/task-status-style";
 import { cn } from "@/lib/utils";
 import { useDroppable } from "@dnd-kit/core";
 import { Ellipsis, Plus } from "lucide-react";
+import * as React from "react";
 
 type Props = {
 	id: string;
@@ -15,7 +16,7 @@ type Props = {
 	className?: string;
 };
 
-export default function ColumnDnd({
+function ColumnDnd({
 	id,
 	children,
 	statusId,
@@ -97,3 +98,5 @@ export default function ColumnDnd({
 		</div>
 	);
 }
+
+export default React.memo(ColumnDnd);

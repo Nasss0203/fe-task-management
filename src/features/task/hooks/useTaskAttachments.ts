@@ -6,7 +6,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_ATTACHMENT_SIZE_MB = 50;
+const MAX_FILE_SIZE = MAX_ATTACHMENT_SIZE_MB * 1024 * 1024;
 
 export function useTaskAttachments(task: TaskItem) {
 	const queryClient = useQueryClient();
@@ -26,7 +27,9 @@ export function useTaskAttachments(task: TaskItem) {
 		const validFiles: File[] = [];
 		for (const file of files) {
 			if (file.size > MAX_FILE_SIZE) {
-				toast.error(`Tệp ${file.name} vượt quá giới hạn 5MB.`);
+				toast.error(
+					`Tệp ${file.name} vượt quá giới hạn ${MAX_ATTACHMENT_SIZE_MB}MB.`,
+				);
 				continue;
 			}
 			validFiles.push(file);
@@ -53,7 +56,7 @@ export function useTaskAttachments(task: TaskItem) {
 			if (failed > 0) {
 				toast.error(`Không thể tải lên ${failed} tệp.`);
 			}
-		} catch (error) {
+		} catch {
 			toast.error("Đã xảy ra lỗi khi tải tệp lên.");
 		} finally {
 			setIsUploading(false);
@@ -83,7 +86,7 @@ export function useTaskAttachments(task: TaskItem) {
 			document.body.appendChild(link);
 			link.click();
 			document.body.removeChild(link);
-		} catch (error) {
+		} catch {
 			toast.error("Không thể lấy liên kết tải xuống.");
 		}
 	};

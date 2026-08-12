@@ -2,6 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { getUserFacingPriorityStyle } from "@/components/shared/priority-badge";
+import { PERMISSIONS } from "@/constants/permissions";
+import { usePermission } from "@/features/permission/hooks/usePermission";
 import { useTaskAttachments } from "@/features/task/hooks/useTaskAttachments";
 import { getTaskStatusStyle } from "@/lib/task-status-style";
 import { cn } from "@/lib/utils";
@@ -94,9 +96,12 @@ type TaskDescriptionFieldProps = {
 };
 
 type TaskAttachmentsFieldProps = {
+	workspaceId: string;
 	attachmentsHook: ReturnType<typeof useTaskAttachments>;
-	isReadOnly?: boolean;
 };
+
+const ATTACHMENT_ACCEPT =
+	".jpg,.jpeg,.png,.gif,.webp,.svg,.txt,.csv,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.fig";
 
 function getTodayBoundary() {
 	const today = new Date();
@@ -132,12 +137,12 @@ function AttachmentCard({
 	attachment,
 	onDownload,
 	onDelete,
-	isReadOnly = false,
+	canDelete,
 }: {
 	attachment: AttachmentItem;
 	onDownload: (id: string, name: string) => void;
 	onDelete: (id: string) => void;
-	isReadOnly?: boolean;
+	canDelete: boolean;
 }) {
 	const previewUrl = getAttachmentPreviewUrl(attachment);
 	const extension = getFileExtension(attachment.fileName);
@@ -183,16 +188,17 @@ function AttachmentCard({
 				>
 					<Download className='size-3.5' />
 				</Button>
-				<Button
-					type='button'
-					variant='ghost'
-					size='icon-xs'
-					onClick={() => onDelete(attachment.id)}
-					disabled={isReadOnly}
-					className='text-destructive hover:bg-destructive/10 hover:text-destructive'
-				>
-					<Trash2 className='size-3.5' />
-				</Button>
+				{canDelete && (
+					<Button
+						type='button'
+						variant='ghost'
+						size='icon-xs'
+						onClick={() => onDelete(attachment.id)}
+						className='text-destructive hover:bg-destructive/10 hover:text-destructive'
+					>
+						<Trash2 className='size-3.5' />
+					</Button>
+				)}
 			</div>
 		</div>
 	);
@@ -798,8 +804,8 @@ export function TaskDescriptionField({
 }
 
 export function TaskAttachmentsField({
+	workspaceId,
 	attachmentsHook,
-	isReadOnly = false,
 }: TaskAttachmentsFieldProps) {
 	const {
 		attachments,
@@ -809,6 +815,12 @@ export function TaskAttachmentsField({
 		handleDownload,
 		deleteAttachment,
 	} = attachmentsHook;
+	const { can, isLoading: isLoadingPermissions } = usePermission(workspaceId);
+	const canUpload =
+		!isLoadingPermissions && can(PERMISSIONS.ATTACHMENT_UPLOAD);
+	const canDelete =
+		!isLoadingPermissions && can(PERMISSIONS.ATTACHMENT_DELETE);
+	const isUploadDisabled = isUploading || isLoadingPermissions;
 	const fileInputRef = React.useRef<HTMLInputElement>(null);
 
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -847,23 +859,26 @@ export function TaskAttachmentsField({
 						</Button>
 					)}
 
-					<Button
-						type='button'
-						size='sm'
-						disabled={isUploading || isReadOnly}
-						onClick={() => fileInputRef.current?.click()}
-						className='h-8 rounded-lg px-3 text-xs'
-					>
-						{isUploading ? (
-							<Loader2 className='size-3.5 animate-spin mr-1' />
-						) : (
-							<Plus className='size-3.5 mr-1' />
-						)}
-						Thêm tệp
-					</Button>
+					{canUpload && (
+						<Button
+							type='button'
+							size='sm'
+							disabled={isUploadDisabled}
+							onClick={() => fileInputRef.current?.click()}
+							className='h-8 rounded-lg px-3 text-xs'
+						>
+							{isUploading ? (
+								<Loader2 className='size-3.5 animate-spin mr-1' />
+							) : (
+								<Plus className='size-3.5 mr-1' />
+							)}
+							Thêm tệp
+						</Button>
+					)}
 					<input
 						type='file'
 						multiple
+						accept={ATTACHMENT_ACCEPT}
 						className='hidden'
 						ref={fileInputRef}
 						onChange={handleFileChange}
@@ -883,27 +898,29 @@ export function TaskAttachmentsField({
 								attachment={attachment}
 								onDownload={handleDownload}
 								onDelete={deleteAttachment}
-								isReadOnly={isReadOnly}
+								canDelete={canDelete}
 							/>
 						))}
 
-						<button
-							type='button'
-							disabled={isUploading || isReadOnly}
-							onClick={() => fileInputRef.current?.click()}
-							className='flex h-16 items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-card text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-60'
-						>
-							{isUploading ? (
-								<Loader2 className='size-4 animate-spin' />
-							) : (
-								<Plus className='size-4' />
-							)}
-							<span>
-								{isUploading
-									? "Đang tải lên..."
-									: "Thêm tệp đính kèm"}
-							</span>
-						</button>
+						{canUpload && (
+							<button
+								type='button'
+								disabled={isUploadDisabled}
+								onClick={() => fileInputRef.current?.click()}
+								className='flex h-16 items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-card text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-60'
+							>
+								{isUploading ? (
+									<Loader2 className='size-4 animate-spin' />
+								) : (
+									<Plus className='size-4' />
+								)}
+								<span>
+									{isUploading
+										? "Đang tải lên..."
+										: "Thêm tệp đính kèm"}
+								</span>
+							</button>
+						)}
 					</div>
 				)}
 			</div>

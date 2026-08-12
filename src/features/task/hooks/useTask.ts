@@ -186,7 +186,13 @@ export const useCreateSubtask = ({
 	});
 };
 
-export const useUpdateTask = (workspaceId: string, projectId: string) => {
+export const useUpdateTask = (
+	workspaceId: string,
+	projectId: string,
+	options?: {
+		refetchOnSuccess?: boolean;
+	},
+) => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
@@ -287,6 +293,8 @@ export const useUpdateTask = (workspaceId: string, projectId: string) => {
 			const detailKey = [TASK_KEY.TASK, variables.id];
 			const taskListKey = [TASK_KEY.TASKS, workspaceId, projectId];
 			const backlogKey = [TASK_KEY.TASK_BACKLOG, workspaceId, projectId];
+			const refetchType =
+				options?.refetchOnSuccess === false ? "none" : "active";
 
 			queryClient.setQueryData<FindOneTaskResponse>(
 				detailKey,
@@ -315,18 +323,23 @@ export const useUpdateTask = (workspaceId: string, projectId: string) => {
 			void Promise.all([
 				queryClient.invalidateQueries({
 					queryKey: detailKey,
+					refetchType,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: taskListKey,
+					refetchType,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: backlogKey,
+					refetchType,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
+					refetchType,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: [SPRINT_KEY.SPRINT, workspaceId, projectId],
+					refetchType,
 				}),
 			]);
 		},
@@ -548,9 +561,11 @@ export const useTaskPriority = (workspaceId?: string, projectId?: string) => {
 export const useReorderTaskPosition = ({
 	workspaceId,
 	projectId,
+	refetchOnSuccess = true,
 }: {
 	workspaceId: string;
 	projectId: string;
+	refetchOnSuccess?: boolean;
 }) => {
 	const queryClient = useQueryClient();
 
@@ -566,22 +581,24 @@ export const useReorderTaskPosition = ({
 			return reorderTaskPositionApi(body);
 		},
 		onSuccess: async () => {
+			const refetchType = refetchOnSuccess ? "active" : "none";
+
 			await Promise.all([
 				queryClient.invalidateQueries({
 					queryKey: [TASK_KEY.TASKS, workspaceId, projectId],
-					refetchType: "active",
+					refetchType,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: [TASK_KEY.TASK_BACKLOG, workspaceId, projectId],
-					refetchType: "active",
+					refetchType,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: [SPRINT_KEY.SPRINTS, workspaceId, projectId],
-					refetchType: "active",
+					refetchType,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: [SPRINT_KEY.SPRINT, workspaceId, projectId],
-					refetchType: "active",
+					refetchType,
 				}),
 			]);
 		},

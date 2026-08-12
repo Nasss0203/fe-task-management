@@ -6,6 +6,7 @@ import {
 	useReorderTaskPosition,
 	useTask,
 	useTaskStatus,
+	useUpdateTask,
 } from "@/features/task/hooks/useTask";
 import { isTaskVisible } from "@/lib/task-completion";
 import type { TaskPositionContextInput } from "@/services/task/type";
@@ -13,7 +14,6 @@ import {
 	DndContext,
 	type DragEndEvent,
 	type DragOverEvent,
-	type DragStartEvent,
 	PointerSensor,
 	closestCorners,
 	useSensor,
@@ -24,7 +24,14 @@ import {
 	arrayMove,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+	startTransition,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import ColumnDnd from "./column-dnd";
 import ItemsDnd from "./items-dnd";
 
@@ -164,14 +171,15 @@ const ProviderDragDrop = ({
 	const {
 		taskQuery,
 		createTask,
-		updateTask: {
-			mutate: updateTaskMutate,
-			mutateAsync: updateTaskMutateAsync,
-		},
 	} = useTask(workspaceId, projectId, positionContext);
+	const { mutate: updateTaskMutate, mutateAsync: updateTaskMutateAsync } =
+		useUpdateTask(workspaceId, projectId, {
+			refetchOnSuccess: false,
+		});
 	const reorderTaskPosition = useReorderTaskPosition({
 		workspaceId,
 		projectId,
+		refetchOnSuccess: false,
 	});
 
 	useSprints({
@@ -220,19 +228,88 @@ const ProviderDragDrop = ({
 	const [items, setItems] = useState<DndColumns>({});
 	const itemsRef = useRef<DndColumns>({});
 	const snapshotRef = useRef<DndColumns>({});
+	const isDraggingRef = useRef(false);
+	const lastPreviewKeyRef = useRef<string | null>(null);
+	const previewFrameRef = useRef<number | null>(null);
+	const pendingPreviewRef = useRef<{
+		activeId: string;
+		overId: string;
+	} | null>(null);
 	const [activeDrawerTaskId, setActiveDrawerTaskId] = useState<string | null>(
 		null,
 	);
 
-	const syncItems = (next: DndColumns) => {
+	const syncItems = useCallback((next: DndColumns) => {
 		itemsRef.current = next;
 		setItems(next);
-	};
+	}, []);
 
 	useEffect(() => {
+		if (isDraggingRef.current) {
+			return;
+		}
+
 		itemsRef.current = mappedItems;
-		setItems(mappedItems);
+		startTransition(() => {
+			setItems(mappedItems);
+		});
 	}, [mappedItems]);
+
+	const cancelPendingPreview = useCallback(() => {
+		pendingPreviewRef.current = null;
+
+		if (previewFrameRef.current !== null) {
+			cancelAnimationFrame(previewFrameRef.current);
+			previewFrameRef.current = null;
+		}
+	}, []);
+
+	const flushPreview = useCallback(() => {
+		previewFrameRef.current = null;
+		const pendingPreview = pendingPreviewRef.current;
+
+		if (!pendingPreview) {
+			return;
+		}
+
+		pendingPreviewRef.current = null;
+
+		const previewKey = `${pendingPreview.activeId}:${pendingPreview.overId}`;
+
+		if (lastPreviewKeyRef.current === previewKey) {
+			return;
+		}
+
+		const nextItems = reorderItems(
+			itemsRef.current,
+			pendingPreview.activeId,
+			pendingPreview.overId,
+		);
+
+		if (nextItems !== itemsRef.current) {
+			lastPreviewKeyRef.current = previewKey;
+			syncItems(nextItems);
+		}
+	}, [syncItems]);
+
+	const schedulePreview = useCallback(
+		(activeId: string, overId: string) => {
+			pendingPreviewRef.current = { activeId, overId };
+
+			if (previewFrameRef.current !== null) {
+				return;
+			}
+
+			previewFrameRef.current = requestAnimationFrame(flushPreview);
+		},
+		[flushPreview],
+	);
+
+	useEffect(() => {
+		return () => {
+			cancelPendingPreview();
+		};
+	}, [cancelPendingPreview]);
 
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
@@ -246,15 +323,7 @@ const ProviderDragDrop = ({
 		? taskMap[activeDrawerTaskId]
 		: null;
 
-	if (taskQuery.isLoading || taskStatusQuery.isLoading) {
-		return <div>Loading...</div>;
-	}
-
-	if (taskQuery.isError || taskStatusQuery.isError) {
-		return <div>Load data failed</div>;
-	}
-
-	const handleAddTask = (statusId: string) => {
+	const handleAddTask = useCallback((statusId: string) => {
 		createTask({
 			workspaceId,
 			projectId,
@@ -264,32 +333,39 @@ const ProviderDragDrop = ({
 			dueAt: null,
 			...(positionContext ? { positionContext } : {}),
 		});
-	};
+	}, [createTask, projectId, workspaceId, positionContext]);
 
-	const handleDragStart = (event: DragStartEvent) => {
+	const handleUpdateTaskName = useCallback(
+		(taskId: string, newName: string) => {
+			updateTaskMutate({
+				id: taskId,
+				title: newName,
+			});
+		},
+		[updateTaskMutate],
+	);
+
+	const handleDragStart = useCallback(() => {
+		cancelPendingPreview();
+		isDraggingRef.current = true;
 		snapshotRef.current = cloneItems(itemsRef.current);
-	};
+		lastPreviewKeyRef.current = null;
+	}, [cancelPendingPreview]);
 
-	const handleDragOver = (event: DragOverEvent) => {
+	const handleDragOver = useCallback((event: DragOverEvent) => {
 		const { active, over } = event;
 
 		if (!over) {
 			return;
 		}
 
-		const nextItems = reorderItems(
-			itemsRef.current,
-			String(active.id),
-			String(over.id),
-		);
+		schedulePreview(String(active.id), String(over.id));
+	}, [schedulePreview]);
 
-		if (nextItems !== itemsRef.current) {
-			syncItems(nextItems);
-		}
-	};
-
-	const handleDragEnd = (event: DragEndEvent) => {
+	const handleDragEnd = useCallback((event: DragEndEvent) => {
 		const { active, over } = event;
+		isDraggingRef.current = false;
+		cancelPendingPreview();
 
 		if (!over) {
 			syncItems(snapshotRef.current);
@@ -340,11 +416,12 @@ const ProviderDragDrop = ({
 
 		void (async () => {
 			try {
-				await updateTaskMutateAsync({
-					id: taskId,
-					statusId: nextStatusId,
-					position: nextPosition,
-				});
+				if (previousStatusId !== nextStatusId) {
+					await updateTaskMutateAsync({
+						id: taskId,
+						statusId: nextStatusId,
+					});
+				}
 
 				if (positionContext) {
 					await reorderTaskPosition.mutateAsync({
@@ -358,7 +435,27 @@ const ProviderDragDrop = ({
 				syncItems(snapshotRef.current);
 			}
 		})();
-	};
+	}, [
+		cancelPendingPreview,
+		positionContext,
+		reorderTaskPosition,
+		syncItems,
+		updateTaskMutateAsync,
+	]);
+
+	const handleDragCancel = useCallback(() => {
+		isDraggingRef.current = false;
+		cancelPendingPreview();
+		syncItems(snapshotRef.current);
+	}, [cancelPendingPreview, syncItems]);
+
+	if (taskQuery.isLoading || taskStatusQuery.isLoading) {
+		return <div>Loading...</div>;
+	}
+
+	if (taskQuery.isError || taskStatusQuery.isError) {
+		return <div>Load data failed</div>;
+	}
 
 	return (
 		<>
@@ -367,6 +464,7 @@ const ProviderDragDrop = ({
 				sensors={sensors}
 				onDragStart={handleDragStart}
 				onDragOver={handleDragOver}
+				onDragCancel={handleDragCancel}
 				onDragEnd={handleDragEnd}
 			>
 				<div className='inline-flex w-full flex-row gap-3'>
@@ -380,7 +478,7 @@ const ProviderDragDrop = ({
 								statusId={status.id}
 								statusName={status.name}
 								isDone={status.isDone}
-								onAddTask={() => handleAddTask(status.id)}
+								onAddTask={handleAddTask}
 								className={className}
 							>
 								<SortableContext
@@ -409,12 +507,7 @@ const ProviderDragDrop = ({
 												startAt={task?.startAt}
 												dueAt={task?.dueAt}
 												onOpenDetail={setActiveDrawerTaskId}
-												onUpdateName={(taskId, newName) => {
-													updateTaskMutate({
-														id: taskId,
-														title: newName,
-													});
-												}}
+												onUpdateName={handleUpdateTaskName}
 											/>
 										);
 									})}

@@ -22,7 +22,7 @@ type ItemsDndProps = {
 	onOpenDetail?: (taskId: string) => void;
 };
 
-const ItemsDnd = ({
+const ItemsDnd = React.memo(function ItemsDnd({
 	id,
 	task,
 	column,
@@ -36,7 +36,7 @@ const ItemsDnd = ({
 	description,
 	onUpdateName,
 	onOpenDetail,
-}: ItemsDndProps) => {
+}: ItemsDndProps) {
 	const {
 		setNodeRef,
 		attributes,
@@ -52,13 +52,11 @@ const ItemsDnd = ({
 			index,
 		},
 	});
-	const [preventOpenDetail, setPreventOpenDetail] = React.useState(false);
 	const wasDraggingRef = React.useRef(false);
 
 	React.useEffect(() => {
 		if (isDragging) {
 			wasDraggingRef.current = true;
-			setPreventOpenDetail(true);
 			return;
 		}
 
@@ -66,7 +64,6 @@ const ItemsDnd = ({
 
 		const timer = window.setTimeout(() => {
 			wasDraggingRef.current = false;
-			setPreventOpenDetail(false);
 		}, 150);
 
 		return () => window.clearTimeout(timer);
@@ -81,6 +78,8 @@ const ItemsDnd = ({
 				opacity: isDragging ? 0.4 : 1,
 				transform: CSS.Transform.toString(transform),
 				transition,
+				willChange: transform ? "transform" : undefined,
+				zIndex: isDragging ? 1 : undefined,
 			}}
 		>
 			<ItemView
@@ -100,11 +99,11 @@ const ItemsDnd = ({
 					const target = event.target as HTMLElement | null;
 					if (target?.closest("[data-prevent-open-detail='true']"))
 						return;
-					if (!preventOpenDetail) onOpenDetail?.(id);
+					if (!wasDraggingRef.current) onOpenDetail?.(id);
 				}}
 			/>
 		</div>
 	);
-};
+});
 
 export default ItemsDnd;
