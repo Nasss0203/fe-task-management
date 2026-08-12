@@ -6,44 +6,16 @@ import {
 	WorkspaceInviteResponse,
 } from "./type";
 
-export const WORKSPACE_INVITE_BATCH_SIZE = 3;
-
-const splitInviteRecipients = (
-	recipients: CreateWorkspaceInviteDto["recipients"],
-) => {
-	const batches: CreateWorkspaceInviteDto["recipients"][] = [];
-
-	for (
-		let index = 0;
-		index < recipients.length;
-		index += WORKSPACE_INVITE_BATCH_SIZE
-	) {
-		batches.push(recipients.slice(index, index + WORKSPACE_INVITE_BATCH_SIZE));
-	}
-
-	return batches;
-};
-
 export const inviteWorkspaceMembersApi = async (
 	workspaceId: string,
 	data: CreateWorkspaceInviteDto,
 ): Promise<WorkspaceInviteResponse[]> => {
-	const batches = splitInviteRecipients(data.recipients);
-	const invites: WorkspaceInviteResponse[] = [];
+	const response = await instance.post<WorkspaceInviteResponse[]>(
+		`/workspace-invites/${workspaceId}/members`,
+		data,
+	);
 
-	for (const recipients of batches) {
-		const response = await instance.post<WorkspaceInviteResponse[]>(
-			`/workspace-invites/${workspaceId}/members`,
-			{
-				...data,
-				recipients,
-			},
-		);
-
-		invites.push(...response.data);
-	}
-
-	return invites;
+	return response.data;
 };
 
 export const searchInviteUsersApi = async ({
