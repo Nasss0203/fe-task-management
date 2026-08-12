@@ -26,3 +26,7 @@ export const removeMemberApi = async (
 ): Promise<void> => {
 	await instance.delete(`/workspace-members/${workspaceId}/members/${userId}`);
 };
+
+export const leaveWorkspaceApi = async (workspaceId: string): Promise<void> => {
+	await instance.delete(`/workspace-members/${workspaceId}/members/me`);
+};
