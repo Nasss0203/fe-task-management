@@ -65,12 +65,9 @@ export default function AdminSystemAdminsPage() {
 	const {
 		userOverview,
 		users,
-		billingPlans,
 		lockUser,
 		unlockUser,
 		createSystemAdmin,
-		grantSubscription,
-		revokeSubscription,
 	} = useAdminUsers(userQuery);
 
 	const isSuperAdmin = user?.systemRole === SystemRole.SUPER_ADMIN;
@@ -81,24 +78,6 @@ export default function AdminSystemAdminsPage() {
 	const lockedSystemAdmins = userItems.filter(
 		(item) => item.status === "LOCKED",
 	).length;
-	const proPlan = useMemo(() => {
-		const activePlans =
-			billingPlans.data?.filter((item) => item.status === "ACTIVE") ?? [];
-
-		return (
-			activePlans.find(
-				(item) =>
-					item.slug?.toLowerCase() === "pro-monthly" ||
-					item.code.toLowerCase() === "pro_monthly",
-			) ??
-			activePlans.find(
-				(item) =>
-					item.slug?.toLowerCase() !== "free" &&
-					item.code.toLowerCase() !== "free",
-			) ??
-			null
-		);
-	}, [billingPlans.data]);
 	const visibleUserItems = useMemo(() => {
 		if (userItems.length <= pagination.pageSize) {
 			return userItems;
@@ -142,6 +121,15 @@ export default function AdminSystemAdminsPage() {
 				await lockUser.mutateAsync(userId);
 			}
 
+			setSelectedUser((current) =>
+				current?.id === userId
+					? {
+							...current,
+							status: isLocked ? "ACTIVE" : "LOCKED",
+						}
+					: current,
+			);
+
 			toast.success(
 				isLocked
 					? "Đã khôi phục tài khoản System Admin."
@@ -155,45 +143,6 @@ export default function AdminSystemAdminsPage() {
 
 	const handleResetStatus = (userId: string) => {
 		unlockUser.mutate(userId);
-	};
-
-	const handleChangePlan = async (user: AdminUser) => {
-		const nextPlan = user.plan === "pro" ? "free" : "pro";
-
-		try {
-			if (nextPlan === "pro") {
-				if (!proPlan) {
-					toast.error("Không tìm thấy gói Pro đang hoạt động.");
-					return;
-				}
-
-				await grantSubscription.mutateAsync({
-					userId: user.id,
-					planId: proPlan.id,
-					months: 1,
-					note: "Granted from admin management",
-				});
-				toast.success("Đã cấp Pro cho System Admin.");
-			} else {
-				await revokeSubscription.mutateAsync({
-					userId: user.id,
-					note: "Revoked from admin management",
-				});
-				toast.success("Đã chuyển System Admin về Free.");
-			}
-
-			setSelectedUser((current) =>
-				current?.id === user.id
-					? {
-							...current,
-							plan: nextPlan,
-						}
-					: current,
-			);
-		} catch (error) {
-			console.error("change system admin billing subscription failed", error);
-			toast.error("Không thể cập nhật gói của System Admin.");
-		}
 	};
 
 	const handleResetFilters = () => {
@@ -246,17 +195,11 @@ export default function AdminSystemAdminsPage() {
 						onView={setSelectedUser}
 						onToggleLock={handleToggleLock}
 						onResetStatus={handleResetStatus}
-						onChangePlan={handleChangePlan}
 						isLoading={users.isLoading}
 						isError={users.isError}
 						isChangingStatus={
 							lockUser.isPending || unlockUser.isPending
 						}
-						isChangingPlan={
-							grantSubscription.isPending ||
-							revokeSubscription.isPending
-						}
-						canGrantPro={Boolean(proPlan)}
 					/>
 				</div>
 			</div>

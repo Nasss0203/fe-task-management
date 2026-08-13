@@ -7,14 +7,10 @@ import {
 	lockAdminUserApi,
 	unlockAdminUserApi,
 } from "@/services/admin/user/user-admin.service";
-import {
-	getAdminBillingPlansApi,
-	grantAdminBillingSubscriptionApi,
-	revokeAdminBillingSubscriptionApi,
-} from "@/services/admin/billing/billing-admin.service";
 import type {
 	AdminFindAllUserQuery,
 	AdminUserPaginationResponse,
+	AdminUserStatus,
 } from "@/services/admin/user/type";
 import type { ApiResponse } from "@/services/admin/dashboard/type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -24,7 +20,6 @@ import { isSystemAdmin } from "@/lib/auth/system-role";
 export const ADMIN_USERS_KEY = {
 	USER_OVERVIEW: "ADMIN_USER_OVERVIEW",
 	USER_LIST: "ADMIN_USER_LIST",
-	BILLING_PLANS: "ADMIN_USER_BILLING_PLANS",
 } as const;
 
 export const useAdminUsers = (query?: AdminFindAllUserQuery) => {
@@ -48,61 +43,82 @@ export const useAdminUsers = (query?: AdminFindAllUserQuery) => {
 		enabled: canAccessAdmin,
 	});
 
-	const billingPlans = useQuery({
-		queryKey: [ADMIN_USERS_KEY.BILLING_PLANS],
-		queryFn: getAdminBillingPlansApi,
-		retry: false,
-		refetchOnWindowFocus: false,
-		enabled: canAccessAdmin,
-	});
+	const setUserStatusInCache = (
+		userId: string,
+		status: AdminUserStatus,
+	) => {
+		queryClient.setQueriesData<ApiResponse<AdminUserPaginationResponse>>(
+			{ queryKey: [ADMIN_USERS_KEY.USER_LIST] },
+			(current) => {
+				if (!current?.data?.data) return current;
 
-	const invalidateUsers = async () => {
+				let changed = false;
+				const data = current.data.data.map((item) => {
+					if (item.id !== userId || item.status === status) return item;
+
+					changed = true;
+					return {
+						...item,
+						status,
+					};
+				});
+
+				return changed
+					? {
+							...current,
+							data: {
+								...current.data,
+								data,
+							},
+						}
+					: current;
+			},
+		);
+	};
+
+	const refreshUsers = async () => {
 		await Promise.all([
-			queryClient.invalidateQueries({
+			queryClient.refetchQueries({
 				queryKey: [ADMIN_USERS_KEY.USER_OVERVIEW],
+				type: "active",
 			}),
-			queryClient.invalidateQueries({
+			queryClient.refetchQueries({
 				queryKey: [ADMIN_USERS_KEY.USER_LIST],
+				type: "active",
 			}),
-			queryClient.invalidateQueries({
+			queryClient.refetchQueries({
 				queryKey: ["ADMIN_WORKSPACE_LIST"],
+				type: "active",
 			}),
 		]);
 	};
 
 	const lockUser = useMutation({
 		mutationFn: lockAdminUserApi,
-		onSuccess: invalidateUsers,
+		onSuccess: async (_, userId) => {
+			setUserStatusInCache(userId, "LOCKED");
+			await refreshUsers();
+		},
 	});
 
 	const createSystemAdmin = useMutation({
 		mutationFn: createSystemAdminApi,
-		onSuccess: invalidateUsers,
+		onSuccess: refreshUsers,
 	});
 
 	const unlockUser = useMutation({
 		mutationFn: unlockAdminUserApi,
-		onSuccess: invalidateUsers,
-	});
-
-	const grantSubscription = useMutation({
-		mutationFn: grantAdminBillingSubscriptionApi,
-		onSuccess: invalidateUsers,
-	});
-
-	const revokeSubscription = useMutation({
-		mutationFn: revokeAdminBillingSubscriptionApi,
-		onSuccess: invalidateUsers,
+		onSuccess: async (_, userId) => {
+			setUserStatusInCache(userId, "ACTIVE");
+			await refreshUsers();
+		},
 	});
 
 	return {
 		userOverview,
 		users,
-		billingPlans,
 		lockUser,
 		createSystemAdmin,
 		unlockUser,
-		grantSubscription,
-		revokeSubscription,
 	};
 };

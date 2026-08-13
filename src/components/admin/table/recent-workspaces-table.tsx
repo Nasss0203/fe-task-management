@@ -15,18 +15,9 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import type {
 	AdminFindAllWorkspaceQuery,
-	PlanTypeWorkspace,
 	WorkspaceItem,
 } from "@/services/admin/dashboard/type";
 import type { OnChangeFn, PaginationState } from "@tanstack/react-table";
@@ -54,9 +45,6 @@ type Props = {
 	isLoading?: boolean;
 	skeletonRowCount?: number;
 };
-
-const selectClass =
-	"h-10 w-full rounded-xl border border-input bg-white px-3 text-sm text-foreground outline-none hover:border-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/15";
 
 const formatDate = (date?: Date) => {
 	if (!date) return "Tất cả ngày tạo";
@@ -88,12 +76,11 @@ export function RecentWorkspacesTable({
 	skeletonRowCount = pagination.pageSize,
 }: Props) {
 	const [search, setSearch] = useState(query.search ?? "");
-	const [plan, setPlan] = useState<PlanTypeWorkspace | "">(query.plan ?? "");
 	const [createdAt, setCreatedAt] = useState(query.createdAt ?? "");
 	const selectedDate = createdAt
 		? new Date(`${createdAt}T00:00:00`)
 		: undefined;
-	const hasActiveFilter = Boolean(plan || createdAt);
+	const hasActiveFilter = Boolean(createdAt);
 	const table = useReactTable({
 		data: items,
 		columns: recentWorkspacesColumns,
@@ -108,12 +95,10 @@ export function RecentWorkspacesTable({
 
 	const updateQuery = (
 		nextSearch: string,
-		nextPlan: PlanTypeWorkspace | "",
 		nextCreatedAt: string,
 	) => {
 		onQueryChange({
 			search: nextSearch.trim() || undefined,
-			plan: nextPlan || undefined,
 			createdAt: nextCreatedAt || undefined,
 			page: 1,
 			pageSize: pagination.pageSize,
@@ -122,24 +107,17 @@ export function RecentWorkspacesTable({
 
 	const handleSearchChange = (value: string) => {
 		setSearch(value);
-		updateQuery(value, plan, createdAt);
-	};
-
-	const handlePlanChange = (value: string) => {
-		const nextPlan = value === "all" ? "" : (value as PlanTypeWorkspace);
-		setPlan(nextPlan);
-		updateQuery(search, nextPlan, createdAt);
+		updateQuery(value, createdAt);
 	};
 
 	const handleCreatedAtChange = (date?: Date) => {
 		const nextCreatedAt = date ? toDateFilter(date) : "";
 		setCreatedAt(nextCreatedAt);
-		updateQuery(search, plan, nextCreatedAt);
+		updateQuery(search, nextCreatedAt);
 	};
 
 	const handleResetFilter = () => {
 		setSearch("");
-		setPlan("");
 		setCreatedAt("");
 		onQueryChange({
 			page: 1,
@@ -199,24 +177,8 @@ export function RecentWorkspacesTable({
 									Bộ lọc workspace gần đây
 								</p>
 								<p className='mt-1 text-xs text-muted-foreground'>
-									Lọc theo gói dịch vụ và ngày tạo.
+									Lọc theo ngày tạo.
 								</p>
-							</div>
-
-							<div className='flex flex-col gap-2'>
-								<label className={adminFieldLabelClass}>Gói dịch vụ</label>
-								<Select value={plan || "all"} onValueChange={handlePlanChange}>
-									<SelectTrigger className={selectClass}>
-										<SelectValue placeholder='Tất cả gói' />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectGroup>
-											<SelectItem value='all'>Tất cả gói</SelectItem>
-											<SelectItem value='free'>Free</SelectItem>
-											<SelectItem value='pro'>Pro</SelectItem>
-										</SelectGroup>
-									</SelectContent>
-								</Select>
 							</div>
 
 							<div className='flex flex-col gap-2'>

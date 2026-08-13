@@ -79,7 +79,7 @@ const getWorkspaceItems = (value: unknown): WorkspaceItem[] => {
 };
 
 const hasWorkspaceFilters = (query: AdminFindAllWorkspaceQuery) => {
-	return Boolean(query.search?.trim() || query.plan || query.createdAt);
+	return Boolean(query.search?.trim() || query.createdAt);
 };
 
 const filterWorkspaces = (
@@ -102,11 +102,10 @@ const filterWorkspaces = (
 				.filter(Boolean)
 				.some((value) => value!.toLowerCase().includes(search));
 
-		const matchesPlan = !query.plan || workspace.plan === query.plan;
 		const matchesCreatedAt =
 			!createdAt || workspace.createdAt?.slice(0, 10) === createdAt;
 
-		return matchesSearch && matchesPlan && matchesCreatedAt;
+		return matchesSearch && matchesCreatedAt;
 	});
 };
 function MetricTile({ item }: { item: MetricItem }) {
@@ -476,7 +475,6 @@ export default function AdminDashboardPage() {
 							}));
 							setWorkspaceFilters({
 								search: nextQuery.search,
-								plan: nextQuery.plan,
 								createdAt: nextQuery.createdAt,
 							});
 						}}

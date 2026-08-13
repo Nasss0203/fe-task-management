@@ -14,7 +14,6 @@ import type { OnChangeFn, PaginationState } from "@tanstack/react-table";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import {
 	Clock3,
-	Crown,
 	Ellipsis,
 	Eye,
 	Lock,
@@ -47,10 +46,7 @@ type Props = {
 	onView: (user: AdminUser) => void;
 	onToggleLock: (userId: string) => void;
 	onResetStatus: (userId: string) => void;
-	onChangePlan: (user: AdminUser) => void;
 	isChangingStatus?: boolean;
-	isChangingPlan?: boolean;
-	canGrantPro?: boolean;
 	isLoading?: boolean;
 	skeletonRowCount?: number;
 };
@@ -110,10 +106,7 @@ export function UserTable({
 	onView,
 	onToggleLock,
 	onResetStatus,
-	onChangePlan,
 	isChangingStatus = false,
-	isChangingPlan = false,
-	canGrantPro = true,
 	isLoading = false,
 	skeletonRowCount = pagination.pageSize,
 }: Props) {
@@ -287,33 +280,6 @@ export function UserTable({
 
 													{!isSuperAdmin && (
 														<>
-															<DropdownMenuSeparator
-																className={adminMenuSeparatorClass}
-															/>
-
-															<DropdownMenuItem
-																disabled={
-																	isChangingPlan ||
-																	(user.plan !==
-																		"pro" &&
-																		!canGrantPro)
-																}
-																onClick={() =>
-																	onChangePlan(
-																		user,
-																	)
-																}
-																className={`${adminMenuItemClass} disabled:cursor-not-allowed disabled:opacity-50`}
-															>
-																<Crown className='mr-2 h-4 w-4' />
-																{isChangingPlan
-																	? "Đang cập nhật..."
-																	: user.plan ===
-																		  "pro"
-																		? "Chuyển về Free"
-																		: "Cấp Pro"}
-															</DropdownMenuItem>
-
 															<DropdownMenuSeparator
 																className={adminMenuSeparatorClass}
 															/>

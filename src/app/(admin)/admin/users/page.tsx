@@ -59,36 +59,15 @@ export default function AdminUsersPage() {
 	const {
 		userOverview,
 		users,
-		billingPlans,
 		lockUser,
 		unlockUser,
 		createSystemAdmin,
-		grantSubscription,
-		revokeSubscription,
 	} = useAdminUsers(userQuery);
 	const isSuperAdmin = user?.systemRole === SystemRole.SUPER_ADMIN;
 
 	const overview = userOverview.data?.data;
 	const userPage = users.data?.data;
 	const userItems = useMemo(() => userPage?.data ?? [], [userPage?.data]);
-	const proPlan = useMemo(() => {
-		const activePlans =
-			billingPlans.data?.filter((item) => item.status === "ACTIVE") ?? [];
-
-		return (
-			activePlans.find(
-				(item) =>
-					item.slug?.toLowerCase() === "pro-monthly" ||
-					item.code.toLowerCase() === "pro_monthly",
-			) ??
-			activePlans.find(
-				(item) =>
-					item.slug?.toLowerCase() !== "free" &&
-					item.code.toLowerCase() !== "free",
-			) ??
-			null
-		);
-	}, [billingPlans.data]);
 	const visibleUserItems = useMemo(() => {
 		if (userItems.length <= pagination.pageSize) {
 			return userItems;
@@ -141,6 +120,15 @@ export default function AdminUsersPage() {
 				await lockUser.mutateAsync(userId);
 			}
 
+			setSelectedUser((current) =>
+				current?.id === userId
+					? {
+							...current,
+							status: isLocked ? "ACTIVE" : "LOCKED",
+						}
+					: current,
+			);
+
 			toast.success(
 				isSystemAdmin
 					? isLocked
@@ -162,49 +150,6 @@ export default function AdminUsersPage() {
 
 	const handleResetStatus = (userId: string) => {
 		unlockUser.mutate(userId);
-	};
-
-	const handleChangePlan = async (user: AdminUser) => {
-		const nextPlan = user.plan === "pro" ? "free" : "pro";
-
-		try {
-			if (nextPlan === "pro") {
-				if (!proPlan) {
-					toast.error("Không tìm thấy gói Pro đang hoạt động.");
-					return;
-				}
-
-				await grantSubscription.mutateAsync({
-					userId: user.id,
-					planId: proPlan.id,
-					months: 1,
-					note: "Granted from admin user management",
-				});
-				toast.success(
-					"Đã cấp Pro cho người dùng và toàn bộ không gian làm việc sở hữu.",
-				);
-			} else {
-				await revokeSubscription.mutateAsync({
-					userId: user.id,
-					note: "Revoked from admin user management",
-				});
-				toast.success(
-					"Đã chuyển người dùng và toàn bộ không gian làm việc sở hữu về Free.",
-				);
-			}
-
-			setSelectedUser((current) =>
-				current?.id === user.id
-					? {
-							...current,
-							plan: nextPlan,
-						}
-					: current,
-			);
-		} catch (error) {
-			console.error("change user billing subscription failed", error);
-			toast.error("Không thể cập nhật gói của người dùng.");
-		}
 	};
 
 	const handleResetFilters = () => {
@@ -266,15 +211,9 @@ export default function AdminUsersPage() {
 								onView={handleViewUser}
 								onToggleLock={handleToggleLock}
 								onResetStatus={handleResetStatus}
-								onChangePlan={handleChangePlan}
 								isChangingStatus={
 									lockUser.isPending || unlockUser.isPending
 								}
-								isChangingPlan={
-									grantSubscription.isPending ||
-									revokeSubscription.isPending
-								}
-								canGrantPro={Boolean(proPlan)}
 								isLoading
 								skeletonRowCount={pagination.pageSize}
 							/>
@@ -298,15 +237,9 @@ export default function AdminUsersPage() {
 							onView={handleViewUser}
 							onToggleLock={handleToggleLock}
 							onResetStatus={handleResetStatus}
-							onChangePlan={handleChangePlan}
 							isChangingStatus={
 								lockUser.isPending || unlockUser.isPending
 							}
-							isChangingPlan={
-								grantSubscription.isPending ||
-								revokeSubscription.isPending
-							}
-							canGrantPro={Boolean(proPlan)}
 						/>
 					)}
 				</div>

@@ -87,7 +87,6 @@ export type PlanTypeWorkspace = "free" | "pro";
 
 export type AdminFindAllWorkspaceQuery = {
 	search?: string;
-	plan?: PlanTypeWorkspace;
 	status?: WorkspaceStatus;
 	createdFrom?: string;
 	createdTo?: string;

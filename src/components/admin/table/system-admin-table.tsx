@@ -14,12 +14,9 @@ type Props = {
 	onView: (user: AdminUser) => void;
 	onToggleLock: (userId: string) => void;
 	onResetStatus: (userId: string) => void;
-	onChangePlan: (user: AdminUser) => void;
 	isLoading?: boolean;
 	isError?: boolean;
 	isChangingStatus?: boolean;
-	isChangingPlan?: boolean;
-	canGrantPro?: boolean;
 };
 
 export function SystemAdminTable({
@@ -31,12 +28,9 @@ export function SystemAdminTable({
 	onView,
 	onToggleLock,
 	onResetStatus,
-	onChangePlan,
 	isLoading = false,
 	isError = false,
 	isChangingStatus = false,
-	isChangingPlan = false,
-	canGrantPro = true,
 }: Props) {
 	if (isError && !isLoading) {
 		return (
@@ -58,10 +52,7 @@ export function SystemAdminTable({
 			onView={onView}
 			onToggleLock={onToggleLock}
 			onResetStatus={onResetStatus}
-			onChangePlan={onChangePlan}
 			isChangingStatus={isChangingStatus}
-			isChangingPlan={isChangingPlan}
-			canGrantPro={canGrantPro}
 			isLoading={isLoading}
 			skeletonRowCount={pagination.pageSize}
 		/>

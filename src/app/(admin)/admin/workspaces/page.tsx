@@ -9,7 +9,6 @@ import { WorkspaceManagementTable } from "@/components/admin/table/workspace-man
 import { useAdminWorkspaces } from "@/features/admin/modules/workspaces/hooks/useAdminWorkspaces";
 import type {
 	AdminFindAllWorkspaceQuery,
-	PlanTypeWorkspace,
 	WorkspaceItem,
 	WorkspaceStatus,
 } from "@/services/admin/workspace/type";
@@ -44,7 +43,6 @@ export default function AdminWorkspacesPage() {
 
 	const [search, setSearch] = useState("");
 	const [status, setStatus] = useState("all");
-	const [plan, setPlan] = useState("all");
 	const [createdAt, setCreatedAt] = useState("all");
 	const [pagination, setPagination] = useState<PaginationState>({
 		pageIndex: 0,
@@ -56,12 +54,11 @@ export default function AdminWorkspacesPage() {
 			search: search.trim() || undefined,
 			status:
 				status === "all" ? undefined : (status as WorkspaceStatus),
-			plan: plan === "all" ? undefined : (plan as PlanTypeWorkspace),
 			createdFrom: getCreatedFrom(createdAt),
 			page: pagination.pageIndex + 1,
 			pageSize: pagination.pageSize,
 		};
-	}, [createdAt, pagination, plan, search, status]);
+	}, [createdAt, pagination, search, status]);
 
 	const { workspaces } = useAdminWorkspaces(workspaceQuery);
 
@@ -82,11 +79,6 @@ export default function AdminWorkspacesPage() {
 		setStatus(value);
 	};
 
-	const handlePlanChange = (value: string) => {
-		resetToFirstPage();
-		setPlan(value);
-	};
-
 	const handleCreatedAtChange = (value: string) => {
 		resetToFirstPage();
 		setCreatedAt(value);
@@ -99,7 +91,6 @@ export default function AdminWorkspacesPage() {
 	const handleResetFilters = () => {
 		setSearch("");
 		setStatus("all");
-		setPlan("all");
 		setCreatedAt("all");
 		resetToFirstPage();
 	};
@@ -125,11 +116,9 @@ export default function AdminWorkspacesPage() {
 							<WorkspaceFilterBar
 								search={search}
 								status={status}
-								plan={plan}
 								createdAt={createdAt}
 								onSearchChange={handleSearchChange}
 								onStatusChange={handleStatusChange}
-								onPlanChange={handlePlanChange}
 								onCreatedAtChange={handleCreatedAtChange}
 								onReset={handleResetFilters}
 							/>
@@ -157,11 +146,9 @@ export default function AdminWorkspacesPage() {
 						<WorkspaceFilterBar
 							search={search}
 							status={status}
-							plan={plan}
 							createdAt={createdAt}
 							onSearchChange={handleSearchChange}
 							onStatusChange={handleStatusChange}
-							onPlanChange={handlePlanChange}
 							onCreatedAtChange={handleCreatedAtChange}
 							onReset={handleResetFilters}
 						/>

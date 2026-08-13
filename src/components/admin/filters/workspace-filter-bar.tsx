@@ -26,11 +26,9 @@ import { adminActionButtonClass } from "../shared/theme";
 type Props = {
 	search: string;
 	status: string;
-	plan: string;
 	createdAt: string;
 	onSearchChange: (value: string) => void;
 	onStatusChange: (value: string) => void;
-	onPlanChange: (value: string) => void;
 	onCreatedAtChange: (value: string) => void;
 	onReset: () => void;
 };
@@ -43,16 +41,13 @@ const compactLabelClass =
 export function WorkspaceFilterBar({
 	search,
 	status,
-	plan,
 	createdAt,
 	onSearchChange,
 	onStatusChange,
-	onPlanChange,
 	onCreatedAtChange,
 	onReset,
 }: Props) {
-	const hasActiveFilter =
-		status !== "all" || plan !== "all" || createdAt !== "all";
+	const hasActiveFilter = status !== "all" || createdAt !== "all";
 
 	return (
 		<div className='flex w-full items-center gap-3'>
@@ -95,7 +90,7 @@ export function WorkspaceFilterBar({
 									Bộ lọc workspace
 								</p>
 								<p className='mt-1 text-xs text-muted-foreground'>
-									Trạng thái, gói dịch vụ và ngày tạo.
+									Trạng thái và ngày tạo.
 								</p>
 							</div>
 
@@ -110,22 +105,6 @@ export function WorkspaceFilterBar({
 											<SelectItem value='all'>Tất cả</SelectItem>
 											<SelectItem value='ACTIVE'>Đang hoạt động</SelectItem>
 											<SelectItem value='DELETED'>Đã xóa</SelectItem>
-										</SelectGroup>
-									</SelectContent>
-								</Select>
-							</div>
-
-							<div className='flex flex-col gap-1.5'>
-								<label className={compactLabelClass}>Gói dịch vụ</label>
-								<Select value={plan} onValueChange={onPlanChange}>
-									<SelectTrigger className={selectClass}>
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectGroup>
-											<SelectItem value='all'>Tất cả</SelectItem>
-											<SelectItem value='free'>Free</SelectItem>
-											<SelectItem value='pro'>Pro</SelectItem>
 										</SelectGroup>
 									</SelectContent>
 								</Select>
