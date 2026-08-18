@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formSchema } from "@/features/auth/schemas/sign-in.schema";
+import { formSchema } from "@/features/auth";
 
 describe("SignIn formSchema", () => {
 	it("hợp lệ với email và password đúng chuẩn", () => {

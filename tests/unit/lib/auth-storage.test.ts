@@ -10,7 +10,7 @@ import {
 	AUTH_TOKEN_CHANGED_EVENT,
 	USER_STORAGE_CHANGED_EVENT,
 	USER_STORAGE_KEY,
-} from "@/lib/auth-storage";
+} from "@/features/auth";
 
 describe("auth-storage helper", () => {
 	// Giả lập fetch API

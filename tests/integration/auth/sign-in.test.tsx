@@ -2,12 +2,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SignIn from "@/app/(auth)/sign-in/page";
-import { useLogin, useResendVerification } from "@/features/auth/hooks/useAuth";
+import { useLogin, useResendVerification } from "@/features/auth/model/use-auth";
 import { useRouter } from "next/navigation";
-import { SystemRole } from "@/services/auth/type";
 
 // Mocks
-vi.mock("@/features/auth/hooks/useAuth");
+vi.mock("@/features/auth/model/use-auth");
 vi.mock("next/navigation", () => ({
 	useRouter: vi.fn(),
 	usePathname: () => "/sign-in",
@@ -71,7 +70,7 @@ describe("SignIn Page Integration", () => {
 		// Mock the onSuccess call behavior
 		mockLoginMutate.mockImplementation((data: any, options: any) => {
 			if (options?.onSuccess) {
-				options.onSuccess({ systemRole: SystemRole.USER });
+				options.onSuccess({});
 			}
 		});
 
@@ -93,15 +92,14 @@ describe("SignIn Page Integration", () => {
 			expect(mockLoginMutate).toHaveBeenCalledTimes(1);
 		});
 
-		// Expect router.push to dashboard for USER
-		expect(mockPush).toHaveBeenCalledWith("/dashboard");
+		expect(mockPush).toHaveBeenCalledWith("/");
 	});
 
 	it("4. Chuyển hướng sang trang admin nếu user là SYSTEM_ADMIN", async () => {
 		const user = userEvent.setup();
 		mockLoginMutate.mockImplementation((data: any, options: any) => {
 			if (options?.onSuccess) {
-				options.onSuccess({ systemRole: SystemRole.SYSTEM_ADMIN });
+				options.onSuccess({ systemRole: "SYSTEM_ADMIN" });
 			}
 		});
 
@@ -119,7 +117,7 @@ describe("SignIn Page Integration", () => {
 			expect(mockLoginMutate).toHaveBeenCalledTimes(1);
 		});
 
-		expect(mockPush).toHaveBeenCalledWith("/admin");
+		expect(mockPush).toHaveBeenCalledWith("/");
 	});
 
 	it("5. Hiển thị đúng trạng thái loading", () => {

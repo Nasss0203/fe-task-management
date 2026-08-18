@@ -1,5 +1,7 @@
-import TemplatesFaqSection from "@/features/landing/components/landing/templates/TemplatesFaqSection";
-import TemplatesSection from "@/features/landing/components/landing/templates/TemplatesSection";
+import {
+	TemplatesFaqSection,
+	TemplatesSection,
+} from "@/widgets/landing/templates";
 
 export default function TemplatesPage() {
 	return (

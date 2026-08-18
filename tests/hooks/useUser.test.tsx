@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { useUser } from "@/features/auth/hooks/useUser";
+import { useUser } from "@/features/auth";
 import {
 	USER_STORAGE_CHANGED_EVENT,
 	USER_STORAGE_KEY,
-} from "@/lib/auth-storage";
-import { SystemRole } from "@/services/auth/type";
+} from "@/features/auth";
+import { SystemRole } from "@/entities/user";
 
 describe("useUser hook", () => {
 	beforeEach(() => {

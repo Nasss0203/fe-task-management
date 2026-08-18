@@ -1,10 +1,9 @@
-import { Toaster } from "@/components/ui/sonner";
-import { ThemeProvider } from "@/config/theme-provider";
-import { RealtimeProviderWrapper } from "@/providers/RealtimeProviderWrapper";
+import { AppProviders } from "@/providers/providers";
+import { ThemeProvider } from "@/providers/theme-provider";
+import { Toaster } from "@/shared/ui/sonner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { JetBrains_Mono, Montserrat } from "next/font/google";
-import Providers from "../config/providers";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -43,12 +42,7 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					<Providers>
-						<RealtimeProviderWrapper>
-							{children}
-						</RealtimeProviderWrapper>
-					</Providers>
-
+					<AppProviders>{children}</AppProviders>
 					<Toaster position='top-right' />
 					<SpeedInsights />
 				</ThemeProvider>
@@ -56,4 +50,3 @@ export default function RootLayout({
 		</html>
 	);
 }
-

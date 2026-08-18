@@ -1,5 +1,5 @@
-import Footer from "@/features/landing/components/landing/footer/Footer";
-import { HeaderLanding } from "@/features/landing/components/landing/header";
+import Footer from "@/widgets/landing/footer";
+import { HeaderLanding } from "@/widgets/landing/header";
 import React from "react";
 
 const layout = ({

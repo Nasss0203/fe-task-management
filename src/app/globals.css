@@ -16,11 +16,6 @@
 	--color-sidebar-primary: var(--sidebar-primary);
 	--color-sidebar-foreground: var(--sidebar-foreground);
 	--color-sidebar: var(--sidebar);
-	--color-chart-5: var(--chart-5);
-	--color-chart-4: var(--chart-4);
-	--color-chart-3: var(--chart-3);
-	--color-chart-2: var(--chart-2);
-	--color-chart-1: var(--chart-1);
 	--color-ring: var(--ring);
 	--color-input: var(--input);
 	--color-border: var(--border);
@@ -54,7 +49,6 @@
 
 :root {
 	--radius: 0.625rem;
-	/* Premium Light Mode - Bolder contrast with slightly grey/blue background and distinct white cards */
 	--background: oklch(0.97 0.01 260);
 	--foreground: oklch(0.15 0.02 260);
 	--card: oklch(1 0 0);
@@ -67,7 +61,7 @@
 	--secondary-foreground: oklch(0.2 0.02 260);
 	--muted: oklch(0.93 0.01 260);
 	--muted-foreground: oklch(0.45 0.02 260);
-	--accent: oklch(0.90 0.02 260);
+	--accent: oklch(0.9 0.02 260);
 	--accent-foreground: oklch(0.2 0.02 260);
 	--destructive: oklch(0.577 0.245 27.325);
 	--info: oklch(0.61 0.14 245);
@@ -79,11 +73,6 @@
 	--ring: oklch(0.45 0.15 260);
 	--surface: oklch(0.985 0.006 260);
 	--surface-foreground: oklch(0.18 0.02 260);
-	--chart-1: oklch(0.646 0.222 41.116);
-	--chart-2: oklch(0.6 0.118 184.704);
-	--chart-3: oklch(0.398 0.07 227.392);
-	--chart-4: oklch(0.828 0.189 84.429);
-	--chart-5: oklch(0.769 0.188 70.08);
 	--sidebar: oklch(0.99 0.005 260);
 	--sidebar-foreground: oklch(0.2 0.02 260);
 	--sidebar-primary: oklch(0.45 0.15 260);
@@ -92,70 +81,9 @@
 	--sidebar-accent-foreground: oklch(0.3 0.02 260);
 	--sidebar-border: oklch(0.92 0.01 260);
 	--sidebar-ring: oklch(0.45 0.15 260);
-
-	/* Calendar */
-	/* Primary colors */
-	--sx-color-primary: var(--primary);
-	--sx-color-on-primary: var(--primary-foreground);
-	--sx-color-primary-container: var(--muted);
-	--sx-color-on-primary-container: var(--muted-foreground);
-
-	/* Secondary colors */
-	--sx-color-secondary: var(--secondary);
-	--sx-color-on-secondary: var(--secondary-foreground);
-	--sx-color-secondary-container: var(--accent);
-	--sx-color-on-secondary-container: var(--accent-foreground);
-
-	/* Tertiary colors */
-	--sx-color-tertiary: var(--muted);
-	--sx-color-on-tertiary: var(--muted-foreground);
-	--sx-color-tertiary-container: var(--accent);
-	--sx-color-on-tertiary-container: var(--accent-foreground);
-
-	/* Surface colors */
-	--sx-color-surface: var(--background);
-	--sx-color-surface-dim: var(--muted);
-	--sx-color-surface-bright: var(--card);
-	--sx-color-on-surface: var(--foreground);
-	--sx-color-surface-container: var(--card);
-	--sx-color-surface-container-low: var(--muted);
-	--sx-color-surface-container-high: var(--accent);
-
-	/* Background colors */
-	--sx-color-background: var(--background);
-	--sx-color-on-background: var(--foreground);
-
-	/* Utility colors */
-	--sx-color-outline: var(--border);
-	--sx-color-outline-variant: var(--border);
-	--sx-color-shadow: var(--border);
-	--sx-color-surface-tint: var(--primary);
-
-	/* Neutral colors */
-	--sx-color-neutral: var(--foreground);
-	--sx-color-neutral-variant: var(--muted-foreground);
-
-	/* Internal colors */
-	--sx-internal-color-gray-ripple-background: var(--muted);
-	--sx-internal-color-light-gray: var(--muted);
-	--sx-internal-color-text: var(--foreground);
-
-	/* Radius */
-	--sx-rounding-extra-small: 0.5rem;
-	--sx-rounding-small: 0.75rem;
-	--sx-rounding-extra-large: 1rem;
-
-	/* Padding */
-	--sx-spacing-padding1: 2px;
-	--sx-spacing-padding2: 4px;
-	--sx-spacing-padding3: 8px;
-	--sx-spacing-padding4: 10px;
-	--sx-spacing-padding6: 12px;
-	--sx-spacing-modal-padding: 14px;
 }
 
 .dark {
-	/* Premium Dark Mode - Deep Midnight Slate */
 	--background: oklch(0.13 0.015 260);
 	--foreground: oklch(0.98 0.01 260);
 	--card: oklch(0.17 0.02 260);
@@ -180,11 +108,6 @@
 	--ring: oklch(0.6 0.18 260);
 	--surface: oklch(0.18 0.02 260);
 	--surface-foreground: oklch(0.98 0.01 260);
-	--chart-1: oklch(0.488 0.243 264.376);
-	--chart-2: oklch(0.696 0.17 162.48);
-	--chart-3: oklch(0.769 0.188 70.08);
-	--chart-4: oklch(0.627 0.265 303.9);
-	--chart-5: oklch(0.645 0.246 16.439);
 	--sidebar: oklch(0.15 0.02 260);
 	--sidebar-foreground: oklch(0.98 0.01 260);
 	--sidebar-primary: oklch(0.6 0.18 260);
@@ -194,151 +117,6 @@
 	--sidebar-border: oklch(0.25 0.03 260);
 	--sidebar-ring: oklch(0.6 0.18 260);
 }
-
-.admin-light-theme {
-	color-scheme: light;
-	--background: #f8fafc;
-	--foreground: #0f172a;
-	--card: #ffffff;
-	--card-foreground: #0f172a;
-	--popover: #ffffff;
-	--popover-foreground: #1e293b;
-	--primary: #2563eb;
-	--primary-foreground: #ffffff;
-	--secondary: #f8fafc;
-	--secondary-foreground: #334155;
-	--muted: #f1f5f9;
-	--muted-foreground: #64748b;
-	--accent: #f1f5f9;
-	--accent-foreground: #0f172a;
-	--destructive: #b91c1c;
-	--info: #1d4ed8;
-	--success: #15803d;
-	--warning: #a16207;
-	--danger: #b91c1c;
-	--border: #e2e8f0;
-	--input: #cbd5e1;
-	--ring: #3b82f6;
-	--surface: #ffffff;
-	--surface-foreground: #1e293b;
-	--chart-1: #2563eb;
-	--chart-2: #7c3aed;
-	--chart-3: #22c55e;
-	--chart-4: #eab308;
-	--chart-5: #ef4444;
-	--sidebar: #ffffff;
-	--sidebar-foreground: #475569;
-	--sidebar-primary: #2563eb;
-	--sidebar-primary-foreground: #ffffff;
-	--sidebar-accent: #f1f5f9;
-	--sidebar-accent-foreground: #0f172a;
-	--sidebar-border: #e2e8f0;
-	--sidebar-ring: #3b82f6;
-}
-
-.admin-light-theme ::selection {
-	background-color: #dbeafe;
-	color: #0f172a;
-}
-
-.admin-light-theme [class*="bg-[#0b0b0b]"],
-.admin-light-theme [class*="bg-[#0f0f0f]"],
-.admin-light-theme [class*="bg-[#101010]"],
-.admin-light-theme [class*="bg-[#111111]"],
-.admin-light-theme [class*="bg-[#171717]"],
-.admin-light-theme [class*="bg-neutral-950"],
-.admin-light-theme [class*="bg-neutral-900"],
-.admin-light-theme [class*="bg-neutral-800"] {
-	background-color: #ffffff !important;
-}
-
-.admin-light-theme [class*="border-white/"],
-.admin-light-theme [class*="border-neutral-800"] {
-	border-color: #e2e8f0 !important;
-}
-
-.admin-light-theme [class*="text-black"] {
-	color: #0f172a !important;
-}
-
-.admin-light-theme [class*="text-neutral-100"],
-.admin-light-theme [class*="text-neutral-200"],
-.admin-light-theme [class*="text-neutral-300"] {
-	color: #334155 !important;
-}
-
-.admin-light-theme [class*="text-neutral-400"],
-.admin-light-theme [class*="text-neutral-500"] {
-	color: #64748b !important;
-}
-
-.admin-light-theme [class*="bg-[#0b0b0b]"][class*="text-white"],
-.admin-light-theme [class*="bg-[#0f0f0f]"][class*="text-white"],
-.admin-light-theme [class*="bg-[#101010]"][class*="text-white"],
-.admin-light-theme [class*="bg-[#111111]"][class*="text-white"],
-.admin-light-theme [class*="bg-[#171717]"][class*="text-white"],
-.admin-light-theme [class*="bg-neutral-950"][class*="text-white"],
-.admin-light-theme [class*="bg-neutral-900"][class*="text-white"],
-.admin-light-theme [class*="bg-neutral-800"][class*="text-white"],
-.admin-light-theme [class*="bg-white/5"][class*="text-white"],
-.admin-light-theme [class*="bg-white/10"][class*="text-white"] {
-	color: #334155 !important;
-}
-
-.admin-light-theme [class*="bg-white/5"],
-.admin-light-theme [class*="bg-white/10"] {
-	background-color: #f8fafc !important;
-}
-
-.admin-light-theme h1[class*="text-white"],
-.admin-light-theme h2[class*="text-white"],
-.admin-light-theme h3[class*="text-white"] {
-	color: #0f172a !important;
-}
-
-[data-slot="drawer-content"][class*="max-w-130"] {
-	background-color: #ffffff !important;
-	color: #1e293b !important;
-	border-color: #e2e8f0 !important;
-}
-
-[data-slot="drawer-content"][class*="max-w-130"] [class*="bg-[#0b0b0b]"],
-[data-slot="drawer-content"][class*="max-w-130"] [class*="bg-[#111111]"],
-[data-slot="drawer-content"][class*="max-w-130"] [class*="bg-[#171717]"],
-[data-slot="drawer-content"][class*="max-w-130"] [class*="bg-white/5"] {
-	background-color: #f8fafc !important;
-}
-
-[data-slot="drawer-content"][class*="max-w-130"] [class*="border-white/"] {
-	border-color: #e2e8f0 !important;
-}
-
-[data-slot="drawer-content"][class*="max-w-130"] [class*="text-white"],
-[data-slot="drawer-content"][class*="max-w-130"] [class*="text-neutral-100"],
-[data-slot="drawer-content"][class*="max-w-130"] [class*="text-neutral-200"] {
-	color: #0f172a !important;
-}
-
-[data-slot="drawer-content"][class*="max-w-130"] [class*="text-neutral-300"],
-[data-slot="drawer-content"][class*="max-w-130"] [class*="text-neutral-400"] {
-	color: #334155 !important;
-}
-
-[data-slot="drawer-content"][class*="max-w-130"] [class*="text-neutral-500"] {
-	color: #64748b !important;
-}
-
-[data-slot="drawer-content"][class*="max-w-130"] input,
-[data-slot="drawer-content"][class*="max-w-130"] textarea,
-[data-slot="drawer-content"][class*="max-w-130"] button[role="combobox"] {
-	background-color: #ffffff !important;
-	border-color: #cbd5e1 !important;
-	color: #1e293b !important;
-}
-
-/* 
-  Calendar
-*/
 
 @layer base {
 	::selection {
@@ -366,7 +144,6 @@
 		scroll-behavior: smooth;
 	}
 
-	/* Add smooth global transitions for common interactive elements without breaking layout */
 	button,
 	a,
 	input,
@@ -380,7 +157,6 @@
 		@apply transition-all duration-200 ease-in-out;
 	}
 
-	/* Subtle glassmorphism and depth in dark mode */
 	.dark .card,
 	.dark [role="dialog"],
 	.dark [role="menu"],
@@ -389,130 +165,9 @@
 		box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
 	}
 
-	.sx-react-calendar-wrapper {
-		width: 100%;
-		max-width: 100%;
-		/* spacing.20 is because the header is spacing.16 + spacing.4 for sidebar padding */
-		height: calc(100svh - theme(spacing.20));
-		margin: 0;
-	}
-
-	.sx__calendar {
-		border: none;
-	}
-
-	.sx__view-selection-items {
-		border-radius: var(--sx-rounding-small);
-		overflow: hidden;
-		margin-top: 10px;
-		box-shadow: none;
-		border-width: 1px;
-		border-color: var(--border);
-	}
-
-	.sx__date-picker-popup {
-		border-radius: var(--sx-rounding-small);
-		overflow: hidden;
-		margin-top: 10px;
-		box-shadow: none;
-		border-width: 1px;
-		border-color: var(--border);
-	}
-
-	.sx__event-modal.sx__event-modal-default {
-		overflow: hidden;
-		box-shadow: none;
-		border-width: 1px;
-		border-color: var(--border);
-	}
-
-	.sx__time-grid-event {
-		min-height: 32px;
-	}
-
-	.sx__time-grid-event .sx__event {
-		min-height: 32px;
-		padding-block: 4px;
-	}
-
-	.sx__forward-backward-navigation {
-		display: flex;
-		align-items: center;
-		justify-self: center;
-		gap: 6px;
-	}
-
-	.sx__chevron-wrapper {
-		/* height: 100%;
-  width: 100%; */
-		min-width: 39px;
-		min-height: 39px;
-		border-radius: var(--sx-rounding-extra-small);
-	}
-
-	.sx__chevron.sx__chevron--next {
-		border-width: 0.1rem 0.1rem 0 0;
-	}
-
-	.sx__chevron.sx__chevron--previous {
-		border-width: 0.1rem 0.1rem 0 0;
-	}
-
-	.sx__date-input-chevron {
-		content: url("data:image/svg+xml,%3c%3fxml version='1.0' encoding='utf-8'%3f%3e%3c!-- Uploaded to: SVG Repo%2c www.svgrepo.com%2c Generator: SVG Repo Mixer Tools --%3e%3csvg width='800px' height='800px' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M6 9L12 15L18 9' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
-	}
-
-	.dark .sx__date-input-chevron {
-		content: url("data:image/svg+xml,%3c%3fxml version='1.0' encoding='utf-8'%3f%3e%3c!-- Uploaded to: SVG Repo%2c www.svgrepo.com%2c Generator: SVG Repo Mixer Tools --%3e%3csvg width='800px' height='800px' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M6 9L12 15L18 9' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
-	}
-
-	.sx__ripple::before,
-	.sx__ripple::after {
-		all: unset !important;
-	}
-
-	.integration-marquee {
-		position: relative;
-		overflow: hidden;
-		width: 100%;
-	}
-
-	.integration-track {
-		display: flex;
-		gap: 20px;
-		width: max-content;
-		animation: integration-scroll-right 28s linear infinite;
-		will-change: transform;
-	}
-
-	.integration-marquee {
-		position: relative;
-		overflow: hidden;
-		width: 100%;
-	}
-
-	.integration-track {
-		display: flex;
-		gap: 20px;
-		width: max-content;
-		animation: integration-scroll-right 28s linear infinite;
-		will-change: transform;
-	}
-
-	@keyframes integration-scroll-right {
-		from {
-			transform: translateX(-50%);
-		}
-
-		to {
-			transform: translateX(0);
-		}
-	}
-
-	/* Custom Scrollbar */
 	::-webkit-scrollbar {
-		width: 8px;
 		height: 8px;
+		width: 8px;
 	}
 
 	::-webkit-scrollbar-track {
@@ -521,7 +176,6 @@
 
 	::-webkit-scrollbar-thumb {
 		background: color-mix(in oklab, var(--foreground) 18%, transparent);
-		/* sáng hơn một chút so với background */
 		border-radius: 4px;
 	}
 
