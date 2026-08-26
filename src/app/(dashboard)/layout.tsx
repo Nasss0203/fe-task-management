@@ -1,17 +1,10 @@
-import { AppSidebar } from "@/shared/ui/app-sidebar";
-import {
-	Breadcrumb,
-	BreadcrumbItem,
-	BreadcrumbList,
-	BreadcrumbPage,
-} from "@/shared/ui/breadcrumb";
-import { NavActions } from "@/shared/ui/nav-actions";
-import { Separator } from "@/shared/ui/separator";
+import { AppSidebar } from "@/widgets/workspace-sidebar";
+import { HeaderWorkspaceContainer } from "@/widgets/workspace-sidebar/ui/header-workspace-container";
 import {
 	SidebarInset,
 	SidebarProvider,
-	SidebarTrigger,
-} from "@/shared/ui/sidebar";
+} from "@/widgets/workspace-sidebar/ui/sidebar";
+
 import React from "react";
 
 const layout = ({
@@ -22,31 +15,12 @@ const layout = ({
 	return (
 		<SidebarProvider>
 			<AppSidebar />
-			<SidebarInset>
-				<header className='flex h-14 shrink-0 items-center gap-2'>
-					<div className='flex flex-1 items-center gap-2 px-3'>
-						<SidebarTrigger />
-						<Separator
-							orientation='vertical'
-							className='mr-2 data-[orientation=vertical]:h-4'
-						/>
-						<Breadcrumb>
-							<BreadcrumbList>
-								<BreadcrumbItem>
-									<BreadcrumbPage className='line-clamp-1'>
-										Project Management & Task Tracking
-									</BreadcrumbPage>
-								</BreadcrumbItem>
-							</BreadcrumbList>
-						</Breadcrumb>
-					</div>
-					<div className='ml-auto px-3'>
-						<NavActions />
-					</div>
-				</header>
-				<div className='flex flex-1 flex-col gap-4 px-4 py-10'>
+			<SidebarInset className='min-w-0 overflow-hidden'>
+				<HeaderWorkspaceContainer />
+
+				<main className='flex min-w-0 max-w-full flex-1 flex-col overflow-hidden py-10'>
 					{children}
-				</div>
+				</main>
 			</SidebarInset>
 		</SidebarProvider>
 	);

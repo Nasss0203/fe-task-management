@@ -8,12 +8,14 @@ export interface User {
 	id: string;
 	email: string;
 	username: string;
+	avatarUrl: string | null;
 	isActive: boolean;
+	systemRole: SystemRole;
+
+	lastActiveWorkspaceId: string | null;
+
 	createdAt: string;
 	updatedAt: string;
-	avatarUrl?: string;
-	googleId?: string;
-	systemRole: SystemRole;
 }
 
 export type GetMeResponse = User;
