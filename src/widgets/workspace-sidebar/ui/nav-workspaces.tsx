@@ -6,6 +6,8 @@ import Link from "next/link";
 import type { Page } from "@/entities/page/model/page.types";
 import { Button } from "@/shared/ui/button";
 
+import { useCreatePage } from "@/entities/page/model/page.mutations";
+import { CreatePageDialog } from "@/features/page/create-page/ui/create-page-dialog";
 import {
 	SidebarGroup,
 	SidebarGroupContent,
@@ -15,14 +17,28 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@/widgets/workspace-sidebar/ui/sidebar";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface NavPagesProps {
 	pages: Page[];
 	activePageId?: string;
 	onCreatePage?: () => void;
+	isCreatingPage?: boolean;
 }
 
-export function NavPages({ pages, activePageId, onCreatePage }: NavPagesProps) {
+export function NavPages({
+	pages,
+	activePageId,
+	onCreatePage,
+	isCreatingPage = false,
+}: NavPagesProps) {
+	const [createDialogOpen, setCreateDialogOpen] = useState(false);
+	const router = useRouter();
+	const createPageMutation = useCreatePage();
+	const [createPageWorkspaceId, setCreatePageWorkspaceId] = useState<
+		string | null
+	>(null);
 	return (
 		<SidebarGroup>
 			<div className='group/private flex items-center justify-between'>
@@ -30,8 +46,10 @@ export function NavPages({ pages, activePageId, onCreatePage }: NavPagesProps) {
 
 				<div className='flex items-center gap-1'>
 					<Button
+						type='button'
 						variant='ghost'
 						size='icon'
+						disabled={isCreatingPage}
 						className='hidden h-6 w-6 group-hover/private:flex'
 						onClick={onCreatePage}
 					>
@@ -39,6 +57,7 @@ export function NavPages({ pages, activePageId, onCreatePage }: NavPagesProps) {
 					</Button>
 
 					<Button
+						type='button'
 						variant='ghost'
 						size='icon'
 						className='hidden h-6 w-6 group-hover/private:flex'
@@ -65,26 +84,51 @@ export function NavPages({ pages, activePageId, onCreatePage }: NavPagesProps) {
 									</span>
 								</Link>
 							</SidebarMenuButton>
+							<SidebarMenuAction showOnHover className='right-6'>
+								<Plus
+									onClick={(event) => {
+										event.preventDefault();
+										event.stopPropagation();
 
-							<SidebarMenuAction showOnHover>
+										setCreatePageWorkspaceId(
+											page.workspace_id,
+										);
+										setCreateDialogOpen(true);
+									}}
+								/>
+							</SidebarMenuAction>
+
+							<SidebarMenuAction showOnHover className='right-1'>
 								<MoreHorizontal />
 							</SidebarMenuAction>
 						</SidebarMenuItem>
 					))}
-
-					{pages.length === 0 && (
-						<SidebarMenuItem>
-							<SidebarMenuButton
-								className='text-sidebar-foreground/70'
-								onClick={onCreatePage}
-							>
-								<Plus />
-								<span>Add a page</span>
-							</SidebarMenuButton>
-						</SidebarMenuItem>
-					)}
 				</SidebarMenu>
 			</SidebarGroupContent>
+			<CreatePageDialog
+				open={createDialogOpen}
+				onOpenChange={setCreateDialogOpen}
+				onCreate={(title) => {
+					if (!createPageWorkspaceId) {
+						return;
+					}
+
+					createPageMutation.mutate(
+						{
+							workspace_id: createPageWorkspaceId,
+							title,
+						},
+						{
+							onSuccess: (page) => {
+								setCreateDialogOpen(false);
+								setCreatePageWorkspaceId(null);
+
+								router.push(`/page/${page.id}`);
+							},
+						},
+					);
+				}}
+			/>
 		</SidebarGroup>
 	);
 }

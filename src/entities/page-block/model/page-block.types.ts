@@ -62,3 +62,16 @@ export interface PageBlock {
 	deleted_at: string | null;
 	deleted_by: string | null;
 }
+
+export interface BookmarkMetadata {
+	url: string;
+	title: string;
+	description: string | null;
+	siteName: string | null;
+	faviconUrl: string | null;
+	imageUrl: string | null;
+}
+
+export interface ResolveBookmarkMetadataInput {
+	url: string;
+}

@@ -4,14 +4,14 @@ import { useEffect, useState } from "react";
 
 import {
 	useDatabase,
-	useDatabaseView,
 	useDatabaseRows,
+	useDatabaseView,
 	useDatabaseViews,
 } from "@/entities/database/model/database.queries";
 
 import { AddDatabaseViewPopover } from "./add-database-view-popover";
-import { DatabaseViewRenderer } from "./database-view-renderer";
 import { DatabaseViewPropertiesPopover } from "./database-view-properties-popover";
+import { DatabaseViewRenderer } from "./database-view-renderer";
 import { DatabaseViewTab } from "./database-view-tab";
 
 interface DatabaseViewBlockProps {

@@ -13,3 +13,8 @@ export interface Page {
 	deletedAt: string | null;
 	deletedBy: string | null;
 }
+
+export interface CreatePageInput {
+	workspace_id: string;
+	title: string;
+}

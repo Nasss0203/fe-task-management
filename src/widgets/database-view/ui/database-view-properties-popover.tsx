@@ -7,11 +7,7 @@ import type {
 	DatabaseProperty,
 	DatabaseViewProperty,
 } from "@/entities/database/model/database.types";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/shared/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 
 interface DatabaseViewPropertiesPopoverProps {
 	databaseId: string;
@@ -61,7 +57,9 @@ export function DatabaseViewPropertiesPopover({
 				</div>
 
 				{orderedProperties.map((property) => {
-					const viewProperty = viewPropertiesByPropertyId.get(property.id);
+					const viewProperty = viewPropertiesByPropertyId.get(
+						property.id,
+					);
 
 					return (
 						<label
@@ -71,7 +69,11 @@ export function DatabaseViewPropertiesPopover({
 							<input
 								type='checkbox'
 								checked={viewProperty?.visible ?? false}
-								disabled={!viewProperty || setVisibilityMutation.isPending}
+								disabled={
+									!viewProperty ||
+									!property.isHideable ||
+									setVisibilityMutation.isPending
+								}
 								onChange={(event) => {
 									setVisibilityMutation.mutate({
 										propertyId: property.id,

@@ -37,6 +37,7 @@ export interface DatabaseProperty {
 	name: string;
 	type: PropertyType;
 	isDefault: boolean;
+	isHideable: boolean;
 	position: string;
 	options: PropertyOption[];
 }

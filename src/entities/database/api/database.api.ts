@@ -16,6 +16,19 @@ import type {
 const DATABASE_API = "/databases";
 
 export const databaseApi = {
+	createDatabase: async (
+		pageId: string,
+		input: {
+			name: string;
+		},
+	): Promise<Database> => {
+		const response = await instance.post<ApiResponse<Database>>(
+			`/pages/${pageId}/databases`,
+			input,
+		);
+
+		return response.data.data;
+	},
 	getById: async (
 		databaseId: string,
 		signal?: AbortSignal,
@@ -157,6 +170,7 @@ export const databaseApi = {
 
 		return response.data.data;
 	},
+
 	deleteView: async (
 		databaseId: string,
 		viewId: string,

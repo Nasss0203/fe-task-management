@@ -138,24 +138,26 @@ export function DatabasePropertyHeader({
 
 				<div className='my-2 border-t' />
 
-				<button
-					type='button'
-					disabled={setVisibilityMutation.isPending}
-					onClick={() => {
-						setVisibilityMutation.mutate(
-							{
-								propertyId: property.id,
-								visible: false,
-							},
-							{
-								onSuccess: () => setOpen(false),
-							},
-						);
-					}}
-					className='flex w-full items-center rounded-md px-2 py-2 text-sm hover:bg-muted disabled:opacity-50'
-				>
-					Hide in view
-				</button>
+				{property.isHideable && (
+					<button
+						type='button'
+						disabled={setVisibilityMutation.isPending}
+						onClick={() => {
+							setVisibilityMutation.mutate(
+								{
+									propertyId: property.id,
+									visible: false,
+								},
+								{
+									onSuccess: () => setOpen(false),
+								},
+							);
+						}}
+						className='flex w-full items-center rounded-md px-2 py-2 text-sm hover:bg-muted disabled:opacity-50'
+					>
+						Hide in view
+					</button>
+				)}
 
 				{!property.isDefault && (
 					<button

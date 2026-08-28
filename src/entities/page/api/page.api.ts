@@ -1,11 +1,16 @@
 import instance from "@/shared/api/api-client";
 
 import { ApiResponse } from "@/shared/api";
-import type { Page } from "../model/page.types";
+import type { CreatePageInput, Page } from "../model/page.types";
 
 const PAGE_API = "/page";
 
 export const pageApi = {
+	create: async (input: CreatePageInput): Promise<Page> => {
+		const response = await instance.post<ApiResponse<Page>>("/page", input);
+
+		return response.data.data;
+	},
 	getByWorkspace: async (
 		workspaceId: string,
 		signal?: AbortSignal,

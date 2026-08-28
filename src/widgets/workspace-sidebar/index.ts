@@ -5,5 +5,5 @@ export { NavFavorites } from "./ui/nav-favorites";
 export { NavMain } from "./ui/nav-main";
 export { NavRecent } from "./ui/nav-recent";
 export { NavSecondary } from "./ui/nav-secondary";
-export { NavWorkspaces } from "./ui/nav-workspaces";
+export { NavPages } from "./ui/nav-workspaces";
 export { TeamSwitcher } from "./ui/team-switcher";

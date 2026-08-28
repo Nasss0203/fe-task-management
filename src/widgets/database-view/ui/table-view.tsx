@@ -30,38 +30,33 @@ export function TableView({
 	const createRowMutation = useCreateDatabaseRow(database.id);
 
 	const viewPropertiesByPropertyId = new Map(
-		viewDetail.properties.map((property) => [
-			property.propertyId,
-			property,
+		viewDetail.properties.map((viewProperty) => [
+			viewProperty.propertyId,
+			viewProperty,
 		]),
 	);
 
-	const missingProperties = database.properties.filter(
-		(property) => !viewPropertiesByPropertyId.has(property.id),
-	);
+	const visibleProperties = [...database.properties]
+		.filter((property) => {
+			// Property bắt buộc như Name luôn phải hiện
+			if (!property.isHideable) {
+				return true;
+			}
 
-	if (missingProperties.length > 0) {
-		return (
-			<div className='p-4 text-sm text-destructive'>
-				This view is missing property configuration.
-			</div>
-		);
-	}
+			const viewProperty = viewPropertiesByPropertyId.get(property.id);
 
-	const properties = database.properties
-		.filter(
-			(property) =>
-				viewPropertiesByPropertyId.get(property.id)?.visible === true,
-		)
+			return viewProperty?.visible ?? false;
+		})
 		.sort((a, b) => {
-			const aViewProperty = viewPropertiesByPropertyId.get(a.id)!;
-			const bViewProperty = viewPropertiesByPropertyId.get(b.id)!;
+			const aViewProperty = viewPropertiesByPropertyId.get(a.id);
+
+			const bViewProperty = viewPropertiesByPropertyId.get(b.id);
 
 			return (
-				Number(aViewProperty.position) - Number(bViewProperty.position)
+				Number(aViewProperty?.position ?? a.position) -
+				Number(bViewProperty?.position ?? b.position)
 			);
 		});
-
 	return (
 		<div className='w-full min-w-0 max-w-full'>
 			{/* Chỉ table được scroll ngang */}
@@ -69,7 +64,7 @@ export function TableView({
 				<table className='min-w-max border-collapse text-sm'>
 					<thead>
 						<tr className='border-b'>
-							{properties.map((property) => (
+							{visibleProperties.map((property) => (
 								<th
 									key={property.id}
 									className='min-w-[160px] border-r px-3 py-2 text-left font-medium'
@@ -102,7 +97,7 @@ export function TableView({
 									key={row.id}
 									className='border-b last:border-b-0'
 								>
-									{properties.map((property) => {
+									{visibleProperties.map((property) => {
 										const value = valueMap.get(property.id);
 
 										return (
@@ -128,7 +123,10 @@ export function TableView({
 						{rows.length === 0 && (
 							<tr>
 								<td
-									colSpan={Math.max(properties.length + 1, 1)}
+									colSpan={Math.max(
+										visibleProperties.length + 1,
+										1,
+									)}
 									className='h-20 text-center text-muted-foreground'
 								>
 									No rows
