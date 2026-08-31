@@ -13,13 +13,14 @@ import {
 import * as React from "react";
 
 import { usePagesByWorkspace } from "@/entities/page/model/page.queries";
+import { useTeamspaces } from "@/entities/teamspace/model/teamspace.queries";
 import { useSelectWorkspace } from "@/entities/workspace/model/workspace.mutations";
 import { useWorkspaces } from "@/entities/workspace/model/workspace.queries";
 import { useUser } from "@/features/auth";
 import { NavFavorites } from "@/widgets/workspace-sidebar/ui/nav-favorites";
 import { NavMain } from "@/widgets/workspace-sidebar/ui/nav-main";
+import { NavPrivatePages } from "@/widgets/workspace-sidebar/ui/nav-private";
 import { NavSecondary } from "@/widgets/workspace-sidebar/ui/nav-secondary";
-import { NavPages } from "@/widgets/workspace-sidebar/ui/nav-workspaces";
 import {
 	Sidebar,
 	SidebarContent,
@@ -29,6 +30,7 @@ import {
 import { TeamSwitcher } from "@/widgets/workspace-sidebar/ui/team-switcher";
 import { usePathname } from "next/navigation";
 import { NavRecent } from "./nav-recent";
+import { NavTeamspaces } from "./nav-teamspaces";
 
 // This is sample data.
 const data = {
@@ -174,6 +176,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		isError: isPagesError,
 	} = usePagesByWorkspace(currentWorkspaceId as string);
 
+	const {
+		data: teamspaces = [],
+		isLoading: isTeamspacesLoading,
+		isError: isTeamspacesError,
+	} = useTeamspaces(currentWorkspaceId ?? "");
+
 	const handleWorkspaceSelect = async (workspaceId: string) => {
 		if (workspaceId === currentWorkspaceId) {
 			return;
@@ -208,8 +216,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				<NavFavorites favorites={data.favorites} />
 
 				{!isPagesLoading && !isPagesError && (
-					<NavPages pages={pages} activePageId={activePageId} />
+					<NavPrivatePages
+						workspaceId={currentWorkspaceId as string}
+						pages={pages}
+						activePageId={activePageId}
+					/>
 				)}
+
+				{!isPagesLoading &&
+					!isPagesError &&
+					!isTeamspacesLoading &&
+					!isTeamspacesError &&
+					currentWorkspaceId && (
+						<NavTeamspaces
+							workspaceId={currentWorkspaceId}
+							teamspaces={teamspaces}
+							pages={pages}
+							activePageId={activePageId}
+						/>
+					)}
 
 				<NavSecondary items={data.navSecondary} className='mt-auto' />
 			</SidebarContent>

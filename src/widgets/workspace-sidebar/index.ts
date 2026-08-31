@@ -3,7 +3,7 @@ export { HeaderWorkspace } from "./ui/header-workspace";
 export { NavActions } from "./ui/nav-actions";
 export { NavFavorites } from "./ui/nav-favorites";
 export { NavMain } from "./ui/nav-main";
+export { NavPrivatePages } from "./ui/nav-private";
 export { NavRecent } from "./ui/nav-recent";
 export { NavSecondary } from "./ui/nav-secondary";
-export { NavPages } from "./ui/nav-workspaces";
 export { TeamSwitcher } from "./ui/team-switcher";
