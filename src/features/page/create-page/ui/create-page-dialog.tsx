@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { EntityEditorDialog } from "@/shared/ui/entity-editor-dialog/entity-editor-dialog";
 
@@ -19,8 +19,20 @@ export function CreatePageDialog({
 }: CreatePageDialogProps) {
 	const [title, setTitle] = useState("");
 
+	useEffect(() => {
+		if (!open) {
+			setTitle("");
+		}
+	}, [open]);
+
 	const handleCreate = () => {
-		onCreate(title.trim() || "Untitled");
+		const normalizedTitle = title.trim();
+
+		if (!normalizedTitle) {
+			return;
+		}
+
+		onCreate(normalizedTitle);
 	};
 
 	return (
