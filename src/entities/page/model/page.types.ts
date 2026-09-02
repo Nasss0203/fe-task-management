@@ -37,3 +37,10 @@ export interface CreatePageInput {
 
 	title: string;
 }
+
+export interface UpdatePageInput {
+	title?: string;
+	slug?: string | null;
+	icon?: string | null;
+	cover_url?: string | null;
+}

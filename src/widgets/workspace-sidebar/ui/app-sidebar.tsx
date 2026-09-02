@@ -73,6 +73,7 @@ const data = {
 			title: "Trash",
 			url: "#",
 			icon: Trash2,
+			action: "trash" as const,
 		},
 		{
 			title: "Help",
@@ -235,8 +236,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 							activePageId={activePageId}
 						/>
 					)}
-
-				<NavSecondary items={data.navSecondary} className='mt-auto' />
+				<NavSecondary
+					workspaceId={currentWorkspaceId as string}
+					items={data.navSecondary}
+					className='mt-auto'
+				/>
 			</SidebarContent>
 
 			<SidebarRail />

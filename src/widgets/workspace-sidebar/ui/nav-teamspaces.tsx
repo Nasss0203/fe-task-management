@@ -17,6 +17,7 @@ import { CreateTeamspaceDialog } from "@/features/teamspace/create-teamspace/ui/
 
 import { Button } from "@/shared/ui/button";
 
+import { PageActionsMenu } from "@/features/page/page-actions/ui/page-actions-menu";
 import {
 	SidebarGroup,
 	SidebarGroupContent,
@@ -363,7 +364,25 @@ function TeamspaceItem({
 						activePageId={activePageId}
 						onOpenPage={onOpenPage}
 						onCreateChild={onCreateChildPage}
-						onOpenActions={onOpenPageActions}
+						renderActions={(page) => (
+							<PageActionsMenu page={page}>
+								<button
+									type='button'
+									aria-label='More page actions'
+									className={[
+										"flex size-6 shrink-0 items-center justify-center rounded-sm",
+										"text-muted-foreground",
+										"hover:bg-sidebar-accent-foreground/10",
+										"hover:text-sidebar-foreground",
+									].join(" ")}
+									onClick={(event) => {
+										event.stopPropagation();
+									}}
+								>
+									<MoreHorizontal className='size-3.5' />
+								</button>
+							</PageActionsMenu>
+						)}
 					/>
 				</div>
 			)}

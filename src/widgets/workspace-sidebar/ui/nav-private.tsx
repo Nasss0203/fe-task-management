@@ -1,16 +1,19 @@
 "use client";
 
-import { Ellipsis, Plus } from "lucide-react";
-
+import { Ellipsis, MoreHorizontal, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { buildPageTree } from "@/entities/page/lib/build-page-tree";
-import { useCreatePage } from "@/entities/page/model/page.mutations";
+import {
+	useCreatePage,
+	useMovePageToTrash,
+} from "@/entities/page/model/page.mutations";
 import type { Page } from "@/entities/page/model/page.types";
 import { PageTree } from "@/entities/page/ui/page-tree";
 
 import { CreatePageDialog } from "@/features/page/create-page/ui/create-page-dialog";
+import { PageActionsMenu } from "@/features/page/page-actions/ui/page-actions-menu";
 
 import { Button } from "@/shared/ui/button";
 
@@ -23,9 +26,7 @@ import {
 
 interface NavPrivatePagesProps {
 	workspaceId: string;
-
 	pages: Page[];
-
 	activePageId?: string;
 }
 
@@ -39,17 +40,13 @@ export function NavPrivatePages({
 	const createPageMutation = useCreatePage();
 
 	const [createDialogOpen, setCreateDialogOpen] = useState(false);
-
 	const [selectedParentPageId, setSelectedParentPageId] = useState<
 		string | null
 	>(null);
 
+	const movePageToTrashMutation = useMovePageToTrash();
 	/**
 	 * Lấy toàn bộ Private pages.
-	 *
-	 * Bao gồm:
-	 * - root pages
-	 * - child pages
 	 */
 	const privatePages = pages.filter((page) => page.teamspace_id === null);
 
@@ -60,8 +57,6 @@ export function NavPrivatePages({
 
 	/**
 	 * + ở header Private.
-	 *
-	 * Tạo root Page.
 	 */
 	const handleOpenCreateRootPage = () => {
 		setSelectedParentPageId(null);
@@ -70,9 +65,7 @@ export function NavPrivatePages({
 	};
 
 	/**
-	 * + cạnh Page.
-	 *
-	 * Tạo child Page.
+	 * + cạnh một Page.
 	 */
 	const handleOpenCreateChildPage = (parentPageId: string) => {
 		setSelectedParentPageId(parentPageId);
@@ -81,7 +74,7 @@ export function NavPrivatePages({
 	};
 
 	/**
-	 * Submit Create Page.
+	 * Create Page.
 	 */
 	const handleCreatePage = (title: string) => {
 		createPageMutation.mutate(
@@ -117,18 +110,21 @@ export function NavPrivatePages({
 		}
 	};
 
-	const handleOpenPageActions = (page: Page) => {
-		console.log("Open page actions:", page);
+	const handleMovePageToTrash = (page: Page) => {
+		movePageToTrashMutation.mutate({
+			pageId: page.id,
+			workspaceId: page.workspace_id,
+		});
 	};
 
 	return (
 		<SidebarGroup>
-			{/* Private header */}
+			{/* Private Header */}
 			<div className='group/private flex items-center justify-between'>
 				<SidebarGroupLabel>Private</SidebarGroupLabel>
 
 				<div className='flex items-center gap-0.5'>
-					{/* Private actions */}
+					{/* Private Actions */}
 					<Button
 						type='button'
 						variant='ghost'
@@ -141,7 +137,8 @@ export function NavPrivatePages({
 					>
 						<Ellipsis size={13} />
 					</Button>
-					{/* Create root Page */}
+
+					{/* Create Root Page */}
 					<Button
 						type='button'
 						variant='ghost'
@@ -158,7 +155,6 @@ export function NavPrivatePages({
 					</Button>
 				</div>
 			</div>
-
 			{/* Pages */}
 			<SidebarGroupContent>
 				<SidebarMenu>
@@ -171,13 +167,31 @@ export function NavPrivatePages({
 						onCreateChild={(page) => {
 							handleOpenCreateChildPage(page.id);
 						}}
-						onOpenActions={(page) => {
-							handleOpenPageActions(page);
-						}}
+						renderActions={(page) => (
+							<PageActionsMenu
+								page={page}
+								onMoveToTrash={handleMovePageToTrash}
+							>
+								<button
+									type='button'
+									aria-label='More page actions'
+									className={[
+										"flex size-6 shrink-0 items-center justify-center rounded-sm",
+										"text-muted-foreground",
+										"hover:bg-sidebar-accent-foreground/10",
+										"hover:text-sidebar-foreground",
+									].join(" ")}
+									onClick={(event) => {
+										event.stopPropagation();
+									}}
+								>
+									<MoreHorizontal className='size-3.5' />
+								</button>
+							</PageActionsMenu>
+						)}
 					/>
 				</SidebarMenu>
 			</SidebarGroupContent>
-
 			{/* Create Page */}
 			<CreatePageDialog
 				open={createDialogOpen}

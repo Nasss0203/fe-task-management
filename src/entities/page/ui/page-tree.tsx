@@ -1,6 +1,7 @@
 "use client";
 
-import { ChevronRight, FileText, MoreHorizontal, Plus } from "lucide-react";
+import { ChevronRight, FileText, Plus } from "lucide-react";
+import type { ReactNode } from "react";
 import { useState } from "react";
 
 import type { PageTreeNode } from "../lib/build-page-tree";
@@ -14,7 +15,13 @@ interface PageTreeProps {
 
 	onCreateChild?: (page: PageTreeNode) => void;
 
-	onOpenActions?: (page: PageTreeNode) => void;
+	/**
+	 * Render action riêng của Page.
+	 *
+	 * Ví dụ:
+	 * PageActionsMenu
+	 */
+	renderActions?: (page: PageTreeNode) => ReactNode;
 
 	depth?: number;
 }
@@ -24,7 +31,7 @@ export function PageTree({
 	activePageId,
 	onOpenPage,
 	onCreateChild,
-	onOpenActions,
+	renderActions,
 	depth = 0,
 }: PageTreeProps) {
 	return (
@@ -36,7 +43,7 @@ export function PageTree({
 					activePageId={activePageId}
 					onOpenPage={onOpenPage}
 					onCreateChild={onCreateChild}
-					onOpenActions={onOpenActions}
+					renderActions={renderActions}
 					depth={depth}
 				/>
 			))}
@@ -53,7 +60,7 @@ interface PageTreeItemProps {
 
 	onCreateChild?: (page: PageTreeNode) => void;
 
-	onOpenActions?: (page: PageTreeNode) => void;
+	renderActions?: (page: PageTreeNode) => ReactNode;
 
 	depth?: number;
 }
@@ -63,7 +70,7 @@ function PageTreeItem({
 	activePageId,
 	onOpenPage,
 	onCreateChild,
-	onOpenActions,
+	renderActions,
 	depth = 0,
 }: PageTreeItemProps) {
 	const [expanded, setExpanded] = useState(true);
@@ -73,7 +80,7 @@ function PageTreeItem({
 	const isActive = page.id === activePageId;
 
 	/**
-	 * Level càng sâu càng compact.
+	 * Càng xuống sâu càng compact.
 	 */
 	const rowSizeClass =
 		depth === 0
@@ -101,13 +108,15 @@ function PageTreeItem({
 				className={[
 					"group/page flex items-center rounded-md",
 					rowSizeClass,
+
 					"hover:bg-sidebar-accent/60",
+
 					isActive
 						? "bg-sidebar-accent text-sidebar-accent-foreground"
 						: "",
 				].join(" ")}
 			>
-				{/* Page icon / Chevron */}
+				{/* Page Icon / Chevron */}
 				<button
 					type='button'
 					aria-label={
@@ -119,7 +128,9 @@ function PageTreeItem({
 					}
 					className={[
 						"group/icon relative flex shrink-0 items-center justify-center rounded-sm",
+
 						iconButtonSizeClass,
+
 						hasChildren
 							? "cursor-pointer hover:bg-sidebar-accent-foreground/10"
 							: "cursor-default",
@@ -134,10 +145,11 @@ function PageTreeItem({
 						setExpanded((current) => !current);
 					}}
 				>
-					{/* Page icon */}
+					{/* Page Icon */}
 					<span
 						className={[
 							"flex items-center justify-center",
+
 							hasChildren ? "group-hover/icon:hidden" : "",
 						].join(" ")}
 					>
@@ -150,21 +162,25 @@ function PageTreeItem({
 						)}
 					</span>
 
-					{/* Chevron chỉ hiện khi hover icon */}
+					{/* Hover icon -> Chevron */}
 					{hasChildren && (
 						<ChevronRight
 							className={[
 								iconSizeClass,
+
 								"absolute hidden",
+
 								"group-hover/icon:block",
+
 								"transition-transform duration-150",
+
 								expanded ? "rotate-90" : "",
 							].join(" ")}
 						/>
 					)}
 				</button>
 
-				{/* Page title */}
+				{/* Page Title */}
 				<button
 					type='button'
 					className='flex min-w-0 flex-1 items-center overflow-hidden text-left'
@@ -177,45 +193,33 @@ function PageTreeItem({
 					</span>
 				</button>
 
-				{/* Right actions */}
+				{/* Right Actions */}
 				<div
 					className={[
-						"mr-1 hidden shrink-0 items-center gap-0.5",
-						"group-hover/page:flex",
+						"mr-1 flex shrink-0 items-center gap-0.5",
+						"pointer-events-none opacity-0",
+						"group-hover/page:pointer-events-auto",
+						"group-hover/page:opacity-100",
+						"transition-opacity duration-100",
 					].join(" ")}
 				>
-					{/* More */}
-					{onOpenActions && (
-						<button
-							type='button'
-							aria-label='More page actions'
-							className={[
-								"flex shrink-0 items-center justify-center rounded-sm",
-								"text-muted-foreground",
-								"hover:bg-sidebar-accent-foreground/10",
-								"hover:text-sidebar-foreground",
-								actionButtonSizeClass,
-							].join(" ")}
-							onClick={(event) => {
-								event.stopPropagation();
+					{/* Page Actions Menu */}
+					{renderActions?.(page)}
 
-								onOpenActions(page);
-							}}
-						>
-							<MoreHorizontal className={actionIconSizeClass} />
-						</button>
-					)}
-
-					{/* Create child */}
+					{/* Create Child */}
 					{onCreateChild && (
 						<button
 							type='button'
 							aria-label='Create child page'
 							className={[
 								"flex shrink-0 items-center justify-center rounded-sm",
+
 								"text-muted-foreground",
+
 								"hover:bg-sidebar-accent-foreground/10",
+
 								"hover:text-sidebar-foreground",
+
 								actionButtonSizeClass,
 							].join(" ")}
 							onClick={(event) => {
@@ -238,7 +242,7 @@ function PageTreeItem({
 						activePageId={activePageId}
 						onOpenPage={onOpenPage}
 						onCreateChild={onCreateChild}
-						onOpenActions={onOpenActions}
+						renderActions={renderActions}
 						depth={depth + 1}
 					/>
 				</div>
