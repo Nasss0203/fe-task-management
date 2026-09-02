@@ -4,6 +4,7 @@ import { ApiResponse } from "@/shared/api";
 
 import type {
 	CreatePageInput,
+	MovePageInput,
 	Page,
 	UpdatePageInput,
 } from "../model/page.types";
@@ -96,5 +97,23 @@ export const pageApi = {
 				workspaceId,
 			},
 		});
+	},
+
+	move: async (
+		pageId: string,
+		workspaceId: string,
+		input: MovePageInput,
+	) => {
+		const response = await instance.patch(
+			`${PAGE_API}/${pageId}/move`,
+			input,
+			{
+				params: {
+					workspaceId,
+				},
+			},
+		);
+
+		return response.data;
 	},
 };

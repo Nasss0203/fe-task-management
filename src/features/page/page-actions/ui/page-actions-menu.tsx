@@ -4,7 +4,6 @@ import {
 	Copy,
 	ExternalLink,
 	Link2,
-	MoveRight,
 	Star,
 	Trash2,
 } from "lucide-react";
@@ -12,6 +11,10 @@ import { type ReactNode, useState } from "react";
 
 import type { Page } from "@/entities/page/model/page.types";
 
+import {
+	MovePageMenu,
+	type TeamspaceOption,
+} from "@/features/page/move-page/ui/move-page-menu";
 import { RenamePageMenu } from "@/features/page/rename-page/ui/rename-page-menu";
 
 import {
@@ -25,23 +28,21 @@ import {
 
 interface PageActionsMenuProps {
 	page: Page;
-
+	pages: Page[];
 	children: ReactNode;
+	teamspaces: TeamspaceOption[];
 
 	onDuplicate?: (page: Page) => void;
-
-	onMove?: (page: Page) => void;
-
 	onMoveToTrash?: (page: Page) => void;
-
 	onAddToFavorites?: (page: Page) => void;
 }
 
 export function PageActionsMenu({
 	page,
+	pages,
 	children,
+	teamspaces,
 	onDuplicate,
-	onMove,
 	onMoveToTrash,
 	onAddToFavorites,
 }: PageActionsMenuProps) {
@@ -123,14 +124,14 @@ export function PageActionsMenu({
 				/>
 
 				{/* Move */}
-				<DropdownMenuItem
-					onSelect={() => {
-						onMove?.(page);
+				<MovePageMenu
+					page={page}
+					pages={pages}
+					teamspaces={teamspaces}
+					onMoved={() => {
+						setOpen(false);
 					}}
-				>
-					<MoveRight className='mr-2 size-4' />
-					Move to
-				</DropdownMenuItem>
+				/>
 
 				{/* Trash */}
 				<DropdownMenuItem

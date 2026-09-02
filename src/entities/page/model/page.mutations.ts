@@ -4,7 +4,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { pageApi } from "../api/page.api";
 import { pageKeys } from "./page.queries";
-import type { CreatePageInput, UpdatePageInput } from "./page.types";
+import type {
+	CreatePageInput,
+	MovePageInput,
+	UpdatePageInput,
+} from "./page.types";
 
 export function useCreatePage() {
 	const queryClient = useQueryClient();
@@ -115,6 +119,34 @@ export function useDeletePagePermanently() {
 			await queryClient.invalidateQueries({
 				queryKey: pageKeys.trash(variables.workspaceId),
 			});
+		},
+	});
+}
+
+export function useMovePage() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({
+			pageId,
+			workspaceId,
+			input,
+		}: {
+			pageId: string;
+			workspaceId: string;
+			input: MovePageInput;
+		}) => pageApi.move(pageId, workspaceId, input),
+
+		onSuccess: async (_, variables) => {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: pageKeys.byWorkspace(variables.workspaceId),
+				}),
+
+				queryClient.invalidateQueries({
+					queryKey: pageKeys.detail(variables.pageId),
+				}),
+			]);
 		},
 	});
 }

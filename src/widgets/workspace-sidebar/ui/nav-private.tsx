@@ -24,27 +24,35 @@ import {
 	SidebarMenu,
 } from "@/widgets/workspace-sidebar/ui/sidebar";
 
+interface TeamspaceOption {
+	id: string;
+	name: string;
+}
+
 interface NavPrivatePagesProps {
 	workspaceId: string;
 	pages: Page[];
+	teamspaces: TeamspaceOption[];
 	activePageId?: string;
 }
 
 export function NavPrivatePages({
 	workspaceId,
 	pages,
+	teamspaces,
 	activePageId,
 }: NavPrivatePagesProps) {
 	const router = useRouter();
 
 	const createPageMutation = useCreatePage();
+	const movePageToTrashMutation = useMovePageToTrash();
 
 	const [createDialogOpen, setCreateDialogOpen] = useState(false);
+
 	const [selectedParentPageId, setSelectedParentPageId] = useState<
 		string | null
 	>(null);
 
-	const movePageToTrashMutation = useMovePageToTrash();
 	/**
 	 * Lấy toàn bộ Private pages.
 	 */
@@ -55,42 +63,27 @@ export function NavPrivatePages({
 	 */
 	const privatePageTree = buildPageTree(privatePages);
 
-	/**
-	 * + ở header Private.
-	 */
 	const handleOpenCreateRootPage = () => {
 		setSelectedParentPageId(null);
-
 		setCreateDialogOpen(true);
 	};
 
-	/**
-	 * + cạnh một Page.
-	 */
 	const handleOpenCreateChildPage = (parentPageId: string) => {
 		setSelectedParentPageId(parentPageId);
-
 		setCreateDialogOpen(true);
 	};
 
-	/**
-	 * Create Page.
-	 */
 	const handleCreatePage = (title: string) => {
 		createPageMutation.mutate(
 			{
 				workspace_id: workspaceId,
-
 				teamspace_id: null,
-
 				parent_page_id: selectedParentPageId,
-
 				title,
 			},
 			{
 				onSuccess: (page) => {
 					setCreateDialogOpen(false);
-
 					setSelectedParentPageId(null);
 
 					router.push(`/page/${page.id}`);
@@ -99,9 +92,6 @@ export function NavPrivatePages({
 		);
 	};
 
-	/**
-	 * Reset context khi đóng dialog.
-	 */
 	const handleDialogOpenChange = (open: boolean) => {
 		setCreateDialogOpen(open);
 
@@ -119,12 +109,10 @@ export function NavPrivatePages({
 
 	return (
 		<SidebarGroup>
-			{/* Private Header */}
 			<div className='group/private flex items-center justify-between'>
 				<SidebarGroupLabel>Private</SidebarGroupLabel>
 
 				<div className='flex items-center gap-0.5'>
-					{/* Private Actions */}
 					<Button
 						type='button'
 						variant='ghost'
@@ -138,7 +126,6 @@ export function NavPrivatePages({
 						<Ellipsis size={13} />
 					</Button>
 
-					{/* Create Root Page */}
 					<Button
 						type='button'
 						variant='ghost'
@@ -155,7 +142,7 @@ export function NavPrivatePages({
 					</Button>
 				</div>
 			</div>
-			{/* Pages */}
+
 			<SidebarGroupContent>
 				<SidebarMenu>
 					<PageTree
@@ -170,6 +157,8 @@ export function NavPrivatePages({
 						renderActions={(page) => (
 							<PageActionsMenu
 								page={page}
+								pages={pages}
+								teamspaces={teamspaces}
 								onMoveToTrash={handleMovePageToTrash}
 							>
 								<button
@@ -192,7 +181,7 @@ export function NavPrivatePages({
 					/>
 				</SidebarMenu>
 			</SidebarGroupContent>
-			{/* Create Page */}
+
 			<CreatePageDialog
 				open={createDialogOpen}
 				onOpenChange={handleDialogOpenChange}

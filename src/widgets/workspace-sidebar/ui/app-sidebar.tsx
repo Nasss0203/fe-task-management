@@ -220,6 +220,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 					<NavPrivatePages
 						workspaceId={currentWorkspaceId as string}
 						pages={pages}
+						teamspaces={teamspaces}
 						activePageId={activePageId}
 					/>
 				)}

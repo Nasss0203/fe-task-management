@@ -44,3 +44,8 @@ export interface UpdatePageInput {
 	icon?: string | null;
 	cover_url?: string | null;
 }
+
+export interface MovePageInput {
+	parent_page_id: string | null;
+	teamspace_id: string | null;
+}

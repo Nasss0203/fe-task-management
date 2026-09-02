@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { buildPageTree } from "@/entities/page/lib/build-page-tree";
-import { useCreatePage } from "@/entities/page/model/page.mutations";
+import {
+	useCreatePage,
+	useMovePageToTrash,
+} from "@/entities/page/model/page.mutations";
 import type { Page } from "@/entities/page/model/page.types";
 import { PageTree } from "@/entities/page/ui/page-tree";
 
@@ -40,6 +43,7 @@ export function NavTeamspaces({
 	const router = useRouter();
 
 	const createPageMutation = useCreatePage();
+	const movePageToTrashMutation = useMovePageToTrash();
 
 	const [createPageDialogOpen, setCreatePageDialogOpen] = useState(false);
 
@@ -130,6 +134,13 @@ export function NavTeamspaces({
 		);
 	};
 
+	const handleMovePageToTrash = (page: Page) => {
+		movePageToTrashMutation.mutate({
+			pageId: page.id,
+			workspaceId: page.workspace_id,
+		});
+	};
+
 	return (
 		<SidebarGroup>
 			{/* Teamspaces header */}
@@ -174,6 +185,8 @@ export function NavTeamspaces({
 								key={teamspace.id}
 								teamspace={teamspace}
 								pages={teamspacePages}
+								allPages={pages}
+								teamspaces={teamspaces}
 								activePageId={activePageId}
 								isCreatingPage={createPageMutation.isPending}
 								onOpenPage={(page) => {
@@ -183,9 +196,7 @@ export function NavTeamspaces({
 									handleOpenCreateRootPage(teamspace.id);
 								}}
 								onCreateChildPage={handleOpenCreateChildPage}
-								onOpenPageActions={(page) => {
-									console.log("Page actions:", page);
-								}}
+								onMovePageToTrash={handleMovePageToTrash}
 								onOpenTeamspaceActions={() => {
 									console.log(
 										"Teamspace actions:",
@@ -227,6 +238,10 @@ interface TeamspaceItemProps {
 
 	pages: Page[];
 
+	allPages: Page[];
+
+	teamspaces: Teamspace[];
+
 	activePageId?: string;
 
 	isCreatingPage?: boolean;
@@ -237,7 +252,7 @@ interface TeamspaceItemProps {
 
 	onCreateChildPage: (page: Page) => void;
 
-	onOpenPageActions: (page: Page) => void;
+	onMovePageToTrash: (page: Page) => void;
 
 	onOpenTeamspaceActions: () => void;
 }
@@ -245,12 +260,14 @@ interface TeamspaceItemProps {
 function TeamspaceItem({
 	teamspace,
 	pages,
+	allPages,
+	teamspaces,
 	activePageId,
 	isCreatingPage = false,
 	onOpenPage,
 	onCreateRootPage,
 	onCreateChildPage,
-	onOpenPageActions,
+	onMovePageToTrash,
 	onOpenTeamspaceActions,
 }: TeamspaceItemProps) {
 	const [expanded, setExpanded] = useState(true);
@@ -365,7 +382,12 @@ function TeamspaceItem({
 						onOpenPage={onOpenPage}
 						onCreateChild={onCreateChildPage}
 						renderActions={(page) => (
-							<PageActionsMenu page={page}>
+							<PageActionsMenu
+								page={page}
+								pages={allPages}
+								teamspaces={teamspaces}
+								onMoveToTrash={onMovePageToTrash}
+							>
 								<button
 									type='button'
 									aria-label='More page actions'
