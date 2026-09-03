@@ -150,3 +150,23 @@ export function useMovePage() {
 		},
 	});
 }
+
+export function useDuplicatePage() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({
+			pageId,
+			workspaceId,
+		}: {
+			pageId: string;
+			workspaceId: string;
+		}) => pageApi.duplicate(pageId, workspaceId),
+
+		onSuccess: (_, variables) => {
+			queryClient.invalidateQueries({
+				queryKey: pageKeys.byWorkspace(variables.workspaceId),
+			});
+		},
+	});
+}

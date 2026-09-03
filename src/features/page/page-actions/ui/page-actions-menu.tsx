@@ -1,12 +1,6 @@
 "use client";
 
-import {
-	Copy,
-	ExternalLink,
-	Link2,
-	Star,
-	Trash2,
-} from "lucide-react";
+import { ExternalLink, Link2, Star, Trash2 } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
 import type { Page } from "@/entities/page/model/page.types";
@@ -25,6 +19,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
+import { DuplicatePageMenuItem } from "../../duplicate-page/ui/duplicate-page-menu-item";
 
 interface PageActionsMenuProps {
 	page: Page;
@@ -106,14 +101,12 @@ export function PageActionsMenu({
 				</DropdownMenuItem>
 
 				{/* Duplicate */}
-				<DropdownMenuItem
-					onSelect={() => {
-						onDuplicate?.(page);
+				<DuplicatePageMenuItem
+					page={page}
+					onDuplicated={() => {
+						setOpen(false);
 					}}
-				>
-					<Copy className='mr-2 size-4' />
-					Duplicate
-				</DropdownMenuItem>
+				/>
 
 				{/* Rename */}
 				<RenamePageMenu

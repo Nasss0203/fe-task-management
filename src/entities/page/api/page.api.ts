@@ -99,14 +99,24 @@ export const pageApi = {
 		});
 	},
 
-	move: async (
-		pageId: string,
-		workspaceId: string,
-		input: MovePageInput,
-	) => {
+	move: async (pageId: string, workspaceId: string, input: MovePageInput) => {
 		const response = await instance.patch(
 			`${PAGE_API}/${pageId}/move`,
 			input,
+			{
+				params: {
+					workspaceId,
+				},
+			},
+		);
+
+		return response.data;
+	},
+
+	duplicate: async (pageId: string, workspaceId: string) => {
+		const response = await instance.post(
+			`${PAGE_API}/${pageId}/duplicate`,
+			undefined,
 			{
 				params: {
 					workspaceId,
