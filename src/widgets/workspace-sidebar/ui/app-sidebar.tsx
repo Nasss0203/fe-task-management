@@ -163,9 +163,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 	const hasLastActiveWorkspace =
 		user?.lastActiveWorkspaceId &&
-		workspaces.some(
-			(workspace) => workspace.id === user.lastActiveWorkspaceId,
-		);
+		workspaces.some((workspace) => workspace.id === user.lastActiveWorkspaceId);
 
 	const currentWorkspaceId = hasLastActiveWorkspace
 		? user.lastActiveWorkspaceId
@@ -192,7 +190,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	};
 
 	return (
-		<Sidebar className='border-r-0' {...props}>
+		<Sidebar className="border-r-0" {...props}>
 			<SidebarHeader>
 				{!isLoading &&
 					!isError &&
@@ -214,7 +212,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			<SidebarContent>
 				<NavRecent recents={data.recents} />
 
-				<NavFavorites favorites={data.favorites} />
+				<NavFavorites
+					workspaceId={currentWorkspaceId ?? undefined}
+					activePageId={activePageId}
+					pages={pages}
+					teamspaces={teamspaces}
+				/>
 
 				{!isPagesLoading && !isPagesError && (
 					<NavPrivatePages
@@ -240,7 +243,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				<NavSecondary
 					workspaceId={currentWorkspaceId as string}
 					items={data.navSecondary}
-					className='mt-auto'
+					className="mt-auto"
 				/>
 			</SidebarContent>
 

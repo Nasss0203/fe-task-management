@@ -13,10 +13,7 @@ const PAGE_API = "/page";
 
 export const pageApi = {
 	create: async (input: CreatePageInput): Promise<Page> => {
-		const response = await instance.post<ApiResponse<Page>>(
-			PAGE_API,
-			input,
-		);
+		const response = await instance.post<ApiResponse<Page>>(PAGE_API, input);
 
 		return response.data.data;
 	},
@@ -53,6 +50,31 @@ export const pageApi = {
 		);
 
 		return response.data.data;
+	},
+
+	getFavorites: async (
+		workspaceId: string,
+		signal?: AbortSignal,
+	): Promise<Page[]> => {
+		const response = await instance.get<ApiResponse<Page[]>>(
+			`${PAGE_API}/favorites`,
+			{
+				params: {
+					workspaceId,
+				},
+				signal,
+			},
+		);
+
+		return response.data.data;
+	},
+
+	addFavorite: async (pageId: string): Promise<void> => {
+		await instance.post(`${PAGE_API}/${pageId}/favorite`);
+	},
+
+	removeFavorite: async (pageId: string): Promise<void> => {
+		await instance.delete(`${PAGE_API}/${pageId}/favorite`);
 	},
 
 	moveToTrash: async (pageId: string, workspaceId: string): Promise<void> => {
@@ -100,15 +122,11 @@ export const pageApi = {
 	},
 
 	move: async (pageId: string, workspaceId: string, input: MovePageInput) => {
-		const response = await instance.patch(
-			`${PAGE_API}/${pageId}/move`,
-			input,
-			{
-				params: {
-					workspaceId,
-				},
+		const response = await instance.patch(`${PAGE_API}/${pageId}/move`, input, {
+			params: {
+				workspaceId,
 			},
-		);
+		});
 
 		return response.data;
 	},

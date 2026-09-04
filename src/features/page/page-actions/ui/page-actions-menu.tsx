@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, Link2, Star, Trash2 } from "lucide-react";
+import { ExternalLink, Link2, Trash2 } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
 import type { Page } from "@/entities/page/model/page.types";
@@ -9,6 +9,7 @@ import {
 	MovePageMenu,
 	type TeamspaceOption,
 } from "@/features/page/move-page/ui/move-page-menu";
+import { FavoritePageMenuItem } from "@/features/page/favorite-page/ui/favorite-page-menu-item";
 import { RenamePageMenu } from "@/features/page/rename-page/ui/rename-page-menu";
 
 import {
@@ -27,9 +28,7 @@ interface PageActionsMenuProps {
 	children: ReactNode;
 	teamspaces: TeamspaceOption[];
 
-	onDuplicate?: (page: Page) => void;
 	onMoveToTrash?: (page: Page) => void;
-	onAddToFavorites?: (page: Page) => void;
 }
 
 export function PageActionsMenu({
@@ -37,9 +36,7 @@ export function PageActionsMenu({
 	pages,
 	children,
 	teamspaces,
-	onDuplicate,
 	onMoveToTrash,
-	onAddToFavorites,
 }: PageActionsMenuProps) {
 	const [open, setOpen] = useState(false);
 
@@ -68,25 +65,18 @@ export function PageActionsMenu({
 			<DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
 
 			<DropdownMenuContent
-				side='right'
-				align='start'
+				side="right"
+				align="start"
 				sideOffset={4}
-				className='w-64'
+				className="w-64"
 			>
 				{/* Page */}
-				<DropdownMenuLabel className='text-xs font-normal text-muted-foreground'>
+				<DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
 					Page
 				</DropdownMenuLabel>
 
 				{/* Favorite */}
-				<DropdownMenuItem
-					onSelect={() => {
-						onAddToFavorites?.(page);
-					}}
-				>
-					<Star className='mr-2 size-4' />
-					Add to Favorites
-				</DropdownMenuItem>
+				<FavoritePageMenuItem page={page} />
 
 				<DropdownMenuSeparator />
 
@@ -96,7 +86,7 @@ export function PageActionsMenu({
 						void handleCopyLink();
 					}}
 				>
-					<Link2 className='mr-2 size-4' />
+					<Link2 className="mr-2 size-4" />
 					Copy link
 				</DropdownMenuItem>
 
@@ -128,12 +118,12 @@ export function PageActionsMenu({
 
 				{/* Trash */}
 				<DropdownMenuItem
-					className='text-destructive focus:text-destructive'
+					className="text-destructive focus:text-destructive"
 					onSelect={() => {
 						onMoveToTrash?.(page);
 					}}
 				>
-					<Trash2 className='mr-2 size-4' />
+					<Trash2 className="mr-2 size-4" />
 					Move to Trash
 				</DropdownMenuItem>
 
@@ -141,7 +131,7 @@ export function PageActionsMenu({
 
 				{/* New Tab */}
 				<DropdownMenuItem onSelect={handleOpenInNewTab}>
-					<ExternalLink className='mr-2 size-4' />
+					<ExternalLink className="mr-2 size-4" />
 					Open in new tab
 				</DropdownMenuItem>
 			</DropdownMenuContent>

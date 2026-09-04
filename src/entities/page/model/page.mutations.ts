@@ -8,6 +8,7 @@ import type {
 	CreatePageInput,
 	MovePageInput,
 	UpdatePageInput,
+	Page,
 } from "./page.types";
 
 export function useCreatePage() {
@@ -72,6 +73,10 @@ export function useMovePageToTrash() {
 				queryClient.invalidateQueries({
 					queryKey: pageKeys.trash(variables.workspaceId),
 				}),
+
+				queryClient.invalidateQueries({
+					queryKey: pageKeys.favorites(variables.workspaceId),
+				}),
 			]);
 		},
 	});
@@ -98,6 +103,10 @@ export function useRestorePage() {
 				queryClient.invalidateQueries({
 					queryKey: pageKeys.trash(variables.workspaceId),
 				}),
+
+				queryClient.invalidateQueries({
+					queryKey: pageKeys.favorites(variables.workspaceId),
+				}),
 			]);
 		},
 	});
@@ -116,8 +125,63 @@ export function useDeletePagePermanently() {
 			pageApi.deletePermanently(pageId, workspaceId),
 
 		onSuccess: async (_, variables) => {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: pageKeys.trash(variables.workspaceId),
+				}),
+
+				queryClient.invalidateQueries({
+					queryKey: pageKeys.favorites(variables.workspaceId),
+				}),
+			]);
+		},
+	});
+}
+
+interface TogglePageFavoriteInput {
+	page: Page;
+	isFavorite: boolean;
+}
+
+export function useTogglePageFavorite() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({ page, isFavorite }: TogglePageFavoriteInput) => {
+			if (isFavorite) {
+				await pageApi.removeFavorite(page.id);
+				return;
+			}
+
+			await pageApi.addFavorite(page.id);
+		},
+
+		onMutate: async ({ page, isFavorite }) => {
+			const queryKey = pageKeys.favorites(page.workspace_id);
+
+			await queryClient.cancelQueries({ queryKey });
+
+			const previousFavorites = queryClient.getQueryData<Page[]>(queryKey);
+
+			queryClient.setQueryData<Page[]>(queryKey, (favorites = []) =>
+				isFavorite
+					? favorites.filter((favorite) => favorite.id !== page.id)
+					: [page, ...favorites.filter((favorite) => favorite.id !== page.id)],
+			);
+
+			return { previousFavorites };
+		},
+
+		onError: (_error, { page }, context) => {
+			queryClient.setQueryData(
+				pageKeys.favorites(page.workspace_id),
+				context?.previousFavorites,
+			);
+		},
+
+		onSettled: async (_data, _error, { page }) => {
 			await queryClient.invalidateQueries({
-				queryKey: pageKeys.trash(variables.workspaceId),
+				queryKey: pageKeys.favorites(page.workspace_id),
 			});
 		},
 	});
