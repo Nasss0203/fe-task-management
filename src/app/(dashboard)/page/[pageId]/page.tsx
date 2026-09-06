@@ -6,6 +6,7 @@ import { useMemo } from "react";
 import { buildPageBlockTree } from "@/entities/page-block/lib/build-page-block-tree";
 import { usePageBlocks } from "@/entities/page-block/model/page-block.queries";
 import { usePage } from "@/entities/page/model/page.queries";
+import { PageEditAccessBoundary } from "@/features/page-access/ui/page-edit-access-boundary";
 import { EmptyPageBlockRow } from "@/widgets/page-block-editor/ui/empty-page-block-row";
 import { PageBlockEditorProvider } from "@/widgets/page-block-editor/ui/page-block-editor-context";
 import { PageBlockEditorRow } from "@/widgets/page-block-editor/ui/page-block-editor-row";
@@ -55,19 +56,29 @@ export default function PageDetail() {
 				</h1>
 			</div>
 
-			<PageBlockEditorProvider orderedBlockIds={orderedBlockIds}>
-				<div className='mt-14 w-full min-w-0 max-w-full px-12 md:px-16 lg:px-24'>
-					<div className='w-full min-w-0 max-w-full space-y-2'>
-						{blockTree.map((block) => (
-							<PageBlockEditorRow key={block.id} block={block} />
-						))}
+			<PageEditAccessBoundary
+				canEdit={page.canEdit}
+				onRequestEdit={() => {
+					console.log("REQUEST EDIT ACCESS");
+				}}
+			>
+				<PageBlockEditorProvider orderedBlockIds={orderedBlockIds}>
+					<div className='mt-14 w-full min-w-0 max-w-full px-12 md:px-16 lg:px-24'>
+						<div className='w-full min-w-0 max-w-full space-y-2'>
+							{blockTree.map((block) => (
+								<PageBlockEditorRow
+									key={block.id}
+									block={block}
+								/>
+							))}
 
-						{blockTree.length === 0 && (
-							<EmptyPageBlockRow pageId={page.id} />
-						)}
+							{blockTree.length === 0 && (
+								<EmptyPageBlockRow pageId={page.id} />
+							)}
+						</div>
 					</div>
-				</div>
-			</PageBlockEditorProvider>
+				</PageBlockEditorProvider>
+			</PageEditAccessBoundary>
 		</div>
 	);
 }

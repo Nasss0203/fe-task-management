@@ -17,12 +17,7 @@ import { PageActionsMenu } from "@/features/page/page-actions/ui/page-actions-me
 
 import { Button } from "@/shared/ui/button";
 
-import {
-	SidebarGroup,
-	SidebarGroupContent,
-	SidebarGroupLabel,
-	SidebarMenu,
-} from "@/widgets/workspace-sidebar/ui/sidebar";
+import { SidebarPageSection } from "@/widgets/workspace-sidebar/ui/sidebar-page-section";
 
 interface TeamspaceOption {
 	id: string;
@@ -53,14 +48,8 @@ export function NavPrivatePages({
 		string | null
 	>(null);
 
-	/**
-	 * Lấy toàn bộ Private pages.
-	 */
 	const privatePages = pages.filter((page) => page.teamspace_id === null);
 
-	/**
-	 * Flat list -> Tree.
-	 */
 	const privatePageTree = buildPageTree(privatePages);
 
 	const handleOpenCreateRootPage = () => {
@@ -84,6 +73,7 @@ export function NavPrivatePages({
 			{
 				onSuccess: (page) => {
 					setCreateDialogOpen(false);
+
 					setSelectedParentPageId(null);
 
 					router.push(`/page/${page.id}`);
@@ -108,85 +98,80 @@ export function NavPrivatePages({
 	};
 
 	return (
-		<SidebarGroup>
-			<div className='group/private flex items-center justify-between'>
-				<SidebarGroupLabel>Private</SidebarGroupLabel>
+		<>
+			<SidebarPageSection
+				title='Private'
+				headerActions={
+					<>
+						<Button
+							type='button'
+							variant='ghost'
+							size='icon'
+							className={[
+								"h-6 w-6",
+								"hover:bg-sidebar-accent",
+							].join(" ")}
+						>
+							<Ellipsis size={13} />
+						</Button>
 
-				<div className='flex items-center gap-0.5'>
-					<Button
-						type='button'
-						variant='ghost'
-						size='icon'
-						className={[
-							"hidden h-6 w-6",
-							"group-hover/private:flex",
-							"hover:bg-sidebar-accent",
-						].join(" ")}
-					>
-						<Ellipsis size={13} />
-					</Button>
-
-					<Button
-						type='button'
-						variant='ghost'
-						size='icon'
-						disabled={createPageMutation.isPending}
-						className={[
-							"hidden h-6 w-6",
-							"group-hover/private:flex",
-							"hover:bg-sidebar-accent",
-						].join(" ")}
-						onClick={handleOpenCreateRootPage}
-					>
-						<Plus size={13} />
-					</Button>
-				</div>
-			</div>
-
-			<SidebarGroupContent>
-				<SidebarMenu>
-					<PageTree
-						pages={privatePageTree}
-						activePageId={activePageId}
-						onOpenPage={(page) => {
-							router.push(`/page/${page.id}`);
-						}}
-						onCreateChild={(page) => {
-							handleOpenCreateChildPage(page.id);
-						}}
-						renderActions={(page) => (
-							<PageActionsMenu
-								page={page}
-								pages={pages}
-								teamspaces={teamspaces}
-								onMoveToTrash={handleMovePageToTrash}
+						<Button
+							type='button'
+							variant='ghost'
+							size='icon'
+							disabled={createPageMutation.isPending}
+							className={[
+								"h-6 w-6",
+								"hover:bg-sidebar-accent",
+							].join(" ")}
+							onClick={handleOpenCreateRootPage}
+						>
+							<Plus size={13} />
+						</Button>
+					</>
+				}
+			>
+				<PageTree
+					pages={privatePageTree}
+					activePageId={activePageId}
+					onOpenPage={(page) => {
+						router.push(`/page/${page.id}`);
+					}}
+					onCreateChild={(page) => {
+						handleOpenCreateChildPage(page.id);
+					}}
+					renderActions={(page) => (
+						<PageActionsMenu
+							page={page}
+							pages={pages}
+							teamspaces={teamspaces}
+							onMoveToTrash={handleMovePageToTrash}
+						>
+							<button
+								type='button'
+								aria-label='More page actions'
+								className={[
+									"flex size-6 shrink-0 items-center justify-center rounded-sm",
+									"text-muted-foreground",
+									"hover:bg-sidebar-accent-foreground/10",
+									"hover:text-sidebar-foreground",
+								].join(" ")}
+								onClick={(event) => {
+									event.stopPropagation();
+								}}
 							>
-								<button
-									type='button'
-									aria-label='More page actions'
-									className={[
-										"flex size-6 shrink-0 items-center justify-center rounded-sm",
-										"text-muted-foreground",
-										"hover:bg-sidebar-accent-foreground/10",
-										"hover:text-sidebar-foreground",
-									].join(" ")}
-									onClick={(event) => {
-										event.stopPropagation();
-									}}
-								>
-									<MoreHorizontal className='size-3.5' />
-								</button>
-							</PageActionsMenu>
-						)}
-					/>
-				</SidebarMenu>
-			</SidebarGroupContent>
+								<MoreHorizontal className='size-3.5' />
+							</button>
+						</PageActionsMenu>
+					)}
+				/>
+			</SidebarPageSection>
 
 			<CreatePageDialog
 				open={createDialogOpen}
 				onOpenChange={handleDialogOpenChange}
 				onCreate={handleCreatePage}
 			/>
-		</SidebarGroup>
+		</>
 	);
 }

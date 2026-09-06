@@ -17,6 +17,8 @@ export interface Page {
 
 	is_template: boolean;
 
+	canEdit: boolean;
+
 	created_by: string;
 
 	createdAt: string;

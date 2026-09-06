@@ -1,26 +1,24 @@
 "use client";
 
+import { MoreHorizontal } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
+
+import { buildPageTree } from "@/entities/page/lib/build-page-tree";
 import {
 	useCreatePage,
 	useMovePageToTrash,
 } from "@/entities/page/model/page.mutations";
 import { usePageFavorites } from "@/entities/page/model/page.queries";
 import type { Page } from "@/entities/page/model/page.types";
+import { PageTree } from "@/entities/page/ui/page-tree";
+
 import type { Teamspace } from "@/entities/teamspace/model/teamspace.types";
+
 import { CreatePageDialog } from "@/features/page/create-page/ui/create-page-dialog";
 import { PageActionsMenu } from "@/features/page/page-actions/ui/page-actions-menu";
-import { MoreHorizontal, Plus } from "lucide-react";
-import NextLink from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
-import {
-	SidebarGroup,
-	SidebarGroupLabel,
-	SidebarMenu,
-	SidebarMenuButton,
-	SidebarMenuItem,
-} from "@/widgets/workspace-sidebar/ui/sidebar";
+import { SidebarPageSection } from "@/widgets/workspace-sidebar/ui/sidebar-page-section";
 
 interface NavFavoritesProps {
 	workspaceId?: string;
@@ -36,23 +34,91 @@ export function NavFavorites({
 	teamspaces,
 }: NavFavoritesProps) {
 	const router = useRouter();
+
 	const { data: favorites = [], isLoading } = usePageFavorites(workspaceId);
+
 	const createPage = useCreatePage();
+
 	const movePageToTrash = useMovePageToTrash();
+
 	const [createDialogOpen, setCreateDialogOpen] = useState(false);
+
 	const [selectedParentPage, setSelectedParentPage] = useState<Page | null>(
 		null,
 	);
 
-	if (!workspaceId || isLoading || favorites.length === 0) {
+	const favoritePages = useMemo(() => {
+		if (favorites.length === 0) {
+			return [];
+		}
+
+		const childrenByParentId = new Map<string, Page[]>();
+
+		for (const page of pages) {
+			if (!page.parent_page_id) {
+				continue;
+			}
+
+			const children = childrenByParentId.get(page.parent_page_id) ?? [];
+
+			children.push(page);
+
+			childrenByParentId.set(page.parent_page_id, children);
+		}
+
+		/**
+		 * Những Page cần hiển thị trong Favorites.
+		 */
+		const includedIds = new Set<string>();
+
+		const collectDescendants = (pageId: string) => {
+			if (includedIds.has(pageId)) {
+				return;
+			}
+
+			includedIds.add(pageId);
+
+			const children = childrenByParentId.get(pageId) ?? [];
+
+			for (const child of children) {
+				collectDescendants(child.id);
+			}
+		};
+
+		for (const favorite of favorites) {
+			collectDescendants(favorite.id);
+		}
+
+		return pages
+			.filter((page) => includedIds.has(page.id))
+			.map((page) => ({
+				...page,
+
+				parent_page_id:
+					page.parent_page_id && includedIds.has(page.parent_page_id)
+						? page.parent_page_id
+						: null,
+			}));
+	}, [favorites, pages]);
+
+	const favoritePageTree = useMemo(
+		() => buildPageTree(favoritePages),
+		[favoritePages],
+	);
+
+	if (!workspaceId || isLoading || favoritePageTree.length === 0) {
 		return null;
 	}
 
 	const handleOpenCreateChildPage = (page: Page) => {
 		setSelectedParentPage(page);
+
 		setCreateDialogOpen(true);
 	};
 
+	/**
+	 * Create child Page.
+	 */
 	const handleCreatePage = (title: string) => {
 		if (!selectedParentPage) {
 			return;
@@ -61,14 +127,19 @@ export function NavFavorites({
 		createPage.mutate(
 			{
 				workspace_id: selectedParentPage.workspace_id,
+
 				teamspace_id: selectedParentPage.teamspace_id,
+
 				parent_page_id: selectedParentPage.id,
+
 				title,
 			},
 			{
 				onSuccess: (page) => {
 					setCreateDialogOpen(false);
+
 					setSelectedParentPage(null);
+
 					router.push(`/page/${page.id}`);
 				},
 			},
@@ -92,58 +163,45 @@ export function NavFavorites({
 
 	return (
 		<>
-			<SidebarGroup className="group-data-[collapsible=icon]:hidden">
-				<SidebarGroupLabel>Favorites</SidebarGroupLabel>
-				<SidebarMenu>
-					{favorites.map((page) => (
-						<SidebarMenuItem key={page.id}>
-							<SidebarMenuButton
-								asChild
-								isActive={page.id === activePageId}
-								className="pr-16"
+			<SidebarPageSection
+				title='Favorites'
+				className='group-data-[collapsible=icon]:hidden'
+			>
+				<PageTree
+					pages={favoritePageTree}
+					activePageId={activePageId}
+					onOpenPage={(page) => {
+						router.push(`/page/${page.id}`);
+					}}
+					onCreateChild={(page) => {
+						handleOpenCreateChildPage(page);
+					}}
+					renderActions={(page) => (
+						<PageActionsMenu
+							page={page}
+							pages={pages}
+							teamspaces={teamspaces}
+							onMoveToTrash={handleMovePageToTrash}
+						>
+							<button
+								type='button'
+								aria-label='More page actions'
+								className={[
+									"flex size-6 shrink-0 items-center justify-center rounded-sm",
+									"text-muted-foreground",
+									"hover:bg-sidebar-accent-foreground/10",
+									"hover:text-sidebar-foreground",
+								].join(" ")}
+								onClick={(event) => {
+									event.stopPropagation();
+								}}
 							>
-								<NextLink href={`/page/${page.id}`} title={page.title}>
-									<span>{page.icon || "📄"}</span>
-									<span>{page.title || "Untitled"}</span>
-								</NextLink>
-							</SidebarMenuButton>
-
-							<div className="pointer-events-none absolute top-1 right-1 flex items-center gap-0.5 opacity-0 transition-opacity duration-100 group-focus-within/menu-item:pointer-events-auto group-focus-within/menu-item:opacity-100 group-hover/menu-item:pointer-events-auto group-hover/menu-item:opacity-100">
-								<PageActionsMenu
-									page={page}
-									pages={pages}
-									teamspaces={teamspaces}
-									onMoveToTrash={handleMovePageToTrash}
-								>
-									<button
-										type="button"
-										aria-label="More page actions"
-										className="flex size-6 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:bg-sidebar-accent-foreground/10 hover:text-sidebar-foreground"
-										onClick={(event) => {
-											event.stopPropagation();
-										}}
-									>
-										<MoreHorizontal className="size-3.5" />
-									</button>
-								</PageActionsMenu>
-
-								<button
-									type="button"
-									aria-label="Create child page"
-									disabled={createPage.isPending}
-									className="flex size-6 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:bg-sidebar-accent-foreground/10 hover:text-sidebar-foreground disabled:pointer-events-none disabled:opacity-50"
-									onClick={(event) => {
-										event.stopPropagation();
-										handleOpenCreateChildPage(page);
-									}}
-								>
-									<Plus className="size-3.5" />
-								</button>
-							</div>
-						</SidebarMenuItem>
-					))}
-				</SidebarMenu>
-			</SidebarGroup>
+								<MoreHorizontal className='size-3.5' />
+							</button>
+						</PageActionsMenu>
+					)}
+				/>
+			</SidebarPageSection>
 
 			<CreatePageDialog
 				open={createDialogOpen}

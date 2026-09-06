@@ -4,16 +4,16 @@ import { ChevronRight, FileText, Plus } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 
-import type { PageTreeNode } from "../lib/build-page-tree";
+import type { PageTreeBase, PageTreeNode } from "../lib/build-page-tree";
 
-interface PageTreeProps {
-	pages: PageTreeNode[];
+interface PageTreeProps<T extends PageTreeBase> {
+	pages: PageTreeNode<T>[];
 
 	activePageId?: string;
 
-	onOpenPage: (page: PageTreeNode) => void;
+	onOpenPage: (page: PageTreeNode<T>) => void;
 
-	onCreateChild?: (page: PageTreeNode) => void;
+	onCreateChild?: (page: PageTreeNode<T>) => void;
 
 	/**
 	 * Render action riêng của Page.
@@ -21,23 +21,23 @@ interface PageTreeProps {
 	 * Ví dụ:
 	 * PageActionsMenu
 	 */
-	renderActions?: (page: PageTreeNode) => ReactNode;
+	renderActions?: (page: PageTreeNode<T>) => ReactNode;
 
 	depth?: number;
 }
 
-export function PageTree({
+export function PageTree<T extends PageTreeBase>({
 	pages,
 	activePageId,
 	onOpenPage,
 	onCreateChild,
 	renderActions,
 	depth = 0,
-}: PageTreeProps) {
+}: PageTreeProps<T>) {
 	return (
 		<div className='space-y-0.5'>
 			{pages.map((page) => (
-				<PageTreeItem
+				<PageTreeItem<T>
 					key={page.id}
 					page={page}
 					activePageId={activePageId}
@@ -51,37 +51,34 @@ export function PageTree({
 	);
 }
 
-interface PageTreeItemProps {
-	page: PageTreeNode;
+interface PageTreeItemProps<T extends PageTreeBase> {
+	page: PageTreeNode<T>;
 
 	activePageId?: string;
 
-	onOpenPage: (page: PageTreeNode) => void;
+	onOpenPage: (page: PageTreeNode<T>) => void;
 
-	onCreateChild?: (page: PageTreeNode) => void;
+	onCreateChild?: (page: PageTreeNode<T>) => void;
 
-	renderActions?: (page: PageTreeNode) => ReactNode;
+	renderActions?: (page: PageTreeNode<T>) => ReactNode;
 
 	depth?: number;
 }
 
-function PageTreeItem({
+function PageTreeItem<T extends PageTreeBase>({
 	page,
 	activePageId,
 	onOpenPage,
 	onCreateChild,
 	renderActions,
 	depth = 0,
-}: PageTreeItemProps) {
+}: PageTreeItemProps<T>) {
 	const [expanded, setExpanded] = useState(true);
 
 	const hasChildren = page.children.length > 0;
 
 	const isActive = page.id === activePageId;
 
-	/**
-	 * Càng xuống sâu càng compact.
-	 */
 	const rowSizeClass =
 		depth === 0
 			? "h-8 text-sm"
@@ -237,7 +234,7 @@ function PageTreeItem({
 			{/* Children */}
 			{expanded && hasChildren && (
 				<div className='ml-4'>
-					<PageTree
+					<PageTree<T>
 						pages={page.children}
 						activePageId={activePageId}
 						onOpenPage={onOpenPage}

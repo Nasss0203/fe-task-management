@@ -1,11 +1,18 @@
-import type { Page } from "../model/page.types";
-
-export interface PageTreeNode extends Page {
-	children: PageTreeNode[];
+export interface PageTreeBase {
+	id: string;
+	parent_page_id: string | null;
+	title: string;
+	icon: string | null;
 }
 
-export function buildPageTree(pages: Page[]): PageTreeNode[] {
-	const pageMap = new Map<string, PageTreeNode>();
+export type PageTreeNode<T extends PageTreeBase> = T & {
+	children: PageTreeNode<T>[];
+};
+
+export function buildPageTree<T extends PageTreeBase>(
+	pages: T[],
+): PageTreeNode<T>[] {
+	const pageMap = new Map<string, PageTreeNode<T>>();
 
 	for (const page of pages) {
 		pageMap.set(page.id, {
@@ -14,7 +21,7 @@ export function buildPageTree(pages: Page[]): PageTreeNode[] {
 		});
 	}
 
-	const roots: PageTreeNode[] = [];
+	const roots: PageTreeNode<T>[] = [];
 
 	for (const page of pages) {
 		const node = pageMap.get(page.id);

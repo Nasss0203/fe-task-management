@@ -29,7 +29,7 @@ import {
 } from "@/widgets/workspace-sidebar/ui/sidebar";
 import { TeamSwitcher } from "@/widgets/workspace-sidebar/ui/team-switcher";
 import { usePathname } from "next/navigation";
-import { NavRecent } from "./nav-recent";
+import { NavSharedPages } from "./nav-shared-pages";
 import { NavTeamspaces } from "./nav-teamspaces";
 
 // This is sample data.
@@ -93,18 +93,7 @@ const data = {
 			emoji: "🍳",
 		},
 	],
-	recents: [
-		{
-			name: "Project Management & Task Tracking",
-			url: "#",
-			emoji: "📊",
-		},
-		{
-			name: "Family Recipe Collection & Meal Planning",
-			url: "#",
-			emoji: "🍳",
-		},
-	],
+
 	workspaces: [
 		{
 			name: "Personal Life Management",
@@ -163,7 +152,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 	const hasLastActiveWorkspace =
 		user?.lastActiveWorkspaceId &&
-		workspaces.some((workspace) => workspace.id === user.lastActiveWorkspaceId);
+		workspaces.some(
+			(workspace) => workspace.id === user.lastActiveWorkspaceId,
+		);
 
 	const currentWorkspaceId = hasLastActiveWorkspace
 		? user.lastActiveWorkspaceId
@@ -190,7 +181,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	};
 
 	return (
-		<Sidebar className="border-r-0" {...props}>
+		<Sidebar className='border-r-0' {...props}>
 			<SidebarHeader>
 				{!isLoading &&
 					!isError &&
@@ -210,14 +201,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			</SidebarHeader>
 
 			<SidebarContent>
-				<NavRecent recents={data.recents} />
-
 				<NavFavorites
 					workspaceId={currentWorkspaceId ?? undefined}
 					activePageId={activePageId}
 					pages={pages}
 					teamspaces={teamspaces}
 				/>
+
+				<NavSharedPages activePageId={activePageId} />
 
 				{!isPagesLoading && !isPagesError && (
 					<NavPrivatePages
@@ -243,7 +234,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				<NavSecondary
 					workspaceId={currentWorkspaceId as string}
 					items={data.navSecondary}
-					className="mt-auto"
+					className='mt-auto'
 				/>
 			</SidebarContent>
 
