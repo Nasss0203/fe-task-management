@@ -19,7 +19,6 @@ export function NavSharedPages({ activePageId }: NavSharedPagesProps) {
 
 	const { data: sharedPages = [], isLoading } = useSharedWithMePages();
 	console.log("🚀 ~ sharedPages~", sharedPages);
-
 	// Page shares can belong to workspaces the recipient is not a member of.
 	const normalizedSharedPages = useMemo(() => {
 		const sharedIds = new Set(sharedPages.map((page) => page.id));
