@@ -8,7 +8,8 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
-import { ArrowUpCircle, Check, ChevronDown, Trash2 } from "lucide-react";
+
+import { Check, ChevronDown, Trash2 } from "lucide-react";
 
 export type AccessLevel = "full" | "edit" | "comment" | "view";
 
@@ -16,61 +17,109 @@ interface AccessOption {
 	value: AccessLevel;
 	label: string;
 	description: string;
-	requiresPlus?: boolean;
 }
 
 const ACCESS_OPTIONS: AccessOption[] = [
 	{
 		value: "full",
 		label: "Full access",
-		description: "Edit, suggest, comment, and share",
+		description: "Edit and manage sharing",
 	},
 	{
 		value: "edit",
 		label: "Can edit",
-		description: "Edit, suggest, and comment",
-		requiresPlus: true,
+		description: "Edit page content",
 	},
 	{
 		value: "comment",
 		label: "Can comment",
-		description: "Suggest and comment",
+		description: "View and comment",
 	},
-	{ value: "view", label: "Can view", description: "" },
+	{
+		value: "view",
+		label: "Can view",
+		description: "View only",
+	},
 ];
 
 interface AccessLevelMenuProps {
 	currentLevel: AccessLevel;
-	inheritedFrom?: string; // vd: "via user access on Untitled"
-	onChange: (level: AccessLevel) => void;
+	allowedLevels?: AccessLevel[];
+	inheritedFrom?: string;
+	onChange?: (level: AccessLevel) => void;
 	onRemove?: () => void;
 	overrideWarning?: string;
-	triggerLabel?: string; // nếu muốn custom text hiển thị ngoài trigger
+	triggerLabel?: string;
+	disabled?: boolean;
+	readOnly?: boolean;
 }
 
 export function AccessLevelMenu({
 	currentLevel,
+	allowedLevels,
 	inheritedFrom,
 	onChange,
 	onRemove,
 	overrideWarning,
 	triggerLabel,
+	disabled = false,
+	readOnly = false,
 }: AccessLevelMenuProps) {
-	const current = ACCESS_OPTIONS.find((o) => o.value === currentLevel);
+	const current = ACCESS_OPTIONS.find(
+		(option) => option.value === currentLevel,
+	);
+
+	const availableOptions = allowedLevels
+		? ACCESS_OPTIONS.filter((option) =>
+				allowedLevels.includes(option.value),
+			)
+		: ACCESS_OPTIONS;
+
+	const handleChange = (level: AccessLevel) => {
+		if (disabled || readOnly) {
+			return;
+		}
+
+		if (level === currentLevel) {
+			return;
+		}
+
+		onChange?.(level);
+	};
+
+	const handleRemove = () => {
+		if (disabled) {
+			return;
+		}
+
+		onRemove?.();
+	};
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger className='flex items-center gap-1 text-xs text-muted-foreground'>
-				{triggerLabel ?? current?.label}
-				<ChevronDown className='h-3.5 w-3.5' />
+			<DropdownMenuTrigger asChild>
+				<button
+					type='button'
+					disabled={disabled}
+					className='flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50'
+				>
+					{triggerLabel ?? current?.label ?? "Access"}
+
+					<ChevronDown className='size-3.5' />
+				</button>
 			</DropdownMenuTrigger>
 
 			<DropdownMenuContent align='end' className='w-64 p-3'>
-				<DropdownMenuLabel className='text-[11px] text-muted-foreground px-0 py-0 font-normal'>
+				{/* Current access */}
+				<DropdownMenuLabel className='px-0 py-0 text-[11px] font-normal text-muted-foreground'>
 					Current access
 				</DropdownMenuLabel>
+
 				<div className='px-0 py-1.5'>
-					<p className='text-xs font-medium'>{current?.label}</p>
+					<p className='text-xs font-medium'>
+						{current?.label ?? "Unknown access"}
+					</p>
+
 					{inheritedFrom && (
 						<p className='text-[11px] text-muted-foreground'>
 							{inheritedFrom}
@@ -78,59 +127,66 @@ export function AccessLevelMenu({
 					)}
 				</div>
 
+				{!readOnly && <>
 				<DropdownMenuSeparator />
 
-				<DropdownMenuLabel className='text-[11px] text-muted-foreground px-0 py-0 font-normal'>
+				{/* User access */}
+				<DropdownMenuLabel className='px-0 py-0 text-[11px] font-normal text-muted-foreground'>
 					User access
 				</DropdownMenuLabel>
 
-				{ACCESS_OPTIONS.map((option) => (
-					<DropdownMenuItem
-						key={option.value}
-						onClick={() => onChange(option.value)}
-						className='flex items-start justify-between px-0 py-1.5 cursor-pointer'
-					>
-						<div>
-							<p className='text-xs font-medium'>
-								{option.label}
-							</p>
-							{option.description && (
-								<p className='text-[11px] text-muted-foreground'>
-									{option.description}
+				{availableOptions.map((option) => {
+					const isCurrent = option.value === currentLevel;
+
+					return (
+						<DropdownMenuItem
+							key={option.value}
+							disabled={disabled}
+							onClick={() => handleChange(option.value)}
+							className='flex cursor-pointer items-start justify-between px-0 py-1.5'
+						>
+							<div className='min-w-0'>
+								<p className='text-xs font-medium'>
+									{option.label}
 								</p>
-							)}
-						</div>
 
-						{option.value === currentLevel && (
-							<Check className='h-3.5 w-3.5 mt-0.5' />
-						)}
-						{option.requiresPlus &&
-							option.value !== currentLevel && (
-								<span className='flex items-center gap-1 text-[11px] text-blue-500 font-medium'>
-									<ArrowUpCircle className='h-3 w-3' />
-									Plus
-								</span>
-							)}
-					</DropdownMenuItem>
-				))}
+								{option.description && (
+									<p className='text-[11px] text-muted-foreground'>
+										{option.description}
+									</p>
+								)}
+							</div>
 
-				{onRemove && (
+							{isCurrent && (
+								<Check className='mt-0.5 size-3.5 shrink-0' />
+							)}
+						</DropdownMenuItem>
+					);
+				})}
+				</>}
+
+				{/* Remove access */}
+				{!readOnly && onRemove && (
 					<>
 						<DropdownMenuSeparator />
+
 						<DropdownMenuItem
-							onClick={onRemove}
-							className='px-0 py-1.5 cursor-pointer text-xs gap-2'
+							disabled={disabled}
+							onClick={handleRemove}
+							className='flex cursor-pointer items-center gap-2 px-0 py-1.5 text-xs'
 						>
-							<Trash2 className='h-3.5 w-3.5' />
+							<Trash2 className='size-3.5' />
 							Remove
 						</DropdownMenuItem>
 					</>
 				)}
 
+				{/* Effective access warning */}
 				{overrideWarning && (
 					<>
 						<DropdownMenuSeparator />
-						<p className='text-[11px] text-muted-foreground px-0 pt-1 leading-relaxed'>
+
+						<p className='px-0 pt-1 text-[11px] leading-relaxed text-muted-foreground'>
 							{overrideWarning}
 						</p>
 					</>

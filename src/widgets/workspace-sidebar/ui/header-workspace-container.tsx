@@ -26,6 +26,7 @@ export function HeaderWorkspaceContainer() {
 		<HeaderWorkspace
 			workspaceName={workspace?.name}
 			pageTitle={page?.title}
+			pageId={pageId}
 		/>
 	);
 }
