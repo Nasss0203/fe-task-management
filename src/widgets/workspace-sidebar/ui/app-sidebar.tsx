@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import * as React from "react";
 
+import { useWorkspaceSubscription } from "@/entities/billing/model/billing.queries";
 import { usePagesByWorkspace } from "@/entities/page/model/page.queries";
 import { useTeamspaces } from "@/entities/teamspace/model/teamspace.queries";
 import { useSelectWorkspace } from "@/entities/workspace/model/workspace.mutations";
@@ -170,6 +171,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		? user.lastActiveWorkspaceId
 		: workspaces[0]?.id;
 
+	const { data: workspaceSubscription } = useWorkspaceSubscription(
+		currentWorkspaceId ?? "",
+	);
+
 	const {
 		data: pages = [],
 		isLoading: isPagesLoading,
@@ -200,6 +205,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 						<TeamSwitcher
 							workspaces={workspaces}
 							currentWorkspaceId={currentWorkspaceId}
+							subscription={workspaceSubscription}
 							user={{
 								email: user?.email ?? "",
 							}}

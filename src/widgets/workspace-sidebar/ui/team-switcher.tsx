@@ -10,6 +10,7 @@ import {
 	Settings as SettingsIcon,
 	UserPlus,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import * as React from "react";
 
 import {
@@ -27,6 +28,7 @@ import {
 } from "@/shared/ui/dropdown-menu";
 
 import { Workspace } from "@/entities/workspace/model/workspace.types";
+import type { WorkspaceSubscription } from "@/entities/billing/model/billing.types";
 import {
 	SidebarMenu,
 	SidebarMenuButton,
@@ -36,6 +38,7 @@ import {
 interface TeamSwitcherProps {
 	workspaces: Workspace[];
 	currentWorkspaceId?: string;
+	subscription?: WorkspaceSubscription;
 
 	user: {
 		email: string;
@@ -49,11 +52,13 @@ interface TeamSwitcherProps {
 export function TeamSwitcher({
 	workspaces,
 	currentWorkspaceId,
+	subscription,
 	user,
 	onWorkspaceSelect,
 	onCreateWorkspace,
 	onLogout,
 }: TeamSwitcherProps) {
+	const router = useRouter();
 	const setSettingsOpen = useSettingsDialog((state) => state.setOpen);
 
 	const pendingSettingsOpen = React.useRef(false);
@@ -65,6 +70,12 @@ export function TeamSwitcher({
 	if (!activeWorkspace) {
 		return null;
 	}
+
+	const activeSubscription =
+		subscription?.workspaceId === activeWorkspace.id
+			? subscription
+			: undefined;
+	const canUpgrade = activeSubscription?.plan.code === "FREE";
 
 	return (
 		<SidebarMenu>
@@ -112,7 +123,9 @@ export function TeamSwitcher({
 									</div>
 
 									<div className='text-xs text-muted-foreground'>
-										Workspace
+										{activeSubscription
+											? `${activeSubscription.plan.name} Plan`
+											: "Workspace"}
 									</div>
 								</div>
 							</div>
@@ -122,10 +135,15 @@ export function TeamSwitcher({
 
 						{/* Workspace actions */}
 						<div className='p-1'>
-							<DropdownMenuItem className='gap-2 p-2 text-blue-500 focus:text-blue-500'>
-								<ArrowUpCircle className='size-4' />
-								Upgrade
-							</DropdownMenuItem>
+							{canUpgrade && (
+								<DropdownMenuItem
+									className='cursor-pointer gap-2 p-2 text-blue-500 focus:text-blue-500'
+									onSelect={() => router.push("/billing")}
+								>
+									<ArrowUpCircle className='size-4' />
+									Upgrade
+								</DropdownMenuItem>
+							)}
 
 							<DropdownMenuItem
 								className='gap-2 p-2'

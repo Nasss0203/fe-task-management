@@ -76,8 +76,10 @@ describe("useUser hook", () => {
 			id: "3",
 			email: "set@example.com",
 			username: "setuser",
+			avatarUrl: null,
 			systemRole: SystemRole.USER,
 			isActive: true,
+			lastActiveWorkspaceId: null,
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString(),
 		};
