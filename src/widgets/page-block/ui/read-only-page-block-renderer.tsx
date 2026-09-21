@@ -15,6 +15,7 @@ import { ReadOnlyDatabaseViewBlock } from "@/widgets/database-view/ui/read-only-
 
 interface ReadOnlyPageBlockRendererProps {
 	block: PageBlockNode;
+	shareToken?: string;
 }
 
 interface SimpleTableCell {
@@ -39,10 +40,7 @@ function getString(content: Record<string, unknown>, key: string): string {
 	return typeof content[key] === "string" ? content[key] : "";
 }
 
-function getBoolean(
-	content: Record<string, unknown>,
-	key: string,
-): boolean {
+function getBoolean(content: Record<string, unknown>, key: string): boolean {
 	return typeof content[key] === "boolean" ? content[key] : false;
 }
 
@@ -176,7 +174,9 @@ function ReadOnlyTodoBlock({ block }: ReadOnlyPageBlockRendererProps) {
 				aria-checked={checked}
 				aria-disabled='true'
 				className={`mt-[6px] flex size-4 shrink-0 items-center justify-center rounded-sm border ${
-					checked ? "border-primary bg-primary text-primary-foreground" : ""
+					checked
+						? "border-primary bg-primary text-primary-foreground"
+						: ""
 				}`}
 			>
 				{checked && <span className='text-[10px] leading-none'>✓</span>}
@@ -192,7 +192,10 @@ function ReadOnlyTodoBlock({ block }: ReadOnlyPageBlockRendererProps) {
 	);
 }
 
-function ReadOnlyToggleBlock({ block }: ReadOnlyPageBlockRendererProps) {
+function ReadOnlyToggleBlock({
+	block,
+	shareToken,
+}: ReadOnlyPageBlockRendererProps) {
 	const text = getString(getContent(block), "text");
 
 	return (
@@ -205,6 +208,7 @@ function ReadOnlyToggleBlock({ block }: ReadOnlyPageBlockRendererProps) {
 						<ChevronRight className='size-4' />
 					)}
 				</span>
+
 				<p className='min-h-7 whitespace-pre-wrap text-base leading-7'>
 					{text || <EmptyValue>Toggle</EmptyValue>}
 				</p>
@@ -216,6 +220,7 @@ function ReadOnlyToggleBlock({ block }: ReadOnlyPageBlockRendererProps) {
 						<ReadOnlyPageBlockRenderer
 							key={child.id}
 							block={child}
+							shareToken={shareToken}
 						/>
 					))}
 				</div>
@@ -351,7 +356,9 @@ function ReadOnlyFileBlock({ block }: ReadOnlyPageBlockRendererProps) {
 				<p className='truncate text-sm font-medium'>
 					{fileName || "No file"}
 				</p>
-				{size && <p className='text-xs text-muted-foreground'>{size}</p>}
+				{size && (
+					<p className='text-xs text-muted-foreground'>{size}</p>
+				)}
 			</div>
 		</div>
 	);
@@ -448,6 +455,7 @@ function ReadOnlyBookmarkBlock({ block }: ReadOnlyPageBlockRendererProps) {
 
 export function ReadOnlyPageBlockRenderer({
 	block,
+	shareToken,
 }: ReadOnlyPageBlockRendererProps) {
 	switch (block.type) {
 		case PageBlockType.TEXT:
@@ -459,7 +467,9 @@ export function ReadOnlyPageBlockRenderer({
 		case PageBlockType.TODO:
 			return <ReadOnlyTodoBlock block={block} />;
 		case PageBlockType.TOGGLE:
-			return <ReadOnlyToggleBlock block={block} />;
+			return (
+				<ReadOnlyToggleBlock block={block} shareToken={shareToken} />
+			);
 		case PageBlockType.QUOTE:
 			return <ReadOnlyQuoteBlock block={block} />;
 		case PageBlockType.CODE:
@@ -489,6 +499,7 @@ export function ReadOnlyPageBlockRenderer({
 				<ReadOnlyDatabaseViewBlock
 					databaseId={config.database_id}
 					viewId={config.view_id}
+					shareToken={shareToken}
 				/>
 			);
 		}

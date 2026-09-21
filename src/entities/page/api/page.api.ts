@@ -13,7 +13,10 @@ const PAGE_API = "/page";
 
 export const pageApi = {
 	create: async (input: CreatePageInput): Promise<Page> => {
-		const response = await instance.post<ApiResponse<Page>>(PAGE_API, input);
+		const response = await instance.post<ApiResponse<Page>>(
+			PAGE_API,
+			input,
+		);
 
 		return response.data.data;
 	},
@@ -41,11 +44,20 @@ export const pageApi = {
 		return response.data.data;
 	},
 
-	getById: async (pageId: string, signal?: AbortSignal): Promise<Page> => {
+	getById: async (
+		pageId: string,
+		signal?: AbortSignal,
+		shareToken?: string,
+	): Promise<Page> => {
 		const response = await instance.get<ApiResponse<Page>>(
 			`${PAGE_API}/${pageId}`,
 			{
 				signal,
+				headers: shareToken
+					? {
+							"X-Page-Share-Token": shareToken,
+						}
+					: undefined,
 			},
 		);
 
@@ -122,11 +134,15 @@ export const pageApi = {
 	},
 
 	move: async (pageId: string, workspaceId: string, input: MovePageInput) => {
-		const response = await instance.patch(`${PAGE_API}/${pageId}/move`, input, {
-			params: {
-				workspaceId,
+		const response = await instance.patch(
+			`${PAGE_API}/${pageId}/move`,
+			input,
+			{
+				params: {
+					workspaceId,
+				},
 			},
-		});
+		);
 
 		return response.data;
 	},

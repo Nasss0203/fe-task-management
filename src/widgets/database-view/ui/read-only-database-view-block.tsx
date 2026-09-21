@@ -4,7 +4,11 @@ import {
 	useDatabase,
 	useDatabaseRows,
 	useDatabaseView,
+	useSharedDatabase,
+	useSharedDatabaseRows,
+	useSharedDatabaseView,
 } from "@/entities/database/model/database.queries";
+
 import {
 	PropertyType,
 	type DatabaseProperty,
@@ -13,23 +17,29 @@ import {
 interface ReadOnlyDatabaseViewBlockProps {
 	databaseId: string;
 	viewId: string;
+	shareToken?: string;
 }
 
 function formatCellValue(property: DatabaseProperty, value: unknown): string {
-	if (value === null || value === undefined || value === "") return "";
+	if (value === null || value === undefined || value === "") {
+		return "";
+	}
 
 	if (
 		property.type === PropertyType.SELECT ||
 		property.type === PropertyType.STATUS
 	) {
-		return property.options.find((option) => option.id === value)?.name ?? "";
+		return (
+			property.options.find((option) => option.id === value)?.name ?? ""
+		);
 	}
 
 	if (property.type === PropertyType.MULTI_SELECT && Array.isArray(value)) {
 		return value
 			.map(
 				(optionId) =>
-					property.options.find((option) => option.id === optionId)?.name,
+					property.options.find((option) => option.id === optionId)
+						?.name,
 			)
 			.filter(Boolean)
 			.join(", ");
@@ -53,15 +63,61 @@ function formatCellValue(property: DatabaseProperty, value: unknown): string {
 export function ReadOnlyDatabaseViewBlock({
 	databaseId,
 	viewId,
+	shareToken,
 }: ReadOnlyDatabaseViewBlockProps) {
-	const { data: database, isLoading: isDatabaseLoading } =
-		useDatabase(databaseId);
-	const { data: rows = [], isLoading: isRowsLoading } =
-		useDatabaseRows(databaseId);
-	const { data: view, isLoading: isViewLoading } = useDatabaseView(
+	const isShared = Boolean(shareToken);
+
+	/*
+	 * Normal Page
+	 */
+	const normalDatabaseQuery = useDatabase(databaseId, !isShared);
+
+	const normalRowsQuery = useDatabaseRows(databaseId, !isShared);
+
+	const normalViewQuery = useDatabaseView(databaseId, viewId, !isShared);
+
+	/*
+	 * Shared Page
+	 *
+	 * Các query này sẽ gửi:
+	 * X-Page-Share-Token
+	 */
+	const sharedDatabaseQuery = useSharedDatabase(
+		databaseId,
+		shareToken,
+		isShared,
+	);
+
+	const sharedRowsQuery = useSharedDatabaseRows(
+		databaseId,
+		shareToken,
+		isShared,
+	);
+
+	const sharedViewQuery = useSharedDatabaseView(
 		databaseId,
 		viewId,
+		shareToken,
+		isShared,
 	);
+
+	/*
+	 * Chọn query result phù hợp.
+	 *
+	 * Hook vẫn luôn được gọi đúng thứ tự,
+	 * chỉ có query bị disable/enable.
+	 */
+	const databaseQuery = isShared ? sharedDatabaseQuery : normalDatabaseQuery;
+
+	const rowsQuery = isShared ? sharedRowsQuery : normalRowsQuery;
+
+	const viewQuery = isShared ? sharedViewQuery : normalViewQuery;
+
+	const { data: database, isLoading: isDatabaseLoading } = databaseQuery;
+
+	const { data: rows = [], isLoading: isRowsLoading } = rowsQuery;
+
+	const { data: view, isLoading: isViewLoading } = viewQuery;
 
 	if (isDatabaseLoading || isRowsLoading || isViewLoading) {
 		return (
@@ -86,8 +142,13 @@ export function ReadOnlyDatabaseViewBlock({
 
 	const visibleProperties = [...database.properties]
 		.filter((property) => {
-			if (!property.isHideable) return true;
-			return viewPropertiesByPropertyId.get(property.id)?.visible ?? false;
+			if (!property.isHideable) {
+				return true;
+			}
+
+			return (
+				viewPropertiesByPropertyId.get(property.id)?.visible ?? false
+			);
 		})
 		.sort((a, b) => {
 			const aPosition =
@@ -146,7 +207,10 @@ export function ReadOnlyDatabaseViewBlock({
 						{rows.length === 0 && (
 							<tr>
 								<td
-									colSpan={Math.max(visibleProperties.length, 1)}
+									colSpan={Math.max(
+										visibleProperties.length,
+										1,
+									)}
 									className='h-20 text-center text-muted-foreground'
 								>
 									No rows

@@ -1,6 +1,6 @@
+import type { ApiResponse } from "@/shared/api";
 import instance from "@/shared/api/api-client";
 
-import { ApiResponse } from "@/shared/api";
 import type {
 	BookmarkMetadata,
 	PageBlock,
@@ -12,15 +12,27 @@ import type {
 
 const PAGE_BLOCK_API = "/pageBlock";
 
+function getShareHeaders(shareToken?: string) {
+	if (!shareToken) {
+		return undefined;
+	}
+
+	return {
+		"X-Page-Share-Token": shareToken,
+	};
+}
+
 export const pageBlockApi = {
 	getByPage: async (
 		pageId: string,
 		signal?: AbortSignal,
+		shareToken?: string,
 	): Promise<PageBlock[]> => {
 		const response = await instance.get<ApiResponse<PageBlock[]>>(
 			`${PAGE_BLOCK_API}/page/${pageId}`,
 			{
 				signal,
+				headers: getShareHeaders(shareToken),
 			},
 		);
 
@@ -30,11 +42,13 @@ export const pageBlockApi = {
 	getById: async (
 		blockId: string,
 		signal?: AbortSignal,
+		shareToken?: string,
 	): Promise<PageBlock> => {
 		const response = await instance.get<ApiResponse<PageBlock>>(
 			`${PAGE_BLOCK_API}/${blockId}`,
 			{
 				signal,
+				headers: getShareHeaders(shareToken),
 			},
 		);
 
@@ -72,6 +86,7 @@ export const pageBlockApi = {
 
 		return response.data.data;
 	},
+
 	update: async (
 		blockId: string,
 		input: {

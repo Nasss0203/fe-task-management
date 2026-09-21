@@ -54,6 +54,7 @@ export default function PageDetail() {
 		<div className='w-full min-w-0'>
 			{page.cover_url && (
 				<div className='h-64 w-full overflow-hidden'>
+					{/* eslint-disable-next-line @next/next/no-img-element */}
 					<img
 						src={page.cover_url}
 						alt=''

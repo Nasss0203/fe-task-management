@@ -9,6 +9,7 @@ import type {
 	PageShareMember,
 	PageShareRecord,
 	PageShareSetting,
+	ResolvedPageShareLink,
 	SharePagePayload,
 	SharedPage,
 	UpdatePageShareSettingPayload,
@@ -39,19 +40,26 @@ export const pageShareApi = {
 	): Promise<PageShareCandidate[]> => {
 		const response = await instance.get<ApiResponse<PageShareCandidate[]>>(
 			`${PAGE_SHARE_API}/page/${pageId}/candidates`,
-			{ params: { query } },
+			{
+				params: {
+					query,
+				},
+			},
 		);
 
 		return response.data.data;
 	},
 
 	/**
-	 * Effective access của user hiện tại.
+	 * Effective normal access của current user.
+	 *
+	 * Không bao gồm quyền đến từ Share Link token.
 	 */
 	getPageAccess: async (pageId: string): Promise<PageAccess> => {
 		const response = await instance.get<ApiResponse<PageAccess>>(
 			`/page/${pageId}/access`,
 		);
+
 		if (process.env.NODE_ENV === "development") {
 			console.log("[getPageAccess raw]", response.data);
 		}
@@ -60,7 +68,7 @@ export const pageShareApi = {
 	},
 
 	/**
-	 * Direct share Page cho user.
+	 * Direct PageShare cho một user.
 	 */
 	sharePage: async (
 		pageId: string,
@@ -74,9 +82,36 @@ export const pageShareApi = {
 		return response.data.data;
 	},
 
+	/**
+	 * Tạo hoặc lấy stable Share Link
+	 * của một Page.
+	 */
 	createPageShareLink: async (pageId: string): Promise<PageShareLink> => {
 		const response = await instance.post<ApiResponse<PageShareLink>>(
 			`/page/${pageId}/share-links`,
+		);
+
+		return response.data.data;
+	},
+
+	/**
+	 * Resolve token thành Page.
+	 *
+	 * Backend:
+	 * GET /page/share/:token
+	 *
+	 * Kết quả:
+	 * {
+	 *   pageId,
+	 *   linkAccessLevel,
+	 *   invitation
+	 * }
+	 */
+	resolvePageShareLink: async (
+		token: string,
+	): Promise<ResolvedPageShareLink> => {
+		const response = await instance.get<ApiResponse<ResolvedPageShareLink>>(
+			`/page/share/${encodeURIComponent(token)}`,
 		);
 
 		return response.data.data;

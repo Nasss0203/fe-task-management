@@ -47,16 +47,12 @@ export function ShareInviteForm({
 	canGrantFullAccess,
 }: ShareInviteFormProps) {
 	const [searchQuery, setSearchQuery] = useState("");
-
 	const [debouncedQuery, setDebouncedQuery] = useState("");
-
 	const [selectedUser, setSelectedUser] = useState<PageShareCandidate | null>(
 		null,
 	);
-
 	const [selectedLevel, setSelectedLevel] =
 		useState<PageShareAccessLevel>("VIEWER");
-
 	const [shareError, setShareError] = useState<string | null>(null);
 
 	const {
@@ -126,7 +122,7 @@ export function ShareInviteForm({
 	return (
 		<form onSubmit={submitShare} className='space-y-2'>
 			<div className='flex gap-2'>
-				<div className='relative min-w-0 flex-1'>
+				<div className='relative flex min-w-0 flex-1 items-center rounded-md border border-[#414141] bg-transparent pr-1 focus-within:border-[#626262]'>
 					<Input
 						aria-label='Search people by name or email'
 						placeholder='Search people by name or email'
@@ -150,8 +146,35 @@ export function ShareInviteForm({
 								chooseCandidate(visibleCandidates[0]);
 							}
 						}}
-						className='h-9 border-[#414141] bg-transparent text-xs text-white placeholder:text-[#777]'
+						className='h-8 flex-1 border-0 bg-transparent px-2 text-xs text-white shadow-none placeholder:text-[#777] focus-visible:border-0 focus-visible:ring-0 dark:bg-transparent'
 					/>
+
+					<Select
+						value={selectedLevel}
+						onValueChange={(value) =>
+							setSelectedLevel(value as PageShareAccessLevel)
+						}
+					>
+						<SelectTrigger
+							size='sm'
+							aria-label='New share access level'
+							className='max-w-28 shrink-0 gap-1 border-0 bg-[#333] px-2 py-0 text-xs text-[#aaa] shadow-none data-[size=sm]:h-6 focus-visible:border-0 focus-visible:ring-1 focus-visible:ring-[#626262] dark:bg-[#333]'
+						>
+							<SelectValue />
+						</SelectTrigger>
+
+						<SelectContent className={selectStyle}>
+							<SelectItem value='VIEWER'>Can view</SelectItem>
+
+							<SelectItem value='EDITOR'>Can edit</SelectItem>
+
+							{canGrantFullAccess && (
+								<SelectItem value='FULL_ACCESS'>
+									Full access
+								</SelectItem>
+							)}
+						</SelectContent>
+					</Select>
 
 					{showCandidates && (
 						<div className='absolute inset-x-0 top-full z-50 mt-1 max-h-56 overflow-auto rounded-lg border border-[#414141] bg-[#2b2b2b] p-1 shadow-xl'>
@@ -199,38 +222,6 @@ export function ShareInviteForm({
 					{sharePage.isPending ? "Sharing..." : "Share"}
 				</Button>
 			</div>
-
-			{selectedUser && (
-				<div className='flex items-center gap-2 text-xs text-[#aaa]'>
-					<span className='truncate'>{selectedUser.email}</span>
-
-					<Select
-						value={selectedLevel}
-						onValueChange={(value) =>
-							setSelectedLevel(value as PageShareAccessLevel)
-						}
-					>
-						<SelectTrigger
-							aria-label='New share access level'
-							className='ml-auto h-7 w-28 border-[#414141] bg-transparent text-xs'
-						>
-							<SelectValue />
-						</SelectTrigger>
-
-						<SelectContent className={selectStyle}>
-							<SelectItem value='VIEWER'>Can view</SelectItem>
-
-							<SelectItem value='EDITOR'>Can edit</SelectItem>
-
-							{canGrantFullAccess && (
-								<SelectItem value='FULL_ACCESS'>
-									Full access
-								</SelectItem>
-							)}
-						</SelectContent>
-					</Select>
-				</div>
-			)}
 
 			{shareError && (
 				<p role='alert' className='text-xs text-red-400'>

@@ -1,9 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
 import { pageShareApi } from "../api/page-share.api";
-
 import { pageShareKeys } from "./page-share.queries";
-
 import type {
 	PageShareAccessLevel,
 	SharePagePayload,
@@ -16,11 +13,13 @@ export function useSharePage(pageId: string) {
 	return useMutation({
 		mutationFn: (payload: SharePagePayload) =>
 			pageShareApi.sharePage(pageId, payload),
+
 		onSuccess: async () => {
 			await Promise.all([
 				queryClient.invalidateQueries({
 					queryKey: pageShareKeys.byPage(pageId),
 				}),
+
 				queryClient.invalidateQueries({
 					queryKey: pageShareKeys.candidates(pageId),
 				}),

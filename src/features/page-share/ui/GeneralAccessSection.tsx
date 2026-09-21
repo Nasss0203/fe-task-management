@@ -115,7 +115,7 @@ export function GeneralAccessSection({
 				</p>
 			) : (
 				<>
-					<div className='flex items-center gap-2.5'>
+					<div className='flex min-w-0 items-center gap-2.5'>
 						<div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#3b3b3b] text-[#aaa]'>
 							{linkEnabled ? (
 								<Link2 className='size-3.5' />
@@ -124,61 +124,62 @@ export function GeneralAccessSection({
 							)}
 						</div>
 
-						<Select
-							value={generalAccess}
-							disabled={!canManage || isUpdating}
-							onValueChange={handleGeneralAccessChange}
-						>
-							<SelectTrigger
-								aria-label='General access'
-								className='h-8 border-0 bg-transparent px-1 text-xs text-[#e6e6e6]'
+						<div className='min-w-0 flex-1'>
+							<Select
+								value={generalAccess}
+								disabled={!canManage || isUpdating}
+								onValueChange={handleGeneralAccessChange}
 							>
-								<SelectValue />
-							</SelectTrigger>
+								<SelectTrigger
+									size='sm'
+									aria-label='General access'
+									className='max-w-full min-w-0 border-0 bg-transparent px-1 text-xs text-[#e6e6e6]'
+								>
+									<SelectValue />
+								</SelectTrigger>
 
-							<SelectContent className={selectStyle}>
-								<SelectItem value='RESTRICTED'>
-									Only people invited
-								</SelectItem>
+								<SelectContent className={selectStyle}>
+									<SelectItem value='RESTRICTED'>
+										Only people invited
+									</SelectItem>
 
-								<SelectItem value='LINK'>
-									Anyone with the link
-								</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
-
-					{setting?.linkAccessLevel && (
-						<div className='flex items-center justify-between pl-[46px] text-xs text-[#aaa]'>
-							<span>Anyone with the link</span>
-
-							{canManage ? (
-								<AccessLevelMenu
-									currentLevel={
-										menuLevel[setting.linkAccessLevel]
-									}
-									allowedLevels={["view", "edit"]}
-									disabled={isUpdating}
-									onChange={(level) => {
-										if (
-											level !== "view" &&
-											level !== "edit"
-										) {
-											return;
-										}
-
-										onUpdate({
-											link_access_level: apiLevel[level],
-										});
-									}}
-								/>
-							) : (
-								<span>
-									{accessLabel[setting.linkAccessLevel]}
-								</span>
-							)}
+									<SelectItem value='LINK'>
+										Anyone with the link
+									</SelectItem>
+								</SelectContent>
+							</Select>
 						</div>
-					)}
+
+						{setting?.linkAccessLevel && (
+							<div className='ml-auto shrink-0 text-xs text-[#aaa]'>
+								{canManage ? (
+									<AccessLevelMenu
+										currentLevel={
+											menuLevel[setting.linkAccessLevel]
+										}
+										allowedLevels={["view", "edit"]}
+										disabled={isUpdating}
+										onChange={(level) => {
+											if (
+												level !== "view" &&
+												level !== "edit"
+											) {
+												return;
+											}
+
+											onUpdate({
+												link_access_level: apiLevel[level],
+											});
+										}}
+									/>
+								) : (
+									<span>
+										{accessLabel[setting.linkAccessLevel]}
+									</span>
+								)}
+							</div>
+						)}
+					</div>
 
 					{isUpdateError && (
 						<p role='alert' className='text-xs text-red-400'>

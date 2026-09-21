@@ -13,6 +13,9 @@ export const pageKeys = {
 
 	detail: (pageId: string) => ["pages", "detail", pageId] as const,
 
+	sharedDetail: (pageId: string, shareToken: string) =>
+		["pages", "shared-detail", pageId, shareToken] as const,
+
 	trash: (workspaceId: string) => ["pages", "trash", workspaceId] as const,
 };
 
@@ -36,13 +39,27 @@ export function usePageFavorites(workspaceId?: string) {
 	});
 }
 
-export function usePage(pageId?: string) {
+export function usePage(pageId?: string, enabled = true) {
 	return useQuery({
 		queryKey: pageKeys.detail(pageId ?? ""),
 
 		queryFn: ({ signal }) => pageApi.getById(pageId!, signal),
 
-		enabled: Boolean(pageId),
+		enabled: Boolean(pageId) && enabled,
+	});
+}
+
+export function useSharedPage(
+	pageId?: string,
+	shareToken?: string,
+	enabled = true,
+) {
+	return useQuery({
+		queryKey: pageKeys.sharedDetail(pageId ?? "", shareToken ?? ""),
+
+		queryFn: ({ signal }) => pageApi.getById(pageId!, signal, shareToken!),
+
+		enabled: Boolean(pageId) && Boolean(shareToken) && enabled,
 	});
 }
 
