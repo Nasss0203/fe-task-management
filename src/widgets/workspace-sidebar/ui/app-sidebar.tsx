@@ -15,7 +15,10 @@ import * as React from "react";
 import { usePagesByWorkspace } from "@/entities/page/model/page.queries";
 import { useTeamspaces } from "@/entities/teamspace/model/teamspace.queries";
 import { useSelectWorkspace } from "@/entities/workspace/model/workspace.mutations";
-import { useWorkspaces } from "@/entities/workspace/model/workspace.queries";
+import {
+	useWorkspaceAccess,
+	useWorkspaces,
+} from "@/entities/workspace/model/workspace.queries";
 import { useUser } from "@/features/auth";
 import { NavFavorites } from "@/widgets/workspace-sidebar/ui/nav-favorites";
 import { NavMain } from "@/widgets/workspace-sidebar/ui/nav-main";
@@ -160,17 +163,29 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		? user.lastActiveWorkspaceId
 		: workspaces[0]?.id;
 
+	const workspaceAccessQuery = useWorkspaceAccess(currentWorkspaceId ?? "");
+	const membershipType =
+		!isError &&
+		workspaceAccessQuery.isSuccess &&
+		workspaceAccessQuery.data.workspace_id === currentWorkspaceId
+			? workspaceAccessQuery.data.membership_type
+			: undefined;
+	const isGuest = membershipType === "GUEST";
+	const isMember = membershipType === "MEMBER";
+	const isAccessLoading =
+		isLoading || (Boolean(currentWorkspaceId) && workspaceAccessQuery.isPending);
+
 	const {
 		data: pages = [],
 		isLoading: isPagesLoading,
 		isError: isPagesError,
-	} = usePagesByWorkspace(currentWorkspaceId as string);
+	} = usePagesByWorkspace(currentWorkspaceId ?? undefined, isMember);
 
 	const {
 		data: teamspaces = [],
 		isLoading: isTeamspacesLoading,
 		isError: isTeamspacesError,
-	} = useTeamspaces(currentWorkspaceId ?? "");
+	} = useTeamspaces(currentWorkspaceId ?? "", isMember);
 
 	const handleWorkspaceSelect = async (workspaceId: string) => {
 		if (workspaceId === currentWorkspaceId) {
@@ -188,8 +203,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 					currentWorkspaceId &&
 					workspaces.length > 0 && (
 						<TeamSwitcher
+							key={currentWorkspaceId}
 							workspaces={workspaces}
 							currentWorkspaceId={currentWorkspaceId}
+							membershipType={membershipType}
 							user={{
 								email: user?.email ?? "",
 							}}
@@ -197,20 +214,42 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 						/>
 					)}
 
-				<NavMain items={data.navMain} />
+				{isMember && <NavMain items={data.navMain} />}
 			</SidebarHeader>
 
 			<SidebarContent>
-				<NavFavorites
-					workspaceId={currentWorkspaceId ?? undefined}
-					activePageId={activePageId}
-					pages={pages}
-					teamspaces={teamspaces}
-				/>
+				{isAccessLoading ? (
+					<p
+						role='status'
+						className='px-4 py-2 text-sm text-muted-foreground'
+					>
+						Loading workspace access...
+					</p>
+				) : !isGuest && !isMember ? (
+					<p
+						role='alert'
+						className='px-4 py-2 text-sm text-muted-foreground'
+					>
+						{!isError && !currentWorkspaceId
+							? "No workspace available."
+							: "Unable to load workspace access."}
+					</p>
+				) : null}
 
-				<NavSharedPages activePageId={activePageId} />
+				{isMember && (
+					<NavFavorites
+						workspaceId={currentWorkspaceId ?? undefined}
+						activePageId={activePageId}
+						pages={pages}
+						teamspaces={teamspaces}
+					/>
+				)}
 
-				{!isPagesLoading && !isPagesError && (
+				{(isGuest || isMember) && (
+					<NavSharedPages activePageId={activePageId} />
+				)}
+
+				{isMember && !isPagesLoading && !isPagesError && (
 					<NavPrivatePages
 						workspaceId={currentWorkspaceId as string}
 						pages={pages}
@@ -219,7 +258,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 					/>
 				)}
 
-				{!isPagesLoading &&
+				{isMember &&
+					!isPagesLoading &&
 					!isPagesError &&
 					!isTeamspacesLoading &&
 					!isTeamspacesError &&
@@ -231,11 +271,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 							activePageId={activePageId}
 						/>
 					)}
-				<NavSecondary
-					workspaceId={currentWorkspaceId as string}
-					items={data.navSecondary}
-					className='mt-auto'
-				/>
+				{isMember && (
+					<NavSecondary
+						workspaceId={currentWorkspaceId as string}
+						items={data.navSecondary}
+						className='mt-auto'
+					/>
+				)}
 			</SidebarContent>
 
 			<SidebarRail />

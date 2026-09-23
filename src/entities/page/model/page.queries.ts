@@ -19,13 +19,13 @@ export const pageKeys = {
 	trash: (workspaceId: string) => ["pages", "trash", workspaceId] as const,
 };
 
-export function usePagesByWorkspace(workspaceId?: string) {
+export function usePagesByWorkspace(workspaceId?: string, enabled = true) {
 	return useQuery({
 		queryKey: pageKeys.byWorkspace(workspaceId ?? ""),
 
 		queryFn: ({ signal }) => pageApi.getByWorkspace(workspaceId!, signal),
 
-		enabled: Boolean(workspaceId),
+		enabled: Boolean(workspaceId) && enabled,
 	});
 }
 

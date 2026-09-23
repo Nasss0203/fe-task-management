@@ -91,13 +91,22 @@ export function PageBlockList({
 	const orderedBlockIds = blocks.map((block) => block.id);
 
 	return (
-		<PageBlockEditorProvider orderedBlockIds={orderedBlockIds}>
+		<PageBlockEditorProvider
+			key={`${pageId}:${shareToken ?? ""}`}
+			orderedBlockIds={orderedBlockIds}
+		>
 			<div className='w-full min-w-0 max-w-full space-y-2'>
 				{blocks.map((block) => (
-					<PageBlockEditorRow key={block.id} block={block} />
+					<PageBlockEditorRow
+						key={block.id}
+						block={block}
+						shareToken={shareToken}
+					/>
 				))}
 
-				{blocks.length === 0 && <EmptyPageBlockRow pageId={pageId} />}
+				{blocks.length === 0 && (
+					<EmptyPageBlockRow pageId={pageId} shareToken={shareToken} />
+				)}
 			</div>
 		</PageBlockEditorProvider>
 	);

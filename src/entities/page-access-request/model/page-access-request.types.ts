@@ -11,3 +11,12 @@ export interface PageAccessRequest {
 export interface CreatePageAccessRequestPayload {
 	token: string;
 }
+
+export interface MyPageAccessRequest {
+	id: string;
+	pageId: string;
+	userId: string;
+	status: "PENDING";
+	createdAt: string;
+	updatedAt: string;
+}

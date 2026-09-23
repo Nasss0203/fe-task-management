@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
 
+import { useMyPageAccessRequest } from "@/entities/page-access-request/model/page-access-request.queries";
 import { buildPageBlockTree } from "@/entities/page-block/lib/build-page-block-tree";
 import {
 	usePageBlocks,
@@ -14,6 +15,7 @@ import {
 } from "@/entities/page-share/model/page-share.queries";
 import { usePage, useSharedPage } from "@/entities/page/model/page.queries";
 import { PageAccessGate } from "@/features/page-access/ui/page-access-gate";
+import { PageShareInvitationGate } from "@/features/page-share/ui/page-share-invitation-gate";
 import { Button } from "@/shared/ui/button";
 import { PageBlockList } from "@/widgets/page-block-editor/ui/page-block-list";
 
@@ -28,6 +30,8 @@ export default function SharedPageDetail() {
 		resolveQuery.isSuccess &&
 		(resolvedShare?.linkAccessLevel === "VIEWER" ||
 			resolvedShare?.linkAccessLevel === "EDITOR");
+	const canEditWithLink =
+		hasLinkAccess && resolvedShare?.linkAccessLevel === "EDITOR";
 	const requiresNormalAccess =
 		resolveQuery.isSuccess && resolvedShare?.linkAccessLevel === null;
 
@@ -37,6 +41,14 @@ export default function SharedPageDetail() {
 		requiresNormalAccess &&
 		accessQuery.isSuccess &&
 		accessQuery.data.effectiveAccessLevel !== null;
+
+	const myAccessRequestQuery = useMyPageAccessRequest(
+		pageId,
+		requiresNormalAccess &&
+			resolvedShare?.invitation === null &&
+			accessQuery.isSuccess &&
+			accessQuery.data.effectiveAccessLevel === null,
+	);
 
 	const sharedPageQuery = useSharedPage(pageId, token, hasLinkAccess);
 	const sharedBlocksQuery = useSharedPageBlocks(pageId, token, hasLinkAccess);
@@ -64,7 +76,7 @@ export default function SharedPageDetail() {
 	}
 
 	if (requiresNormalAccess) {
-		if (accessQuery.isPending) {
+		if (accessQuery.isLoading) {
 			return <div className='p-6'>Checking access...</div>;
 		}
 
@@ -89,11 +101,27 @@ export default function SharedPageDetail() {
 			accessQuery.isSuccess &&
 			accessQuery.data.effectiveAccessLevel === null
 		) {
+			// Direct invitation được ưu tiên trước Request Access.
+			if (resolvedShare.invitation) {
+				return (
+					<PageShareInvitationGate
+						key={`${pageId}:${token}:${resolvedShare.invitation.shareId}`}
+						token={token}
+						invitation={resolvedShare.invitation}
+						isCheckingAccess={accessQuery.isFetching}
+						onCheckAccess={() => void accessQuery.refetch()}
+					/>
+				);
+			}
+
 			return (
 				<PageAccessGate
 					key={`${pageId}:${token}`}
 					pageId={pageId}
 					token={token}
+					hasPendingRequest={
+						myAccessRequestQuery.data?.status === "PENDING"
+					}
 					isCheckingAccess={accessQuery.isFetching}
 					onCheckAccess={() => void accessQuery.refetch()}
 				/>
@@ -107,7 +135,9 @@ export default function SharedPageDetail() {
 
 	if (pageQuery.isError || blocksQuery.isError || !page) {
 		return (
-			<div role='alert' className='p-6'>Unable to load this page.</div>
+			<div role='alert' className='p-6'>
+				Unable to load this page.
+			</div>
 		);
 	}
 
@@ -126,14 +156,16 @@ export default function SharedPageDetail() {
 
 			<div className='flex items-center gap-1 px-12 pt-10 md:px-16 lg:px-24'>
 				<div className='mb-3 text-5xl'>{page.icon || "📄"}</div>
-				<h1 className='text-4xl font-bold'>{page.title || "Untitled"}</h1>
+				<h1 className='text-4xl font-bold'>
+					{page.title || "Untitled"}
+				</h1>
 			</div>
 
 			<div className='mt-14 w-full min-w-0 max-w-full px-12 md:px-16 lg:px-24'>
 				<PageBlockList
 					pageId={page.id}
 					blocks={blockTree}
-					canEdit={false}
+					canEdit={canEditWithLink}
 					shareToken={hasLinkAccess ? token : undefined}
 				/>
 			</div>

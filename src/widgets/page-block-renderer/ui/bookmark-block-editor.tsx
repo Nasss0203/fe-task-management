@@ -11,6 +11,7 @@ import {
 
 interface BookmarkBlockEditorProps {
 	block: PageBlockNode;
+	shareToken?: string;
 }
 
 type BookmarkContent = Record<string, unknown> & {
@@ -93,14 +94,14 @@ function getHostname(url: string): string {
 	}
 }
 
-export function BookmarkBlockEditor({ block }: BookmarkBlockEditorProps) {
+export function BookmarkBlockEditor({ block, shareToken }: BookmarkBlockEditorProps) {
 	const [content, setContent] = useState<BookmarkContent>(() =>
 		getBookmarkContent(block),
 	);
 
 	const [urlInput, setUrlInput] = useState("");
 
-	const updateBlock = useUpdatePageBlock();
+	const updateBlock = useUpdatePageBlock(shareToken);
 	const resolveMetadata = useResolveBookmarkMetadata();
 
 	useEffect(() => {

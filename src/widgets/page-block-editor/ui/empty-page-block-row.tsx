@@ -15,12 +15,13 @@ import {
 
 interface EmptyPageBlockRowProps {
 	pageId: string;
+	shareToken?: string;
 }
 
-export function EmptyPageBlockRow({ pageId }: EmptyPageBlockRowProps) {
+export function EmptyPageBlockRow({ pageId, shareToken }: EmptyPageBlockRowProps) {
 	const [open, setOpen] = useState(false);
 
-	const createBlockMutation = useCreatePageBlock();
+	const createBlockMutation = useCreatePageBlock(shareToken);
 
 	const handleSelect = ({ type, styleConfig }: PageBlockCommand) => {
 		// DATABASE_VIEW xử lý riêng
@@ -52,6 +53,7 @@ export function EmptyPageBlockRow({ pageId }: EmptyPageBlockRowProps) {
 				<PopoverTrigger asChild>
 					<button
 						type='button'
+						aria-label='Add block'
 						disabled={createBlockMutation.isPending}
 						className='
               mr-2 flex size-7 items-center
@@ -77,7 +79,10 @@ export function EmptyPageBlockRow({ pageId }: EmptyPageBlockRowProps) {
             shadow-none
           '
 				>
-					<PageBlockCommandMenu onSelect={handleSelect} />
+					<PageBlockCommandMenu
+						onSelect={handleSelect}
+						allowDatabase={!shareToken}
+					/>
 				</PopoverContent>
 			</Popover>
 

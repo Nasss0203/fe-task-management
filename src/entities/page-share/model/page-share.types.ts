@@ -70,6 +70,11 @@ export interface ResolvedPageShareInvitation {
 	status: PageShareStatus;
 }
 
+export interface PageShareInvitationResult {
+	pageId: string;
+	shareId: string;
+}
+
 /**
  * Kết quả resolve:
  *

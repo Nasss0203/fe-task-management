@@ -13,6 +13,7 @@ import { usePage } from "@/entities/page/model/page.queries";
 
 interface VideoBlockEditorProps {
 	block: PageBlockNode;
+	shareToken?: string;
 }
 
 type VideoContent = Record<string, unknown> & {
@@ -124,7 +125,7 @@ function isDirectVideoUrl(url: string): boolean {
 	}
 }
 
-export function VideoBlockEditor({ block }: VideoBlockEditorProps) {
+export function VideoBlockEditor({ block, shareToken }: VideoBlockEditorProps) {
 	const [content, setContent] = useState<VideoContent>(() =>
 		getVideoContent(block),
 	);
@@ -135,11 +136,11 @@ export function VideoBlockEditor({ block }: VideoBlockEditorProps) {
 
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
-	const { data: page } = usePage(block.page_id);
+	const { data: page } = usePage(block.page_id, !shareToken);
 
 	const uploadAttachment = useUploadAttachment();
 	const createDownloadUrl = useCreateAttachmentDownloadUrl();
-	const updateBlock = useUpdatePageBlock();
+	const updateBlock = useUpdatePageBlock(shareToken);
 
 	useEffect(() => {
 		setContent(getVideoContent(block));
@@ -189,7 +190,7 @@ export function VideoBlockEditor({ block }: VideoBlockEditorProps) {
 	const handleUpload = async (event: ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0];
 
-		if (!file || !page?.workspace_id) {
+		if (shareToken || !file || !page?.workspace_id) {
 			return;
 		}
 
@@ -239,6 +240,7 @@ export function VideoBlockEditor({ block }: VideoBlockEditorProps) {
 				<input
 					ref={fileInputRef}
 					type='file'
+					disabled={Boolean(shareToken)}
 					accept='video/mp4,video/webm,video/ogg'
 					className='hidden'
 					onChange={handleUpload}
@@ -293,6 +295,7 @@ export function VideoBlockEditor({ block }: VideoBlockEditorProps) {
 									type='button'
 									disabled={
 										!page?.workspace_id ||
+										Boolean(shareToken) ||
 										uploadAttachment.isPending
 									}
 									onClick={() =>
@@ -323,6 +326,12 @@ export function VideoBlockEditor({ block }: VideoBlockEditorProps) {
 							</div>
 						</div>
 					</div>
+				)}
+
+				{shareToken && (
+					<p className='mt-2 text-xs text-muted-foreground'>
+						File uploads are not supported through share links.
+					</p>
 				)}
 
 				{uploadAttachment.isError && (

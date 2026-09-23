@@ -22,17 +22,20 @@ import {
 
 interface PageBlockEditorRowProps {
 	block: PageBlockNode;
+	shareToken?: string;
 }
 
-export function PageBlockEditorRow({ block }: PageBlockEditorRowProps) {
+export function PageBlockEditorRow({ block, shareToken }: PageBlockEditorRowProps) {
 	const [open, setOpen] = useState(false);
 	const [actionOpen, setActionOpen] = useState(false);
 
-	const createBlockMutation = useCreatePageBlock();
+	const createBlockMutation = useCreatePageBlock(shareToken);
 	const createDatabaseBlockMutation = useCreateDatabaseBlock();
 
 	const handleCreateBlock = ({ type, styleConfig }: PageBlockCommand) => {
 		if (type === PageBlockType.DATABASE_VIEW) {
+			if (shareToken) return;
+
 			createDatabaseBlockMutation.mutate(
 				{
 					pageId: block.page_id,
@@ -74,6 +77,7 @@ export function PageBlockEditorRow({ block }: PageBlockEditorRowProps) {
 				<PopoverTrigger asChild>
 					<Button
 						type='button'
+						aria-label='Add block'
 						variant='ghost'
 						size='icon'
 						className='size-7'
@@ -88,7 +92,10 @@ export function PageBlockEditorRow({ block }: PageBlockEditorRowProps) {
 					sideOffset={6}
 					className='w-64 p-0'
 				>
-					<PageBlockCommandMenu onSelect={handleCreateBlock} />
+					<PageBlockCommandMenu
+						onSelect={handleCreateBlock}
+						allowDatabase={!shareToken}
+					/>
 				</PopoverContent>
 			</Popover>
 
@@ -97,6 +104,7 @@ export function PageBlockEditorRow({ block }: PageBlockEditorRowProps) {
 				<PopoverTrigger asChild>
 					<Button
 						type='button'
+						aria-label='Block actions'
 						variant='ghost'
 						size='icon'
 						className='
@@ -124,6 +132,7 @@ export function PageBlockEditorRow({ block }: PageBlockEditorRowProps) {
 				>
 					<PageBlockActionMenu
 						block={block}
+						shareToken={shareToken}
 						onClose={() => setActionOpen(false)}
 					/>
 				</PopoverContent>
@@ -131,7 +140,7 @@ export function PageBlockEditorRow({ block }: PageBlockEditorRowProps) {
 
 			{/* Block content */}
 			<div className='min-w-0 pl-1'>
-				<PageBlockRenderer block={block} />
+				<PageBlockRenderer block={block} shareToken={shareToken} />
 			</div>
 		</div>
 	);

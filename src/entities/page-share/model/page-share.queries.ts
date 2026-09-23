@@ -39,13 +39,12 @@ export function useSharedWithMePages() {
 export function usePageAccess(pageId: string, enabled = true) {
 	return useQuery({
 		queryKey: pageShareKeys.access(pageId),
-
 		queryFn: () => pageShareApi.getPageAccess(pageId),
-
 		enabled: Boolean(pageId) && enabled,
+
+		retry: false,
 	});
 }
-
 export function usePageShares(pageId: string, enabled = true) {
 	return useQuery({
 		queryKey: pageShareKeys.byPage(pageId),

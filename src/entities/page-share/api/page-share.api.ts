@@ -5,6 +5,7 @@ import type {
 	PageAccess,
 	PageShareAccessLevel,
 	PageShareCandidate,
+	PageShareInvitationResult,
 	PageShareLink,
 	PageShareMember,
 	PageShareRecord,
@@ -77,6 +78,24 @@ export const pageShareApi = {
 		const response = await instance.post<ApiResponse<PageShareRecord>>(
 			`${PAGE_SHARE_API}/page/${pageId}`,
 			payload,
+		);
+
+		return response.data.data;
+	},
+
+	acceptInvitation: async (token: string): Promise<PageShareInvitationResult> => {
+		const response = await instance.post<ApiResponse<PageShareInvitationResult>>(
+			"/page/share-links/accept",
+			{ token },
+		);
+
+		return response.data.data;
+	},
+
+	rejectInvitation: async (token: string): Promise<PageShareInvitationResult> => {
+		const response = await instance.post<ApiResponse<PageShareInvitationResult>>(
+			"/page/share-links/reject",
+			{ token },
 		);
 
 		return response.data.data;

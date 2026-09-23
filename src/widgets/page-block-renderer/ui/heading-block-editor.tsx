@@ -16,6 +16,7 @@ import { usePageBlockEditor } from "@/widgets/page-block-editor/ui/page-block-ed
 
 interface HeadingBlockEditorProps {
 	block: PageBlockNode;
+	shareToken?: string;
 }
 
 function getText(block: PageBlockNode): string {
@@ -60,16 +61,16 @@ const headingStyles: Record<1 | 2 | 3, string> = {
 	3: "text-xl font-semibold leading-7",
 };
 
-export function HeadingBlockEditor({ block }: HeadingBlockEditorProps) {
+export function HeadingBlockEditor({ block, shareToken }: HeadingBlockEditorProps) {
 	const [value, setValue] = useState(() => getText(block));
 
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	const updateBlock = useUpdatePageBlock();
+	const updateBlock = useUpdatePageBlock(shareToken);
 
-	const deleteBlock = useDeletePageBlock();
+	const deleteBlock = useDeletePageBlock(shareToken);
 
-	const createBlock = useCreatePageBlock();
+	const createBlock = useCreatePageBlock(shareToken);
 
 	const { focusBlockId, requestFocus, clearFocus, getPreviousBlockId } =
 		usePageBlockEditor();

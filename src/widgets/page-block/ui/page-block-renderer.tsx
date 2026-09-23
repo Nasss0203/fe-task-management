@@ -3,6 +3,7 @@ import { getDatabaseViewConfig } from "@/entities/page-block/lib/get-database-vi
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
 import { Separator } from "@/shared/ui/separator";
 import { DatabaseViewBlock } from "@/widgets/database-view/ui/database-view-block";
+import { ReadOnlyDatabaseViewBlock } from "@/widgets/database-view/ui/read-only-database-view-block";
 import { BookmarkBlockEditor } from "@/widgets/page-block-renderer/ui/bookmark-block-editor";
 import { CodeBlockEditor } from "@/widgets/page-block-renderer/ui/code-block-editor";
 import { FileBlockEditor } from "@/widgets/page-block-renderer/ui/file-block-editor";
@@ -17,36 +18,37 @@ import { VideoBlockEditor } from "@/widgets/page-block-renderer/ui/video-block-e
 
 interface PageBlockRendererProps {
 	block: PageBlockNode;
+	shareToken?: string;
 }
 
-export function PageBlockRenderer({ block }: PageBlockRendererProps) {
+export function PageBlockRenderer({ block, shareToken }: PageBlockRendererProps) {
 	switch (block.type) {
 		case PageBlockType.TEXT:
-			return <TextBlockEditor block={block} />;
+			return <TextBlockEditor block={block} shareToken={shareToken} />;
 		case PageBlockType.HEADER:
-			return <HeadingBlockEditor block={block} />;
+			return <HeadingBlockEditor block={block} shareToken={shareToken} />;
 		case PageBlockType.DIVIDER:
 			return <Separator className='w-full' />;
 		case PageBlockType.TODO:
-			return <TodoBlockEditor block={block} />;
+			return <TodoBlockEditor block={block} shareToken={shareToken} />;
 		case PageBlockType.TOGGLE:
-			return <ToggleBlockEditor block={block} />;
+			return <ToggleBlockEditor block={block} shareToken={shareToken} />;
 
 		case PageBlockType.QUOTE:
-			return <QuoteBlockEditor block={block} />;
+			return <QuoteBlockEditor block={block} shareToken={shareToken} />;
 
 		case PageBlockType.CODE:
-			return <CodeBlockEditor block={block} />;
+			return <CodeBlockEditor block={block} shareToken={shareToken} />;
 		case PageBlockType.TABLE_SIMPLE:
-			return <SimpleTableBlockEditor block={block} />;
+			return <SimpleTableBlockEditor block={block} shareToken={shareToken} />;
 		case PageBlockType.IMAGE:
-			return <ImageBlockEditor block={block} />;
+			return <ImageBlockEditor block={block} shareToken={shareToken} />;
 		case PageBlockType.FILE:
-			return <FileBlockEditor block={block} />;
+			return <FileBlockEditor block={block} shareToken={shareToken} />;
 		case PageBlockType.VIDEO:
-			return <VideoBlockEditor block={block} />;
+			return <VideoBlockEditor block={block} shareToken={shareToken} />;
 		case PageBlockType.BOOKMARK:
-			return <BookmarkBlockEditor block={block} />;
+			return <BookmarkBlockEditor block={block} shareToken={shareToken} />;
 		case PageBlockType.DATABASE_VIEW: {
 			const config = getDatabaseViewConfig(block);
 
@@ -55,6 +57,16 @@ export function PageBlockRenderer({ block }: PageBlockRendererProps) {
 					<div className='text-sm text-destructive'>
 						Invalid database view configuration
 					</div>
+				);
+			}
+
+			if (shareToken) {
+				return (
+					<ReadOnlyDatabaseViewBlock
+						databaseId={config.database_id}
+						viewId={config.view_id}
+						shareToken={shareToken}
+					/>
 				);
 			}
 

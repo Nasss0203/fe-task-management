@@ -40,6 +40,7 @@ import { useState } from "react";
 
 interface PageBlockActionMenuProps {
 	block: PageBlockNode;
+	shareToken?: string;
 	onClose?: () => void;
 }
 
@@ -101,15 +102,16 @@ function getText(block: PageBlockNode): string {
 
 export function PageBlockActionMenu({
 	block,
+	shareToken,
 	onClose,
 }: PageBlockActionMenuProps) {
 	const [mode, setMode] = useState<MenuMode>("actions");
 
-	const createBlock = useCreatePageBlock();
+	const createBlock = useCreatePageBlock(shareToken);
 
-	const updateBlock = useUpdatePageBlock();
+	const updateBlock = useUpdatePageBlock(shareToken);
 
-	const deleteBlock = useDeletePageBlock();
+	const deleteBlock = useDeletePageBlock(shareToken);
 
 	const handleCopyLink = async () => {
 		const url =

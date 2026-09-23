@@ -18,6 +18,7 @@ import { PageBlockRenderer } from "@/widgets/page-block/ui/page-block-renderer";
 
 interface ToggleBlockEditorProps {
 	block: PageBlockNode;
+	shareToken?: string;
 }
 
 function getText(block: PageBlockNode): string {
@@ -36,7 +37,7 @@ function getText(block: PageBlockNode): string {
 	return "";
 }
 
-export function ToggleBlockEditor({ block }: ToggleBlockEditorProps) {
+export function ToggleBlockEditor({ block, shareToken }: ToggleBlockEditorProps) {
 	const [value, setValue] = useState(() => getText(block));
 
 	/**
@@ -45,9 +46,9 @@ export function ToggleBlockEditor({ block }: ToggleBlockEditorProps) {
 	 */
 	const creatingChildRef = useRef(false);
 
-	const updateBlock = useUpdatePageBlock();
+	const updateBlock = useUpdatePageBlock(shareToken);
 
-	const createBlock = useCreatePageBlock();
+	const createBlock = useCreatePageBlock(shareToken);
 
 	const { requestFocus } = usePageBlockEditor();
 
@@ -228,7 +229,11 @@ export function ToggleBlockEditor({ block }: ToggleBlockEditorProps) {
 			{block.is_open && (
 				<div className='ml-7 pl-2'>
 					{block.children.map((child) => (
-						<PageBlockRenderer key={child.id} block={child} />
+						<PageBlockRenderer
+							key={child.id}
+							block={child}
+							shareToken={shareToken}
+						/>
 					))}
 				</div>
 			)}

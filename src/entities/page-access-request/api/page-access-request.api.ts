@@ -2,6 +2,7 @@ import { ApiResponse } from "@/shared/api";
 import instance from "@/shared/api/api-client";
 import {
 	CreatePageAccessRequestPayload,
+	MyPageAccessRequest,
 	PageAccessRequest,
 } from "../model/page-access-request.types";
 
@@ -16,6 +17,14 @@ export const pageAccessRequestApi = {
 			`${PAGE_ACCESS_REQUEST_API}/${pageId}/access-requests`,
 			payload,
 		);
+
+		return response.data.data;
+	},
+
+	getMine: async (pageId: string): Promise<MyPageAccessRequest | null> => {
+		const response = await instance.get<
+			ApiResponse<MyPageAccessRequest | null>
+		>(`/page/${pageId}/access-requests/me`);
 
 		return response.data.data;
 	},
