@@ -1,6 +1,6 @@
 "use client";
 
-import { Link2, LockKeyhole } from "lucide-react";
+import { Link2, LockKeyhole, Users } from "lucide-react";
 
 import {
 	AccessLevelMenu,
@@ -9,6 +9,7 @@ import {
 
 import type {
 	PageShareAccessLevel,
+	PageShareLinkAccessLevel,
 	PageShareSetting,
 	UpdatePageShareSettingPayload,
 } from "@/entities/page-share/model/page-share.types";
@@ -21,16 +22,19 @@ import {
 	SelectValue,
 } from "@/shared/ui/select";
 
-type GeneralAccessChoice = "RESTRICTED" | "LINK";
+type GeneralAccessChoice = "RESTRICTED" | "WORKSPACE" | "LINK";
 
 interface GeneralAccessSectionProps {
 	setting?: PageShareSetting;
+
 	canManage: boolean;
 
 	isPending: boolean;
+
 	isError: boolean;
 
 	isUpdating: boolean;
+
 	isUpdateError: boolean;
 
 	onUpdate: (payload: UpdatePageShareSettingPayload) => void;
@@ -52,6 +56,11 @@ const apiLevel: Record<AccessLevel, PageShareAccessLevel> = {
 	full: "FULL_ACCESS",
 };
 
+const linkApiLevel: Record<"view" | "edit", PageShareLinkAccessLevel> = {
+	view: "VIEWER",
+	edit: "EDITOR",
+};
+
 const accessLabel: Record<PageShareAccessLevel, string> = {
 	VIEWER: "Can view",
 	COMMENTER: "Can comment",
@@ -68,11 +77,15 @@ export function GeneralAccessSection({
 	isUpdateError,
 	onUpdate,
 }: GeneralAccessSectionProps) {
+	const workspaceEnabled = setting?.workspaceAccessLevel != null;
+
 	const linkEnabled = setting?.linkAccessLevel != null;
 
 	const generalAccess: GeneralAccessChoice = linkEnabled
 		? "LINK"
-		: "RESTRICTED";
+		: workspaceEnabled
+			? "WORKSPACE"
+			: "RESTRICTED";
 
 	const handleGeneralAccessChange = (value: string) => {
 		if (!canManage || isUpdating || value === generalAccess) {
@@ -90,6 +103,17 @@ export function GeneralAccessSection({
 			return;
 		}
 
+		if (nextValue === "WORKSPACE") {
+			onUpdate({
+				workspace_access_level:
+					setting?.workspaceAccessLevel ?? "VIEWER",
+
+				link_access_level: null,
+			});
+
+			return;
+		}
+
 		if (nextValue === "LINK") {
 			onUpdate({
 				workspace_access_level: null,
@@ -98,6 +122,15 @@ export function GeneralAccessSection({
 			});
 		}
 	};
+
+	const icon =
+		generalAccess === "LINK" ? (
+			<Link2 className='size-3.5' />
+		) : generalAccess === "WORKSPACE" ? (
+			<Users className='size-3.5' />
+		) : (
+			<LockKeyhole className='size-3.5' />
+		);
 
 	return (
 		<section className='space-y-2'>
@@ -117,11 +150,7 @@ export function GeneralAccessSection({
 				<>
 					<div className='flex min-w-0 items-center gap-2.5'>
 						<div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#3b3b3b] text-[#aaa]'>
-							{linkEnabled ? (
-								<Link2 className='size-3.5' />
-							) : (
-								<LockKeyhole className='size-3.5' />
-							)}
+							{icon}
 						</div>
 
 						<div className='min-w-0 flex-1'>
@@ -143,6 +172,10 @@ export function GeneralAccessSection({
 										Only people invited
 									</SelectItem>
 
+									<SelectItem value='WORKSPACE'>
+										Everyone in workspace
+									</SelectItem>
+
 									<SelectItem value='LINK'>
 										Anyone with the link
 									</SelectItem>
@@ -150,35 +183,81 @@ export function GeneralAccessSection({
 							</Select>
 						</div>
 
-						{setting?.linkAccessLevel && (
-							<div className='ml-auto shrink-0 text-xs text-[#aaa]'>
-								{canManage ? (
-									<AccessLevelMenu
-										currentLevel={
-											menuLevel[setting.linkAccessLevel]
-										}
-										allowedLevels={["view", "edit"]}
-										disabled={isUpdating}
-										onChange={(level) => {
-											if (
-												level !== "view" &&
-												level !== "edit"
-											) {
-												return;
+						{/* Everyone in workspace */}
+						{generalAccess === "WORKSPACE" &&
+							setting?.workspaceAccessLevel && (
+								<div className='ml-auto shrink-0 text-xs text-[#aaa]'>
+									{canManage ? (
+										<AccessLevelMenu
+											currentLevel={
+												menuLevel[
+													setting.workspaceAccessLevel
+												]
 											}
+											allowedLevels={[
+												"view",
+												"comment",
+												"edit",
+												"full",
+											]}
+											disabled={isUpdating}
+											onChange={(level) => {
+												onUpdate({
+													workspace_access_level:
+														apiLevel[level],
+												});
+											}}
+										/>
+									) : (
+										<span>
+											{
+												accessLabel[
+													setting.workspaceAccessLevel
+												]
+											}
+										</span>
+									)}
+								</div>
+							)}
 
-											onUpdate({
-												link_access_level: apiLevel[level],
-											});
-										}}
-									/>
-								) : (
-									<span>
-										{accessLabel[setting.linkAccessLevel]}
-									</span>
-								)}
-							</div>
-						)}
+						{/* Anyone with the link */}
+						{generalAccess === "LINK" &&
+							setting?.linkAccessLevel && (
+								<div className='ml-auto shrink-0 text-xs text-[#aaa]'>
+									{canManage ? (
+										<AccessLevelMenu
+											currentLevel={
+												menuLevel[
+													setting.linkAccessLevel
+												]
+											}
+											allowedLevels={["view", "edit"]}
+											disabled={isUpdating}
+											onChange={(level) => {
+												if (
+													level !== "view" &&
+													level !== "edit"
+												) {
+													return;
+												}
+
+												onUpdate({
+													link_access_level:
+														linkApiLevel[level],
+												});
+											}}
+										/>
+									) : (
+										<span>
+											{
+												accessLabel[
+													setting.linkAccessLevel
+												]
+											}
+										</span>
+									)}
+								</div>
+							)}
 					</div>
 
 					{isUpdateError && (

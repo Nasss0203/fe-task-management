@@ -1,6 +1,7 @@
 "use client";
 
 import { isAxiosError } from "axios";
+import { useEffect } from "react";
 
 import { useCreatePageAccessRequest } from "@/entities/page-access-request/model/page-access-request.mutations";
 
@@ -8,11 +9,13 @@ import { Button } from "@/shared/ui/button";
 
 interface PageAccessGateProps {
 	pageId: string;
+
 	token: string;
 
 	hasPendingRequest: boolean;
 
 	isCheckingAccess: boolean;
+
 	onCheckAccess: () => void;
 }
 
@@ -26,25 +29,28 @@ export function PageAccessGate({
 	const createRequest = useCreatePageAccessRequest(pageId, token);
 
 	const alreadyPendingError =
-		isAxiosError<{ message?: string }>(createRequest.error) &&
+		isAxiosError<{
+			message?: string;
+		}>(createRequest.error) &&
 		createRequest.error.response?.status === 409 &&
 		createRequest.error.response.data.message ===
 			"Access request is already pending";
 
-	/*
-	 * Có 3 trường hợp được xem là đã gửi:
-	 *
-	 * 1. GET /access-requests/me trả PENDING
-	 * 2. vừa POST thành công
-	 * 3. backend trả 409 vì request đã tồn tại
-	 */
+	useEffect(() => {
+		if (hasPendingRequest) {
+			createRequest.reset();
+		}
+	}, [hasPendingRequest, createRequest.reset]);
+
 	const requestSent =
 		hasPendingRequest || createRequest.isSuccess || alreadyPendingError;
 
 	const handleRequest = () => {
-		if (!createRequest.isPending && !requestSent) {
-			createRequest.mutate();
+		if (createRequest.isPending || requestSent) {
+			return;
 		}
+
+		createRequest.mutate();
 	};
 
 	return (
@@ -59,11 +65,7 @@ export function PageAccessGate({
 
 				{requestSent && (
 					<div role='status' className='text-sm'>
-						<p>
-							{hasPendingRequest || alreadyPendingError
-								? "Access request already pending"
-								: "Request sent"}
-						</p>
+						<p className='font-medium'>Request sent</p>
 
 						<p className='text-muted-foreground'>
 							Waiting for approval
@@ -73,35 +75,36 @@ export function PageAccessGate({
 
 				{createRequest.isError && !alreadyPendingError && (
 					<p role='alert' className='text-sm text-destructive'>
-						Unable to request access. Please try again or check your
-						access.
+						Unable to request access. Please try again.
 					</p>
 				)}
 
-				<div className='flex flex-wrap justify-center gap-2'>
-					<Button
-						type='button'
-						disabled={createRequest.isPending || requestSent}
-						onClick={handleRequest}
-					>
-						{createRequest.isPending
-							? "Requesting..."
-							: requestSent
-								? "Request sent"
+				{!requestSent && (
+					<div className='flex flex-wrap justify-center gap-2'>
+						<Button
+							type='button'
+							disabled={createRequest.isPending}
+							onClick={handleRequest}
+						>
+							{createRequest.isPending
+								? "Requesting..."
 								: "Request access"}
-					</Button>
+						</Button>
 
-					<Button
-						type='button'
-						variant='outline'
-						disabled={isCheckingAccess || createRequest.isPending}
-						onClick={onCheckAccess}
-					>
-						{isCheckingAccess
-							? "Checking access..."
-							: "Check access"}
-					</Button>
-				</div>
+						<Button
+							type='button'
+							variant='outline'
+							disabled={
+								isCheckingAccess || createRequest.isPending
+							}
+							onClick={onCheckAccess}
+						>
+							{isCheckingAccess
+								? "Checking access..."
+								: "Check access"}
+						</Button>
+					</div>
+				)}
 			</div>
 		</div>
 	);

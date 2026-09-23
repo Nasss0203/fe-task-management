@@ -10,8 +10,10 @@ import {
 	Sparkles,
 	Trash2,
 } from "lucide-react";
-import * as React from "react";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 
+import { useUnreadNotificationCount } from "@/entities/notification/model/notification.queries";
 import { usePagesByWorkspace } from "@/entities/page/model/page.queries";
 import { useTeamspaces } from "@/entities/teamspace/model/teamspace.queries";
 import { useSelectWorkspace } from "@/entities/workspace/model/workspace.mutations";
@@ -19,9 +21,15 @@ import {
 	useWorkspaceAccess,
 	useWorkspaces,
 } from "@/entities/workspace/model/workspace.queries";
+
 import { useUser } from "@/features/auth";
+
 import { NavFavorites } from "@/widgets/workspace-sidebar/ui/nav-favorites";
-import { NavMain } from "@/widgets/workspace-sidebar/ui/nav-main";
+import {
+	NavMain,
+	type NavMainAction,
+	type NavMainItem,
+} from "@/widgets/workspace-sidebar/ui/nav-main";
 import { NavPrivatePages } from "@/widgets/workspace-sidebar/ui/nav-private";
 import { NavSecondary } from "@/widgets/workspace-sidebar/ui/nav-secondary";
 import {
@@ -31,17 +39,18 @@ import {
 	SidebarRail,
 } from "@/widgets/workspace-sidebar/ui/sidebar";
 import { TeamSwitcher } from "@/widgets/workspace-sidebar/ui/team-switcher";
-import { usePathname } from "next/navigation";
+
+import { InboxSidebar } from "./inbox-sidebar";
 import { NavSharedPages } from "./nav-shared-pages";
 import { NavTeamspaces } from "./nav-teamspaces";
 
-// This is sample data.
 const data = {
 	teams: {
 		name: "Acme Inc",
 		logo: Command,
 		plan: "Enterprise",
 	},
+
 	navMain: [
 		{
 			title: "Search",
@@ -57,15 +66,16 @@ const data = {
 			title: "Home",
 			url: "#",
 			icon: Home,
-			isActive: true,
+			action: "home",
 		},
 		{
 			title: "Inbox",
 			url: "#",
 			icon: Inbox,
-			badge: "10",
+			action: "inbox",
 		},
-	],
+	] satisfies NavMainItem[],
+
 	navSecondary: [
 		{
 			title: "Templates",
@@ -84,96 +94,58 @@ const data = {
 			icon: MessageCircleQuestion,
 		},
 	],
-	favorites: [
-		{
-			name: "Project Management & Task Tracking",
-			url: "#",
-			emoji: "📊",
-		},
-		{
-			name: "Family Recipe Collection & Meal Planning",
-			url: "#",
-			emoji: "🍳",
-		},
-	],
-
-	workspaces: [
-		{
-			name: "Personal Life Management",
-			emoji: "🏠",
-			pages: [
-				{
-					name: "Daily Journal & Reflection",
-					url: "#",
-					emoji: "📔",
-				},
-				{
-					name: "Health & Wellness Tracker",
-					url: "#",
-					emoji: "🍏",
-				},
-				{
-					name: "Personal Growth & Learning Goals",
-					url: "#",
-					emoji: "🌟",
-				},
-			],
-		},
-		{
-			name: "Professional Development",
-			emoji: "💼",
-			pages: [
-				{
-					name: "Career Objectives & Milestones",
-					url: "#",
-					emoji: "🎯",
-				},
-				{
-					name: "Skill Acquisition & Training Log",
-					url: "#",
-					emoji: "🧠",
-				},
-				{
-					name: "Networking Contacts & Events",
-					url: "#",
-					emoji: "🤝",
-				},
-			],
-		},
-	],
 };
+
+const SidebarView = {
+	WORKSPACE: "workspace",
+	INBOX: "inbox",
+} as const;
+
+type SidebarView = (typeof SidebarView)[keyof typeof SidebarView];
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const pathname = usePathname();
+
 	const { data: workspaces = [], isLoading, isError } = useWorkspaces();
+
 	const { user } = useUser();
 
 	const selectWorkspaceMutation = useSelectWorkspace();
+
+	const { data: unreadNotificationCount } = useUnreadNotificationCount();
+
+	const [view, setView] = useState<SidebarView>(SidebarView.WORKSPACE);
 
 	const activePageId = pathname.startsWith("/page/")
 		? pathname.split("/")[2]
 		: undefined;
 
 	const hasLastActiveWorkspace =
-		user?.lastActiveWorkspaceId &&
+		Boolean(user?.lastActiveWorkspaceId) &&
 		workspaces.some(
-			(workspace) => workspace.id === user.lastActiveWorkspaceId,
+			(workspace) => workspace.id === user?.lastActiveWorkspaceId,
 		);
 
 	const currentWorkspaceId = hasLastActiveWorkspace
-		? user.lastActiveWorkspaceId
+		? user?.lastActiveWorkspaceId
 		: workspaces[0]?.id;
 
 	const workspaceAccessQuery = useWorkspaceAccess(currentWorkspaceId ?? "");
+
 	const membershipType =
 		!isError &&
 		workspaceAccessQuery.isSuccess &&
 		workspaceAccessQuery.data.workspace_id === currentWorkspaceId
 			? workspaceAccessQuery.data.membership_type
 			: undefined;
+
 	const isGuest = membershipType === "GUEST";
+
 	const isMember = membershipType === "MEMBER";
+
 	const isAccessLoading =
-		isLoading || (Boolean(currentWorkspaceId) && workspaceAccessQuery.isPending);
+		isLoading ||
+		(Boolean(currentWorkspaceId) && workspaceAccessQuery.isPending);
 
 	const {
 		data: pages = [],
@@ -195,6 +167,38 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		await selectWorkspaceMutation.mutateAsync(workspaceId);
 	};
 
+	const handleMainAction = (action: NavMainAction) => {
+		switch (action) {
+			case "home":
+				setView(SidebarView.WORKSPACE);
+				break;
+
+			case "inbox":
+				setView(SidebarView.INBOX);
+				break;
+		}
+	};
+
+	const activeMainAction: NavMainAction =
+		view === SidebarView.INBOX ? "inbox" : "home";
+
+	const unreadCount = unreadNotificationCount?.count ?? 0;
+
+	const navMainItems: NavMainItem[] = data.navMain.map((item) => {
+		if (item.action !== "inbox") {
+			return item;
+		}
+
+		return {
+			...item,
+			badge: unreadCount > 0 ? String(unreadCount) : undefined,
+		};
+	});
+
+	const guestNavMainItems = navMainItems.filter(
+		(item) => item.action === "inbox",
+	);
+
 	return (
 		<Sidebar className='border-r-0' {...props}>
 			<SidebarHeader>
@@ -214,69 +218,92 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 						/>
 					)}
 
-				{isMember && <NavMain items={data.navMain} />}
+				{isMember && (
+					<NavMain
+						items={navMainItems}
+						activeAction={activeMainAction}
+						onAction={handleMainAction}
+					/>
+				)}
+
+				{isGuest && (
+					<NavMain
+						items={guestNavMainItems}
+						activeAction={
+							view === SidebarView.INBOX ? "inbox" : undefined
+						}
+						onAction={handleMainAction}
+					/>
+				)}
 			</SidebarHeader>
 
 			<SidebarContent>
-				{isAccessLoading ? (
-					<p
-						role='status'
-						className='px-4 py-2 text-sm text-muted-foreground'
-					>
-						Loading workspace access...
-					</p>
-				) : !isGuest && !isMember ? (
-					<p
-						role='alert'
-						className='px-4 py-2 text-sm text-muted-foreground'
-					>
-						{!isError && !currentWorkspaceId
-							? "No workspace available."
-							: "Unable to load workspace access."}
-					</p>
-				) : null}
+				{view === SidebarView.INBOX ? (
+					<InboxSidebar />
+				) : (
+					<>
+						{isAccessLoading ? (
+							<p
+								role='status'
+								className='px-4 py-2 text-sm text-muted-foreground'
+							>
+								Loading workspace access...
+							</p>
+						) : !isGuest && !isMember ? (
+							<p
+								role='alert'
+								className='px-4 py-2 text-sm text-muted-foreground'
+							>
+								{!isError && !currentWorkspaceId
+									? "No workspace available."
+									: "Unable to load workspace access."}
+							</p>
+						) : null}
 
-				{isMember && (
-					<NavFavorites
-						workspaceId={currentWorkspaceId ?? undefined}
-						activePageId={activePageId}
-						pages={pages}
-						teamspaces={teamspaces}
-					/>
-				)}
+						{isMember && (
+							<NavFavorites
+								workspaceId={currentWorkspaceId ?? undefined}
+								activePageId={activePageId}
+								pages={pages}
+								teamspaces={teamspaces}
+							/>
+						)}
 
-				{(isGuest || isMember) && (
-					<NavSharedPages activePageId={activePageId} />
-				)}
+						{(isGuest || isMember) && (
+							<NavSharedPages activePageId={activePageId} />
+						)}
 
-				{isMember && !isPagesLoading && !isPagesError && (
-					<NavPrivatePages
-						workspaceId={currentWorkspaceId as string}
-						pages={pages}
-						teamspaces={teamspaces}
-						activePageId={activePageId}
-					/>
-				)}
+						{isMember && !isPagesLoading && !isPagesError && (
+							<NavPrivatePages
+								workspaceId={currentWorkspaceId as string}
+								pages={pages}
+								teamspaces={teamspaces}
+								activePageId={activePageId}
+							/>
+						)}
 
-				{isMember &&
-					!isPagesLoading &&
-					!isPagesError &&
-					!isTeamspacesLoading &&
-					!isTeamspacesError &&
-					currentWorkspaceId && (
-						<NavTeamspaces
-							workspaceId={currentWorkspaceId}
-							teamspaces={teamspaces}
-							pages={pages}
-							activePageId={activePageId}
-						/>
-					)}
-				{isMember && (
-					<NavSecondary
-						workspaceId={currentWorkspaceId as string}
-						items={data.navSecondary}
-						className='mt-auto'
-					/>
+						{isMember &&
+							!isPagesLoading &&
+							!isPagesError &&
+							!isTeamspacesLoading &&
+							!isTeamspacesError &&
+							currentWorkspaceId && (
+								<NavTeamspaces
+									workspaceId={currentWorkspaceId}
+									teamspaces={teamspaces}
+									pages={pages}
+									activePageId={activePageId}
+								/>
+							)}
+
+						{isMember && (
+							<NavSecondary
+								workspaceId={currentWorkspaceId as string}
+								items={data.navSecondary}
+								className='mt-auto'
+							/>
+						)}
+					</>
 				)}
 			</SidebarContent>
 

@@ -1,5 +1,7 @@
 import { ApiResponse } from "@/shared/api";
 import instance from "@/shared/api/api-client";
+
+import { PageShareAccessLevel } from "@/entities/page-share/model/page-share.types";
 import {
 	CreatePageAccessRequestPayload,
 	MyPageAccessRequest,
@@ -25,6 +27,28 @@ export const pageAccessRequestApi = {
 		const response = await instance.get<
 			ApiResponse<MyPageAccessRequest | null>
 		>(`/page/${pageId}/access-requests/me`);
+
+		return response.data.data;
+	},
+
+	approve: async (
+		requestId: string,
+		accessLevel: PageShareAccessLevel,
+	): Promise<PageAccessRequest> => {
+		const response = await instance.patch<ApiResponse<PageAccessRequest>>(
+			`/page-access-requests/${requestId}/approve`,
+			{
+				access_level: accessLevel,
+			},
+		);
+
+		return response.data.data;
+	},
+
+	reject: async (requestId: string): Promise<PageAccessRequest> => {
+		const response = await instance.patch<ApiResponse<PageAccessRequest>>(
+			`/page-access-requests/${requestId}/reject`,
+		);
 
 		return response.data.data;
 	},

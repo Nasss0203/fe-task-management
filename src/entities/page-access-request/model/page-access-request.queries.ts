@@ -18,5 +18,7 @@ export function useMyPageAccessRequest(pageId?: string, enabled = true) {
 		enabled: Boolean(pageId) && enabled,
 
 		retry: false,
+
+		refetchOnWindowFocus: true,
 	});
 }

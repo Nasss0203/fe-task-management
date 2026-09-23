@@ -1,3 +1,5 @@
+import type { PageShareAccessLevel } from "@/entities/page-share/model/page-share.types";
+
 export type PageAccessRequestStatus = "PENDING" | "APPROVED" | "REJECTED";
 
 export interface PageAccessRequest {
@@ -10,6 +12,10 @@ export interface PageAccessRequest {
 
 export interface CreatePageAccessRequestPayload {
 	token: string;
+}
+
+export interface ApprovePageAccessRequestPayload {
+	accessLevel: PageShareAccessLevel;
 }
 
 export interface MyPageAccessRequest {
