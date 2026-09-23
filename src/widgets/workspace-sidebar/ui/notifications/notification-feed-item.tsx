@@ -3,7 +3,9 @@
 import { formatNotificationTime } from "@/entities/notification/lib/notification-date";
 import { getNotificationPresentation } from "@/entities/notification/lib/notification-presentation";
 import type { Notification } from "@/entities/notification/model/notification.types";
+
 import { PageAccessRequestNotification } from "./page-access-request-notification";
+import { WorkspaceInviteNotification } from "./workspace-invite-notification";
 
 interface NotificationFeedItemProps {
 	notification: Notification;
@@ -26,6 +28,19 @@ export function NotificationFeedItem({
 		);
 	}
 
+	if (notification.type === "workspace.invite") {
+		return (
+			<WorkspaceInviteNotification
+				notification={notification}
+				isMarkingRead={isPending}
+				onRead={onRead}
+			/>
+		);
+	}
+
+	/**
+	 * Các notification thông thường.
+	 */
 	const presentation = getNotificationPresentation(notification);
 
 	const Icon = presentation.icon;

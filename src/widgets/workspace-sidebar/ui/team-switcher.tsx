@@ -30,6 +30,7 @@ import type {
 	Workspace,
 	WorkspaceMembershipType,
 } from "@/entities/workspace/model/workspace.types";
+import { InviteWorkspaceMembersDialog } from "@/features/workspace-invite/ui/InviteWorkspaceMembersDialog";
 import {
 	SidebarMenu,
 	SidebarMenuButton,
@@ -60,6 +61,7 @@ export function TeamSwitcher({
 	onLogout,
 }: TeamSwitcherProps) {
 	const setSettingsOpen = useSettingsDialog((state) => state.setOpen);
+	const [inviteDialogOpen, setInviteDialogOpen] = React.useState(false);
 
 	const pendingSettingsOpen = React.useRef(false);
 	const isMember = membershipType === "MEMBER";
@@ -145,7 +147,12 @@ export function TeamSwitcher({
 										Settings
 									</DropdownMenuItem>
 
-									<DropdownMenuItem className='gap-2 p-2'>
+									<DropdownMenuItem
+										className='gap-2 p-2'
+										onSelect={() =>
+											setInviteDialogOpen(true)
+										}
+									>
 										<Mail className='size-4' />
 										Invite members
 									</DropdownMenuItem>
@@ -219,6 +226,13 @@ export function TeamSwitcher({
 			</SidebarMenuItem>
 
 			{isMember && <SettingsDialog />}
+			{isMember && (
+				<InviteWorkspaceMembersDialog
+					open={inviteDialogOpen}
+					onOpenChange={setInviteDialogOpen}
+					workspaceId={activeWorkspace.id}
+				/>
+			)}
 		</SidebarMenu>
 	);
 }
