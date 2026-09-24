@@ -42,6 +42,8 @@ interface TeamSwitcherProps {
 	currentWorkspaceId?: string;
 	membershipType?: WorkspaceMembershipType;
 
+	canInviteMembers?: boolean;
+
 	user: {
 		email: string;
 	};
@@ -50,12 +52,12 @@ interface TeamSwitcherProps {
 	onCreateWorkspace?: () => void;
 	onLogout?: () => void;
 }
-
 export function TeamSwitcher({
 	workspaces,
 	currentWorkspaceId,
 	membershipType,
 	user,
+	canInviteMembers = false,
 	onWorkspaceSelect,
 	onCreateWorkspace,
 	onLogout,
@@ -147,15 +149,17 @@ export function TeamSwitcher({
 										Settings
 									</DropdownMenuItem>
 
-									<DropdownMenuItem
-										className='gap-2 p-2'
-										onSelect={() =>
-											setInviteDialogOpen(true)
-										}
-									>
-										<Mail className='size-4' />
-										Invite members
-									</DropdownMenuItem>
+									{canInviteMembers && (
+										<DropdownMenuItem
+											className='gap-2 p-2'
+											onSelect={() =>
+												setInviteDialogOpen(true)
+											}
+										>
+											<Mail className='size-4' />
+											Invite members
+										</DropdownMenuItem>
+									)}
 
 									<DropdownMenuItem className='gap-2 p-2'>
 										<UserPlus className='size-4' />
@@ -225,7 +229,7 @@ export function TeamSwitcher({
 				</DropdownMenu>
 			</SidebarMenuItem>
 
-			{isMember && <SettingsDialog />}
+			{isMember && <SettingsDialog workspaceId={activeWorkspace.id} />}
 			{isMember && (
 				<InviteWorkspaceMembersDialog
 					open={inviteDialogOpen}

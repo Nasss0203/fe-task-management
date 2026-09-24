@@ -44,6 +44,18 @@ import { InboxSidebar } from "./inbox-sidebar";
 import { NavSharedPages } from "./nav-shared-pages";
 import { NavTeamspaces } from "./nav-teamspaces";
 
+/**
+ * Phải khớp với permission mà:
+ *
+ * GET /workspaces/:workspaceId/access
+ *
+ * trả về trong permissions[].
+ *
+ * Nếu backend của bạn trả string khác,
+ * chỉ cần sửa constant này.
+ */
+const WORKSPACE_MEMBER_ADD_PERMISSION = "WORKSPACE_MEMBER_ADD";
+
 const data = {
 	teams: {
 		name: "Acme Inc",
@@ -120,6 +132,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		? pathname.split("/")[2]
 		: undefined;
 
+	/**
+	 * Workspace hiện tại.
+	 */
 	const hasLastActiveWorkspace =
 		Boolean(user?.lastActiveWorkspaceId) &&
 		workspaces.some(
@@ -130,6 +145,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		? user?.lastActiveWorkspaceId
 		: workspaces[0]?.id;
 
+	/**
+	 * Workspace access.
+	 *
+	 * Response:
+	 *
+	 * {
+	 *   membership_type: "MEMBER" | "GUEST",
+	 *   roles: [],
+	 *   permissions: []
+	 * }
+	 */
 	const workspaceAccessQuery = useWorkspaceAccess(currentWorkspaceId ?? "");
 
 	const membershipType =
@@ -139,26 +165,54 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			? workspaceAccessQuery.data.membership_type
 			: undefined;
 
+	const workspacePermissions =
+		workspaceAccessQuery.isSuccess &&
+		workspaceAccessQuery.data.workspace_id === currentWorkspaceId
+			? workspaceAccessQuery.data.permissions
+			: [];
+
 	const isGuest = membershipType === "GUEST";
 
 	const isMember = membershipType === "MEMBER";
+
+	/**
+	 * Không dựa vào role OWNER/MEMBER.
+	 *
+	 * UI dựa trực tiếp vào permission
+	 * mà backend cấp.
+	 */
+	const canInviteMembers =
+		isMember &&
+		workspacePermissions.includes(WORKSPACE_MEMBER_ADD_PERMISSION);
 
 	const isAccessLoading =
 		isLoading ||
 		(Boolean(currentWorkspaceId) && workspaceAccessQuery.isPending);
 
+	/**
+	 * MEMBER mới load toàn bộ pages
+	 * của workspace.
+	 *
+	 * GUEST chỉ xem Shared Pages.
+	 */
 	const {
 		data: pages = [],
 		isLoading: isPagesLoading,
 		isError: isPagesError,
 	} = usePagesByWorkspace(currentWorkspaceId ?? undefined, isMember);
 
+	/**
+	 * Teamspaces chỉ load đối với MEMBER.
+	 */
 	const {
 		data: teamspaces = [],
 		isLoading: isTeamspacesLoading,
 		isError: isTeamspacesError,
 	} = useTeamspaces(currentWorkspaceId ?? "", isMember);
 
+	/**
+	 * Switch workspace.
+	 */
 	const handleWorkspaceSelect = async (workspaceId: string) => {
 		if (workspaceId === currentWorkspaceId) {
 			return;
@@ -167,6 +221,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		await selectWorkspaceMutation.mutateAsync(workspaceId);
 	};
 
+	/**
+	 * Main navigation actions.
+	 */
 	const handleMainAction = (action: NavMainAction) => {
 		switch (action) {
 			case "home":
@@ -182,6 +239,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const activeMainAction: NavMainAction =
 		view === SidebarView.INBOX ? "inbox" : "home";
 
+	/**
+	 * Inbox unread badge.
+	 */
 	const unreadCount = unreadNotificationCount?.count ?? 0;
 
 	const navMainItems: NavMainItem[] = data.navMain.map((item) => {
@@ -195,6 +255,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		};
 	});
 
+	/**
+	 * Guest chỉ được thấy Inbox trong
+	 * nav chính.
+	 */
 	const guestNavMainItems = navMainItems.filter(
 		(item) => item.action === "inbox",
 	);
@@ -211,6 +275,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 							workspaces={workspaces}
 							currentWorkspaceId={currentWorkspaceId}
 							membershipType={membershipType}
+							canInviteMembers={canInviteMembers}
 							user={{
 								email: user?.email ?? "",
 							}}

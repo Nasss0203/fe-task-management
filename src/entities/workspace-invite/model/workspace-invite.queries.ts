@@ -7,6 +7,8 @@ export const workspaceInviteKeys = {
 
 	search: (workspaceId: string, query: string) =>
 		[...workspaceInviteKeys.all, "search", workspaceId, query] as const,
+	pending: (workspaceId: string) =>
+		[...workspaceInviteKeys.all, "pending", workspaceId] as const,
 };
 
 export function useSearchWorkspaceInviteUsers(
@@ -24,5 +26,18 @@ export function useSearchWorkspaceInviteUsers(
 		enabled: Boolean(workspaceId) && normalizedQuery.length > 0,
 
 		retry: false,
+	});
+}
+
+export function usePendingWorkspaceInvites(
+	workspaceId: string,
+	enabled = true,
+) {
+	return useQuery({
+		queryKey: workspaceInviteKeys.pending(workspaceId),
+
+		queryFn: () => workspaceInviteApi.getPendingInvites(workspaceId),
+
+		enabled: Boolean(workspaceId) && enabled,
 	});
 }

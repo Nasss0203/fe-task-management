@@ -39,3 +39,14 @@ export interface InviteSuggestion {
 
 	status: InviteSuggestionStatus;
 }
+
+export interface PendingWorkspaceInvite {
+	id: string;
+	workspaceId: string;
+	userId: string | null;
+	email: string | null;
+	roleName: WorkspaceInviteRole;
+	status: "PENDING";
+	expiresAt: string;
+	createdAt: string;
+}

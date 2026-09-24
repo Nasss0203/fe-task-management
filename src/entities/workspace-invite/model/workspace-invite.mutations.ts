@@ -5,6 +5,7 @@ import { notificationKeys } from "@/entities/notification/model/notification.key
 import { workspaceInviteApi } from "../api/workspace-invite.api";
 
 import { workspaceKeys } from "@/entities/workspace/model/workspace.queries";
+import { workspaceInviteKeys } from "./workspace-invite.queries";
 import type { CreateWorkspaceInvitePayload } from "./workspace-invite.types";
 
 interface InviteWorkspaceMembersVariables {
@@ -14,12 +15,55 @@ interface InviteWorkspaceMembersVariables {
 }
 
 export function useInviteWorkspaceMembers() {
+	const queryClient = useQueryClient();
+
 	return useMutation({
 		mutationFn: ({
 			workspaceId,
 			payload,
 		}: InviteWorkspaceMembersVariables) =>
 			workspaceInviteApi.invite(workspaceId, payload),
+
+		onSuccess: async (_data, { workspaceId }) => {
+			await queryClient.invalidateQueries({
+				queryKey: workspaceInviteKeys.pending(workspaceId),
+			});
+		},
+	});
+}
+
+interface ManageWorkspaceInviteVariables {
+	workspaceId: string;
+	inviteId: string;
+}
+
+export function useResendWorkspaceInvite() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({ workspaceId, inviteId }: ManageWorkspaceInviteVariables) =>
+			workspaceInviteApi.resend(workspaceId, inviteId),
+
+		onSuccess: async (_data, { workspaceId }) => {
+			await queryClient.invalidateQueries({
+				queryKey: workspaceInviteKeys.pending(workspaceId),
+			});
+		},
+	});
+}
+
+export function useRevokeWorkspaceInvite() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({ workspaceId, inviteId }: ManageWorkspaceInviteVariables) =>
+			workspaceInviteApi.revoke(workspaceId, inviteId),
+
+		onSuccess: async (_data, { workspaceId }) => {
+			await queryClient.invalidateQueries({
+				queryKey: workspaceInviteKeys.pending(workspaceId),
+			});
+		},
 	});
 }
 

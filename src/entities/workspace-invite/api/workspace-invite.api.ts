@@ -4,6 +4,7 @@ import instance from "@/shared/api/api-client";
 import type {
 	CreateWorkspaceInvitePayload,
 	InviteSuggestion,
+	PendingWorkspaceInvite,
 } from "../model/workspace-invite.types";
 
 const WORKSPACE_INVITE_API = "/workspace-invites";
@@ -45,6 +46,28 @@ export const workspaceInviteApi = {
 	decline: async (token: string): Promise<void> => {
 		await instance.post(
 			`${WORKSPACE_INVITE_API}/${encodeURIComponent(token)}/decline`,
+		);
+	},
+
+	getPendingInvites: async (
+		workspaceId: string,
+	): Promise<PendingWorkspaceInvite[]> => {
+		const response = await instance.get<
+			ApiResponse<PendingWorkspaceInvite[]>
+		>(`${WORKSPACE_INVITE_API}/${workspaceId}/invites/pending`);
+
+		return response.data.data;
+	},
+
+	resend: async (workspaceId: string, inviteId: string): Promise<void> => {
+		await instance.post(
+			`${WORKSPACE_INVITE_API}/${workspaceId}/invites/${inviteId}/resend`,
+		);
+	},
+
+	revoke: async (workspaceId: string, inviteId: string): Promise<void> => {
+		await instance.post(
+			`${WORKSPACE_INVITE_API}/${workspaceId}/invites/${inviteId}/revoke`,
 		);
 	},
 };
