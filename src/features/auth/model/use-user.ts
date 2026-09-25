@@ -1,52 +1,58 @@
 "use client";
 import {
-	clearStoredUser,
-	setStoredUser,
-	USER_STORAGE_CHANGED_EVENT,
-	USER_STORAGE_KEY,
+  clearStoredUser,
+  setStoredUser,
+  USER_STORAGE_CHANGED_EVENT,
+  USER_STORAGE_KEY,
 } from "../lib/auth-storage";
 import type { GetMeResponse } from "@/entities/user";
 import { useCallback, useMemo, useSyncExternalStore } from "react";
+import { useAuthSessionSnapshot } from "./auth-session";
 
 const getUserSnapshot = () => {
-	if (typeof window === "undefined") return null;
+  if (typeof window === "undefined") return null;
 
-	return localStorage.getItem(USER_STORAGE_KEY);
+  return localStorage.getItem(USER_STORAGE_KEY);
 };
 
 const subscribeToUserStorage = (callback: () => void) => {
-	window.addEventListener(USER_STORAGE_CHANGED_EVENT, callback);
-	window.addEventListener("storage", callback);
+  window.addEventListener(USER_STORAGE_CHANGED_EVENT, callback);
+  window.addEventListener("storage", callback);
 
-	return () => {
-		window.removeEventListener(USER_STORAGE_CHANGED_EVENT, callback);
-		window.removeEventListener("storage", callback);
-	};
+  return () => {
+    window.removeEventListener(USER_STORAGE_CHANGED_EVENT, callback);
+    window.removeEventListener("storage", callback);
+  };
 };
 
 export const useUser = () => {
-	const rawUser = useSyncExternalStore(
-		subscribeToUserStorage,
-		getUserSnapshot,
-		() => null,
-	);
-	const user = useMemo(() => {
-		if (!rawUser) return undefined;
+  const session = useAuthSessionSnapshot();
+  const rawUser = useSyncExternalStore(
+    subscribeToUserStorage,
+    getUserSnapshot,
+    () => null,
+  );
+  const user = useMemo(() => {
+    if (!session.isBootstrapped || !session.isAuthenticated) {
+      return undefined;
+    }
 
-		try {
-			return JSON.parse(rawUser) as GetMeResponse;
-		} catch {
-			return undefined;
-		}
-	}, [rawUser]);
+    if (!rawUser) return undefined;
 
-	const setUser = useCallback((value: GetMeResponse | undefined) => {
-		if (value) {
-			setStoredUser(value);
-		} else {
-			clearStoredUser();
-		}
-	}, []);
+    try {
+      return JSON.parse(rawUser) as GetMeResponse;
+    } catch {
+      return undefined;
+    }
+  }, [rawUser, session.isAuthenticated, session.isBootstrapped]);
 
-	return { user, setUser };
+  const setUser = useCallback((value: GetMeResponse | undefined) => {
+    if (value) {
+      setStoredUser(value);
+    } else {
+      clearStoredUser();
+    }
+  }, []);
+
+  return { user, setUser, ...session };
 };

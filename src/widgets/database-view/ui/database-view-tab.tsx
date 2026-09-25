@@ -217,7 +217,7 @@ export function DatabaseViewTab({
 				<AlertDialogContent>
 					<AlertDialogHeader>
 						<AlertDialogTitle>
-							Delete "{view.name}"?
+							Delete &quot;{view.name}&quot;?
 						</AlertDialogTitle>
 
 						<AlertDialogDescription>
