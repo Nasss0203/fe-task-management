@@ -12,14 +12,14 @@ export const teamspaceKeys = {
 		["teamspaces", teamspaceId, "members"] as const,
 };
 
-export function useTeamspaces(workspaceId: string) {
+export function useTeamspaces(workspaceId: string, enabled = true) {
 	return useQuery({
 		queryKey: teamspaceKeys.workspace(workspaceId),
 
 		queryFn: ({ signal }) =>
 			teamspaceApi.getByWorkspace(workspaceId, signal),
 
-		enabled: Boolean(workspaceId),
+		enabled: Boolean(workspaceId) && enabled,
 	});
 }
 

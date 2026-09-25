@@ -15,6 +15,7 @@ import { usePageBlockEditor } from "@/widgets/page-block-editor/ui/page-block-ed
 
 interface QuoteBlockEditorProps {
 	block: PageBlockNode;
+	shareToken?: string;
 }
 
 function getText(block: PageBlockNode): string {
@@ -33,14 +34,14 @@ function getText(block: PageBlockNode): string {
 	return "";
 }
 
-export function QuoteBlockEditor({ block }: QuoteBlockEditorProps) {
+export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 	const [value, setValue] = useState(() => getText(block));
 
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-	const updateBlock = useUpdatePageBlock();
+	const updateBlock = useUpdatePageBlock(shareToken);
 
-	const createBlock = useCreatePageBlock();
+	const createBlock = useCreatePageBlock(shareToken);
 
 	const { requestFocus } = usePageBlockEditor();
 

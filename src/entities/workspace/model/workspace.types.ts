@@ -12,9 +12,14 @@ export interface Workspace {
 	createdBy: string | null;
 }
 
+export type WorkspaceMembershipType = "MEMBER" | "GUEST";
+
+export type WorkspaceRole = "OWNER" | "MEMBER";
+
 export interface WorkspaceAccess {
 	user_id: string;
 	workspace_id: string;
-	roles: string[];
+	membership_type: WorkspaceMembershipType;
+	roles: WorkspaceRole[];
 	permissions: string[];
 }

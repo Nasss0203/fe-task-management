@@ -1,6 +1,6 @@
+import type { ApiResponse } from "@/shared/api";
 import instance from "@/shared/api/api-client";
 
-import { ApiResponse } from "@/shared/api";
 import type {
 	BookmarkMetadata,
 	PageBlock,
@@ -12,15 +12,27 @@ import type {
 
 const PAGE_BLOCK_API = "/pageBlock";
 
+function getShareHeaders(shareToken?: string) {
+	if (!shareToken) {
+		return undefined;
+	}
+
+	return {
+		"X-Page-Share-Token": shareToken,
+	};
+}
+
 export const pageBlockApi = {
 	getByPage: async (
 		pageId: string,
 		signal?: AbortSignal,
+		shareToken?: string,
 	): Promise<PageBlock[]> => {
 		const response = await instance.get<ApiResponse<PageBlock[]>>(
 			`${PAGE_BLOCK_API}/page/${pageId}`,
 			{
 				signal,
+				headers: getShareHeaders(shareToken),
 			},
 		);
 
@@ -30,29 +42,35 @@ export const pageBlockApi = {
 	getById: async (
 		blockId: string,
 		signal?: AbortSignal,
+		shareToken?: string,
 	): Promise<PageBlock> => {
 		const response = await instance.get<ApiResponse<PageBlock>>(
 			`${PAGE_BLOCK_API}/${blockId}`,
 			{
 				signal,
+				headers: getShareHeaders(shareToken),
 			},
 		);
 
 		return response.data.data;
 	},
 
-	create: async (input: {
-		page_id: string;
-		parent_block_id?: string | null;
-		after_block_id?: string | null;
-		type: PageBlockType;
-		content?: PageBlockJson;
-		style_config?: PageBlockStyleConfig;
-		data_config?: PageBlockJson;
-	}): Promise<PageBlock> => {
+	create: async (
+		input: {
+			page_id: string;
+			parent_block_id?: string | null;
+			after_block_id?: string | null;
+			type: PageBlockType;
+			content?: PageBlockJson;
+			style_config?: PageBlockStyleConfig;
+			data_config?: PageBlockJson;
+		},
+		shareToken?: string,
+	): Promise<PageBlock> => {
 		const response = await instance.post<ApiResponse<PageBlock>>(
 			"/pageBlock",
 			input,
+			{ headers: getShareHeaders(shareToken) },
 		);
 
 		return response.data.data;
@@ -64,14 +82,17 @@ export const pageBlockApi = {
 			database_id: string;
 			view_id: string;
 		},
+		shareToken?: string,
 	): Promise<PageBlock> => {
 		const response = await instance.post<ApiResponse<PageBlock>>(
 			`/pageBlock/${blockId}/database-views`,
 			input,
+			{ headers: getShareHeaders(shareToken) },
 		);
 
 		return response.data.data;
 	},
+
 	update: async (
 		blockId: string,
 		input: {
@@ -82,17 +103,21 @@ export const pageBlockApi = {
 			data_config?: PageBlockJson;
 			is_open?: boolean;
 		},
+		shareToken?: string,
 	): Promise<PageBlock> => {
 		const response = await instance.patch<ApiResponse<PageBlock>>(
 			`${PAGE_BLOCK_API}/${blockId}`,
 			input,
+			{ headers: getShareHeaders(shareToken) },
 		);
 
 		return response.data.data;
 	},
 
-	delete: async (blockId: string): Promise<void> => {
-		await instance.delete(`${PAGE_BLOCK_API}/${blockId}`);
+	delete: async (blockId: string, shareToken?: string): Promise<void> => {
+		await instance.delete(`${PAGE_BLOCK_API}/${blockId}`, {
+			headers: getShareHeaders(shareToken),
+		});
 	},
 
 	resolveBookmarkMetadata: async (

@@ -9,17 +9,22 @@ import {
 } from "@/shared/ui/breadcrumb";
 
 import { Separator } from "@/shared/ui/separator";
+
 import { DashboardHeader } from "@/widgets/dashboard-header";
+
 import { SidebarTrigger } from "@/widgets/workspace-sidebar/ui/sidebar";
 
 interface HeaderWorkspaceProps {
 	workspaceName?: string;
 	pageTitle?: string;
+
+	pageId?: string;
 }
 
 export function HeaderWorkspace({
 	workspaceName,
 	pageTitle,
+	pageId,
 }: HeaderWorkspaceProps) {
 	return (
 		<header className='flex h-10 shrink-0 items-center gap-2'>
@@ -57,7 +62,7 @@ export function HeaderWorkspace({
 			</div>
 
 			<div className='ml-auto px-3'>
-				<DashboardHeader />
+				<DashboardHeader pageId={pageId} />
 			</div>
 		</header>
 	);

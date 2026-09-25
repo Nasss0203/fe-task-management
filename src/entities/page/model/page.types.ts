@@ -17,6 +17,8 @@ export interface Page {
 
 	is_template: boolean;
 
+	canEdit: boolean;
+
 	created_by: string;
 
 	createdAt: string;
@@ -36,4 +38,16 @@ export interface CreatePageInput {
 	parent_page_id?: string | null;
 
 	title: string;
+}
+
+export interface UpdatePageInput {
+	title?: string;
+	slug?: string | null;
+	icon?: string | null;
+	cover_url?: string | null;
+}
+
+export interface MovePageInput {
+	parent_page_id: string | null;
+	teamspace_id: string | null;
 }

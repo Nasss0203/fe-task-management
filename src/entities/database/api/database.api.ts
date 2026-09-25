@@ -15,6 +15,16 @@ import type {
 
 const DATABASE_API = "/databases";
 
+function getShareHeaders(shareToken?: string) {
+	if (!shareToken) {
+		return undefined;
+	}
+
+	return {
+		"X-Page-Share-Token": shareToken,
+	};
+}
+
 export const databaseApi = {
 	createDatabase: async (
 		pageId: string,
@@ -32,10 +42,14 @@ export const databaseApi = {
 	getById: async (
 		databaseId: string,
 		signal?: AbortSignal,
+		shareToken?: string,
 	): Promise<Database> => {
 		const response = await instance.get<ApiResponse<Database>>(
 			`${DATABASE_API}/${databaseId}`,
-			{ signal },
+			{
+				signal,
+				headers: getShareHeaders(shareToken),
+			},
 		);
 
 		return response.data.data;
@@ -44,10 +58,14 @@ export const databaseApi = {
 	getViews: async (
 		databaseId: string,
 		signal?: AbortSignal,
+		shareToken?: string,
 	): Promise<DatabaseView[]> => {
 		const response = await instance.get<ApiResponse<DatabaseView[]>>(
 			`${DATABASE_API}/${databaseId}/views`,
-			{ signal },
+			{
+				signal,
+				headers: getShareHeaders(shareToken),
+			},
 		);
 
 		return response.data.data;
@@ -57,10 +75,14 @@ export const databaseApi = {
 		databaseId: string,
 		viewId: string,
 		signal?: AbortSignal,
+		shareToken?: string,
 	): Promise<DatabaseViewDetail> => {
 		const response = await instance.get<ApiResponse<DatabaseViewDetail>>(
 			`${DATABASE_API}/${databaseId}/views/${viewId}`,
-			{ signal },
+			{
+				signal,
+				headers: getShareHeaders(shareToken),
+			},
 		);
 
 		return response.data.data;
@@ -69,10 +91,14 @@ export const databaseApi = {
 	getRows: async (
 		databaseId: string,
 		signal?: AbortSignal,
+		shareToken?: string,
 	): Promise<DatabaseRow[]> => {
 		const response = await instance.get<ApiResponse<DatabaseRow[]>>(
 			`${DATABASE_API}/${databaseId}/rows`,
-			{ signal },
+			{
+				signal,
+				headers: getShareHeaders(shareToken),
+			},
 		);
 
 		return response.data.data;

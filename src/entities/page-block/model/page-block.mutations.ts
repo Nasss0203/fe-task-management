@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import { DatabaseViewType } from "@/entities/database/model/database.types";
 
@@ -12,6 +13,20 @@ import {
 	PageBlockType,
 } from "@/entities/page-block/model/page-block.types";
 import { pageBlockKeys } from "./page-block.queries";
+
+function blockListKey(pageId: string, shareToken?: string) {
+	return shareToken
+		? pageBlockKeys.sharedByPage(pageId, shareToken)
+		: pageBlockKeys.byPage(pageId);
+}
+
+function notifySharedWriteError(shareToken?: string) {
+	if (shareToken) {
+		toast.error(
+			"Unable to save this block change. Please check your access and try again.",
+		);
+	}
+}
 
 interface CreateDatabaseBlockInput {
 	pageId: string;
@@ -85,10 +100,11 @@ interface CreatePageBlockInput {
 	dataConfig?: PageBlockJson;
 }
 
-export function useCreatePageBlock() {
+export function useCreatePageBlock(shareToken?: string) {
 	const queryClient = useQueryClient();
 
 	return useMutation({
+		mutationKey: [...pageBlockKeys.all, "create", shareToken ?? null],
 		mutationFn: ({
 			pageId,
 			parentBlockId = null,
@@ -98,21 +114,26 @@ export function useCreatePageBlock() {
 			styleConfig = {},
 			dataConfig = {},
 		}: CreatePageBlockInput) =>
-			pageBlockApi.create({
-				page_id: pageId,
-				parent_block_id: parentBlockId,
-				after_block_id: afterBlockId,
-				type,
-				content,
-				style_config: styleConfig,
-				data_config: dataConfig,
-			}),
+			pageBlockApi.create(
+				{
+					page_id: pageId,
+					parent_block_id: parentBlockId,
+					after_block_id: afterBlockId,
+					type,
+					content,
+					style_config: styleConfig,
+					data_config: dataConfig,
+				},
+				shareToken,
+			),
 
 		onSuccess: async (_, variables) => {
 			await queryClient.invalidateQueries({
-				queryKey: pageBlockKeys.byPage(variables.pageId),
+				queryKey: blockListKey(variables.pageId, shareToken),
+				exact: true,
 			});
 		},
+		onError: () => notifySharedWriteError(shareToken),
 	});
 }
 
@@ -128,10 +149,11 @@ interface UpdatePageBlockInput {
 	isOpen?: boolean;
 }
 
-export function useUpdatePageBlock() {
+export function useUpdatePageBlock(shareToken?: string) {
 	const queryClient = useQueryClient();
 
 	return useMutation({
+		mutationKey: [...pageBlockKeys.all, "update", shareToken ?? null],
 		mutationFn: ({
 			blockId,
 			type,
@@ -141,20 +163,26 @@ export function useUpdatePageBlock() {
 			dataConfig,
 			isOpen,
 		}: UpdatePageBlockInput) =>
-			pageBlockApi.update(blockId, {
-				type,
-				title,
-				content,
-				style_config: styleConfig,
-				data_config: dataConfig,
-				is_open: isOpen,
-			}),
+			pageBlockApi.update(
+				blockId,
+				{
+					type,
+					title,
+					content,
+					style_config: styleConfig,
+					data_config: dataConfig,
+					is_open: isOpen,
+				},
+				shareToken,
+			),
 
-		onSuccess: (_, variables) => {
-			queryClient.invalidateQueries({
-				queryKey: pageBlockKeys.byPage(variables.pageId),
+		onSuccess: async (_, variables) => {
+			await queryClient.invalidateQueries({
+				queryKey: blockListKey(variables.pageId, shareToken),
+				exact: true,
 			});
 		},
+		onError: () => notifySharedWriteError(shareToken),
 	});
 }
 
@@ -218,18 +246,21 @@ interface DeletePageBlockInput {
 	pageId: string;
 }
 
-export function useDeletePageBlock() {
+export function useDeletePageBlock(shareToken?: string) {
 	const queryClient = useQueryClient();
 
 	return useMutation({
+		mutationKey: [...pageBlockKeys.all, "delete", shareToken ?? null],
 		mutationFn: ({ blockId }: DeletePageBlockInput) =>
-			pageBlockApi.delete(blockId),
+			pageBlockApi.delete(blockId, shareToken),
 
-		onSuccess: (_, variables) => {
-			queryClient.invalidateQueries({
-				queryKey: pageBlockKeys.byPage(variables.pageId),
+		onSuccess: async (_, variables) => {
+			await queryClient.invalidateQueries({
+				queryKey: blockListKey(variables.pageId, shareToken),
+				exact: true,
 			});
 		},
+		onError: () => notifySharedWriteError(shareToken),
 	});
 }
 

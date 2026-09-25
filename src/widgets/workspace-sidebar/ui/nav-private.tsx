@@ -1,42 +1,46 @@
 "use client";
 
-import { Ellipsis, Plus } from "lucide-react";
-
+import { Ellipsis, MoreHorizontal, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { buildPageTree } from "@/entities/page/lib/build-page-tree";
-import { useCreatePage } from "@/entities/page/model/page.mutations";
+import {
+	useCreatePage,
+	useMovePageToTrash,
+} from "@/entities/page/model/page.mutations";
 import type { Page } from "@/entities/page/model/page.types";
 import { PageTree } from "@/entities/page/ui/page-tree";
 
 import { CreatePageDialog } from "@/features/page/create-page/ui/create-page-dialog";
+import { PageActionsMenu } from "@/features/page/page-actions/ui/page-actions-menu";
 
 import { Button } from "@/shared/ui/button";
 
-import {
-	SidebarGroup,
-	SidebarGroupContent,
-	SidebarGroupLabel,
-	SidebarMenu,
-} from "@/widgets/workspace-sidebar/ui/sidebar";
+import { SidebarPageSection } from "@/widgets/workspace-sidebar/ui/sidebar-page-section";
+
+interface TeamspaceOption {
+	id: string;
+	name: string;
+}
 
 interface NavPrivatePagesProps {
 	workspaceId: string;
-
 	pages: Page[];
-
+	teamspaces: TeamspaceOption[];
 	activePageId?: string;
 }
 
 export function NavPrivatePages({
 	workspaceId,
 	pages,
+	teamspaces,
 	activePageId,
 }: NavPrivatePagesProps) {
 	const router = useRouter();
 
 	const createPageMutation = useCreatePage();
+	const movePageToTrashMutation = useMovePageToTrash();
 
 	const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
@@ -44,54 +48,26 @@ export function NavPrivatePages({
 		string | null
 	>(null);
 
-	/**
-	 * Lấy toàn bộ Private pages.
-	 *
-	 * Bao gồm:
-	 * - root pages
-	 * - child pages
-	 */
 	const privatePages = pages.filter((page) => page.teamspace_id === null);
 
-	/**
-	 * Flat list -> Tree.
-	 */
 	const privatePageTree = buildPageTree(privatePages);
 
-	/**
-	 * + ở header Private.
-	 *
-	 * Tạo root Page.
-	 */
 	const handleOpenCreateRootPage = () => {
 		setSelectedParentPageId(null);
-
 		setCreateDialogOpen(true);
 	};
 
-	/**
-	 * + cạnh Page.
-	 *
-	 * Tạo child Page.
-	 */
 	const handleOpenCreateChildPage = (parentPageId: string) => {
 		setSelectedParentPageId(parentPageId);
-
 		setCreateDialogOpen(true);
 	};
 
-	/**
-	 * Submit Create Page.
-	 */
 	const handleCreatePage = (title: string) => {
 		createPageMutation.mutate(
 			{
 				workspace_id: workspaceId,
-
 				teamspace_id: null,
-
 				parent_page_id: selectedParentPageId,
-
 				title,
 			},
 			{
@@ -106,9 +82,6 @@ export function NavPrivatePages({
 		);
 	};
 
-	/**
-	 * Reset context khi đóng dialog.
-	 */
 	const handleDialogOpenChange = (open: boolean) => {
 		setCreateDialogOpen(open);
 
@@ -117,73 +90,88 @@ export function NavPrivatePages({
 		}
 	};
 
-	const handleOpenPageActions = (page: Page) => {
-		console.log("Open page actions:", page);
+	const handleMovePageToTrash = (page: Page) => {
+		movePageToTrashMutation.mutate({
+			pageId: page.id,
+			workspaceId: page.workspace_id,
+		});
 	};
 
 	return (
-		<SidebarGroup>
-			{/* Private header */}
-			<div className='group/private flex items-center justify-between'>
-				<SidebarGroupLabel>Private</SidebarGroupLabel>
+		<>
+			<SidebarPageSection
+				title='Private'
+				headerActions={
+					<>
+						<Button
+							type='button'
+							variant='ghost'
+							size='icon'
+							className={[
+								"h-6 w-6",
+								"hover:bg-sidebar-accent",
+							].join(" ")}
+						>
+							<Ellipsis size={13} />
+						</Button>
 
-				<div className='flex items-center gap-0.5'>
-					{/* Private actions */}
-					<Button
-						type='button'
-						variant='ghost'
-						size='icon'
-						className={[
-							"hidden h-6 w-6",
-							"group-hover/private:flex",
-							"hover:bg-sidebar-accent",
-						].join(" ")}
-					>
-						<Ellipsis size={13} />
-					</Button>
-					{/* Create root Page */}
-					<Button
-						type='button'
-						variant='ghost'
-						size='icon'
-						disabled={createPageMutation.isPending}
-						className={[
-							"hidden h-6 w-6",
-							"group-hover/private:flex",
-							"hover:bg-sidebar-accent",
-						].join(" ")}
-						onClick={handleOpenCreateRootPage}
-					>
-						<Plus size={13} />
-					</Button>
-				</div>
-			</div>
+						<Button
+							type='button'
+							variant='ghost'
+							size='icon'
+							disabled={createPageMutation.isPending}
+							className={[
+								"h-6 w-6",
+								"hover:bg-sidebar-accent",
+							].join(" ")}
+							onClick={handleOpenCreateRootPage}
+						>
+							<Plus size={13} />
+						</Button>
+					</>
+				}
+			>
+				<PageTree
+					pages={privatePageTree}
+					activePageId={activePageId}
+					onOpenPage={(page) => {
+						router.push(`/page/${page.id}`);
+					}}
+					onCreateChild={(page) => {
+						handleOpenCreateChildPage(page.id);
+					}}
+					renderActions={(page) => (
+						<PageActionsMenu
+							page={page}
+							pages={pages}
+							teamspaces={teamspaces}
+							onMoveToTrash={handleMovePageToTrash}
+						>
+							<button
+								type='button'
+								aria-label='More page actions'
+								className={[
+									"flex size-6 shrink-0 items-center justify-center rounded-sm",
+									"text-muted-foreground",
+									"hover:bg-sidebar-accent-foreground/10",
+									"hover:text-sidebar-foreground",
+								].join(" ")}
+								onClick={(event) => {
+									event.stopPropagation();
+								}}
+							>
+								<MoreHorizontal className='size-3.5' />
+							</button>
+						</PageActionsMenu>
+					)}
+				/>
+			</SidebarPageSection>
 
-			{/* Pages */}
-			<SidebarGroupContent>
-				<SidebarMenu>
-					<PageTree
-						pages={privatePageTree}
-						activePageId={activePageId}
-						onOpenPage={(page) => {
-							router.push(`/page/${page.id}`);
-						}}
-						onCreateChild={(page) => {
-							handleOpenCreateChildPage(page.id);
-						}}
-						onOpenActions={(page) => {
-							handleOpenPageActions(page);
-						}}
-					/>
-				</SidebarMenu>
-			</SidebarGroupContent>
-
-			{/* Create Page */}
 			<CreatePageDialog
 				open={createDialogOpen}
 				onOpenChange={handleDialogOpenChange}
 				onCreate={handleCreatePage}
 			/>
-		</SidebarGroup>
+		</>
 	);
 }

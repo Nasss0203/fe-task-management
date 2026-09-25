@@ -30,6 +30,7 @@ import { usePageBlockEditor } from "@/widgets/page-block-editor/ui/page-block-ed
 
 interface CodeBlockEditorProps {
 	block: PageBlockNode;
+	shareToken?: string;
 }
 
 type CodeLanguage =
@@ -116,7 +117,7 @@ function getLanguage(block: PageBlockNode): CodeLanguage {
 	return "typescript";
 }
 
-export function CodeBlockEditor({ block }: CodeBlockEditorProps) {
+export function CodeBlockEditor({ block, shareToken }: CodeBlockEditorProps) {
 	const [value, setValue] = useState(() => getCode(block));
 
 	const [language, setLanguage] = useState<CodeLanguage>(() =>
@@ -127,9 +128,9 @@ export function CodeBlockEditor({ block }: CodeBlockEditorProps) {
 
 	const [copied, setCopied] = useState(false);
 
-	const updateBlock = useUpdatePageBlock();
+	const updateBlock = useUpdatePageBlock(shareToken);
 
-	const createBlock = useCreatePageBlock();
+	const createBlock = useCreatePageBlock(shareToken);
 
 	const { requestFocus } = usePageBlockEditor();
 

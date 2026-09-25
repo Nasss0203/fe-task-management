@@ -18,6 +18,7 @@ import { usePageBlockEditor } from "@/widgets/page-block-editor/ui/page-block-ed
 
 interface TextBlockEditorProps {
 	block: PageBlockNode;
+	shareToken?: string;
 }
 
 function getText(block: PageBlockNode): string {
@@ -36,10 +37,10 @@ function getText(block: PageBlockNode): string {
 	return "";
 }
 
-export function TextBlockEditor({ block }: TextBlockEditorProps) {
+export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 	const transformToDatabaseBlock = useTransformToDatabaseBlock();
-	const deleteBlock = useDeletePageBlock();
-	const createBlock = useCreatePageBlock();
+	const deleteBlock = useDeletePageBlock(shareToken);
+	const createBlock = useCreatePageBlock(shareToken);
 
 	const [value, setValue] = useState(() => getText(block));
 
@@ -47,7 +48,7 @@ export function TextBlockEditor({ block }: TextBlockEditorProps) {
 	const [commandOpen, setCommandOpen] = useState(false);
 	const [slashIndex, setSlashIndex] = useState<number | null>(null);
 
-	const updateBlock = useUpdatePageBlock();
+	const updateBlock = useUpdatePageBlock(shareToken);
 	const { focusBlockId, requestFocus, clearFocus, getPreviousBlockId } =
 		usePageBlockEditor();
 
@@ -107,6 +108,8 @@ export function TextBlockEditor({ block }: TextBlockEditorProps) {
 		setSlashIndex(null);
 
 		if (type === PageBlockType.DATABASE_VIEW) {
+			if (shareToken) return;
+
 			await transformToDatabaseBlock.mutateAsync({
 				blockId: block.id,
 				pageId: block.page_id,
@@ -289,7 +292,10 @@ export function TextBlockEditor({ block }: TextBlockEditorProps) {
           shadow-xl
         '
 				>
-					<PageBlockCommandMenu onSelect={handleSlashSelect} />
+					<PageBlockCommandMenu
+						onSelect={handleSlashSelect}
+						allowDatabase={!shareToken}
+					/>
 				</div>
 			)}
 		</div>

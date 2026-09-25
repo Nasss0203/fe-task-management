@@ -1,42 +1,49 @@
 "use client";
 
-import { ChevronRight, FileText, MoreHorizontal, Plus } from "lucide-react";
+import { ChevronRight, FileText, Plus } from "lucide-react";
+import type { ReactNode } from "react";
 import { useState } from "react";
 
-import type { PageTreeNode } from "../lib/build-page-tree";
+import type { PageTreeBase, PageTreeNode } from "../lib/build-page-tree";
 
-interface PageTreeProps {
-	pages: PageTreeNode[];
+interface PageTreeProps<T extends PageTreeBase> {
+	pages: PageTreeNode<T>[];
 
 	activePageId?: string;
 
-	onOpenPage: (page: PageTreeNode) => void;
+	onOpenPage: (page: PageTreeNode<T>) => void;
 
-	onCreateChild?: (page: PageTreeNode) => void;
+	onCreateChild?: (page: PageTreeNode<T>) => void;
 
-	onOpenActions?: (page: PageTreeNode) => void;
+	/**
+	 * Render action riêng của Page.
+	 *
+	 * Ví dụ:
+	 * PageActionsMenu
+	 */
+	renderActions?: (page: PageTreeNode<T>) => ReactNode;
 
 	depth?: number;
 }
 
-export function PageTree({
+export function PageTree<T extends PageTreeBase>({
 	pages,
 	activePageId,
 	onOpenPage,
 	onCreateChild,
-	onOpenActions,
+	renderActions,
 	depth = 0,
-}: PageTreeProps) {
+}: PageTreeProps<T>) {
 	return (
 		<div className='space-y-0.5'>
 			{pages.map((page) => (
-				<PageTreeItem
+				<PageTreeItem<T>
 					key={page.id}
 					page={page}
 					activePageId={activePageId}
 					onOpenPage={onOpenPage}
 					onCreateChild={onCreateChild}
-					onOpenActions={onOpenActions}
+					renderActions={renderActions}
 					depth={depth}
 				/>
 			))}
@@ -44,37 +51,34 @@ export function PageTree({
 	);
 }
 
-interface PageTreeItemProps {
-	page: PageTreeNode;
+interface PageTreeItemProps<T extends PageTreeBase> {
+	page: PageTreeNode<T>;
 
 	activePageId?: string;
 
-	onOpenPage: (page: PageTreeNode) => void;
+	onOpenPage: (page: PageTreeNode<T>) => void;
 
-	onCreateChild?: (page: PageTreeNode) => void;
+	onCreateChild?: (page: PageTreeNode<T>) => void;
 
-	onOpenActions?: (page: PageTreeNode) => void;
+	renderActions?: (page: PageTreeNode<T>) => ReactNode;
 
 	depth?: number;
 }
 
-function PageTreeItem({
+function PageTreeItem<T extends PageTreeBase>({
 	page,
 	activePageId,
 	onOpenPage,
 	onCreateChild,
-	onOpenActions,
+	renderActions,
 	depth = 0,
-}: PageTreeItemProps) {
+}: PageTreeItemProps<T>) {
 	const [expanded, setExpanded] = useState(true);
 
 	const hasChildren = page.children.length > 0;
 
 	const isActive = page.id === activePageId;
 
-	/**
-	 * Level càng sâu càng compact.
-	 */
 	const rowSizeClass =
 		depth === 0
 			? "h-8 text-sm"
@@ -101,13 +105,15 @@ function PageTreeItem({
 				className={[
 					"group/page flex items-center rounded-md",
 					rowSizeClass,
+
 					"hover:bg-sidebar-accent/60",
+
 					isActive
 						? "bg-sidebar-accent text-sidebar-accent-foreground"
 						: "",
 				].join(" ")}
 			>
-				{/* Page icon / Chevron */}
+				{/* Page Icon / Chevron */}
 				<button
 					type='button'
 					aria-label={
@@ -119,7 +125,9 @@ function PageTreeItem({
 					}
 					className={[
 						"group/icon relative flex shrink-0 items-center justify-center rounded-sm",
+
 						iconButtonSizeClass,
+
 						hasChildren
 							? "cursor-pointer hover:bg-sidebar-accent-foreground/10"
 							: "cursor-default",
@@ -134,10 +142,11 @@ function PageTreeItem({
 						setExpanded((current) => !current);
 					}}
 				>
-					{/* Page icon */}
+					{/* Page Icon */}
 					<span
 						className={[
 							"flex items-center justify-center",
+
 							hasChildren ? "group-hover/icon:hidden" : "",
 						].join(" ")}
 					>
@@ -150,21 +159,25 @@ function PageTreeItem({
 						)}
 					</span>
 
-					{/* Chevron chỉ hiện khi hover icon */}
+					{/* Hover icon -> Chevron */}
 					{hasChildren && (
 						<ChevronRight
 							className={[
 								iconSizeClass,
+
 								"absolute hidden",
+
 								"group-hover/icon:block",
+
 								"transition-transform duration-150",
+
 								expanded ? "rotate-90" : "",
 							].join(" ")}
 						/>
 					)}
 				</button>
 
-				{/* Page title */}
+				{/* Page Title */}
 				<button
 					type='button'
 					className='flex min-w-0 flex-1 items-center overflow-hidden text-left'
@@ -177,45 +190,33 @@ function PageTreeItem({
 					</span>
 				</button>
 
-				{/* Right actions */}
+				{/* Right Actions */}
 				<div
 					className={[
-						"mr-1 hidden shrink-0 items-center gap-0.5",
-						"group-hover/page:flex",
+						"mr-1 flex shrink-0 items-center gap-0.5",
+						"pointer-events-none opacity-0",
+						"group-hover/page:pointer-events-auto",
+						"group-hover/page:opacity-100",
+						"transition-opacity duration-100",
 					].join(" ")}
 				>
-					{/* More */}
-					{onOpenActions && (
-						<button
-							type='button'
-							aria-label='More page actions'
-							className={[
-								"flex shrink-0 items-center justify-center rounded-sm",
-								"text-muted-foreground",
-								"hover:bg-sidebar-accent-foreground/10",
-								"hover:text-sidebar-foreground",
-								actionButtonSizeClass,
-							].join(" ")}
-							onClick={(event) => {
-								event.stopPropagation();
+					{/* Page Actions Menu */}
+					{renderActions?.(page)}
 
-								onOpenActions(page);
-							}}
-						>
-							<MoreHorizontal className={actionIconSizeClass} />
-						</button>
-					)}
-
-					{/* Create child */}
+					{/* Create Child */}
 					{onCreateChild && (
 						<button
 							type='button'
 							aria-label='Create child page'
 							className={[
 								"flex shrink-0 items-center justify-center rounded-sm",
+
 								"text-muted-foreground",
+
 								"hover:bg-sidebar-accent-foreground/10",
+
 								"hover:text-sidebar-foreground",
+
 								actionButtonSizeClass,
 							].join(" ")}
 							onClick={(event) => {
@@ -233,12 +234,12 @@ function PageTreeItem({
 			{/* Children */}
 			{expanded && hasChildren && (
 				<div className='ml-4'>
-					<PageTree
+					<PageTree<T>
 						pages={page.children}
 						activePageId={activePageId}
 						onOpenPage={onOpenPage}
 						onCreateChild={onCreateChild}
-						onOpenActions={onOpenActions}
+						renderActions={renderActions}
 						depth={depth + 1}
 					/>
 				</div>

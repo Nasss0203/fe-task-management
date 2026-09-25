@@ -13,6 +13,7 @@ import { usePage } from "@/entities/page/model/page.queries";
 
 interface FileBlockEditorProps {
 	block: PageBlockNode;
+	shareToken?: string;
 }
 
 type FileContent = Record<string, unknown> & {
@@ -78,18 +79,18 @@ function formatFileSize(size: number): string {
 	return `${(size / (1024 * 1024 * 1024)).toFixed(1)} GB`;
 }
 
-export function FileBlockEditor({ block }: FileBlockEditorProps) {
+export function FileBlockEditor({ block, shareToken }: FileBlockEditorProps) {
 	const [content, setContent] = useState<FileContent>(() =>
 		getFileContent(block),
 	);
 
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
-	const { data: page } = usePage(block.page_id);
+	const { data: page } = usePage(block.page_id, !shareToken);
 
 	const uploadAttachment = useUploadAttachment();
 	const createDownloadUrl = useCreateAttachmentDownloadUrl();
-	const updateBlock = useUpdatePageBlock();
+	const updateBlock = useUpdatePageBlock(shareToken);
 
 	useEffect(() => {
 		setContent(getFileContent(block));
@@ -108,7 +109,7 @@ export function FileBlockEditor({ block }: FileBlockEditorProps) {
 	const handleUpload = async (event: ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0];
 
-		if (!file || !page?.workspace_id) {
+		if (shareToken || !file || !page?.workspace_id) {
 			return;
 		}
 
@@ -148,6 +149,7 @@ export function FileBlockEditor({ block }: FileBlockEditorProps) {
 				<input
 					ref={fileInputRef}
 					type='file'
+					disabled={Boolean(shareToken)}
 					className='hidden'
 					onChange={handleUpload}
 				/>
@@ -165,6 +167,7 @@ export function FileBlockEditor({ block }: FileBlockEditorProps) {
 								type='button'
 								disabled={
 									!page?.workspace_id ||
+									Boolean(shareToken) ||
 									uploadAttachment.isPending
 								}
 								onClick={() => fileInputRef.current?.click()}
@@ -183,6 +186,12 @@ export function FileBlockEditor({ block }: FileBlockEditorProps) {
 						</div>
 					</div>
 				</div>
+
+				{shareToken && (
+					<p className='mt-2 text-xs text-muted-foreground'>
+						File uploads are not supported through share links.
+					</p>
+				)}
 
 				{uploadAttachment.isError && (
 					<p className='mt-2 text-xs text-destructive'>

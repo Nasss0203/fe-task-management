@@ -10,6 +10,7 @@ import { usePage } from "@/entities/page/model/page.queries";
 
 interface ImageBlockEditorProps {
 	block: PageBlockNode;
+	shareToken?: string;
 }
 
 type ImageContent = Record<string, unknown> & {
@@ -46,7 +47,7 @@ function getImageContent(block: PageBlockNode): ImageContent {
 	};
 }
 
-export function ImageBlockEditor({ block }: ImageBlockEditorProps) {
+export function ImageBlockEditor({ block, shareToken }: ImageBlockEditorProps) {
 	const [content, setContent] = useState<ImageContent>(() =>
 		getImageContent(block),
 	);
@@ -55,9 +56,9 @@ export function ImageBlockEditor({ block }: ImageBlockEditorProps) {
 
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
-	const { data: page } = usePage(block.page_id);
+	const { data: page } = usePage(block.page_id, !shareToken);
 
-	const updateBlock = useUpdatePageBlock();
+	const updateBlock = useUpdatePageBlock(shareToken);
 	const uploadAttachment = useUploadAttachment();
 
 	useEffect(() => {
@@ -77,7 +78,7 @@ export function ImageBlockEditor({ block }: ImageBlockEditorProps) {
 	const handleUpload = async (event: ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0];
 
-		if (!file || !page?.workspace_id) {
+		if (shareToken || !file || !page?.workspace_id) {
 			return;
 		}
 
@@ -127,6 +128,7 @@ export function ImageBlockEditor({ block }: ImageBlockEditorProps) {
 				<input
 					ref={fileInputRef}
 					type='file'
+					disabled={Boolean(shareToken)}
 					accept='image/*'
 					className='hidden'
 					onChange={handleUpload}
@@ -182,6 +184,7 @@ export function ImageBlockEditor({ block }: ImageBlockEditorProps) {
 									type='button'
 									disabled={
 										!page?.workspace_id ||
+										Boolean(shareToken) ||
 										uploadAttachment.isPending
 									}
 									onClick={() =>
@@ -208,6 +211,12 @@ export function ImageBlockEditor({ block }: ImageBlockEditorProps) {
 							</div>
 						</div>
 					</div>
+				)}
+
+				{shareToken && (
+					<p className='mt-2 text-xs text-muted-foreground'>
+						File uploads are not supported through share links.
+					</p>
 				)}
 
 				{uploadAttachment.isError && (

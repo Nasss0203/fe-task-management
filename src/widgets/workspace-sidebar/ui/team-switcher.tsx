@@ -27,8 +27,12 @@ import {
 	DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
 
-import { Workspace } from "@/entities/workspace/model/workspace.types";
 import type { WorkspaceSubscription } from "@/entities/billing/model/billing.types";
+import type {
+	Workspace,
+	WorkspaceMembershipType,
+} from "@/entities/workspace/model/workspace.types";
+import { InviteWorkspaceMembersDialog } from "@/features/workspace-invite/ui/InviteWorkspaceMembersDialog";
 import {
 	SidebarMenu,
 	SidebarMenuButton,
@@ -39,6 +43,9 @@ interface TeamSwitcherProps {
 	workspaces: Workspace[];
 	currentWorkspaceId?: string;
 	subscription?: WorkspaceSubscription;
+	membershipType?: WorkspaceMembershipType;
+
+	canInviteMembers?: boolean;
 
 	user: {
 		email: string;
@@ -48,20 +55,23 @@ interface TeamSwitcherProps {
 	onCreateWorkspace?: () => void;
 	onLogout?: () => void;
 }
-
 export function TeamSwitcher({
 	workspaces,
 	currentWorkspaceId,
 	subscription,
+	membershipType,
 	user,
+	canInviteMembers = false,
 	onWorkspaceSelect,
 	onCreateWorkspace,
 	onLogout,
 }: TeamSwitcherProps) {
 	const router = useRouter();
 	const setSettingsOpen = useSettingsDialog((state) => state.setOpen);
+	const [inviteDialogOpen, setInviteDialogOpen] = React.useState(false);
 
 	const pendingSettingsOpen = React.useRef(false);
+	const isMember = membershipType === "MEMBER";
 
 	const activeWorkspace =
 		workspaces.find((workspace) => workspace.id === currentWorkspaceId) ??
@@ -101,7 +111,7 @@ export function TeamSwitcher({
 						side='bottom'
 						sideOffset={6}
 						onCloseAutoFocus={(event) => {
-							if (pendingSettingsOpen.current) {
+							if (isMember && pendingSettingsOpen.current) {
 								event.preventDefault();
 								pendingSettingsOpen.current = false;
 
@@ -144,29 +154,46 @@ export function TeamSwitcher({
 									Upgrade
 								</DropdownMenuItem>
 							)}
-
-							<DropdownMenuItem
-								className='gap-2 p-2'
-								onSelect={() => {
-									pendingSettingsOpen.current = true;
-								}}
-							>
-								<SettingsIcon className='size-4' />
-								Settings
-							</DropdownMenuItem>
-
-							<DropdownMenuItem className='gap-2 p-2'>
-								<Mail className='size-4' />
-								Invite members
-							</DropdownMenuItem>
-
-							<DropdownMenuItem className='gap-2 p-2'>
-								<UserPlus className='size-4' />
-								Add account
-							</DropdownMenuItem>
 						</div>
+						{isMember && (
+							<>
+								<div className='p-1'>
+									<DropdownMenuItem className='gap-2 p-2 text-blue-500 focus:text-blue-500'>
+										<ArrowUpCircle className='size-4' />
+										Upgrade
+									</DropdownMenuItem>
 
-						<DropdownMenuSeparator className='my-0' />
+									<DropdownMenuItem
+										className='gap-2 p-2'
+										onSelect={() => {
+											pendingSettingsOpen.current = true;
+										}}
+									>
+										<SettingsIcon className='size-4' />
+										Settings
+									</DropdownMenuItem>
+
+									{canInviteMembers && (
+										<DropdownMenuItem
+											className='gap-2 p-2'
+											onSelect={() =>
+												setInviteDialogOpen(true)
+											}
+										>
+											<Mail className='size-4' />
+											Invite members
+										</DropdownMenuItem>
+									)}
+
+									<DropdownMenuItem className='gap-2 p-2'>
+										<UserPlus className='size-4' />
+										Add account
+									</DropdownMenuItem>
+								</div>
+
+								<DropdownMenuSeparator className='my-0' />
+							</>
+						)}
 
 						{/* Account */}
 						<DropdownMenuLabel className='px-3 py-2 text-xs font-normal text-muted-foreground'>
@@ -200,13 +227,15 @@ export function TeamSwitcher({
 								);
 							})}
 
-							<DropdownMenuItem
-								className='gap-2 p-2 text-blue-500 focus:text-blue-500'
-								onSelect={onCreateWorkspace}
-							>
-								<Plus className='size-4' />
-								New workspace
-							</DropdownMenuItem>
+							{isMember && (
+								<DropdownMenuItem
+									className='gap-2 p-2 text-blue-500 focus:text-blue-500'
+									onSelect={onCreateWorkspace}
+								>
+									<Plus className='size-4' />
+									New workspace
+								</DropdownMenuItem>
+							)}
 						</div>
 
 						<DropdownMenuSeparator className='my-0' />
@@ -224,7 +253,14 @@ export function TeamSwitcher({
 				</DropdownMenu>
 			</SidebarMenuItem>
 
-			<SettingsDialog />
+			{isMember && <SettingsDialog workspaceId={activeWorkspace.id} />}
+			{isMember && (
+				<InviteWorkspaceMembersDialog
+					open={inviteDialogOpen}
+					onOpenChange={setInviteDialogOpen}
+					workspaceId={activeWorkspace.id}
+				/>
+			)}
 		</SidebarMenu>
 	);
 }

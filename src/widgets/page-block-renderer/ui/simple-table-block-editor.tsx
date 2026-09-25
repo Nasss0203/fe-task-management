@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 
 interface SimpleTableBlockEditorProps {
 	block: PageBlockNode;
+	shareToken?: string;
 }
 
 interface TableCell {
@@ -81,12 +82,12 @@ function getTableContent(block: PageBlockNode): SimpleTableContent {
 	return createDefaultTable();
 }
 
-export function SimpleTableBlockEditor({ block }: SimpleTableBlockEditorProps) {
+export function SimpleTableBlockEditor({ block, shareToken }: SimpleTableBlockEditorProps) {
 	const [table, setTable] = useState<SimpleTableContent>(() =>
 		getTableContent(block),
 	);
 
-	const updateBlock = useUpdatePageBlock();
+	const updateBlock = useUpdatePageBlock(shareToken);
 
 	useEffect(() => {
 		setTable(getTableContent(block));

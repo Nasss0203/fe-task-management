@@ -15,6 +15,7 @@ import { usePageBlockEditor } from "@/widgets/page-block-editor/ui/page-block-ed
 
 interface TodoBlockEditorProps {
 	block: PageBlockNode;
+	shareToken?: string;
 }
 
 function getTodoContent(block: PageBlockNode) {
@@ -40,7 +41,7 @@ function getTodoContent(block: PageBlockNode) {
 	};
 }
 
-export function TodoBlockEditor({ block }: TodoBlockEditorProps) {
+export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 	const initial = getTodoContent(block);
 
 	const [text, setText] = useState(initial.text);
@@ -49,9 +50,9 @@ export function TodoBlockEditor({ block }: TodoBlockEditorProps) {
 
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-	const updateBlock = useUpdatePageBlock();
+	const updateBlock = useUpdatePageBlock(shareToken);
 
-	const createBlock = useCreatePageBlock();
+	const createBlock = useCreatePageBlock(shareToken);
 
 	const { requestFocus } = usePageBlockEditor();
 
