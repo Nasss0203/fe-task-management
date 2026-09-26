@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
 import { isAxiosError } from "axios";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 import {
@@ -92,7 +92,9 @@ export default function BillingPage() {
 		workspaces[0]?.id;
 
 	const canCheckout =
-		Boolean(user && workspaceId) && !isWorkspacesLoading && !isWorkspacesError;
+		Boolean(user && workspaceId) &&
+		!isWorkspacesLoading &&
+		!isWorkspacesError;
 
 	async function handleCheckout(price: BillingPrice) {
 		if (checkoutLock.current) {
@@ -133,8 +135,8 @@ export default function BillingPage() {
 				</p>
 
 				<p className='mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900'>
-					Môi trường thử nghiệm cho đồ án. Thanh toán thẻ Stripe chỉ dùng thẻ
-					test, không nhập thông tin thẻ thật.
+					Môi trường thử nghiệm cho đồ án. Thanh toán thẻ Stripe chỉ
+					dùng thẻ test, không nhập thông tin thẻ thật.
 				</p>
 
 				{workspaceId && (
@@ -201,7 +203,9 @@ export default function BillingPage() {
 								key={plan.id}
 								className='flex flex-col rounded-xl border bg-card p-6 text-card-foreground'
 							>
-								<h2 className='text-2xl font-semibold'>{plan.name}</h2>
+								<h2 className='text-2xl font-semibold'>
+									{plan.name}
+								</h2>
 
 								<p className='mt-2 text-sm text-muted-foreground'>
 									{plan.description}
@@ -209,7 +213,9 @@ export default function BillingPage() {
 
 								<ul className='my-6 space-y-3 text-sm'>
 									{plan.features.map((feature) => (
-										<li key={feature.id}>{formatFeature(feature)}</li>
+										<li key={feature.id}>
+											{formatFeature(feature)}
+										</li>
 									))}
 								</ul>
 
@@ -227,21 +233,32 @@ export default function BillingPage() {
 											<button
 												key={price.id}
 												type='button'
-												disabled={!canCheckout || loadingPriceId !== null}
-												onClick={() => void handleCheckout(price)}
+												disabled={
+													!canCheckout ||
+													loadingPriceId !== null
+												}
+												onClick={() =>
+													void handleCheckout(price)
+												}
 												className='w-full rounded-lg border px-4 py-3 text-left transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50'
 											>
 												<span className='block font-medium'>
 													{loadingPriceId === price.id
 														? "Đang chuyển đến thanh toán..."
-														: price.provider === "STRIPE"
+														: price.provider ===
+															  "STRIPE"
 															? "Thẻ Visa/Mastercard · Stripe test"
 															: "Chuyển khoản QR · SePay"}
 												</span>
 
 												<span className='mt-1 block text-sm text-muted-foreground'>
-													{formatPrice(price.amount, price.currency)}
-													{interval === "MONTHLY" ? " / tháng" : " / năm"}
+													{formatPrice(
+														price.amount,
+														price.currency,
+													)}
+													{interval === "MONTHLY"
+														? " / tháng"
+														: " / năm"}
 												</span>
 											</button>
 										))

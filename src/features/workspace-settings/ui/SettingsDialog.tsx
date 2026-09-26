@@ -13,9 +13,19 @@ import WorkspaceSection from "./sections/WorkspaceSection";
 
 interface SettingsDialogProps {
 	workspaceId: string;
+	currentUserId: string;
+	canInviteMembers?: boolean;
+	canUpdateMemberRole?: boolean;
+	canRemoveMember?: boolean;
 }
 
-const SettingsDialog = ({ workspaceId }: SettingsDialogProps) => {
+const SettingsDialog = ({
+	workspaceId,
+	currentUserId,
+	canInviteMembers = false,
+	canUpdateMemberRole = false,
+	canRemoveMember = false,
+}: SettingsDialogProps) => {
 	const { open, setOpen, section } = useSettingsDialog();
 
 	return (
@@ -41,7 +51,13 @@ const SettingsDialog = ({ workspaceId }: SettingsDialogProps) => {
 						</div>
 					)}
 					{section === "members" && (
-						<MembersSection workspaceId={workspaceId} />
+						<MembersSection
+							workspaceId={workspaceId}
+							currentUserId={currentUserId}
+							canInviteMembers={canInviteMembers}
+							canUpdateMemberRole={canUpdateMemberRole}
+							canRemoveMember={canRemoveMember}
+						/>
 					)}
 				</div>
 			</DialogContent>

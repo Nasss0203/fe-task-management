@@ -55,7 +55,10 @@ import { NavTeamspaces } from "./nav-teamspaces";
  * Nếu backend của bạn trả string khác,
  * chỉ cần sửa constant này.
  */
-const WORKSPACE_MEMBER_ADD_PERMISSION = "WORKSPACE_MEMBER_ADD";
+const WORKSPACE_MEMBER_ADD_PERMISSION = "workspace.member.add";
+const WORKSPACE_MEMBER_UPDATE_ROLE_PERMISSION =
+	"workspace.member.update_role";
+const WORKSPACE_MEMBER_REMOVE_PERMISSION = "workspace.member.remove";
 
 const data = {
 	teams: {
@@ -189,6 +192,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const canInviteMembers =
 		isMember &&
 		workspacePermissions.includes(WORKSPACE_MEMBER_ADD_PERMISSION);
+	const canUpdateMemberRole =
+		isMember &&
+		workspacePermissions.includes(WORKSPACE_MEMBER_UPDATE_ROLE_PERMISSION);
+	const canRemoveMember =
+		isMember &&
+		workspacePermissions.includes(WORKSPACE_MEMBER_REMOVE_PERMISSION);
 
 	const isAccessLoading =
 		isLoading ||
@@ -282,7 +291,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 							subscription={workspaceSubscription}
 							membershipType={membershipType}
 							canInviteMembers={canInviteMembers}
+							canUpdateMemberRole={canUpdateMemberRole}
+							canRemoveMember={canRemoveMember}
 							user={{
+								id: user?.id ?? "",
 								email: user?.email ?? "",
 							}}
 							onWorkspaceSelect={handleWorkspaceSelect}

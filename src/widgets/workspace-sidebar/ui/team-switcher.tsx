@@ -46,8 +46,11 @@ interface TeamSwitcherProps {
 	membershipType?: WorkspaceMembershipType;
 
 	canInviteMembers?: boolean;
+	canUpdateMemberRole?: boolean;
+	canRemoveMember?: boolean;
 
 	user: {
+		id?: string;
 		email: string;
 	};
 
@@ -62,6 +65,8 @@ export function TeamSwitcher({
 	membershipType,
 	user,
 	canInviteMembers = false,
+	canUpdateMemberRole = false,
+	canRemoveMember = false,
 	onWorkspaceSelect,
 	onCreateWorkspace,
 	onLogout,
@@ -253,7 +258,15 @@ export function TeamSwitcher({
 				</DropdownMenu>
 			</SidebarMenuItem>
 
-			{isMember && <SettingsDialog workspaceId={activeWorkspace.id} />}
+			{isMember && (
+				<SettingsDialog
+					workspaceId={activeWorkspace.id}
+					currentUserId={user.id ?? ""}
+					canInviteMembers={canInviteMembers}
+					canUpdateMemberRole={canUpdateMemberRole}
+					canRemoveMember={canRemoveMember}
+				/>
+			)}
 			{isMember && (
 				<InviteWorkspaceMembersDialog
 					open={inviteDialogOpen}
@@ -274,6 +287,8 @@ function WorkspaceIcon({
 }) {
 	return (
 		<div
+			role='img'
+			aria-label={`${name} workspace`}
 			className={
 				size === "lg"
 					? "flex size-9 shrink-0 items-center justify-center rounded-md border bg-background text-lg"
