@@ -7,15 +7,25 @@ import {
 	VideoIcon,
 } from "lucide-react";
 
-import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-tree";
 import { getDatabaseViewConfig } from "@/entities/page-block/lib/get-database-view-config";
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
 import { Separator } from "@/shared/ui/separator";
 import { ReadOnlyDatabaseViewBlock } from "@/widgets/database-view/ui/read-only-database-view-block";
 
+export interface ReadOnlyPageBlockNode {
+	id: string;
+	type: PageBlockType;
+	content: unknown;
+	style_config: Record<string, unknown> | null;
+	data_config: unknown;
+	is_open: boolean;
+	children: ReadOnlyPageBlockNode[];
+}
+
 interface ReadOnlyPageBlockRendererProps {
-	block: PageBlockNode;
+	block: ReadOnlyPageBlockNode;
 	shareToken?: string;
+	disableDatabaseView?: boolean;
 }
 
 interface SimpleTableCell {
@@ -28,9 +38,13 @@ interface SimpleTableRow {
 	cells?: SimpleTableCell[];
 }
 
-function getContent(block: PageBlockNode): Record<string, unknown> {
-	if (block.content && !Array.isArray(block.content)) {
-		return block.content;
+function getContent(block: ReadOnlyPageBlockNode): Record<string, unknown> {
+	if (
+		block.content &&
+		typeof block.content === "object" &&
+		!Array.isArray(block.content)
+	) {
+		return block.content as Record<string, unknown>;
 	}
 
 	return {};
@@ -195,6 +209,7 @@ function ReadOnlyTodoBlock({ block }: ReadOnlyPageBlockRendererProps) {
 function ReadOnlyToggleBlock({
 	block,
 	shareToken,
+	disableDatabaseView,
 }: ReadOnlyPageBlockRendererProps) {
 	const text = getString(getContent(block), "text");
 
@@ -221,6 +236,7 @@ function ReadOnlyToggleBlock({
 							key={child.id}
 							block={child}
 							shareToken={shareToken}
+							disableDatabaseView={disableDatabaseView}
 						/>
 					))}
 				</div>
@@ -456,6 +472,7 @@ function ReadOnlyBookmarkBlock({ block }: ReadOnlyPageBlockRendererProps) {
 export function ReadOnlyPageBlockRenderer({
 	block,
 	shareToken,
+	disableDatabaseView = false,
 }: ReadOnlyPageBlockRendererProps) {
 	switch (block.type) {
 		case PageBlockType.TEXT:
@@ -468,7 +485,11 @@ export function ReadOnlyPageBlockRenderer({
 			return <ReadOnlyTodoBlock block={block} />;
 		case PageBlockType.TOGGLE:
 			return (
-				<ReadOnlyToggleBlock block={block} shareToken={shareToken} />
+				<ReadOnlyToggleBlock
+					block={block}
+					shareToken={shareToken}
+					disableDatabaseView={disableDatabaseView}
+				/>
 			);
 		case PageBlockType.QUOTE:
 			return <ReadOnlyQuoteBlock block={block} />;
@@ -485,6 +506,14 @@ export function ReadOnlyPageBlockRenderer({
 		case PageBlockType.BOOKMARK:
 			return <ReadOnlyBookmarkBlock block={block} />;
 		case PageBlockType.DATABASE_VIEW: {
+			if (disableDatabaseView) {
+				return (
+					<div className='rounded-md border border-dashed p-3 text-sm text-muted-foreground'>
+						Database views are not available on public pages.
+					</div>
+				);
+			}
+
 			const config = getDatabaseViewConfig(block);
 
 			if (!config) {

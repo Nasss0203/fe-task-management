@@ -1,22 +1,31 @@
 import {
 	PageBlockType,
 	type DatabaseViewBlockDataConfig,
-	type PageBlock,
 } from "../model/page-block.types";
 
+interface DatabaseViewConfigSource {
+	type: PageBlockType;
+	data_config: unknown;
+}
+
 export function getDatabaseViewConfig(
-	block: PageBlock,
+	block: DatabaseViewConfigSource,
 ): DatabaseViewBlockDataConfig | null {
 	if (block.type !== PageBlockType.DATABASE_VIEW) {
 		return null;
 	}
 
-	if (!block.data_config) {
+	if (
+		!block.data_config ||
+		typeof block.data_config !== "object" ||
+		Array.isArray(block.data_config)
+	) {
 		return null;
 	}
 
-	const databaseId = block.data_config.database_id;
-	const viewId = block.data_config.view_id;
+	const dataConfig = block.data_config as Record<string, unknown>;
+	const databaseId = dataConfig.database_id;
+	const viewId = dataConfig.view_id;
 
 	if (typeof databaseId !== "string" || typeof viewId !== "string") {
 		return null;

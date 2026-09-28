@@ -13,12 +13,12 @@ import {
 	usePageShareSetting,
 } from "@/entities/page-share/model/page-share.queries";
 
-import type {
-	PageShareCandidate,
-	PageShareMember,
-} from "@/entities/page-share/model/page-share.types";
+import type { PageShareMember } from "@/entities/page-share/model/page-share.types";
+
+import { PagePublishTab } from "@/features/page-publish/ui/PagePublishTab";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
+import { Tabs, TabsContent } from "@/shared/ui/tabs";
 
 import { GeneralAccessSection } from "./GeneralAccessSection";
 import { PeopleWithAccess } from "./PeopleWithAccess";
@@ -26,17 +26,7 @@ import { ShareInviteForm } from "./ShareInviteForm";
 import { SharePopoverFooter } from "./SharePopoverFooter";
 import { SharePopoverHeader } from "./SharePopoverHeader";
 
-/**
- * Mapping giữa access level của backend
- * và AccessLevelMenu trên frontend.
- */
-
-const selectStyle = "border-[#414141] bg-[#2b2b2b] text-white";
-
 const emptyShares: PageShareMember[] = [];
-
-const userName = (user: PageShareCandidate) =>
-	user.displayName?.trim() || user.username?.trim() || user.email;
 
 interface ShareButtonProps {
 	pageId: string;
@@ -99,50 +89,57 @@ export default function ShareButton({ pageId }: ShareButtonProps) {
 				sideOffset={8}
 				className='w-[calc(100vw-2rem)] overflow-visible rounded-xl border-[#3d3d3d] bg-[#252525] p-0 text-[#f1f1f1] shadow-xl sm:w-[500px]'
 			>
-				{/* Header */}
-				<SharePopoverHeader />
+				<Tabs defaultValue='share' className='gap-0'>
+					<SharePopoverHeader />
 
-				<div className='space-y-4 px-4 py-4'>
-					{/* Direct Share */}
-					<ShareInviteForm
-						pageId={pageId}
-						shares={pageShares}
-						canAdd={canAddShares}
-						canGrantFullAccess={canManageShares}
-					/>
+					<TabsContent value='share'>
+						<div className='space-y-4 px-4 py-4'>
+							{/* Direct Share */}
+							<ShareInviteForm
+								pageId={pageId}
+								shares={pageShares}
+								canAdd={canAddShares}
+								canGrantFullAccess={canManageShares}
+							/>
 
-					{/* People with access */}
-					<PeopleWithAccess
-						shares={pageShares}
-						effectiveAccessLevel={effectiveAccessLevel}
-						canManage={canManageShares}
-						isPending={isSharesPending}
-						isError={isSharesError}
-						isUpdating={updateShareAccess.isPending}
-						isUpdateError={updateShareAccess.isError}
-						onChangeAccess={(shareId, accessLevel) => {
-							updateShareAccess.mutate({
-								shareId,
-								accessLevel,
-							});
-						}}
-					/>
-					{/* General Access */}
-					<GeneralAccessSection
-						setting={shareSetting}
-						canManage={canManageShares}
-						isPending={isSettingPending}
-						isError={isSettingError}
-						isUpdating={updateSetting.isPending}
-						isUpdateError={updateSetting.isError}
-						onUpdate={(payload) => {
-							updateSetting.mutate(payload);
-						}}
-					/>
-				</div>
+							{/* People with access */}
+							<PeopleWithAccess
+								shares={pageShares}
+								effectiveAccessLevel={effectiveAccessLevel}
+								canManage={canManageShares}
+								isPending={isSharesPending}
+								isError={isSharesError}
+								isUpdating={updateShareAccess.isPending}
+								isUpdateError={updateShareAccess.isError}
+								onChangeAccess={(shareId, accessLevel) => {
+									updateShareAccess.mutate({
+										shareId,
+										accessLevel,
+									});
+								}}
+							/>
+							{/* General Access */}
+							<GeneralAccessSection
+								setting={shareSetting}
+								canManage={canManageShares}
+								isPending={isSettingPending}
+								isError={isSettingError}
+								isUpdating={updateSetting.isPending}
+								isUpdateError={updateSetting.isError}
+								onUpdate={(payload) => {
+									updateSetting.mutate(payload);
+								}}
+							/>
+						</div>
 
-				{/* Footer */}
-				<SharePopoverFooter pageId={pageId} />
+						{/* Footer */}
+						<SharePopoverFooter pageId={pageId} />
+					</TabsContent>
+
+					<TabsContent value='publish'>
+						<PagePublishTab pageId={pageId} />
+					</TabsContent>
+				</Tabs>
 			</PopoverContent>
 		</Popover>
 	);
