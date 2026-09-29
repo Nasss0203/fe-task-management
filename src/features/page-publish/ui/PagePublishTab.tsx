@@ -3,13 +3,17 @@
 import { isAxiosError } from "axios";
 import { Check, ExternalLink, Globe2, Link2, RotateCcw } from "lucide-react";
 import { useState, type FormEvent } from "react";
+import { buildPublicSiteUrl } from "@/entities/page-publication/lib/build-public-site-url";
+import { usePage } from "@/entities/page/model/page.queries";
+import { PublishPageToSiteForm } from "./PublishPageToSiteForm";
 
 import {
 	usePublishPage,
+	usePublishPageToSite,
 	useRepublishPage,
 	useUnpublishPage,
 } from "@/entities/page-publication/model/page-publication.mutations";
-import { usePagePublication } from "@/entities/page-publication/model/page-publication.queries";
+import { usePagePublication, useWorkspacePublishedSites } from "@/entities/page-publication/model/page-publication.queries";
 import { getFriendlyApiErrorMessage } from "@/shared/lib/api-error-message";
 import {
 	AlertDialog,
@@ -45,50 +49,6 @@ function getPublicationErrorMessage(error: unknown, fallback: string) {
 	return getFriendlyApiErrorMessage(error, fallback);
 }
 
-function buildPublicPath(subdomain: string, path?: string) {
-	const publicPath = path && path !== "/" ? `/${path.replace(/^\/+/, "")}` : "";
-
-	return `/public/${encodeURIComponent(subdomain)}${publicPath}`;
-}
-
-function getConfiguredAppDomain() {
-	const value = process.env.NEXT_PUBLIC_APP_DOMAIN?.trim().toLowerCase();
-
-	if (!value) return null;
-
-	const domain = value.replace(/:\d+$/, "").replace(/\.$/, "");
-
-	if (!domain || domain.includes("/") || domain.includes(":")) {
-		return null;
-	}
-
-	return domain;
-}
-
-function isLocalHostname(hostname: string) {
-	return (
-		hostname === "localhost" ||
-		hostname.endsWith(".localhost") ||
-		hostname === "127.0.0.1" ||
-		hostname === "[::1]"
-	);
-}
-
-function buildAbsolutePublicUrl(subdomain: string, path?: string) {
-	const currentUrl = new URL(window.location.origin);
-	const appDomain = getConfiguredAppDomain();
-
-	if (!appDomain || isLocalHostname(currentUrl.hostname)) {
-		return new URL(buildPublicPath(subdomain, path), currentUrl).toString();
-	}
-
-	currentUrl.hostname = `${subdomain}.${appDomain}`;
-	currentUrl.pathname =
-		path && path !== "/" ? `/${path.replace(/^\/+/, "")}` : "/";
-
-	return currentUrl.toString();
-}
-
 function PublicationLoadingState() {
 	return (
 		<div className='space-y-4 px-4 py-5' role='status' aria-label='Loading publication status'>
@@ -106,11 +66,21 @@ function PublicationLoadingState() {
 
 export function PagePublishTab({ pageId }: PagePublishTabProps) {
 	const publicationQuery = usePagePublication(pageId);
-	const publishPage = usePublishPage(pageId);
+	const pageQuery = usePage(pageId);
+	const workspaceId = pageQuery.data?.workspace_id;
+	const sitesQuery = useWorkspacePublishedSites(
+		publicationQuery.data && !publicationQuery.data.site_id && !publicationQuery.data.published
+			? workspaceId : undefined,
+	);
+	const publishPage = usePublishPage(pageId, workspaceId);
+	const publishPageToSite = usePublishPageToSite(pageId, workspaceId);
 	const unpublishPage = useUnpublishPage(pageId);
 	const republishPage = useRepublishPage(pageId);
 
 	const [subdomain, setSubdomain] = useState("");
+	const [mode, setMode] = useState<"new" | "existing">("new");
+	const hasNoSites = sitesQuery.isSuccess && sitesQuery.data.length === 0;
+	const activeMode = hasNoSites ? "new" : mode;
 	const [formError, setFormError] = useState<string | null>(null);
 	const [actionError, setActionError] = useState<string | null>(null);
 	const [copyError, setCopyError] = useState<string | null>(null);
@@ -146,7 +116,7 @@ export function PagePublishTab({ pageId }: PagePublishTabProps) {
 	const publication = publicationQuery.data;
 	const hasExistingSite = Boolean(publication.site_id && publication.subdomain);
 	const publicPath = publication.subdomain
-		? buildPublicPath(publication.subdomain, publication.path)
+		? buildPublicSiteUrl({ subdomain: publication.subdomain, path: publication.path })
 		: null;
 
 	const handleCopyLink = async () => {
@@ -157,7 +127,7 @@ export function PagePublishTab({ pageId }: PagePublishTabProps) {
 
 		try {
 			await navigator.clipboard.writeText(
-				buildAbsolutePublicUrl(publication.subdomain, publication.path),
+				publicPath,
 			);
 			setCopied(true);
 
@@ -173,7 +143,7 @@ export function PagePublishTab({ pageId }: PagePublishTabProps) {
 		if (!publication.subdomain || !publicPath) return;
 
 		window.open(
-			buildAbsolutePublicUrl(publication.subdomain, publication.path),
+			publicPath,
 			"_blank",
 			"noopener,noreferrer",
 		);
@@ -233,6 +203,15 @@ export function PagePublishTab({ pageId }: PagePublishTabProps) {
 		}
 	};
 
+	const handlePublishToSite = async (siteId: string, path: string) => {
+		setFormError(null);
+		try {
+			await publishPageToSite.mutateAsync({ siteId, path });
+		} catch (error) {
+			setFormError(getPublicationErrorMessage(error, "Unable to publish this page."));
+		}
+	};
+
 	const handleRepublish = async () => {
 		if (republishPage.isPending) return;
 
@@ -262,6 +241,7 @@ export function PagePublishTab({ pageId }: PagePublishTabProps) {
 		return (
 			<>
 				<div className='space-y-4 px-4 py-5'>
+					<p className='text-sm font-medium'>Published</p>
 					<div className='flex items-start gap-3 rounded-lg border border-border p-3'>
 						<div className='flex size-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground'>
 							<Globe2 className='size-4' />
@@ -409,10 +389,21 @@ export function PagePublishTab({ pageId }: PagePublishTabProps) {
 		);
 	}
 
-	const previewPath = buildPublicPath(subdomain.trim().toLowerCase() || "your-site");
+	const previewPath = buildPublicSiteUrl({ subdomain: subdomain.trim().toLowerCase() || "your-site" });
 
 	return (
-		<form className='space-y-4 px-4 py-5' onSubmit={handlePublish}>
+		<div className='space-y-4 px-4 py-5'>
+			<div role='group' aria-label='Publication mode' className='flex gap-2'>
+				<Button type='button' size='sm' variant={activeMode === "new" ? "default" : "outline"} aria-pressed={activeMode === "new"} disabled={publishPage.isPending || publishPageToSite.isPending} onClick={() => { setMode("new"); setFormError(null); }}>Create new site</Button>
+				<Button type='button' size='sm' variant={activeMode === "existing" ? "default" : "outline"} aria-pressed={activeMode === "existing"} disabled={hasNoSites || publishPage.isPending || publishPageToSite.isPending} onClick={() => { setMode("existing"); setFormError(null); }}>Add to existing site</Button>
+			</div>
+			{hasNoSites ? <p className='text-xs text-muted-foreground'>No published sites yet. Create a new site first.</p> : null}
+			{activeMode === "existing" ? (
+				pageQuery.isPending ? <PublicationLoadingState /> :
+				pageQuery.isError ? <div className='space-y-2'><p role='alert' className='text-sm text-destructive'>Unable to load workspace information.</p><Button type='button' variant='outline' onClick={() => void pageQuery.refetch()}>Try again</Button></div> :
+				<PublishPageToSiteForm workspaceId={workspaceId} sitesQuery={sitesQuery} isPending={publishPageToSite.isPending} error={formError} onPublish={handlePublishToSite} onChange={() => setFormError(null)} />
+			) : (
+		<form className='space-y-4' onSubmit={handlePublish}>
 			<div className='space-y-1'>
 				<h2 className='text-sm font-medium'>Publish this page to the web</h2>
 				<p className='text-xs text-muted-foreground'>
@@ -455,5 +446,7 @@ export function PagePublishTab({ pageId }: PagePublishTabProps) {
 				</Button>
 			</div>
 		</form>
+			)}
+		</div>
 	);
 }

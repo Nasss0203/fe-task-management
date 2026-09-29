@@ -7,7 +7,20 @@ export const pagePublicationKeys = {
 
 	detail: (pageId: string) =>
 		[...pagePublicationKeys.all, "detail", pageId] as const,
+	workspaceSites: (workspaceId: string) =>
+		[...pagePublicationKeys.all, "workspace-sites", workspaceId] as const,
+	sitePublications: (siteId: string) =>
+		[...pagePublicationKeys.all, "site-publications", siteId] as const,
 };
+
+export function useWorkspacePublishedSites(workspaceId?: string) {
+	return useQuery({
+		queryKey: pagePublicationKeys.workspaceSites(workspaceId ?? ""),
+		queryFn: ({ signal }) =>
+			pagePublicationApi.listWorkspacePublishedSites(workspaceId!, signal),
+		enabled: Boolean(workspaceId),
+	});
+}
 
 export function usePagePublication(pageId?: string) {
 	return useQuery({

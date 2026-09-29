@@ -3,6 +3,8 @@ import instance from "@/shared/api/api-client";
 
 import type {
 	PagePublicationStatus,
+	PublishedSiteSummary,
+	PublishPageToSitePayload,
 	PublishSitePayload,
 	PublishSiteResponse,
 	UnpublishSiteResponse,
@@ -11,6 +13,27 @@ import type {
 const PAGE_API = "/page";
 
 export const pagePublicationApi = {
+	listWorkspacePublishedSites: async (
+		workspaceId: string,
+		signal?: AbortSignal,
+	): Promise<PublishedSiteSummary[]> => {
+		const response = await instance.get<ApiResponse<PublishedSiteSummary[]>>(
+			`/workspaces/${workspaceId}/published-sites`,
+			{ signal },
+		);
+		return response.data.data;
+	},
+
+	publishPageToSite: async (
+		siteId: string,
+		payload: PublishPageToSitePayload,
+	): Promise<PublishSiteResponse> => {
+		const response = await instance.post<ApiResponse<PublishSiteResponse>>(
+			`/published-sites/${siteId}/publications`, payload,
+		);
+		return response.data.data;
+	},
+
 	getPagePublication: async (
 		pageId: string,
 		signal?: AbortSignal,
