@@ -10,6 +10,7 @@ const directRoot: PagePublication = {
 	parent_publication_id: null,
 	path: "/",
 	publication_type: "DIRECT",
+	visibility_override: null,
 	include_descendants: true,
 	published: true,
 	published_at: "2026-09-30T00:00:00Z",
@@ -24,6 +25,7 @@ const directHistoricalChild: PagePublication = {
 	parent_publication_id: null,
 	path: "/",
 	publication_type: "DIRECT",
+	visibility_override: null,
 	include_descendants: false,
 	published: false,
 	published_at: "2026-09-01T00:00:00Z",
@@ -38,6 +40,7 @@ const inheritedChild: PagePublication = {
 	parent_publication_id: "pub-1",
 	path: "/about",
 	publication_type: "INHERITED",
+	visibility_override: null,
 	include_descendants: true,
 	published: true,
 	published_at: "2026-09-30T00:00:00Z",
@@ -80,6 +83,15 @@ describe("getCurrentPagePublication", () => {
 			publications: [inheritedChild],
 		});
 		expect(result).toBe(inheritedChild);
+	});
+
+	it("returns private INHERITED publication for a child toggle", () => {
+		const privateChild = { ...inheritedChild, published: false, visibility_override: "UNPUBLISHED" as const };
+		expect(getCurrentPagePublication({
+			isRootPage: false,
+			publicSubdomain: null,
+			publications: [privateChild],
+		})).toBe(privateChild);
 	});
 
 	it("ignores historical DIRECT publication for child page and returns active INHERITED", () => {

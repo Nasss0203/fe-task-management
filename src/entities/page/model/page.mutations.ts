@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { pageApi } from "../api/page.api";
 import { pageKeys } from "./page.queries";
+import { pagePublicationKeys } from "@/entities/page-publication/model/page-publication.queries";
 import type {
 	CreatePageInput,
 	MovePageInput,
@@ -209,6 +210,9 @@ export function useMovePage() {
 
 				queryClient.invalidateQueries({
 					queryKey: pageKeys.detail(variables.pageId),
+				}),
+				queryClient.invalidateQueries({
+					queryKey: pagePublicationKeys.all,
 				}),
 			]);
 		},

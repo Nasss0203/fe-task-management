@@ -6,6 +6,7 @@ export type PagePublicationStatus = {
 	page_id?: string;
 
 	subdomain?: string;
+	site_active?: boolean;
 
 	path?: string;
 
@@ -32,6 +33,7 @@ export type PagePublication = {
 	published: boolean;
 	published_at: string | null;
 	unpublished_at: string | null;
+	visibility_override: "PUBLISHED" | "UNPUBLISHED" | null;
 };
 
 export type PublishSiteResponse = {

@@ -10,8 +10,9 @@ import {
 	useRepublishPage,
 	useUnpublishPage,
 	useUpdatePublicationSettings,
+	useUpdatePageVisibility,
 } from "@/entities/page-publication/model/page-publication.mutations";
-import { usePagePublications } from "@/entities/page-publication/model/page-publication.queries";
+import { usePagePublication, usePagePublications } from "@/entities/page-publication/model/page-publication.queries";
 import { usePage } from "@/entities/page/model/page.queries";
 import { getFriendlyApiErrorMessage } from "@/shared/lib/api-error-message";
 import {
@@ -40,15 +41,17 @@ function getErrorMessage(error: unknown, fallback: string): string {
 export function PagePublishTab({ pageId }: { pageId: string }) {
 	const pageQuery = usePage(pageId);
 	const publicationsQuery = usePagePublications(pageId);
+	const statusQuery = usePagePublication(pageQuery.data?.parent_page_id ? pageId : undefined);
 
 	const publishPage = usePublishPage(pageId);
 	const unpublishPage = useUnpublishPage(pageId);
 	const republishPage = useRepublishPage(pageId);
 	const updateSettings = useUpdatePublicationSettings(pageId);
+	const updateVisibility = useUpdatePageVisibility(pageId);
 
 	const [copied, setCopied] = useState(false);
 	const [confirmUnpublish, setConfirmUnpublish] = useState(false);
-	const [initialIncludeDescendants, setInitialIncludeDescendants] = useState(true);
+	const [draftIncludeDescendants, setDraftIncludeDescendants] = useState<boolean | null>(null);
 	const [formError, setFormError] = useState<string | null>(null);
 
 	const page = pageQuery.data;
@@ -61,20 +64,24 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 		publications,
 	});
 
-	const isPublished = Boolean(currentPublication && currentPublication.published);
+	const isPublished = Boolean(
+		currentPublication
+			? currentPublication.published
+			: (!isRootPage && statusQuery.data?.published),
+	);
 
-	const includeDescendants =
-		isPublished && currentPublication
-			? currentPublication.include_descendants
-			: initialIncludeDescendants;
+	const includeDescendants = isPublished && currentPublication
+		? currentPublication.include_descendants
+		: (draftIncludeDescendants ?? currentPublication?.include_descendants ?? true);
 
 	const busy =
 		publishPage.isPending ||
 		unpublishPage.isPending ||
 		republishPage.isPending ||
-		updateSettings.isPending;
+		updateSettings.isPending ||
+		updateVisibility.isPending;
 
-	if (pageQuery.isPending || publicationsQuery.isPending) {
+	if (pageQuery.isPending || publicationsQuery.isPending || (!isRootPage && statusQuery.isPending)) {
 		return (
 			<div
 				className='space-y-3 px-4 py-4'
@@ -88,7 +95,7 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 		);
 	}
 
-	if (pageQuery.isError || publicationsQuery.isError) {
+	if (pageQuery.isError || publicationsQuery.isError || (!isRootPage && statusQuery.isError)) {
 		return (
 			<div className='space-y-3 px-4 py-4'>
 				<p role='alert' className='text-xs text-destructive'>
@@ -101,6 +108,7 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 					onClick={() => {
 						void pageQuery.refetch();
 						void publicationsQuery.refetch();
+						void statusQuery.refetch();
 					}}
 				>
 					Retry
@@ -109,43 +117,26 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 		);
 	}
 
-	// Case: Child Private
-	if (!isRootPage && !isPublished) {
-		return (
-			<div className='space-y-4 px-4 py-4'>
-				<h3 className='text-sm font-semibold text-[#f1f1f1]'>Publish</h3>
-				<div className='space-y-2 py-2'>
-					<p className='text-sm font-medium text-[#f1f1f1]'>
-						This page is not currently public.
-					</p>
-					<p className='text-xs text-[#999]'>
-						Child pages are published through their parent page.
-					</p>
-					<p className='text-xs text-[#777]'>
-						Publish the parent page with subpages enabled to make this page public.
-					</p>
-				</div>
-			</div>
-		);
-	}
-
 	// Resolve target url
 	const effectiveSubdomain =
-		currentPublication?.subdomain || page?.public_subdomain || "";
-	const effectivePath = currentPublication?.path || "/";
+		currentPublication?.subdomain || statusQuery.data?.subdomain || page?.public_subdomain || "";
+	const effectivePath = currentPublication?.path || statusQuery.data?.path || "/";
 	const publicUrl = effectiveSubdomain
 		? buildPublicSiteUrl({
 				subdomain: effectiveSubdomain,
 				path: effectivePath,
 			})
 		: "";
+	const domainUrl = effectiveSubdomain
+		? buildPublicSiteUrl({ subdomain: effectiveSubdomain, path: "/" })
+		: "";
 
-	const displayUrl = publicUrl.replace(/^https?:\/\//, "");
+	const displayUrl = domainUrl.replace(/^https?:\/\//, "");
 
 	const handleCopy = async () => {
-		if (!publicUrl) return;
+		if (!domainUrl) return;
 		try {
-			await navigator.clipboard.writeText(publicUrl);
+			await navigator.clipboard.writeText(domainUrl);
 			setCopied(true);
 			setTimeout(() => setCopied(false), 2000);
 		} catch {
@@ -173,7 +164,16 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 				);
 			}
 		} else {
-			setInitialIncludeDescendants(checked);
+			setDraftIncludeDescendants(checked);
+		}
+	};
+
+	const handleToggleChild = async (checked: boolean) => {
+		setFormError(null);
+		try {
+			await updateVisibility.mutateAsync(checked);
+		} catch (error) {
+			setFormError(getErrorMessage(error, "Unable to update page visibility."));
 		}
 	};
 
@@ -182,15 +182,15 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 		try {
 			if (currentPublication && !currentPublication.published) {
 				await republishPage.mutateAsync(currentPublication.site_id);
-				if (initialIncludeDescendants !== currentPublication.include_descendants) {
+				if (includeDescendants !== currentPublication.include_descendants) {
 					await updateSettings.mutateAsync({
 						siteId: currentPublication.site_id,
-						include_descendants: initialIncludeDescendants,
+						include_descendants: includeDescendants,
 					});
 				}
 			} else {
 				await publishPage.mutateAsync({
-					include_descendants: initialIncludeDescendants,
+					include_descendants: includeDescendants,
 				});
 			}
 		} catch (error) {
@@ -222,11 +222,11 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 					<span
 						className='truncate text-[#e5e5e5]'
 						data-testid='public-url'
-						title={publicUrl}
+						title={domainUrl}
 					>
 						{displayUrl || "Not configured"}
 					</span>
-					{publicUrl ? (
+					{domainUrl ? (
 						<button
 							type='button'
 							className='shrink-0 rounded p-1 text-[#aaa] transition-colors hover:bg-white/10 hover:text-white'
@@ -259,13 +259,15 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 						/>
 					</label>
 					<p className='text-xs text-[#888]'>
-						New and existing subpages will be published under this page.
+						Default for subpages. You can change individual pages separately.
 					</p>
 				</div>
 			) : (
-				<div className='py-1'>
-					<p className='text-xs text-[#999]'>Published via parent page</p>
-				</div>
+				<p className='text-xs text-[#999]'>
+					{isPublished
+						? "This page is published on the site."
+						: "This page is not currently public."}
+				</p>
 			)}
 
 			{formError ? (
@@ -278,40 +280,39 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 			<div className='border-t border-[#383838]' />
 
 			{/* Actions */}
-			{isRootPage && !isPublished ? (
+			{!isPublished ? (
 				<div className='flex justify-end'>
 					<Button
 						type='button'
 						className='w-full bg-[#2e8de6] text-white hover:bg-[#2078ce]'
-						disabled={busy || !page?.public_subdomain}
-						onClick={() => void handlePublishRoot()}
+						disabled={
+							busy ||
+							(isRootPage
+								? !page?.public_subdomain
+								: !statusQuery.data?.site_active || !effectiveSubdomain)
+						}
+						onClick={() => void (isRootPage ? handlePublishRoot() : handleToggleChild(true))}
 					>
 						{busy ? "Publishing..." : "Publish"}
 					</Button>
 				</div>
-			) : isRootPage && isPublished ? (
+			) : (
 				<div className='flex items-center justify-between gap-2'>
 					<Button
 						type='button'
 						variant='outline'
 						className='border-[#414141] bg-transparent text-[#eee] hover:bg-white/5'
 						disabled={busy}
-						onClick={() => setConfirmUnpublish(true)}
+						onClick={() => {
+							if (isRootPage) {
+								setConfirmUnpublish(true);
+							} else {
+								void handleToggleChild(false);
+							}
+						}}
 					>
 						Unpublish
 					</Button>
-					<Button
-						type='button'
-						className='bg-[#2e8de6] text-white hover:bg-[#2078ce]'
-						onClick={handleViewSite}
-					>
-						<ExternalLink className='mr-1.5 size-4' />
-						View site
-					</Button>
-				</div>
-			) : (
-				/* Child Inherited */
-				<div className='flex justify-end'>
 					<Button
 						type='button'
 						className='bg-[#2e8de6] text-white hover:bg-[#2078ce]'

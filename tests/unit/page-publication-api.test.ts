@@ -68,4 +68,13 @@ describe("page-publication API", () => {
 			{ params: { site_id: "site-1" } },
 		);
 	});
+
+	it("sends only child visibility intent", async () => {
+		const response = { published: false };
+		const patch = vi.spyOn(instance, "patch").mockResolvedValue({ data: { data: response } });
+		expect(await pagePublicationApi.updatePageVisibility("about", false)).toBe(response);
+		expect(patch).toHaveBeenCalledWith(
+			"/page/about/publication/visibility", { published: false },
+		);
+	});
 });

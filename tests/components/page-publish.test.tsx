@@ -37,6 +37,7 @@ const rootDirectPublished: PagePublication = {
 	parent_publication_id: null,
 	path: "/",
 	publication_type: "DIRECT",
+	visibility_override: null,
 	include_descendants: true,
 	published: true,
 	published_at: "2026-09-29T00:00:00Z",
@@ -51,6 +52,7 @@ const inheritedChildPublished: PagePublication = {
 	parent_publication_id: "pub-1",
 	path: "/about",
 	publication_type: "INHERITED",
+	visibility_override: null,
 	include_descendants: true,
 	published: true,
 	published_at: "2026-09-29T00:00:00Z",
@@ -65,6 +67,7 @@ const historicalChildDirectUnpublished: PagePublication = {
 	parent_publication_id: null,
 	path: "/",
 	publication_type: "DIRECT",
+	visibility_override: null,
 	include_descendants: false,
 	published: false,
 	published_at: "2026-09-01T00:00:00Z",
@@ -89,6 +92,14 @@ describe("PagePublishTab", () => {
 	beforeEach(() => {
 		records = [];
 		vi.spyOn(pagePublicationApi, "listPagePublications").mockImplementation(async () => records);
+		vi.spyOn(pagePublicationApi, "getPagePublication").mockImplementation(async () => ({
+			published: records.some((record) => record.publication_type === "INHERITED" && record.published),
+			site_id: "site-1",
+			page_id: "about",
+			subdomain: "asss",
+			site_active: true,
+			path: records.find((record) => record.publication_type === "INHERITED")?.path,
+		}));
 		vi.spyOn(pagePublicationApi, "publishPage").mockResolvedValue({
 			site_id: "site-1",
 			page_id: "home",
@@ -102,6 +113,16 @@ describe("PagePublishTab", () => {
 				return records[0];
 			},
 		);
+		vi.spyOn(pagePublicationApi, "updatePageVisibility").mockImplementation(async (_pageId, published) => {
+			const updated = {
+				...inheritedChildPublished,
+				published,
+				visibility_override: published ? "PUBLISHED" as const : "UNPUBLISHED" as const,
+				unpublished_at: published ? null : "2026-09-30T00:00:00Z",
+			};
+			records = [updated];
+			return updated;
+		});
 		vi.spyOn(pagePublicationApi, "unpublishPage").mockImplementation(async () => ({
 			site_id: "site-1",
 			page_id: "home",
@@ -110,13 +131,16 @@ describe("PagePublishTab", () => {
 			published: false,
 			unpublished_at: "2026-09-30T00:00:00Z",
 		}));
-		vi.spyOn(pagePublicationApi, "republishPage").mockImplementation(async () => ({
-			site_id: "site-1",
-			page_id: "home",
-			subdomain: "asss",
-			path: "/",
-			published_at: "2026-09-30T00:00:00Z",
-		}));
+		vi.spyOn(pagePublicationApi, "republishPage").mockImplementation(async () => {
+			records = [{ ...records[0], published: true, unpublished_at: null }];
+			return {
+				site_id: "site-1",
+				page_id: "home",
+				subdomain: "asss",
+				path: "/",
+				published_at: "2026-09-30T00:00:00Z",
+			};
+		});
 	});
 
 	afterEach(() => vi.restoreAllMocks());
@@ -205,16 +229,30 @@ describe("PagePublishTab", () => {
 		});
 	});
 
-	it("renders Child inherited with /about URL, 'Published via parent page', and View site (NO publish, NO selector, NO switch)", async () => {
+	it("keeps the saved root default when republishing", async () => {
+		records = [{ ...rootDirectPublished, published: false, include_descendants: false, unpublished_at: "2026-09-30T00:00:00Z" }];
+		mount("home");
+		const toggle = await screen.findByRole("checkbox", { name: "Publish subpages" });
+		expect(toggle).not.toBeChecked();
+		await userEvent.click(screen.getByRole("button", { name: "Publish" }));
+		await waitFor(() => expect(pagePublicationApi.republishPage).toHaveBeenCalledWith("home", "site-1"));
+		expect(pagePublicationApi.updatePublicationSettings).not.toHaveBeenCalled();
+	});
+
+	it("shows only the domain for a published Child and opens its actual page URL", async () => {
 		records = [inheritedChildPublished];
 		const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
 		mount("about");
 
-		expect(await screen.findByText(/asss\.localhost:3000\/about/)).toBeInTheDocument();
-		expect(screen.getByText("Published via parent page")).toBeInTheDocument();
+		expect(await screen.findByTestId("public-url")).toHaveTextContent("asss.localhost:3000");
+		expect(screen.getByTestId("public-url")).not.toHaveTextContent("/about");
+		expect(screen.getByText("This page is published on the site.")).toBeInTheDocument();
+		expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
 
 		const viewSiteBtn = screen.getByRole("button", { name: /View site/i });
+		const unpublishBtn = screen.getByRole("button", { name: "Unpublish" });
 		expect(viewSiteBtn).toBeInTheDocument();
+		expect(unpublishBtn).toBeInTheDocument();
 
 		await userEvent.click(viewSiteBtn);
 		expect(openSpy).toHaveBeenCalledWith(
@@ -223,10 +261,9 @@ describe("PagePublishTab", () => {
 			"noopener,noreferrer",
 		);
 
-		// Verification that forbidden child controls are absent
+		// Child never owns site settings or a new site, and does not show Publish when already published
 		expect(screen.queryByRole("button", { name: /^Publish$/i })).not.toBeInTheDocument();
-		expect(screen.queryByRole("button", { name: "Unpublish" })).not.toBeInTheDocument();
-		expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+		expect(screen.queryByRole("checkbox", { name: "Publish subpages" })).not.toBeInTheDocument();
 		expect(screen.queryByLabelText(/Site address/i)).not.toBeInTheDocument();
 		expect(screen.queryByText(/New site/i)).not.toBeInTheDocument();
 		expect(screen.queryByText(/Existing site/i)).not.toBeInTheDocument();
@@ -234,30 +271,51 @@ describe("PagePublishTab", () => {
 		expect(screen.queryByText(/INHERITED/i)).not.toBeInTheDocument();
 	});
 
-	it("renders Child private when child is not published with explanation and NO publish button", async () => {
-		records = [];
+	it("publishes a private Child via Publish button and refreshes publication data", async () => {
+		records = [{ ...inheritedChildPublished, published: false, unpublished_at: "2026-09-30T00:00:00Z", visibility_override: "UNPUBLISHED" }];
 		mount("about");
 
 		expect(await screen.findByText("This page is not currently public.")).toBeInTheDocument();
-		expect(
-			screen.getByText("Child pages are published through their parent page."),
-		).toBeInTheDocument();
-		expect(
-			screen.getByText(
-				"Publish the parent page with subpages enabled to make this page public.",
-			),
-		).toBeInTheDocument();
+		expect(screen.getByTestId("public-url")).toHaveTextContent("asss.localhost:3000");
+		expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: /View site/i })).not.toBeInTheDocument();
 
-		expect(screen.queryByRole("button", { name: /Publish/i })).not.toBeInTheDocument();
-		expect(screen.queryByRole("button", { name: /Create site/i })).not.toBeInTheDocument();
+		const publishBtn = screen.getByRole("button", { name: "Publish" });
+		expect(publishBtn).toBeInTheDocument();
+
+		await userEvent.click(publishBtn);
+		await waitFor(() => expect(pagePublicationApi.updatePageVisibility).toHaveBeenCalledWith("about", true));
+		expect(await screen.findByText("This page is published on the site.")).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Unpublish" })).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: /View site/i })).toBeInTheDocument();
+	});
+
+	it("unpublishes a published Child via Unpublish button without confirmation dialog", async () => {
+		records = [inheritedChildPublished];
+		mount("about");
+
+		expect(await screen.findByText("This page is published on the site.")).toBeInTheDocument();
+		expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+
+		const unpublishBtn = screen.getByRole("button", { name: "Unpublish" });
+		expect(unpublishBtn).toBeInTheDocument();
+
+		await userEvent.click(unpublishBtn);
+		await waitFor(() => expect(pagePublicationApi.updatePageVisibility).toHaveBeenCalledWith("about", false));
+		expect(await screen.findByText("This page is not currently public.")).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Publish" })).toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: /View site/i })).not.toBeInTheDocument();
 	});
 
 	it("ignores historical child DIRECT publication and renders only active inherited publication", async () => {
 		records = [historicalChildDirectUnpublished, inheritedChildPublished];
 		mount("about");
 
-		expect(await screen.findByText(/asss\.localhost:3000\/about/)).toBeInTheDocument();
-		expect(screen.getByText("Published via parent page")).toBeInTheDocument();
+		expect(await screen.findByTestId("public-url")).toHaveTextContent("asss.localhost:3000");
+		expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+		expect(screen.getByText("This page is published on the site.")).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Unpublish" })).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: /View site/i })).toBeInTheDocument();
 
 		// Does not render historical "abc" site
 		expect(screen.queryByText(/abc/)).not.toBeInTheDocument();
@@ -271,13 +329,14 @@ describe("PagePublishTab", () => {
 		mount("about");
 
 		expect(await screen.findByText("This page is not currently public.")).toBeInTheDocument();
-		expect(
-			screen.getByText("Child pages are published through their parent page."),
-		).toBeInTheDocument();
+		expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Publish" })).toBeEnabled();
+		expect(screen.getByTestId("public-url")).toHaveTextContent("asss.localhost:3000");
 
 		expect(screen.queryByText(/abc/)).not.toBeInTheDocument();
 		expect(screen.queryByRole("button", { name: /Republish/i })).not.toBeInTheDocument();
-		expect(screen.queryByRole("button", { name: /^Publish$/i })).not.toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: "Unpublish" })).not.toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: /View site/i })).not.toBeInTheDocument();
 	});
 
 	it("copies the public link to clipboard and provides feedback", async () => {
@@ -294,9 +353,7 @@ describe("PagePublishTab", () => {
 		const copyBtn = await screen.findByRole("button", { name: "Copy link" });
 		await userEvent.click(copyBtn);
 
-		expect(writeTextMock).toHaveBeenCalledWith(
-			expect.stringMatching(/http:\/\/asss\.localhost:3000\/about$/),
-		);
+		expect(writeTextMock).toHaveBeenCalledWith("http://asss.localhost:3000");
 		expect(await screen.findByText("Copied")).toBeInTheDocument();
 	});
 });

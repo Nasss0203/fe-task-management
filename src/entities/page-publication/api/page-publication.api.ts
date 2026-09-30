@@ -20,6 +20,13 @@ export const pagePublicationApi = {
 		const response = await instance.patch<ApiResponse<PagePublication>>(`${PAGE_API}/${pageId}/publication/settings`, payload, { params: { site_id: siteId } });
 		return response.data.data;
 	},
+	updatePageVisibility: async (pageId: string, published: boolean): Promise<PagePublication> => {
+		const response = await instance.patch<ApiResponse<PagePublication>>(
+			`${PAGE_API}/${pageId}/publication/visibility`,
+			{ published },
+		);
+		return response.data.data;
+	},
 
 	getPagePublication: async (
 		pageId: string,

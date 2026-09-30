@@ -43,10 +43,7 @@ export function getCurrentPagePublication({
 		return directAny ?? null;
 	}
 
-	// Child: Chỉ quan tâm effective inherited publication hợp lệ: publication_type === "INHERITED" && published === true
-	// Không render historical DIRECT unpublished của child
-	const inheritedPublished = publications.find(
-		(p) => p.publication_type === "INHERITED" && p.published,
-	);
-	return inheritedPublished ?? null;
+	// The backend list is scoped to the current root site. Keep private inherited
+	// records so the child toggle can reactivate the same publication and path.
+	return publications.find((p) => p.publication_type === "INHERITED") ?? null;
 }

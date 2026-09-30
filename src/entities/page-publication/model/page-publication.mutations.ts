@@ -89,3 +89,16 @@ export function useUpdatePublicationSettings(pageId: string) {
 		},
 	});
 }
+
+export function useUpdatePageVisibility(pageId: string) {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (published: boolean) => pagePublicationApi.updatePageVisibility(pageId, published),
+		onSuccess: async () => {
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: pagePublicationKeys.list(pageId) }),
+				queryClient.invalidateQueries({ queryKey: pagePublicationKeys.detail(pageId) }),
+			]);
+		},
+	});
+}
