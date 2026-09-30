@@ -1,7 +1,10 @@
 import type { ApiResponse } from "@/shared/api";
 import publicApiClient from "@/shared/api/public-api-client";
 
-import type { PublicSitePage } from "../model/public-site.types";
+import type {
+	PublicSiteNavigation,
+	PublicSitePage,
+} from "../model/public-site.types";
 
 const PUBLIC_SITE_API = "/public/sites";
 
@@ -19,6 +22,18 @@ export const publicSiteApi = {
 				},
 				signal,
 			},
+		);
+
+		return response.data.data;
+	},
+
+	getPublicSiteNavigation: async (
+		subdomain: string,
+		signal?: AbortSignal,
+	): Promise<PublicSiteNavigation> => {
+		const response = await publicApiClient.get<ApiResponse<PublicSiteNavigation>>(
+			`${PUBLIC_SITE_API}/${encodeURIComponent(subdomain)}/navigation`,
+			{ signal },
 		);
 
 		return response.data.data;

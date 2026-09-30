@@ -56,3 +56,20 @@ export type PublicBreadcrumb = {
 	title: string;
 	path: string;
 };
+
+export type PublicNavigationPage = {
+	page_id: string;
+	title: string;
+	icon: string | null;
+	path: string;
+	navigation_parent_id: string | null;
+};
+
+export type PublicSiteNavigation = {
+	subdomain: string;
+	pages: PublicNavigationPage[];
+};
+
+export type PublicNavigationNode = PublicNavigationPage & {
+	children: PublicNavigationNode[];
+};

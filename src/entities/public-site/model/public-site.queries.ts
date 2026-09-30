@@ -7,6 +7,9 @@ export const publicSiteKeys = {
 
 	detail: (subdomain: string, path: string) =>
 		[...publicSiteKeys.all, "detail", subdomain, path] as const,
+
+	navigation: (subdomain: string) =>
+		[...publicSiteKeys.all, "navigation", subdomain] as const,
 };
 
 export function usePublicPage(subdomain?: string, path?: string) {
@@ -17,6 +20,19 @@ export function usePublicPage(subdomain?: string, path?: string) {
 
 		queryFn: ({ signal }) =>
 			publicSiteApi.getPublicPage(subdomain!, resolvedPath, signal),
+
+		enabled: Boolean(subdomain),
+
+		retry: false,
+	});
+}
+
+export function usePublicSiteNavigation(subdomain?: string) {
+	return useQuery({
+		queryKey: publicSiteKeys.navigation(subdomain ?? ""),
+
+		queryFn: ({ signal }) =>
+			publicSiteApi.getPublicSiteNavigation(subdomain!, signal),
 
 		enabled: Boolean(subdomain),
 
