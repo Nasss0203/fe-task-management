@@ -65,6 +65,7 @@ const page: Page = {
 	workspace_id: workspaceId,
 	teamspace_id: null,
 	parent_page_id: null,
+	public_subdomain: null,
 	title: "Invited page content",
 	slug: null,
 	icon: null,

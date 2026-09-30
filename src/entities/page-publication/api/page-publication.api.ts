@@ -3,8 +3,7 @@ import instance from "@/shared/api/api-client";
 
 import type {
 	PagePublicationStatus,
-	PublishedSiteSummary,
-	PublishPageToSitePayload,
+	PagePublication,
 	PublishSitePayload,
 	PublishSiteResponse,
 	UnpublishSiteResponse,
@@ -13,24 +12,12 @@ import type {
 const PAGE_API = "/page";
 
 export const pagePublicationApi = {
-	listWorkspacePublishedSites: async (
-		workspaceId: string,
-		signal?: AbortSignal,
-	): Promise<PublishedSiteSummary[]> => {
-		const response = await instance.get<ApiResponse<PublishedSiteSummary[]>>(
-			`/workspaces/${workspaceId}/published-sites`,
-			{ signal },
-		);
+	listPagePublications: async (pageId: string, signal?: AbortSignal): Promise<PagePublication[]> => {
+		const response = await instance.get<ApiResponse<PagePublication[]>>(`${PAGE_API}/${pageId}/publications`, { signal });
 		return response.data.data;
 	},
-
-	publishPageToSite: async (
-		siteId: string,
-		payload: PublishPageToSitePayload,
-	): Promise<PublishSiteResponse> => {
-		const response = await instance.post<ApiResponse<PublishSiteResponse>>(
-			`/published-sites/${siteId}/publications`, payload,
-		);
+	updatePublicationSettings: async (pageId: string, siteId: string, payload: { include_descendants: boolean }): Promise<PagePublication> => {
+		const response = await instance.patch<ApiResponse<PagePublication>>(`${PAGE_API}/${pageId}/publication/settings`, payload, { params: { site_id: siteId } });
 		return response.data.data;
 	},
 
@@ -60,17 +47,20 @@ export const pagePublicationApi = {
 		return response.data.data;
 	},
 
-	unpublishPage: async (pageId: string): Promise<UnpublishSiteResponse> => {
+	unpublishPage: async (pageId: string, siteId: string): Promise<UnpublishSiteResponse> => {
 		const response = await instance.delete<ApiResponse<UnpublishSiteResponse>>(
 			`${PAGE_API}/${pageId}/publication`,
+			{ params: { site_id: siteId } },
 		);
 
 		return response.data.data;
 	},
 
-	republishPage: async (pageId: string): Promise<PublishSiteResponse> => {
+	republishPage: async (pageId: string, siteId: string): Promise<PublishSiteResponse> => {
 		const response = await instance.post<ApiResponse<PublishSiteResponse>>(
 			`${PAGE_API}/${pageId}/publication/republish`,
+			undefined,
+			{ params: { site_id: siteId } },
 		);
 
 		return response.data.data;

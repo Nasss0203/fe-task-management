@@ -15,21 +15,23 @@ export type PagePublicationStatus = {
 };
 
 export type PublishSitePayload = {
-	subdomain: string;
+	include_descendants: boolean;
 };
 
-export type PublishedSiteSummary = {
+export type PagePublicationType = "DIRECT" | "INHERITED";
+
+export type PagePublication = {
 	id: string;
-	workspace_id: string;
-	root_page_id: string;
-	subdomain: string;
-	disabled_at: string | null;
-	created_at: string;
-};
-
-export type PublishPageToSitePayload = {
 	page_id: string;
+	site_id: string;
+	subdomain: string;
+	parent_publication_id: string | null;
 	path: string;
+	publication_type: PagePublicationType;
+	include_descendants: boolean;
+	published: boolean;
+	published_at: string | null;
+	unpublished_at: string | null;
 };
 
 export type PublishSiteResponse = {

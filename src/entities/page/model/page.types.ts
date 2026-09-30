@@ -7,6 +7,8 @@ export interface Page {
 
 	parent_page_id: string | null;
 
+	public_subdomain: string | null;
+
 	title: string;
 
 	slug: string | null;

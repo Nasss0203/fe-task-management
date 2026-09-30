@@ -3,18 +3,13 @@ import { ThemeProvider } from "@/providers/theme-provider";
 import { Toaster } from "@/shared/ui/sonner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
-import { JetBrains_Mono, Montserrat } from "next/font/google";
+import { Roboto } from "next/font/google";
 import "./globals.css";
 
-const montserrat = Montserrat({
-	variable: "--font-geist-sans", // Keeping variable name same to prevent breakage in tailwind config if hardcoded somewhere, though CSS maps it.
-	subsets: ["latin"],
-	display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-	variable: "--font-geist-mono",
-	subsets: ["latin"],
+const roboto = Roboto({
+	variable: "--font-geist-sans", // Giữ nguyên tên biến để không ảnh hưởng tailwind config
+	subsets: ["latin", "vietnamese"],
+	weight: ["300", "400", "500", "700"],
 	display: "swap",
 });
 
@@ -33,7 +28,7 @@ export default function RootLayout({
 		<html
 			lang='en'
 			suppressHydrationWarning
-			className={`${montserrat.variable} ${jetbrainsMono.variable}`}
+			className={`${roboto.variable} `}
 		>
 			<body className='font-sans antialiased'>
 				<ThemeProvider

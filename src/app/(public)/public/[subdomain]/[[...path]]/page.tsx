@@ -1,7 +1,7 @@
 "use client";
 
 import { isAxiosError } from "axios";
-import { useParams } from "next/navigation";
+import { use } from "react";
 
 import { usePublicPage } from "@/entities/public-site/model/public-site.queries";
 import { Button } from "@/shared/ui/button";
@@ -23,11 +23,11 @@ function PublicPageNotFound() {
 	);
 }
 
-export default function PublicSiteRoute() {
-	const params = useParams<{
+export default function PublicSiteRoute({ params: promisedParams }: { params: Promise<{
 		subdomain: string;
 		path?: string[];
-	}>();
+	}> }) {
+	const params = use(promisedParams);
 
 	const resolvedPath =
 		!params.path || params.path.length === 0
@@ -53,7 +53,7 @@ export default function PublicSiteRoute() {
 				<div className='space-y-4'>
 					<div className='space-y-2'>
 						<h1 className='text-2xl font-semibold'>
-							Unable to load this page.
+							Unable to load page
 						</h1>
 						<p className='text-sm text-muted-foreground'>
 							Check your connection and try again.
@@ -66,15 +66,11 @@ export default function PublicSiteRoute() {
 						disabled={publicPageQuery.isFetching}
 						onClick={() => void publicPageQuery.refetch()}
 					>
-						{publicPageQuery.isFetching ? "Retrying..." : "Try again"}
+						{publicPageQuery.isFetching ? "Retrying..." : "Retry"}
 					</Button>
 				</div>
 			</section>
 		);
-	}
-
-	if (!publicPageQuery.data) {
-		return <PublicPageNotFound />;
 	}
 
 	return <PublicPage publicSite={publicPageQuery.data} />;

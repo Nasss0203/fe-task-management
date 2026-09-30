@@ -1,19 +1,18 @@
 "use client";
 
 import { isAxiosError } from "axios";
-import { Check, ExternalLink, Globe2, Link2, RotateCcw } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { ExternalLink, Link2 } from "lucide-react";
+import { useState } from "react";
 import { buildPublicSiteUrl } from "@/entities/page-publication/lib/build-public-site-url";
-import { usePage } from "@/entities/page/model/page.queries";
-import { PublishPageToSiteForm } from "./PublishPageToSiteForm";
-
+import { getCurrentPagePublication } from "@/entities/page-publication/lib/get-current-page-publication";
 import {
 	usePublishPage,
-	usePublishPageToSite,
 	useRepublishPage,
 	useUnpublishPage,
+	useUpdatePublicationSettings,
 } from "@/entities/page-publication/model/page-publication.mutations";
-import { usePagePublication, useWorkspacePublishedSites } from "@/entities/page-publication/model/page-publication.queries";
+import { usePagePublications } from "@/entities/page-publication/model/page-publication.queries";
+import { usePage } from "@/entities/page/model/page.queries";
 import { getFriendlyApiErrorMessage } from "@/shared/lib/api-error-message";
 import {
 	AlertDialog,
@@ -26,427 +25,328 @@ import {
 	AlertDialogTitle,
 } from "@/shared/ui/alert-dialog";
 import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
 import { Skeleton } from "@/shared/ui/skeleton";
 
-interface PagePublishTabProps {
-	pageId: string;
-}
-
-type PublicationErrorResponse = {
-	message?: unknown;
-};
-
-function getPublicationErrorMessage(error: unknown, fallback: string) {
-	if (isAxiosError<PublicationErrorResponse>(error)) {
-		const message = error.response?.data?.message;
-
-		if (typeof message === "string" && message.trim()) {
-			return message;
-		}
+function getErrorMessage(error: unknown, fallback: string): string {
+	if (
+		isAxiosError<{ message?: unknown }>(error) &&
+		typeof error.response?.data?.message === "string"
+	) {
+		return error.response.data.message;
 	}
-
 	return getFriendlyApiErrorMessage(error, fallback);
 }
 
-function PublicationLoadingState() {
-	return (
-		<div className='space-y-4 px-4 py-5' role='status' aria-label='Loading publication status'>
-			<div className='space-y-2'>
-				<Skeleton className='h-4 w-36' />
-				<Skeleton className='h-3 w-64 max-w-full' />
-			</div>
-			<Skeleton className='h-9 w-full' />
-			<div className='flex justify-end'>
-				<Skeleton className='h-9 w-24' />
-			</div>
-		</div>
-	);
-}
-
-export function PagePublishTab({ pageId }: PagePublishTabProps) {
-	const publicationQuery = usePagePublication(pageId);
+export function PagePublishTab({ pageId }: { pageId: string }) {
 	const pageQuery = usePage(pageId);
-	const workspaceId = pageQuery.data?.workspace_id;
-	const sitesQuery = useWorkspacePublishedSites(
-		publicationQuery.data && !publicationQuery.data.site_id && !publicationQuery.data.published
-			? workspaceId : undefined,
-	);
-	const publishPage = usePublishPage(pageId, workspaceId);
-	const publishPageToSite = usePublishPageToSite(pageId, workspaceId);
+	const publicationsQuery = usePagePublications(pageId);
+
+	const publishPage = usePublishPage(pageId);
 	const unpublishPage = useUnpublishPage(pageId);
 	const republishPage = useRepublishPage(pageId);
+	const updateSettings = useUpdatePublicationSettings(pageId);
 
-	const [subdomain, setSubdomain] = useState("");
-	const [mode, setMode] = useState<"new" | "existing">("new");
-	const hasNoSites = sitesQuery.isSuccess && sitesQuery.data.length === 0;
-	const activeMode = hasNoSites ? "new" : mode;
-	const [formError, setFormError] = useState<string | null>(null);
-	const [actionError, setActionError] = useState<string | null>(null);
-	const [copyError, setCopyError] = useState<string | null>(null);
 	const [copied, setCopied] = useState(false);
-	const [unpublishOpen, setUnpublishOpen] = useState(false);
+	const [confirmUnpublish, setConfirmUnpublish] = useState(false);
+	const [initialIncludeDescendants, setInitialIncludeDescendants] = useState(true);
+	const [formError, setFormError] = useState<string | null>(null);
 
-	if (publicationQuery.isPending) {
-		return <PublicationLoadingState />;
+	const page = pageQuery.data;
+	const isRootPage = page ? page.parent_page_id === null : false;
+	const publications = publicationsQuery.data ?? [];
+
+	const currentPublication = getCurrentPagePublication({
+		isRootPage,
+		publicSubdomain: page?.public_subdomain,
+		publications,
+	});
+
+	const isPublished = Boolean(currentPublication && currentPublication.published);
+
+	const includeDescendants =
+		isPublished && currentPublication
+			? currentPublication.include_descendants
+			: initialIncludeDescendants;
+
+	const busy =
+		publishPage.isPending ||
+		unpublishPage.isPending ||
+		republishPage.isPending ||
+		updateSettings.isPending;
+
+	if (pageQuery.isPending || publicationsQuery.isPending) {
+		return (
+			<div
+				className='space-y-3 px-4 py-4'
+				role='status'
+				aria-label='Loading publication details'
+			>
+				<Skeleton className='h-4 w-24' />
+				<Skeleton className='h-10 w-full' />
+				<Skeleton className='h-6 w-full' />
+			</div>
+		);
 	}
 
-	if (publicationQuery.isError || !publicationQuery.data) {
+	if (pageQuery.isError || publicationsQuery.isError) {
 		return (
-			<div className='space-y-3 px-4 py-5'>
-				<div className='space-y-1'>
-					<p className='text-sm font-medium'>Unable to load publication status</p>
-					<p className='text-xs text-muted-foreground'>
-						Check your connection and try again.
-					</p>
-				</div>
+			<div className='space-y-3 px-4 py-4'>
+				<p role='alert' className='text-xs text-destructive'>
+					Unable to load publication details.
+				</p>
 				<Button
 					type='button'
 					variant='outline'
 					size='sm'
-					disabled={publicationQuery.isFetching}
-					onClick={() => void publicationQuery.refetch()}
+					onClick={() => {
+						void pageQuery.refetch();
+						void publicationsQuery.refetch();
+					}}
 				>
-					{publicationQuery.isFetching ? "Retrying..." : "Try again"}
+					Retry
 				</Button>
 			</div>
 		);
 	}
 
-	const publication = publicationQuery.data;
-	const hasExistingSite = Boolean(publication.site_id && publication.subdomain);
-	const publicPath = publication.subdomain
-		? buildPublicSiteUrl({ subdomain: publication.subdomain, path: publication.path })
-		: null;
+	// Case: Child Private
+	if (!isRootPage && !isPublished) {
+		return (
+			<div className='space-y-4 px-4 py-4'>
+				<h3 className='text-sm font-semibold text-[#f1f1f1]'>Publish</h3>
+				<div className='space-y-2 py-2'>
+					<p className='text-sm font-medium text-[#f1f1f1]'>
+						This page is not currently public.
+					</p>
+					<p className='text-xs text-[#999]'>
+						Child pages are published through their parent page.
+					</p>
+					<p className='text-xs text-[#777]'>
+						Publish the parent page with subpages enabled to make this page public.
+					</p>
+				</div>
+			</div>
+		);
+	}
 
-	const handleCopyLink = async () => {
-		if (!publication.subdomain || !publicPath) return;
+	// Resolve target url
+	const effectiveSubdomain =
+		currentPublication?.subdomain || page?.public_subdomain || "";
+	const effectivePath = currentPublication?.path || "/";
+	const publicUrl = effectiveSubdomain
+		? buildPublicSiteUrl({
+				subdomain: effectiveSubdomain,
+				path: effectivePath,
+			})
+		: "";
 
-		setCopied(false);
-		setCopyError(null);
+	const displayUrl = publicUrl.replace(/^https?:\/\//, "");
 
+	const handleCopy = async () => {
+		if (!publicUrl) return;
 		try {
-			await navigator.clipboard.writeText(
-				publicPath,
-			);
+			await navigator.clipboard.writeText(publicUrl);
 			setCopied(true);
-
-			window.setTimeout(() => {
-				setCopied(false);
-			}, 1500);
+			setTimeout(() => setCopied(false), 2000);
 		} catch {
-			setCopyError("Unable to copy the public link.");
+			// Clipboard API failed fallback
 		}
 	};
 
 	const handleViewSite = () => {
-		if (!publication.subdomain || !publicPath) return;
-
-		window.open(
-			publicPath,
-			"_blank",
-			"noopener,noreferrer",
-		);
+		if (publicUrl) {
+			window.open(publicUrl, "_blank", "noopener,noreferrer");
+		}
 	};
 
-	const handlePublish = async (event: FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-
-		if (publishPage.isPending) return;
-
-		const normalizedSubdomain = subdomain.trim().toLowerCase();
-
-		if (!normalizedSubdomain) {
-			setFormError("Site address is required.");
-			return;
-		}
-
-		if (/\s/.test(normalizedSubdomain)) {
-			setFormError("Site address cannot contain whitespace.");
-			return;
-		}
-
-		if (normalizedSubdomain.length > 63) {
-			setFormError("Site address must be 63 characters or fewer.");
-			return;
-		}
-
+	const handleToggleSubpages = async (checked: boolean) => {
 		setFormError(null);
+		if (isPublished && currentPublication) {
+			try {
+				await updateSettings.mutateAsync({
+					siteId: currentPublication.site_id,
+					include_descendants: checked,
+				});
+			} catch (error) {
+				setFormError(
+					getErrorMessage(error, "Unable to update subpage publication settings."),
+				);
+			}
+		} else {
+			setInitialIncludeDescendants(checked);
+		}
+	};
 
+	const handlePublishRoot = async () => {
+		setFormError(null);
 		try {
-			await publishPage.mutateAsync({ subdomain: normalizedSubdomain });
+			if (currentPublication && !currentPublication.published) {
+				await republishPage.mutateAsync(currentPublication.site_id);
+				if (initialIncludeDescendants !== currentPublication.include_descendants) {
+					await updateSettings.mutateAsync({
+						siteId: currentPublication.site_id,
+						include_descendants: initialIncludeDescendants,
+					});
+				}
+			} else {
+				await publishPage.mutateAsync({
+					include_descendants: initialIncludeDescendants,
+				});
+			}
 		} catch (error) {
-			const message = getPublicationErrorMessage(
-				error,
-				"Unable to publish this page.",
-			);
-
-			setFormError(message);
+			setFormError(getErrorMessage(error, "Unable to publish this page."));
 		}
 	};
 
 	const handleUnpublish = async () => {
-		if (unpublishPage.isPending) return;
-
-		setActionError(null);
-
-		try {
-			await unpublishPage.mutateAsync();
-			setUnpublishOpen(false);
-		} catch (error) {
-			const message = getPublicationErrorMessage(
-				error,
-				"Unable to unpublish this site.",
-			);
-
-			setActionError(message);
-		}
-	};
-
-	const handlePublishToSite = async (siteId: string, path: string) => {
+		if (!currentPublication) return;
 		setFormError(null);
 		try {
-			await publishPageToSite.mutateAsync({ siteId, path });
+			await unpublishPage.mutateAsync(currentPublication.site_id);
+			setConfirmUnpublish(false);
 		} catch (error) {
-			setFormError(getPublicationErrorMessage(error, "Unable to publish this page."));
+			setFormError(getErrorMessage(error, "Unable to unpublish this page."));
 		}
 	};
 
-	const handleRepublish = async () => {
-		if (republishPage.isPending) return;
+	return (
+		<div className='space-y-4 px-4 py-4 text-sm'>
+			<h3 className='text-sm font-semibold text-[#f1f1f1]'>Publish</h3>
 
-		setActionError(null);
-
-		try {
-			await republishPage.mutateAsync();
-		} catch (error) {
-			const message = getPublicationErrorMessage(
-				error,
-				"Unable to republish this site.",
-			);
-
-			setActionError(message);
-		}
-	};
-
-	if (publication.published) {
-		if (!publication.subdomain || !publicPath) {
-			return (
-				<p role='alert' className='px-4 py-5 text-sm text-destructive'>
-					Published site information is incomplete.
-				</p>
-			);
-		}
-
-		return (
-			<>
-				<div className='space-y-4 px-4 py-5'>
-					<p className='text-sm font-medium'>Published</p>
-					<div className='flex items-start gap-3 rounded-lg border border-border p-3'>
-						<div className='flex size-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground'>
-							<Globe2 className='size-4' />
-						</div>
-						<div className='min-w-0 flex-1'>
-							<p className='truncate text-sm font-medium'>
-								{publication.subdomain}
-							</p>
-							<p className='truncate text-xs text-muted-foreground'>
-								{publicPath}
-							</p>
-						</div>
-						<Button
-							type='button'
-							variant='outline'
-							size='sm'
-							onClick={() => void handleCopyLink()}
-						>
-							{copied ? <Check /> : <Link2 />}
-							{copied ? "Copied" : "Copy link"}
-						</Button>
-					</div>
-
-					{copyError ? (
-						<p role='alert' className='text-xs text-destructive'>
-							{copyError}
-						</p>
-					) : null}
-
-					<div className='flex flex-wrap justify-end gap-2'>
-						<Button
-							type='button'
-							variant='outline'
-							onClick={() => {
-								setActionError(null);
-								setUnpublishOpen(true);
-							}}
-						>
-							Unpublish
-						</Button>
-						<Button type='button' onClick={handleViewSite}>
-							<ExternalLink />
-							View site
-						</Button>
-					</div>
-				</div>
-
-				<AlertDialog
-					open={unpublishOpen}
-					onOpenChange={(open) => {
-						if (!unpublishPage.isPending) {
-							setUnpublishOpen(open);
-						}
-					}}
-				>
-					<AlertDialogContent>
-						<AlertDialogHeader>
-							<AlertDialogTitle>Unpublish this site?</AlertDialogTitle>
-							<AlertDialogDescription>
-								People with the public link will no longer be able to
-								access this page.
-							</AlertDialogDescription>
-							{actionError ? (
-								<p role='alert' className='text-sm text-destructive'>
-									{actionError}
-								</p>
-							) : null}
-						</AlertDialogHeader>
-						<AlertDialogFooter>
-							<AlertDialogCancel disabled={unpublishPage.isPending}>
-								Cancel
-							</AlertDialogCancel>
-							<AlertDialogAction
-								variant='destructive'
-								disabled={unpublishPage.isPending}
-								onClick={(event) => {
-									event.preventDefault();
-									void handleUnpublish();
-								}}
-							>
-								{unpublishPage.isPending ? "Unpublishing..." : "Unpublish"}
-							</AlertDialogAction>
-						</AlertDialogFooter>
-					</AlertDialogContent>
-				</AlertDialog>
-			</>
-		);
-	}
-
-	if (hasExistingSite && publication.subdomain && publicPath) {
-		return (
-			<div className='space-y-4 px-4 py-5'>
-				<div className='space-y-1'>
-					<p className='text-sm font-medium'>Site is currently unpublished</p>
-					<p className='text-xs text-muted-foreground'>
-						Republish the existing site to make it available again.
-					</p>
-				</div>
-
-				<div className='flex items-center gap-3 rounded-lg border border-border p-3'>
-					<div className='flex size-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground'>
-						<Globe2 className='size-4' />
-					</div>
-					<div className='min-w-0 flex-1'>
-						<p className='truncate text-sm font-medium'>
-							{publication.subdomain}
-						</p>
-						<p className='truncate text-xs text-muted-foreground'>
-							{publicPath}
-						</p>
-					</div>
-				</div>
-
-				{actionError ? (
-					<p role='alert' className='text-xs text-destructive'>
-						{actionError}
-					</p>
+			{/* URL row */}
+			<div className='space-y-1.5'>
+				{!isPublished && isRootPage ? (
+					<span className='text-xs font-medium text-[#bbb]'>Site address</span>
 				) : null}
+				<div className='flex min-w-0 items-center justify-between gap-2 rounded-md border border-[#414141] bg-[#202020] px-3 py-2 text-sm'>
+					<span
+						className='truncate text-[#e5e5e5]'
+						data-testid='public-url'
+						title={publicUrl}
+					>
+						{displayUrl || "Not configured"}
+					</span>
+					{publicUrl ? (
+						<button
+							type='button'
+							className='shrink-0 rounded p-1 text-[#aaa] transition-colors hover:bg-white/10 hover:text-white'
+							aria-label='Copy link'
+							onClick={() => void handleCopy()}
+						>
+							{copied ? (
+								<span className='text-xs font-medium text-[#4b9eff]'>Copied</span>
+							) : (
+								<Link2 className='size-4' />
+							)}
+						</button>
+					) : null}
+				</div>
+			</div>
 
-				<div className='flex flex-wrap justify-end gap-2'>
+			{/* Status / Settings */}
+			{isRootPage ? (
+				<div className='space-y-1'>
+					<label className='flex cursor-pointer items-center justify-between gap-3 text-sm text-[#e5e5e5]'>
+						<span>Publish subpages</span>
+						<input
+							type='checkbox'
+							role='checkbox'
+							aria-label='Publish subpages'
+							className='size-4 accent-[#2e8de6]'
+							checked={includeDescendants}
+							disabled={busy}
+							onChange={(e) => void handleToggleSubpages(e.target.checked)}
+						/>
+					</label>
+					<p className='text-xs text-[#888]'>
+						New and existing subpages will be published under this page.
+					</p>
+				</div>
+			) : (
+				<div className='py-1'>
+					<p className='text-xs text-[#999]'>Published via parent page</p>
+				</div>
+			)}
+
+			{formError ? (
+				<p role='alert' className='text-xs text-destructive'>
+					{formError}
+				</p>
+			) : null}
+
+			{/* Divider */}
+			<div className='border-t border-[#383838]' />
+
+			{/* Actions */}
+			{isRootPage && !isPublished ? (
+				<div className='flex justify-end'>
+					<Button
+						type='button'
+						className='w-full bg-[#2e8de6] text-white hover:bg-[#2078ce]'
+						disabled={busy || !page?.public_subdomain}
+						onClick={() => void handlePublishRoot()}
+					>
+						{busy ? "Publishing..." : "Publish"}
+					</Button>
+				</div>
+			) : isRootPage && isPublished ? (
+				<div className='flex items-center justify-between gap-2'>
 					<Button
 						type='button'
 						variant='outline'
-						onClick={() => void handleCopyLink()}
+						className='border-[#414141] bg-transparent text-[#eee] hover:bg-white/5'
+						disabled={busy}
+						onClick={() => setConfirmUnpublish(true)}
 					>
-						{copied ? <Check /> : <Link2 />}
-						{copied ? "Copied" : "Copy previous link"}
+						Unpublish
 					</Button>
 					<Button
 						type='button'
-						disabled={republishPage.isPending}
-						onClick={() => void handleRepublish()}
+						className='bg-[#2e8de6] text-white hover:bg-[#2078ce]'
+						onClick={handleViewSite}
 					>
-						<RotateCcw />
-						{republishPage.isPending ? "Republishing..." : "Republish"}
+						<ExternalLink className='mr-1.5 size-4' />
+						View site
 					</Button>
 				</div>
-
-				{copyError ? (
-					<p role='alert' className='text-xs text-destructive'>
-						{copyError}
-					</p>
-				) : null}
-			</div>
-		);
-	}
-
-	const previewPath = buildPublicSiteUrl({ subdomain: subdomain.trim().toLowerCase() || "your-site" });
-
-	return (
-		<div className='space-y-4 px-4 py-5'>
-			<div role='group' aria-label='Publication mode' className='flex gap-2'>
-				<Button type='button' size='sm' variant={activeMode === "new" ? "default" : "outline"} aria-pressed={activeMode === "new"} disabled={publishPage.isPending || publishPageToSite.isPending} onClick={() => { setMode("new"); setFormError(null); }}>Create new site</Button>
-				<Button type='button' size='sm' variant={activeMode === "existing" ? "default" : "outline"} aria-pressed={activeMode === "existing"} disabled={hasNoSites || publishPage.isPending || publishPageToSite.isPending} onClick={() => { setMode("existing"); setFormError(null); }}>Add to existing site</Button>
-			</div>
-			{hasNoSites ? <p className='text-xs text-muted-foreground'>No published sites yet. Create a new site first.</p> : null}
-			{activeMode === "existing" ? (
-				pageQuery.isPending ? <PublicationLoadingState /> :
-				pageQuery.isError ? <div className='space-y-2'><p role='alert' className='text-sm text-destructive'>Unable to load workspace information.</p><Button type='button' variant='outline' onClick={() => void pageQuery.refetch()}>Try again</Button></div> :
-				<PublishPageToSiteForm workspaceId={workspaceId} sitesQuery={sitesQuery} isPending={publishPageToSite.isPending} error={formError} onPublish={handlePublishToSite} onChange={() => setFormError(null)} />
 			) : (
-		<form className='space-y-4' onSubmit={handlePublish}>
-			<div className='space-y-1'>
-				<h2 className='text-sm font-medium'>Publish this page to the web</h2>
-				<p className='text-xs text-muted-foreground'>
-					Choose the site address for this public page.
-				</p>
-			</div>
-
-			<div className='space-y-2'>
-				<label htmlFor='page-publication-subdomain' className='text-xs font-medium'>
-					Site address
-				</label>
-				<Input
-					id='page-publication-subdomain'
-					value={subdomain}
-					maxLength={63}
-					aria-invalid={Boolean(formError)}
-					aria-describedby={formError ? "page-publication-error" : undefined}
-					placeholder='abcd'
-					autoCapitalize='none'
-					autoCorrect='off'
-					disabled={publishPage.isPending}
-					onChange={(event) => {
-						setSubdomain(event.target.value.toLowerCase());
-						setFormError(null);
-					}}
-				/>
-				<p className='text-xs text-muted-foreground'>
-					Preview: {previewPath}
-				</p>
-				{formError ? (
-					<p id='page-publication-error' role='alert' className='text-xs text-destructive'>
-						{formError}
-					</p>
-				) : null}
-			</div>
-
-			<div className='flex justify-end'>
-				<Button type='submit' disabled={publishPage.isPending}>
-					{publishPage.isPending ? "Publishing..." : "Publish"}
-				</Button>
-			</div>
-		</form>
+				/* Child Inherited */
+				<div className='flex justify-end'>
+					<Button
+						type='button'
+						className='bg-[#2e8de6] text-white hover:bg-[#2078ce]'
+						onClick={handleViewSite}
+					>
+						<ExternalLink className='mr-1.5 size-4' />
+						View site
+					</Button>
+				</div>
 			)}
+
+			{/* Unpublish Confirmation Alert */}
+			<AlertDialog open={confirmUnpublish} onOpenChange={setConfirmUnpublish}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Unpublish this page?</AlertDialogTitle>
+						<AlertDialogDescription>
+							People with this public link will no longer be able to access the page.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel disabled={busy}>Cancel</AlertDialogCancel>
+						<AlertDialogAction
+							variant='destructive'
+							disabled={busy}
+							onClick={(event) => {
+								event.preventDefault();
+								void handleUnpublish();
+							}}
+						>
+							Unpublish
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	);
 }

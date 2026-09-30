@@ -41,6 +41,7 @@ export type PublicPageBlock = {
 };
 
 export type PublicSitePage = {
+	breadcrumbs: PublicBreadcrumb[];
 	subdomain: string;
 
 	path: string;
@@ -48,4 +49,10 @@ export type PublicSitePage = {
 	page: PublicPage;
 
 	blocks: PublicPageBlock[];
+};
+
+export type PublicBreadcrumb = {
+	page_id: string;
+	title: string;
+	path: string;
 };

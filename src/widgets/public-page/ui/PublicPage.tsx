@@ -1,6 +1,15 @@
 import type { PublicSitePage } from "@/entities/public-site/model/public-site.types";
 import { Skeleton } from "@/shared/ui/skeleton";
 
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbPage,
+	BreadcrumbSeparator,
+} from "@/shared/ui/breadcrumb";
+import { Fragment } from "react/jsx-runtime";
 import { PublicPageBlockList } from "./PublicPageBlockList";
 
 interface PublicPageProps {
@@ -8,40 +17,73 @@ interface PublicPageProps {
 }
 
 export function PublicPage({ publicSite }: PublicPageProps) {
-	const { page, blocks } = publicSite;
+	const { page, blocks, breadcrumbs } = publicSite;
 
 	return (
-		<article className='w-full min-w-0'>
-			{page.cover_url ? (
-				<div className='h-56 w-full overflow-hidden sm:h-72'>
-					{/* Public cover URLs can use arbitrary backend-approved hosts. */}
-					{/* eslint-disable-next-line @next/next/no-img-element */}
-					<img
-						src={page.cover_url}
-						alt=''
-						className='h-full w-full object-cover'
-					/>
-				</div>
-			) : null}
-
-			<div className='mx-auto w-full max-w-4xl px-6 py-12 sm:px-10 lg:px-12'>
-				<header className='space-y-4'>
-					{page.icon ? (
-						<div className='text-5xl leading-none' aria-hidden='true'>
-							{page.icon}
+		<div className='flex flex-col p-5'>
+			<div className=''>
+				<div className=''></div>
+				{breadcrumbs?.length ? (
+					<Breadcrumb>
+						<BreadcrumbList>
+							{breadcrumbs.map((crumb, index) => (
+								<Fragment key={`${crumb.page_id}-${index}`}>
+									{index > 0 ? <BreadcrumbSeparator /> : null}
+									<BreadcrumbItem>
+										{index === breadcrumbs.length - 1 ? (
+											<BreadcrumbPage className='font-medium'>
+												{crumb.title}
+											</BreadcrumbPage>
+										) : (
+											<BreadcrumbLink href={crumb.path}>
+												{crumb.title}
+											</BreadcrumbLink>
+										)}
+									</BreadcrumbItem>
+								</Fragment>
+							))}
+						</BreadcrumbList>
+					</Breadcrumb>
+				) : null}
+			</div>
+			<div className='w-full min-w-0'>
+				<div className=''></div>
+				<div>
+					{page.cover_url ? (
+						<div className='h-56 w-full overflow-hidden sm:h-72'>
+							{/* Public cover URLs can use arbitrary backend-approved hosts. */}
+							{/* eslint-disable-next-line @next/next/no-img-element */}
+							<img
+								src={page.cover_url}
+								alt=''
+								className='h-full w-full object-cover'
+							/>
 						</div>
 					) : null}
 
-					<h1 className='break-words text-4xl font-bold tracking-tight sm:text-5xl'>
-						{page.title || "Untitled"}
-					</h1>
-				</header>
+					<div className='mx-auto w-full max-w-4xl px-6 py-12 sm:px-10 lg:px-12'>
+						<header className='space-y-4'>
+							{page.icon ? (
+								<div
+									className='text-5xl leading-none'
+									aria-hidden='true'
+								>
+									{page.icon}
+								</div>
+							) : null}
 
-				<div className='mt-12'>
-					<PublicPageBlockList blocks={blocks} />
+							<h1 className='break-words text-4xl font-bold tracking-tight sm:text-5xl'>
+								{page.title || "Untitled"}
+							</h1>
+						</header>
+
+						<div className='mt-12'>
+							<PublicPageBlockList blocks={blocks} />
+						</div>
+					</div>
 				</div>
 			</div>
-		</article>
+		</div>
 	);
 }
 

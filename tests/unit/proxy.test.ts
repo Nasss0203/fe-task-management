@@ -49,6 +49,10 @@ describe("public site hostname proxy", () => {
 			"http://abcd.localhost:3000/public/abcd",
 		);
 	});
+	it("rewrites a nested local public page to the matching catch-all route", () => {
+		const response = runProxy("http://asss.localhost:3000/about", "asss.localhost:3000");
+		expect(getRewrittenUrl(response)).toBe("http://asss.localhost:3000/public/asss/about");
+	});
 
 	it.each([
 		["apex domain", "https://task.com/dashboard", "task.com"],

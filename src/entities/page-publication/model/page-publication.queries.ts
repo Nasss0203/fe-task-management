@@ -7,20 +7,9 @@ export const pagePublicationKeys = {
 
 	detail: (pageId: string) =>
 		[...pagePublicationKeys.all, "detail", pageId] as const,
-	workspaceSites: (workspaceId: string) =>
-		[...pagePublicationKeys.all, "workspace-sites", workspaceId] as const,
-	sitePublications: (siteId: string) =>
-		[...pagePublicationKeys.all, "site-publications", siteId] as const,
+	list: (pageId: string) =>
+		[...pagePublicationKeys.all, "list", pageId] as const,
 };
-
-export function useWorkspacePublishedSites(workspaceId?: string) {
-	return useQuery({
-		queryKey: pagePublicationKeys.workspaceSites(workspaceId ?? ""),
-		queryFn: ({ signal }) =>
-			pagePublicationApi.listWorkspacePublishedSites(workspaceId!, signal),
-		enabled: Boolean(workspaceId),
-	});
-}
 
 export function usePagePublication(pageId?: string) {
 	return useQuery({
@@ -29,6 +18,14 @@ export function usePagePublication(pageId?: string) {
 		queryFn: ({ signal }) =>
 			pagePublicationApi.getPagePublication(pageId!, signal),
 
+		enabled: Boolean(pageId),
+	});
+}
+
+export function usePagePublications(pageId?: string) {
+	return useQuery({
+		queryKey: pagePublicationKeys.list(pageId ?? ""),
+		queryFn: ({ signal }) => pagePublicationApi.listPagePublications(pageId!, signal),
 		enabled: Boolean(pageId),
 	});
 }
