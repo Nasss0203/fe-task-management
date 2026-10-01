@@ -8,7 +8,7 @@ import {
 	SidebarMenuItem,
 } from "@/widgets/workspace-sidebar/ui/sidebar";
 
-export type NavMainAction = "home" | "inbox";
+export type NavMainAction = "home" | "inbox" | "ai";
 
 export interface NavMainItem {
 	title: string;
@@ -16,6 +16,7 @@ export interface NavMainItem {
 	icon: LucideIcon;
 	action?: NavMainAction;
 	badge?: string;
+	isActive?: boolean;
 }
 
 interface NavMainProps {
@@ -29,7 +30,9 @@ export function NavMain({ items, activeAction, onAction }: NavMainProps) {
 		<SidebarMenu>
 			{items.map((item) => {
 				const isActive =
-					item.action !== undefined && item.action === activeAction;
+					item.isActive !== undefined
+						? item.isActive
+						: item.action !== undefined && item.action === activeAction;
 
 				return (
 					<SidebarMenuItem key={item.title}>

@@ -10,7 +10,7 @@ import {
 	Sparkles,
 	Trash2,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { useWorkspaceSubscription } from "@/entities/billing/model/billing.queries";
@@ -36,7 +36,7 @@ import {
 	Sidebar,
 	SidebarContent,
 	SidebarHeader,
-	SidebarRail,
+	SidebarResizeHandle,
 } from "@/widgets/workspace-sidebar/ui/sidebar";
 import { TeamSwitcher } from "@/widgets/workspace-sidebar/ui/team-switcher";
 
@@ -75,12 +75,13 @@ const data = {
 		},
 		{
 			title: "Ask AI",
-			url: "#",
+			url: "/ai",
 			icon: Sparkles,
+			action: "ai",
 		},
 		{
 			title: "Home",
-			url: "#",
+			url: "/dashboard",
 			icon: Home,
 			action: "home",
 		},
@@ -121,6 +122,7 @@ type SidebarView = (typeof SidebarView)[keyof typeof SidebarView];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const pathname = usePathname();
+	const router = useRouter();
 
 	const { data: workspaces = [], isLoading, isError } = useWorkspaces();
 
@@ -238,20 +240,34 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	/**
 	 * Main navigation actions.
 	 */
+	const isAiRoute = pathname === "/ai" || pathname.startsWith("/ai/");
+
 	const handleMainAction = (action: NavMainAction) => {
 		switch (action) {
 			case "home":
 				setView(SidebarView.WORKSPACE);
+				if (pathname !== "/dashboard") {
+					router.push("/dashboard");
+				}
 				break;
 
 			case "inbox":
 				setView(SidebarView.INBOX);
 				break;
+
+			case "ai":
+				setView(SidebarView.WORKSPACE);
+				router.push("/ai");
+				break;
 		}
 	};
 
 	const activeMainAction: NavMainAction =
-		view === SidebarView.INBOX ? "inbox" : "home";
+		view === SidebarView.INBOX
+			? "inbox"
+			: isAiRoute
+				? "ai"
+				: "home";
 
 	/**
 	 * Inbox unread badge.
@@ -390,7 +406,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				)}
 			</SidebarContent>
 
-			<SidebarRail />
+			<SidebarResizeHandle />
 		</Sidebar>
 	);
 }

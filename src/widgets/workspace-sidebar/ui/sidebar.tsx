@@ -24,10 +24,16 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/shared/ui/tooltip";
+import {
+	DEFAULT_SIDEBAR_WIDTH,
+	MAX_SIDEBAR_WIDTH,
+	MIN_SIDEBAR_WIDTH,
+	SIDEBAR_WIDTH_STORAGE_KEY,
+} from "../model/use-resizable-sidebar";
+import { SidebarResizeHandle } from "./sidebar-resize-handle";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
-const SIDEBAR_WIDTH = "16rem";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
@@ -40,6 +46,10 @@ type SidebarContextProps = {
 	setOpenMobile: (open: boolean) => void;
 	isMobile: boolean;
 	toggleSidebar: () => void;
+	sidebarWidth: number;
+	setSidebarWidth: React.Dispatch<React.SetStateAction<number>>;
+	isResizing: boolean;
+	setIsResizing: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const SidebarContext = React.createContext<SidebarContextProps | null>(null);
@@ -57,6 +67,7 @@ function SidebarProvider({
 	defaultOpen = true,
 	open: openProp,
 	onOpenChange: setOpenProp,
+	defaultWidth = DEFAULT_SIDEBAR_WIDTH,
 	className,
 	style,
 	children,
@@ -65,6 +76,7 @@ function SidebarProvider({
 	defaultOpen?: boolean;
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
+	defaultWidth?: number;
 }) {
 	const isMobile = useIsMobile();
 	const [openMobile, setOpenMobile] = React.useState(false);
@@ -111,6 +123,29 @@ function SidebarProvider({
 		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, [toggleSidebar]);
 
+	// Resizable desktop sidebar width state
+	const [sidebarWidth, setSidebarWidth] = React.useState<number>(defaultWidth);
+	const [isResizing, setIsResizing] = React.useState(false);
+
+	// Restore chosen desktop width on mount
+	React.useEffect(() => {
+		try {
+			const stored = localStorage.getItem(SIDEBAR_WIDTH_STORAGE_KEY);
+			if (stored) {
+				const parsed = Number(stored);
+				if (
+					!isNaN(parsed) &&
+					parsed >= MIN_SIDEBAR_WIDTH &&
+					parsed <= MAX_SIDEBAR_WIDTH
+				) {
+					setSidebarWidth(parsed);
+				}
+			}
+		} catch {
+			// ignore storage access errors
+		}
+	}, []);
+
 	// We add a state so that we can do data-state="expanded" or "collapsed".
 	// This makes it easier to style the sidebar with Tailwind classes.
 	const state = open ? "expanded" : "collapsed";
@@ -124,6 +159,10 @@ function SidebarProvider({
 			openMobile,
 			setOpenMobile,
 			toggleSidebar,
+			sidebarWidth,
+			setSidebarWidth,
+			isResizing,
+			setIsResizing,
 		}),
 		[
 			state,
@@ -133,6 +172,10 @@ function SidebarProvider({
 			openMobile,
 			setOpenMobile,
 			toggleSidebar,
+			sidebarWidth,
+			setSidebarWidth,
+			isResizing,
+			setIsResizing,
 		],
 	);
 
@@ -141,15 +184,21 @@ function SidebarProvider({
 			<TooltipProvider delayDuration={0}>
 				<div
 					data-slot='sidebar-wrapper'
+					data-resizing={isResizing}
 					style={
 						{
-							"--sidebar-width": SIDEBAR_WIDTH,
 							"--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
 							...style,
+							"--sidebar-width":
+								(style as Record<string, string | undefined>)?.[
+									"--sidebar-width"
+								] ?? `${sidebarWidth}px`,
 						} as React.CSSProperties
 					}
 					className={cn(
 						"group/sidebar-wrapper flex min-h-svh w-full has-data-[variant=inset]:bg-sidebar",
+						isResizing &&
+							"[&_[data-slot=sidebar-gap]]:transition-none [&_[data-slot=sidebar-container]]:transition-none select-none cursor-col-resize",
 						className,
 					)}
 					{...props}
@@ -258,7 +307,7 @@ function Sidebar({
 				<div
 					data-sidebar='sidebar'
 					data-slot='sidebar-inner'
-					className='flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow-sm'
+					className='relative flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow-sm'
 				>
 					{children}
 				</div>
@@ -746,6 +795,7 @@ export {
 	SidebarMenuSubItem,
 	SidebarProvider,
 	SidebarRail,
+	SidebarResizeHandle,
 	SidebarSeparator,
 	SidebarTrigger,
 	useSidebar,

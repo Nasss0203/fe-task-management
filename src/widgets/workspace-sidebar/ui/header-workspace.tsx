@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react";
+
 import {
 	Breadcrumb,
 	BreadcrumbItem,
@@ -17,14 +19,15 @@ import { SidebarTrigger } from "@/widgets/workspace-sidebar/ui/sidebar";
 interface HeaderWorkspaceProps {
 	workspaceName?: string;
 	pageTitle?: string;
-
 	pageId?: string;
+	rightAction?: React.ReactNode;
 }
 
 export function HeaderWorkspace({
 	workspaceName,
 	pageTitle,
 	pageId,
+	rightAction,
 }: HeaderWorkspaceProps) {
 	return (
 		<header className='flex h-10 shrink-0 items-center gap-2'>
@@ -62,7 +65,7 @@ export function HeaderWorkspace({
 			</div>
 
 			<div className='ml-auto px-3'>
-				<DashboardHeader pageId={pageId} />
+				{rightAction ?? <DashboardHeader pageId={pageId} />}
 			</div>
 		</header>
 	);
