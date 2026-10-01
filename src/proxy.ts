@@ -1,60 +1,11 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import {
+	getPublicSiteSubdomain,
+	normalizeHostname,
+} from "@/shared/lib/public-site-host";
 
-const RESERVED_SUBDOMAINS = new Set(["api", "www"]);
-const SUBDOMAIN_PATTERN = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
 const STATIC_ASSET_PATTERN = /\.[^/]+$/;
-
-function normalizeHostname(host: string): string {
-	return host.trim().toLowerCase().replace(/:\d+$/, "").replace(/\.$/, "");
-}
-
-function getConfiguredRootDomain(): string | null {
-	const value = process.env.NEXT_PUBLIC_APP_DOMAIN;
-
-	if (!value) return null;
-
-	const domain = normalizeHostname(value);
-
-	if (!domain || domain.includes("/") || domain.includes(":")) {
-		return null;
-	}
-
-	return domain;
-}
-
-function getPublicSiteSubdomain(hostname: string): string | null {
-	let candidate: string | null = null;
-
-	if (hostname.endsWith(".localhost")) {
-		candidate = hostname.slice(0, -".localhost".length);
-	} else {
-		const rootDomain = getConfiguredRootDomain();
-
-		if (!rootDomain || hostname === rootDomain) {
-			return null;
-		}
-
-		const rootDomainSuffix = `.${rootDomain}`;
-
-		if (!hostname.endsWith(rootDomainSuffix)) {
-			return null;
-		}
-
-		candidate = hostname.slice(0, -rootDomainSuffix.length);
-	}
-
-	if (
-		!candidate ||
-		candidate.includes(".") ||
-		!SUBDOMAIN_PATTERN.test(candidate) ||
-		RESERVED_SUBDOMAINS.has(candidate)
-	) {
-		return null;
-	}
-
-	return candidate;
-}
 
 function isExcludedPath(pathname: string): boolean {
 	return (

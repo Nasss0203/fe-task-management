@@ -19,6 +19,16 @@ export type PublishSitePayload = {
 	include_descendants: boolean;
 };
 
+export type PublicationSettingsPayload =
+	| {
+			include_descendants: boolean;
+			allow_updates?: never;
+	  }
+	| {
+			include_descendants?: never;
+			allow_updates: boolean;
+	  };
+
 export type PagePublicationType = "DIRECT" | "INHERITED";
 
 export type PagePublication = {
@@ -30,6 +40,7 @@ export type PagePublication = {
 	path: string;
 	publication_type: PagePublicationType;
 	include_descendants: boolean;
+	allow_updates: boolean;
 	published: boolean;
 	published_at: string | null;
 	unpublished_at: string | null;

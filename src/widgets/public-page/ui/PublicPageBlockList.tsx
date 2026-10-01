@@ -14,7 +14,10 @@ export function PublicPageBlockList({ blocks }: PublicPageBlockListProps) {
 	}
 
 	return (
-		<div className='w-full min-w-0 max-w-full space-y-2'>
+		<div
+			className='pointer-events-auto w-full min-w-0 max-w-full select-text space-y-2'
+			data-testid='public-block-list'
+		>
 			{blockTree.map((block) => (
 				<div key={block.id} className='min-w-0 py-0.5'>
 					<ReadOnlyPageBlockRenderer

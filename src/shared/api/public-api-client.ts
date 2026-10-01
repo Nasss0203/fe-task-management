@@ -12,4 +12,31 @@ const publicApiClient = axios.create({
 	withCredentials: false,
 });
 
+type PublicApiClientAuthAdapter = {
+	getAccessToken: () => string | null;
+};
+
+let authAdapter: PublicApiClientAuthAdapter = {
+	getAccessToken: () => null,
+};
+
+export const configurePublicApiClientAuth = (
+	adapter: PublicApiClientAuthAdapter,
+) => {
+	authAdapter = adapter;
+};
+
+publicApiClient.interceptors.request.use(
+	(config) => {
+		const token = authAdapter.getAccessToken();
+
+		if (token) {
+			config.headers.Authorization = `Bearer ${token}`;
+		}
+
+		return config;
+	},
+	(error) => Promise.reject(error),
+);
+
 export default publicApiClient;

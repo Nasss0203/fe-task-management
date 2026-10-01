@@ -4,6 +4,7 @@ import instance from "@/shared/api/api-client";
 import type {
 	PagePublicationStatus,
 	PagePublication,
+	PublicationSettingsPayload,
 	PublishSitePayload,
 	PublishSiteResponse,
 	UnpublishSiteResponse,
@@ -16,7 +17,7 @@ export const pagePublicationApi = {
 		const response = await instance.get<ApiResponse<PagePublication[]>>(`${PAGE_API}/${pageId}/publications`, { signal });
 		return response.data.data;
 	},
-	updatePublicationSettings: async (pageId: string, siteId: string, payload: { include_descendants: boolean }): Promise<PagePublication> => {
+	updatePublicationSettings: async (pageId: string, siteId: string, payload: PublicationSettingsPayload): Promise<PagePublication> => {
 		const response = await instance.patch<ApiResponse<PagePublication>>(`${PAGE_API}/${pageId}/publication/settings`, payload, { params: { site_id: siteId } });
 		return response.data.data;
 	},

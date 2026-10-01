@@ -3,6 +3,7 @@ import axios, {
   type AxiosResponse,
   type InternalAxiosRequestConfig,
 } from "axios";
+import { isPublicSiteHostname } from "@/shared/lib/public-site-host";
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -42,9 +43,19 @@ export const configureApiClientAuth = (adapter: ApiClientAuthAdapter) => {
   authAdapter = adapter;
 };
 
+export const shouldRedirectToSignIn = (hostname: string, pathname: string) =>
+  pathname !== "/sign-in" && !isPublicSiteHostname(hostname);
+
 const redirectToSignIn = () => {
   if (typeof window === "undefined") return;
-  if (window.location.pathname === "/sign-in") return;
+  if (
+    !shouldRedirectToSignIn(
+      window.location.hostname,
+      window.location.pathname,
+    )
+  ) {
+    return;
+  }
 
   window.location.assign("/sign-in");
 };

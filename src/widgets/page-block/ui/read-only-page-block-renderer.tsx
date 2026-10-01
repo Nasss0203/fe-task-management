@@ -1,3 +1,5 @@
+"use client";
+
 import {
 	BookmarkIcon,
 	ChevronDown,
@@ -6,6 +8,7 @@ import {
 	ImageIcon,
 	VideoIcon,
 } from "lucide-react";
+import { Fragment, useState } from "react";
 
 import { getDatabaseViewConfig } from "@/entities/page-block/lib/get-database-view-config";
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
@@ -143,7 +146,7 @@ function ReadOnlyTextBlock({ block }: ReadOnlyPageBlockRendererProps) {
 
 	return (
 		<p className='min-h-7 whitespace-pre-wrap text-base leading-7'>
-			{text || <EmptyValue>Empty text</EmptyValue>}
+			{text ? <ReadOnlyRichText text={text} /> : <EmptyValue>Empty text</EmptyValue>}
 		</p>
 	);
 }
@@ -156,7 +159,7 @@ function ReadOnlyHeadingBlock({ block }: ReadOnlyPageBlockRendererProps) {
 	if (level === 2 || level === "2") {
 		return (
 			<h2 className='min-h-8 whitespace-pre-wrap text-2xl font-semibold leading-8'>
-				{text || <EmptyValue>Heading 2</EmptyValue>}
+				{text ? <ReadOnlyRichText text={text} /> : <EmptyValue>Heading 2</EmptyValue>}
 			</h2>
 		);
 	}
@@ -164,14 +167,14 @@ function ReadOnlyHeadingBlock({ block }: ReadOnlyPageBlockRendererProps) {
 	if (level === 3 || level === "3") {
 		return (
 			<h3 className='min-h-7 whitespace-pre-wrap text-xl font-semibold leading-7'>
-				{text || <EmptyValue>Heading 3</EmptyValue>}
+				{text ? <ReadOnlyRichText text={text} /> : <EmptyValue>Heading 3</EmptyValue>}
 			</h3>
 		);
 	}
 
 	return (
 		<h1 className='min-h-10 whitespace-pre-wrap text-3xl font-bold leading-10'>
-			{text || <EmptyValue>Heading 1</EmptyValue>}
+			{text ? <ReadOnlyRichText text={text} /> : <EmptyValue>Heading 1</EmptyValue>}
 		</h1>
 	);
 }
@@ -200,7 +203,7 @@ function ReadOnlyTodoBlock({ block }: ReadOnlyPageBlockRendererProps) {
 					checked ? "text-muted-foreground line-through" : ""
 				}`}
 			>
-				{text || <EmptyValue>To-do</EmptyValue>}
+				{text ? <ReadOnlyRichText text={text} /> : <EmptyValue>To-do</EmptyValue>}
 			</p>
 		</div>
 	);
@@ -212,12 +215,19 @@ function ReadOnlyToggleBlock({
 	disableDatabaseView,
 }: ReadOnlyPageBlockRendererProps) {
 	const text = getString(getContent(block), "text");
+	const [isOpen, setIsOpen] = useState(block.is_open);
 
 	return (
 		<div className='w-full'>
-			<div className='flex min-h-7 items-start'>
+			<button
+				type='button'
+				aria-expanded={isOpen}
+				aria-controls={`toggle-children-${block.id}`}
+				className='flex min-h-7 w-full items-start rounded-sm text-left hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+				onClick={() => setIsOpen((current) => !current)}
+			>
 				<span className='flex size-7 shrink-0 items-center justify-center text-muted-foreground'>
-					{block.is_open ? (
+					{isOpen ? (
 						<ChevronDown className='size-4' />
 					) : (
 						<ChevronRight className='size-4' />
@@ -227,10 +237,10 @@ function ReadOnlyToggleBlock({
 				<p className='min-h-7 whitespace-pre-wrap text-base leading-7'>
 					{text || <EmptyValue>Toggle</EmptyValue>}
 				</p>
-			</div>
+			</button>
 
-			{block.is_open && block.children.length > 0 && (
-				<div className='ml-7 pl-2'>
+			{isOpen && block.children.length > 0 && (
+				<div id={`toggle-children-${block.id}`} className='ml-7 pl-2'>
 					{block.children.map((child) => (
 						<ReadOnlyPageBlockRenderer
 							key={child.id}
@@ -250,7 +260,7 @@ function ReadOnlyQuoteBlock({ block }: ReadOnlyPageBlockRendererProps) {
 
 	return (
 		<blockquote className='min-h-7 border-l-4 border-foreground/70 pl-4 text-base italic leading-7'>
-			{text || <EmptyValue>Quote</EmptyValue>}
+			{text ? <ReadOnlyRichText text={text} /> : <EmptyValue>Quote</EmptyValue>}
 		</blockquote>
 	);
 }
@@ -439,7 +449,12 @@ function ReadOnlyBookmarkBlock({ block }: ReadOnlyPageBlockRendererProps) {
 	}
 
 	return (
-		<div className='flex w-full max-w-3xl overflow-hidden rounded-md border border-border'>
+		<a
+			href={url}
+			target='_blank'
+			rel='noopener noreferrer'
+			className='group flex w-full max-w-3xl overflow-hidden rounded-md border border-border transition-colors hover:bg-muted/30'
+		>
 			<div className='min-w-0 flex flex-1 flex-col justify-between p-3'>
 				<div className='min-w-0'>
 					<p className='line-clamp-2 text-sm font-medium'>
@@ -465,8 +480,42 @@ function ReadOnlyBookmarkBlock({ block }: ReadOnlyPageBlockRendererProps) {
 					/>
 				</div>
 			)}
-		</div>
+		</a>
 	);
+}
+
+function ReadOnlyRichText({ text }: { text: string }) {
+	const parts = [];
+	const linkPattern = /\[([^\]]+)]\(((?:https?:\/\/|mailto:)[^\s)]+)\)|((?:https?:\/\/|mailto:)[^\s]+)/gi;
+	let previousIndex = 0;
+
+	for (const match of text.matchAll(linkPattern)) {
+		const matchIndex = match.index;
+		if (matchIndex > previousIndex) {
+			parts.push(text.slice(previousIndex, matchIndex));
+		}
+
+		const href = match[2] ?? match[3];
+		const label = match[1] ?? href;
+		parts.push(
+			<a
+				key={`${matchIndex}-${href}`}
+				href={href}
+				target='_blank'
+				rel='noopener noreferrer'
+				className='text-primary underline decoration-primary/50 underline-offset-2 hover:decoration-primary'
+			>
+				{label}
+			</a>,
+		);
+		previousIndex = matchIndex + match[0].length;
+	}
+
+	if (previousIndex < text.length) {
+		parts.push(text.slice(previousIndex));
+	}
+
+	return <Fragment>{parts}</Fragment>;
 }
 
 export function ReadOnlyPageBlockRenderer({

@@ -35,7 +35,9 @@ interface PublicPageProps {
 }
 
 export function PublicPage({ publicSite }: PublicPageProps) {
-	const { page, blocks, breadcrumbs, subdomain, path } = publicSite;
+	const { page, blocks, breadcrumbs, subdomain, path, capabilities } = publicSite;
+	const canInteract = true;
+	const canMutate = capabilities.can_update;
 	const isMobile = useIsMobile();
 	const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
 	const [lastSidebarWidth, setLastSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
@@ -104,7 +106,11 @@ export function PublicPage({ publicSite }: PublicPageProps) {
 	};
 
 	return (
-		<div className='flex min-h-screen w-full bg-background text-foreground'>
+		<div
+			className='flex min-h-screen w-full bg-background text-foreground'
+			data-can-interact={canInteract}
+			data-can-mutate={canMutate}
+		>
 			{/* Desktop Sidebar */}
 			{!isMobile ? (
 				<aside

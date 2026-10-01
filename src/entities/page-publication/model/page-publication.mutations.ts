@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { pagePublicationApi } from "../api/page-publication.api";
 import { pagePublicationKeys } from "./page-publication.queries";
-import type { PublishSitePayload } from "./page-publication.types";
+import type { PublicationSettingsPayload, PublishSitePayload } from "./page-publication.types";
 
 export function usePublishPage(pageId: string) {
 	const queryClient = useQueryClient();
@@ -67,16 +67,8 @@ export function useRepublishPage(pageId: string) {
 export function useUpdatePublicationSettings(pageId: string) {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: ({
-			siteId,
-			include_descendants,
-		}: {
-			siteId: string;
-			include_descendants: boolean;
-		}) =>
-			pagePublicationApi.updatePublicationSettings(pageId, siteId, {
-				include_descendants,
-			}),
+		mutationFn: ({ siteId, payload }: { siteId: string; payload: PublicationSettingsPayload }) =>
+			pagePublicationApi.updatePublicationSettings(pageId, siteId, payload),
 		onSuccess: async () => {
 			await Promise.all([
 				queryClient.invalidateQueries({

@@ -40,6 +40,12 @@ export type PublicPageBlock = {
 	is_open: boolean;
 };
 
+export type PublicPageCapabilities = {
+	updates_enabled: boolean;
+	authenticated: boolean;
+	can_update: boolean;
+};
+
 export type PublicSitePage = {
 	breadcrumbs: PublicBreadcrumb[];
 	subdomain: string;
@@ -49,6 +55,8 @@ export type PublicSitePage = {
 	page: PublicPage;
 
 	blocks: PublicPageBlock[];
+
+	capabilities: PublicPageCapabilities;
 };
 
 export type PublicBreadcrumb = {

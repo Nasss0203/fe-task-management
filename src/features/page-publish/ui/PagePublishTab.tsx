@@ -1,7 +1,7 @@
 "use client";
 
 import { isAxiosError } from "axios";
-import { ExternalLink, Link2 } from "lucide-react";
+import { ExternalLink, Link2, Settings } from "lucide-react";
 import { useState } from "react";
 import { buildPublicSiteUrl } from "@/entities/page-publication/lib/build-public-site-url";
 import { getCurrentPagePublication } from "@/entities/page-publication/lib/get-current-page-publication";
@@ -9,7 +9,6 @@ import {
 	usePublishPage,
 	useRepublishPage,
 	useUnpublishPage,
-	useUpdatePublicationSettings,
 	useUpdatePageVisibility,
 } from "@/entities/page-publication/model/page-publication.mutations";
 import { usePagePublication, usePagePublications } from "@/entities/page-publication/model/page-publication.queries";
@@ -27,6 +26,7 @@ import {
 } from "@/shared/ui/alert-dialog";
 import { Button } from "@/shared/ui/button";
 import { Skeleton } from "@/shared/ui/skeleton";
+import { PublicationSettingsDialog } from "./PublicationSettingsDialog";
 
 function getErrorMessage(error: unknown, fallback: string): string {
 	if (
@@ -46,11 +46,11 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 	const publishPage = usePublishPage(pageId);
 	const unpublishPage = useUnpublishPage(pageId);
 	const republishPage = useRepublishPage(pageId);
-	const updateSettings = useUpdatePublicationSettings(pageId);
 	const updateVisibility = useUpdatePageVisibility(pageId);
 
 	const [copied, setCopied] = useState(false);
 	const [confirmUnpublish, setConfirmUnpublish] = useState(false);
+	const [settingsOpen, setSettingsOpen] = useState(false);
 	const [draftIncludeDescendants, setDraftIncludeDescendants] = useState<boolean | null>(null);
 	const [formError, setFormError] = useState<string | null>(null);
 
@@ -78,7 +78,6 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 		publishPage.isPending ||
 		unpublishPage.isPending ||
 		republishPage.isPending ||
-		updateSettings.isPending ||
 		updateVisibility.isPending;
 
 	if (pageQuery.isPending || publicationsQuery.isPending || (!isRootPage && statusQuery.isPending)) {
@@ -150,24 +149,6 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 		}
 	};
 
-	const handleToggleSubpages = async (checked: boolean) => {
-		setFormError(null);
-		if (isPublished && currentPublication) {
-			try {
-				await updateSettings.mutateAsync({
-					siteId: currentPublication.site_id,
-					include_descendants: checked,
-				});
-			} catch (error) {
-				setFormError(
-					getErrorMessage(error, "Unable to update subpage publication settings."),
-				);
-			}
-		} else {
-			setDraftIncludeDescendants(checked);
-		}
-	};
-
 	const handleToggleChild = async (checked: boolean) => {
 		setFormError(null);
 		try {
@@ -182,12 +163,6 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 		try {
 			if (currentPublication && !currentPublication.published) {
 				await republishPage.mutateAsync(currentPublication.site_id);
-				if (includeDescendants !== currentPublication.include_descendants) {
-					await updateSettings.mutateAsync({
-						siteId: currentPublication.site_id,
-						include_descendants: includeDescendants,
-					});
-				}
 			} else {
 				await publishPage.mutateAsync({
 					include_descendants: includeDescendants,
@@ -211,7 +186,19 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 
 	return (
 		<div className='space-y-4 px-4 py-4 text-sm'>
-			<h3 className='text-sm font-semibold text-[#f1f1f1]'>Publish</h3>
+			<div className='flex items-center justify-between gap-3'>
+				<h3 className='text-sm font-semibold text-[#f1f1f1]'>Publish</h3>
+				<Button
+					type='button'
+					variant='ghost'
+					size='sm'
+					className='h-8 gap-1.5 px-2 text-[#bbb] hover:bg-white/5 hover:text-white'
+					onClick={() => setSettingsOpen(true)}
+				>
+					<Settings className='size-4' />
+					Settings
+				</Button>
+			</div>
 
 			{/* URL row */}
 			<div className='space-y-1.5'>
@@ -243,32 +230,14 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 				</div>
 			</div>
 
-			{/* Status / Settings */}
-			{isRootPage ? (
-				<div className='space-y-1'>
-					<label className='flex cursor-pointer items-center justify-between gap-3 text-sm text-[#e5e5e5]'>
-						<span>Publish subpages</span>
-						<input
-							type='checkbox'
-							role='checkbox'
-							aria-label='Publish subpages'
-							className='size-4 accent-[#2e8de6]'
-							checked={includeDescendants}
-							disabled={busy}
-							onChange={(e) => void handleToggleSubpages(e.target.checked)}
-						/>
-					</label>
-					<p className='text-xs text-[#888]'>
-						Default for subpages. You can change individual pages separately.
-					</p>
-				</div>
-			) : (
+			{/* Status */}
+			{!isRootPage ? (
 				<p className='text-xs text-[#999]'>
 					{isPublished
 						? "This page is published on the site."
 						: "This page is not currently public."}
 				</p>
-			)}
+			) : null}
 
 			{formError ? (
 				<p role='alert' className='text-xs text-destructive'>
@@ -348,6 +317,15 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
+
+			<PublicationSettingsDialog
+				open={settingsOpen}
+				onOpenChange={setSettingsOpen}
+				pageId={pageId}
+				publication={currentPublication}
+				draftIncludeDescendants={includeDescendants}
+				onDraftIncludeDescendantsChange={setDraftIncludeDescendants}
+			/>
 		</div>
 	);
 }
