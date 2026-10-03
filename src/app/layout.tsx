@@ -14,9 +14,9 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-	title: "Taskmanly - Smarter project execution",
+	title: "Taskmanly - The connected workspace",
 	description:
-		"The optimal solution for collaborative tasks across diverse functions.",
+		"Docs, databases, tasks & AI in one unified workspace.",
 };
 
 export default function RootLayout({

@@ -13,7 +13,7 @@ interface GoogleLoginButtonProps {
 const GoogleLoginButton = ({
 	className,
 	label = "Tiếp tục với Google",
-	variant = "default",
+	variant = "outline",
 	size = "default",
 }: GoogleLoginButtonProps) => {
 	const handleLoginGoogle = async () => {
@@ -26,10 +26,13 @@ const GoogleLoginButton = ({
 			variant={variant}
 			size={size}
 			onClick={handleLoginGoogle}
-			className={cn("flex items-center gap-1.5", className)}
+			className={cn(
+				"flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-border/80 bg-background/80 text-sm font-medium text-foreground shadow-2xs transition-colors hover:bg-muted/60",
+				className
+			)}
 		>
-			<FcGoogle size={16} />
-			{label}
+			<FcGoogle className='h-4.5 w-4.5 shrink-0' />
+			<span>{label}</span>
 		</Button>
 	);
 };

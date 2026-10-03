@@ -1,27 +1,28 @@
+import React from "react";
 import Footer from "@/widgets/landing/footer";
 import { HeaderLanding } from "@/widgets/landing/header";
-import React from "react";
 
-const layout = ({
+export default function LandingLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
-}>) => {
+}>) {
 	return (
-		<main className='min-h-screen bg-background text-foreground selection:bg-primary/30'>
-			<div className='relative overflow-clip'>
-				{/* Refined Background Mesh */}
-				<div className='absolute inset-0 bg-[radial-gradient(circle_at_top,var(--color-primary)_12%,transparent_50%),radial-gradient(circle_at_bottom,var(--color-secondary)_2%,transparent_50%)] opacity-20' />
-				<div className='absolute inset-0 bg-[linear-gradient(var(--color-border)_1px,transparent_1px),linear-gradient(90deg,var(--color-border)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_80%)] opacity-30' />
+		<div className='min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20 relative overflow-x-hidden'>
+			{/* Subtle ambient lighting mesh */}
+			<div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(120,119,198,0.12),transparent_70%)]' />
+			<div className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_60%_40%_at_50%_100%,rgba(59,130,246,0.06),transparent_70%)]' />
 
-				<div className='relative mx-auto max-w-7xl px-6 pb-20 pt-8 lg:px-8'>
-					<HeaderLanding />
-					{children}
-					<Footer />
-				</div>
+			{/* Sticky Header */}
+			<div className='pt-3 px-4 sm:px-6 sticky top-0 z-50'>
+				<HeaderLanding />
 			</div>
-		</main>
-	);
-};
 
-export default layout;
+			{/* Main Content Area */}
+			<main className='flex-1 relative z-10'>{children}</main>
+
+			{/* Public Footer */}
+			<Footer />
+		</div>
+	);
+}

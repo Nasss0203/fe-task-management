@@ -49,7 +49,11 @@ export {
   useVerifyEmail,
 } from "./model/use-auth";
 export { useUser } from "./model/use-user";
-export { AuthCard } from "./ui/auth-card";
+export {
+  AuthCard,
+  authInputClassName,
+  authSubmitButtonClassName,
+} from "./ui/auth-card";
 export { default as ActivateAdminPage } from "./ui/activate-admin-page";
 export { AuthBootstrap } from "./ui/auth-bootstrap";
 export { default as AuthCallbackPage } from "./ui/auth-callback-page";

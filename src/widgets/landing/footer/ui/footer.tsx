@@ -1,129 +1,118 @@
-import { Button } from "@/shared/ui/button";
-import { LayoutGrid, Mail } from "lucide-react";
 import Link from "next/link";
+import { LayoutGrid } from "lucide-react";
 
-const footerColumns = [
-	{
-		title: "Sản phẩm",
-		links: [
-			"Trang chủ",
-			"Bảng giá",
-			"Doanh nghiệp",
-			"Bảo mật & Tin cậy",
-			"Tích hợp",
-			"Mẫu",
-		],
-	},
-	{
-		title: "Giải pháp",
-		links: [
-			"Quản lý Tác vụ",
-			"Trình soạn thảo",
-			"Wiki Kỹ thuật",
-			"Ghi chú họp",
-			"Quy trình Agile",
-		],
-	},
-	{
-		title: "Tài nguyên",
-		links: [
-			"Trung tâm Trợ giúp",
-			"Blog",
-			"Cộng đồng",
-			"API cho Lập trình viên",
-			"Trợ năng",
-		],
-	},
-	{
-		title: "Công ty",
-		links: ["Về chúng tôi", "Tuyển dụng", "Báo chí", "Khách hàng", "Liên hệ"],
-	},
-];
-
-const Footer = () => {
+export const Footer = () => {
 	return (
-		<footer className='mx-auto mt-32 max-w-6xl rounded-t-[48px] border border-border border-b-0 bg-card'>
-			<div className='border-b border-border px-8 py-20 lg:px-16'>
-				<div className='mx-auto max-w-3xl text-center'>
-					<h2 className='text-4xl font-semibold tracking-tight text-foreground sm:text-5xl'>
-						Sẵn sàng tối ưu hóa?
-					</h2>
-
-					<p className='mx-auto mt-6 max-w-xl text-lg text-muted-foreground'>
-						Tham gia cùng hơn 40.000 đội ngũ kiến tạo tương lai với
-						Taskmanly. Bắt đầu dùng thử miễn phí ngay hôm nay.
-					</p>
-
-					<div className='mx-auto mt-10 flex max-w-md flex-col gap-3 sm:flex-row'>
-						<div className='flex flex-1 items-center gap-3 rounded-full border border-border bg-background px-6 py-3 transition-focus-within focus-within:border-primary/50'>
-							<Mail className='h-4 w-4 text-muted-foreground' />
-							<input
-								type='email'
-								placeholder='Nhập email của bạn'
-								className='w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground'
-							/>
-						</div>
-
-						<Button className='h-12 rounded-full bg-foreground px-8 font-semibold text-background hover:bg-foreground/90 active:scale-[0.98]'>
-							Bắt đầu ngay
-						</Button>
-					</div>
-				</div>
-			</div>
-
-			<div className='px-8 py-16 lg:px-16'>
-				<div className='grid gap-12 lg:grid-cols-6'>
-					<div className='lg:col-span-2'>
-						<div className='flex items-center gap-3'>
-							<div className='flex h-10 w-10 items-center justify-center rounded-xl bg-secondary text-foreground ring-1 ring-border'>
-								<LayoutGrid className='h-5 w-5' />
+		<footer className='border-t border-border/80 bg-card/60 backdrop-blur-sm mt-20 sm:mt-28'>
+			<div className='mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-14 sm:py-16'>
+				<div className='grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12'>
+					{/* Brand Column */}
+					<div className='col-span-2 md:col-span-1 space-y-3.5'>
+						<Link href='/' className='flex items-center gap-2.5'>
+							<div className='flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-xs'>
+								<LayoutGrid className='h-4 w-4' />
 							</div>
-							<span className='text-2xl font-semibold tracking-tight text-foreground'>
+							<span className='text-lg font-bold tracking-tight text-foreground'>
 								Taskmanly
 							</span>
-						</div>
-
-						<p className='mt-6 max-w-xs text-sm leading-relaxed text-muted-foreground'>
-							Giải pháp tối ưu cho cộng tác trên nhiều bộ phận.
-							Được xây dựng cho các nhóm làm việc hiện đại.
+						</Link>
+						<p className='text-xs text-muted-foreground leading-relaxed max-w-xs'>
+							The connected workspace for flexible documents, structured databases, web publishing, and AI collaboration.
 						</p>
 					</div>
 
-					{footerColumns.map((column) => (
-						<div key={column.title}>
-							<h3 className='text-sm font-semibold text-foreground'>
-								{column.title}
-							</h3>
-
-							<div className='mt-6 space-y-4'>
-								{column.links.map((link) => (
-									<Link
-										key={link}
-										href='#'
-										className='block text-sm text-muted-foreground transition-colors hover:text-foreground'
-									>
-										{link}
-									</Link>
-								))}
-							</div>
+					{/* Column 1: Product */}
+					<div className='space-y-3'>
+						<div className='text-xs font-semibold uppercase tracking-wider text-foreground'>
+							Product
 						</div>
-					))}
+						<ul className='space-y-2 text-xs text-muted-foreground'>
+							<li>
+								<Link href='/features' className='hover:text-foreground transition-colors'>
+									Features
+								</Link>
+							</li>
+							<li>
+								<Link href='/templates' className='hover:text-foreground transition-colors'>
+									Templates
+								</Link>
+							</li>
+							<li>
+								<Link href='/ai' className='hover:text-foreground transition-colors'>
+									AI Assistant
+								</Link>
+							</li>
+							<li>
+								<Link href='/publish' className='hover:text-foreground transition-colors'>
+									Web Publishing
+								</Link>
+							</li>
+						</ul>
+					</div>
+
+					{/* Column 2: Resources */}
+					<div className='space-y-3'>
+						<div className='text-xs font-semibold uppercase tracking-wider text-foreground'>
+							Resources
+						</div>
+						<ul className='space-y-2 text-xs text-muted-foreground'>
+							<li>
+								<Link href='/pricing' className='hover:text-foreground transition-colors'>
+									Pricing Plans
+								</Link>
+							</li>
+							<li>
+								<Link href='/templates' className='hover:text-foreground transition-colors'>
+									Template Gallery
+								</Link>
+							</li>
+							<li>
+								<Link href='/features#database-views' className='hover:text-foreground transition-colors'>
+									Database Engine
+								</Link>
+							</li>
+							<li>
+								<Link href='/features#team-collaboration' className='hover:text-foreground transition-colors'>
+									Teamspaces & Roles
+								</Link>
+							</li>
+						</ul>
+					</div>
+
+					{/* Column 3: Account */}
+					<div className='space-y-3'>
+						<div className='text-xs font-semibold uppercase tracking-wider text-foreground'>
+							Account
+						</div>
+						<ul className='space-y-2 text-xs text-muted-foreground'>
+							<li>
+								<Link href='/sign-in' className='hover:text-foreground transition-colors'>
+									Log in
+								</Link>
+							</li>
+							<li>
+								<Link href='/sign-up' className='hover:text-foreground transition-colors'>
+									Get started free
+								</Link>
+							</li>
+							<li>
+								<Link href='/dashboard' className='hover:text-foreground transition-colors'>
+									Workspace Dashboard
+								</Link>
+							</li>
+						</ul>
+					</div>
 				</div>
 
-				<div className='mt-20 flex flex-col gap-6 border-t border-border pt-8 lg:flex-row lg:items-center lg:justify-between'>
-					<p className='text-xs text-muted-foreground font-mono'>
-						© 2024 Taskmanly Inc. All rights reserved.
-					</p>
-					<div className='flex flex-wrap items-center gap-x-8 gap-y-2 text-xs text-muted-foreground'>
-						<Link href='#' className='hover:text-foreground transition-colors'>
-							Chính sách bảo mật
-						</Link>
-						<Link href='#' className='hover:text-foreground transition-colors'>
-							Điều khoản dịch vụ
-						</Link>
-						<Link href='#' className='hover:text-foreground transition-colors'>
-							Bảo mật
-						</Link>
+				{/* Bottom Bar */}
+				<div className='mt-12 pt-6 border-t border-border/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground'>
+					<div>
+						© {new Date().getFullYear()} Taskmanly. All rights reserved.
+					</div>
+					<div className='flex items-center gap-6'>
+						<span className='hover:text-foreground cursor-pointer'>Privacy</span>
+						<span className='hover:text-foreground cursor-pointer'>Terms</span>
+						<span className='hover:text-foreground cursor-pointer'>Security</span>
 					</div>
 				</div>
 			</div>

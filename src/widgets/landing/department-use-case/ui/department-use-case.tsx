@@ -10,8 +10,8 @@ const departmentTabs = [
 ];
 
 const engineeringPoints = [
-	"Viết đặc tả kỹ thuật và liên kết trực tiếp tới các lỗi đang theo dõi.",
-	"Theo dõi tiến độ sprint với các bảng Kanban được tích hợp.",
+	"Viết đặc tả kỹ thuật và liên kết trực tiếp tới các tài liệu liên quan.",
+	"Theo dõi tiến độ và thuộc tính dữ liệu với các chế độ xem Board tích hợp.",
 	"Cộng tác đưa ra quyết định kiến trúc theo thời gian thực.",
 ];
 
@@ -99,7 +99,7 @@ const DepartmentUseCase = () => {
 
 					<p className='mt-6 text-lg text-muted-foreground'>
 						Tối đa hóa hiệu quả nguồn lực và tự tin mở rộng
-						quy trình công việc của bất kỳ sprint nào với độ chính xác cao.
+						quy trình công việc và tài liệu với độ chính xác cao.
 					</p>
 
 					<div className='mt-10 space-y-5'>

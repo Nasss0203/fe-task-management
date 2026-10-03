@@ -55,7 +55,7 @@ export function HomeQuickActions({ workspaceId }: HomeQuickActionsProps) {
 					type='button'
 					variant='outline'
 					size='sm'
-					onClick={() => router.push("/ai")}
+					onClick={() => router.push("/dashboard/ai")}
 					className='h-8 gap-1.5 rounded-lg border-border/60 bg-background text-xs font-medium text-foreground hover:bg-accent/50'
 				>
 					<Sparkles className='size-3.5 text-primary' />

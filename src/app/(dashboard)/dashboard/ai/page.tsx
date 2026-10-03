@@ -7,6 +7,6 @@ export const metadata: Metadata = {
 	description: "Workspace AI assistant for notes, brainstorming, and image generation.",
 };
 
-export default function AiPage() {
+export default function DashboardAiPage() {
 	return <AiChat />;
 }

@@ -75,7 +75,7 @@ const data = {
 		},
 		{
 			title: "Ask AI",
-			url: "/ai",
+			url: "/dashboard/ai",
 			icon: Sparkles,
 			action: "ai",
 		},
@@ -240,7 +240,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	/**
 	 * Main navigation actions.
 	 */
-	const isAiRoute = pathname === "/ai" || pathname.startsWith("/ai/");
+	const isAiRoute =
+		pathname === "/dashboard/ai" || pathname.startsWith("/dashboard/ai/");
 
 	const handleMainAction = (action: NavMainAction) => {
 		switch (action) {
@@ -257,7 +258,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 			case "ai":
 				setView(SidebarView.WORKSPACE);
-				router.push("/ai");
+				router.push("/dashboard/ai");
 				break;
 		}
 	};

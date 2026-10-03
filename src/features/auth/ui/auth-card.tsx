@@ -1,93 +1,107 @@
 import GoogleLoginButton from "./google-login-button";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from "@/shared/ui/card";
 import { Separator } from "@/shared/ui/separator";
 import { cn } from "@/shared/lib/utils";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-interface AuthCardProps {
-	title: string;
-	description: string;
-	alternateText: string;
-	alternateHref: string;
-	alternateLabel: string;
-	googleLabel: string;
-	children: ReactNode;
+export const authInputClassName =
+	"h-11 rounded-xl border border-border/80 bg-background/80 px-3.5 text-sm text-foreground placeholder:text-muted-foreground/60 shadow-2xs focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 transition-all";
+
+export const authSubmitButtonClassName =
+	"h-11 w-full rounded-xl text-sm font-semibold bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 active:scale-[0.98] transition-all";
+
+export interface AuthCardProps {
+	title?: ReactNode;
+	description?: ReactNode;
+	icon?: ReactNode;
+	alternateText?: string;
+	alternateHref?: string;
+	alternateLabel?: string;
+	googleLabel?: string;
+	children?: ReactNode;
+	footer?: ReactNode;
 	className?: string;
 }
-
-const socialButtonClassName =
-	"h-11 w-full justify-center rounded-xl border-slate-200/80 bg-white/90 text-sm font-semibold text-slate-700 shadow-sm hover:border-slate-300 hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:hover:bg-white/10";
 
 export function AuthCard({
 	title,
 	description,
+	icon,
 	alternateText,
 	alternateHref,
 	alternateLabel,
 	googleLabel,
 	children,
+	footer,
 	className,
 }: AuthCardProps) {
+	const hasFooter = Boolean(
+		footer || googleLabel || (alternateText && alternateHref && alternateLabel)
+	);
+
 	return (
-		<Card
+		<div
 			className={cn(
-				"relative w-full max-w-xl overflow-hidden border-white/70 bg-white/[0.92] py-0 shadow-[0_36px_90px_-48px_rgba(15,23,42,0.65)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/[0.72]",
-				className,
+				"relative flex max-h-full w-full max-w-md flex-col rounded-2xl border border-border/80 bg-card/90 shadow-xl shadow-black/5 dark:shadow-black/20 backdrop-blur-xl overflow-hidden",
+				className
 			)}
 		>
-			<div
-				aria-hidden='true'
-				className='absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-sky-400 to-emerald-400'
-			/>
-
-			<CardHeader className='gap-3 px-6 pb-0 pt-8 sm:px-8'>
-				<CardTitle className='text-[1.95rem] font-semibold tracking-tight text-slate-950 dark:text-white sm:text-[2.15rem]'>
-					{title}
-				</CardTitle>
-				<CardDescription className='max-w-sm text-[15px] leading-6 text-slate-500 dark:text-slate-300'>
-					{description}
-				</CardDescription>
-			</CardHeader>
-
-			<CardContent className='px-6 pb-0 pt-6 sm:px-8'>
-				{children}
-
-				<div className='mt-6 flex items-center justify-center gap-1.5 text-sm text-slate-500 dark:text-slate-300'>
-					<span>{alternateText}</span>
-					<Link
-						href={alternateHref}
-						className='font-semibold text-slate-950 transition-colors hover:text-primary hover:underline dark:text-white'
-					>
-						{alternateLabel}
-					</Link>
+			{/* Fixed / pinned Card Header */}
+			{(title || description || icon) && (
+				<div className='shrink-0 px-6 pt-6 pb-2 sm:px-8 sm:pt-7 sm:pb-3 flex flex-col gap-2'>
+					{icon && <div className='mb-1 flex'>{icon}</div>}
+					{title && (
+						<h1 className='text-xl font-bold tracking-tight text-foreground sm:text-2xl'>
+							{title}
+						</h1>
+					)}
+					{description && (
+						<p className='text-xs sm:text-sm text-muted-foreground leading-relaxed'>
+							{description}
+						</p>
+					)}
 				</div>
-			</CardContent>
+			)}
 
-			<CardFooter className='mb-0 flex-col gap-6 border-t border-slate-100 px-6 pb-8 pt-6 sm:px-8 dark:border-white/10'>
-				<div className='flex w-full items-center gap-3'>
-					<Separator className='flex-1 bg-slate-200 dark:bg-white/10' />
-					<span className='text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500'>
-						Hoặc tiếp tục với
-					</span>
-					<Separator className='flex-1 bg-slate-200 dark:bg-white/10' />
+			{/* Scrollable Form Content - only scrolls if content overflows available height */}
+			{children && (
+				<div className='min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-2 sm:px-8 [scrollbar-width:thin]'>
+					{children}
 				</div>
+			)}
 
-				<div className='grid w-full gap-3'>
-					<GoogleLoginButton
-						label={googleLabel}
-						variant='outline'
-						className={socialButtonClassName}
-					/>
+			{/* Fixed / pinned Card Footer */}
+			{hasFooter && (
+				<div className='shrink-0 px-6 pt-2 pb-6 sm:px-8 sm:pb-7 flex flex-col gap-3.5 border-t border-border/50 mt-1'>
+					{footer}
+
+					{googleLabel && (
+						<>
+							<div className='flex w-full items-center gap-3 pt-1'>
+								<Separator className='flex-1' />
+								<span className='text-[11px] font-medium uppercase tracking-wider text-muted-foreground'>
+									Hoặc tiếp tục với
+								</span>
+								<Separator className='flex-1' />
+							</div>
+
+							<GoogleLoginButton label={googleLabel} />
+						</>
+					)}
+
+					{alternateText && alternateHref && alternateLabel && (
+						<div className='flex items-center justify-center gap-1.5 text-xs text-muted-foreground pt-0.5'>
+							<span>{alternateText}</span>
+							<Link
+								href={alternateHref}
+								className='font-semibold text-foreground transition-colors hover:text-primary hover:underline'
+							>
+								{alternateLabel}
+							</Link>
+						</div>
+					)}
 				</div>
-			</CardFooter>
-		</Card>
+			)}
+		</div>
 	);
 }

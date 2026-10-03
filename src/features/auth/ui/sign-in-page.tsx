@@ -1,6 +1,10 @@
 "use client";
 
-import { AuthCard } from "./auth-card";
+import {
+	AuthCard,
+	authInputClassName,
+	authSubmitButtonClassName,
+} from "./auth-card";
 import { Button } from "@/shared/ui/button";
 import {
 	Field,
@@ -22,12 +26,6 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { formSchema } from "../model/sign-in.schema";
 import z from "zod";
-
-const authInputClassName =
-	"h-12 rounded-xl border-slate-200 bg-white/85 px-4 shadow-sm focus-visible:border-primary/70 focus-visible:ring-primary/15 dark:border-white/10 dark:bg-white/5";
-
-const submitButtonClassName =
-	"h-12 w-full rounded-xl text-sm font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/30";
 
 export default function SignIn() {
 	const router = useRouter();
@@ -89,7 +87,7 @@ export default function SignIn() {
 
 	return (
 		<AuthCard
-			title='Đăng nhập vào tài khoản'
+			title='Đăng nhập'
 			description='Chào mừng trở lại! Vui lòng nhập thông tin để tiếp tục với workspace của bạn.'
 			alternateText='Bạn chưa có tài khoản?'
 			alternateHref='/sign-up'
@@ -99,15 +97,15 @@ export default function SignIn() {
 			<form
 				id='sign-in-form'
 				onSubmit={form.handleSubmit(onSubmit)}
-				className='flex flex-col gap-4'
+				className='flex flex-col gap-3.5'
 			>
-				<FieldGroup>
+				<FieldGroup className='gap-3.5'>
 					<Controller
 						name='email'
 						control={form.control}
 						render={({ field, fieldState }) => (
-							<Field data-invalid={fieldState.invalid}>
-								<FieldLabel htmlFor='sign-in-email'>
+							<Field data-invalid={fieldState.invalid} className='gap-1.5'>
+								<FieldLabel htmlFor='sign-in-email' className='text-xs sm:text-sm font-medium text-foreground'>
 									Email hoặc tên đăng nhập
 								</FieldLabel>
 								<Input
@@ -124,17 +122,23 @@ export default function SignIn() {
 							</Field>
 						)}
 					/>
-				</FieldGroup>
 
-				<FieldGroup>
 					<Controller
 						name='password'
 						control={form.control}
 						render={({ field, fieldState }) => (
-							<Field data-invalid={fieldState.invalid}>
-								<FieldLabel htmlFor='sign-in-password'>
-									Mật khẩu
-								</FieldLabel>
+							<Field data-invalid={fieldState.invalid} className='gap-1.5'>
+								<div className='flex items-center justify-between'>
+									<FieldLabel htmlFor='sign-in-password' className='text-xs sm:text-sm font-medium text-foreground'>
+										Mật khẩu
+									</FieldLabel>
+									<Link
+										href='/forgot-password'
+										className='text-xs font-semibold text-primary hover:text-primary/90 hover:underline'
+									>
+										Quên mật khẩu?
+									</Link>
+								</div>
 								<PasswordInput
 									{...field}
 									id='sign-in-password'
@@ -151,33 +155,20 @@ export default function SignIn() {
 					/>
 				</FieldGroup>
 
-				<Field
-					orientation='horizontal'
-					className='justify-end pt-1'
-				>
-					<Link
-						href='/forgot-password'
-						className='text-sm font-medium text-primary hover:text-primary/80 hover:underline'
-					>
-						Quên mật khẩu?
-					</Link>
-				</Field>
-
-				<Field orientation='horizontal' className='pt-2'>
+				<div className='pt-1.5'>
 					<Button
 						type='submit'
 						form='sign-in-form'
-						size='lg'
-						className={submitButtonClassName}
+						className={authSubmitButtonClassName}
 						disabled={isPending}
 					>
 						{isPending ? (
-							<div className='h-5 w-5 animate-spin rounded-full border-[2.5px] border-white/35 border-t-white' />
+							<div className='h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/35 border-t-primary-foreground' />
 						) : (
 							<span>Đăng nhập</span>
 						)}
 					</Button>
-				</Field>
+				</div>
 			</form>
 		</AuthCard>
 	);

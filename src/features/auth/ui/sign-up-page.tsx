@@ -1,6 +1,10 @@
 "use client";
 
-import { AuthCard } from "./auth-card";
+import {
+	AuthCard,
+	authInputClassName,
+	authSubmitButtonClassName,
+} from "./auth-card";
 import { Button } from "@/shared/ui/button";
 import {
 	Field,
@@ -33,12 +37,6 @@ const formSchema = z.object({
 		.min(6, "Mật khẩu phải có ít nhất 6 ký tự.")
 		.max(100, "Mật khẩu không được vượt quá 100 ký tự."),
 });
-
-const authInputClassName =
-	"h-12 rounded-xl border-slate-200 bg-white/85 px-4 shadow-sm focus-visible:border-primary/70 focus-visible:ring-primary/15 dark:border-white/10 dark:bg-white/5";
-
-const submitButtonClassName =
-	"h-12 w-full rounded-xl text-sm font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/30";
 
 export default function SignUp() {
 	const router = useRouter();
@@ -75,7 +73,7 @@ export default function SignUp() {
 	return (
 		<AuthCard
 			title='Tạo tài khoản mới'
-			description='Nhập thông tin của bạn bên dưới để bắt đầu workspace đầu tiên một cách gọn gàng hơn.'
+			description='Nhập thông tin bên dưới để bắt đầu workspace của bạn.'
 			alternateText='Đã có tài khoản?'
 			alternateHref='/sign-in'
 			alternateLabel='Đăng nhập'
@@ -84,15 +82,17 @@ export default function SignUp() {
 			<form
 				id='sign-up-form'
 				onSubmit={form.handleSubmit(onSubmit)}
-				className='flex flex-col gap-4'
+				className='flex flex-col gap-3.5'
 			>
-				<FieldGroup>
+				<FieldGroup className='gap-3.5'>
 					<Controller
 						name='email'
 						control={form.control}
 						render={({ field, fieldState }) => (
-							<Field data-invalid={fieldState.invalid}>
-								<FieldLabel htmlFor='sign-up-email'>Email</FieldLabel>
+							<Field data-invalid={fieldState.invalid} className='gap-1.5'>
+								<FieldLabel htmlFor='sign-up-email' className='text-xs sm:text-sm font-medium text-foreground'>
+									Email
+								</FieldLabel>
 								<Input
 									{...field}
 									id='sign-up-email'
@@ -108,15 +108,13 @@ export default function SignUp() {
 							</Field>
 						)}
 					/>
-				</FieldGroup>
 
-				<FieldGroup>
 					<Controller
 						name='username'
 						control={form.control}
 						render={({ field, fieldState }) => (
-							<Field data-invalid={fieldState.invalid}>
-								<FieldLabel htmlFor='sign-up-username'>
+							<Field data-invalid={fieldState.invalid} className='gap-1.5'>
+								<FieldLabel htmlFor='sign-up-username' className='text-xs sm:text-sm font-medium text-foreground'>
 									Tên đăng nhập
 								</FieldLabel>
 								<Input
@@ -133,15 +131,13 @@ export default function SignUp() {
 							</Field>
 						)}
 					/>
-				</FieldGroup>
 
-				<FieldGroup>
 					<Controller
 						name='password'
 						control={form.control}
 						render={({ field, fieldState }) => (
-							<Field data-invalid={fieldState.invalid}>
-								<FieldLabel htmlFor='sign-up-password'>
+							<Field data-invalid={fieldState.invalid} className='gap-1.5'>
+								<FieldLabel htmlFor='sign-up-password' className='text-xs sm:text-sm font-medium text-foreground'>
 									Mật khẩu
 								</FieldLabel>
 								<PasswordInput
@@ -149,7 +145,7 @@ export default function SignUp() {
 									id='sign-up-password'
 									aria-invalid={fieldState.invalid}
 									className={authInputClassName}
-									placeholder='Nhập mật khẩu'
+									placeholder='Nhập mật khẩu (tối thiểu 6 ký tự)'
 									autoComplete='new-password'
 								/>
 								{fieldState.invalid && (
@@ -160,21 +156,20 @@ export default function SignUp() {
 					/>
 				</FieldGroup>
 
-				<Field orientation='horizontal' className='pt-2'>
+				<div className='pt-1.5'>
 					<Button
 						type='submit'
 						form='sign-up-form'
-						size='lg'
-						className={submitButtonClassName}
+						className={authSubmitButtonClassName}
 						disabled={isPending}
 					>
 						{isPending ? (
-							<div className='h-5 w-5 animate-spin rounded-full border-[2.5px] border-white/35 border-t-white' />
+							<div className='h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/35 border-t-primary-foreground' />
 						) : (
 							<span>Đăng ký</span>
 						)}
 					</Button>
-				</Field>
+				</div>
 			</form>
 		</AuthCard>
 	);

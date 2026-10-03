@@ -24,7 +24,8 @@ export function HeaderWorkspaceContainer() {
 	}>();
 
 	const isPageRoute = pathname.startsWith("/page/");
-	const isAiRoute = pathname === "/ai" || pathname.startsWith("/ai/");
+	const isAiRoute =
+		pathname === "/dashboard/ai" || pathname.startsWith("/dashboard/ai/");
 	const isDashboardRoute = pathname === "/dashboard";
 
 	const pageId = isPageRoute ? params.pageId : undefined;

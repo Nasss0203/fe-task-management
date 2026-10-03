@@ -6,36 +6,35 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef } from "react";
 import { toast } from "sonner";
 
+import { AuthCard } from "./auth-card";
+
 function LoadingScreen({
   message = "Đang đăng nhập...",
 }: {
   message?: string;
 }) {
   return (
-    <div className="flex flex-col items-center gap-6">
-      {/* Logo */}
-      <div className="flex flex-col items-center gap-3">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-950 text-white shadow-xl shadow-slate-900/20 dark:bg-white dark:text-slate-950">
+    <AuthCard className="text-center">
+      <div className="flex flex-col items-center justify-center gap-5 py-8">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-xs">
           <LayoutGrid className="h-6 w-6" />
         </div>
-        <div className="text-center">
-          <div className="text-base font-semibold tracking-tight text-slate-950 dark:text-white">
+        <div>
+          <div className="text-base font-bold tracking-tight text-foreground">
             Taskmanly
           </div>
-          <div className="text-xs text-slate-500 dark:text-slate-400">
-            Project execution without the clutter
+          <div className="text-xs text-muted-foreground mt-0.5">
+            The connected workspace
           </div>
         </div>
+        <div className="flex flex-col items-center gap-2.5 pt-2">
+          <div className="h-7 w-7 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
+          <p className="text-xs sm:text-sm text-muted-foreground font-medium">
+            {message}
+          </p>
+        </div>
       </div>
-
-      {/* Spinner + message */}
-      <div className="flex flex-col items-center gap-3">
-        <div className="h-7 w-7 animate-spin rounded-full border-[2.5px] border-primary/20 border-t-primary" />
-        <p className="text-sm font-medium text-slate-500 dark:text-slate-300">
-          {message}
-        </p>
-      </div>
-    </div>
+    </AuthCard>
   );
 }
 
