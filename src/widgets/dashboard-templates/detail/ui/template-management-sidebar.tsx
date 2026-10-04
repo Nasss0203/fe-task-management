@@ -5,9 +5,7 @@ import { format } from "date-fns";
 import {
 	Archive,
 	ArrowRight,
-	Calendar,
 	Check,
-	Clock,
 	Edit2,
 	Eye,
 	FileText,
@@ -16,7 +14,6 @@ import {
 	MoreHorizontal,
 	RotateCcw,
 	Sparkles,
-	User as UserIcon,
 	Users,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -28,6 +25,7 @@ import type {
 	TemplateVisibility,
 } from "@/entities/template";
 import { useRestoreTemplate } from "@/entities/template";
+import { usePage } from "@/entities/page/model/page.queries";
 import { useUser } from "@/features/auth";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -35,10 +33,10 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
 import { Separator } from "@/shared/ui/separator";
+import { Skeleton } from "@/shared/ui/skeleton";
 
 interface TemplateManagementSidebarProps {
 	template: PageTemplate;
@@ -49,6 +47,7 @@ interface TemplateManagementSidebarProps {
 	onOpenUse: () => void;
 	onOpenEdit: () => void;
 	onOpenArchive: () => void;
+	onViewAllVersions?: () => void;
 }
 
 export function TemplateManagementSidebar({
@@ -60,9 +59,16 @@ export function TemplateManagementSidebar({
 	onOpenUse,
 	onOpenEdit,
 	onOpenArchive,
+	onViewAllVersions,
 }: TemplateManagementSidebarProps) {
 	const { user } = useUser();
 	const restoreMutation = useRestoreTemplate();
+
+	// Fetch source page detail if source_page_id exists
+	const { data: sourcePage } = usePage(
+		template.source_page_id ?? undefined,
+		Boolean(template.source_page_id),
+	);
 
 	// Resolve the active selected version object
 	const activeVersion = React.useMemo(() => {
@@ -90,6 +96,12 @@ export function TemplateManagementSidebar({
 		}
 		return "Workspace member";
 	}, [user, template.created_by]);
+
+	const sourcePageDisplay = React.useMemo(() => {
+		if (!template.source_page_id) return null;
+		if (sourcePage?.title) return sourcePage.title;
+		return "Available";
+	}, [template.source_page_id, sourcePage?.title]);
 
 	const renderVisibilityBadge = (visibility: TemplateVisibility) => {
 		switch (visibility) {
@@ -175,213 +187,255 @@ export function TemplateManagementSidebar({
 	const isDraftVersion = activeVersion?.status === "DRAFT";
 	const isPublishedVersion = activeVersion?.status === "PUBLISHED";
 
+	// Show max 4 recent versions in summary card
+	const recentVersions = versions.slice(0, 4);
+
 	return (
-		<aside className='w-full rounded-2xl border border-border/80 bg-card p-5 space-y-6 shadow-xs sticky top-4'>
-			{/* Header: Icon, Name, More menu */}
-			<div className='space-y-3'>
-				<div className='flex items-start justify-between gap-3'>
-					<div className='flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary text-xl font-bold shrink-0'>
-						{template.icon ? (
-							<span>{template.icon}</span>
-						) : (
-							<FileText className='size-5' />
-						)}
+		<aside className='w-full space-y-4 lg:sticky lg:top-4'>
+			{/* CARD 1: TEMPLATE MANAGEMENT (Metadata + Unified Action Hierarchy) */}
+			<div className='rounded-2xl border border-border/80 bg-card p-5 space-y-4 shadow-xs'>
+				<div className='flex items-center justify-between'>
+					<h3 className='text-sm font-semibold text-foreground'>
+						Template management
+					</h3>
+				</div>
+
+				{/* Two-Column Definition Layout */}
+				<dl className='space-y-2.5 text-xs'>
+					<div className='flex items-center justify-between'>
+						<dt className='text-muted-foreground font-normal'>Status</dt>
+						<dd>{renderStatusBadge(template.status)}</dd>
 					</div>
 
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button
-								variant='ghost'
-								size='icon-sm'
-								className='text-muted-foreground hover:text-foreground shrink-0 rounded-lg'
-								aria-label='More options'
-							>
-								<MoreHorizontal className='size-4' />
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align='end' className='w-44'>
-							{!isArchived ? (
-								<>
-									<DropdownMenuItem onClick={onOpenEdit} className='text-xs'>
-										<Edit2 className='size-3.5 mr-2 text-muted-foreground' />
-										Edit details
-									</DropdownMenuItem>
-									<DropdownMenuSeparator />
-									<DropdownMenuItem
-										onClick={onOpenArchive}
-										className='text-xs text-destructive focus:text-destructive'
-									>
-										<Archive className='size-3.5 mr-2' />
-										Archive template
-									</DropdownMenuItem>
-								</>
+					<div className='flex items-center justify-between'>
+						<dt className='text-muted-foreground font-normal'>Visibility</dt>
+						<dd>{renderVisibilityBadge(template.visibility)}</dd>
+					</div>
+
+					<div className='flex items-center justify-between'>
+						<dt className='text-muted-foreground font-normal'>Current version</dt>
+						<dd className='flex items-center gap-1.5'>
+							<span className='font-mono font-medium text-foreground'>
+								v{activeVersion?.version_number ?? 1}
+							</span>
+							<span className='text-muted-foreground'>·</span>
+							{activeVersion?.status === "PUBLISHED" ? (
+								<span className='text-emerald-500 font-medium'>Published</span>
 							) : (
-								<DropdownMenuItem
-									onClick={handleRestore}
-									disabled={restoreMutation.isPending}
-									className='text-xs'
-								>
-									<RotateCcw className='size-3.5 mr-2 text-muted-foreground' />
-									Restore template
-								</DropdownMenuItem>
+								<span className='text-amber-500 font-medium'>Draft</span>
 							)}
-						</DropdownMenuContent>
-					</DropdownMenu>
-				</div>
-
-				<div className='space-y-1.5'>
-					<h2 className='text-base font-semibold leading-snug text-foreground line-clamp-2'>
-						{template.name}
-					</h2>
-					{template.description && (
-						<p className='text-xs text-muted-foreground leading-relaxed line-clamp-3'>
-							{template.description}
-						</p>
-					)}
-				</div>
-
-				<div className='flex items-center gap-1.5 pt-1'>
-					{renderStatusBadge(template.status)}
-					{renderVisibilityBadge(template.visibility)}
-				</div>
-			</div>
-
-			<Separator className='border-border/60' />
-
-			{/* Metadata list */}
-			<div className='space-y-2.5 text-xs'>
-				<div className='flex items-center justify-between text-muted-foreground'>
-					<div className='flex items-center gap-1.5'>
-						<UserIcon className='size-3.5 text-muted-foreground/70' />
-						<span>Creator</span>
+						</dd>
 					</div>
-					<span className='font-medium text-foreground'>{creatorDisplay}</span>
-				</div>
 
-				<div className='flex items-center justify-between text-muted-foreground'>
-					<div className='flex items-center gap-1.5'>
-						<Calendar className='size-3.5 text-muted-foreground/70' />
-						<span>Updated</span>
+					<div className='flex items-center justify-between'>
+						<dt className='text-muted-foreground font-normal'>Created by</dt>
+						<dd className='text-foreground font-medium'>{creatorDisplay}</dd>
 					</div>
-					<span className='font-medium text-foreground'>{formattedUpdated}</span>
-				</div>
 
-				{template.source_page_id && (
-					<div className='flex items-center justify-between text-muted-foreground'>
-						<div className='flex items-center gap-1.5'>
-							<FileText className='size-3.5 text-muted-foreground/70' />
-							<span>Source page</span>
+					<div className='flex items-center justify-between'>
+						<dt className='text-muted-foreground font-normal'>Updated</dt>
+						<dd className='text-foreground'>{formattedUpdated}</dd>
+					</div>
+
+					{sourcePageDisplay && (
+						<div className='flex items-center justify-between'>
+							<dt className='text-muted-foreground font-normal'>Source page</dt>
+							<dd
+								className='text-foreground font-medium truncate max-w-[170px]'
+								title={sourcePageDisplay}
+							>
+								{sourcePageDisplay}
+							</dd>
 						</div>
-						<span className='font-medium text-foreground truncate max-w-[140px]'>
-							Saved from page
-						</span>
-					</div>
-				)}
+					)}
+				</dl>
 
-				<div className='flex items-center justify-between text-muted-foreground'>
-					<div className='flex items-center gap-1.5'>
-						<Clock className='size-3.5 text-muted-foreground/70' />
-						<span>Current version</span>
-					</div>
-					<span className='font-medium text-foreground'>
-						v{activeVersion?.version_number ?? 1}{" "}
-						{activeVersion?.status ? `(${activeVersion.status.toLowerCase()})` : ""}
-					</span>
-				</div>
-			</div>
+				<Separator className='border-border/60' />
 
-			<Separator className='border-border/60' />
-
-			{/* Primary Action Buttons */}
-			<div className='space-y-2'>
+				{/* Action Hierarchy */}
 				{isArchived ? (
-					<div className='space-y-2'>
-						<div className='rounded-lg border border-border/70 bg-muted/20 p-3 text-xs text-muted-foreground text-center'>
-							This template is archived. Restore it to publish or use.
+					<div className='space-y-3 pt-1'>
+						<div className='rounded-xl border border-border/70 bg-muted/20 p-3 text-xs text-muted-foreground text-center leading-relaxed'>
+							This template is archived. Restore it to make it active and usable.
 						</div>
 						<Button
-							variant='outline'
 							size='sm'
 							onClick={handleRestore}
 							disabled={restoreMutation.isPending}
-							className='w-full text-xs font-semibold'
+							className='w-full bg-primary text-primary-foreground text-xs font-semibold h-9'
 						>
 							<RotateCcw className='size-3.5 mr-1.5' />
 							Restore template
 						</Button>
+						<Button
+							variant='outline'
+							size='sm'
+							onClick={onOpenEdit}
+							className='w-full text-xs font-medium h-9'
+						>
+							<Edit2 className='size-3.5 mr-1.5' />
+							Edit details
+						</Button>
 					</div>
 				) : isDraftVersion ? (
-					<>
+					<div className='space-y-2.5 pt-1'>
+						{/* Primary Action */}
 						<Button
 							size='sm'
 							onClick={onOpenPublish}
-							className='w-full bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 gap-1.5'
+							className='w-full bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 gap-1.5 h-9'
 						>
 							<Sparkles className='size-3.5' />
 							Publish version
 						</Button>
 
-						<Button
-							variant='outline'
-							size='sm'
-							onClick={onOpenEdit}
-							className='w-full text-xs font-medium'
-						>
-							<Edit2 className='size-3.5 mr-1.5' />
-							Edit details
-						</Button>
+						{/* Secondary Action + More Menu */}
+						<div className='flex items-center gap-2'>
+							<Button
+								variant='outline'
+								size='sm'
+								onClick={onOpenEdit}
+								className='flex-1 text-xs font-medium h-9'
+							>
+								<Edit2 className='size-3.5 mr-1.5' />
+								Edit details
+							</Button>
 
-						<div className='text-[11px] text-muted-foreground/80 text-center px-1'>
-							This version is a draft. Publish to make it usable.
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button
+										variant='outline'
+										size='sm'
+										aria-label='More actions'
+										className='size-9 px-0 text-muted-foreground hover:text-foreground shrink-0'
+									>
+										<MoreHorizontal className='size-4' />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align='end' className='w-44'>
+									<DropdownMenuItem
+										variant='destructive'
+										onClick={onOpenArchive}
+										className='text-xs'
+									>
+										<Archive className='size-3.5 mr-1.5' />
+										Archive template
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
 						</div>
-					</>
+
+						<p className='text-[11px] text-muted-foreground text-center pt-0.5 leading-normal'>
+							This version is a draft. Publish to make it usable.
+						</p>
+					</div>
 				) : isPublishedVersion ? (
-					<>
+					<div className='space-y-2.5 pt-1'>
+						{/* Primary Action */}
 						<Button
 							size='sm'
 							onClick={onOpenUse}
-							className='w-full bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 gap-1.5'
+							className='w-full bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 gap-1.5 h-9'
 						>
 							<FileText className='size-3.5' />
 							Use template
 							<ArrowRight className='size-3.5 ml-auto' />
 						</Button>
 
+						{/* Secondary Action + More Menu */}
+						<div className='flex items-center gap-2'>
+							<Button
+								variant='outline'
+								size='sm'
+								onClick={onOpenEdit}
+								className='flex-1 text-xs font-medium h-9'
+							>
+								<Edit2 className='size-3.5 mr-1.5' />
+								Edit details
+							</Button>
+
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button
+										variant='outline'
+										size='sm'
+										aria-label='More actions'
+										className='size-9 px-0 text-muted-foreground hover:text-foreground shrink-0'
+									>
+										<MoreHorizontal className='size-4' />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align='end' className='w-44'>
+									<DropdownMenuItem
+										variant='destructive'
+										onClick={onOpenArchive}
+										className='text-xs'
+									>
+										<Archive className='size-3.5 mr-1.5' />
+										Archive template
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</div>
+					</div>
+				) : (
+					<div className='flex items-center gap-2 pt-1'>
 						<Button
 							variant='outline'
 							size='sm'
 							onClick={onOpenEdit}
-							className='w-full text-xs font-medium'
+							className='flex-1 text-xs font-medium h-9'
 						>
 							<Edit2 className='size-3.5 mr-1.5' />
 							Edit details
 						</Button>
-					</>
-				) : (
-					<Button
-						variant='outline'
-						size='sm'
-						onClick={onOpenEdit}
-						className='w-full text-xs font-medium'
-					>
-						<Edit2 className='size-3.5 mr-1.5' />
-						Edit details
-					</Button>
+
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button
+									variant='outline'
+									size='sm'
+									aria-label='More actions'
+									className='size-9 px-0 text-muted-foreground hover:text-foreground shrink-0'
+								>
+									<MoreHorizontal className='size-4' />
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align='end' className='w-44'>
+								<DropdownMenuItem
+									variant='destructive'
+									onClick={onOpenArchive}
+									className='text-xs'
+								>
+									<Archive className='size-3.5 mr-1.5' />
+									Archive template
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</div>
 				)}
 			</div>
 
-			<Separator className='border-border/60' />
-
-			{/* Versions Section */}
-			<div className='space-y-3'>
+			{/* CARD 2: VERSIONS SUMMARY (Max 4 recent versions with View All link) */}
+			<div className='rounded-2xl border border-border/80 bg-card p-5 space-y-3.5 shadow-xs'>
 				<div className='flex items-center justify-between'>
-					<h3 className='text-xs font-semibold text-foreground uppercase tracking-wider'>
+					<h3 className='text-sm font-semibold text-foreground'>
 						Versions ({versions.length})
 					</h3>
+					{onViewAllVersions && versions.length > 0 && (
+						<Button
+							variant='ghost'
+							size='xs'
+							onClick={onViewAllVersions}
+							className='h-6 px-2 text-[11px] font-medium text-muted-foreground hover:text-foreground'
+						>
+							View all
+						</Button>
+					)}
 				</div>
 
-				<div className='space-y-1.5'>
-					{versions.map((ver) => {
+				<div className='space-y-2'>
+					{recentVersions.map((ver) => {
 						const isSelected = ver.id === activeVersion?.id;
 						const formattedVerDate = (() => {
 							try {
@@ -394,10 +448,10 @@ export function TemplateManagementSidebar({
 						return (
 							<div
 								key={ver.id}
-								className={`flex items-center justify-between p-2 rounded-lg border text-xs transition-colors ${
+								className={`flex items-center justify-between p-2.5 rounded-xl border text-xs transition-colors ${
 									isSelected
 										? "border-primary/40 bg-primary/5 ring-1 ring-primary/20"
-										: "border-border/60 bg-muted/10 hover:bg-muted/30"
+										: "border-border/60 bg-muted/10 hover:bg-muted/20"
 								}`}
 							>
 								<div className='flex items-center gap-2 min-w-0'>
@@ -408,14 +462,14 @@ export function TemplateManagementSidebar({
 									{ver.status === "DRAFT" ? (
 										<Badge
 											variant='outline'
-											className='text-[9px] px-1.5 py-0 bg-amber-500/10 text-amber-500 border-amber-500/30'
+											className='text-[9px] px-1.5 py-0 bg-amber-500/10 text-amber-500 border-amber-500/30 font-medium'
 										>
 											Draft
 										</Badge>
 									) : (
 										<Badge
 											variant='secondary'
-											className='text-[9px] px-1.5 py-0 bg-emerald-500/10 text-emerald-500 border-emerald-500/30'
+											className='text-[9px] px-1.5 py-0 bg-emerald-500/10 text-emerald-500 border-emerald-500/30 font-medium'
 										>
 											Published
 										</Badge>
@@ -431,10 +485,10 @@ export function TemplateManagementSidebar({
 								{isSelected ? (
 									<Badge
 										variant='secondary'
-										className='text-[9px] bg-primary/20 text-primary border-transparent gap-1 px-1.5 py-0'
+										className='text-[9px] bg-primary/20 text-primary border-transparent gap-1 px-2 py-0.5'
 									>
 										<Check className='size-2.5' />
-										Active
+										Previewing
 									</Badge>
 								) : (
 									<Button
@@ -458,53 +512,49 @@ export function TemplateManagementSidebar({
 
 export function TemplateManagementSidebarSkeleton() {
 	return (
-		<aside className='w-full rounded-2xl border border-border/80 bg-card p-5 space-y-6 shadow-xs'>
-			<div className='space-y-3'>
-				<div className='flex items-start justify-between'>
-					<div className='size-10 rounded-xl bg-muted/40 animate-pulse' />
-					<div className='size-7 rounded-lg bg-muted/40 animate-pulse' />
+		<aside className='w-full space-y-4'>
+			{/* Management Card Skeleton */}
+			<div className='rounded-2xl border border-border/80 bg-card p-5 space-y-4 shadow-xs'>
+				<Skeleton className='h-4 w-36' />
+				<div className='space-y-3 pt-1'>
+					<div className='flex justify-between items-center'>
+						<Skeleton className='h-3 w-14' />
+						<Skeleton className='h-5 w-16 rounded-full' />
+					</div>
+					<div className='flex justify-between items-center'>
+						<Skeleton className='h-3 w-16' />
+						<Skeleton className='h-5 w-20 rounded-full' />
+					</div>
+					<div className='flex justify-between items-center'>
+						<Skeleton className='h-3 w-24' />
+						<Skeleton className='h-3 w-20' />
+					</div>
+					<div className='flex justify-between items-center'>
+						<Skeleton className='h-3 w-18' />
+						<Skeleton className='h-3 w-24' />
+					</div>
+					<div className='flex justify-between items-center'>
+						<Skeleton className='h-3 w-14' />
+						<Skeleton className='h-3 w-20' />
+					</div>
 				</div>
-				<div className='space-y-2'>
-					<div className='h-5 w-3/4 rounded bg-muted/40 animate-pulse' />
-					<div className='h-3 w-full rounded bg-muted/30 animate-pulse' />
-					<div className='h-3 w-2/3 rounded bg-muted/30 animate-pulse' />
-				</div>
-				<div className='flex gap-2 pt-1'>
-					<div className='h-4 w-14 rounded-full bg-muted/40 animate-pulse' />
-					<div className='h-4 w-16 rounded-full bg-muted/40 animate-pulse' />
+
+				<Skeleton className='h-px w-full' />
+
+				<div className='space-y-2 pt-1'>
+					<Skeleton className='h-9 w-full rounded-lg' />
+					<Skeleton className='h-9 w-full rounded-lg' />
 				</div>
 			</div>
 
-			<Separator className='border-border/60' />
-
-			<div className='space-y-3'>
-				<div className='flex justify-between'>
-					<div className='h-3 w-16 rounded bg-muted/30 animate-pulse' />
-					<div className='h-3 w-24 rounded bg-muted/40 animate-pulse' />
+			{/* Versions Card Skeleton */}
+			<div className='rounded-2xl border border-border/80 bg-card p-5 space-y-3 shadow-xs'>
+				<div className='flex justify-between items-center'>
+					<Skeleton className='h-4 w-24' />
+					<Skeleton className='h-3 w-12' />
 				</div>
-				<div className='flex justify-between'>
-					<div className='h-3 w-16 rounded bg-muted/30 animate-pulse' />
-					<div className='h-3 w-20 rounded bg-muted/40 animate-pulse' />
-				</div>
-				<div className='flex justify-between'>
-					<div className='h-3 w-20 rounded bg-muted/30 animate-pulse' />
-					<div className='h-3 w-16 rounded bg-muted/40 animate-pulse' />
-				</div>
-			</div>
-
-			<Separator className='border-border/60' />
-
-			<div className='space-y-2'>
-				<div className='h-9 w-full rounded-lg bg-muted/40 animate-pulse' />
-				<div className='h-9 w-full rounded-lg bg-muted/30 animate-pulse' />
-			</div>
-
-			<Separator className='border-border/60' />
-
-			<div className='space-y-2'>
-				<div className='h-4 w-24 rounded bg-muted/40 animate-pulse' />
-				<div className='h-10 w-full rounded-lg bg-muted/30 animate-pulse' />
-				<div className='h-10 w-full rounded-lg bg-muted/30 animate-pulse' />
+				<Skeleton className='h-10 w-full rounded-xl' />
+				<Skeleton className='h-10 w-full rounded-xl' />
 			</div>
 		</aside>
 	);

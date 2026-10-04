@@ -13,12 +13,29 @@ import {
 	type TemplateVersion,
 } from "@/entities/template";
 import { Button } from "@/shared/ui/button";
+import { Skeleton } from "@/shared/ui/skeleton";
+import { Tabs, TabsContent } from "@/shared/ui/tabs";
 
-import { TemplatePreviewPanel, TemplatePreviewSkeleton } from "./template-preview-panel";
+import {
+	TemplateDetailHeader,
+	TemplateDetailHeaderSkeleton,
+} from "./template-detail-header";
+import {
+	TemplateDetailTabsList,
+	type TemplateDetailTab,
+} from "./template-detail-tabs";
+import {
+	TemplatePreviewPanel,
+	TemplatePreviewSkeleton,
+} from "./template-preview-panel";
 import {
 	TemplateManagementSidebar,
 	TemplateManagementSidebarSkeleton,
 } from "./template-management-sidebar";
+import { TemplateVersionList } from "./template-version-list";
+import { TemplateMarketplaceShell } from "./template-marketplace-shell";
+import { TemplateCommentsShell } from "./template-comments-shell";
+import { TemplateAnalyticsShell } from "./template-analytics-shell";
 import { PublishTemplateDialog } from "./publish-template-dialog";
 import { UseTemplateDialog } from "./use-template-dialog";
 import { EditTemplateDialog } from "./edit-template-dialog";
@@ -28,17 +45,48 @@ interface TemplateDetailPageProps {
 	templateId: string;
 }
 
+function parseTabParam(tabStr: string | null): TemplateDetailTab {
+	if (
+		tabStr === "versions" ||
+		tabStr === "marketplace" ||
+		tabStr === "comments" ||
+		tabStr === "analytics"
+	) {
+		return tabStr;
+	}
+	return "preview";
+}
+
 export function TemplateDetailPage({ templateId }: TemplateDetailPageProps) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
+
+	// Parse URL params with fallback
+	const initialTabFromUrl = searchParams.get("tab");
 	const initialVersionFromUrl = searchParams.get("version") || undefined;
 
+	const resolvedInitialTab: TemplateDetailTab = parseTabParam(initialTabFromUrl);
+
+	const [activeTab, setActiveTab] =
+		useState<TemplateDetailTab>(resolvedInitialTab);
 	const [selectedVersionId, setSelectedVersionId] = useState<string | undefined>(
 		initialVersionFromUrl,
 	);
 
+	// Sync state with search params changes (e.g. browser back/forward or testing updates)
+	React.useEffect(() => {
+		const tabFromUrl = searchParams.get("tab");
+		setActiveTab(parseTabParam(tabFromUrl));
+		const verFromUrl = searchParams.get("version");
+		if (verFromUrl) {
+			setSelectedVersionId(verFromUrl);
+		}
+	}, [searchParams]);
+
 	// Dialog states
 	const [publishOpen, setPublishOpen] = useState(false);
+	const [publishTargetVersion, setPublishTargetVersion] =
+		useState<TemplateVersion | null>(null);
 	const [useOpen, setUseOpen] = useState(false);
 	const [editOpen, setEditOpen] = useState(false);
 	const [archiveOpen, setArchiveOpen] = useState(false);
@@ -94,22 +142,59 @@ export function TemplateDetailPage({ templateId }: TemplateDetailPageProps) {
 		return previewVersion || versions[0] || null;
 	}, [effectiveVersionId, versions, previewVersion]);
 
-	// Handle version selection
-	const handleSelectVersion = (versionId: string) => {
-		setSelectedVersionId(versionId);
-		// Update URL optionally without full navigation
-		const newUrl = `/dashboard/templates/${templateId}?version=${versionId}`;
-		window.history.replaceState(null, "", newUrl);
+	// Update URL helper without full page reload
+	const syncUrl = (newTab: TemplateDetailTab, versionId?: string) => {
+		const params = new URLSearchParams();
+		if (newTab !== "preview") {
+			params.set("tab", newTab);
+		}
+		const effVersion = versionId || effectiveVersionId;
+		if (effVersion) {
+			params.set("version", effVersion);
+		}
+		const query = params.toString();
+		const newUrl = query
+			? `/dashboard/templates/${templateId}?${query}`
+			: `/dashboard/templates/${templateId}`;
+
+		if (typeof window !== "undefined" && window.history?.replaceState) {
+			window.history.replaceState(null, "", newUrl);
+		}
 	};
 
-	// Skeletons during initial load
-	const isInitialLoading =
-		isLoadingTemplate && !template && !previewData;
+	// Handle tab switching
+	const handleTabChange = (newTab: string) => {
+		const targetTab: TemplateDetailTab = parseTabParam(newTab);
+		setActiveTab(targetTab);
+		syncUrl(targetTab, effectiveVersionId);
+	};
 
+	// Handle version selection
+	const handleSelectVersion = (versionId: string, switchToPreview = false) => {
+		setSelectedVersionId(versionId);
+		const targetTab = switchToPreview ? "preview" : activeTab;
+		if (switchToPreview) {
+			setActiveTab("preview");
+		}
+		syncUrl(targetTab, versionId);
+	};
+
+	const versionToPublish = publishTargetVersion || activeVersion;
+
+	// Initial loading skeleton
+	const isInitialLoading = isLoadingTemplate && !template && !previewData;
 	if (isInitialLoading) {
 		return (
-			<div className='max-w-7xl mx-auto p-4 md:p-6'>
-				<div className='grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-6 items-start'>
+			<div className='mx-auto w-full max-w-[1480px] px-4 md:px-6 xl:px-8 space-y-6'>
+				<TemplateDetailHeaderSkeleton />
+				<div className='flex gap-2 border-b border-border/60 pb-px'>
+					<Skeleton className='h-8 w-24 rounded-lg' />
+					<Skeleton className='h-8 w-28 rounded-lg' />
+					<Skeleton className='h-8 w-28 rounded-lg' />
+					<Skeleton className='h-8 w-28 rounded-lg' />
+					<Skeleton className='h-8 w-28 rounded-lg' />
+				</div>
+				<div className='grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_380px] gap-6 lg:gap-8 items-start'>
 					<TemplatePreviewSkeleton />
 					<TemplateManagementSidebarSkeleton />
 				</div>
@@ -225,39 +310,89 @@ export function TemplateDetailPage({ templateId }: TemplateDetailPageProps) {
 	}
 
 	return (
-		<div className='max-w-7xl mx-auto p-4 md:p-6 space-y-6'>
-			{/* Main Two-Column Layout */}
-			<div className='grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-6 items-start'>
-				{/* Left Preview Panel (~70-75%) */}
-				<div className='min-w-0'>
-					<TemplatePreviewPanel
-						template={template}
-						version={activeVersion}
-						blocks={previewData?.blocks || []}
-						isLoading={(isLoadingPreview || isFetchingPreview) && !previewData}
-					/>
-				</div>
+		<div className='mx-auto w-full max-w-[1480px] px-4 md:px-6 xl:px-8 space-y-6'>
+			{/* Page Header (Full Width alignment with Tabs and Content) */}
+			<TemplateDetailHeader template={template} />
 
-				{/* Right Management Sidebar (~25-30%) */}
-				<div className='min-w-0'>
-					<TemplateManagementSidebar
+			{/* Detail Tabs Structure */}
+			<Tabs
+				value={activeTab}
+				onValueChange={handleTabChange}
+				className='space-y-8'
+			>
+				<TemplateDetailTabsList
+					activeTab={activeTab}
+					versionsCount={versions.length}
+				/>
+
+				{/* TAB 1: PREVIEW (REAL DATA) */}
+				<TabsContent value='preview' className='mt-0 focus-visible:outline-none'>
+					<div className='grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_380px] gap-6 lg:gap-8 items-start'>
+						{/* Left: Template Preview Panel */}
+						<div className='min-w-0'>
+							<TemplatePreviewPanel
+								template={template}
+								version={activeVersion}
+								blocks={previewData?.blocks || []}
+								isLoading={(isLoadingPreview || isFetchingPreview) && !previewData}
+							/>
+						</div>
+
+						{/* Right: Consolidated Management Sidebar */}
+						<div className='min-w-0'>
+							<TemplateManagementSidebar
+								template={template}
+								versions={versions}
+								selectedVersionId={activeVersion?.id}
+								onSelectVersion={(vId) => handleSelectVersion(vId, false)}
+								onOpenPublish={() => {
+									setPublishTargetVersion(activeVersion);
+									setPublishOpen(true);
+								}}
+								onOpenUse={() => setUseOpen(true)}
+								onOpenEdit={() => setEditOpen(true)}
+								onOpenArchive={() => setArchiveOpen(true)}
+								onViewAllVersions={() => handleTabChange("versions")}
+							/>
+						</div>
+					</div>
+				</TabsContent>
+
+				{/* TAB 2: VERSIONS (REAL DATA - FULL WIDTH) */}
+				<TabsContent value='versions' className='mt-0 focus-visible:outline-none'>
+					<TemplateVersionList
 						template={template}
 						versions={versions}
 						selectedVersionId={activeVersion?.id}
-						onSelectVersion={handleSelectVersion}
-						onOpenPublish={() => setPublishOpen(true)}
-						onOpenUse={() => setUseOpen(true)}
-						onOpenEdit={() => setEditOpen(true)}
-						onOpenArchive={() => setArchiveOpen(true)}
+						onPreviewVersion={(vId) => handleSelectVersion(vId, true)}
+						onPublishVersion={(ver) => {
+							setPublishTargetVersion(ver);
+							setPublishOpen(true);
+						}}
 					/>
-				</div>
-			</div>
+				</TabsContent>
+
+				{/* TAB 3: MARKETPLACE (UI SHELL ONLY - NO API) */}
+				<TabsContent value='marketplace' className='mt-0 focus-visible:outline-none'>
+					<TemplateMarketplaceShell template={template} />
+				</TabsContent>
+
+				{/* TAB 4: COMMENTS (UI SHELL ONLY - NO API) */}
+				<TabsContent value='comments' className='mt-0 focus-visible:outline-none'>
+					<TemplateCommentsShell template={template} />
+				</TabsContent>
+
+				{/* TAB 5: ANALYTICS (UI SHELL ONLY - NO API) */}
+				<TabsContent value='analytics' className='mt-0 focus-visible:outline-none'>
+					<TemplateAnalyticsShell template={template} />
+				</TabsContent>
+			</Tabs>
 
 			{/* Dialogs */}
-			{activeVersion && (
+			{versionToPublish && (
 				<PublishTemplateDialog
 					template={template}
-					version={activeVersion}
+					version={versionToPublish}
 					open={publishOpen}
 					onOpenChange={setPublishOpen}
 					onPublished={() => {

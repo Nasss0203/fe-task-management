@@ -3,6 +3,7 @@
 import React from "react";
 import {
 	Calendar,
+	CheckSquare,
 	CircleDot,
 	Database,
 	Hash,
@@ -20,7 +21,7 @@ interface TemplateDatabasePreviewProps {
 interface ColumnDef {
 	id: string;
 	name: string;
-	type: "text" | "status" | "select" | "date" | "number" | "person";
+	type: "text" | "status" | "select" | "date" | "number" | "person" | "checkbox";
 }
 
 interface RowDef {
@@ -30,7 +31,7 @@ interface RowDef {
 
 export function TemplateDatabasePreview({ block }: TemplateDatabasePreviewProps) {
 	// Parse snapshot configuration from block content or data_config
-	// Note: We deliberately DO NOT call live database APIs with template database IDs.
+	// CRITICAL INVARIANT: Template database ID is isolated. Never call live database endpoints.
 	const content = React.useMemo(() => {
 		return (block.content || {}) as Record<string, unknown>;
 	}, [block.content]);
@@ -50,14 +51,17 @@ export function TemplateDatabasePreview({ block }: TemplateDatabasePreviewProps)
 	const viewName =
 		(dataConfig.view_name as string) ||
 		(content.view_name as string) ||
-		"Table View";
+		"Table view";
 
-	// Extract columns if present in snapshot data, or use realistic default schema
+	// Extract columns from snapshot data: SOURCE DATA WINS
 	const columns: ColumnDef[] = React.useMemo(() => {
 		const rawProps =
 			(dataConfig.properties as unknown[]) ||
 			(content.properties as unknown[]) ||
-			(dataConfig.columns as unknown[]);
+			(dataConfig.columns as unknown[]) ||
+			(content.columns as unknown[]) ||
+			(dataConfig.fields as unknown[]) ||
+			(content.fields as unknown[]);
 
 		if (Array.isArray(rawProps) && rawProps.length > 0) {
 			return rawProps.map((p, idx) => {
@@ -68,7 +72,7 @@ export function TemplateDatabasePreview({ block }: TemplateDatabasePreviewProps)
 					const obj = p as Record<string, unknown>;
 					return {
 						id: (obj.id as string) || `col-${idx}`,
-						name: (obj.name as string) || `Column ${idx + 1}`,
+						name: (obj.name as string) || (obj.title as string) || `Column ${idx + 1}`,
 						type: ((obj.type as string) || "text").toLowerCase() as ColumnDef["type"],
 					};
 				}
@@ -76,22 +80,22 @@ export function TemplateDatabasePreview({ block }: TemplateDatabasePreviewProps)
 			});
 		}
 
-		// Curated default columns representing a task / team wiki database snapshot
+		// Curated default columns only when snapshot does not contain property schema
 		return [
 			{ id: "col-name", name: "Name", type: "text" },
 			{ id: "col-status", name: "Status", type: "status" },
 			{ id: "col-priority", name: "Priority", type: "select" },
-			{ id: "col-owner", name: "Assignee", type: "person" },
-			{ id: "col-due", name: "Due Date", type: "date" },
 		];
 	}, [content, dataConfig]);
 
-	// Extract rows if present in snapshot data, or use realistic sample rows
+	// Extract rows from snapshot data: SOURCE DATA WINS
 	const rows: RowDef[] = React.useMemo(() => {
 		const rawRows =
 			(dataConfig.rows as unknown[]) ||
 			(content.rows as unknown[]) ||
-			(dataConfig.records as unknown[]);
+			(dataConfig.records as unknown[]) ||
+			(content.records as unknown[]) ||
+			(dataConfig.data as unknown[]);
 
 		if (Array.isArray(rawRows) && rawRows.length > 0) {
 			return rawRows.map((r, idx) => {
@@ -111,7 +115,7 @@ export function TemplateDatabasePreview({ block }: TemplateDatabasePreviewProps)
 			});
 		}
 
-		// Sample read-only snapshot records
+		// Curated fallback snapshot rows only when snapshot contains no rows
 		return [
 			{
 				id: "row-1",
@@ -119,8 +123,6 @@ export function TemplateDatabasePreview({ block }: TemplateDatabasePreviewProps)
 					"col-name": "Team Onboarding Guide",
 					"col-status": "Done",
 					"col-priority": "High",
-					"col-owner": "Alex Rivera",
-					"col-due": "Oct 12, 2026",
 				},
 			},
 			{
@@ -129,18 +131,6 @@ export function TemplateDatabasePreview({ block }: TemplateDatabasePreviewProps)
 					"col-name": "Technical Architecture Spec",
 					"col-status": "In Progress",
 					"col-priority": "High",
-					"col-owner": "Nam",
-					"col-due": "Oct 18, 2026",
-				},
-			},
-			{
-				id: "row-3",
-				cells: {
-					"col-name": "Product Documentation Review",
-					"col-status": "Todo",
-					"col-priority": "Medium",
-					"col-owner": "Sara Chen",
-					"col-due": "Oct 25, 2026",
 				},
 			},
 		];
@@ -156,6 +146,10 @@ export function TemplateDatabasePreview({ block }: TemplateDatabasePreviewProps)
 				return <Calendar className='size-3 text-blue-500' />;
 			case "person":
 				return <User className='size-3 text-purple-500' />;
+			case "checkbox":
+				return <CheckSquare className='size-3 text-emerald-500' />;
+			case "number":
+				return <Hash className='size-3 text-cyan-500' />;
 			default:
 				return <Type className='size-3 text-muted-foreground' />;
 		}
@@ -233,7 +227,7 @@ export function TemplateDatabasePreview({ block }: TemplateDatabasePreviewProps)
 						<div className='flex items-center gap-1.5 mt-0.5'>
 							<TableIcon className='size-3 text-muted-foreground' />
 							<span className='text-[11px] text-muted-foreground'>
-								{viewName}
+								{viewName} · {rows.length} {rows.length === 1 ? "row" : "rows"}
 							</span>
 						</div>
 					</div>
@@ -243,7 +237,7 @@ export function TemplateDatabasePreview({ block }: TemplateDatabasePreviewProps)
 					variant='secondary'
 					className='text-[10px] bg-background/80 text-muted-foreground border border-border/60 font-normal px-2'
 				>
-					Database Snapshot (Read-only)
+					Read-only snapshot
 				</Badge>
 			</div>
 
@@ -287,7 +281,7 @@ export function TemplateDatabasePreview({ block }: TemplateDatabasePreviewProps)
 
 			{/* Read-only Footer Note */}
 			<div className='px-4 py-2 bg-muted/10 border-t border-border/40 flex items-center justify-between text-[11px] text-muted-foreground'>
-				<span>Showing {rows.length} rows snapshot</span>
+				<span>Showing {rows.length} {rows.length === 1 ? "row" : "rows"} snapshot</span>
 				<span className='italic'>Snapshot view • Editing disabled</span>
 			</div>
 		</div>
