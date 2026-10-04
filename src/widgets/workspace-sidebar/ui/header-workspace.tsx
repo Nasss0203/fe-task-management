@@ -2,9 +2,11 @@
 
 import React from "react";
 
+import Link from "next/link";
 import {
 	Breadcrumb,
 	BreadcrumbItem,
+	BreadcrumbLink,
 	BreadcrumbList,
 	BreadcrumbPage,
 	BreadcrumbSeparator,
@@ -16,11 +18,17 @@ import { DashboardHeader } from "@/widgets/dashboard-header";
 
 import { SidebarTrigger } from "@/widgets/workspace-sidebar/ui/sidebar";
 
+export interface BreadcrumbCrumb {
+	label: string;
+	href?: string;
+}
+
 interface HeaderWorkspaceProps {
 	workspaceName?: string;
 	pageTitle?: string;
 	pageId?: string;
 	rightAction?: React.ReactNode;
+	customBreadcrumbs?: BreadcrumbCrumb[];
 }
 
 export function HeaderWorkspace({
@@ -28,6 +36,7 @@ export function HeaderWorkspace({
 	pageTitle,
 	pageId,
 	rightAction,
+	customBreadcrumbs,
 }: HeaderWorkspaceProps) {
 	return (
 		<header className='flex h-10 shrink-0 items-center gap-2'>
@@ -41,24 +50,53 @@ export function HeaderWorkspace({
 
 				<Breadcrumb>
 					<BreadcrumbList>
-						{workspaceName && (
+						{customBreadcrumbs && customBreadcrumbs.length > 0 ? (
+							customBreadcrumbs.map((crumb, index) => {
+								const isLast = index === customBreadcrumbs.length - 1;
+								return (
+									<React.Fragment key={crumb.label + index}>
+										<BreadcrumbItem>
+											{isLast || !crumb.href ? (
+												<BreadcrumbPage className='line-clamp-1 text-xs font-medium'>
+													{crumb.label}
+												</BreadcrumbPage>
+											) : (
+												<BreadcrumbLink asChild>
+													<Link
+														href={crumb.href}
+														className='text-xs text-muted-foreground hover:text-foreground'
+													>
+														{crumb.label}
+													</Link>
+												</BreadcrumbLink>
+											)}
+										</BreadcrumbItem>
+										{!isLast && <BreadcrumbSeparator />}
+									</React.Fragment>
+								);
+							})
+						) : (
 							<>
-								<BreadcrumbItem>
-									<span className='text-xs text-muted-foreground'>
-										{workspaceName}
-									</span>
-								</BreadcrumbItem>
+								{workspaceName && (
+									<>
+										<BreadcrumbItem>
+											<span className='text-xs text-muted-foreground'>
+												{workspaceName}
+											</span>
+										</BreadcrumbItem>
 
-								{pageTitle && <BreadcrumbSeparator />}
+										{pageTitle && <BreadcrumbSeparator />}
+									</>
+								)}
+
+								{pageTitle && (
+									<BreadcrumbItem>
+										<BreadcrumbPage className='line-clamp-1 text-xs font-medium'>
+											{pageTitle}
+										</BreadcrumbPage>
+									</BreadcrumbItem>
+								)}
 							</>
-						)}
-
-						{pageTitle && (
-							<BreadcrumbItem>
-								<BreadcrumbPage className='line-clamp-1 text-xs font-medium'>
-									{pageTitle}
-								</BreadcrumbPage>
-							</BreadcrumbItem>
 						)}
 					</BreadcrumbList>
 				</Breadcrumb>
