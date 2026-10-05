@@ -1,6 +1,15 @@
 "use client";
 
-import { ArrowUp, ImageIcon, MessageSquare, Plus } from "lucide-react";
+import {
+	AlignLeft,
+	ArrowUp,
+	ListPlus,
+	Maximize2,
+	MessageSquareMore,
+	Minimize2,
+	Plus,
+	WandSparkles,
+} from "lucide-react";
 import React, { useEffect, useRef } from "react";
 
 import { Button } from "@/shared/ui/button";
@@ -11,6 +20,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/ui/select";
+
 import type { AiChatMode } from "../model/types";
 
 interface AiChatComposerProps {
@@ -20,6 +30,34 @@ interface AiChatComposerProps {
 	onModeChange: (mode: AiChatMode) => void;
 	onSend: () => void;
 	disabled?: boolean;
+}
+
+function getPlaceholder(mode: AiChatMode): string {
+	switch (mode) {
+		case "GENERATE_PAGE_COMPOSITION":
+			return "Describe the page you want AI to create...";
+
+		case "writing.improve":
+			return "Enter text you want to improve...";
+
+		case "writing.shorten":
+			return "Enter text you want to shorten...";
+
+		case "writing.expand":
+			return "Enter text you want to expand...";
+
+		case "writing.summarize":
+			return "Enter text you want to summarize...";
+
+		case "writing.continue":
+			return "Enter text you want AI to continue...";
+
+		case "writing.translate":
+			return "Enter text you want to translate...";
+
+		default:
+			return "Enter your text...";
+	}
 }
 
 export function AiChatComposer({
@@ -32,37 +70,36 @@ export function AiChatComposer({
 }: AiChatComposerProps) {
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-	const placeholder =
-		mode === "image"
-			? "Describe the image you want to generate..."
-			: "Ask anything...";
+	const placeholder = getPlaceholder(mode);
 
-	// Auto-resize textarea according to content
 	useEffect(() => {
 		const textarea = textareaRef.current;
-		if (!textarea) return;
+
+		if (!textarea) {
+			return;
+		}
 
 		textarea.style.height = "auto";
 		textarea.style.height = `${Math.min(textarea.scrollHeight, 160)}px`;
 	}, [value]);
 
 	const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-		if (event.key === "Enter" && !event.shiftKey) {
-			// Suppress default newline
-			event.preventDefault();
+		if (event.key !== "Enter" || event.shiftKey) {
+			return;
+		}
 
-			// IME composition safety check (per modern web guidance)
-			if (
-				event.nativeEvent.isComposing ||
-				("keyCode" in event &&
-					(event as unknown as { keyCode: number }).keyCode === 229)
-			) {
-				return;
-			}
+		event.preventDefault();
 
-			if (value.trim() && !disabled) {
-				onSend();
-			}
+		if (
+			event.nativeEvent.isComposing ||
+			("keyCode" in event &&
+				(event as unknown as { keyCode: number }).keyCode === 229)
+		) {
+			return;
+		}
+
+		if (value.trim() && !disabled) {
+			onSend();
 		}
 	};
 
@@ -71,8 +108,9 @@ export function AiChatComposer({
 	return (
 		<div className='sticky bottom-0 z-10 w-full bg-background pt-2 pb-1'>
 			<form
-				onSubmit={(e) => {
-					e.preventDefault();
+				onSubmit={(event) => {
+					event.preventDefault();
+
 					if (canSend) {
 						onSend();
 					}
@@ -87,7 +125,7 @@ export function AiChatComposer({
 					ref={textareaRef}
 					id='ai-chat-input'
 					value={value}
-					onChange={(e) => onChange(e.target.value)}
+					onChange={(event) => onChange(event.target.value)}
 					onKeyDown={handleKeyDown}
 					placeholder={placeholder}
 					rows={1}
@@ -111,26 +149,58 @@ export function AiChatComposer({
 
 						<Select
 							value={mode}
-							onValueChange={(val) => onModeChange(val as AiChatMode)}
+							onValueChange={(value) =>
+								onModeChange(value as AiChatMode)
+							}
 						>
 							<SelectTrigger
 								size='sm'
-								aria-label='Select AI mode'
+								aria-label='Select AI capability'
 								className='h-7 gap-1 rounded-md border-0 bg-transparent px-2 text-xs font-medium text-muted-foreground shadow-none hover:bg-accent/50 hover:text-foreground'
 							>
 								<SelectValue />
 							</SelectTrigger>
+
 							<SelectContent className='rounded-lg border-border/60 bg-popover'>
-								<SelectItem value='text'>
+								<SelectItem value='GENERATE_PAGE_COMPOSITION'>
 									<span className='flex items-center gap-1.5'>
-										<MessageSquare className='size-3.5 text-muted-foreground' />
-										<span>Text</span>
+										<ListPlus className='size-3.5 text-muted-foreground' />
+										<span>Create page</span>
 									</span>
 								</SelectItem>
-								<SelectItem value='image'>
+
+								<SelectItem value='writing.improve'>
 									<span className='flex items-center gap-1.5'>
-										<ImageIcon className='size-3.5 text-muted-foreground' />
-										<span>Image</span>
+										<WandSparkles className='size-3.5 text-muted-foreground' />
+										<span>Improve</span>
+									</span>
+								</SelectItem>
+
+								<SelectItem value='writing.shorten'>
+									<span className='flex items-center gap-1.5'>
+										<Minimize2 className='size-3.5 text-muted-foreground' />
+										<span>Shorten</span>
+									</span>
+								</SelectItem>
+
+								<SelectItem value='writing.expand'>
+									<span className='flex items-center gap-1.5'>
+										<Maximize2 className='size-3.5 text-muted-foreground' />
+										<span>Expand</span>
+									</span>
+								</SelectItem>
+
+								<SelectItem value='writing.summarize'>
+									<span className='flex items-center gap-1.5'>
+										<AlignLeft className='size-3.5 text-muted-foreground' />
+										<span>Summarize</span>
+									</span>
+								</SelectItem>
+
+								<SelectItem value='writing.continue'>
+									<span className='flex items-center gap-1.5'>
+										<MessageSquareMore className='size-3.5 text-muted-foreground' />
+										<span>Continue</span>
 									</span>
 								</SelectItem>
 							</SelectContent>

@@ -1,95 +1,86 @@
 import { create } from "zustand";
 
-import type { AiChatMode, AiChatMessage } from "./types";
+import type { AiChatMessage, AiChatMode, QuickActionItem } from "./types";
 
 interface AiChatStore {
 	messages: AiChatMessage[];
 	mode: AiChatMode;
 	input: string;
+
+	conversationId: string | null;
+	conversationWorkspaceId: string | null;
+
 	setMessages: (
-		messages: AiChatMessage[] | ((prev: AiChatMessage[]) => AiChatMessage[]),
+		messages:
+			| AiChatMessage[]
+			| ((prev: AiChatMessage[]) => AiChatMessage[]),
 	) => void;
+
+	addMessage: (message: AiChatMessage) => void;
+
 	setMode: (mode: AiChatMode) => void;
 	setInput: (input: string) => void;
-	sendMessage: () => void;
+
+	setConversation: (conversationId: string, workspaceId: string) => void;
+
+	clearConversation: () => void;
+
 	newChat: () => void;
-	selectQuickAction: (action: {
-		label: string;
-		prompt: string;
-		mode: AiChatMode;
-	}) => void;
+
+	selectQuickAction: (action: QuickActionItem) => void;
 }
 
-export const useAiChatStore = create<AiChatStore>((set, get) => ({
+const DEFAULT_AI_MODE: AiChatMode = "writing.improve";
+
+export const useAiChatStore = create<AiChatStore>((set) => ({
 	messages: [],
-	mode: "text",
+	mode: DEFAULT_AI_MODE,
 	input: "",
+
+	conversationId: null,
+	conversationWorkspaceId: null,
 
 	setMessages: (messages) =>
 		set((state) => ({
 			messages:
-				typeof messages === "function" ? messages(state.messages) : messages,
+				typeof messages === "function"
+					? messages(state.messages)
+					: messages,
+		})),
+
+	addMessage: (message) =>
+		set((state) => ({
+			messages: [...state.messages, message],
 		})),
 
 	setMode: (mode) => set({ mode }),
 
 	setInput: (input) => set({ input }),
 
-	sendMessage: () => {
-		const { input, mode } = get();
-		const trimmed = input.trim();
-		if (!trimmed) return;
+	setConversation: (conversationId, workspaceId) =>
+		set({
+			conversationId,
+			conversationWorkspaceId: workspaceId,
+		}),
 
-		const userMessageId = `user-${Date.now()}`;
-		const currentMode = mode;
+	clearConversation: () =>
+		set({
+			conversationId: null,
+			conversationWorkspaceId: null,
+		}),
 
-		const newUserMessage: AiChatMessage = {
-			id: userMessageId,
-			role: "user",
-			content: trimmed,
-			mode: currentMode,
-			createdAt: new Date().toISOString(),
-		};
-
-		const assistantMessageId = `assistant-${Date.now() + 1}`;
-		const demoAssistantReply: AiChatMessage =
-			currentMode === "image"
-				? {
-						id: assistantMessageId,
-						role: "assistant",
-						content: `Here is a preview of the generated image layout for: "${trimmed}"`,
-						imageUrl:
-							"https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80",
-						mode: "image",
-						createdAt: new Date().toISOString(),
-				  }
-				: {
-						id: assistantMessageId,
-						role: "assistant",
-						content:
-							"This is a local UI preview response. Backend AI services (Gemini/OpenAI) will be integrated in a future task.",
-						mode: "text",
-						createdAt: new Date().toISOString(),
-				  };
-
-		set((state) => ({
-			messages: [...state.messages, newUserMessage, demoAssistantReply],
-			input: "",
-		}));
-	},
-
-	newChat: () => {
+	newChat: () =>
 		set({
 			messages: [],
 			input: "",
-			mode: "text",
-		});
-	},
+			mode: DEFAULT_AI_MODE,
+			conversationId: null,
+			conversationWorkspaceId: null,
+		}),
 
-	selectQuickAction: (action) => {
+	selectQuickAction: (action) =>
 		set({
 			mode: action.mode,
-			input: action.prompt || "",
-		});
-	},
+			input: action.prompt,
+		}),
 }));

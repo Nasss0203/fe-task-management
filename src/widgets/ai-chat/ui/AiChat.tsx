@@ -1,5 +1,6 @@
 "use client";
 
+import { useAiChat } from "../model/use-ai-chat";
 import { useAiChatStore } from "../model/use-ai-chat-store";
 import { AiChatComposer } from "./AiChatComposer";
 import { AiChatEmptyState } from "./AiChatEmptyState";
@@ -17,10 +18,17 @@ export function AiChat({ showHeader = false }: AiChatProps) {
 		input,
 		setInput,
 		setMode,
-		sendMessage,
 		newChat,
 		selectQuickAction,
 	} = useAiChatStore();
+
+	const {
+		sendMessage,
+		confirmPageComposition,
+		discardGeneration,
+		isPending,
+		currentWorkspaceId,
+	} = useAiChat();
 
 	return (
 		<div className='mx-auto flex h-full w-full max-w-3xl flex-col px-4 sm:px-6'>
@@ -34,7 +42,16 @@ export function AiChat({ showHeader = false }: AiChatProps) {
 			{messages.length === 0 ? (
 				<AiChatEmptyState onSelectQuickAction={selectQuickAction} />
 			) : (
-				<AiMessageList messages={messages} />
+				<AiMessageList
+					messages={messages}
+					disabled={isPending}
+					onConfirmPageComposition={(generationId) => {
+						void confirmPageComposition(generationId);
+					}}
+					onDiscardGeneration={(generationId) => {
+						void discardGeneration(generationId);
+					}}
+				/>
 			)}
 
 			<AiChatComposer
@@ -42,7 +59,10 @@ export function AiChat({ showHeader = false }: AiChatProps) {
 				onChange={setInput}
 				mode={mode}
 				onModeChange={setMode}
-				onSend={sendMessage}
+				onSend={() => {
+					void sendMessage();
+				}}
+				disabled={isPending || !currentWorkspaceId}
 			/>
 		</div>
 	);
