@@ -2,7 +2,7 @@
 
 import React from "react";
 import { format } from "date-fns";
-import { Check, Eye, GitBranch, Sparkles } from "lucide-react";
+import { Check, Eye, GitBranch, Loader2, Plus, Sparkles } from "lucide-react";
 import type { PageTemplate, TemplateVersion } from "@/entities/template";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -13,13 +13,18 @@ interface TemplateVersionListProps {
 	selectedVersionId?: string;
 	onPreviewVersion: (versionId: string) => void;
 	onPublishVersion?: (version: TemplateVersion) => void;
+	onCreateVersion: () => void;
+	isCreatingVersion: boolean;
 }
 
 export function TemplateVersionList({
+	template,
 	versions,
 	selectedVersionId,
 	onPreviewVersion,
 	onPublishVersion,
+	onCreateVersion,
+	isCreatingVersion,
 }: TemplateVersionListProps) {
 	const activeVersionId = selectedVersionId || versions[0]?.id;
 
@@ -35,7 +40,7 @@ export function TemplateVersionList({
 	return (
 		<div className='w-full space-y-4'>
 			{/* Tab Header (Full Width) */}
-			<div className='flex items-center justify-between'>
+			<div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4'>
 				<div>
 					<h2 className='text-lg font-semibold tracking-tight text-foreground'>
 						Versions
@@ -44,6 +49,25 @@ export function TemplateVersionList({
 						Manage saved versions of this template.
 					</p>
 				</div>
+
+				<Button
+					size='sm'
+					onClick={onCreateVersion}
+					disabled={isCreatingVersion || template.status === "ARCHIVED"}
+					className='self-start sm:self-auto shrink-0 gap-1.5'
+				>
+					{isCreatingVersion ? (
+						<>
+							<Loader2 className='size-3.5 animate-spin' />
+							Creating...
+						</>
+					) : (
+						<>
+							<Plus className='size-3.5' />
+							Create new version
+						</>
+					)}
+				</Button>
 			</div>
 
 			{/* Versions Table / Card List (Full Width) */}

@@ -58,6 +58,25 @@ export function usePublishTemplateVersion() {
 	});
 }
 
+export interface CreateTemplateVersionInput {
+	templateId: string;
+}
+
+export function useCreateTemplateVersion() {
+	const queryClient = useQueryClient();
+
+	return useMutation<TemplateVersion, Error, CreateTemplateVersionInput>({
+		mutationFn: ({ templateId }: CreateTemplateVersionInput) =>
+			templateApi.createVersion(templateId),
+
+		onSuccess: async (_, variables) => {
+			await queryClient.invalidateQueries({
+				queryKey: templateKeys.versions(variables.templateId),
+			});
+		},
+	});
+}
+
 export interface UseTemplateInput {
 	templateId: string;
 	versionId: string;
@@ -67,11 +86,20 @@ export interface UseTemplateInput {
 
 export function useUseTemplate() {
 	return useMutation<UseTemplateResponse, Error, UseTemplateInput>({
-		mutationFn: ({ templateId, versionId, payload, workspace_id }: UseTemplateInput) => {
+		mutationFn: ({
+			templateId,
+			versionId,
+			payload,
+			workspace_id,
+		}: UseTemplateInput) => {
 			const resolvedPayload: UseTemplatePayload = payload ?? {
 				workspace_id: workspace_id || "",
 			};
-			return templateApi.useTemplate(templateId, versionId, resolvedPayload);
+			return templateApi.useTemplate(
+				templateId,
+				versionId,
+				resolvedPayload,
+			);
 		},
 	});
 }
@@ -141,4 +169,3 @@ export function useRestoreTemplate() {
 		},
 	});
 }
-

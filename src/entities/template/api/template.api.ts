@@ -1,5 +1,5 @@
-import instance from "@/shared/api/api-client";
 import type { ApiResponse } from "@/shared/api";
+import instance from "@/shared/api/api-client";
 import type {
 	CreateTemplateFromPagePayload,
 	ListTemplatesParams,
@@ -77,14 +77,21 @@ export const templateApi = {
 		signal?: AbortSignal,
 	): Promise<TemplateVersion[]> => {
 		const response = await instance.get<
-			ApiResponse<TemplateVersion[]> | TemplateVersion[] | { items: TemplateVersion[] }
+			| ApiResponse<TemplateVersion[]>
+			| TemplateVersion[]
+			| { items: TemplateVersion[] }
 		>(`${TEMPLATE_API}/${templateId}/versions`, { signal });
 
 		const unwrapped = unwrapResponse<
 			TemplateVersion[] | { items: TemplateVersion[] }
 		>(response.data);
 
-		if (unwrapped && typeof unwrapped === "object" && "items" in unwrapped && Array.isArray(unwrapped.items)) {
+		if (
+			unwrapped &&
+			typeof unwrapped === "object" &&
+			"items" in unwrapped &&
+			Array.isArray(unwrapped.items)
+		) {
 			return unwrapped.items;
 		}
 
@@ -152,5 +159,13 @@ export const templateApi = {
 		>(`${TEMPLATE_API}/from-page/${pageId}`, payload);
 
 		return unwrapResponse<PageTemplate>(response.data);
+	},
+
+	createVersion: async (templateId: string): Promise<TemplateVersion> => {
+		const response = await instance.post<
+			ApiResponse<TemplateVersion> | TemplateVersion
+		>(`${TEMPLATE_API}/${templateId}/versions`);
+
+		return unwrapResponse<TemplateVersion>(response.data);
 	},
 };
