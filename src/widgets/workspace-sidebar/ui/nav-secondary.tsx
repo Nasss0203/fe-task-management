@@ -1,6 +1,8 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React from "react";
 
 import { PageTrashPopover } from "@/features/page/trash/ui/page-trash-popover";
@@ -36,6 +38,8 @@ export function NavSecondary({
 	items,
 	...props
 }: NavSecondaryProps) {
+	const pathname = usePathname();
+
 	return (
 		<SidebarGroup {...props}>
 			<SidebarGroupContent>
@@ -76,14 +80,26 @@ export function NavSecondary({
 						/**
 						 * Normal link
 						 */
+						const isInternal = item.url.startsWith("/");
+						const isActive =
+							isInternal &&
+							(pathname === item.url ||
+								(item.url !== "/" && pathname.startsWith(`${item.url}/`)));
+
 						return (
 							<SidebarMenuItem key={item.title}>
-								<SidebarMenuButton asChild>
-									<a href={item.url}>
-										<item.icon />
-
-										<span>{item.title}</span>
-									</a>
+								<SidebarMenuButton asChild isActive={isActive}>
+									{isInternal ? (
+										<Link href={item.url}>
+											<item.icon />
+											<span>{item.title}</span>
+										</Link>
+									) : (
+										<a href={item.url}>
+											<item.icon />
+											<span>{item.title}</span>
+										</a>
+									)}
 								</SidebarMenuButton>
 
 								{item.badge && (

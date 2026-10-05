@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import { useParams, usePathname } from "next/navigation";
 
 import { usePage } from "@/entities/page/model/page.queries";
+import { useTemplateDetail } from "@/entities/template";
 import {
 	useWorkspace,
 	useWorkspaces,
@@ -21,16 +22,25 @@ export function HeaderWorkspaceContainer() {
 
 	const params = useParams<{
 		pageId?: string;
+		templateId?: string;
 	}>();
 
 	const isPageRoute = pathname.startsWith("/page/");
 	const isAiRoute =
 		pathname === "/dashboard/ai" || pathname.startsWith("/dashboard/ai/");
 	const isDashboardRoute = pathname === "/dashboard";
+	const isTemplatesGalleryRoute = pathname === "/dashboard/templates";
+	const isTemplateDetailRoute =
+		pathname.startsWith("/dashboard/templates/") &&
+		pathname !== "/dashboard/templates";
 
 	const pageId = isPageRoute ? params.pageId : undefined;
+	const templateId = isTemplateDetailRoute ? params.templateId : undefined;
 
 	const { data: page } = usePage(pageId);
+	const { data: templateDetail } = useTemplateDetail(templateId ?? "", {
+		enabled: Boolean(templateId),
+	});
 
 	const hasLastActiveWorkspace =
 		Boolean(user?.lastActiveWorkspaceId) &&
@@ -50,9 +60,19 @@ export function HeaderWorkspaceContainer() {
 		? page?.title
 		: isAiRoute
 			? "Ask AI"
-			: isDashboardRoute
-				? "Home"
-				: undefined;
+			: isTemplatesGalleryRoute
+				? "Templates"
+				: isDashboardRoute
+					? "Home"
+					: undefined;
+
+	const customBreadcrumbs = isTemplateDetailRoute
+		? [
+				...(workspace?.name ? [{ label: workspace.name }] : []),
+				{ label: "Templates", href: "/dashboard/templates" },
+				{ label: templateDetail?.name || "Template" },
+			]
+		: undefined;
 
 	const { messages, newChat } = useAiChatStore();
 	const hasMessages = messages.length > 0;
@@ -77,6 +97,7 @@ export function HeaderWorkspaceContainer() {
 			pageTitle={pageTitle}
 			pageId={pageId}
 			rightAction={rightAction}
+			customBreadcrumbs={customBreadcrumbs}
 		/>
 	);
 }

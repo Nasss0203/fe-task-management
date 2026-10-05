@@ -96,7 +96,7 @@ const data = {
 	navSecondary: [
 		{
 			title: "Templates",
-			url: "#",
+			url: "/dashboard/templates",
 			icon: Blocks,
 		},
 		{

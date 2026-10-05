@@ -3,6 +3,7 @@
 import { ExternalLink, Link2, Trash2 } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
+import { useMovePageToTrash } from "@/entities/page/model/page.mutations";
 import type { Page } from "@/entities/page/model/page.types";
 
 import {
@@ -11,6 +12,7 @@ import {
 } from "@/features/page/move-page/ui/move-page-menu";
 import { FavoritePageMenuItem } from "@/features/page/favorite-page/ui/favorite-page-menu-item";
 import { RenamePageMenu } from "@/features/page/rename-page/ui/rename-page-menu";
+import { SaveAsTemplateMenuItem } from "@/features/page/save-as-template/ui/save-as-template-menu-item";
 
 import {
 	DropdownMenu,
@@ -24,9 +26,9 @@ import { DuplicatePageMenuItem } from "../../duplicate-page/ui/duplicate-page-me
 
 interface PageActionsMenuProps {
 	page: Page;
-	pages: Page[];
+	pages?: Page[];
 	children: ReactNode;
-	teamspaces: TeamspaceOption[];
+	teamspaces?: TeamspaceOption[];
 
 	onMoveToTrash?: (page: Page) => void;
 }
@@ -39,6 +41,7 @@ export function PageActionsMenu({
 	onMoveToTrash,
 }: PageActionsMenuProps) {
 	const [open, setOpen] = useState(false);
+	const defaultMoveToTrash = useMovePageToTrash();
 
 	/**
 	 * Copy URL Page.
@@ -57,6 +60,18 @@ export function PageActionsMenu({
 	const handleOpenInNewTab = () => {
 		window.open(`/page/${page.id}`, "_blank", "noopener,noreferrer");
 
+		setOpen(false);
+	};
+
+	const handleTrashAction = () => {
+		if (onMoveToTrash) {
+			onMoveToTrash(page);
+		} else {
+			defaultMoveToTrash.mutate({
+				pageId: page.id,
+				workspaceId: page.workspace_id,
+			});
+		}
 		setOpen(false);
 	};
 
@@ -98,6 +113,14 @@ export function PageActionsMenu({
 					}}
 				/>
 
+				{/* Save as template */}
+				<SaveAsTemplateMenuItem
+					page={page}
+					onSaved={() => {
+						setOpen(false);
+					}}
+				/>
+
 				{/* Rename */}
 				<RenamePageMenu
 					page={page}
@@ -107,21 +130,21 @@ export function PageActionsMenu({
 				/>
 
 				{/* Move */}
-				<MovePageMenu
-					page={page}
-					pages={pages}
-					teamspaces={teamspaces}
-					onMoved={() => {
-						setOpen(false);
-					}}
-				/>
+				{pages && teamspaces && (
+					<MovePageMenu
+						page={page}
+						pages={pages}
+						teamspaces={teamspaces}
+						onMoved={() => {
+							setOpen(false);
+						}}
+					/>
+				)}
 
 				{/* Trash */}
 				<DropdownMenuItem
 					className="text-destructive focus:text-destructive"
-					onSelect={() => {
-						onMoveToTrash?.(page);
-					}}
+					onSelect={handleTrashAction}
 				>
 					<Trash2 className="mr-2 size-4" />
 					Move to Trash

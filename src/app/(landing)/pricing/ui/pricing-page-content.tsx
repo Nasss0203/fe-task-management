@@ -44,9 +44,9 @@ export function PricingPageContent() {
 					Transparent Pricing
 				</div>
 
-				<h1 className='text-4xl sm:text-6xl font-bold tracking-tight text-foreground leading-[1.1]'>
+				<h1 className='text-4xl sm:text-6xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50 leading-[1.1]'>
 					Choose the plan that{" "}
-					<span className='bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-300 dark:to-purple-400 bg-clip-text text-transparent'>
+					<span className='bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 bg-clip-text text-transparent'>
 						fits your team
 					</span>
 				</h1>
