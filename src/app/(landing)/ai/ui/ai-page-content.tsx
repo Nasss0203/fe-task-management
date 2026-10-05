@@ -35,14 +35,14 @@ export function AiPageContent() {
 					Taskmanly AI Assistant
 				</div>
 
-				<h1 className='text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.1]'>
+				<h1 className='text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50 leading-[1.1]'>
 					Get more done{" "}
-					<span className='bg-gradient-to-r from-amber-500 via-orange-500 to-primary bg-clip-text text-transparent'>
+					<span className='bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 bg-clip-text text-transparent'>
 						with AI
 					</span>
 				</h1>
 
-				<p className='text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed'>
+				<p className='text-base sm:text-xl text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto leading-relaxed'>
 					Taskmanly AI understands workspace context and helps users create, plan and organize work without tedious administrative overhead.
 				</p>
 
@@ -51,7 +51,7 @@ export function AiPageContent() {
 					<Link href={user ? "/dashboard/ai" : "/sign-up"}>
 						<Button
 							size='lg'
-							className='h-12 w-full sm:w-auto rounded-full bg-primary px-8 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90'
+							className='h-12 w-full sm:w-auto rounded-full bg-indigo-600 hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white px-8 text-sm font-semibold shadow-md shadow-indigo-600/20 dark:shadow-indigo-950/40'
 						>
 							Try AI
 							<ArrowRight className='ml-2 h-4 w-4' />
