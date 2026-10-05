@@ -3,12 +3,21 @@
 import { Sparkles } from "lucide-react";
 
 import type { AiChatMessage } from "../model/types";
+import { AiPageCompositionPreview } from "./AiPageCompositionPreview";
 
 interface AiMessageItemProps {
 	message: AiChatMessage;
+	disabled?: boolean;
+	onConfirmPageComposition: (generationId: string) => void;
+	onDiscardGeneration: (generationId: string) => void;
 }
 
-export function AiMessageItem({ message }: AiMessageItemProps) {
+export function AiMessageItem({
+	message,
+	disabled = false,
+	onConfirmPageComposition,
+	onDiscardGeneration,
+}: AiMessageItemProps) {
 	const isUser = message.role === "user";
 
 	if (isUser) {
@@ -23,9 +32,14 @@ export function AiMessageItem({ message }: AiMessageItemProps) {
 		);
 	}
 
+	const generation = message.generation;
+
+	const isPageComposition =
+		generation?.capability === "GENERATE_PAGE_COMPOSITION";
+
 	return (
 		<div className='flex w-full items-start gap-3'>
-			<div className='flex size-6 shrink-0 items-center justify-center rounded-md border border-border/40 bg-muted/80 text-foreground/80 mt-0.5'>
+			<div className='mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md border border-border/40 bg-muted/80 text-foreground/80'>
 				<Sparkles className='size-3.5' />
 			</div>
 
@@ -36,16 +50,13 @@ export function AiMessageItem({ message }: AiMessageItemProps) {
 					</p>
 				)}
 
-				{message.imageUrl && (
-					<div className='mt-2.5 overflow-hidden rounded-lg border border-border/60 bg-muted/20 max-w-sm sm:max-w-md'>
-						{/* eslint-disable-next-line @next/next/no-img-element */}
-						<img
-							src={message.imageUrl}
-							alt={message.content || "AI generated image preview"}
-							className='h-auto w-full object-cover max-h-80'
-							loading='lazy'
-						/>
-					</div>
+				{isPageComposition && generation && (
+					<AiPageCompositionPreview
+						generation={generation}
+						disabled={disabled}
+						onConfirm={onConfirmPageComposition}
+						onDiscard={onDiscardGeneration}
+					/>
 				)}
 			</div>
 		</div>

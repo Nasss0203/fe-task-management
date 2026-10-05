@@ -1,12 +1,17 @@
-export type AiChatMode = "text" | "image";
+import type {
+	AiCapability,
+	AiGeneration,
+} from "@/entities/ai-assistant/model/ai-assistant.types";
+
+export type AiChatMode = AiCapability;
 
 export interface AiChatMessage {
 	id: string;
 	role: "user" | "assistant";
 	content: string;
-	imageUrl?: string;
-	mode?: AiChatMode;
-	createdAt?: string;
+	capability: AiCapability;
+	generation?: AiGeneration;
+	createdAt: string;
 }
 
 export interface QuickActionItem {
@@ -14,5 +19,12 @@ export interface QuickActionItem {
 	label: string;
 	prompt: string;
 	mode: AiChatMode;
-	iconName: "image" | "file-text" | "lightbulb" | "align-left";
+	iconName:
+		| "file-text"
+		| "wand"
+		| "align-left"
+		| "minimize"
+		| "maximize"
+		| "languages"
+		| "list-plus";
 }
