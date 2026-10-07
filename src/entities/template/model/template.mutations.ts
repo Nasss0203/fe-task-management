@@ -70,9 +70,14 @@ export function useCreateTemplateVersion() {
 			templateApi.createVersion(templateId),
 
 		onSuccess: async (_, variables) => {
-			await queryClient.invalidateQueries({
-				queryKey: templateKeys.versions(variables.templateId),
-			});
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: templateKeys.versions(variables.templateId),
+				}),
+				queryClient.invalidateQueries({
+					queryKey: templateKeys.lists(),
+				}),
+			]);
 		},
 	});
 }

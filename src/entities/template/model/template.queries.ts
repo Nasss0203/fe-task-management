@@ -27,6 +27,9 @@ export const templateKeys = {
 
 	preview: (templateId: string, versionId: string) =>
 		[...templateKeys.detail(templateId), "preview", versionId] as const,
+
+	thumbnail: (templateId: string, versionId: string) =>
+		[...templateKeys.detail(templateId), "thumbnail", versionId] as const,
 };
 
 export interface UseInfiniteTemplatesOptions {
@@ -56,7 +59,8 @@ export function useInfiniteTemplates({
 			templateApi.list(
 				{
 					scope,
-					workspaceId: scope === "workspace" ? workspaceId : undefined,
+					workspaceId:
+						scope === "workspace" ? workspaceId : undefined,
 					search: trimmedSearch,
 					cursor: pageParam,
 					limit,
@@ -101,7 +105,25 @@ export function useTemplatePreview(
 		queryKey: templateKeys.preview(templateId, versionId ?? ""),
 		queryFn: ({ signal }) =>
 			templateApi.getPreview(templateId, versionId!, signal),
-		enabled:
-			Boolean(templateId && versionId) && (options?.enabled ?? true),
+		enabled: Boolean(templateId && versionId) && (options?.enabled ?? true),
+	});
+}
+
+export function useTemplateVersionThumbnail(
+	templateId: string,
+	versionId?: string,
+	options?: { enabled?: boolean },
+) {
+	return useQuery({
+		queryKey: templateKeys.thumbnail(templateId, versionId ?? ""),
+
+		queryFn: ({ signal }) =>
+			templateApi.getVersionThumbnail(templateId, versionId!, signal),
+
+		enabled: Boolean(templateId && versionId) && (options?.enabled ?? true),
+
+		retry: false,
+
+		staleTime: 10 * 60 * 1000,
 	});
 }

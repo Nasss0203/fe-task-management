@@ -7,6 +7,7 @@ import type {
 	TemplateListResponse,
 	TemplatePreview,
 	TemplateVersion,
+	TemplateVersionThumbnail,
 	UpdateTemplatePayload,
 	UseTemplatePayload,
 	UseTemplateResponse,
@@ -167,5 +168,19 @@ export const templateApi = {
 		>(`${TEMPLATE_API}/${templateId}/versions`);
 
 		return unwrapResponse<TemplateVersion>(response.data);
+	},
+
+	getVersionThumbnail: async (
+		templateId: string,
+		versionId: string,
+		signal?: AbortSignal,
+	): Promise<TemplateVersionThumbnail> => {
+		const response = await instance.get<
+			ApiResponse<TemplateVersionThumbnail> | TemplateVersionThumbnail
+		>(`${TEMPLATE_API}/${templateId}/versions/${versionId}/thumbnail`, {
+			signal,
+		});
+
+		return unwrapResponse<TemplateVersionThumbnail>(response.data);
 	},
 };

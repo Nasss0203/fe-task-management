@@ -5,7 +5,6 @@ import Link from "next/link";
 import { format } from "date-fns";
 import {
 	ExternalLink,
-	Eye,
 	FileText,
 	Globe,
 	Lock,
@@ -22,6 +21,7 @@ import {
 	DialogTitle,
 } from "@/shared/ui/dialog";
 import type { PageTemplate } from "@/entities/template";
+import { TemplateVersionStatusBadge } from "./template-version-status-badge";
 
 interface TemplatePreviewDialogProps {
 	template: PageTemplate | null;
@@ -67,16 +67,7 @@ export function TemplatePreviewDialog({
 								Public
 							</Badge>
 						)}
-						<Badge
-							variant={template.status === "PUBLISHED" ? "secondary" : "outline"}
-							className={
-								template.status === "PUBLISHED"
-									? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 text-[10px]"
-									: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 text-[10px]"
-							}
-						>
-							{template.status === "PUBLISHED" ? "Published" : "Draft"}
-						</Badge>
+						<TemplateVersionStatusBadge status={template.version?.status} />
 					</div>
 
 					<DialogTitle className='text-xl font-bold text-foreground flex items-center gap-2'>

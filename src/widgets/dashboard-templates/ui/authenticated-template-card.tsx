@@ -1,17 +1,7 @@
 "use client";
 
-import React from "react";
-import { useRouter } from "next/navigation";
-import { format } from "date-fns";
-import {
-	Eye,
-	FileText,
-	Globe,
-	Lock,
-	MoreHorizontal,
-	Users,
-	Sparkles,
-} from "lucide-react";
+import type { PageTemplate, TemplateVisibility } from "@/entities/template";
+import { useTemplateVersionThumbnail } from "@/entities/template/model/template.queries";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import {
@@ -20,12 +10,20 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
-import type {
-	PageTemplate,
-	TemplateStatus,
-	TemplateVisibility,
-} from "@/entities/template";
+import { format } from "date-fns";
+import {
+	Eye,
+	FileText,
+	Globe,
+	Lock,
+	MoreHorizontal,
+	Sparkles,
+	Users,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import React from "react";
 import { TemplateCardShell } from "./template-card-shell";
+import { TemplateVersionStatusBadge } from "./template-version-status-badge";
 
 interface AuthenticatedTemplateCardProps {
 	template: PageTemplate;
@@ -39,6 +37,12 @@ export function AuthenticatedTemplateCard({
 	onUse,
 }: AuthenticatedTemplateCardProps) {
 	const router = useRouter();
+	const versionId = template.version?.id;
+
+	const { data: thumbnail } = useTemplateVersionThumbnail(
+		template.id,
+		versionId,
+	);
 	const formattedDate = React.useMemo(() => {
 		try {
 			return format(new Date(template.updated_at), "MMM d, yyyy");
@@ -83,39 +87,19 @@ export function AuthenticatedTemplateCard({
 				return null;
 		}
 	};
-
-	const renderStatusBadge = (status: TemplateStatus) => {
-		if (status === "DRAFT") {
-			return (
-				<Badge
-					variant='outline'
-					className='bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 text-[10px] font-medium'
-				>
-					Draft
-				</Badge>
-			);
-		}
-		if (status === "PUBLISHED") {
-			return (
-				<Badge
-					variant='secondary'
-					className='bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 text-[10px] font-medium'
-				>
-					Published
-				</Badge>
-			);
-		}
-		return null;
-	};
-
 	return (
 		<TemplateCardShell
 			onClick={() => {
 				router.push(`/dashboard/templates/${template.id}`);
 			}}
 			preview={
-				template.cover_url ? (
-					// eslint-disable-next-line @next/next/no-img-element
+				thumbnail?.url ? (
+					<img
+						src={thumbnail.url}
+						alt={`${template.name} preview`}
+						className='h-full w-full object-cover'
+					/>
+				) : template.cover_url ? (
 					<img
 						src={template.cover_url}
 						alt={template.name}
@@ -165,7 +149,9 @@ export function AuthenticatedTemplateCard({
 								Workspace Template
 							</span>
 							<span className='text-[9px] text-muted-foreground/80'>
-								v1
+								{template.version
+									? `v${template.version.version_number}`
+									: ""}
 							</span>
 						</div>
 					</div>
@@ -175,7 +161,9 @@ export function AuthenticatedTemplateCard({
 			meta={
 				<div className='flex items-center justify-between w-full text-[10px] text-muted-foreground'>
 					<div className='flex items-center gap-1.5'>
-						{renderStatusBadge(template.status)}
+						<TemplateVersionStatusBadge
+							status={template.version?.status}
+						/>
 					</div>
 					<span className='text-[10px] text-muted-foreground'>
 						Updated {formattedDate}

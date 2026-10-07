@@ -15,10 +15,12 @@ export interface PageTemplate {
 	visibility: TemplateVisibility;
 	created_at: string;
 	updated_at: string;
+	/** Represented version, included by the template list endpoint. */
+	version?: TemplateVersion | null;
 }
 
 export interface TemplateListResponse {
-	items: PageTemplate[];
+	items: (PageTemplate & { version: TemplateVersion | null })[];
 	nextCursor: string | null;
 }
 
@@ -69,10 +71,70 @@ export interface TemplateBlock {
 	updated_at: string;
 }
 
+export interface TemplateDatabasePropertyOption {
+	id: string;
+	template_property_id: string;
+	name: string;
+	color: string | null;
+	position: string;
+}
+
+export interface TemplateDatabaseProperty {
+	id: string;
+	template_database_id: string;
+	name: string;
+	type: string;
+	is_default: boolean;
+	is_hideable: boolean;
+	position: string;
+	options: TemplateDatabasePropertyOption[];
+}
+
+export interface TemplateDatabaseRowValue {
+	id: string;
+	template_row_id: string;
+	template_property_id: string;
+	value: unknown;
+}
+
+export interface TemplateDatabaseRow {
+	id: string;
+	template_database_id: string;
+	values: TemplateDatabaseRowValue[];
+}
+
+export interface TemplateDatabaseViewProperty {
+	id: string;
+	template_view_id: string;
+	template_property_id: string;
+	position: string;
+	visible: boolean;
+	width: number | null;
+}
+
+export interface TemplateDatabaseView {
+	id: string;
+	template_database_id: string;
+	name: string;
+	type: string;
+	position: string;
+	properties: TemplateDatabaseViewProperty[];
+}
+
+export interface TemplateDatabaseSnapshot {
+	id: string;
+	version_id: string;
+	name: string;
+	properties: TemplateDatabaseProperty[];
+	rows: TemplateDatabaseRow[];
+	views: TemplateDatabaseView[];
+}
+
 export interface TemplatePreview {
 	template: PageTemplate;
 	version: TemplateVersion;
 	blocks: TemplateBlock[];
+	databases: TemplateDatabaseSnapshot[];
 }
 
 export interface UseTemplatePayload {
@@ -90,3 +152,10 @@ export interface UpdateTemplatePayload {
 	cover_url?: string | null;
 	visibility?: TemplateVisibility;
 }
+
+export type TemplateVersionThumbnail = {
+	url: string;
+	mimeType: string;
+	width: number;
+	height: number;
+};

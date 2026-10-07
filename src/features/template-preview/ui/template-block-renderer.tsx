@@ -11,7 +11,10 @@ import {
 	VideoIcon,
 } from "lucide-react";
 import { Separator } from "@/shared/ui/separator";
-import type { TemplateBlock } from "@/entities/template";
+import type {
+	TemplateBlock,
+	TemplateDatabaseSnapshot,
+} from "@/entities/template";
 import { TemplateDatabasePreview } from "./template-database-preview";
 
 export interface TemplateBlockNode extends TemplateBlock {
@@ -20,6 +23,7 @@ export interface TemplateBlockNode extends TemplateBlock {
 
 interface TemplateBlockRendererProps {
 	block: TemplateBlockNode;
+	databases: TemplateDatabaseSnapshot[];
 }
 
 function getContent(block: TemplateBlock): Record<string, unknown> {
@@ -76,7 +80,10 @@ function ReadOnlyRichText({ text }: { text: string }) {
 	return <Fragment>{parts}</Fragment>;
 }
 
-export function TemplateBlockRenderer({ block }: TemplateBlockRendererProps) {
+export function TemplateBlockRenderer({
+	block,
+	databases,
+}: TemplateBlockRendererProps) {
 	const blockType = (block.type || "").toUpperCase();
 	const content = getContent(block);
 	const text = getString(content, "text") || block.title || "";
@@ -171,7 +178,11 @@ export function TemplateBlockRenderer({ block }: TemplateBlockRendererProps) {
 					{isOpen && block.children && block.children.length > 0 && (
 						<div className='ml-6 pl-2 border-l border-border/40 mt-1 space-y-1'>
 							{block.children.map((child) => (
-								<TemplateBlockRenderer key={child.id} block={child} />
+								<TemplateBlockRenderer
+									key={child.id}
+									block={child}
+									databases={databases}
+								/>
 							))}
 						</div>
 					)}
@@ -350,7 +361,12 @@ export function TemplateBlockRenderer({ block }: TemplateBlockRendererProps) {
 
 		case "DATABASE_VIEW": {
 			// CRITICAL: Dedicated template database snapshot renderer. Never calls live database APIs.
-			return <TemplateDatabasePreview block={block} />;
+			return (
+				<TemplateDatabasePreview
+					block={block}
+					databases={databases}
+				/>
+			);
 		}
 
 		default: {

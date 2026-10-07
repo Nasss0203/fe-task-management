@@ -386,6 +386,7 @@ export function TemplateDetailPage({ templateId }: TemplateDetailPageProps) {
 								template={template}
 								version={activeVersion}
 								blocks={previewData?.blocks || []}
+								databases={previewData?.databases || []}
 								isLoading={
 									(isLoadingPreview || isFetchingPreview) &&
 									!previewData

@@ -1,0 +1,1734 @@
+{
+  "v1": {
+    "template": {
+      "id": "c9d5efeb-9e99-49c4-b73b-87b43c203b40",
+      "source_page_id": "7995a33d-f988-44ee-a42a-e69a5930d0dd",
+      "workspace_id": "a5fbfd13-fafc-43fe-ba54-377ff22260af",
+      "name": "Release 1.0 Command Center",
+      "description": "Test deep database snap",
+      "icon": null,
+      "cover_url": null,
+      "created_by": "ecf5ae0b-0833-4bbe-b01a-71dc38b91b8f",
+      "status": "DRAFT",
+      "visibility": "PRIVATE",
+      "created_at": "2026-10-04T07:12:30.064Z",
+      "updated_at": "2026-10-04T07:12:30.064Z"
+    },
+    "version": {
+      "id": "ade05d9b-22cf-4e31-9cbd-c8c4c0aab367",
+      "template_id": "c9d5efeb-9e99-49c4-b73b-87b43c203b40",
+      "version_number": 1,
+      "status": "PUBLISHED",
+      "created_by": "ecf5ae0b-0833-4bbe-b01a-71dc38b91b8f",
+      "published_at": "2026-10-04T07:15:08.511Z",
+      "created_at": "2026-10-04T07:12:30.085Z",
+      "updated_at": "2026-10-04T07:15:08.511Z"
+    },
+    "blocks": [
+      {
+        "id": "cda57149-a1c8-475d-b1ad-07077292b3d7",
+        "version_id": "ade05d9b-22cf-4e31-9cbd-c8c4c0aab367",
+        "parent_block_id": null,
+        "type": "HEADER",
+        "title": null,
+        "position_x": null,
+        "position_y": null,
+        "width": null,
+        "height": null,
+        "order_index": 0,
+        "content": {
+          "text": "Release 1.0 Command Center"
+        },
+        "style_config": {
+          "level": 1
+        },
+        "data_config": null,
+        "created_by": "ecf5ae0b-0833-4bbe-b01a-71dc38b91b8f",
+        "is_open": true,
+        "created_at": "2026-10-04T07:12:30.257Z",
+        "updated_at": "2026-10-04T07:12:30.257Z"
+      },
+      {
+        "id": "6ffc6808-7c39-4d86-b9d2-4b705cc67539",
+        "version_id": "ade05d9b-22cf-4e31-9cbd-c8c4c0aab367",
+        "parent_block_id": null,
+        "type": "TEXT",
+        "title": null,
+        "position_x": null,
+        "position_y": null,
+        "width": null,
+        "height": null,
+        "order_index": 1,
+        "content": {
+          "text": "Manage all tasks for Release 1.0 with real-time status and team tracking."
+        },
+        "style_config": null,
+        "data_config": null,
+        "created_by": "ecf5ae0b-0833-4bbe-b01a-71dc38b91b8f",
+        "is_open": true,
+        "created_at": "2026-10-04T07:12:30.257Z",
+        "updated_at": "2026-10-04T07:12:30.257Z"
+      },
+      {
+        "id": "3f5af35e-8ae9-4da4-a66f-eb3ec7ad3ce3",
+        "version_id": "ade05d9b-22cf-4e31-9cbd-c8c4c0aab367",
+        "parent_block_id": null,
+        "type": "HEADER",
+        "title": null,
+        "position_x": null,
+        "position_y": null,
+        "width": null,
+        "height": null,
+        "order_index": 2,
+        "content": {
+          "text": "Task Status Overview"
+        },
+        "style_config": {
+          "level": 2
+        },
+        "data_config": null,
+        "created_by": "ecf5ae0b-0833-4bbe-b01a-71dc38b91b8f",
+        "is_open": true,
+        "created_at": "2026-10-04T07:12:30.257Z",
+        "updated_at": "2026-10-04T07:12:30.257Z"
+      },
+      {
+        "id": "7c6c6f0d-e967-46c2-8108-5db1bf88a838",
+        "version_id": "ade05d9b-22cf-4e31-9cbd-c8c4c0aab367",
+        "parent_block_id": null,
+        "type": "TEXT",
+        "title": null,
+        "position_x": null,
+        "position_y": null,
+        "width": null,
+        "height": null,
+        "order_index": 3,
+        "content": {
+          "text": "All tasks are tracked in the Release Tasks database below."
+        },
+        "style_config": null,
+        "data_config": null,
+        "created_by": "ecf5ae0b-0833-4bbe-b01a-71dc38b91b8f",
+        "is_open": true,
+        "created_at": "2026-10-04T07:12:30.257Z",
+        "updated_at": "2026-10-04T07:12:30.257Z"
+      },
+      {
+        "id": "ff915e86-5b46-414c-9032-f8b110e02edf",
+        "version_id": "ade05d9b-22cf-4e31-9cbd-c8c4c0aab367",
+        "parent_block_id": null,
+        "type": "DATABASE_VIEW",
+        "title": null,
+        "position_x": null,
+        "position_y": null,
+        "width": null,
+        "height": null,
+        "order_index": 4,
+        "content": null,
+        "style_config": null,
+        "data_config": {
+          "view_id": "8ee5fab2-0868-4327-a676-f49a635aabbc",
+          "database_id": "4e725cae-b409-4ff9-a44a-b5235e915800"
+        },
+        "created_by": "ecf5ae0b-0833-4bbe-b01a-71dc38b91b8f",
+        "is_open": true,
+        "created_at": "2026-10-04T07:12:30.257Z",
+        "updated_at": "2026-10-04T07:12:30.257Z"
+      }
+    ],
+    "databases": [
+      {
+        "id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+        "version_id": "ade05d9b-22cf-4e31-9cbd-c8c4c0aab367",
+        "name": "Release Tasks",
+        "properties": [
+          {
+            "id": "a7e3345e-7808-4c0f-847a-a97af19ef00e",
+            "template_database_id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+            "name": "Name",
+            "type": "TITLE",
+            "is_default": true,
+            "is_hideable": false,
+            "position": "0",
+            "options": []
+          },
+          {
+            "id": "bfa889cd-9955-49da-afed-06e46931dc04",
+            "template_database_id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+            "name": "Assignee",
+            "type": "PERSON",
+            "is_default": true,
+            "is_hideable": true,
+            "position": "1",
+            "options": []
+          },
+          {
+            "id": "d1adda73-88b5-4dd5-b832-c8879eca0f69",
+            "template_database_id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+            "name": "Due date",
+            "type": "DATE",
+            "is_default": true,
+            "is_hideable": true,
+            "position": "2",
+            "options": []
+          },
+          {
+            "id": "2a464906-71a7-47c9-bb52-b304eefab270",
+            "template_database_id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+            "name": "Status",
+            "type": "SELECT",
+            "is_default": false,
+            "is_hideable": true,
+            "position": "3",
+            "options": [
+              {
+                "id": "75f7d4b0-f24a-4c89-a617-d2b2c6d93c0c",
+                "template_property_id": "2a464906-71a7-47c9-bb52-b304eefab270",
+                "name": "Backlog",
+                "color": null,
+                "position": "0"
+              },
+              {
+                "id": "e4856a91-fad1-48cd-b9fd-8a7e15924c95",
+                "template_property_id": "2a464906-71a7-47c9-bb52-b304eefab270",
+                "name": "Todo",
+                "color": null,
+                "position": "1"
+              },
+              {
+                "id": "e185c35a-3250-4691-960f-a9a8f08317e6",
+                "template_property_id": "2a464906-71a7-47c9-bb52-b304eefab270",
+                "name": "In Progress",
+                "color": null,
+                "position": "2"
+              },
+              {
+                "id": "ad775e83-678b-469e-bb2d-a247aed31f81",
+                "template_property_id": "2a464906-71a7-47c9-bb52-b304eefab270",
+                "name": "Review",
+                "color": null,
+                "position": "3"
+              },
+              {
+                "id": "396dbff9-af08-4523-8c01-690b4ab15f90",
+                "template_property_id": "2a464906-71a7-47c9-bb52-b304eefab270",
+                "name": "Done",
+                "color": null,
+                "position": "4"
+              }
+            ]
+          },
+          {
+            "id": "7ee729dc-3f18-4e5d-914b-f9cf0aa6fe54",
+            "template_database_id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+            "name": "Priority",
+            "type": "SELECT",
+            "is_default": false,
+            "is_hideable": true,
+            "position": "4",
+            "options": [
+              {
+                "id": "1fb7128d-372c-4618-b482-12011f7a3f1a",
+                "template_property_id": "7ee729dc-3f18-4e5d-914b-f9cf0aa6fe54",
+                "name": "Low",
+                "color": null,
+                "position": "0"
+              },
+              {
+                "id": "4f93e2a9-e881-47ae-b55e-b78eb6fdeb2f",
+                "template_property_id": "7ee729dc-3f18-4e5d-914b-f9cf0aa6fe54",
+                "name": "Medium",
+                "color": null,
+                "position": "1"
+              },
+              {
+                "id": "758e81ba-b78a-43ce-bf27-b861e8bbc680",
+                "template_property_id": "7ee729dc-3f18-4e5d-914b-f9cf0aa6fe54",
+                "name": "High",
+                "color": null,
+                "position": "2"
+              },
+              {
+                "id": "9f4eed99-15f7-48d3-8ac5-a58b898d5833",
+                "template_property_id": "7ee729dc-3f18-4e5d-914b-f9cf0aa6fe54",
+                "name": "Critical",
+                "color": null,
+                "position": "3"
+              }
+            ]
+          },
+          {
+            "id": "09f8b080-ff23-4aa5-b429-563cadf64461",
+            "template_database_id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+            "name": "Team",
+            "type": "SELECT",
+            "is_default": false,
+            "is_hideable": true,
+            "position": "5",
+            "options": [
+              {
+                "id": "bfabb850-1eda-4c8e-a5dd-f4f22e6fd8bb",
+                "template_property_id": "09f8b080-ff23-4aa5-b429-563cadf64461",
+                "name": "Backend",
+                "color": null,
+                "position": "0"
+              },
+              {
+                "id": "844740c7-cedc-4079-b87d-bd789f60f37d",
+                "template_property_id": "09f8b080-ff23-4aa5-b429-563cadf64461",
+                "name": "Frontend",
+                "color": null,
+                "position": "1"
+              },
+              {
+                "id": "f814d97c-cc30-41a9-a2d8-e7adc2b99862",
+                "template_property_id": "09f8b080-ff23-4aa5-b429-563cadf64461",
+                "name": "QA",
+                "color": null,
+                "position": "2"
+              },
+              {
+                "id": "23c46b00-8b49-4c31-bc83-bc081006d808",
+                "template_property_id": "09f8b080-ff23-4aa5-b429-563cadf64461",
+                "name": "DevOps",
+                "color": null,
+                "position": "3"
+              }
+            ]
+          },
+          {
+            "id": "b2b393b8-e559-4434-a558-9fc4ea330e0d",
+            "template_database_id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+            "name": "Estimate",
+            "type": "NUMBER",
+            "is_default": false,
+            "is_hideable": true,
+            "position": "6",
+            "options": []
+          },
+          {
+            "id": "7313b56e-b70f-42d5-a19e-37b716e89fce",
+            "template_database_id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+            "name": "Story Points",
+            "type": "NUMBER",
+            "is_default": false,
+            "is_hideable": true,
+            "position": "7",
+            "options": []
+          },
+          {
+            "id": "e8c6f788-e947-4a7d-887e-9516f70c8566",
+            "template_database_id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+            "name": "QA Passed",
+            "type": "CHECKBOX",
+            "is_default": false,
+            "is_hideable": true,
+            "position": "8",
+            "options": []
+          },
+          {
+            "id": "1cacb974-72a5-4eac-ae1d-f8755e6e7168",
+            "template_database_id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+            "name": "Blocked",
+            "type": "CHECKBOX",
+            "is_default": false,
+            "is_hideable": true,
+            "position": "9",
+            "options": []
+          }
+        ],
+        "rows": [
+          {
+            "id": "5cc16366-453b-4895-ad00-7839320e68dc",
+            "template_database_id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+            "values": [
+              {
+                "id": "96a62dff-01f0-4ed0-8b59-c8427bcf96ee",
+                "template_row_id": "5cc16366-453b-4895-ad00-7839320e68dc",
+                "template_property_id": "7ee729dc-3f18-4e5d-914b-f9cf0aa6fe54",
+                "value": "4f93e2a9-e881-47ae-b55e-b78eb6fdeb2f"
+              },
+              {
+                "id": "212b2f86-31da-448e-82e3-2535f31d6178",
+                "template_row_id": "5cc16366-453b-4895-ad00-7839320e68dc",
+                "template_property_id": "7313b56e-b70f-42d5-a19e-37b716e89fce",
+                "value": 3
+              },
+              {
+                "id": "335a34f5-02ce-4e62-8a2f-fa4247df0a85",
+                "template_row_id": "5cc16366-453b-4895-ad00-7839320e68dc",
+                "template_property_id": "a7e3345e-7808-4c0f-847a-a97af19ef00e",
+                "value": "Optimize dashboard API query"
+              },
+              {
+                "id": "c8a4adfb-8b8b-47ba-9aef-d2d7e001307c",
+                "template_row_id": "5cc16366-453b-4895-ad00-7839320e68dc",
+                "template_property_id": "b2b393b8-e559-4434-a558-9fc4ea330e0d",
+                "value": 3
+              },
+              {
+                "id": "44d513f9-1ecc-481c-bc30-af135ce39ba7",
+                "template_row_id": "5cc16366-453b-4895-ad00-7839320e68dc",
+                "template_property_id": "1cacb974-72a5-4eac-ae1d-f8755e6e7168",
+                "value": false
+              },
+              {
+                "id": "e5f5c2af-c981-4f2b-92a6-e7eed73174f8",
+                "template_row_id": "5cc16366-453b-4895-ad00-7839320e68dc",
+                "template_property_id": "e8c6f788-e947-4a7d-887e-9516f70c8566",
+                "value": false
+              },
+              {
+                "id": "15bc22e1-fb5c-4774-b8ff-955cb9a12cf4",
+                "template_row_id": "5cc16366-453b-4895-ad00-7839320e68dc",
+                "template_property_id": "2a464906-71a7-47c9-bb52-b304eefab270",
+                "value": "e4856a91-fad1-48cd-b9fd-8a7e15924c95"
+              },
+              {
+                "id": "0699104f-fa71-4aa5-b0b4-2225bd4f7622",
+                "template_row_id": "5cc16366-453b-4895-ad00-7839320e68dc",
+                "template_property_id": "09f8b080-ff23-4aa5-b429-563cadf64461",
+                "value": "bfabb850-1eda-4c8e-a5dd-f4f22e6fd8bb"
+              }
+            ]
+          },
+          {
+            "id": "d8d73f1c-ee40-47ea-af6b-2b2751a2d3c2",
+            "template_database_id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+            "values": [
+              {
+                "id": "bd1c0ce0-6ae6-4fe3-99f5-edeb5af69471",
+                "template_row_id": "d8d73f1c-ee40-47ea-af6b-2b2751a2d3c2",
+                "template_property_id": "a7e3345e-7808-4c0f-847a-a97af19ef00e",
+                "value": "Implement refresh token rotation"
+              },
+              {
+                "id": "84515520-00da-4532-a568-fb954bf97a63",
+                "template_row_id": "d8d73f1c-ee40-47ea-af6b-2b2751a2d3c2",
+                "template_property_id": "09f8b080-ff23-4aa5-b429-563cadf64461",
+                "value": "bfabb850-1eda-4c8e-a5dd-f4f22e6fd8bb"
+              },
+              {
+                "id": "ebffc5e0-104f-420f-b04a-ffa4c120854a",
+                "template_row_id": "d8d73f1c-ee40-47ea-af6b-2b2751a2d3c2",
+                "template_property_id": "1cacb974-72a5-4eac-ae1d-f8755e6e7168",
+                "value": false
+              },
+              {
+                "id": "2534a0fb-d6a2-4807-b4b5-da3f8119dc83",
+                "template_row_id": "d8d73f1c-ee40-47ea-af6b-2b2751a2d3c2",
+                "template_property_id": "b2b393b8-e559-4434-a558-9fc4ea330e0d",
+                "value": 8
+              },
+              {
+                "id": "c3e29cc8-6ee0-46ad-bf9f-3c3679d8a48e",
+                "template_row_id": "d8d73f1c-ee40-47ea-af6b-2b2751a2d3c2",
+                "template_property_id": "7ee729dc-3f18-4e5d-914b-f9cf0aa6fe54",
+                "value": "9f4eed99-15f7-48d3-8ac5-a58b898d5833"
+              },
+              {
+                "id": "a4b9f4e2-fc17-42f8-b482-600892e91a08",
+                "template_row_id": "d8d73f1c-ee40-47ea-af6b-2b2751a2d3c2",
+                "template_property_id": "2a464906-71a7-47c9-bb52-b304eefab270",
+                "value": "ad775e83-678b-469e-bb2d-a247aed31f81"
+              },
+              {
+                "id": "54e74f03-12d5-4c7f-9cf4-b10cd4a9c376",
+                "template_row_id": "d8d73f1c-ee40-47ea-af6b-2b2751a2d3c2",
+                "template_property_id": "e8c6f788-e947-4a7d-887e-9516f70c8566",
+                "value": false
+              },
+              {
+                "id": "06446c8c-fa35-49d4-883f-17e78daa19fe",
+                "template_row_id": "d8d73f1c-ee40-47ea-af6b-2b2751a2d3c2",
+                "template_property_id": "7313b56e-b70f-42d5-a19e-37b716e89fce",
+                "value": 8
+              }
+            ]
+          },
+          {
+            "id": "08495441-f081-4bcd-b4fd-5071869cc56a",
+            "template_database_id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+            "values": [
+              {
+                "id": "8cea753a-edcd-4d4c-9cd6-7b9886ede7d7",
+                "template_row_id": "08495441-f081-4bcd-b4fd-5071869cc56a",
+                "template_property_id": "a7e3345e-7808-4c0f-847a-a97af19ef00e",
+                "value": "Configure production deployment pipeline"
+              },
+              {
+                "id": "c2b49945-3ce2-4655-b8f2-8b75614ce42a",
+                "template_row_id": "08495441-f081-4bcd-b4fd-5071869cc56a",
+                "template_property_id": "09f8b080-ff23-4aa5-b429-563cadf64461",
+                "value": "23c46b00-8b49-4c31-bc83-bc081006d808"
+              },
+              {
+                "id": "4a4e6083-a27f-49ec-9311-688c6418129b",
+                "template_row_id": "08495441-f081-4bcd-b4fd-5071869cc56a",
+                "template_property_id": "7313b56e-b70f-42d5-a19e-37b716e89fce",
+                "value": 3
+              },
+              {
+                "id": "25dbe413-b3a6-422e-ac96-ec2b7f9e8f0b",
+                "template_row_id": "08495441-f081-4bcd-b4fd-5071869cc56a",
+                "template_property_id": "e8c6f788-e947-4a7d-887e-9516f70c8566",
+                "value": true
+              },
+              {
+                "id": "e3617702-50e3-48f1-8b6f-2a2899091b19",
+                "template_row_id": "08495441-f081-4bcd-b4fd-5071869cc56a",
+                "template_property_id": "b2b393b8-e559-4434-a558-9fc4ea330e0d",
+                "value": 4
+              },
+              {
+                "id": "6ec59b3e-c4b1-41c6-b1d4-884522326856",
+                "template_row_id": "08495441-f081-4bcd-b4fd-5071869cc56a",
+                "template_property_id": "2a464906-71a7-47c9-bb52-b304eefab270",
+                "value": "396dbff9-af08-4523-8c01-690b4ab15f90"
+              },
+              {
+                "id": "0316360d-269e-41f4-bd57-dfa22c54f51e",
+                "template_row_id": "08495441-f081-4bcd-b4fd-5071869cc56a",
+                "template_property_id": "7ee729dc-3f18-4e5d-914b-f9cf0aa6fe54",
+                "value": "758e81ba-b78a-43ce-bf27-b861e8bbc680"
+              },
+              {
+                "id": "455e65e2-e69a-4569-a89c-108230bdd5e3",
+                "template_row_id": "08495441-f081-4bcd-b4fd-5071869cc56a",
+                "template_property_id": "1cacb974-72a5-4eac-ae1d-f8755e6e7168",
+                "value": false
+              }
+            ]
+          },
+          {
+            "id": "7ad28e44-6481-4936-9504-a418f0ab71d5",
+            "template_database_id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+            "values": [
+              {
+                "id": "88959972-d743-4337-b88a-f51a1dfe40be",
+                "template_row_id": "7ad28e44-6481-4936-9504-a418f0ab71d5",
+                "template_property_id": "a7e3345e-7808-4c0f-847a-a97af19ef00e",
+                "value": "Add end-to-end checkout tests"
+              },
+              {
+                "id": "55964117-da10-4d35-9337-197329c1d583",
+                "template_row_id": "7ad28e44-6481-4936-9504-a418f0ab71d5",
+                "template_property_id": "09f8b080-ff23-4aa5-b429-563cadf64461",
+                "value": "f814d97c-cc30-41a9-a2d8-e7adc2b99862"
+              },
+              {
+                "id": "87539d65-7ebf-4436-98a5-7e35e3157ca6",
+                "template_row_id": "7ad28e44-6481-4936-9504-a418f0ab71d5",
+                "template_property_id": "b2b393b8-e559-4434-a558-9fc4ea330e0d",
+                "value": 7
+              },
+              {
+                "id": "861b006f-1690-4ab1-a431-1cc821641c79",
+                "template_row_id": "7ad28e44-6481-4936-9504-a418f0ab71d5",
+                "template_property_id": "e8c6f788-e947-4a7d-887e-9516f70c8566",
+                "value": false
+              },
+              {
+                "id": "d42c5ac6-71c0-49ba-8e6a-f424d16d7502",
+                "template_row_id": "7ad28e44-6481-4936-9504-a418f0ab71d5",
+                "template_property_id": "7ee729dc-3f18-4e5d-914b-f9cf0aa6fe54",
+                "value": "758e81ba-b78a-43ce-bf27-b861e8bbc680"
+              },
+              {
+                "id": "fc2a959d-cb40-42f7-95e1-4484611b6483",
+                "template_row_id": "7ad28e44-6481-4936-9504-a418f0ab71d5",
+                "template_property_id": "1cacb974-72a5-4eac-ae1d-f8755e6e7168",
+                "value": false
+              },
+              {
+                "id": "50118430-531d-43e7-8d24-4f3923945503",
+                "template_row_id": "7ad28e44-6481-4936-9504-a418f0ab71d5",
+                "template_property_id": "7313b56e-b70f-42d5-a19e-37b716e89fce",
+                "value": 8
+              },
+              {
+                "id": "7854037d-e1e4-49a3-b4fc-493f245c1a60",
+                "template_row_id": "7ad28e44-6481-4936-9504-a418f0ab71d5",
+                "template_property_id": "2a464906-71a7-47c9-bb52-b304eefab270",
+                "value": "e185c35a-3250-4691-960f-a9a8f08317e6"
+              }
+            ]
+          },
+          {
+            "id": "006ebf39-2c38-4eae-a7dc-6b432a27f184",
+            "template_database_id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+            "values": [
+              {
+                "id": "74ffded8-f16f-491f-a1f0-41865efd2d15",
+                "template_row_id": "006ebf39-2c38-4eae-a7dc-6b432a27f184",
+                "template_property_id": "2a464906-71a7-47c9-bb52-b304eefab270",
+                "value": "ad775e83-678b-469e-bb2d-a247aed31f81"
+              },
+              {
+                "id": "2af04973-70a0-4ca8-943e-390a943127bb",
+                "template_row_id": "006ebf39-2c38-4eae-a7dc-6b432a27f184",
+                "template_property_id": "1cacb974-72a5-4eac-ae1d-f8755e6e7168",
+                "value": false
+              },
+              {
+                "id": "ff9aa7f9-21e5-4863-95f8-66610d475d48",
+                "template_row_id": "006ebf39-2c38-4eae-a7dc-6b432a27f184",
+                "template_property_id": "a7e3345e-7808-4c0f-847a-a97af19ef00e",
+                "value": "Build responsive dashboard"
+              },
+              {
+                "id": "2349f7ca-a7ff-4420-84fa-9f65cace59fc",
+                "template_row_id": "006ebf39-2c38-4eae-a7dc-6b432a27f184",
+                "template_property_id": "b2b393b8-e559-4434-a558-9fc4ea330e0d",
+                "value": 6
+              },
+              {
+                "id": "2b1e6cb4-ebce-4347-9416-72ae8d061cd5",
+                "template_row_id": "006ebf39-2c38-4eae-a7dc-6b432a27f184",
+                "template_property_id": "7313b56e-b70f-42d5-a19e-37b716e89fce",
+                "value": 5
+              },
+              {
+                "id": "231f7630-f8e3-4f8b-95e2-25988a9c555f",
+                "template_row_id": "006ebf39-2c38-4eae-a7dc-6b432a27f184",
+                "template_property_id": "7ee729dc-3f18-4e5d-914b-f9cf0aa6fe54",
+                "value": "758e81ba-b78a-43ce-bf27-b861e8bbc680"
+              },
+              {
+                "id": "b1c00fef-c895-4666-9e74-d8a12a032619",
+                "template_row_id": "006ebf39-2c38-4eae-a7dc-6b432a27f184",
+                "template_property_id": "09f8b080-ff23-4aa5-b429-563cadf64461",
+                "value": "844740c7-cedc-4079-b87d-bd789f60f37d"
+              },
+              {
+                "id": "95347be4-dd4f-420d-a3db-0ee1dcc76e79",
+                "template_row_id": "006ebf39-2c38-4eae-a7dc-6b432a27f184",
+                "template_property_id": "e8c6f788-e947-4a7d-887e-9516f70c8566",
+                "value": false
+              }
+            ]
+          },
+          {
+            "id": "4506fed0-cfeb-494f-9c89-eded8fde66ad",
+            "template_database_id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+            "values": [
+              {
+                "id": "2c2883f5-a4ce-4250-9ca5-40edc29956a2",
+                "template_row_id": "4506fed0-cfeb-494f-9c89-eded8fde66ad",
+                "template_property_id": "7313b56e-b70f-42d5-a19e-37b716e89fce",
+                "value": 5
+              },
+              {
+                "id": "b947558e-7e08-42e0-92b1-74fd6288a840",
+                "template_row_id": "4506fed0-cfeb-494f-9c89-eded8fde66ad",
+                "template_property_id": "2a464906-71a7-47c9-bb52-b304eefab270",
+                "value": "ad775e83-678b-469e-bb2d-a247aed31f81"
+              },
+              {
+                "id": "06f95b5f-b9e9-45bd-ad3b-2c31c60d5b67",
+                "template_row_id": "4506fed0-cfeb-494f-9c89-eded8fde66ad",
+                "template_property_id": "a7e3345e-7808-4c0f-847a-a97af19ef00e",
+                "value": "Fix duplicate payment webhook"
+              },
+              {
+                "id": "ee28814b-3458-4392-a502-813383890c8f",
+                "template_row_id": "4506fed0-cfeb-494f-9c89-eded8fde66ad",
+                "template_property_id": "1cacb974-72a5-4eac-ae1d-f8755e6e7168",
+                "value": true
+              },
+              {
+                "id": "7485edca-ec07-4399-8892-4fc84bbb575b",
+                "template_row_id": "4506fed0-cfeb-494f-9c89-eded8fde66ad",
+                "template_property_id": "e8c6f788-e947-4a7d-887e-9516f70c8566",
+                "value": false
+              },
+              {
+                "id": "5a118941-0a7e-4ee1-a8e6-ca72a5b33755",
+                "template_row_id": "4506fed0-cfeb-494f-9c89-eded8fde66ad",
+                "template_property_id": "b2b393b8-e559-4434-a558-9fc4ea330e0d",
+                "value": 5
+              },
+              {
+                "id": "8446c698-2f1c-4f2d-9bf8-c55d29041d4b",
+                "template_row_id": "4506fed0-cfeb-494f-9c89-eded8fde66ad",
+                "template_property_id": "7ee729dc-3f18-4e5d-914b-f9cf0aa6fe54",
+                "value": "9f4eed99-15f7-48d3-8ac5-a58b898d5833"
+              },
+              {
+                "id": "cef64d02-6ebc-4e92-8665-748ea3e6afcf",
+                "template_row_id": "4506fed0-cfeb-494f-9c89-eded8fde66ad",
+                "template_property_id": "09f8b080-ff23-4aa5-b429-563cadf64461",
+                "value": "bfabb850-1eda-4c8e-a5dd-f4f22e6fd8bb"
+              }
+            ]
+          },
+          {
+            "id": "76d40b3c-9d01-45e3-adf0-2a1fde5c1a5c",
+            "template_database_id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+            "values": [
+              {
+                "id": "f675327c-e8e6-43bb-9a53-468c3991e854",
+                "template_row_id": "76d40b3c-9d01-45e3-adf0-2a1fde5c1a5c",
+                "template_property_id": "a7e3345e-7808-4c0f-847a-a97af19ef00e",
+                "value": "Prepare release smoke test"
+              },
+              {
+                "id": "01939b9e-5bc1-4d40-a5f6-e88a89f06536",
+                "template_row_id": "76d40b3c-9d01-45e3-adf0-2a1fde5c1a5c",
+                "template_property_id": "b2b393b8-e559-4434-a558-9fc4ea330e0d",
+                "value": 4
+              },
+              {
+                "id": "0f8b21ee-ec07-49d6-b553-23624bfc529f",
+                "template_row_id": "76d40b3c-9d01-45e3-adf0-2a1fde5c1a5c",
+                "template_property_id": "7313b56e-b70f-42d5-a19e-37b716e89fce",
+                "value": 5
+              },
+              {
+                "id": "48ce1a73-4f01-4bb0-8447-9b808168cd4d",
+                "template_row_id": "76d40b3c-9d01-45e3-adf0-2a1fde5c1a5c",
+                "template_property_id": "2a464906-71a7-47c9-bb52-b304eefab270",
+                "value": "e4856a91-fad1-48cd-b9fd-8a7e15924c95"
+              },
+              {
+                "id": "19f0e4b1-3267-4331-8c34-22c2f50f2f04",
+                "template_row_id": "76d40b3c-9d01-45e3-adf0-2a1fde5c1a5c",
+                "template_property_id": "7ee729dc-3f18-4e5d-914b-f9cf0aa6fe54",
+                "value": "758e81ba-b78a-43ce-bf27-b861e8bbc680"
+              },
+              {
+                "id": "b6a5a39b-9214-4690-acf7-4eed7dee7c45",
+                "template_row_id": "76d40b3c-9d01-45e3-adf0-2a1fde5c1a5c",
+                "template_property_id": "1cacb974-72a5-4eac-ae1d-f8755e6e7168",
+                "value": false
+              },
+              {
+                "id": "8f73e3b1-d878-4e2b-9bd5-e284dbe6915f",
+                "template_row_id": "76d40b3c-9d01-45e3-adf0-2a1fde5c1a5c",
+                "template_property_id": "e8c6f788-e947-4a7d-887e-9516f70c8566",
+                "value": false
+              },
+              {
+                "id": "c3499988-ce29-4f31-bf61-1f0d42ec228b",
+                "template_row_id": "76d40b3c-9d01-45e3-adf0-2a1fde5c1a5c",
+                "template_property_id": "09f8b080-ff23-4aa5-b429-563cadf64461",
+                "value": "f814d97c-cc30-41a9-a2d8-e7adc2b99862"
+              }
+            ]
+          },
+          {
+            "id": "37c41459-242c-4e6f-acd9-5fe7daa22034",
+            "template_database_id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+            "values": [
+              {
+                "id": "b8eceb68-ada9-47c5-9a71-b794c9132243",
+                "template_row_id": "37c41459-242c-4e6f-acd9-5fe7daa22034",
+                "template_property_id": "7313b56e-b70f-42d5-a19e-37b716e89fce",
+                "value": 2
+              },
+              {
+                "id": "c67eff0d-646e-4b35-8e18-fa833d7e6ab9",
+                "template_row_id": "37c41459-242c-4e6f-acd9-5fe7daa22034",
+                "template_property_id": "e8c6f788-e947-4a7d-887e-9516f70c8566",
+                "value": true
+              },
+              {
+                "id": "3a6b8ff0-998c-4ed4-8fbc-9a5d2aec92aa",
+                "template_row_id": "37c41459-242c-4e6f-acd9-5fe7daa22034",
+                "template_property_id": "a7e3345e-7808-4c0f-847a-a97af19ef00e",
+                "value": "Fix mobile navigation layout"
+              },
+              {
+                "id": "b01d1995-f3e0-490c-b349-d76c159e7b10",
+                "template_row_id": "37c41459-242c-4e6f-acd9-5fe7daa22034",
+                "template_property_id": "09f8b080-ff23-4aa5-b429-563cadf64461",
+                "value": "844740c7-cedc-4079-b87d-bd789f60f37d"
+              },
+              {
+                "id": "2ed2377a-9887-4169-9bad-94016bbfdb9a",
+                "template_row_id": "37c41459-242c-4e6f-acd9-5fe7daa22034",
+                "template_property_id": "7ee729dc-3f18-4e5d-914b-f9cf0aa6fe54",
+                "value": "4f93e2a9-e881-47ae-b55e-b78eb6fdeb2f"
+              },
+              {
+                "id": "b8ec5551-9aa4-485f-8f28-0ad51d0c3624",
+                "template_row_id": "37c41459-242c-4e6f-acd9-5fe7daa22034",
+                "template_property_id": "b2b393b8-e559-4434-a558-9fc4ea330e0d",
+                "value": 2
+              },
+              {
+                "id": "3f82cb49-4222-4b0f-b7ac-c913a2ef7ab0",
+                "template_row_id": "37c41459-242c-4e6f-acd9-5fe7daa22034",
+                "template_property_id": "2a464906-71a7-47c9-bb52-b304eefab270",
+                "value": "396dbff9-af08-4523-8c01-690b4ab15f90"
+              },
+              {
+                "id": "49314357-8201-4e8a-b0d6-7b761e05492a",
+                "template_row_id": "37c41459-242c-4e6f-acd9-5fe7daa22034",
+                "template_property_id": "1cacb974-72a5-4eac-ae1d-f8755e6e7168",
+                "value": false
+              }
+            ]
+          }
+        ],
+        "views": [
+          {
+            "id": "8ee5fab2-0868-4327-a676-f49a635aabbc",
+            "template_database_id": "4e725cae-b409-4ff9-a44a-b5235e915800",
+            "name": "Release Overview",
+            "type": "TABLE",
+            "position": "0",
+            "properties": [
+              {
+                "id": "fbae784e-0819-4b4b-93f7-b77029d92d1c",
+                "template_view_id": "8ee5fab2-0868-4327-a676-f49a635aabbc",
+                "template_property_id": "2a464906-71a7-47c9-bb52-b304eefab270",
+                "position": "0",
+                "visible": true,
+                "width": null
+              },
+              {
+                "id": "bc60e393-d208-4046-804c-50e03f2daa4a",
+                "template_view_id": "8ee5fab2-0868-4327-a676-f49a635aabbc",
+                "template_property_id": "7ee729dc-3f18-4e5d-914b-f9cf0aa6fe54",
+                "position": "1",
+                "visible": true,
+                "width": null
+              },
+              {
+                "id": "abd39958-e0a6-4ed9-b8e3-65745d6c5b41",
+                "template_view_id": "8ee5fab2-0868-4327-a676-f49a635aabbc",
+                "template_property_id": "09f8b080-ff23-4aa5-b429-563cadf64461",
+                "position": "2",
+                "visible": true,
+                "width": null
+              },
+              {
+                "id": "1db6457d-6df1-45db-bc87-96d8e580c815",
+                "template_view_id": "8ee5fab2-0868-4327-a676-f49a635aabbc",
+                "template_property_id": "7313b56e-b70f-42d5-a19e-37b716e89fce",
+                "position": "3",
+                "visible": true,
+                "width": null
+              },
+              {
+                "id": "6ea503cf-36ed-4cb2-afbc-7dc615d7699d",
+                "template_view_id": "8ee5fab2-0868-4327-a676-f49a635aabbc",
+                "template_property_id": "d1adda73-88b5-4dd5-b832-c8879eca0f69",
+                "position": "4",
+                "visible": true,
+                "width": null
+              },
+              {
+                "id": "5f2bbc5a-172e-49a0-96a6-109050975bdb",
+                "template_view_id": "8ee5fab2-0868-4327-a676-f49a635aabbc",
+                "template_property_id": "1cacb974-72a5-4eac-ae1d-f8755e6e7168",
+                "position": "5",
+                "visible": true,
+                "width": null
+              },
+              {
+                "id": "d8fad755-3db5-4b81-a0d8-ceaf520ce29f",
+                "template_view_id": "8ee5fab2-0868-4327-a676-f49a635aabbc",
+                "template_property_id": "a7e3345e-7808-4c0f-847a-a97af19ef00e",
+                "position": "6",
+                "visible": true,
+                "width": null
+              },
+              {
+                "id": "b3d9d54f-67e5-4b38-8a63-075b61a1edce",
+                "template_view_id": "8ee5fab2-0868-4327-a676-f49a635aabbc",
+                "template_property_id": "e8c6f788-e947-4a7d-887e-9516f70c8566",
+                "position": "7",
+                "visible": true,
+                "width": null
+              },
+              {
+                "id": "01995d97-d2b1-4d51-ac50-0b1025eeda00",
+                "template_view_id": "8ee5fab2-0868-4327-a676-f49a635aabbc",
+                "template_property_id": "b2b393b8-e559-4434-a558-9fc4ea330e0d",
+                "position": "8",
+                "visible": true,
+                "width": null
+              },
+              {
+                "id": "d99a3dcc-31f0-4a3b-8491-8c0367eddb1b",
+                "template_view_id": "8ee5fab2-0868-4327-a676-f49a635aabbc",
+                "template_property_id": "bfa889cd-9955-49da-afed-06e46931dc04",
+                "position": "9",
+                "visible": true,
+                "width": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "v2": {
+    "template": {
+      "id": "c9d5efeb-9e99-49c4-b73b-87b43c203b40",
+      "source_page_id": "7995a33d-f988-44ee-a42a-e69a5930d0dd",
+      "workspace_id": "a5fbfd13-fafc-43fe-ba54-377ff22260af",
+      "name": "Release 1.0 Command Center",
+      "description": "Test deep database snap",
+      "icon": null,
+      "cover_url": null,
+      "created_by": "ecf5ae0b-0833-4bbe-b01a-71dc38b91b8f",
+      "status": "DRAFT",
+      "visibility": "PRIVATE",
+      "created_at": "2026-10-04T07:12:30.064Z",
+      "updated_at": "2026-10-04T07:12:30.064Z"
+    },
+    "version": {
+      "id": "5c3746da-44a8-4382-82de-30d4684a71de",
+      "template_id": "c9d5efeb-9e99-49c4-b73b-87b43c203b40",
+      "version_number": 2,
+      "status": "DRAFT",
+      "created_by": "ecf5ae0b-0833-4bbe-b01a-71dc38b91b8f",
+      "published_at": null,
+      "created_at": "2026-10-06T14:30:48.666Z",
+      "updated_at": "2026-10-06T14:30:48.666Z"
+    },
+    "blocks": [
+      {
+        "id": "d257e0d5-55f0-4cb0-b1d9-5541033f4ffe",
+        "version_id": "5c3746da-44a8-4382-82de-30d4684a71de",
+        "parent_block_id": null,
+        "type": "HEADER",
+        "title": null,
+        "position_x": null,
+        "position_y": null,
+        "width": null,
+        "height": null,
+        "order_index": 0,
+        "content": {
+          "text": "Release 1.0 Command Center"
+        },
+        "style_config": {
+          "level": 1
+        },
+        "data_config": null,
+        "created_by": "ecf5ae0b-0833-4bbe-b01a-71dc38b91b8f",
+        "is_open": true,
+        "created_at": "2026-10-06T14:30:48.706Z",
+        "updated_at": "2026-10-06T14:30:48.706Z"
+      },
+      {
+        "id": "74d65b9c-c17f-4755-8767-11873e856283",
+        "version_id": "5c3746da-44a8-4382-82de-30d4684a71de",
+        "parent_block_id": null,
+        "type": "TEXT",
+        "title": null,
+        "position_x": null,
+        "position_y": null,
+        "width": null,
+        "height": null,
+        "order_index": 1,
+        "content": {
+          "text": "Manage all tasks for Release 1.0 with real-time status and team tracking."
+        },
+        "style_config": null,
+        "data_config": null,
+        "created_by": "ecf5ae0b-0833-4bbe-b01a-71dc38b91b8f",
+        "is_open": true,
+        "created_at": "2026-10-06T14:30:48.707Z",
+        "updated_at": "2026-10-06T14:30:48.707Z"
+      },
+      {
+        "id": "83628fe4-65d5-465c-a4a8-9632bfd12831",
+        "version_id": "5c3746da-44a8-4382-82de-30d4684a71de",
+        "parent_block_id": null,
+        "type": "HEADER",
+        "title": null,
+        "position_x": null,
+        "position_y": null,
+        "width": null,
+        "height": null,
+        "order_index": 2,
+        "content": {
+          "text": "Task Status Overview"
+        },
+        "style_config": {
+          "level": 2
+        },
+        "data_config": null,
+        "created_by": "ecf5ae0b-0833-4bbe-b01a-71dc38b91b8f",
+        "is_open": true,
+        "created_at": "2026-10-06T14:30:48.707Z",
+        "updated_at": "2026-10-06T14:30:48.707Z"
+      },
+      {
+        "id": "ace3df3e-1615-4e87-a973-bd10b8cc0add",
+        "version_id": "5c3746da-44a8-4382-82de-30d4684a71de",
+        "parent_block_id": null,
+        "type": "TEXT",
+        "title": null,
+        "position_x": null,
+        "position_y": null,
+        "width": null,
+        "height": null,
+        "order_index": 3,
+        "content": {
+          "text": "All tasks are tracked in the Release Tasks database below."
+        },
+        "style_config": null,
+        "data_config": null,
+        "created_by": "ecf5ae0b-0833-4bbe-b01a-71dc38b91b8f",
+        "is_open": true,
+        "created_at": "2026-10-06T14:30:48.707Z",
+        "updated_at": "2026-10-06T14:30:48.707Z"
+      },
+      {
+        "id": "3bfc1fe0-cbcb-4963-adc9-d5cb16cec9b9",
+        "version_id": "5c3746da-44a8-4382-82de-30d4684a71de",
+        "parent_block_id": null,
+        "type": "DATABASE_VIEW",
+        "title": null,
+        "position_x": null,
+        "position_y": null,
+        "width": null,
+        "height": null,
+        "order_index": 4,
+        "content": null,
+        "style_config": null,
+        "data_config": {
+          "view_id": "df797681-35e2-4b63-95ee-911ec9b20b98",
+          "database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6"
+        },
+        "created_by": "ecf5ae0b-0833-4bbe-b01a-71dc38b91b8f",
+        "is_open": true,
+        "created_at": "2026-10-06T14:30:48.707Z",
+        "updated_at": "2026-10-06T14:30:48.707Z"
+      }
+    ],
+    "databases": [
+      {
+        "id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+        "version_id": "5c3746da-44a8-4382-82de-30d4684a71de",
+        "name": "Release Tasks",
+        "properties": [
+          {
+            "id": "481242dc-28e6-4c94-b0d2-12f955c404ea",
+            "template_database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+            "name": "Name",
+            "type": "TITLE",
+            "is_default": true,
+            "is_hideable": false,
+            "position": "0",
+            "options": []
+          },
+          {
+            "id": "b0ee3902-6909-4186-ae7f-adc5f802a9c0",
+            "template_database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+            "name": "Assignee",
+            "type": "PERSON",
+            "is_default": true,
+            "is_hideable": true,
+            "position": "1",
+            "options": []
+          },
+          {
+            "id": "7f8f048a-7694-4227-b3ac-69e72980fb23",
+            "template_database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+            "name": "Due date",
+            "type": "DATE",
+            "is_default": true,
+            "is_hideable": true,
+            "position": "2",
+            "options": []
+          },
+          {
+            "id": "77434c8f-ffe1-40dc-a918-8bea547ce353",
+            "template_database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+            "name": "Status",
+            "type": "SELECT",
+            "is_default": false,
+            "is_hideable": true,
+            "position": "3",
+            "options": [
+              {
+                "id": "0a3d2399-a8e4-4b57-9bed-51106cfe603e",
+                "template_property_id": "77434c8f-ffe1-40dc-a918-8bea547ce353",
+                "name": "Backlog",
+                "color": null,
+                "position": "0"
+              },
+              {
+                "id": "fd7e2bf8-65fd-4a34-92fb-ddc91ba4565d",
+                "template_property_id": "77434c8f-ffe1-40dc-a918-8bea547ce353",
+                "name": "Todo",
+                "color": null,
+                "position": "1"
+              },
+              {
+                "id": "8289a908-0010-4f03-a7c9-8953201563d5",
+                "template_property_id": "77434c8f-ffe1-40dc-a918-8bea547ce353",
+                "name": "In Progress",
+                "color": null,
+                "position": "2"
+              },
+              {
+                "id": "aca49e7f-82ed-4555-8b95-e42570114bfe",
+                "template_property_id": "77434c8f-ffe1-40dc-a918-8bea547ce353",
+                "name": "Review",
+                "color": null,
+                "position": "3"
+              },
+              {
+                "id": "8f62a500-3376-4fdd-898d-1500db029019",
+                "template_property_id": "77434c8f-ffe1-40dc-a918-8bea547ce353",
+                "name": "Done",
+                "color": null,
+                "position": "4"
+              }
+            ]
+          },
+          {
+            "id": "0b56a101-7634-4e01-a6d8-b926f461e02c",
+            "template_database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+            "name": "Priority",
+            "type": "SELECT",
+            "is_default": false,
+            "is_hideable": true,
+            "position": "4",
+            "options": [
+              {
+                "id": "2f93e2d9-f71f-42eb-a2fa-d2ef14dab983",
+                "template_property_id": "0b56a101-7634-4e01-a6d8-b926f461e02c",
+                "name": "Low",
+                "color": null,
+                "position": "0"
+              },
+              {
+                "id": "dfa9c4a5-c820-45e1-bbba-cc0d66e126de",
+                "template_property_id": "0b56a101-7634-4e01-a6d8-b926f461e02c",
+                "name": "Medium",
+                "color": null,
+                "position": "1"
+              },
+              {
+                "id": "b5dd3f69-7fc5-4821-b693-e25efbe0d131",
+                "template_property_id": "0b56a101-7634-4e01-a6d8-b926f461e02c",
+                "name": "High",
+                "color": null,
+                "position": "2"
+              },
+              {
+                "id": "b027b159-4162-4ffe-98db-9c47b48c0ac3",
+                "template_property_id": "0b56a101-7634-4e01-a6d8-b926f461e02c",
+                "name": "Critical",
+                "color": null,
+                "position": "3"
+              }
+            ]
+          },
+          {
+            "id": "34e6dd5c-86ec-4e2f-a074-7caf243af1a4",
+            "template_database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+            "name": "Team",
+            "type": "SELECT",
+            "is_default": false,
+            "is_hideable": true,
+            "position": "5",
+            "options": [
+              {
+                "id": "b94c95dc-6aa1-442a-94fb-f08d6fbead65",
+                "template_property_id": "34e6dd5c-86ec-4e2f-a074-7caf243af1a4",
+                "name": "Backend",
+                "color": null,
+                "position": "0"
+              },
+              {
+                "id": "88a79fdb-9cf9-4bbb-b2c4-b7bb3fac55ea",
+                "template_property_id": "34e6dd5c-86ec-4e2f-a074-7caf243af1a4",
+                "name": "Frontend",
+                "color": null,
+                "position": "1"
+              },
+              {
+                "id": "17be6e5b-f06b-4b3f-9c19-af57aae6b04f",
+                "template_property_id": "34e6dd5c-86ec-4e2f-a074-7caf243af1a4",
+                "name": "QA",
+                "color": null,
+                "position": "2"
+              },
+              {
+                "id": "3febc5ee-3cfe-4306-9e72-b1b05c23b5e9",
+                "template_property_id": "34e6dd5c-86ec-4e2f-a074-7caf243af1a4",
+                "name": "DevOps",
+                "color": null,
+                "position": "3"
+              }
+            ]
+          },
+          {
+            "id": "69ae9776-183d-44fd-a843-784ff410be38",
+            "template_database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+            "name": "Estimate",
+            "type": "NUMBER",
+            "is_default": false,
+            "is_hideable": true,
+            "position": "6",
+            "options": []
+          },
+          {
+            "id": "952a83c4-400d-40c0-a6ca-63f63038afd3",
+            "template_database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+            "name": "Story Points",
+            "type": "NUMBER",
+            "is_default": false,
+            "is_hideable": true,
+            "position": "7",
+            "options": []
+          },
+          {
+            "id": "42603958-7c8a-47be-ab49-9888c21b6fb2",
+            "template_database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+            "name": "QA Passed",
+            "type": "CHECKBOX",
+            "is_default": false,
+            "is_hideable": true,
+            "position": "8",
+            "options": []
+          },
+          {
+            "id": "9ba1697c-49a3-4ddb-a150-aef0690383af",
+            "template_database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+            "name": "Blocked",
+            "type": "CHECKBOX",
+            "is_default": false,
+            "is_hideable": true,
+            "position": "9",
+            "options": []
+          }
+        ],
+        "rows": [
+          {
+            "id": "56d3bc57-313a-4468-8ffa-fd445d83ec16",
+            "template_database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+            "values": [
+              {
+                "id": "135e5222-84ee-4872-8c06-37a1707abf70",
+                "template_row_id": "56d3bc57-313a-4468-8ffa-fd445d83ec16",
+                "template_property_id": "42603958-7c8a-47be-ab49-9888c21b6fb2",
+                "value": true
+              },
+              {
+                "id": "7b6f973c-f151-4a87-bbea-0376b60c79cf",
+                "template_row_id": "56d3bc57-313a-4468-8ffa-fd445d83ec16",
+                "template_property_id": "34e6dd5c-86ec-4e2f-a074-7caf243af1a4",
+                "value": "3febc5ee-3cfe-4306-9e72-b1b05c23b5e9"
+              },
+              {
+                "id": "06763dce-2b14-4a1f-9a0c-935ece200ae5",
+                "template_row_id": "56d3bc57-313a-4468-8ffa-fd445d83ec16",
+                "template_property_id": "69ae9776-183d-44fd-a843-784ff410be38",
+                "value": 4
+              },
+              {
+                "id": "f5e0ea64-ba2d-4dba-b59d-ac809e85f7bd",
+                "template_row_id": "56d3bc57-313a-4468-8ffa-fd445d83ec16",
+                "template_property_id": "9ba1697c-49a3-4ddb-a150-aef0690383af",
+                "value": false
+              },
+              {
+                "id": "d5348b52-d646-4749-b959-b3899c8be832",
+                "template_row_id": "56d3bc57-313a-4468-8ffa-fd445d83ec16",
+                "template_property_id": "77434c8f-ffe1-40dc-a918-8bea547ce353",
+                "value": "8f62a500-3376-4fdd-898d-1500db029019"
+              },
+              {
+                "id": "f3b49df7-0116-4ad5-b9de-02f742fb8082",
+                "template_row_id": "56d3bc57-313a-4468-8ffa-fd445d83ec16",
+                "template_property_id": "952a83c4-400d-40c0-a6ca-63f63038afd3",
+                "value": 3
+              },
+              {
+                "id": "972aa60e-2341-48ef-bb3f-85267dd32924",
+                "template_row_id": "56d3bc57-313a-4468-8ffa-fd445d83ec16",
+                "template_property_id": "0b56a101-7634-4e01-a6d8-b926f461e02c",
+                "value": "b5dd3f69-7fc5-4821-b693-e25efbe0d131"
+              },
+              {
+                "id": "b68b6245-611b-4fd2-af92-44b34a251538",
+                "template_row_id": "56d3bc57-313a-4468-8ffa-fd445d83ec16",
+                "template_property_id": "481242dc-28e6-4c94-b0d2-12f955c404ea",
+                "value": "Configure production deployment pipeline"
+              }
+            ]
+          },
+          {
+            "id": "a444d0a8-57dd-4783-91a0-ec5746740c66",
+            "template_database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+            "values": [
+              {
+                "id": "797c13ec-2c56-46f8-bdbb-4133d034d596",
+                "template_row_id": "a444d0a8-57dd-4783-91a0-ec5746740c66",
+                "template_property_id": "9ba1697c-49a3-4ddb-a150-aef0690383af",
+                "value": false
+              },
+              {
+                "id": "80d1c6cd-5564-4303-96d5-e5308ce8c336",
+                "template_row_id": "a444d0a8-57dd-4783-91a0-ec5746740c66",
+                "template_property_id": "77434c8f-ffe1-40dc-a918-8bea547ce353",
+                "value": "fd7e2bf8-65fd-4a34-92fb-ddc91ba4565d"
+              },
+              {
+                "id": "e1d3b518-232c-4f7f-a300-515899bf5c91",
+                "template_row_id": "a444d0a8-57dd-4783-91a0-ec5746740c66",
+                "template_property_id": "34e6dd5c-86ec-4e2f-a074-7caf243af1a4",
+                "value": "17be6e5b-f06b-4b3f-9c19-af57aae6b04f"
+              },
+              {
+                "id": "c47c877d-217c-4514-ab14-725530cb875d",
+                "template_row_id": "a444d0a8-57dd-4783-91a0-ec5746740c66",
+                "template_property_id": "69ae9776-183d-44fd-a843-784ff410be38",
+                "value": 4
+              },
+              {
+                "id": "946fa5ae-354b-41c6-9a3c-2cd1f468d760",
+                "template_row_id": "a444d0a8-57dd-4783-91a0-ec5746740c66",
+                "template_property_id": "0b56a101-7634-4e01-a6d8-b926f461e02c",
+                "value": "b5dd3f69-7fc5-4821-b693-e25efbe0d131"
+              },
+              {
+                "id": "0333aa22-2e86-46bd-ab39-9e6489153d78",
+                "template_row_id": "a444d0a8-57dd-4783-91a0-ec5746740c66",
+                "template_property_id": "481242dc-28e6-4c94-b0d2-12f955c404ea",
+                "value": "Prepare release smoke test"
+              },
+              {
+                "id": "2259abed-3502-4b94-9d5a-b0e6c53c3765",
+                "template_row_id": "a444d0a8-57dd-4783-91a0-ec5746740c66",
+                "template_property_id": "952a83c4-400d-40c0-a6ca-63f63038afd3",
+                "value": 5
+              },
+              {
+                "id": "be86eb6c-1ab7-432e-8f1e-185388eda339",
+                "template_row_id": "a444d0a8-57dd-4783-91a0-ec5746740c66",
+                "template_property_id": "42603958-7c8a-47be-ab49-9888c21b6fb2",
+                "value": false
+              }
+            ]
+          },
+          {
+            "id": "34db8b77-ae14-49a9-9e53-fd0c262875dc",
+            "template_database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+            "values": [
+              {
+                "id": "da06f78d-55db-44fc-9c58-4ccf41b37326",
+                "template_row_id": "34db8b77-ae14-49a9-9e53-fd0c262875dc",
+                "template_property_id": "69ae9776-183d-44fd-a843-784ff410be38",
+                "value": 5
+              },
+              {
+                "id": "4cd64d15-68c5-4f3d-b7e0-b8a7e841692d",
+                "template_row_id": "34db8b77-ae14-49a9-9e53-fd0c262875dc",
+                "template_property_id": "77434c8f-ffe1-40dc-a918-8bea547ce353",
+                "value": "aca49e7f-82ed-4555-8b95-e42570114bfe"
+              },
+              {
+                "id": "ad28aca4-0e07-43bb-ac3b-679eed40410c",
+                "template_row_id": "34db8b77-ae14-49a9-9e53-fd0c262875dc",
+                "template_property_id": "481242dc-28e6-4c94-b0d2-12f955c404ea",
+                "value": "Fix duplicate payment webhook"
+              },
+              {
+                "id": "6380d772-f368-46d6-97e9-841abf1ac2cc",
+                "template_row_id": "34db8b77-ae14-49a9-9e53-fd0c262875dc",
+                "template_property_id": "952a83c4-400d-40c0-a6ca-63f63038afd3",
+                "value": 5
+              },
+              {
+                "id": "d5dbe84c-7974-4979-8574-29b25a27fbdd",
+                "template_row_id": "34db8b77-ae14-49a9-9e53-fd0c262875dc",
+                "template_property_id": "9ba1697c-49a3-4ddb-a150-aef0690383af",
+                "value": true
+              },
+              {
+                "id": "f984ae84-8444-4bbc-93a9-adc1261ccbaf",
+                "template_row_id": "34db8b77-ae14-49a9-9e53-fd0c262875dc",
+                "template_property_id": "34e6dd5c-86ec-4e2f-a074-7caf243af1a4",
+                "value": "b94c95dc-6aa1-442a-94fb-f08d6fbead65"
+              },
+              {
+                "id": "4d87d119-096d-4001-8020-f78d89569bb5",
+                "template_row_id": "34db8b77-ae14-49a9-9e53-fd0c262875dc",
+                "template_property_id": "0b56a101-7634-4e01-a6d8-b926f461e02c",
+                "value": "b027b159-4162-4ffe-98db-9c47b48c0ac3"
+              },
+              {
+                "id": "e7bc3d58-67d8-4788-a4e0-ee7c82692275",
+                "template_row_id": "34db8b77-ae14-49a9-9e53-fd0c262875dc",
+                "template_property_id": "42603958-7c8a-47be-ab49-9888c21b6fb2",
+                "value": false
+              }
+            ]
+          },
+          {
+            "id": "1f433910-88d8-4eb0-a8e1-6db19f16b4f0",
+            "template_database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+            "values": [
+              {
+                "id": "438a2f58-dc42-4e5f-9524-8fa0efb84d87",
+                "template_row_id": "1f433910-88d8-4eb0-a8e1-6db19f16b4f0",
+                "template_property_id": "34e6dd5c-86ec-4e2f-a074-7caf243af1a4",
+                "value": "b94c95dc-6aa1-442a-94fb-f08d6fbead65"
+              },
+              {
+                "id": "31e88d11-b5bd-49cf-aafd-81f600b8e862",
+                "template_row_id": "1f433910-88d8-4eb0-a8e1-6db19f16b4f0",
+                "template_property_id": "9ba1697c-49a3-4ddb-a150-aef0690383af",
+                "value": false
+              },
+              {
+                "id": "8cb7b2fd-6b66-4d38-a056-4d1d35b3c8c0",
+                "template_row_id": "1f433910-88d8-4eb0-a8e1-6db19f16b4f0",
+                "template_property_id": "481242dc-28e6-4c94-b0d2-12f955c404ea",
+                "value": "Optimize dashboard API query"
+              },
+              {
+                "id": "aa472445-c9db-4751-8fd6-ff34569d1332",
+                "template_row_id": "1f433910-88d8-4eb0-a8e1-6db19f16b4f0",
+                "template_property_id": "77434c8f-ffe1-40dc-a918-8bea547ce353",
+                "value": "fd7e2bf8-65fd-4a34-92fb-ddc91ba4565d"
+              },
+              {
+                "id": "29335313-d2f9-43b5-93c8-0ddb9e9b39a9",
+                "template_row_id": "1f433910-88d8-4eb0-a8e1-6db19f16b4f0",
+                "template_property_id": "69ae9776-183d-44fd-a843-784ff410be38",
+                "value": 3
+              },
+              {
+                "id": "69a1edb6-8c71-47fe-9ecb-de4b9aa07400",
+                "template_row_id": "1f433910-88d8-4eb0-a8e1-6db19f16b4f0",
+                "template_property_id": "952a83c4-400d-40c0-a6ca-63f63038afd3",
+                "value": 3
+              },
+              {
+                "id": "d2c480bf-f0b9-4ca8-8893-074235f85f3d",
+                "template_row_id": "1f433910-88d8-4eb0-a8e1-6db19f16b4f0",
+                "template_property_id": "42603958-7c8a-47be-ab49-9888c21b6fb2",
+                "value": false
+              },
+              {
+                "id": "8d621dd0-fabe-4324-807e-5a018f92ca61",
+                "template_row_id": "1f433910-88d8-4eb0-a8e1-6db19f16b4f0",
+                "template_property_id": "0b56a101-7634-4e01-a6d8-b926f461e02c",
+                "value": "dfa9c4a5-c820-45e1-bbba-cc0d66e126de"
+              }
+            ]
+          },
+          {
+            "id": "cc76d48a-c4f0-45e3-a901-8fb59a2be043",
+            "template_database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+            "values": [
+              {
+                "id": "10a75d9a-4542-4c93-9102-cc58b88de3d3",
+                "template_row_id": "cc76d48a-c4f0-45e3-a901-8fb59a2be043",
+                "template_property_id": "952a83c4-400d-40c0-a6ca-63f63038afd3",
+                "value": 5
+              },
+              {
+                "id": "a3b23980-2286-4967-a53c-22cb27387d00",
+                "template_row_id": "cc76d48a-c4f0-45e3-a901-8fb59a2be043",
+                "template_property_id": "0b56a101-7634-4e01-a6d8-b926f461e02c",
+                "value": "b5dd3f69-7fc5-4821-b693-e25efbe0d131"
+              },
+              {
+                "id": "269dbef5-7767-4d9c-84d7-f71b177129ef",
+                "template_row_id": "cc76d48a-c4f0-45e3-a901-8fb59a2be043",
+                "template_property_id": "69ae9776-183d-44fd-a843-784ff410be38",
+                "value": 6
+              },
+              {
+                "id": "b8e76a28-827a-4f58-b2b5-c309a1da1535",
+                "template_row_id": "cc76d48a-c4f0-45e3-a901-8fb59a2be043",
+                "template_property_id": "9ba1697c-49a3-4ddb-a150-aef0690383af",
+                "value": false
+              },
+              {
+                "id": "b3a734cb-79c0-4f53-a49a-64fa7383fd8c",
+                "template_row_id": "cc76d48a-c4f0-45e3-a901-8fb59a2be043",
+                "template_property_id": "77434c8f-ffe1-40dc-a918-8bea547ce353",
+                "value": "aca49e7f-82ed-4555-8b95-e42570114bfe"
+              },
+              {
+                "id": "ef9e699d-1927-455c-8feb-e60d654f535b",
+                "template_row_id": "cc76d48a-c4f0-45e3-a901-8fb59a2be043",
+                "template_property_id": "42603958-7c8a-47be-ab49-9888c21b6fb2",
+                "value": false
+              },
+              {
+                "id": "c37e8440-8a07-4a87-846b-16e719bc5cea",
+                "template_row_id": "cc76d48a-c4f0-45e3-a901-8fb59a2be043",
+                "template_property_id": "34e6dd5c-86ec-4e2f-a074-7caf243af1a4",
+                "value": "88a79fdb-9cf9-4bbb-b2c4-b7bb3fac55ea"
+              },
+              {
+                "id": "4da060be-98d7-4d80-aa31-745dd9dc2daa",
+                "template_row_id": "cc76d48a-c4f0-45e3-a901-8fb59a2be043",
+                "template_property_id": "481242dc-28e6-4c94-b0d2-12f955c404ea",
+                "value": "Build responsive dashboard"
+              }
+            ]
+          },
+          {
+            "id": "9a172bbd-1f55-4d9c-82c2-63a0c1f1b7a8",
+            "template_database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+            "values": [
+              {
+                "id": "19f0dd16-b29f-4c05-a59a-a1c5459a3fcb",
+                "template_row_id": "9a172bbd-1f55-4d9c-82c2-63a0c1f1b7a8",
+                "template_property_id": "42603958-7c8a-47be-ab49-9888c21b6fb2",
+                "value": true
+              },
+              {
+                "id": "ce2c90f2-e59c-46e7-a749-b0c62f2a2645",
+                "template_row_id": "9a172bbd-1f55-4d9c-82c2-63a0c1f1b7a8",
+                "template_property_id": "34e6dd5c-86ec-4e2f-a074-7caf243af1a4",
+                "value": "88a79fdb-9cf9-4bbb-b2c4-b7bb3fac55ea"
+              },
+              {
+                "id": "c7a4ff2a-015f-4b5d-8887-37e7c96aae09",
+                "template_row_id": "9a172bbd-1f55-4d9c-82c2-63a0c1f1b7a8",
+                "template_property_id": "952a83c4-400d-40c0-a6ca-63f63038afd3",
+                "value": 2
+              },
+              {
+                "id": "6b7cf62b-d9e8-44ab-9ecc-b3f54f3e1f2b",
+                "template_row_id": "9a172bbd-1f55-4d9c-82c2-63a0c1f1b7a8",
+                "template_property_id": "481242dc-28e6-4c94-b0d2-12f955c404ea",
+                "value": "Fix mobile navigation layout"
+              },
+              {
+                "id": "ca0994a7-bbcf-4051-807d-404331eb0c82",
+                "template_row_id": "9a172bbd-1f55-4d9c-82c2-63a0c1f1b7a8",
+                "template_property_id": "9ba1697c-49a3-4ddb-a150-aef0690383af",
+                "value": false
+              },
+              {
+                "id": "a2c22408-2446-45a5-8830-af39d88aacc1",
+                "template_row_id": "9a172bbd-1f55-4d9c-82c2-63a0c1f1b7a8",
+                "template_property_id": "77434c8f-ffe1-40dc-a918-8bea547ce353",
+                "value": "8f62a500-3376-4fdd-898d-1500db029019"
+              },
+              {
+                "id": "b28edd5f-15b5-46fe-908e-3e9d87002434",
+                "template_row_id": "9a172bbd-1f55-4d9c-82c2-63a0c1f1b7a8",
+                "template_property_id": "69ae9776-183d-44fd-a843-784ff410be38",
+                "value": 2
+              },
+              {
+                "id": "e097daa0-06a1-4b31-a372-a975b54d9604",
+                "template_row_id": "9a172bbd-1f55-4d9c-82c2-63a0c1f1b7a8",
+                "template_property_id": "0b56a101-7634-4e01-a6d8-b926f461e02c",
+                "value": "dfa9c4a5-c820-45e1-bbba-cc0d66e126de"
+              }
+            ]
+          },
+          {
+            "id": "2ae60225-b770-4001-8631-6134a7b45e93",
+            "template_database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+            "values": [
+              {
+                "id": "951e092d-7e90-415b-a435-d2ff872efc87",
+                "template_row_id": "2ae60225-b770-4001-8631-6134a7b45e93",
+                "template_property_id": "34e6dd5c-86ec-4e2f-a074-7caf243af1a4",
+                "value": "17be6e5b-f06b-4b3f-9c19-af57aae6b04f"
+              },
+              {
+                "id": "ae530d9e-f7f2-4058-9d31-f3837ec5249a",
+                "template_row_id": "2ae60225-b770-4001-8631-6134a7b45e93",
+                "template_property_id": "69ae9776-183d-44fd-a843-784ff410be38",
+                "value": 7
+              },
+              {
+                "id": "064bf308-ddf5-4da4-b1bd-d40b7cd1324a",
+                "template_row_id": "2ae60225-b770-4001-8631-6134a7b45e93",
+                "template_property_id": "952a83c4-400d-40c0-a6ca-63f63038afd3",
+                "value": 8
+              },
+              {
+                "id": "fcd34570-a4aa-4afa-aec8-3bd8042a64a6",
+                "template_row_id": "2ae60225-b770-4001-8631-6134a7b45e93",
+                "template_property_id": "42603958-7c8a-47be-ab49-9888c21b6fb2",
+                "value": false
+              },
+              {
+                "id": "b150534e-55e0-4dde-8e1f-039af8c2b0fb",
+                "template_row_id": "2ae60225-b770-4001-8631-6134a7b45e93",
+                "template_property_id": "0b56a101-7634-4e01-a6d8-b926f461e02c",
+                "value": "b5dd3f69-7fc5-4821-b693-e25efbe0d131"
+              },
+              {
+                "id": "88842bf7-57de-4394-8bb1-672036dab5c9",
+                "template_row_id": "2ae60225-b770-4001-8631-6134a7b45e93",
+                "template_property_id": "9ba1697c-49a3-4ddb-a150-aef0690383af",
+                "value": false
+              },
+              {
+                "id": "73f6f908-fc8c-4ff8-98e4-256dc49b2429",
+                "template_row_id": "2ae60225-b770-4001-8631-6134a7b45e93",
+                "template_property_id": "77434c8f-ffe1-40dc-a918-8bea547ce353",
+                "value": "8289a908-0010-4f03-a7c9-8953201563d5"
+              },
+              {
+                "id": "f811711e-faf7-439a-9bb4-c05e65f1857c",
+                "template_row_id": "2ae60225-b770-4001-8631-6134a7b45e93",
+                "template_property_id": "481242dc-28e6-4c94-b0d2-12f955c404ea",
+                "value": "Add end-to-end checkout tests"
+              }
+            ]
+          },
+          {
+            "id": "a7e3366f-ba88-445f-b7d3-dc4d15dd2c5f",
+            "template_database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+            "values": [
+              {
+                "id": "7571c331-e2ca-409a-9060-3d0fac1a9e8b",
+                "template_row_id": "a7e3366f-ba88-445f-b7d3-dc4d15dd2c5f",
+                "template_property_id": "0b56a101-7634-4e01-a6d8-b926f461e02c",
+                "value": "b027b159-4162-4ffe-98db-9c47b48c0ac3"
+              },
+              {
+                "id": "3cc3f3a6-ab5e-40ca-aff5-d8e0b6caeff9",
+                "template_row_id": "a7e3366f-ba88-445f-b7d3-dc4d15dd2c5f",
+                "template_property_id": "42603958-7c8a-47be-ab49-9888c21b6fb2",
+                "value": false
+              },
+              {
+                "id": "1c3d94aa-cf00-47e5-a881-2576de714f8f",
+                "template_row_id": "a7e3366f-ba88-445f-b7d3-dc4d15dd2c5f",
+                "template_property_id": "9ba1697c-49a3-4ddb-a150-aef0690383af",
+                "value": false
+              },
+              {
+                "id": "66c12bad-4a69-4463-b7ab-d9b05b84b225",
+                "template_row_id": "a7e3366f-ba88-445f-b7d3-dc4d15dd2c5f",
+                "template_property_id": "69ae9776-183d-44fd-a843-784ff410be38",
+                "value": 8
+              },
+              {
+                "id": "8335ca8b-40d7-4c3e-b702-4d4c37b89ee0",
+                "template_row_id": "a7e3366f-ba88-445f-b7d3-dc4d15dd2c5f",
+                "template_property_id": "77434c8f-ffe1-40dc-a918-8bea547ce353",
+                "value": "aca49e7f-82ed-4555-8b95-e42570114bfe"
+              },
+              {
+                "id": "786af095-3e76-473c-be17-31a59ecb44cc",
+                "template_row_id": "a7e3366f-ba88-445f-b7d3-dc4d15dd2c5f",
+                "template_property_id": "481242dc-28e6-4c94-b0d2-12f955c404ea",
+                "value": "Implement refresh token rotation"
+              },
+              {
+                "id": "6ae14a6e-a64e-4276-8da4-2e23f318333a",
+                "template_row_id": "a7e3366f-ba88-445f-b7d3-dc4d15dd2c5f",
+                "template_property_id": "952a83c4-400d-40c0-a6ca-63f63038afd3",
+                "value": 8
+              },
+              {
+                "id": "67585771-09ae-49f4-9182-a8cbd7e819be",
+                "template_row_id": "a7e3366f-ba88-445f-b7d3-dc4d15dd2c5f",
+                "template_property_id": "34e6dd5c-86ec-4e2f-a074-7caf243af1a4",
+                "value": "b94c95dc-6aa1-442a-94fb-f08d6fbead65"
+              }
+            ]
+          }
+        ],
+        "views": [
+          {
+            "id": "df797681-35e2-4b63-95ee-911ec9b20b98",
+            "template_database_id": "fc717a70-391d-4cb7-ade4-54b0451937b6",
+            "name": "Release Overview",
+            "type": "TABLE",
+            "position": "0",
+            "properties": [
+              {
+                "id": "e586ec5b-bad2-46f5-8c39-dd259e6f808e",
+                "template_view_id": "df797681-35e2-4b63-95ee-911ec9b20b98",
+                "template_property_id": "77434c8f-ffe1-40dc-a918-8bea547ce353",
+                "position": "0",
+                "visible": true,
+                "width": null
+              },
+              {
+                "id": "dd9ec8c8-d41c-415d-93a8-ac73544333f8",
+                "template_view_id": "df797681-35e2-4b63-95ee-911ec9b20b98",
+                "template_property_id": "0b56a101-7634-4e01-a6d8-b926f461e02c",
+                "position": "1",
+                "visible": false,
+                "width": null
+              },
+              {
+                "id": "7b9b1483-2edd-4e21-a727-54d264b3aab0",
+                "template_view_id": "df797681-35e2-4b63-95ee-911ec9b20b98",
+                "template_property_id": "34e6dd5c-86ec-4e2f-a074-7caf243af1a4",
+                "position": "2",
+                "visible": true,
+                "width": null
+              },
+              {
+                "id": "7e31dd51-b156-469e-a3f3-4288495d1a4d",
+                "template_view_id": "df797681-35e2-4b63-95ee-911ec9b20b98",
+                "template_property_id": "952a83c4-400d-40c0-a6ca-63f63038afd3",
+                "position": "3",
+                "visible": true,
+                "width": null
+              },
+              {
+                "id": "4c8b9803-ddb2-4861-a76f-9632fd819995",
+                "template_view_id": "df797681-35e2-4b63-95ee-911ec9b20b98",
+                "template_property_id": "7f8f048a-7694-4227-b3ac-69e72980fb23",
+                "position": "4",
+                "visible": true,
+                "width": null
+              },
+              {
+                "id": "ec37ed06-39dc-472f-a5e0-693d4bbc4102",
+                "template_view_id": "df797681-35e2-4b63-95ee-911ec9b20b98",
+                "template_property_id": "9ba1697c-49a3-4ddb-a150-aef0690383af",
+                "position": "5",
+                "visible": true,
+                "width": null
+              },
+              {
+                "id": "d324ba3a-eb46-4c4e-a8e6-a400682af66a",
+                "template_view_id": "df797681-35e2-4b63-95ee-911ec9b20b98",
+                "template_property_id": "481242dc-28e6-4c94-b0d2-12f955c404ea",
+                "position": "6",
+                "visible": true,
+                "width": null
+              },
+              {
+                "id": "a614bfe4-758d-488e-b32e-6ce13da104fa",
+                "template_view_id": "df797681-35e2-4b63-95ee-911ec9b20b98",
+                "template_property_id": "42603958-7c8a-47be-ab49-9888c21b6fb2",
+                "position": "7",
+                "visible": true,
+                "width": null
+              },
+              {
+                "id": "463badd7-fe29-4240-9c7b-5aaa150b348e",
+                "template_view_id": "df797681-35e2-4b63-95ee-911ec9b20b98",
+                "template_property_id": "69ae9776-183d-44fd-a843-784ff410be38",
+                "position": "8",
+                "visible": true,
+                "width": null
+              },
+              {
+                "id": "936bdfa1-afbb-492b-819e-f01491584da1",
+                "template_view_id": "df797681-35e2-4b63-95ee-911ec9b20b98",
+                "template_property_id": "b0ee3902-6909-4186-ae7f-adc5f802a9c0",
+                "position": "9",
+                "visible": true,
+                "width": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
