@@ -1,4 +1,5 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import { templateApi } from "../api/template.api";
 
 export const templateKeys = {
@@ -122,7 +123,15 @@ export function useTemplateVersionThumbnail(
 
 		enabled: Boolean(templateId && versionId) && (options?.enabled ?? true),
 
-		retry: false,
+		retry: (failureCount, error) => {
+			if (axios.isAxiosError(error) && error.response?.status === 404) {
+				return failureCount < 5;
+			}
+
+			return false;
+		},
+
+		retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
 
 		staleTime: 10 * 60 * 1000,
 	});
