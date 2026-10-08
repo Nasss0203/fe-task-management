@@ -5,6 +5,7 @@ import { useDeferredValue, useState } from "react";
 
 import { useInfinitePublicTemplates } from "@/entities/template/model/template.queries";
 import { Button } from "@/shared/ui/button";
+import { Skeleton } from "@/shared/ui/skeleton";
 
 import TemplateCard from "./template-card";
 
@@ -66,8 +67,23 @@ export default function TemplatesSection() {
 
 				{/* Loading */}
 				{isLoading && (
-					<div className='py-16 text-center text-sm text-muted-foreground'>
-						Loading templates...
+					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch'>
+						{Array.from({ length: 6 }).map((_, index) => (
+							<div
+								key={index}
+								className='flex flex-col overflow-hidden rounded-xl border border-border/70 bg-card p-0'
+							>
+								<Skeleton className='aspect-[16/10] w-full rounded-none' />
+								<div className='p-4 sm:p-5 space-y-3'>
+									<Skeleton className='h-5 w-3/4 rounded' />
+									<Skeleton className='h-4 w-full rounded' />
+									<Skeleton className='h-4 w-2/3 rounded' />
+									<div className='pt-3 border-t border-border/40'>
+										<Skeleton className='h-3 w-1/4 rounded' />
+									</div>
+								</div>
+							</div>
+						))}
 					</div>
 				)}
 

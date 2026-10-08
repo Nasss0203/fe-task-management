@@ -1,4 +1,5 @@
 "use client";
+
 import type { TemplatePreviewInteractions } from "../model/template-preview-interactions";
 
 import type {
@@ -30,14 +31,18 @@ export function TemplateSnapshotRenderer({
 	mode = "readonly",
 	onDatabaseValueChange,
 	onDatabaseViewChange,
+	onTodoCheckedChange,
 }: TemplateSnapshotRendererProps) {
 	const blockTree = buildTemplateBlockTree(blocks);
+
 	return (
 		<div className='w-full min-w-0 bg-background pb-16 text-foreground'>
 			{template?.cover_url && (
 				<PageCover url={template.cover_url} title={template.name} />
 			)}
+
 			<PageHeader icon={template?.icon} title={template?.name} />
+
 			<PageContent>
 				{blockTree.length ? (
 					<div className='w-full min-w-0 max-w-full space-y-2'>
@@ -50,7 +55,12 @@ export function TemplateSnapshotRenderer({
 									onDatabaseValueChange={
 										onDatabaseValueChange
 									}
-									onDatabaseViewChange={onDatabaseViewChange}
+									onDatabaseViewChange={
+										onDatabaseViewChange
+									}
+									onTodoCheckedChange={
+										onTodoCheckedChange
+									}
 								/>
 							</div>
 						))}

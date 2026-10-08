@@ -42,10 +42,28 @@ export function PropertyOptionBadge({
 	);
 }
 
-export function DatabaseTableSurface({ children }: { children: ReactNode }) {
+export function DatabaseTableSurface({
+	children,
+	className,
+	tableClassName,
+}: {
+	children: ReactNode;
+	className?: string;
+	tableClassName?: string;
+}) {
 	return (
-		<div className='w-full min-w-0 max-w-full overflow-x-auto'>
-			<table className='min-w-max border-collapse text-sm'>
+		<div
+			className={cn(
+				"w-full min-w-0 max-w-full overflow-x-auto",
+				className,
+			)}
+		>
+			<table
+				className={cn(
+					"min-w-max border-collapse text-sm",
+					tableClassName,
+				)}
+			>
 				{children}
 			</table>
 		</div>

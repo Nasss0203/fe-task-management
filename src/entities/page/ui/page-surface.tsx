@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { cn } from "@/shared/lib/utils";
 
 export function PageCover({
 	url,
@@ -19,21 +20,39 @@ export function PageCover({
 export function PageHeader({
 	icon,
 	title,
+	className,
 }: {
 	icon?: string | null;
 	title?: string | null;
+	className?: string;
 }) {
 	return (
-		<div className='flex items-center gap-1 px-12 pt-10 md:px-16 lg:px-24'>
+		<div
+			className={cn(
+				"flex items-center gap-1 px-12 pt-10 md:px-16 lg:px-24",
+				className,
+			)}
+		>
 			<div className='mb-3 text-5xl'>{icon || "📄"}</div>
 			<h1 className='text-4xl font-bold'>{title || "Untitled"}</h1>
 		</div>
 	);
 }
 
-export function PageContent({ children }: { children: ReactNode }) {
+export function PageContent({
+	children,
+	className,
+}: {
+	children: ReactNode;
+	className?: string;
+}) {
 	return (
-		<div className='mt-14 w-full min-w-0 max-w-full px-12 md:px-16 lg:px-24'>
+		<div
+			className={cn(
+				"mt-14 w-full min-w-0 max-w-full px-12 md:px-16 lg:px-24",
+				className,
+			)}
+		>
 			{children}
 		</div>
 	);

@@ -174,3 +174,19 @@ export interface PublicTemplateListResponse {
 	items: PublicTemplateListItem[];
 	nextCursor: string | null;
 }
+
+export type TemplateAccess = {
+	canPreview: boolean;
+	canUse: boolean;
+	canPurchase: boolean;
+	isOwned: boolean;
+};
+
+export function getPublicTemplateAccess(): TemplateAccess {
+	return {
+		canPreview: true,
+		canUse: true,
+		canPurchase: false,
+		isOwned: false,
+	};
+}

@@ -1,5 +1,6 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { useEffect, useMemo } from "react";
 import { templateApi } from "../api/template.api";
 
 export const templateKeys = {
@@ -201,4 +202,59 @@ export function usePublicTemplatePreview(
 
 		enabled: Boolean(templateId && versionId) && (options?.enabled ?? true),
 	});
+}
+
+export function usePublicTemplate(
+	templateId: string,
+	options?: { enabled?: boolean },
+) {
+	const isEnabled = Boolean(templateId) && (options?.enabled ?? true);
+	const listQuery = useInfinitePublicTemplates({
+		enabled: isEnabled,
+	});
+
+	const template = useMemo(() => {
+		if (!listQuery.data) return undefined;
+		for (const page of listQuery.data.pages) {
+			const found = page.items.find((item) => item.id === templateId);
+			if (found) return found;
+		}
+		return undefined;
+	}, [listQuery.data, templateId]);
+
+	const {
+		hasNextPage,
+		isFetchingNextPage,
+		fetchNextPage,
+		isLoading,
+	} = listQuery;
+
+	useEffect(() => {
+		if (
+			isEnabled &&
+			!isLoading &&
+			!template &&
+			hasNextPage &&
+			!isFetchingNextPage
+		) {
+			fetchNextPage();
+		}
+	}, [
+		isEnabled,
+		isLoading,
+		template,
+		hasNextPage,
+		isFetchingNextPage,
+		fetchNextPage,
+	]);
+
+	const isResolving = isLoading || (isEnabled && !template && isFetchingNextPage);
+
+	return {
+		template,
+		isLoading: isResolving,
+		isError: listQuery.isError,
+		error: listQuery.error,
+		refetch: listQuery.refetch,
+	};
 }
