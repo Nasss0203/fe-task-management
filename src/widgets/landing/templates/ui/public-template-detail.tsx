@@ -1,5 +1,6 @@
 "use client";
 
+import axios from "axios";
 import { ArrowLeft, ArrowRight, Eye, LayoutTemplate } from "lucide-react";
 import Link from "next/link";
 
@@ -20,14 +21,15 @@ interface PublicTemplateDetailPageProps {
 export function PublicTemplateDetailPage({
 	templateId,
 }: PublicTemplateDetailPageProps) {
-	const { template, isLoading, isError, refetch } =
+	const { data: template, isLoading, isError, error, refetch } =
 		usePublicTemplate(templateId);
 
 	if (isLoading) {
 		return <TemplateDetailSkeleton />;
 	}
 
-	if (isError) {
+	const isNotFound = axios.isAxiosError(error) && error.response?.status === 404;
+	if (isError && !isNotFound) {
 		return (
 			<div className='mx-auto max-w-4xl px-4 py-20 sm:px-6 lg:px-8 text-center'>
 				<div role='alert' className='space-y-4'>
@@ -42,7 +44,7 @@ export function PublicTemplateDetailPage({
 		);
 	}
 
-	if (!template) {
+	if (!template || isNotFound) {
 		return (
 			<div className='mx-auto max-w-4xl px-4 py-20 sm:px-6 lg:px-8 text-center'>
 				<div className='mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground'>

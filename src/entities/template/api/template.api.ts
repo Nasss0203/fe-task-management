@@ -5,6 +5,7 @@ import type {
 	ListPublicTemplatesParams,
 	ListTemplatesParams,
 	PageTemplate,
+	PublicTemplateListItem,
 	PublicTemplateListResponse,
 	TemplateListResponse,
 	TemplatePreview,
@@ -203,6 +204,17 @@ export const templateApi = {
 		});
 
 		return unwrapResponse<PublicTemplateListResponse>(response.data);
+	},
+
+	getPublicById: async (
+		templateId: string,
+		signal?: AbortSignal,
+	): Promise<PublicTemplateListItem> => {
+		const response = await instance.get<
+			ApiResponse<PublicTemplateListItem> | PublicTemplateListItem
+		>(`${PUBLIC_TEMPLATE_API}/${templateId}`, { signal });
+
+		return unwrapResponse<PublicTemplateListItem>(response.data);
 	},
 
 	getPublicPreview: async (

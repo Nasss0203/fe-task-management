@@ -1,0 +1,25 @@
+import type { PublicTemplateListItem } from "@/entities/template/model/template.types";
+export const publicTemplate: PublicTemplateListItem = {
+  id: "public-template",
+  source_page_id: null,
+  workspace_id: "workspace",
+  name: "Database Snapshot Updated",
+  description: "Updated from template management",
+  icon: null,
+  cover_url: null,
+  created_by: "creator",
+  status: "DRAFT",
+  visibility: "PUBLIC",
+  created_at: "2026-10-04T13:18:53.039Z",
+  updated_at: "2026-10-07T16:22:16.517Z",
+  version: {
+    id: "published-version-2",
+    template_id: "public-template",
+    version_number: 2,
+    status: "PUBLISHED",
+    created_by: "creator",
+    published_at: "2026-10-07T16:22:24.121Z",
+    created_at: "2026-10-05T08:50:17.741Z",
+    updated_at: "2026-10-07T16:22:24.121Z",
+  },
+};
