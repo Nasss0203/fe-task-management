@@ -1,15 +1,10 @@
 "use client";
 
+import { PropertyIcon } from "@/entities/database/ui/database-visuals";
+
 import { useEffect, useState } from "react";
 
-import {
-	CalendarDays,
-	CheckSquare,
-	Hash,
-	MoreHorizontal,
-	Text,
-	Trash2,
-} from "lucide-react";
+import { MoreHorizontal, Trash2 } from "lucide-react";
 
 import {
 	useDeleteDatabaseProperty,
@@ -24,6 +19,7 @@ import {
 
 import { Input } from "@/shared/ui/input";
 
+import { InteractionMode } from "@/shared/model/interaction-mode";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 import { PropertyOptionsEditor } from "./property-options-editor";
 
@@ -31,29 +27,16 @@ interface DatabasePropertyHeaderProps {
 	databaseId: string;
 	viewId: string;
 	property: DatabaseProperty;
-}
-
-function PropertyIcon({ type }: { type: PropertyType }) {
-	switch (type) {
-		case PropertyType.NUMBER:
-			return <Hash className='size-4' />;
-
-		case PropertyType.DATE:
-			return <CalendarDays className='size-4' />;
-
-		case PropertyType.CHECKBOX:
-			return <CheckSquare className='size-4' />;
-
-		default:
-			return <Text className='size-4' />;
-	}
+	mode?: InteractionMode;
 }
 
 export function DatabasePropertyHeader({
 	databaseId,
 	viewId,
 	property,
+	mode = "editable",
 }: DatabasePropertyHeaderProps) {
+	const editable = mode === "editable";
 	const [open, setOpen] = useState(false);
 
 	const [name, setName] = useState(property.name);
@@ -85,6 +68,16 @@ export function DatabasePropertyHeader({
 			name: nextName,
 		});
 	};
+
+	if (!editable) {
+		return (
+			<div className='flex w-full items-center gap-2 text-left'>
+				<PropertyIcon type={property.type} />
+
+				<span className='min-w-0 flex-1 truncate'>{property.name}</span>
+			</div>
+		);
+	}
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>

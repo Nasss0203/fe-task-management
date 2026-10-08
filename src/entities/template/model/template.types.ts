@@ -159,3 +159,18 @@ export type TemplateVersionThumbnail = {
 	width: number;
 	height: number;
 };
+
+export interface ListPublicTemplatesParams {
+	search?: string;
+	cursor?: string | null;
+	limit?: number;
+}
+
+export type PublicTemplateListItem = Omit<PageTemplate, "version"> & {
+	version: TemplateVersion;
+};
+
+export interface PublicTemplateListResponse {
+	items: PublicTemplateListItem[];
+	nextCursor: string | null;
+}

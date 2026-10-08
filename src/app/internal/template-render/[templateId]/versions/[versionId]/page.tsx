@@ -88,6 +88,7 @@ export default async function InternalTemplateRenderPage({
 			template={preview.template}
 			blocks={preview.blocks}
 			databases={preview.databases}
+			mode='readonly'
 		/>
 	);
 }

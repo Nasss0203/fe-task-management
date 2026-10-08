@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
 import {
 	TemplatesFaqSection,
 	TemplatesSection,
 } from "@/widgets/landing/templates";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
 	title: "Starter Templates — Team Wikis, Notes & Database Views | Taskmanly",

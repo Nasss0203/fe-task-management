@@ -1,5 +1,11 @@
 "use client";
 
+import {
+	DatabaseHeaderCell,
+	DatabaseTableSurface,
+	DatabaseValueCell,
+} from "@/entities/database/ui/database-visuals";
+
 import { Plus } from "lucide-react";
 
 import { useCreateDatabaseRow } from "@/entities/database/model/database.mutations";
@@ -10,15 +16,27 @@ import type {
 	DatabaseViewDetail,
 } from "@/entities/database/model/database.types";
 
+import { InteractionMode } from "@/shared/model/interaction-mode";
 import { AddPropertyPopover } from "./add-property-popover";
 import { DatabaseCell } from "./database-cell";
 import { DatabasePropertyHeader } from "./database-property-header";
+
+type DatabaseValueChangeInput = {
+	databaseId: string;
+	rowId: string;
+	propertyId: string;
+	value: unknown;
+};
 
 interface TableViewProps {
 	database: Database;
 	viewId: string;
 	viewDetail: DatabaseViewDetail;
 	rows: DatabaseRow[];
+
+	mode?: InteractionMode;
+
+	onDatabaseValueChange?: (input: DatabaseValueChangeInput) => void;
 }
 
 export function TableView({
@@ -26,7 +44,10 @@ export function TableView({
 	viewId,
 	viewDetail,
 	rows,
+	mode = "editable",
+	onDatabaseValueChange,
 }: TableViewProps) {
+	const editable = mode === "editable";
 	const createRowMutation = useCreateDatabaseRow(database.id);
 
 	const viewPropertiesByPropertyId = new Map(
@@ -60,92 +81,99 @@ export function TableView({
 	return (
 		<div className='w-full min-w-0 max-w-full'>
 			{/* Chỉ table được scroll ngang */}
-			<div className='w-full min-w-0 max-w-full overflow-x-auto'>
-				<table className='min-w-max border-collapse text-sm'>
-					<thead>
-						<tr className='border-b'>
-							{visibleProperties.map((property) => (
-								<th
-									key={property.id}
-									className='min-w-[160px] border-r px-3 py-2 text-left font-medium'
-								>
-									<DatabasePropertyHeader
+			<DatabaseTableSurface>
+				<thead>
+					<tr className='border-b'>
+						{visibleProperties.map((property) => (
+							<DatabaseHeaderCell key={property.id}>
+								<DatabasePropertyHeader
+									databaseId={database.id}
+									viewId={viewId}
+									property={property}
+									mode={mode}
+								/>
+							</DatabaseHeaderCell>
+						))}
+
+						<th className='w-10 min-w-10 px-1'>
+							{editable && (
+								<th className='w-10 min-w-10 px-1'>
+									<AddPropertyPopover
 										databaseId={database.id}
-										viewId={viewId}
-										property={property}
 									/>
 								</th>
-							))}
+							)}
+						</th>
+					</tr>
+				</thead>
 
-							<th className='w-10 min-w-10 px-1'>
-								<AddPropertyPopover databaseId={database.id} />
-							</th>
-						</tr>
-					</thead>
+				<tbody>
+					{rows.map((row) => {
+						const valueMap = new Map<string, unknown>(
+							row.values.map((item) => [
+								item.propertyId,
+								item.value,
+							]),
+						);
 
-					<tbody>
-						{rows.map((row) => {
-							const valueMap = new Map<string, unknown>(
-								row.values.map((item) => [
-									item.propertyId,
-									item.value,
-								]),
-							);
+						return (
+							<tr
+								key={row.id}
+								className='border-b last:border-b-0'
+							>
+								{visibleProperties.map((property) => {
+									const value = valueMap.get(property.id);
 
-							return (
-								<tr
-									key={row.id}
-									className='border-b last:border-b-0'
-								>
-									{visibleProperties.map((property) => {
-										const value = valueMap.get(property.id);
+									return (
+										<DatabaseValueCell key={property.id}>
+											<DatabaseCell
+												databaseId={database.id}
+												rowId={row.id}
+												property={property}
+												value={value}
+												mode={mode}
+												onValueChange={
+													mode === "preview"
+														? onDatabaseValueChange
+														: undefined
+												}
+											/>
+										</DatabaseValueCell>
+									);
+								})}
 
-										return (
-											<td
-												key={property.id}
-												className='h-10 min-w-[160px] border-r px-2 py-1 align-middle'
-											>
-												<DatabaseCell
-													databaseId={database.id}
-													rowId={row.id}
-													property={property}
-													value={value}
-												/>
-											</td>
-										);
-									})}
-
-									<td className='w-10 min-w-10' />
-								</tr>
-							);
-						})}
-
-						{rows.length === 0 && (
-							<tr>
-								<td
-									colSpan={Math.max(
-										visibleProperties.length + 1,
-										1,
-									)}
-									className='h-20 text-center text-muted-foreground'
-								>
-									No rows
-								</td>
+								{editable && <td className='w-10 min-w-10' />}
 							</tr>
-						)}
-					</tbody>
-				</table>
-			</div>
-			<button
-				type='button'
-				disabled={createRowMutation.isPending}
-				onClick={() => createRowMutation.mutate()}
-				className='flex h-9 w-full items-center gap-2 px-3 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground disabled:opacity-50'
-			>
-				<Plus className='size-4' />
+						);
+					})}
 
-				{createRowMutation.isPending ? "Adding..." : "New row"}
-			</button>
+					{rows.length === 0 && (
+						<tr>
+							<td
+								colSpan={Math.max(
+									visibleProperties.length + 1,
+									1,
+								)}
+								className='h-20 text-center text-muted-foreground'
+							>
+								No rows
+							</td>
+						</tr>
+					)}
+				</tbody>
+			</DatabaseTableSurface>
+			{editable && (
+				<button
+					type='button'
+					disabled={createRowMutation.isPending}
+					onClick={() => createRowMutation.mutate()}
+					className='flex h-9 w-full items-center gap-2 px-3 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground disabled:opacity-50'
+				>
+					<Plus className='size-4' />
+
+					{createRowMutation.isPending ? "Adding..." : "New row"}
+				</button>
+			)}
 		</div>
 	);
 }

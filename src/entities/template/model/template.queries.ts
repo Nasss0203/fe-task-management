@@ -21,6 +21,20 @@ export const templateKeys = {
 			},
 		] as const,
 
+	publicLists: () => [...templateKeys.all, "public-list"] as const,
+
+	publicList: (filters: { search?: string; limit?: number }) =>
+		[
+			...templateKeys.publicLists(),
+			{
+				search: filters.search,
+				limit: filters.limit,
+			},
+		] as const,
+
+	publicPreview: (templateId: string, versionId: string) =>
+		[...templateKeys.all, "public-preview", templateId, versionId] as const,
+
 	detail: (id: string) => [...templateKeys.all, "detail", id] as const,
 
 	versions: (templateId: string) =>
@@ -134,5 +148,57 @@ export function useTemplateVersionThumbnail(
 		retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
 
 		staleTime: 10 * 60 * 1000,
+	});
+}
+
+export interface UseInfinitePublicTemplatesOptions {
+	search?: string;
+	limit?: number;
+	enabled?: boolean;
+}
+
+export function useInfinitePublicTemplates({
+	search,
+	limit = 20,
+	enabled = true,
+}: UseInfinitePublicTemplatesOptions = {}) {
+	const trimmedSearch = search?.trim() || undefined;
+
+	return useInfiniteQuery({
+		queryKey: templateKeys.publicList({
+			search: trimmedSearch,
+			limit,
+		}),
+
+		queryFn: ({ pageParam, signal }) =>
+			templateApi.listPublic(
+				{
+					search: trimmedSearch,
+					cursor: pageParam,
+					limit,
+				},
+				signal,
+			),
+
+		initialPageParam: undefined as string | undefined,
+
+		getNextPageParam: (lastPage) => lastPage?.nextCursor ?? undefined,
+
+		enabled,
+	});
+}
+
+export function usePublicTemplatePreview(
+	templateId: string,
+	versionId?: string,
+	options?: { enabled?: boolean },
+) {
+	return useQuery({
+		queryKey: templateKeys.publicPreview(templateId, versionId ?? ""),
+
+		queryFn: ({ signal }) =>
+			templateApi.getPublicPreview(templateId, versionId!, signal),
+
+		enabled: Boolean(templateId && versionId) && (options?.enabled ?? true),
 	});
 }

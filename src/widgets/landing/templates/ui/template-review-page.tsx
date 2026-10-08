@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
-import Link from "next/link";
-import { notFound, useParams } from "next/navigation";
+import { useUser } from "@/features/auth";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
 import {
 	ArrowLeft,
 	ArrowRight,
@@ -10,21 +10,22 @@ import {
 	LayoutTemplate,
 	PlayCircle,
 } from "lucide-react";
-import { useUser } from "@/features/auth";
-import { Badge } from "@/shared/ui/badge";
-import { Button } from "@/shared/ui/button";
+import Link from "next/link";
+import { notFound, useParams } from "next/navigation";
+import { useMemo } from "react";
 import {
 	MARKETING_TEMPLATES,
 	type MarketingTemplate,
 } from "../../data/marketing-data";
 import TemplatePreview from "./template-preview";
-import TemplateCard from "./template-card";
 
 interface TemplateReviewPageProps {
 	template?: MarketingTemplate;
 }
 
-export default function TemplateReviewPage({ template: propTemplate }: TemplateReviewPageProps) {
+export default function TemplateReviewPage({
+	template: propTemplate,
+}: TemplateReviewPageProps) {
 	const params = useParams();
 	const templateId = (params?.templateId as string) || "";
 	const { user } = useUser();
@@ -33,24 +34,13 @@ export default function TemplateReviewPage({ template: propTemplate }: TemplateR
 	const template: MarketingTemplate | undefined = useMemo(() => {
 		if (propTemplate) return propTemplate;
 		return MARKETING_TEMPLATES.find(
-			(t) => t.id === templateId || t.slug === templateId
+			(t) => t.id === templateId || t.slug === templateId,
 		);
 	}, [propTemplate, templateId]);
 
 	if (!template) {
 		notFound();
 	}
-
-	// Calculate similar templates locally based on category or overlapping tags
-	const similarTemplates = useMemo(() => {
-		return MARKETING_TEMPLATES.filter(
-			(t) =>
-				t.id !== template.id &&
-				t.slug !== template.slug &&
-				(t.category === template.category ||
-					t.tags.some((tag) => template.tags.includes(tag)))
-		).slice(0, 3);
-	}, [template]);
 
 	const ctaHref = user ? "/dashboard" : "/sign-up";
 
@@ -68,7 +58,10 @@ export default function TemplateReviewPage({ template: propTemplate }: TemplateR
 			{/* Template Header Section */}
 			<div className='space-y-6'>
 				<div className='flex flex-wrap items-center gap-2.5'>
-					<Badge variant='secondary' className='text-xs font-semibold bg-primary/10 text-primary border-none'>
+					<Badge
+						variant='secondary'
+						className='text-xs font-semibold bg-primary/10 text-primary border-none'
+					>
 						{template.category}
 					</Badge>
 					{template.tags.map((tag) => (
@@ -118,11 +111,16 @@ export default function TemplateReviewPage({ template: propTemplate }: TemplateR
 						<PlayCircle className='h-4 w-4 text-primary' />
 						Interactive Layout Preview
 					</span>
-					<span className='font-mono text-[11px]'>Mode: Read-only Demo</span>
+					<span className='font-mono text-[11px]'>
+						Mode: Read-only Demo
+					</span>
 				</div>
 
 				<div className='relative aspect-[16/9] w-full rounded-xl overflow-hidden border border-border/50 bg-muted/20'>
-					<TemplatePreview previewType={template.previewType} variant={template.variant} />
+					<TemplatePreview
+						previewType={template.previewType}
+						variant={template.variant}
+					/>
 				</div>
 			</div>
 
@@ -130,59 +128,45 @@ export default function TemplateReviewPage({ template: propTemplate }: TemplateR
 			<div className='mt-14 grid grid-cols-1 md:grid-cols-2 gap-10 border-t border-border/60 pt-10'>
 				{/* About column */}
 				<div className='space-y-4'>
-					<h2 className='text-xl font-bold text-foreground'>About this template</h2>
+					<h2 className='text-xl font-bold text-foreground'>
+						About this template
+					</h2>
 					<p className='text-sm text-muted-foreground leading-relaxed'>
-						Built by workflow architects to help squads launch initiatives with clear documentation, structured properties, and zero setup friction.
+						Built by workflow architects to help squads launch
+						initiatives with clear documentation, structured
+						properties, and zero setup friction.
 					</p>
 					<p className='text-sm text-muted-foreground leading-relaxed'>
-						Once applied to your workspace, all properties, columns, views, and cards can be fully customized, renamed, or linked to existing documents.
+						Once applied to your workspace, all properties, columns,
+						views, and cards can be fully customized, renamed, or
+						linked to existing documents.
 					</p>
 				</div>
 
 				{/* What's included column */}
 				<div className='space-y-4'>
-					<h2 className='text-xl font-bold text-foreground'>What&apos;s included</h2>
+					<h2 className='text-xl font-bold text-foreground'>
+						What&apos;s included
+					</h2>
 					<div className='space-y-2.5 text-sm'>
-						{(template.included || template.features || []).map((feature) => (
-							<div key={feature} className='flex items-start gap-2.5'>
-								<div className='h-5 w-5 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5'>
-									<Check className='h-3 w-3' />
+						{(template.included || template.features || []).map(
+							(feature) => (
+								<div
+									key={feature}
+									className='flex items-start gap-2.5'
+								>
+									<div className='h-5 w-5 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5'>
+										<Check className='h-3 w-3' />
+									</div>
+									<span className='text-foreground font-medium'>
+										{feature}
+									</span>
 								</div>
-								<span className='text-foreground font-medium'>{feature}</span>
-							</div>
-						))}
+							),
+						)}
 					</div>
 				</div>
 			</div>
-
-			{/* Similar Templates Recommendation Row */}
-			{similarTemplates.length > 0 && (
-				<div className='mt-20 border-t border-border/60 pt-12 space-y-8'>
-					<div className='flex items-center justify-between'>
-						<div>
-							<h2 className='text-xl sm:text-2xl font-bold text-foreground'>
-								Similar templates
-							</h2>
-							<p className='text-xs text-muted-foreground mt-1'>
-								Explore related setups for your squad
-							</p>
-						</div>
-
-						<Link href='/templates'>
-							<Button variant='ghost' size='sm' className='text-xs'>
-								View all templates
-								<ArrowRight className='ml-1.5 h-3.5 w-3.5' />
-							</Button>
-						</Link>
-					</div>
-
-					<div className='grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch'>
-						{similarTemplates.map((sim) => (
-							<TemplateCard key={sim.id} item={sim} />
-						))}
-					</div>
-				</div>
-			)}
 		</div>
 	);
 }

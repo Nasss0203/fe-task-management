@@ -1,5 +1,7 @@
 "use client";
 
+import { NativeCheckbox } from "@/shared/ui/native-checkbox";
+
 import { useEffect, useRef, useState } from "react";
 
 import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-tree";
@@ -170,8 +172,7 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 
 	return (
 		<div className='flex min-h-7 w-full items-start gap-2'>
-			<input
-				type='checkbox'
+			<NativeCheckbox
 				checked={checked}
 				onChange={(event) => handleCheckedChange(event.target.checked)}
 				className='

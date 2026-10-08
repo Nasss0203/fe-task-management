@@ -1,50 +1,41 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import {
-	ChevronDown,
-	HelpCircle,
-} from "lucide-react";
-import { Button } from "@/shared/ui/button";
 import { cn } from "@/shared/lib/utils";
+import { Button } from "@/shared/ui/button";
+import { ChevronDown, HelpCircle } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 
 const faqs = [
 	{
 		id: "item-1",
 		question: "What is Taskmanly and how does it help my team?",
-		answer:
-			"Taskmanly is an all-in-one collaborative workspace that unites flexible documents, structured databases, teamspaces, web publishing, and AI assistance into a single unified platform.",
+		answer: "Taskmanly is an all-in-one collaborative workspace that unites flexible documents, structured databases, teamspaces, web publishing, and AI assistance into a single unified platform.",
 	},
 	{
 		id: "item-2",
 		question: "Is Taskmanly suitable for remote and distributed squads?",
-		answer:
-			"Yes. Taskmanly provides real-time collaborative editing, instant workspace invitations, granular role-based access control, and dedicated teamspaces for every department.",
+		answer: "Yes. Taskmanly provides real-time collaborative editing, instant workspace invitations, granular role-based access control, and dedicated teamspaces for every department.",
 	},
 	{
 		id: "item-3",
 		question: "Can I use templates for personal and company workspaces?",
-		answer:
-			"Absolutely. Our curated template gallery includes ready-to-use setups for team wikis, meeting agendas, knowledge bases, content calendars, and personal planners.",
+		answer: "Absolutely. Our curated template gallery includes ready-to-use setups for team wikis, meeting agendas, knowledge bases, content calendars, and personal planners.",
 	},
 	{
 		id: "item-4",
 		question: "How secure is my data in Taskmanly?",
-		answer:
-			"We utilize encryption in transit and at rest, strict workspace role isolation (Owner, Admin, Member, Viewer), and token-based authentication.",
+		answer: "We utilize encryption in transit and at rest, strict workspace role isolation (Owner, Admin, Member, Viewer), and token-based authentication.",
 	},
 	{
 		id: "item-5",
 		question: "Can I publish pages to the public web?",
-		answer:
-			"Yes. With one click you can turn any document or nested subpage tree into a fast, public website hosted on a custom Taskmanly subdomain.",
+		answer: "Yes. With one click you can turn any document or nested subpage tree into a fast, public website hosted on a custom Taskmanly subdomain.",
 	},
 	{
 		id: "item-6",
 		question: "How does Taskmanly AI assist my daily workflow?",
-		answer:
-			"Taskmanly AI understands your workspace context, drafting technical specs, summarizing long docs, extracting actionable checklist items, and organizing unstructured ideas.",
+		answer: "Taskmanly AI understands your workspace context, drafting technical specs, summarizing long docs, extracting actionable checklist items, and organizing unstructured ideas.",
 	},
 ];
 
@@ -92,7 +83,9 @@ function FaqCard({
 				)}
 			>
 				<div className='border-t border-border/50 px-5 pb-5 pt-3.5'>
-					<p className='text-xs leading-relaxed text-muted-foreground'>{answer}</p>
+					<p className='text-xs leading-relaxed text-muted-foreground'>
+						{answer}
+					</p>
 				</div>
 			</div>
 		</div>
@@ -122,7 +115,8 @@ export default function TemplatesFaqSection() {
 						Frequently Asked Questions
 					</h2>
 					<p className='text-sm text-muted-foreground'>
-						Everything you need to know about Taskmanly templates and workspaces.
+						Everything you need to know about Taskmanly templates
+						and workspaces.
 					</p>
 				</div>
 
@@ -159,18 +153,27 @@ export default function TemplatesFaqSection() {
 							Ready to build your workspace?
 						</h3>
 						<p className='text-xs sm:text-sm text-muted-foreground leading-relaxed'>
-							Start with any template or build from scratch. Collaborate on docs, databases, and wikis with zero setup friction.
+							Start with any template or build from scratch.
+							Collaborate on docs, databases, and wikis with zero
+							setup friction.
 						</p>
 					</div>
 
 					<div className='flex items-center gap-3 shrink-0'>
 						<Link href='/sign-up'>
-							<Button size='lg' className='rounded-full bg-primary font-semibold text-primary-foreground shadow-xs px-6'>
+							<Button
+								size='lg'
+								className='rounded-full bg-primary font-semibold text-primary-foreground shadow-xs px-6'
+							>
 								Get started free
 							</Button>
 						</Link>
 						<Link href='/features'>
-							<Button size='lg' variant='outline' className='rounded-full px-6'>
+							<Button
+								size='lg'
+								variant='outline'
+								className='rounded-full px-6'
+							>
 								Explore features
 							</Button>
 						</Link>

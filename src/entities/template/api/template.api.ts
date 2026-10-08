@@ -2,8 +2,10 @@ import type { ApiResponse } from "@/shared/api";
 import instance from "@/shared/api/api-client";
 import type {
 	CreateTemplateFromPagePayload,
+	ListPublicTemplatesParams,
 	ListTemplatesParams,
 	PageTemplate,
+	PublicTemplateListResponse,
 	TemplateListResponse,
 	TemplatePreview,
 	TemplateVersion,
@@ -14,6 +16,7 @@ import type {
 } from "../model/template.types";
 
 const TEMPLATE_API = "/templates";
+const PUBLIC_TEMPLATE_API = "/public/templates";
 
 function unwrapResponse<T>(responseData: unknown): T {
 	if (
@@ -182,5 +185,37 @@ export const templateApi = {
 		});
 
 		return unwrapResponse<TemplateVersionThumbnail>(response.data);
+	},
+
+	listPublic: async (
+		params: ListPublicTemplatesParams,
+		signal?: AbortSignal,
+	): Promise<PublicTemplateListResponse> => {
+		const response = await instance.get<
+			ApiResponse<PublicTemplateListResponse> | PublicTemplateListResponse
+		>(PUBLIC_TEMPLATE_API, {
+			params: {
+				search: params.search || undefined,
+				cursor: params.cursor || undefined,
+				limit: params.limit ?? 20,
+			},
+			signal,
+		});
+
+		return unwrapResponse<PublicTemplateListResponse>(response.data);
+	},
+
+	getPublicPreview: async (
+		templateId: string,
+		versionId: string,
+		signal?: AbortSignal,
+	): Promise<TemplatePreview> => {
+		const response = await instance.get<
+			ApiResponse<TemplatePreview> | TemplatePreview
+		>(`/public/templates/${templateId}/versions/${versionId}/preview`, {
+			signal,
+		});
+
+		return unwrapResponse<TemplatePreview>(response.data);
 	},
 };

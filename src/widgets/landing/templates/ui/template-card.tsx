@@ -1,63 +1,63 @@
 "use client";
 
+import { LayoutTemplate } from "lucide-react";
 import Link from "next/link";
-import { Badge } from "@/shared/ui/badge";
-import { Button } from "@/shared/ui/button";
+
+import { useTemplateVersionThumbnail } from "@/entities/template/model/template.queries";
+import type { PublicTemplateListItem } from "@/entities/template/model/template.types";
 import { useUser } from "@/features/auth";
-import type { MarketingTemplate } from "../../data/marketing-data";
-import TemplatePreview from "./template-preview";
+import { Button } from "@/shared/ui/button";
 
 type TemplateCardProps = {
-	item: MarketingTemplate;
+	item: PublicTemplateListItem;
 };
 
 export default function TemplateCard({ item }: TemplateCardProps) {
 	const { user } = useUser();
+
+	const { data: thumbnail } = useTemplateVersionThumbnail(
+		item.id,
+		item.version.id,
+	);
+
 	const ctaHref = user ? "/dashboard" : "/sign-up";
-	const detailHref = `/templates/${item.slug || item.id}`;
 
 	return (
-		<div className='group flex flex-col h-full rounded-2xl border border-border/80 bg-card p-4 shadow-xs transition-all duration-300 hover:border-primary/50 hover:shadow-lg hover:-translate-y-1'>
-			{/* Preview */}
-			<div className='relative h-44 w-full shrink-0 overflow-hidden rounded-xl border border-border/50 bg-muted/20 mb-3.5'>
-				<TemplatePreview previewType={item.previewType} variant={item.variant} />
-
-				{/* Category badge overlaid top right */}
-				<Badge className='absolute top-2.5 right-2.5 bg-background/90 text-foreground border border-border/60 text-[10px] backdrop-blur-md shadow-xs'>
-					{item.category}
-				</Badge>
+		<div className='group flex h-full flex-col rounded-2xl border border-border/80 bg-card p-4 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg'>
+			<div className='relative mb-3.5 h-44 w-full shrink-0 overflow-hidden rounded-xl border border-border/50 bg-muted/20'>
+				{thumbnail?.url || item.cover_url ? (
+					<div
+						className='h-full w-full bg-cover bg-center bg-no-repeat'
+						style={{
+							backgroundImage: `url("${thumbnail?.url || item.cover_url}")`,
+						}}
+					/>
+				) : (
+					<div className='flex h-full w-full items-center justify-center'>
+						{item.icon ? (
+							<span className='text-4xl'>{item.icon}</span>
+						) : (
+							<LayoutTemplate className='h-10 w-10 text-muted-foreground/40' />
+						)}
+					</div>
+				)}
 			</div>
 
-			{/* Tags Row */}
-			<div className='flex flex-wrap items-center gap-1.5 mb-2'>
-				{item.tags.slice(0, 3).map((tag) => (
-					<span
-						key={tag}
-						className='text-[10px] px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground font-medium'
-					>
-						{tag}
-					</span>
-				))}
-			</div>
-
-			{/* Title & Description */}
-			<div className='flex flex-col flex-1'>
-				<h3 className='text-base font-semibold text-foreground group-hover:text-primary transition-colors tracking-tight line-clamp-1'>
-					{item.name || item.title}
+			<div className='flex flex-1 flex-col'>
+				<h3 className='line-clamp-1 text-base font-semibold tracking-tight text-foreground transition-colors group-hover:text-primary'>
+					{item.name}
 				</h3>
 
-				<p className='mt-1.5 text-xs text-muted-foreground leading-relaxed line-clamp-2 flex-1'>
-					{item.description}
+				<p className='mt-1.5 line-clamp-2 flex-1 text-xs leading-relaxed text-muted-foreground'>
+					{item.description || "No description available."}
 				</p>
 
-				{/* Action Buttons */}
-				<div className='mt-5 pt-3 border-t border-border/60 flex items-center justify-between gap-2'>
-					<Link href={detailHref} className='flex-1'>
-						<Button
-							variant='outline'
-							size='sm'
-							className='w-full rounded-lg text-xs font-medium'
-						>
+				<div className='mt-5 flex items-center justify-between gap-2 border-t border-border/60 pt-3'>
+					<Link
+						href={`/templates/${item.id}/versions/${item.version.id}/preview`}
+						className='flex-1'
+					>
+						<Button variant='outline' size='sm' className='w-full rounded-lg text-xs font-medium'>
 							Preview
 						</Button>
 					</Link>
@@ -65,7 +65,7 @@ export default function TemplateCard({ item }: TemplateCardProps) {
 					<Link href={ctaHref} className='flex-1'>
 						<Button
 							size='sm'
-							className='w-full rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90'
+							className='w-full rounded-lg bg-primary text-xs font-semibold text-primary-foreground hover:bg-primary/90'
 						>
 							Use template
 						</Button>

@@ -1,5 +1,8 @@
 "use client";
 
+import { DatabaseValueControl } from "@/entities/database/ui/database-value-control";
+import { formatDatabaseValue } from "@/entities/database/ui/database-visuals";
+
 import { useEffect, useState } from "react";
 
 import { useSetDatabaseRowValue } from "@/entities/database/model/database.mutations";
@@ -8,14 +11,22 @@ import {
 	PropertyType,
 	type DatabaseProperty,
 } from "@/entities/database/model/database.types";
-import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
-import { Check, ChevronDown } from "lucide-react";
+import { canInteract, InteractionMode } from "@/shared/model/interaction-mode";
 
 interface DatabaseCellProps {
 	databaseId: string;
 	rowId: string;
 	property: DatabaseProperty;
 	value: unknown;
+
+	mode?: InteractionMode;
+
+	onValueChange?: (input: {
+		databaseId: string;
+		rowId: string;
+		propertyId: string;
+		value: unknown;
+	}) => void;
 }
 
 export function DatabaseCell({
@@ -23,6 +34,8 @@ export function DatabaseCell({
 	rowId,
 	property,
 	value,
+	mode = "editable",
+	onValueChange,
 }: DatabaseCellProps) {
 	const [inputValue, setInputValue] = useState(
 		typeof value === "string" ? value : "",
@@ -35,23 +48,44 @@ export function DatabaseCell({
 	}, [value]);
 
 	const save = () => {
+		if (!interactive) {
+			return;
+		}
+
 		const currentValue = typeof value === "string" ? value : "";
 
 		if (inputValue === currentValue) {
 			return;
 		}
 
-		setValueMutation.mutate({
-			rowId,
-			propertyId: property.id,
-			value: inputValue,
-		});
+		updateValue(inputValue);
 	};
+	const interactive = canInteract(mode);
 
-	const selectedOption =
-		typeof value === "string"
-			? property.options.find((option) => option.id === value)
-			: undefined;
+	const updateValue = (nextValue: unknown) => {
+		if (!interactive) {
+			return;
+		}
+
+		if (mode === "preview") {
+			onValueChange?.({
+				databaseId,
+				rowId,
+				propertyId: property.id,
+				value: nextValue,
+			});
+
+			return;
+		}
+
+		if (mode === "editable") {
+			setValueMutation.mutate({
+				rowId,
+				propertyId: property.id,
+				value: nextValue,
+			});
+		}
+	};
 
 	switch (property.type) {
 		case PropertyType.TITLE:
@@ -69,93 +103,31 @@ export function DatabaseCell({
 					placeholder={
 						property.type === PropertyType.TITLE ? "Untitled" : ""
 					}
-					disabled={setValueMutation.isPending}
+					disabled={
+						!interactive ||
+						(mode === "editable" && setValueMutation.isPending)
+					}
 					className='h-8 w-full bg-transparent px-1 outline-none'
 				/>
 			);
 		case PropertyType.SELECT:
 		case PropertyType.STATUS:
 			return (
-				<Popover>
-					<PopoverTrigger asChild>
-						<button
-							type='button'
-							className='flex h-8 w-full items-center gap-2 rounded px-1 text-left hover:bg-muted/50'
-						>
-							{selectedOption ? (
-								<span
-									className='inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium'
-									style={{
-										backgroundColor:
-											selectedOption.color ?? undefined,
-									}}
-								>
-									{selectedOption.name}
-								</span>
-							) : (
-								<span className='text-muted-foreground'>
-									Select
-								</span>
-							)}
-
-							<ChevronDown className='ml-auto size-3.5 text-muted-foreground' />
-						</button>
-					</PopoverTrigger>
-
-					<PopoverContent align='start' className='w-56 p-1'>
-						{property.options.length === 0 ? (
-							<div className='px-2 py-2 text-sm text-muted-foreground'>
-								No options
-							</div>
-						) : (
-							property.options
-								.slice()
-								.sort(
-									(a, b) =>
-										Number(a.position) - Number(b.position),
-								)
-								.map((option) => {
-									const active =
-										selectedOption?.id === option.id;
-
-									return (
-										<button
-											key={option.id}
-											type='button'
-											disabled={
-												setValueMutation.isPending
-											}
-											onClick={() => {
-												setValueMutation.mutate({
-													rowId,
-													propertyId: property.id,
-
-													// Lưu ID của option
-													value: option.id,
-												});
-											}}
-											className='flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm hover:bg-muted disabled:opacity-50'
-										>
-											<span
-												className='inline-flex items-center rounded-md px-2 py-0.5 text-xs'
-												style={{
-													backgroundColor:
-														option.color ??
-														undefined,
-												}}
-											>
-												{option.name}
-											</span>
-
-											{active && (
-												<Check className='ml-auto size-4' />
-											)}
-										</button>
-									);
-								})
-						)}
-					</PopoverContent>
-				</Popover>
+				<DatabaseValueControl
+					type={property.type}
+					name={property.name}
+					value={value}
+					options={property.options}
+					mode='editable'
+					disabled={setValueMutation.isPending}
+					onValueChange={(next) =>
+						setValueMutation.mutate({
+							rowId,
+							propertyId: property.id,
+							value: next,
+						})
+					}
+				/>
 			);
 		case PropertyType.NUMBER:
 			return (
@@ -174,48 +146,30 @@ export function DatabaseCell({
 								? ""
 								: Number(event.target.value);
 
-						setValueMutation.mutate({
-							rowId,
-							propertyId: property.id,
-							value: nextValue,
-						});
+						updateValue(nextValue);
 					}}
+					disabled={
+						!interactive ||
+						(mode === "editable" && setValueMutation.isPending)
+					}
 					className='h-8 w-full bg-transparent px-1 outline-none'
 				/>
 			);
 		case PropertyType.CHECKBOX:
 			return (
-				<input
-					type='checkbox'
-					checked={value === true}
-					onChange={(event) => {
-						setValueMutation.mutate({
-							rowId,
-							propertyId: property.id,
-							value: event.target.checked,
-						});
-					}}
-					className='size-4'
+				<DatabaseValueControl
+					type={property.type}
+					name={property.name}
+					value={value}
+					mode={mode}
+					disabled={mode === "editable" && setValueMutation.isPending}
+					onValueChange={updateValue}
 				/>
 			);
 
 		default:
-			return <span className='block px-1'>{renderValue(value)}</span>;
+			return (
+				<span className='block px-1'>{formatDatabaseValue(value)}</span>
+			);
 	}
-}
-
-function renderValue(value: unknown): string {
-	if (value === null || value === undefined) {
-		return "";
-	}
-
-	if (typeof value === "string" || typeof value === "number") {
-		return String(value);
-	}
-
-	if (typeof value === "boolean") {
-		return value ? "✓" : "";
-	}
-
-	return JSON.stringify(value);
 }

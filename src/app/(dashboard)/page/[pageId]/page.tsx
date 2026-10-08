@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { buildPageBlockTree } from "@/entities/page-block/lib/build-page-block-tree";
 import { usePageBlocks } from "@/entities/page-block/model/page-block.queries";
 import { useMyPageEditRequests } from "@/entities/page-edit-request/model/page-edit-request.queries";
+import { PageContent, PageCover, PageHeader } from "@/entities/page/ui/page-surface";
 import { usePage } from "@/entities/page/model/page.queries";
 
 import { PageEditAccessBoundary } from "@/features/page-access/ui/page-edit-access-boundary";
@@ -52,24 +53,9 @@ export default function PageDetail() {
 
 	return (
 		<div className='w-full min-w-0'>
-			{page.cover_url && (
-				<div className='h-64 w-full overflow-hidden'>
-					{/* eslint-disable-next-line @next/next/no-img-element */}
-					<img
-						src={page.cover_url}
-						alt=''
-						className='h-full w-full object-cover'
-					/>
-				</div>
-			)}
+			{page.cover_url && <PageCover url={page.cover_url} />}
 
-			<div className='flex items-center gap-1 px-12 pt-10 md:px-16 lg:px-24'>
-				<div className='mb-3 text-5xl'>{page.icon || "📄"}</div>
-
-				<h1 className='text-4xl font-bold'>
-					{page.title || "Untitled"}
-				</h1>
-			</div>
+			<PageHeader icon={page.icon} title={page.title} />
 
 			<PageEditAccessBoundary
 				canEdit={page.canEdit}
@@ -77,13 +63,13 @@ export default function PageDetail() {
 					setRequestEditOpen(true);
 				}}
 			>
-				<div className='mt-14 w-full min-w-0 max-w-full px-12 md:px-16 lg:px-24'>
+				<PageContent>
 					<PageBlockList
 						pageId={page.id}
 						blocks={blockTree}
 						canEdit={page.canEdit}
 					/>
-				</div>
+				</PageContent>
 			</PageEditAccessBoundary>
 
 			<RequestEditAccessDialog
