@@ -6,7 +6,7 @@ import { Check, ChevronsUpDown, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 
-import { useUseTemplate } from "@/entities/template";
+import { useClaimFreeTemplate, useUseTemplate } from "@/entities/template";
 import type { PageTemplate, TemplateVersion } from "@/entities/template";
 import { useWorkspaces } from "@/entities/workspace/model/workspace.queries";
 import { useUser } from "@/features/auth";
@@ -28,10 +28,11 @@ import {
 } from "@/shared/ui/dropdown-menu";
 
 interface UseTemplateDialogProps {
-	template: PageTemplate;
-	version: TemplateVersion;
+	template: Pick<PageTemplate, "id" | "name">;
+	version: Pick<TemplateVersion, "id">;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	requireClaim?: boolean;
 }
 
 export function UseTemplateDialog({
@@ -39,11 +40,16 @@ export function UseTemplateDialog({
 	version,
 	open,
 	onOpenChange,
+	requireClaim,
 }: UseTemplateDialogProps) {
 	const router = useRouter();
 	const { user } = useUser();
 	const { data: workspaces = [] } = useWorkspaces();
+	const claimMutation = useClaimFreeTemplate();
 	const useMutation = useUseTemplate();
+	const isSubmittingRef = React.useRef(false);
+
+	const shouldClaim = requireClaim ?? false;
 
 	// Select destination workspace, defaulting to user's last active workspace or first available
 	const initialWorkspaceId =
@@ -58,23 +64,56 @@ export function UseTemplateDialog({
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 	React.useEffect(() => {
-		if (open && !selectedWorkspaceId && workspaces.length > 0) {
-			setSelectedWorkspaceId(initialWorkspaceId);
+		if (open) {
+			setErrorMessage(null);
+			if (!selectedWorkspaceId && workspaces.length > 0) {
+				setSelectedWorkspaceId(initialWorkspaceId);
+			}
 		}
 	}, [open, selectedWorkspaceId, workspaces, initialWorkspaceId]);
 
-	const selectedWorkspace = workspaces.find((w) => w.id === selectedWorkspaceId);
-	const isPending = useMutation.isPending;
+	const selectedWorkspace = workspaces.find(
+		(w) => w.id === selectedWorkspaceId,
+	);
+	const isClaiming = claimMutation.isPending;
+	const isUsing = useMutation.isPending;
+	const isPending = isClaiming || isUsing;
 
 	const handleUseTemplate = async () => {
+		if (isPending || isSubmittingRef.current) {
+			return;
+		}
+
 		if (!selectedWorkspaceId) {
 			setErrorMessage("Please select a destination workspace.");
 			return;
 		}
 
 		setErrorMessage(null);
+		isSubmittingRef.current = true;
 
 		try {
+			if (shouldClaim) {
+				try {
+					await claimMutation.mutateAsync(template.id);
+				} catch (claimError: unknown) {
+					let message = "Unable to claim template. Please try again.";
+					if (axios.isAxiosError(claimError)) {
+						const data = claimError.response?.data as
+							| { message?: string | string[] }
+							| undefined;
+						if (data?.message) {
+							message = Array.isArray(data.message)
+								? data.message.join(", ")
+								: data.message;
+						}
+					}
+					setErrorMessage(message);
+					toast.error(message);
+					return;
+				}
+			}
+
 			const result = await useMutation.mutateAsync({
 				templateId: template.id,
 				versionId: version.id,
@@ -91,15 +130,22 @@ export function UseTemplateDialog({
 			let message = "Unable to use template. Please try again.";
 			if (axios.isAxiosError(error)) {
 				const status = error.response?.status;
-				const data = error.response?.data as { message?: string | string[] } | undefined;
-				if (status === 403) {
-					message = "You don't have permission to create pages in this workspace.";
-				} else if (data?.message) {
-					message = Array.isArray(data.message) ? data.message.join(", ") : data.message;
+				const data = error.response?.data as
+					| { message?: string | string[] }
+					| undefined;
+				if (data?.message) {
+					message = Array.isArray(data.message)
+						? data.message.join(", ")
+						: data.message;
+				} else if (status === 403) {
+					message =
+						"You don't have permission to create pages in this workspace.";
 				}
 			}
 			setErrorMessage(message);
 			toast.error(message);
+		} finally {
+			isSubmittingRef.current = false;
 		}
 	};
 
@@ -144,40 +190,50 @@ export function UseTemplateDialog({
 						<Label className='text-xs font-medium text-foreground'>
 							Destination Workspace
 						</Label>
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button
-									variant='outline'
-									role='combobox'
-									disabled={isPending || workspaces.length === 0}
-									className='w-full justify-between h-9 text-xs font-normal'
-								>
-									<span className='truncate'>
-										{selectedWorkspace?.name || "Select workspace..."}
-									</span>
-									<ChevronsUpDown className='ml-2 size-3.5 shrink-0 opacity-50' />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align='start' className='w-[410px]'>
-								{workspaces.map((ws) => (
-									<DropdownMenuItem
-										key={ws.id}
-										onClick={() => {
-											setSelectedWorkspaceId(ws.id);
-											setErrorMessage(null);
-										}}
-										className='flex items-center justify-between text-xs cursor-pointer'
+						{workspaces.length === 0 ? (
+							<div
+								role='status'
+								className='rounded-md border border-border/80 bg-muted/40 p-3 text-xs text-muted-foreground'
+							>
+								No workspaces available. Please create a workspace first.
+							</div>
+						) : (
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button
+										variant='outline'
+										role='combobox'
+										disabled={isPending}
+										className='w-full justify-between h-9 text-xs font-normal'
 									>
-										<span className='truncate'>{ws.name}</span>
-										{ws.id === selectedWorkspaceId && (
-											<Check className='size-3.5 text-primary ml-2' />
-										)}
-									</DropdownMenuItem>
-								))}
-							</DropdownMenuContent>
-						</DropdownMenu>
+										<span className='truncate'>
+											{selectedWorkspace?.name || "Select workspace..."}
+										</span>
+										<ChevronsUpDown className='ml-2 size-3.5 shrink-0 opacity-50' />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align='start' className='w-[410px]'>
+									{workspaces.map((ws) => (
+										<DropdownMenuItem
+											key={ws.id}
+											onClick={() => {
+												setSelectedWorkspaceId(ws.id);
+												setErrorMessage(null);
+											}}
+											className='flex items-center justify-between text-xs cursor-pointer'
+										>
+											<span className='truncate'>{ws.name}</span>
+											{ws.id === selectedWorkspaceId && (
+												<Check className='size-3.5 text-primary ml-2' />
+											)}
+										</DropdownMenuItem>
+									))}
+								</DropdownMenuContent>
+							</DropdownMenu>
+						)}
 						<p className='text-[11px] text-muted-foreground'>
-							The template content and database snapshot will be cloned into this workspace.
+							The template content and database snapshot will be cloned into
+							this workspace.
 						</p>
 					</div>
 				</div>
@@ -202,7 +258,7 @@ export function UseTemplateDialog({
 						{isPending ? (
 							<>
 								<Loader2 className='mr-1.5 size-3.5 animate-spin' />
-								Creating page...
+								{isClaiming ? "Preparing template..." : "Creating page..."}
 							</>
 						) : (
 							"Use template"

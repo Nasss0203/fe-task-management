@@ -6,6 +6,7 @@ import {
 	screen,
 	waitFor,
 	act,
+	within,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, afterEach, describe, it, expect, vi } from "vitest";
@@ -19,7 +20,21 @@ import {
 import TemplatesSection from "@/widgets/landing/templates/ui/templates-section";
 import { PublicTemplateDetailPage } from "@/widgets/landing/templates/ui/public-template-detail";
 import { publicTemplate } from "../fixtures/public-template";
-vi.mock("@/features/auth", () => ({ useUser: () => ({ user: null }) }));
+vi.mock("next/navigation", () => ({
+	useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+	usePathname: () => "/templates/public-template",
+}));
+let mockUser: { id: string; lastActiveWorkspaceId?: string } | null = null;
+vi.mock("@/features/auth", () => ({
+	useUser: () => ({
+		user: mockUser,
+		isBootstrapped: true,
+		isAuthenticated: Boolean(mockUser),
+	}),
+}));
+vi.mock("@/entities/workspace/model/workspace.queries", () => ({
+	useWorkspaces: () => ({ data: [{ id: "ws-1", name: "Engineering" }] }),
+}));
 const clients: QueryClient[] = [];
 function setup() {
 	const client = new QueryClient({
@@ -47,6 +62,7 @@ function notFound() {
 	);
 }
 beforeEach(() => {
+	mockUser = null;
 	vi.spyOn(templateApi, "getPublicById").mockResolvedValue(publicTemplate);
 	vi.spyOn(templateApi, "listPublic").mockResolvedValue({
 		items: [],
@@ -60,6 +76,7 @@ beforeEach(() => {
 	});
 });
 afterEach(() => {
+	mockUser = null;
 	clients.splice(0).forEach((c) => c.clear());
 	vi.restoreAllMocks();
 });
@@ -200,12 +217,44 @@ describe("public detail UI", () => {
 			"href",
 			"/sign-up",
 		);
+		expect(screen.getByText("Free")).toBeInTheDocument();
+		const thumbnailLink = screen.getByRole("link", {
+			name: `Interactive preview of ${publicTemplate.name}`,
+		});
+		expect(thumbnailLink).toHaveAttribute(
+			"href",
+			"/templates/public-template/versions/published-version-2/preview",
+		);
+		const thumbnailImg = await screen.findByRole("img", {
+			name: publicTemplate.name,
+		});
+		expect(thumbnailImg).toHaveAttribute(
+			"src",
+			"https://example.com/thumbnail.png",
+		);
 		expect(templateApi.getVersionThumbnail).toHaveBeenCalledWith(
 			publicTemplate.id,
 			publicTemplate.version.id,
 			expect.any(AbortSignal),
 		);
 		expect(templateApi.listPublic).not.toHaveBeenCalled();
+	});
+	it("renders fallback icon when thumbnail URL is unavailable", async () => {
+		vi.mocked(templateApi.getVersionThumbnail).mockResolvedValue(null as any);
+		const { wrapper } = setup();
+		render(
+			<PublicTemplateDetailPage templateId={publicTemplate.id} />,
+			{ wrapper },
+		);
+		expect(
+			await screen.findByRole("heading", { name: publicTemplate.name }),
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole("link", {
+				name: `Interactive preview of ${publicTemplate.name}`,
+			}),
+		).toBeInTheDocument();
+		expect(screen.queryByRole("img", { name: publicTemplate.name })).not.toBeInTheDocument();
 	});
 	it("keeps its existing skeleton while detail is loading", () => {
 		vi.mocked(templateApi.getPublicById).mockReturnValue(new Promise(() => {}));
@@ -269,5 +318,97 @@ describe("public detail UI", () => {
 		).toBeInTheDocument();
 		expect(templateApi.getPublicById).toHaveBeenCalledTimes(2);
 		expect(templateApi.listPublic).not.toHaveBeenCalled();
+	});
+
+	it("shows Claimed badge and skips claiming when user already claimed the template", async () => {
+		mockUser = { id: "user-claimed", lastActiveWorkspaceId: "ws-1" };
+		const claimSpy = vi.spyOn(templateApi, "claimFreeTemplate");
+		const useSpy = vi.spyOn(templateApi, "useTemplate").mockResolvedValue({ pageId: "page-1" });
+		vi.spyOn(templateApi, "listMyClaimedTemplates").mockResolvedValue({
+			items: [
+				{
+					entitlement_id: "ent-1",
+					template_id: publicTemplate.id,
+					source: "FREE_CLAIM",
+					claimed_at: "2026-10-10T00:00:00.000Z",
+					name: publicTemplate.name,
+					description: publicTemplate.description,
+					icon: publicTemplate.icon,
+					cover_url: publicTemplate.cover_url,
+					visibility: "PUBLIC",
+					status: "PUBLISHED",
+					listing_status: "PUBLISHED",
+					published_version: publicTemplate.version,
+				},
+			],
+			nextCursor: null,
+		});
+
+		const { wrapper } = setup();
+		render(<PublicTemplateDetailPage templateId={publicTemplate.id} />, {
+			wrapper,
+		});
+
+		expect(
+			await screen.findByRole("heading", { name: publicTemplate.name }),
+		).toBeInTheDocument();
+		expect(await screen.findByText("Claimed")).toBeInTheDocument();
+
+		await userEvent.click(screen.getByRole("button", { name: "Use template" }));
+		const dialog = await screen.findByRole("dialog");
+		await userEvent.click(
+			within(dialog).getByRole("button", { name: "Use template" }),
+		);
+
+		await waitFor(() =>
+			expect(useSpy).toHaveBeenCalledWith(
+				publicTemplate.id,
+				publicTemplate.version.id,
+				{ workspace_id: "ws-1" },
+			),
+		);
+		// Already claimed: must NOT call claimFreeTemplate!
+		expect(claimSpy).not.toHaveBeenCalled();
+	});
+
+	it("triggers Claim FREE before Use for authenticated user who has not claimed yet", async () => {
+		mockUser = { id: "user-new", lastActiveWorkspaceId: "ws-1" };
+		const claimSpy = vi.spyOn(templateApi, "claimFreeTemplate").mockResolvedValue({
+			id: "ent-new",
+			template_id: publicTemplate.id,
+			user_id: "user-new",
+			source: "FREE_CLAIM",
+			created_at: "2026-10-11T00:00:00.000Z",
+		});
+		const useSpy = vi.spyOn(templateApi, "useTemplate").mockResolvedValue({ pageId: "page-2" });
+		vi.spyOn(templateApi, "listMyClaimedTemplates").mockResolvedValue({
+			items: [],
+			nextCursor: null,
+		});
+
+		const { wrapper } = setup();
+		render(<PublicTemplateDetailPage templateId={publicTemplate.id} />, {
+			wrapper,
+		});
+
+		expect(
+			await screen.findByRole("heading", { name: publicTemplate.name }),
+		).toBeInTheDocument();
+		expect(screen.queryByText("Claimed")).not.toBeInTheDocument();
+
+		await userEvent.click(screen.getByRole("button", { name: "Use template" }));
+		const dialog = await screen.findByRole("dialog");
+		await userEvent.click(
+			within(dialog).getByRole("button", { name: "Use template" }),
+		);
+
+		await waitFor(() => {
+			expect(claimSpy).toHaveBeenCalledWith(publicTemplate.id);
+			expect(useSpy).toHaveBeenCalledWith(
+				publicTemplate.id,
+				publicTemplate.version.id,
+				{ workspace_id: "ws-1" },
+			);
+		});
 	});
 });

@@ -11,6 +11,7 @@ export { TemplateVersionList } from "./ui/template-version-list";
 export { TemplateMarketplaceShell } from "./ui/template-marketplace-shell";
 export { TemplateCommentsShell } from "./ui/template-comments-shell";
 export { TemplateAnalyticsShell } from "./ui/template-analytics-shell";
+export { UseTemplateDialog } from "./ui/use-template-dialog";
 export {
 	TemplateBlockRenderer,
 	TemplateDatabasePreview,

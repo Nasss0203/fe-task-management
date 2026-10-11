@@ -2,52 +2,24 @@
 
 import React from "react";
 import { Globe, Lock, Users } from "lucide-react";
-import type { PageTemplate, TemplateStatus, TemplateVisibility } from "@/entities/template";
+import type { PageTemplate, TemplateVersion, TemplateVisibility } from "@/entities/template";
 import { Badge } from "@/shared/ui/badge";
 import { Skeleton } from "@/shared/ui/skeleton";
+import { TemplateVersionStatusBadge } from "../../ui/template-version-status-badge";
 
-interface TemplateDetailHeaderProps {
+export interface TemplateDetailHeaderProps {
 	template: PageTemplate;
+	selectedVersion?: TemplateVersion | null;
 	className?: string;
 }
 
 export function TemplateDetailHeader({
 	template,
+	selectedVersion,
 	className = "",
 }: TemplateDetailHeaderProps) {
-	const renderStatusBadge = (status: TemplateStatus) => {
-		switch (status) {
-			case "DRAFT":
-				return (
-					<Badge
-						variant='outline'
-						className='bg-amber-500/10 text-amber-500 border-amber-500/30 text-[11px] font-medium'
-					>
-						Draft
-					</Badge>
-				);
-			case "PUBLISHED":
-				return (
-					<Badge
-						variant='secondary'
-						className='bg-emerald-500/10 text-emerald-500 border-emerald-500/30 text-[11px] font-medium'
-					>
-						Published
-					</Badge>
-				);
-			case "ARCHIVED":
-				return (
-					<Badge
-						variant='outline'
-						className='bg-muted text-muted-foreground border-border/60 text-[11px] font-medium'
-					>
-						Archived
-					</Badge>
-				);
-			default:
-				return null;
-		}
-	};
+	const version = selectedVersion ?? template.version ?? null;
+	const isArchived = template.status === "ARCHIVED";
 
 	const renderVisibilityBadge = (visibility: TemplateVisibility) => {
 		switch (visibility) {
@@ -93,8 +65,28 @@ export function TemplateDetailHeader({
 					{template.name}
 				</h1>
 				<div className='flex items-center gap-2'>
-					{renderStatusBadge(template.status)}
-					{renderVisibilityBadge(template.visibility)}
+					{isArchived ? (
+						<>
+							<Badge
+								variant='outline'
+								className='bg-muted text-muted-foreground border-border/60 text-[11px] font-medium'
+							>
+								Archived
+							</Badge>
+							{renderVisibilityBadge(template.visibility)}
+						</>
+					) : (
+						<>
+							{renderVisibilityBadge(template.visibility)}
+							{version && (
+								<TemplateVersionStatusBadge
+									status={version.status}
+									versionNumber={version.version_number}
+									className='text-[11px]'
+								/>
+							)}
+						</>
+					)}
 				</div>
 			</div>
 			{template.description && (

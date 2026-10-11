@@ -361,7 +361,10 @@ export function TemplateDetailPage({ templateId }: TemplateDetailPageProps) {
 	return (
 		<div className='mx-auto w-full max-w-[1480px] px-4 md:px-6 xl:px-8 space-y-6'>
 			{/* Page Header (Full Width alignment with Tabs and Content) */}
-			<TemplateDetailHeader template={template} />
+			<TemplateDetailHeader
+				template={template}
+				selectedVersion={activeVersion}
+			/>
 
 			{/* Detail Tabs Structure */}
 			<Tabs
@@ -439,12 +442,18 @@ export function TemplateDetailPage({ templateId }: TemplateDetailPageProps) {
 					/>
 				</TabsContent>
 
-				{/* TAB 3: MARKETPLACE (UI SHELL ONLY - NO API) */}
+				{/* TAB 3: MARKETPLACE */}
 				<TabsContent
 					value='marketplace'
 					className='mt-0 focus-visible:outline-none'
 				>
-					<TemplateMarketplaceShell template={template} />
+					<TemplateMarketplaceShell
+						template={template}
+						versions={versions}
+						selectedVersionId={activeVersion?.id}
+						onSwitchTab={handleTabChange}
+						onOpenEdit={() => setEditOpen(true)}
+					/>
 				</TabsContent>
 
 				{/* TAB 4: COMMENTS (UI SHELL ONLY - NO API) */}

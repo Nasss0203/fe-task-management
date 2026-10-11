@@ -20,7 +20,6 @@ import { toast } from "sonner";
 
 import type {
 	PageTemplate,
-	TemplateStatus,
 	TemplateVersion,
 	TemplateVisibility,
 } from "@/entities/template";
@@ -140,40 +139,6 @@ export function TemplateManagementSidebar({
 		}
 	};
 
-	const renderStatusBadge = (status: TemplateStatus) => {
-		if (status === "DRAFT") {
-			return (
-				<Badge
-					variant='outline'
-					className='bg-amber-500/10 text-amber-500 border-amber-500/30 text-[10px] font-medium'
-				>
-					Draft
-				</Badge>
-			);
-		}
-		if (status === "PUBLISHED") {
-			return (
-				<Badge
-					variant='secondary'
-					className='bg-emerald-500/10 text-emerald-500 border-emerald-500/30 text-[10px] font-medium'
-				>
-					Published
-				</Badge>
-			);
-		}
-		if (status === "ARCHIVED") {
-			return (
-				<Badge
-					variant='outline'
-					className='bg-muted text-muted-foreground border-border/60 text-[10px] font-medium'
-				>
-					Archived
-				</Badge>
-			);
-		}
-		return null;
-	};
-
 	const handleRestore = async () => {
 		try {
 			await restoreMutation.mutateAsync({ templateId: template.id });
@@ -202,10 +167,19 @@ export function TemplateManagementSidebar({
 
 				{/* Two-Column Definition Layout */}
 				<dl className='space-y-2.5 text-xs'>
-					<div className='flex items-center justify-between'>
-						<dt className='text-muted-foreground font-normal'>Status</dt>
-						<dd>{renderStatusBadge(template.status)}</dd>
-					</div>
+					{isArchived && (
+						<div className='flex items-center justify-between'>
+							<dt className='text-muted-foreground font-normal'>Lifecycle</dt>
+							<dd>
+								<Badge
+									variant='outline'
+									className='bg-muted text-muted-foreground border-border/60 text-[10px] font-medium'
+								>
+									Archived
+								</Badge>
+							</dd>
+						</div>
+					)}
 
 					<div className='flex items-center justify-between'>
 						<dt className='text-muted-foreground font-normal'>Visibility</dt>
@@ -213,16 +187,22 @@ export function TemplateManagementSidebar({
 					</div>
 
 					<div className='flex items-center justify-between'>
-						<dt className='text-muted-foreground font-normal'>Current version</dt>
+						<dt className='text-muted-foreground font-normal'>Selected version</dt>
 						<dd className='flex items-center gap-1.5'>
-							<span className='font-mono font-medium text-foreground'>
-								v{activeVersion?.version_number ?? 1}
-							</span>
-							<span className='text-muted-foreground'>·</span>
-							{activeVersion?.status === "PUBLISHED" ? (
-								<span className='text-emerald-500 font-medium'>Published</span>
+							{activeVersion ? (
+								<>
+									<span className='font-mono font-medium text-foreground'>
+										v{activeVersion.version_number}
+									</span>
+									<span className='text-muted-foreground'>·</span>
+									{activeVersion.status === "PUBLISHED" ? (
+										<span className='text-emerald-500 font-medium'>Published</span>
+									) : (
+										<span className='text-amber-500 font-medium'>Draft</span>
+									)}
+								</>
 							) : (
-								<span className='text-amber-500 font-medium'>Draft</span>
+								<span className='text-muted-foreground italic'>None</span>
 							)}
 						</dd>
 					</div>

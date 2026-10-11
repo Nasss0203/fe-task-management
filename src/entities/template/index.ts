@@ -1,10 +1,13 @@
 export { templateApi } from "./api/template.api";
 export {
 	templateKeys,
+	useMyClaimedTemplates,
+	type UseMyClaimedTemplatesOptions,
 	useInfiniteTemplates,
 	useTemplateDetail,
 	useTemplateVersions,
 	useTemplatePreview,
+	useTemplateListing,
 	type UseInfiniteTemplatesOptions,
 } from "./model/template.queries";
 export {
@@ -14,12 +17,24 @@ export {
 	useUpdateTemplate,
 	useArchiveTemplate,
 	useRestoreTemplate,
+	useClaimFreeTemplate,
+	useCreateTemplateListing,
+	usePublishTemplateListing,
+	useUnpublishTemplateListing,
+	usePublishTemplateToMarketplace,
 	type CreateTemplateFromPageInput,
 	type PublishTemplateVersionInput,
 	type UseTemplateInput,
 	type UpdateTemplateInput,
+	type ClaimFreeTemplateInput,
+	type CreateTemplateListingInput,
+	type PublishTemplateListingInput,
+	type UnpublishTemplateListingInput,
 } from "./model/template.mutations";
 export type {
+	ClaimedTemplateDto,
+	MyClaimedTemplatesResponse,
+	ListMyClaimedTemplatesParams,
 	PageTemplate,
 	TemplateStatus,
 	TemplateVisibility,
@@ -40,4 +55,11 @@ export type {
 	UseTemplatePayload,
 	UseTemplateResponse,
 	UpdateTemplatePayload,
+	TemplateEntitlementDto,
+	PublicTemplateListItem,
+	TemplateOfferType,
+	TemplateListingStatus,
+	TemplateListingDto,
+	PublishTemplateToMarketplacePayload,
+	PublishTemplateToMarketplaceResponse,
 } from "./model/template.types";

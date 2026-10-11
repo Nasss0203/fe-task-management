@@ -1,6 +1,9 @@
 import type { ApiResponse } from "@/shared/api";
 import instance from "@/shared/api/api-client";
+import publicApiClient from "@/shared/api/public-api-client";
 import type {
+	ListMyClaimedTemplatesParams,
+	MyClaimedTemplatesResponse,
 	CreateTemplateFromPagePayload,
 	ListPublicTemplatesParams,
 	ListTemplatesParams,
@@ -14,6 +17,10 @@ import type {
 	UpdateTemplatePayload,
 	UseTemplatePayload,
 	UseTemplateResponse,
+	TemplateEntitlementDto,
+	TemplateListingDto,
+	PublishTemplateToMarketplacePayload,
+	PublishTemplateToMarketplaceResponse,
 } from "../model/template.types";
 
 const TEMPLATE_API = "/templates";
@@ -32,6 +39,19 @@ function unwrapResponse<T>(responseData: unknown): T {
 }
 
 export const templateApi = {
+	listMyClaimedTemplates: async (
+		params: ListMyClaimedTemplatesParams = {},
+		signal?: AbortSignal,
+	): Promise<MyClaimedTemplatesResponse> => {
+		const response = await instance.get<
+			ApiResponse<MyClaimedTemplatesResponse> | MyClaimedTemplatesResponse
+		>(`${TEMPLATE_API}/me/claimed`, {
+			params: { limit: params.limit ?? 20, cursor: params.cursor || undefined },
+			signal,
+		});
+		return unwrapResponse<MyClaimedTemplatesResponse>(response.data);
+	},
+
 	list: async (
 		params: ListTemplatesParams,
 		signal?: AbortSignal,
@@ -128,6 +148,16 @@ export const templateApi = {
 		return unwrapResponse<UseTemplateResponse>(response.data);
 	},
 
+	claimFreeTemplate: async (
+		templateId: string,
+	): Promise<TemplateEntitlementDto> => {
+		const response = await instance.post<
+			ApiResponse<TemplateEntitlementDto> | TemplateEntitlementDto
+		>(`${TEMPLATE_API}/${templateId}/claim`);
+
+		return unwrapResponse<TemplateEntitlementDto>(response.data);
+	},
+
 	update: async (
 		templateId: string,
 		payload: UpdateTemplatePayload,
@@ -188,11 +218,57 @@ export const templateApi = {
 		return unwrapResponse<TemplateVersionThumbnail>(response.data);
 	},
 
+	getListing: async (
+		templateId: string,
+		signal?: AbortSignal,
+	): Promise<TemplateListingDto> => {
+		const response = await instance.get<
+			ApiResponse<TemplateListingDto> | TemplateListingDto
+		>(`${TEMPLATE_API}/${templateId}/listing`, { signal });
+
+		return unwrapResponse<TemplateListingDto>(response.data);
+	},
+
+	createListing: async (templateId: string): Promise<TemplateListingDto> => {
+		const response = await instance.post<
+			ApiResponse<TemplateListingDto> | TemplateListingDto
+		>(`${TEMPLATE_API}/${templateId}/listing`);
+
+		return unwrapResponse<TemplateListingDto>(response.data);
+	},
+
+	publishListing: async (templateId: string): Promise<TemplateListingDto> => {
+		const response = await instance.post<
+			ApiResponse<TemplateListingDto> | TemplateListingDto
+		>(`${TEMPLATE_API}/${templateId}/listing/publish`);
+
+		return unwrapResponse<TemplateListingDto>(response.data);
+	},
+
+	publishToMarketplace: async (
+		templateId: string,
+		payload: PublishTemplateToMarketplacePayload,
+	): Promise<PublishTemplateToMarketplaceResponse> => {
+		const response = await instance.post(
+			`${TEMPLATE_API}/${templateId}/marketplace/publish`,
+			payload,
+		);
+		return unwrapResponse<PublishTemplateToMarketplaceResponse>(response.data);
+	},
+
+	unpublishListing: async (templateId: string): Promise<TemplateListingDto> => {
+		const response = await instance.post<
+			ApiResponse<TemplateListingDto> | TemplateListingDto
+		>(`${TEMPLATE_API}/${templateId}/listing/unPublish`);
+
+		return unwrapResponse<TemplateListingDto>(response.data);
+	},
+
 	listPublic: async (
 		params: ListPublicTemplatesParams,
 		signal?: AbortSignal,
 	): Promise<PublicTemplateListResponse> => {
-		const response = await instance.get<
+		const response = await publicApiClient.get<
 			ApiResponse<PublicTemplateListResponse> | PublicTemplateListResponse
 		>(PUBLIC_TEMPLATE_API, {
 			params: {
@@ -210,7 +286,7 @@ export const templateApi = {
 		templateId: string,
 		signal?: AbortSignal,
 	): Promise<PublicTemplateListItem> => {
-		const response = await instance.get<
+		const response = await publicApiClient.get<
 			ApiResponse<PublicTemplateListItem> | PublicTemplateListItem
 		>(`${PUBLIC_TEMPLATE_API}/${templateId}`, { signal });
 
@@ -222,9 +298,9 @@ export const templateApi = {
 		versionId: string,
 		signal?: AbortSignal,
 	): Promise<TemplatePreview> => {
-		const response = await instance.get<
+		const response = await publicApiClient.get<
 			ApiResponse<TemplatePreview> | TemplatePreview
-		>(`/public/templates/${templateId}/versions/${versionId}/preview`, {
+		>(`${PUBLIC_TEMPLATE_API}/${templateId}/versions/${versionId}/preview`, {
 			signal,
 		});
 

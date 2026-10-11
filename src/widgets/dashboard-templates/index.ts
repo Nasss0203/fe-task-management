@@ -14,4 +14,5 @@ export {
 	TemplateManagementSidebar,
 	TemplateDatabasePreview,
 	TemplateBlockRenderer,
+	UseTemplateDialog,
 } from "./detail";

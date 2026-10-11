@@ -4,6 +4,8 @@ import { templateApi } from "../api/template.api";
 
 export const templateKeys = {
 	all: ["templates"] as const,
+	claimed: (userId: string | undefined, limit = 20) =>
+		[...templateKeys.all, "claimed", userId, { limit }] as const,
 
 	lists: () => [...templateKeys.all, "list"] as const,
 
@@ -48,6 +50,9 @@ export const templateKeys = {
 
 	thumbnail: (templateId: string, versionId: string) =>
 		[...templateKeys.detail(templateId), "thumbnail", versionId] as const,
+
+	listing: (templateId: string) =>
+		[...templateKeys.detail(templateId), "listing"] as const,
 };
 
 export interface UseInfiniteTemplatesOptions {
@@ -56,6 +61,29 @@ export interface UseInfiniteTemplatesOptions {
 	search?: string;
 	limit?: number;
 	enabled?: boolean;
+}
+
+export interface UseMyClaimedTemplatesOptions {
+	/** Cache isolation only; identity is never sent in the request. */
+	userId?: string;
+	limit?: number;
+	enabled?: boolean;
+}
+
+export function useMyClaimedTemplates({
+	userId,
+	limit = 20,
+	enabled = true,
+}: UseMyClaimedTemplatesOptions) {
+	return useInfiniteQuery({
+		queryKey: templateKeys.claimed(userId, limit),
+		queryFn: ({ pageParam, signal }) =>
+			templateApi.listMyClaimedTemplates({ limit, cursor: pageParam }, signal),
+		initialPageParam: undefined as string | undefined,
+		getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+		enabled: Boolean(userId) && enabled,
+		staleTime: 0,
+	});
 }
 
 export function useInfiniteTemplates({
@@ -77,8 +105,7 @@ export function useInfiniteTemplates({
 			templateApi.list(
 				{
 					scope,
-					workspaceId:
-						scope === "workspace" ? workspaceId : undefined,
+					workspaceId: scope === "workspace" ? workspaceId : undefined,
 					search: trimmedSearch,
 					cursor: pageParam,
 					limit,
@@ -214,5 +241,27 @@ export function usePublicTemplate(
 		queryKey: templateKeys.publicDetail(templateId),
 		queryFn: ({ signal }) => templateApi.getPublicById(templateId, signal),
 		enabled: Boolean(templateId) && (options?.enabled ?? true),
+	});
+}
+
+export function useTemplateListing(
+	templateId: string,
+	options?: { enabled?: boolean },
+) {
+	return useQuery({
+		queryKey: templateKeys.listing(templateId),
+		queryFn: ({ signal }) => templateApi.getListing(templateId, signal),
+		enabled: Boolean(templateId) && (options?.enabled ?? true),
+		retry: (failureCount, error) => {
+			if (
+				axios.isAxiosError(error) &&
+				(error.response?.status === 404 ||
+					error.response?.status === 403 ||
+					error.response?.status === 401)
+			) {
+				return false;
+			}
+			return failureCount < 2;
+		},
 	});
 }

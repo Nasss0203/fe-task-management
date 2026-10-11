@@ -1,10 +1,19 @@
 "use client";
 
 import axios from "axios";
-import { ArrowLeft, ArrowRight, Eye, LayoutTemplate } from "lucide-react";
+import {
+	ArrowLeft,
+	ArrowRight,
+	Calendar,
+	CheckCircle2,
+	Eye,
+	LayoutTemplate,
+} from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 import {
+	useMyClaimedTemplates,
 	usePublicTemplate,
 	useTemplateVersionThumbnail,
 } from "@/entities/template/model/template.queries";
@@ -13,6 +22,7 @@ import { useUser } from "@/features/auth";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Skeleton } from "@/shared/ui/skeleton";
+import { UseTemplateDialog } from "@/widgets/dashboard-templates";
 
 interface PublicTemplateDetailPageProps {
 	templateId: string;
@@ -31,14 +41,25 @@ export function PublicTemplateDetailPage({
 	const isNotFound = axios.isAxiosError(error) && error.response?.status === 404;
 	if (isError && !isNotFound) {
 		return (
-			<div className='mx-auto max-w-4xl px-4 py-20 sm:px-6 lg:px-8 text-center'>
-				<div role='alert' className='space-y-4'>
+			<div className='mx-auto max-w-xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 text-center'>
+				<div
+					role='alert'
+					className='rounded-2xl border border-destructive/20 bg-destructive/5 p-8 sm:p-10 text-center shadow-xs space-y-4'
+				>
+					<div className='mx-auto flex size-12 items-center justify-center rounded-full bg-destructive/10 text-destructive'>
+						<LayoutTemplate className='size-6' />
+					</div>
+					<h1 className='text-xl font-bold tracking-tight text-foreground'>
+						Unable to load template
+					</h1>
 					<p className='text-sm text-destructive'>
 						Unable to load template details.
 					</p>
-					<Button variant='outline' onClick={() => refetch()}>
-						Try again
-					</Button>
+					<div className='pt-2'>
+						<Button variant='outline' onClick={() => refetch()} className='rounded-xl'>
+							Try again
+						</Button>
+					</div>
 				</div>
 			</div>
 		);
@@ -46,23 +67,25 @@ export function PublicTemplateDetailPage({
 
 	if (!template || isNotFound) {
 		return (
-			<div className='mx-auto max-w-4xl px-4 py-20 sm:px-6 lg:px-8 text-center'>
-				<div className='mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground'>
-					<LayoutTemplate className='size-6' />
-				</div>
-				<h1 className='text-2xl font-bold tracking-tight text-foreground'>
-					Template not found
-				</h1>
-				<p className='mt-2 text-sm text-muted-foreground'>
-					The template you are looking for does not exist or has been removed.
-				</p>
-				<div className='mt-6'>
-					<Link href='/templates'>
-						<Button variant='outline'>
-							<ArrowLeft className='mr-2 size-4' />
-							Back to templates
-						</Button>
-					</Link>
+			<div className='mx-auto max-w-xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 text-center'>
+				<div className='rounded-2xl border border-border/80 bg-card/60 p-8 sm:p-10 text-center shadow-xs space-y-4'>
+					<div className='mx-auto flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground'>
+						<LayoutTemplate className='size-6' />
+					</div>
+					<h1 className='text-2xl font-bold tracking-tight text-foreground'>
+						Template not found
+					</h1>
+					<p className='text-sm text-muted-foreground max-w-sm mx-auto'>
+						The template you are looking for does not exist or has been removed.
+					</p>
+					<div className='mt-6'>
+						<Link href='/templates'>
+							<Button variant='outline' className='rounded-xl'>
+								<ArrowLeft className='mr-2 size-4' />
+								Back to templates
+							</Button>
+						</Link>
+					</div>
 				</div>
 			</div>
 		);
@@ -77,7 +100,19 @@ function TemplateDetailContent({
 	template: PublicTemplateListItem;
 }) {
 	const { user } = useUser();
-	const ctaHref = user ? "/dashboard" : "/sign-up";
+	const [useDialogOpen, setUseDialogOpen] = useState(false);
+
+	const { data: claimedData } = useMyClaimedTemplates({
+		userId: user?.id,
+		enabled: Boolean(user?.id),
+	});
+
+	const isClaimed = Boolean(
+		user?.id &&
+		claimedData?.pages?.some((page) =>
+			page.items?.some((item) => item.template_id === template.id),
+		),
+	);
 
 	const { data: thumbnail } = useTemplateVersionThumbnail(
 		template.id,
@@ -105,167 +140,260 @@ function TemplateDetailContent({
 			: null;
 
 	return (
-		<div className='mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8'>
+		<div className='mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8'>
 			{/* Back navigation */}
 			<div className='mb-6 sm:mb-8'>
 				<Link
 					href='/templates'
-					className='inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground'
+					className='group inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg px-2 py-1 -ml-2'
 				>
-					<ArrowLeft className='size-4' />
-					Back to templates
+					<ArrowLeft className='size-4 transition-transform group-hover:-translate-x-0.5' />
+					<span>Back to templates</span>
 				</Link>
 			</div>
 
-			{/* Responsive 2-column layout */}
-			<div className='grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-12'>
-				{/* Left Column on Desktop (Order 2 on Mobile): Media & About */}
-				<div className='order-2 space-y-8 lg:order-1 lg:col-span-7'>
-					{/* Large Thumbnail */}
+			{/* Responsive 2-column layout via CSS Grid */}
+			<div className='grid grid-cols-1 items-start gap-8 md:grid-cols-12 md:gap-8 lg:gap-10'>
+				{/* Block 1: Preview Area (Left Column on Desktop, First on Mobile) */}
+				<div className='md:col-span-7 md:col-start-1 md:row-start-1 space-y-6'>
 					<div className='relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-border/80 bg-muted/20 shadow-xs'>
-						{visualUrl ? (
-							<div
-								className='h-full w-full bg-cover bg-center bg-no-repeat'
-								style={{
-									backgroundImage: `url("${visualUrl}")`,
-								}}
+						{previewHref ? (
+							<Link
+								href={previewHref}
+								aria-label={`Interactive preview of ${template.name}`}
+								className='group relative block h-full w-full overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+							>
+								{visualUrl ? (
+									/* eslint-disable-next-line @next/next/no-img-element */
+									<img
+										src={visualUrl}
+										alt={template.name}
+										className='h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-[1.01]'
+									/>
+								) : (
+									<div className='flex h-full w-full items-center justify-center bg-gradient-to-br from-muted/30 via-muted/10 to-background text-muted-foreground/40 transition-colors group-hover:text-muted-foreground/60'>
+										{template.icon ? (
+											<span className='text-6xl select-none transition-transform duration-200 group-hover:scale-105'>
+												{template.icon}
+											</span>
+										) : (
+											<LayoutTemplate className='size-14 transition-transform duration-200 group-hover:scale-105' />
+										)}
+									</div>
+								)}
+
+								{/* Interactive preview hover indicator */}
+								<div className='absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full border border-border/60 bg-background/90 px-3 py-1 text-xs font-medium text-foreground backdrop-blur-md shadow-xs transition-transform duration-200 group-hover:scale-105'>
+									<Eye className='size-3.5 text-primary' />
+									<span>Interactive preview</span>
+								</div>
+							</Link>
+						) : visualUrl ? (
+							/* eslint-disable-next-line @next/next/no-img-element */
+							<img
+								src={visualUrl}
+								alt={template.name}
+								className='h-full w-full object-cover object-top'
 							/>
 						) : (
-							<div className='flex h-full w-full items-center justify-center bg-muted/20 text-muted-foreground/40'>
+							<div className='flex h-full w-full items-center justify-center bg-gradient-to-br from-muted/30 via-muted/10 to-background text-muted-foreground/40'>
 								{template.icon ? (
-									<span className='text-6xl select-none'>
-										{template.icon}
-									</span>
+									<span className='text-6xl select-none'>{template.icon}</span>
 								) : (
 									<LayoutTemplate className='size-14' />
 								)}
 							</div>
 						)}
 					</div>
+				</div>
 
-					{/* About this template section */}
-					{template.description && (
-						<div className='border-t border-border/60 pt-8 space-y-3'>
+				{/* Block 2: Info Panel & CTAs (Sticky Right Column on Desktop, Second on Mobile) */}
+				<div className='md:col-span-5 md:col-start-8 md:row-start-1 md:row-span-2 md:sticky md:top-24 space-y-6'>
+					<div className='rounded-2xl border border-border/80 bg-card/70 p-5 sm:p-6 lg:p-7 backdrop-blur-xs shadow-xs dark:bg-card/40 dark:border-border/60 space-y-6'>
+						{/* Header Info */}
+						<div className='space-y-3.5'>
+							<div className='flex items-start gap-3.5'>
+								{template.icon && (
+									<div
+										className='flex size-11 sm:size-12 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-muted/40 text-2xl select-none shadow-2xs'
+										aria-hidden='true'
+									>
+										{template.icon}
+									</div>
+								)}
+								<h1 className='text-2xl sm:text-3xl font-bold tracking-tight text-foreground leading-tight break-words'>
+									{template.name}
+								</h1>
+							</div>
+
+							{/* Metadata Badges */}
+							<div className='flex flex-wrap items-center gap-2 pt-1'>
+								<Badge
+									variant='secondary'
+									className='bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 text-xs font-semibold px-2.5 py-0.5 rounded-full'
+								>
+									Free
+								</Badge>
+
+								{isClaimed && (
+									<Badge
+										variant='secondary'
+										className='bg-primary/10 text-primary border border-primary/20 text-xs font-semibold px-2.5 py-0.5 rounded-full'
+									>
+										Claimed
+									</Badge>
+								)}
+
+								<Badge
+									variant='secondary'
+									className='text-xs font-medium text-foreground bg-secondary border border-border/60 px-2.5 py-0.5 rounded-full'
+								>
+									Version v{versionNumber}
+								</Badge>
+
+								{formattedDate && (
+									<span className='text-xs text-muted-foreground flex items-center gap-1.5 ml-1'>
+										<Calendar className='size-3 text-muted-foreground/70' />
+										Updated {formattedDate}
+									</span>
+								)}
+							</div>
+						</div>
+
+						{/* CTAs */}
+						<div className='flex flex-col gap-3 pt-2 border-t border-border/60'>
+							{user ? (
+								<Button
+									size='lg'
+									onClick={() => setUseDialogOpen(true)}
+									className='h-11 sm:h-12 w-full rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 shadow-sm transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+								>
+									Use template
+									<ArrowRight className='ml-2 size-4.5' />
+								</Button>
+							) : (
+								<Link href='/sign-up' className='block w-full'>
+									<Button
+										size='lg'
+										className='h-11 sm:h-12 w-full rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 shadow-sm transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+									>
+										Use template
+										<ArrowRight className='ml-2 size-4.5' />
+									</Button>
+								</Link>
+							)}
+
+							{previewHref && (
+								<Link href={previewHref} className='block w-full'>
+									<Button
+										variant='outline'
+										size='lg'
+										className='h-11 sm:h-12 w-full rounded-xl font-medium border-border/80 hover:bg-muted/60 transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+									>
+										<Eye className='mr-2 size-4.5 text-muted-foreground' />
+										Preview
+									</Button>
+								</Link>
+							)}
+						</div>
+
+						{/* Value highlights */}
+						<div className='space-y-2.5 pt-4 border-t border-border/40 text-xs text-muted-foreground'>
+							<div className='flex items-center gap-2'>
+								<CheckCircle2 className='size-3.5 text-emerald-500 shrink-0' />
+								<span>Claim once, use across workspaces</span>
+							</div>
+							<div className='flex items-center gap-2'>
+								<CheckCircle2 className='size-3.5 text-emerald-500 shrink-0' />
+								<span>Full layout & database views cloning</span>
+							</div>
+							<div className='flex items-center gap-2'>
+								<CheckCircle2 className='size-3.5 text-emerald-500 shrink-0' />
+								<span>Non-destructive workspace import</span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{/* Block 3: About Section (Left Column on Desktop, Third on Mobile) */}
+				{template.description && (
+					<div className='md:col-span-7 md:col-start-1 md:row-start-2'>
+						<div className='rounded-2xl border border-border/60 bg-card/30 p-6 sm:p-7 backdrop-blur-xs dark:bg-card/20 space-y-3.5'>
 							<h2 className='text-lg font-semibold tracking-tight text-foreground'>
 								About this template
 							</h2>
-							<p className='whitespace-pre-line text-sm leading-relaxed text-muted-foreground'>
+							<p className='whitespace-pre-line text-sm sm:text-base leading-relaxed text-muted-foreground'>
 								{template.description}
 							</p>
 						</div>
-					)}
-				</div>
-
-				{/* Right Column on Desktop (Order 1 on Mobile): Title, Meta & CTAs */}
-				<div className='order-1 space-y-6 lg:order-2 lg:col-span-5'>
-					{/* Header Info */}
-					<div className='space-y-3'>
-						<div className='flex items-center gap-3'>
-							{template.icon && (
-								<span
-									className='text-3xl select-none'
-									aria-hidden='true'
-								>
-									{template.icon}
-								</span>
-							)}
-							<h1 className='text-2xl font-bold tracking-tight text-foreground sm:text-3xl'>
-								{template.name}
-							</h1>
-						</div>
-
-						{template.description && (
-							<p className='text-base leading-relaxed text-muted-foreground'>
-								{template.description}
-							</p>
-						)}
 					</div>
-
-					{/* Metadata Pills */}
-					<div className='flex flex-wrap items-center gap-2'>
-						<Badge
-							variant='secondary'
-							className='text-xs font-medium text-foreground bg-secondary'
-						>
-							Version v{versionNumber}
-						</Badge>
-
-						{formattedDate && (
-							<span className='text-xs text-muted-foreground'>
-								Updated {formattedDate}
-							</span>
-						)}
-					</div>
-
-					{/* CTAs */}
-					<div className='flex flex-col gap-3 pt-2 sm:flex-row lg:flex-col'>
-						{previewHref && (
-							<Link href={previewHref} className='w-full'>
-								<Button
-									variant='outline'
-									size='lg'
-									className='h-11 w-full rounded-xl font-medium'
-								>
-									<Eye className='mr-2 size-4' />
-									Preview
-								</Button>
-							</Link>
-						)}
-
-						<Link href={ctaHref} className='w-full'>
-							<Button
-								size='lg'
-								className='h-11 w-full rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90'
-							>
-								Use template
-								<ArrowRight className='ml-2 size-4' />
-							</Button>
-						</Link>
-					</div>
-				</div>
+				)}
 			</div>
+
+			{user && template.version && (
+				<UseTemplateDialog
+					template={template}
+					version={template.version}
+					open={useDialogOpen}
+					onOpenChange={setUseDialogOpen}
+					requireClaim={!isClaimed}
+				/>
+			)}
 		</div>
 	);
 }
 
 function TemplateDetailSkeleton() {
 	return (
-		<div className='mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8'>
+		<div className='mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8'>
 			{/* Back navigation skeleton */}
 			<div className='mb-6 sm:mb-8'>
-				<Skeleton className='h-5 w-32 rounded' />
+				<Skeleton className='h-5 w-36 rounded-md' />
 			</div>
 
-			<div className='grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-12'>
+			<div className='grid grid-cols-1 items-start gap-8 md:grid-cols-12 md:gap-8 lg:gap-10'>
 				{/* Media skeleton */}
-				<div className='order-2 space-y-8 lg:order-1 lg:col-span-7'>
+				<div className='md:col-span-7 md:col-start-1 md:row-start-1 space-y-6'>
 					<Skeleton className='aspect-[16/10] w-full rounded-2xl' />
-					<div className='space-y-3 pt-6 border-t border-border/60'>
-						<Skeleton className='h-6 w-44 rounded' />
-						<Skeleton className='h-4 w-full rounded' />
-						<Skeleton className='h-4 w-5/6 rounded' />
-					</div>
 				</div>
 
 				{/* Info skeleton */}
-				<div className='order-1 space-y-6 lg:order-2 lg:col-span-5'>
-					<div className='space-y-3'>
-						<Skeleton className='h-9 w-3/4 rounded-lg' />
-						<Skeleton className='h-5 w-full rounded' />
-						<Skeleton className='h-5 w-4/5 rounded' />
-					</div>
+				<div className='md:col-span-5 md:col-start-8 md:row-start-1 md:row-span-2'>
+					<div className='rounded-2xl border border-border/80 bg-card/60 p-5 sm:p-6 lg:p-7 space-y-6'>
+						<div className='space-y-3.5'>
+							<div className='flex items-center gap-3'>
+								<Skeleton className='size-11 rounded-xl shrink-0' />
+								<Skeleton className='h-8 w-3/4 rounded-lg' />
+							</div>
+							<div className='flex gap-2 pt-1'>
+								<Skeleton className='h-5 w-16 rounded-full' />
+								<Skeleton className='h-5 w-24 rounded-full' />
+								<Skeleton className='h-5 w-28 rounded-md' />
+							</div>
+						</div>
 
-					<div className='flex gap-2'>
-						<Skeleton className='h-6 w-24 rounded-full' />
-						<Skeleton className='h-6 w-32 rounded-full' />
-					</div>
+						<div className='space-y-3 pt-2 border-t border-border/60'>
+							<Skeleton className='h-11 sm:h-12 w-full rounded-xl' />
+							<Skeleton className='h-11 sm:h-12 w-full rounded-xl' />
+						</div>
 
-					<div className='space-y-3 pt-2'>
-						<Skeleton className='h-11 w-full rounded-xl' />
-						<Skeleton className='h-11 w-full rounded-xl' />
+						<div className='space-y-2 pt-4 border-t border-border/40'>
+							<Skeleton className='h-4 w-5/6 rounded' />
+							<Skeleton className='h-4 w-4/6 rounded' />
+						</div>
+					</div>
+				</div>
+
+				{/* About skeleton */}
+				<div className='md:col-span-7 md:col-start-1 md:row-start-2'>
+					<div className='rounded-2xl border border-border/60 bg-card/30 p-6 sm:p-7 space-y-3.5'>
+						<Skeleton className='h-6 w-44 rounded-md' />
+						<Skeleton className='h-4 w-full rounded' />
+						<Skeleton className='h-4 w-5/6 rounded' />
 					</div>
 				</div>
 			</div>
 		</div>
 	);
 }
+

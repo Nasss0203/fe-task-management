@@ -4,7 +4,7 @@ import { FileText, Layers, Search, Sparkles } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 
 interface TemplateEmptyStateProps {
-	variant: "explore" | "mine" | "workspace" | "no-workspace";
+	variant: "explore" | "mine" | "claimed" | "workspace" | "no-workspace";
 	onResetSearch?: () => void;
 	hasSearch?: boolean;
 }
@@ -39,6 +39,25 @@ export function TemplateEmptyState({
 						Clear search
 					</Button>
 				)}
+			</div>
+		);
+	}
+
+	if (variant === "claimed") {
+		return (
+			<div className='col-span-full flex flex-col items-center justify-center py-16 px-4 text-center rounded-2xl border border-dashed border-border/80 bg-card/40'>
+				<FileText className='size-6 text-primary mb-4' />
+				<h3 className='text-base font-semibold text-foreground'>
+					No claimed templates yet.
+				</h3>
+				<p className='text-xs text-muted-foreground mt-1.5 max-w-sm'>
+					Claim a free template from the marketplace to add it to your library.
+				</p>
+				<Link href='/templates' className='mt-5'>
+					<Button size='sm' className='rounded-lg text-xs'>
+						Browse marketplace
+					</Button>
+				</Link>
 			</div>
 		);
 	}
@@ -102,7 +121,8 @@ export function TemplateEmptyState({
 					No workspace selected
 				</h3>
 				<p className='text-xs text-muted-foreground mt-1.5 max-w-sm leading-relaxed'>
-					Please select an active workspace from the sidebar to view workspace templates.
+					Please select an active workspace from the sidebar to view workspace
+					templates.
 				</p>
 			</div>
 		);

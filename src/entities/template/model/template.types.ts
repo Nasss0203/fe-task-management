@@ -145,6 +145,43 @@ export interface UseTemplateResponse {
 	pageId: string;
 }
 
+export interface TemplateEntitlementDto {
+	id: string;
+	template_id: string;
+	user_id: string;
+	source: "FREE_CLAIM";
+	created_at: string;
+}
+
+/** Step 5A library projection; intentionally excludes workspace/source content. */
+export interface ClaimedTemplateDto {
+	entitlement_id: string;
+	template_id: string;
+	source: TemplateEntitlementDto["source"];
+	claimed_at: string;
+	name: string | null;
+	description: string | null;
+	icon: string | null;
+	cover_url: string | null;
+	visibility: TemplateVisibility;
+	status: TemplateStatus;
+	listing_status: TemplateListingStatus | null;
+	published_version: Pick<
+		TemplateVersion,
+		"id" | "template_id" | "version_number" | "status" | "published_at"
+	> | null;
+}
+
+export interface MyClaimedTemplatesResponse {
+	items: ClaimedTemplateDto[];
+	nextCursor: string | null;
+}
+
+export interface ListMyClaimedTemplatesParams {
+	limit?: number;
+	cursor?: string | null;
+}
+
 export interface UpdateTemplatePayload {
 	name?: string;
 	description?: string | null;
@@ -189,4 +226,31 @@ export function getPublicTemplateAccess(): TemplateAccess {
 		canPurchase: false,
 		isOwned: false,
 	};
+}
+
+export type TemplateOfferType = "FREE";
+
+export type TemplateListingStatus = "DRAFT" | "PUBLISHED";
+
+export interface TemplateListingDto {
+	published_version_id?: string | null;
+	id: string;
+	template_id: string;
+	offer_type: TemplateOfferType;
+	status: TemplateListingStatus;
+	created_by: string;
+	published_at: string | null;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface PublishTemplateToMarketplacePayload {
+	version_id: string;
+	offer_type: "FREE";
+}
+
+export interface PublishTemplateToMarketplaceResponse {
+	template: PageTemplate;
+	version: TemplateVersion;
+	listing: TemplateListingDto;
 }
