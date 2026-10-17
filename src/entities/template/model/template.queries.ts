@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { templateApi } from "../api/template.api";
+import type { PreviewTemplateDemoPayload } from "./template.types";
 
 export const templateKeys = {
 	all: ["templates"] as const,
@@ -25,14 +26,18 @@ export const templateKeys = {
 
 	publicLists: () => [...templateKeys.all, "public-list"] as const,
 
-	publicList: (filters: { search?: string; limit?: number }) =>
+	publicList: (filters: { search?: string; category?: string; limit?: number }) =>
 		[
 			...templateKeys.publicLists(),
 			{
 				search: filters.search,
+				category: filters.category,
 				limit: filters.limit,
 			},
 		] as const,
+
+	usableVersions: (templateId: string, userId?: string) =>
+		[...templateKeys.all, "usable-versions", templateId, userId] as const,
 
 	publicDetail: (templateId: string) =>
 		[...templateKeys.all, "public-detail", templateId] as const,
@@ -53,6 +58,11 @@ export const templateKeys = {
 
 	listing: (templateId: string) =>
 		[...templateKeys.detail(templateId), "listing"] as const,
+
+	categories: () => [...templateKeys.all, "categories"] as const,
+
+	demoPreview: (templateId: string, payload: unknown) =>
+		[...templateKeys.detail(templateId), "demo-preview", payload] as const,
 };
 
 export interface UseInfiniteTemplatesOptions {
@@ -157,8 +167,17 @@ export function useTemplatePreview(
 export function useTemplateVersionThumbnail(
 	templateId: string,
 	versionId?: string,
-	options?: { enabled?: boolean },
+	options?: {
+		enabled?: boolean;
+		/**
+		 * Retry 404s while a new thumbnail is generated. Turn off for paid
+		 * listings, where 404 is the backend hiding the paid screenshot.
+		 */
+		retryMissing?: boolean;
+	},
 ) {
+	const retryMissing = options?.retryMissing ?? true;
+
 	return useQuery({
 		queryKey: templateKeys.thumbnail(templateId, versionId ?? ""),
 
@@ -169,7 +188,7 @@ export function useTemplateVersionThumbnail(
 
 		retry: (failureCount, error) => {
 			if (axios.isAxiosError(error) && error.response?.status === 404) {
-				return failureCount < 5;
+				return retryMissing && failureCount < 5;
 			}
 
 			return false;
@@ -183,12 +202,14 @@ export function useTemplateVersionThumbnail(
 
 export interface UseInfinitePublicTemplatesOptions {
 	search?: string;
+	category?: string;
 	limit?: number;
 	enabled?: boolean;
 }
 
 export function useInfinitePublicTemplates({
 	search,
+	category,
 	limit = 20,
 	enabled = true,
 }: UseInfinitePublicTemplatesOptions = {}) {
@@ -197,6 +218,7 @@ export function useInfinitePublicTemplates({
 	return useInfiniteQuery({
 		queryKey: templateKeys.publicList({
 			search: trimmedSearch,
+			category,
 			limit,
 		}),
 
@@ -204,6 +226,7 @@ export function useInfinitePublicTemplates({
 			templateApi.listPublic(
 				{
 					search: trimmedSearch,
+					...(category ? { category } : {}),
 					cursor: pageParam,
 					limit,
 				},
@@ -263,5 +286,44 @@ export function useTemplateListing(
 			}
 			return failureCount < 2;
 		},
+	});
+}
+
+export function useTemplateCategories() {
+	return useQuery({
+		queryKey: templateKeys.categories(),
+		queryFn: ({ signal }) => templateApi.listPublicCategories(signal),
+		staleTime: 5 * 60 * 1000,
+	});
+}
+
+export function useTemplateDemoPreview(
+	templateId: string,
+	payload: PreviewTemplateDemoPayload | null,
+) {
+	return useQuery({
+		queryKey: templateKeys.demoPreview(templateId, payload),
+		queryFn: ({ signal }) =>
+			templateApi.previewDemo(templateId, payload!, signal),
+		enabled: Boolean(templateId && payload?.demo_version_id),
+		retry: false,
+		placeholderData: (previous) => previous,
+	});
+}
+
+/**
+ * Official releases the signed-in user may use. A 403 means "no entitlement"
+ * (not claimed / not purchased) and is not retried.
+ */
+export function useUsableTemplateVersions(
+	templateId: string,
+	options?: { userId?: string; enabled?: boolean },
+) {
+	return useQuery({
+		queryKey: templateKeys.usableVersions(templateId, options?.userId),
+		queryFn: ({ signal }) => templateApi.listUsableVersions(templateId, signal),
+		enabled:
+			Boolean(templateId && options?.userId) && (options?.enabled ?? true),
+		retry: false,
 	});
 }

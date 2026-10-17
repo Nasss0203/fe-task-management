@@ -3,14 +3,12 @@
 import axios from "axios";
 import {
 	ArrowLeft,
-	ArrowRight,
 	Calendar,
 	CheckCircle2,
 	Eye,
 	LayoutTemplate,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
 
 import {
 	useMyClaimedTemplates,
@@ -22,14 +20,18 @@ import { useUser } from "@/features/auth";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Skeleton } from "@/shared/ui/skeleton";
-import { UseTemplateDialog } from "@/widgets/dashboard-templates";
+import { getTemplatePriceLabel } from "./template-card";
+import { TemplateDetailActions } from "./template-detail-actions";
 
 interface PublicTemplateDetailPageProps {
 	templateId: string;
+	/** Gallery the page belongs to: the landing marketplace or the workspace. */
+	basePath?: "/templates" | "/dashboard/templates";
 }
 
 export function PublicTemplateDetailPage({
 	templateId,
+	basePath = "/templates",
 }: PublicTemplateDetailPageProps) {
 	const { data: template, isLoading, isError, error, refetch } =
 		usePublicTemplate(templateId);
@@ -79,7 +81,7 @@ export function PublicTemplateDetailPage({
 						The template you are looking for does not exist or has been removed.
 					</p>
 					<div className='mt-6'>
-						<Link href='/templates'>
+						<Link href={basePath}>
 							<Button variant='outline' className='rounded-xl'>
 								<ArrowLeft className='mr-2 size-4' />
 								Back to templates
@@ -91,16 +93,17 @@ export function PublicTemplateDetailPage({
 		);
 	}
 
-	return <TemplateDetailContent template={template} />;
+	return <TemplateDetailContent template={template} basePath={basePath} />;
 }
 
 function TemplateDetailContent({
 	template,
+	basePath,
 }: {
 	template: PublicTemplateListItem;
+	basePath: string;
 }) {
 	const { user } = useUser();
-	const [useDialogOpen, setUseDialogOpen] = useState(false);
 
 	const { data: claimedData } = useMyClaimedTemplates({
 		userId: user?.id,
@@ -114,16 +117,25 @@ function TemplateDetailContent({
 		),
 	);
 
+	const isPaid = template.offer_type === "PAID";
 	const { data: thumbnail } = useTemplateVersionThumbnail(
 		template.id,
 		template.version?.id,
+		// Paid screenshots are hidden on purpose; fall back to the cover at once.
+		{ retryMissing: template.offer_type !== "PAID" },
 	);
 
 	const visualUrl = thumbnail?.url || template.cover_url;
 	const versionNumber = template.version?.version_number ?? 1;
-	const previewHref = template.version?.id
-		? `/templates/${template.id}/versions/${template.version.id}/preview`
-		: null;
+	// IMAGE listings have no interactive preview (the backend returns 403).
+	const previewHref =
+		template.version?.id && template.preview_mode !== "IMAGE"
+			? `/templates/${template.id}/versions/${template.version.id}/preview${
+					basePath === "/templates"
+						? ""
+						: `?back=${encodeURIComponent(`${basePath}/${template.id}`)}`
+				}`
+			: null;
 
 	const formattedDate = template.version?.published_at
 		? new Date(template.version.published_at).toLocaleDateString("en-US", {
@@ -144,7 +156,7 @@ function TemplateDetailContent({
 			{/* Back navigation */}
 			<div className='mb-6 sm:mb-8'>
 				<Link
-					href='/templates'
+					href={basePath}
 					className='group inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg px-2 py-1 -ml-2'
 				>
 					<ArrowLeft className='size-4 transition-transform group-hover:-translate-x-0.5' />
@@ -230,12 +242,16 @@ function TemplateDetailContent({
 							<div className='flex flex-wrap items-center gap-2 pt-1'>
 								<Badge
 									variant='secondary'
-									className='bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 text-xs font-semibold px-2.5 py-0.5 rounded-full'
+									className={
+										isPaid
+											? "bg-foreground text-background text-xs font-semibold px-2.5 py-0.5 rounded-full"
+											: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 text-xs font-semibold px-2.5 py-0.5 rounded-full"
+									}
 								>
-									Free
+									{getTemplatePriceLabel(template)}
 								</Badge>
 
-								{isClaimed && (
+								{!isPaid && isClaimed && (
 									<Badge
 										variant='secondary'
 										className='bg-primary/10 text-primary border border-primary/20 text-xs font-semibold px-2.5 py-0.5 rounded-full'
@@ -260,44 +276,28 @@ function TemplateDetailContent({
 							</div>
 						</div>
 
+						{template.categories && template.categories.length > 0 && (
+							<div className='flex flex-wrap gap-1.5'>
+								{template.categories.map((category) => (
+									<span
+										key={category.id}
+										className='rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground'
+									>
+										{category.name}
+									</span>
+								))}
+							</div>
+						)}
+
 						{/* CTAs */}
-						<div className='flex flex-col gap-3 pt-2 border-t border-border/60'>
-							{user ? (
-								<Button
-									size='lg'
-									onClick={() => setUseDialogOpen(true)}
-									className='h-11 sm:h-12 w-full rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 shadow-sm transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-								>
-									Use template
-									<ArrowRight className='ml-2 size-4.5' />
-								</Button>
-							) : (
-								<Link href='/sign-up' className='block w-full'>
-									<Button
-										size='lg'
-										className='h-11 sm:h-12 w-full rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 shadow-sm transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-									>
-										Use template
-										<ArrowRight className='ml-2 size-4.5' />
-									</Button>
-								</Link>
-							)}
+						<TemplateDetailActions
+							template={template}
+							isClaimed={isClaimed}
+							previewHref={previewHref}
+						/>
 
-							{previewHref && (
-								<Link href={previewHref} className='block w-full'>
-									<Button
-										variant='outline'
-										size='lg'
-										className='h-11 sm:h-12 w-full rounded-xl font-medium border-border/80 hover:bg-muted/60 transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-									>
-										<Eye className='mr-2 size-4.5 text-muted-foreground' />
-										Preview
-									</Button>
-								</Link>
-							)}
-						</div>
-
-						{/* Value highlights */}
+						{/* Value highlights (FREE claims only) */}
+						{!isPaid && (
 						<div className='space-y-2.5 pt-4 border-t border-border/40 text-xs text-muted-foreground'>
 							<div className='flex items-center gap-2'>
 								<CheckCircle2 className='size-3.5 text-emerald-500 shrink-0' />
@@ -312,6 +312,7 @@ function TemplateDetailContent({
 								<span>Non-destructive workspace import</span>
 							</div>
 						</div>
+						)}
 					</div>
 				</div>
 
@@ -330,15 +331,7 @@ function TemplateDetailContent({
 				)}
 			</div>
 
-			{user && template.version && (
-				<UseTemplateDialog
-					template={template}
-					version={template.version}
-					open={useDialogOpen}
-					onOpenChange={setUseDialogOpen}
-					requireClaim={!isClaimed}
-				/>
-			)}
+
 		</div>
 	);
 }

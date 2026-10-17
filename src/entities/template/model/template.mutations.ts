@@ -5,7 +5,10 @@ import { templateApi } from "../api/template.api";
 import { templateKeys } from "./template.queries";
 import type {
 	CreateTemplateFromPagePayload,
+	CreateTemplateListingPayload,
 	PageTemplate,
+	PublishTemplateToMarketplacePayload,
+	UpdateTemplateListingPayload,
 	TemplateEntitlementDto,
 	TemplateListingDto,
 	TemplateVersion,
@@ -138,14 +141,26 @@ export function useClaimFreeTemplate() {
 
 export interface CreateTemplateListingInput {
 	templateId: string;
+	payload?: CreateTemplateListingPayload;
+}
+
+export interface PublishTemplateToMarketplaceInput {
+	templateId: string;
+	versionId: string;
+	/** Defaults to a FREE offer, matching the original marketplace flow. */
+	payload?: Omit<PublishTemplateToMarketplacePayload, "version_id">;
 }
 
 export function usePublishTemplateToMarketplace() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		retry: false,
-		mutationFn: ({ templateId, versionId }: { templateId: string; versionId: string }) =>
-			templateApi.publishToMarketplace(templateId, { version_id: versionId, offer_type: "FREE" }),
+		mutationFn: ({ templateId, versionId, payload }: PublishTemplateToMarketplaceInput) =>
+			templateApi.publishToMarketplace(templateId, {
+				offer_type: "FREE",
+				...payload,
+				version_id: versionId,
+			}),
 		onSuccess: async (result, { templateId }) => {
 			queryClient.setQueryData(templateKeys.listing(templateId), result.listing);
 			await Promise.all([
@@ -170,9 +185,13 @@ export function useCreateTemplateListing() {
 		string | CreateTemplateListingInput
 	>({
 		mutationFn: (variables: string | CreateTemplateListingInput) => {
-			const templateId =
-				typeof variables === "string" ? variables : variables.templateId;
-			return templateApi.createListing(templateId);
+			if (typeof variables === "string") {
+				return templateApi.createListing(variables);
+			}
+			return templateApi.createListing(
+				variables.templateId,
+				variables.payload,
+			);
 		},
 		onSuccess: async (_, variables) => {
 			const templateId =
@@ -183,6 +202,32 @@ export function useCreateTemplateListing() {
 				}),
 				queryClient.invalidateQueries({
 					queryKey: templateKeys.detail(templateId),
+				}),
+			]);
+		},
+	});
+}
+
+export interface UpdateTemplateListingInput {
+	templateId: string;
+	payload: UpdateTemplateListingPayload;
+}
+
+export function useUpdateTemplateListing() {
+	const queryClient = useQueryClient();
+
+	return useMutation<TemplateListingDto, Error, UpdateTemplateListingInput>({
+		retry: false,
+		mutationFn: ({ templateId, payload }) =>
+			templateApi.updateListing(templateId, payload),
+		onSuccess: async (listing, { templateId }) => {
+			queryClient.setQueryData(templateKeys.listing(templateId), listing);
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: templateKeys.publicDetail(templateId),
+				}),
+				queryClient.invalidateQueries({
+					queryKey: templateKeys.publicLists(),
 				}),
 			]);
 		},

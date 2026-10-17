@@ -28,3 +28,19 @@ export const getFriendlyApiErrorMessage = (
 
 	return fallback;
 };
+
+/**
+ * The backend's own message (a string or a list of validation messages), for
+ * flows where the exact reason helps, e.g. creator forms. Use
+ * getFriendlyApiErrorMessage when only code-mapped copy should be shown.
+ */
+export const getApiErrorMessage = (error: unknown, fallback: string) => {
+	if (!axios.isAxiosError<{ message?: string | string[] }>(error)) {
+		return fallback;
+	}
+	const message = [error.response?.data?.message]
+		.flat()
+		.filter(Boolean)
+		.join(", ");
+	return message || fallback;
+};

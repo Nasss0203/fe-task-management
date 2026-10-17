@@ -4,7 +4,7 @@ import { useTemplatePreviewStore } from "@/features/template-preview/model/templ
 import axios from "axios";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 import { usePublicTemplatePreview } from "@/entities/template/model/template.queries";
@@ -19,7 +19,14 @@ export default function PublicTemplatePreviewPage() {
 	}>();
 
 	const { user } = useUser();
-	const ctaHref = user ? "/dashboard" : "/sign-up";
+	const back = useSearchParams().get("back");
+	// Only in-app gallery pages are valid return targets.
+	const backHref =
+		back && /^\/(dashboard\/)?templates\/[\w-]+$/.test(back)
+			? back
+			: `/templates/${params.templateId}`;
+	// Claim, purchase and use all happen on the detail page.
+	const ctaHref = user ? backHref : "/sign-up";
 
 	const {
 		data: snapshot,
@@ -67,10 +74,7 @@ export default function PublicTemplatePreviewPage() {
 						? "Template preview not found."
 						: "Unable to load template preview."}
 				</p>
-				<Link
-					href={`/templates/${params.templateId}`}
-					className='text-sm text-primary underline'
-				>
+				<Link href={backHref} className='text-sm text-primary underline'>
 					Back to template
 				</Link>
 			</div>
@@ -83,7 +87,7 @@ export default function PublicTemplatePreviewPage() {
 			<header className='sticky top-0 z-30 w-full border-b border-border/70 bg-background/95 backdrop-blur-xs'>
 				<div className='flex h-14 w-full items-center justify-between px-6 sm:px-8 lg:px-12'>
 					<Link
-						href={`/templates/${params.templateId}`}
+						href={backHref}
 						className='inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground'
 					>
 						<ArrowLeft className='size-4' />
@@ -92,11 +96,22 @@ export default function PublicTemplatePreviewPage() {
 
 					<Link href={ctaHref}>
 						<Button size='sm' className='h-9 rounded-lg px-4 font-medium shadow-xs'>
-							Use template
+							Get template
 						</Button>
 					</Link>
 				</div>
 			</header>
+
+			{snapshot?.isDemo && (
+				<div
+					role='note'
+					className='border-b border-border/70 bg-muted/40 px-6 py-2.5 text-center text-sm text-muted-foreground sm:px-8 lg:px-12'
+				>
+					{snapshot.demoScope === "LIMITED"
+						? `Limited preview · ${formatHidden(snapshot.hiddenContent)} hidden. Get the template to see everything.`
+						: "You're viewing a demo version of this template."}
+				</div>
+			)}
 
 			{/* Outer document canvas */}
 			<main className='w-full min-w-0 pb-24'>
@@ -112,4 +127,13 @@ export default function PublicTemplatePreviewPage() {
 			</main>
 		</div>
 	);
+}
+
+function formatHidden(hidden?: { blocks: number; rows: number }) {
+	if (!hidden) return "some content";
+	const parts = [
+		hidden.blocks > 0 && `${hidden.blocks} section${hidden.blocks === 1 ? "" : "s"}`,
+		hidden.rows > 0 && `${hidden.rows} row${hidden.rows === 1 ? "" : "s"}`,
+	].filter(Boolean);
+	return parts.length > 0 ? parts.join(" and ") : "some content";
 }

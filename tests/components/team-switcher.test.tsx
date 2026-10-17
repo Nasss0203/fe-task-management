@@ -103,4 +103,15 @@ describe("TeamSwitcher subscription presentation", () => {
 			screen.queryByRole("menuitem", { name: /Upgrade/i }),
 		).not.toBeInTheDocument();
 	});
+
+	it("navigates to Creator Studio from the account menu", async () => {
+		renderTeamSwitcher(createSubscription("PLUS", "Plus"));
+
+		await openWorkspaceMenu();
+		await userEvent.click(
+			await screen.findByRole("menuitem", { name: /Creator Studio/i }),
+		);
+
+		expect(routerPush).toHaveBeenCalledWith("/creator");
+	});
 });

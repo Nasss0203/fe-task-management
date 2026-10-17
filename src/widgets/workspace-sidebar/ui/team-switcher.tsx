@@ -8,6 +8,7 @@ import {
 	Mail,
 	Plus,
 	Settings as SettingsIcon,
+	Store,
 	UserPlus,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -241,6 +242,23 @@ export function TeamSwitcher({
 									New workspace
 								</DropdownMenuItem>
 							)}
+						</div>
+
+						<DropdownMenuSeparator className='my-0' />
+
+						<div className='p-1'>
+							<DropdownMenuItem
+								className='cursor-pointer gap-2 p-2'
+								onSelect={() => router.push("/creator")}
+							>
+								<Store className='size-4' />
+								<div className='flex min-w-0 flex-col'>
+									<span>Creator Studio</span>
+									<span className='text-xs text-muted-foreground'>
+										Manage your templates
+									</span>
+								</div>
+							</DropdownMenuItem>
 						</div>
 
 						<DropdownMenuSeparator className='my-0' />

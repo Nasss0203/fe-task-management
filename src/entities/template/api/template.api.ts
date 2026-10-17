@@ -21,6 +21,11 @@ import type {
 	TemplateListingDto,
 	PublishTemplateToMarketplacePayload,
 	PublishTemplateToMarketplaceResponse,
+	CreateTemplateListingPayload,
+	UpdateTemplateListingPayload,
+	TemplateCategory,
+	PreviewTemplateDemoPayload,
+	UsableTemplateVersionsResponse,
 } from "../model/template.types";
 
 const TEMPLATE_API = "/templates";
@@ -229,12 +234,64 @@ export const templateApi = {
 		return unwrapResponse<TemplateListingDto>(response.data);
 	},
 
-	createListing: async (templateId: string): Promise<TemplateListingDto> => {
-		const response = await instance.post<
-			ApiResponse<TemplateListingDto> | TemplateListingDto
-		>(`${TEMPLATE_API}/${templateId}/listing`);
+	createListing: async (
+		templateId: string,
+		payload?: CreateTemplateListingPayload,
+	): Promise<TemplateListingDto> => {
+		const url = `${TEMPLATE_API}/${templateId}/listing`;
+		const response = await (payload
+			? instance.post<ApiResponse<TemplateListingDto> | TemplateListingDto>(url, payload)
+			: instance.post<ApiResponse<TemplateListingDto> | TemplateListingDto>(url));
 
 		return unwrapResponse<TemplateListingDto>(response.data);
+	},
+
+	updateListing: async (
+		templateId: string,
+		payload: UpdateTemplateListingPayload,
+	): Promise<TemplateListingDto> => {
+		const response = await instance.patch<
+			ApiResponse<TemplateListingDto> | TemplateListingDto
+		>(`${TEMPLATE_API}/${templateId}/listing`, payload);
+
+		return unwrapResponse<TemplateListingDto>(response.data);
+	},
+
+	/** 403 when the user has no entitlement (not claimed / not purchased). */
+	listUsableVersions: async (
+		templateId: string,
+		signal?: AbortSignal,
+	): Promise<UsableTemplateVersionsResponse> => {
+		const response = await instance.get<
+			ApiResponse<UsableTemplateVersionsResponse> | UsableTemplateVersionsResponse
+		>(`${TEMPLATE_API}/${templateId}/usable-versions`, { signal });
+
+		return unwrapResponse<UsableTemplateVersionsResponse>(response.data);
+	},
+
+	/** Creator-only dry run of the public demo; nothing is saved. */
+	previewDemo: async (
+		templateId: string,
+		payload: PreviewTemplateDemoPayload,
+		signal?: AbortSignal,
+	): Promise<TemplatePreview> => {
+		const response = await instance.post<
+			ApiResponse<TemplatePreview> | TemplatePreview
+		>(`${TEMPLATE_API}/${templateId}/listing/demo-preview`, payload, {
+			signal,
+		});
+
+		return unwrapResponse<TemplatePreview>(response.data);
+	},
+
+	listPublicCategories: async (
+		signal?: AbortSignal,
+	): Promise<TemplateCategory[]> => {
+		const response = await publicApiClient.get<
+			ApiResponse<TemplateCategory[]> | TemplateCategory[]
+		>("/public/template-categories", { signal });
+
+		return unwrapResponse<TemplateCategory[]>(response.data);
 	},
 
 	publishListing: async (templateId: string): Promise<TemplateListingDto> => {
@@ -273,6 +330,7 @@ export const templateApi = {
 		>(PUBLIC_TEMPLATE_API, {
 			params: {
 				search: params.search || undefined,
+				category: params.category || undefined,
 				cursor: params.cursor || undefined,
 				limit: params.limit ?? 20,
 			},

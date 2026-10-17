@@ -111,9 +111,9 @@ export function SaveAsTemplateDialog({
 
 			toast.success("Template saved successfully.", {
 				action: {
-					label: "View my templates",
+					label: "Manage template",
 					onClick: () => {
-						router.push("/dashboard/templates?tab=mine");
+						router.push(`/creator/templates/${createdTemplate.id}`);
 					},
 				},
 			});

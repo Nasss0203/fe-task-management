@@ -5,22 +5,35 @@ import Link from "next/link";
 
 import { useTemplateVersionThumbnail } from "@/entities/template/model/template.queries";
 import type { PublicTemplateListItem } from "@/entities/template/model/template.types";
+import { formatVnd } from "@/shared/lib/currency";
 
 type TemplateCardProps = {
 	item: PublicTemplateListItem;
+	/** Detail page link; landing and workspace galleries differ only here. */
+	href?: string;
 };
 
-export default function TemplateCard({ item }: TemplateCardProps) {
+export function getTemplatePriceLabel(
+	item: Pick<PublicTemplateListItem, "offer_type" | "price_amount">,
+) {
+	return item.offer_type === "PAID" && item.price_amount
+		? formatVnd(item.price_amount)
+		: "Free";
+}
+
+export default function TemplateCard({ item, href }: TemplateCardProps) {
 	const { data: thumbnail } = useTemplateVersionThumbnail(
 		item.id,
 		item.version?.id,
+		// Paid screenshots are hidden on purpose; fall back to the cover at once.
+		{ retryMissing: item.offer_type !== "PAID" },
 	);
 
 	const visualUrl = thumbnail?.url || item.cover_url;
 
 	return (
 		<Link
-			href={`/templates/${item.id}`}
+			href={href ?? `/templates/${item.id}`}
 			className='group flex h-full flex-col overflow-hidden rounded-xl border border-border/70 bg-card transition-all duration-200 hover:border-foreground/20 hover:shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
 			aria-label={`View template ${item.name}`}
 		>
@@ -61,9 +74,33 @@ export default function TemplateCard({ item }: TemplateCardProps) {
 					{item.description || "Explore and use this template in your workspace."}
 				</p>
 
-				<div className='mt-4 flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors group-hover:text-foreground pt-3 border-t border-border/40'>
-					<span>View template</span>
-					<ArrowRight className='h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5' />
+				{item.categories && item.categories.length > 0 && (
+					<div className='mt-3 flex flex-wrap gap-1'>
+						{item.categories.slice(0, 2).map((category) => (
+							<span
+								key={category.id}
+								className='rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground'
+							>
+								{category.name}
+							</span>
+						))}
+					</div>
+				)}
+
+				<div className='mt-4 flex items-center justify-between gap-2 border-t border-border/40 pt-3 text-xs font-medium'>
+					<span
+						className={
+							item.offer_type === "PAID"
+								? "text-foreground"
+								: "text-emerald-600 dark:text-emerald-400"
+						}
+					>
+						{getTemplatePriceLabel(item)}
+					</span>
+					<span className='inline-flex items-center gap-1.5 text-muted-foreground transition-colors group-hover:text-foreground'>
+						View template
+						<ArrowRight className='h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5' />
+					</span>
 				</div>
 			</div>
 		</Link>

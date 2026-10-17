@@ -1,34 +1,10 @@
 "use client";
 
-import { LayoutTemplate, Search } from "lucide-react";
-import { useDeferredValue, useState } from "react";
+import { LayoutTemplate } from "lucide-react";
 
-import { useInfinitePublicTemplates } from "@/entities/template/model/template.queries";
-import { Button } from "@/shared/ui/button";
-import { Skeleton } from "@/shared/ui/skeleton";
-
-import TemplateCard from "./template-card";
+import { PublicTemplateGallery } from "./public-template-gallery";
 
 export default function TemplatesSection() {
-	const [searchQuery, setSearchQuery] = useState("");
-
-	const deferredSearch = useDeferredValue(searchQuery);
-
-	const {
-		data,
-		isLoading,
-		isError,
-		refetch,
-		hasNextPage,
-		fetchNextPage,
-		isFetchingNextPage,
-	} = useInfinitePublicTemplates({
-		search: deferredSearch,
-		limit: 20,
-	});
-
-	const templates = data?.pages.flatMap((page) => page.items) ?? [];
-
 	return (
 		<section className='py-12 sm:py-20'>
 			<div className='mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'>
@@ -49,95 +25,9 @@ export default function TemplatesSection() {
 					</p>
 				</div>
 
-				{/* Search */}
-				<div className='mb-10'>
-					<div className='relative max-w-md w-full'>
-						<Search className='absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
-
-						<input
-							type='search'
-							aria-label='Search templates'
-							placeholder='Search templates...'
-							value={searchQuery}
-							onChange={(e) => setSearchQuery(e.target.value)}
-							className='w-full h-11 pl-10 pr-4 rounded-xl border border-border/80 bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all shadow-xs'
-						/>
-					</div>
-				</div>
-
-				{/* Loading */}
-				{isLoading && (
-					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch'>
-						{Array.from({ length: 6 }).map((_, index) => (
-							<div
-								key={index}
-								className='flex flex-col overflow-hidden rounded-xl border border-border/70 bg-card p-0'
-							>
-								<Skeleton className='aspect-[16/10] w-full rounded-none' />
-								<div className='p-4 sm:p-5 space-y-3'>
-									<Skeleton className='h-5 w-3/4 rounded' />
-									<Skeleton className='h-4 w-full rounded' />
-									<Skeleton className='h-4 w-2/3 rounded' />
-									<div className='pt-3 border-t border-border/40'>
-										<Skeleton className='h-3 w-1/4 rounded' />
-									</div>
-								</div>
-							</div>
-						))}
-					</div>
-				)}
-
-				{/* Error */}
-				{isError && (
-					<div role='alert' className='py-16 text-center text-sm text-destructive'>
-						<p>Unable to load templates.</p>
-						<Button type='button' variant='outline' className='mt-4' onClick={() => refetch()}>
-							Try again
-						</Button>
-					</div>
-				)}
-
-				{/* Template Grid */}
-				{!isLoading && !isError && (
-					<>
-						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch'>
-							{templates.map((template) => (
-								<TemplateCard
-									key={template.id}
-									item={template}
-								/>
-							))}
-
-							{templates.length === 0 && (
-								<div className='col-span-full py-16 text-center text-muted-foreground rounded-2xl border border-dashed border-border/80 bg-card/40 p-8'>
-									<p className='text-sm font-medium text-foreground'>
-										No templates found
-									</p>
-
-									<p className='text-xs text-muted-foreground mt-1'>
-										Try another search keyword.
-									</p>
-								</div>
-							)}
-						</div>
-
-						{/* Cursor pagination */}
-						{hasNextPage && (
-							<div className='mt-10 flex justify-center'>
-								<Button
-									type='button'
-									variant='outline'
-									disabled={isFetchingNextPage}
-									onClick={() => fetchNextPage()}
-								>
-									{isFetchingNextPage
-										? "Loading..."
-										: "Load more"}
-								</Button>
-							</div>
-						)}
-					</>
-				)}
+				<PublicTemplateGallery
+					detailHref={(templateId) => `/templates/${templateId}`}
+				/>
 			</div>
 		</section>
 	);

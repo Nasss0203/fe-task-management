@@ -4,7 +4,7 @@ import { Plus } from "lucide-react";
 import { useParams, usePathname } from "next/navigation";
 
 import { usePage } from "@/entities/page/model/page.queries";
-import { useTemplateDetail } from "@/entities/template";
+import { usePublicTemplate } from "@/entities/template";
 import {
 	useWorkspace,
 	useWorkspaces,
@@ -38,7 +38,8 @@ export function HeaderWorkspaceContainer() {
 	const templateId = isTemplateDetailRoute ? params.templateId : undefined;
 
 	const { data: page } = usePage(pageId);
-	const { data: templateDetail } = useTemplateDetail(templateId ?? "", {
+	// Buyer detail: public data only, never the creator's private template.
+	const { data: templateDetail } = usePublicTemplate(templateId ?? "", {
 		enabled: Boolean(templateId),
 	});
 
