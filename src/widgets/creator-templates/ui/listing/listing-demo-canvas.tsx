@@ -10,7 +10,10 @@ import {
 } from "@/features/template-preview";
 import { cn } from "@/shared/lib/utils";
 
-import { PRIVATE_DEMO_BLOCK_TYPES } from "../../model/demo-visibility";
+import {
+	describeBlock,
+	PRIVATE_DEMO_BLOCK_TYPES,
+} from "../../model/demo-visibility";
 import type { DemoSelectionApi } from "./use-demo-selection";
 
 export const demoBlockAnchorId = (blockId: string) => `demo-block-${blockId}`;
@@ -62,7 +65,7 @@ export function ListingDemoCanvas({
 									role='button'
 									tabIndex={isPrivate || disabled ? -1 : 0}
 									aria-pressed={shown}
-									aria-label={`${shown ? "Hide" : "Show"} block`}
+									aria-label={`${shown ? "Hide" : "Show"} ${describeBlock(block)}`}
 									onClick={toggle}
 									onKeyDown={(event) => {
 										if (event.key === "Enter" || event.key === " ") {

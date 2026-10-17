@@ -133,14 +133,14 @@ export function ListingDemoVisibility({
 								>
 									<input
 										type='checkbox'
-										aria-label={`Show ${ref ? database?.name ?? "database" : describeBlock(block)}`}
+										aria-label={`Show ${BLOCK_TYPE_LABELS[block.type] ?? block.type}: ${ref ? database?.name ?? "database" : describeBlock(block)}`}
 										className='size-4 shrink-0 cursor-pointer accent-primary disabled:cursor-not-allowed'
 										checked={checked}
 										disabled={locked}
 										onChange={(event) => api.toggle(block.id, event.target.checked)}
 									/>
 									<Icon
-										aria-label={BLOCK_TYPE_LABELS[block.type] ?? block.type}
+										aria-hidden
 										className='size-3.5 shrink-0 text-muted-foreground'
 									/>
 									<button

@@ -47,14 +47,11 @@ import {
 } from "@/shared/ui/select";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
-// shortcut: management pieces still live in the dashboard widget; move them here when UI-4 strips creator controls from the dashboard.
-import {
-	TemplatePreviewPanel,
-	TemplateVersionList,
-} from "@/widgets/dashboard-templates/detail";
-import { ArchiveTemplateDialog } from "@/widgets/dashboard-templates/detail/ui/archive-template-dialog";
-import { EditTemplateDialog } from "@/widgets/dashboard-templates/detail/ui/edit-template-dialog";
-import { PublishTemplateDialog } from "@/widgets/dashboard-templates/detail/ui/publish-template-dialog";
+import { ArchiveTemplateDialog } from "./manage/archive-template-dialog";
+import { EditTemplateDialog } from "./manage/edit-template-dialog";
+import { PublishTemplateDialog } from "./manage/publish-template-dialog";
+import { TemplatePreviewPanel } from "./manage/template-preview-panel";
+import { TemplateVersionList } from "./manage/template-version-list";
 
 import {
 	getTemplateDisplayStatus,

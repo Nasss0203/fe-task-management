@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toClaimedTemplateCard } from "@/widgets/dashboard-templates/model/claimed-template-card.model";
+import { toClaimedTemplateCard } from "@/widgets/workspace-template-gallery/model/claimed-template-card.model";
 import { claimedTemplate } from "../fixtures/claimed-template";
 
 describe("toClaimedTemplateCard", () => {

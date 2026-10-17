@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { ClaimedTemplateCard } from "@/widgets/dashboard-templates/ui/claimed-template-card";
-import { toClaimedTemplateCard } from "@/widgets/dashboard-templates/model/claimed-template-card.model";
+import { ClaimedTemplateCard } from "@/widgets/workspace-template-gallery/ui/claimed-template-card";
+import { toClaimedTemplateCard } from "@/widgets/workspace-template-gallery/model/claimed-template-card.model";
 import type { ClaimedTemplateDto } from "@/entities/template";
 import { claimedTemplate } from "../fixtures/claimed-template";
 
@@ -112,8 +112,8 @@ describe("Claimed template card presentation", () => {
 	it("renders Next.js links to consumer detail for public published templates", () => {
 		const { container } = setup();
 		const titleLink = screen.getByRole("link", { name: claimedTemplate.name! });
-		expect(titleLink).toHaveAttribute("href", `/templates/${claimedTemplate.template_id}`);
-		const coverLink = container.querySelector('a[href="/templates/template-a"][tabindex="-1"]');
+		expect(titleLink).toHaveAttribute("href", `/dashboard/templates/${claimedTemplate.template_id}`);
+		const coverLink = container.querySelector('a[href="/dashboard/templates/template-a"][tabindex="-1"]');
 		expect(coverLink).toBeInTheDocument();
 	});
 
@@ -122,7 +122,7 @@ describe("Claimed template card presentation", () => {
 		expect(
 			screen.queryByRole("link", { name: claimedTemplate.name! }),
 		).not.toBeInTheDocument();
-		expect(container.querySelector('a[href^="/templates/"]')).not.toBeInTheDocument();
+		expect(container.querySelector('a[href^="/dashboard/templates/"]')).not.toBeInTheDocument();
 	});
 
 	it("triggers onDetails on card click and stops propagation on button clicks", async () => {

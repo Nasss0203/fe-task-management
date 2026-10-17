@@ -4,7 +4,7 @@ import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { templateApi, templateKeys } from "@/entities/template";
-import { AuthenticatedTemplatesPage } from "@/widgets/dashboard-templates/ui/authenticated-templates-page";
+import { WorkspaceTemplateLibraryPage } from "@/widgets/workspace-template-gallery";
 import { publicTemplate } from "../fixtures/public-template";
 import { claimedTemplate } from "../fixtures/claimed-template";
 
@@ -39,12 +39,9 @@ function setup() {
 	});
 	return render(
 		<QueryClientProvider client={client}>
-			<AuthenticatedTemplatesPage />
+			<WorkspaceTemplateLibraryPage />
 		</QueryClientProvider>,
 	);
-}
-async function selectClaimed() {
-	await userEvent.click(screen.getByRole("tab", { name: "Claimed" }));
 }
 
 beforeEach(() => {
@@ -77,70 +74,17 @@ afterEach(() => {
 	vi.restoreAllMocks();
 });
 
-describe("My templates Created / Claimed", () => {
+describe("Workspace template library (claimed templates)", () => {
 	it("renders skeletons while loading the claimed library", async () => {
 		navigation.params = "tab=mine&library=claimed";
 		let resolve!: (value: { items: typeof claimedTemplate[]; nextCursor: null }) => void;
 		vi.mocked(templateApi.listMyClaimedTemplates).mockReturnValue(new Promise(done => { resolve = done; }));
 		const { container } = setup();
 		expect(container.querySelector('[data-slot="skeleton"]')).toBeInTheDocument();
-		expect(screen.queryByText("No claimed templates yet.")).not.toBeInTheDocument();
+		expect(screen.queryByText("Your library is empty")).not.toBeInTheDocument();
 		resolve({ items: [claimedTemplate], nextCursor: null });
 		await screen.findByRole("heading", { name: "Claimed planning" });
 		expect(container.querySelector('[data-slot="skeleton"]')).not.toBeInTheDocument();
-	});
-
-	it("supports keyboard subtab selection and URL back/forward updates", async () => {
-		const { rerender } = setup();
-		await screen.findByRole("heading", { name: "Created planning" });
-		screen.getByRole("tab", { name: "Created by me" }).focus();
-		await userEvent.keyboard('{ArrowRight}');
-		await screen.findByRole("heading", { name: "Claimed planning" });
-		expect(screen.getByRole("tab", { name: "Claimed" })).toHaveFocus();
-		navigation.params = "tab=workspace&library=claimed";
-		rerender(<QueryClientProvider client={client}><AuthenticatedTemplatesPage /></QueryClientProvider>);
-		await waitFor(() => expect(screen.getByRole("tab", { name: /^Workspace/ })).toHaveAttribute("aria-selected", "true"));
-		navigation.params = "tab=mine&library=created";
-		rerender(<QueryClientProvider client={client}><AuthenticatedTemplatesPage /></QueryClientProvider>);
-		await waitFor(() => expect(screen.getByRole("tab", { name: "Created by me" })).toHaveAttribute("aria-selected", "true"));
-		expect(screen.queryByRole("heading", { name: "Claimed planning" })).not.toBeInTheDocument();
-	});
-
-	it("preserves creator source, search and selected subtab on top-tab navigation", async () => {
-		setup();
-		await screen.findByRole("heading", { name: "Created planning" });
-		expect(templateApi.listMyClaimedTemplates).not.toHaveBeenCalled();
-		expect(templateApi.list).toHaveBeenCalledWith(
-			expect.objectContaining({ scope: "mine" }),
-			expect.any(AbortSignal),
-		);
-		const search = screen.getByPlaceholderText("Search templates...");
-		await userEvent.type(search, "engineering");
-		await waitFor(() =>
-			expect(templateApi.list).toHaveBeenCalledWith(
-				expect.objectContaining({ search: "engineering" }),
-				expect.any(AbortSignal),
-			),
-		);
-		await selectClaimed();
-		await screen.findByRole("heading", { name: "Claimed planning" });
-		expect(
-			screen.queryByPlaceholderText("Search templates..."),
-		).not.toBeInTheDocument();
-		await userEvent.click(screen.getByRole("tab", { name: /^Workspace/ }));
-		await userEvent.click(screen.getByRole("tab", { name: "My templates" }));
-		expect(screen.getByRole("tab", { name: "Claimed" })).toHaveAttribute(
-			"aria-selected",
-			"true",
-		);
-		await userEvent.click(screen.getByRole("tab", { name: "Created by me" }));
-		expect(screen.getByPlaceholderText("Search templates...")).toHaveValue(
-			"engineering",
-		);
-		expect(navigation.replace).toHaveBeenCalledWith(
-			expect.stringContaining("library=claimed"),
-			{ scroll: false },
-		);
 	});
 
 	it("shows the empty state and retries initial errors", async () => {
@@ -148,10 +92,9 @@ describe("My templates Created / Claimed", () => {
 			.mockRejectedValueOnce(new Error("offline"))
 			.mockResolvedValue({ items: [], nextCursor: null });
 		setup();
-		await selectClaimed();
-		await screen.findByText("Unable to load claimed templates.");
+		await screen.findByText("Unable to load your library.");
 		await userEvent.click(screen.getByRole("button", { name: "Try again" }));
-		await screen.findByText("No claimed templates yet.");
+		await screen.findByText("Your library is empty");
 	});
 
 	it("keeps unpublished templates, uses the supplied pin, and never claims again", async () => {
@@ -160,7 +103,6 @@ describe("My templates Created / Claimed", () => {
 			nextCursor: null,
 		});
 		setup();
-		await selectClaimed();
 		await screen.findByText("Unpublished · In your library");
 		await userEvent.click(screen.getByRole("button", { name: "Use template" }));
 		const dialog = await screen.findByRole("dialog");
@@ -189,7 +131,6 @@ describe("My templates Created / Claimed", () => {
 			},
 		});
 		setup();
-		await selectClaimed();
 		await screen.findByRole("heading", { name: "Claimed planning" });
 		await userEvent.click(screen.getByRole("button", { name: "Use template" }));
 		const dialog = await screen.findByRole("dialog");
@@ -284,11 +225,12 @@ describe("My templates Created / Claimed", () => {
 		setup();
 		await screen.findByRole("heading", { name: "Claimed planning" });
 		await userEvent.click(screen.getByRole("button", { name: "Load more" }));
-		await screen.findByText("Unable to load more claimed templates.");
+		await screen.findByText("Unable to load more templates.");
 		expect(
 			screen.getByRole("heading", { name: "Claimed planning" }),
 		).toBeInTheDocument();
-		await userEvent.click(screen.getByRole("button", { name: "Try again" }));
+		// Load more stays available after a failed page, so it doubles as retry.
+		await userEvent.click(screen.getByRole("button", { name: "Load more" }));
 		await screen.findByRole("heading", { name: "Second claimed" });
 		expect(templateApi.listMyClaimedTemplates).toHaveBeenLastCalledWith(
 			{ limit: 20, cursor: "next-page" },
@@ -313,13 +255,13 @@ describe("My templates Created / Claimed", () => {
 		navigation.userId = "user-b";
 		rerender(
 			<QueryClientProvider client={client}>
-				<AuthenticatedTemplatesPage />
+				<WorkspaceTemplateLibraryPage />
 			</QueryClientProvider>,
 		);
 		expect(
 			screen.queryByRole("heading", { name: "Claimed planning" }),
 		).not.toBeInTheDocument();
-		await screen.findByText("No claimed templates yet.");
+		await screen.findByText("Your library is empty");
 		expect(client.getQueryData(templateKeys.claimed("user-a"))).toBeDefined();
 		expect(client.getQueryData(templateKeys.claimed("user-b"))).toBeDefined();
 	});
@@ -357,7 +299,7 @@ describe("My templates Created / Claimed", () => {
 		setup();
 		await screen.findByRole("heading", { name: "Claimed planning" });
 		await userEvent.click(screen.getByRole("button", { name: "Details" }));
-		expect(navigation.push).toHaveBeenCalledWith("/templates/template-a");
+		expect(navigation.push).toHaveBeenCalledWith("/dashboard/templates/template-a");
 		expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 	});
 
@@ -368,7 +310,7 @@ describe("My templates Created / Claimed", () => {
 		await userEvent.click(screen.getByRole("button", { name: "Use template" }));
 		const dialog = await screen.findByRole("dialog");
 		expect(within(dialog).getByRole("heading", { name: "Use template" })).toBeInTheDocument();
-		expect(navigation.push).not.toHaveBeenCalledWith("/templates/template-a");
+		expect(navigation.push).not.toHaveBeenCalledWith("/dashboard/templates/template-a");
 	});
 
 	it("NAV-07/08: shows unpublished information dialog with working Use template action and does not navigate to public detail", async () => {
@@ -387,7 +329,7 @@ describe("My templates Created / Claimed", () => {
 		expect(
 			within(dialog).getByText("You previously claimed this template."),
 		).toBeInTheDocument();
-		expect(navigation.push).not.toHaveBeenCalledWith("/templates/template-a");
+		expect(navigation.push).not.toHaveBeenCalledWith("/dashboard/templates/template-a");
 
 		// Clicking Use template from unpublished info dialog opens UseTemplateDialog
 		await userEvent.click(within(dialog).getByRole("button", { name: "Use template" }));

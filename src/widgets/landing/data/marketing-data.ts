@@ -393,15 +393,6 @@ export const MARKETING_TEMPLATES: MarketingTemplate[] = [
 	},
 ];
 
-export const TEMPLATE_CATEGORIES = [
-	"All",
-	"Documentation",
-	"Knowledge Base",
-	"Database",
-	"Team",
-	"Personal",
-] as const;
-
 export interface AiCapability {
 	id: string;
 	title: string;

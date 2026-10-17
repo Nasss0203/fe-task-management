@@ -29,10 +29,11 @@ export function HeaderWorkspaceContainer() {
 	const isAiRoute =
 		pathname === "/dashboard/ai" || pathname.startsWith("/dashboard/ai/");
 	const isDashboardRoute = pathname === "/dashboard";
-	const isTemplatesGalleryRoute = pathname === "/dashboard/templates";
+	const isTemplatesGalleryRoute =
+		pathname === "/dashboard/templates" ||
+		pathname === "/dashboard/templates/library";
 	const isTemplateDetailRoute =
-		pathname.startsWith("/dashboard/templates/") &&
-		pathname !== "/dashboard/templates";
+		pathname.startsWith("/dashboard/templates/") && !isTemplatesGalleryRoute;
 
 	const pageId = isPageRoute ? params.pageId : undefined;
 	const templateId = isTemplateDetailRoute ? params.templateId : undefined;

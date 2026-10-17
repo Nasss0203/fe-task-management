@@ -17,7 +17,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/ui/select";
-import { UseTemplateDialog } from "@/widgets/dashboard-templates";
+import { UseTemplateDialog } from "@/features/template-use";
 
 import { getTemplatePriceLabel } from "./template-card";
 
@@ -48,12 +48,12 @@ export function TemplateDetailActions({
 	return (
 		<div className='flex flex-col gap-3 pt-2 border-t border-border/60'>
 			{!user ? (
-				<Link href={isPaid ? "/sign-in" : "/sign-up"} className='block w-full'>
-					<Button size='lg' className={primaryClass}>
+				<Button asChild size='lg' className={primaryClass}>
+					<Link href={isPaid ? "/sign-in" : "/sign-up"}>
 						{isPaid ? "Sign in to buy" : "Use template"}
 						<ArrowRight className='ml-2 size-4.5' />
-					</Button>
-				</Link>
+					</Link>
+				</Button>
 			) : isPaid ? (
 				<PaidTemplateActions template={template} userId={user.id} />
 			) : (
@@ -61,12 +61,12 @@ export function TemplateDetailActions({
 			)}
 
 			{previewHref && (
-				<Link href={previewHref} className='block w-full'>
-					<Button variant='outline' size='lg' className={secondaryClass}>
-						<Eye className='mr-2 size-4.5 text-muted-foreground' />
+				<Button asChild variant='outline' size='lg' className={secondaryClass}>
+					<Link href={previewHref}>
+						<Eye className='mr-2 size-4.5 text-muted-foreground' aria-hidden />
 						{isPaid ? "Try the demo" : "Preview"}
-					</Button>
-				</Link>
+					</Link>
+				</Button>
 			)}
 		</div>
 	);

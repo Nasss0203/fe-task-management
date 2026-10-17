@@ -15,7 +15,7 @@ import type {
 	UseTemplateResponse,
 } from "@/entities/template/model/template.types";
 import { PublicTemplateDetailPage } from "@/widgets/landing/templates/ui/public-template-detail";
-import { UseTemplateDialog } from "@/widgets/dashboard-templates/detail/ui/use-template-dialog";
+import { UseTemplateDialog } from "@/features/template-use/ui/use-template-dialog";
 import { publicTemplate } from "../fixtures/public-template";
 
 const mockPush = vi.fn();

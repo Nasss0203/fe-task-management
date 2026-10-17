@@ -30,7 +30,7 @@ export function ClaimedTemplateCard({
 	}
 
 	const consumerDetailHref = template.canNavigateToPublicDetail
-		? `/templates/${template.id}`
+		? `/dashboard/templates/${template.id}`
 		: null;
 
 	const previewVisual =

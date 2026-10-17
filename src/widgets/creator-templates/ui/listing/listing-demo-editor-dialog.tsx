@@ -96,12 +96,19 @@ export function ListingDemoEditorDialog({
 							role='tablist'
 							aria-label='Demo editor view'
 							className='inline-flex rounded-lg bg-muted p-0.5'
+							onKeyDown={(event) => {
+								if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+								const next = tab === "edit" ? "visitor" : "edit";
+								onTabChange(next);
+								document.getElementById(`demo-editor-tab-${next}`)?.focus();
+							}}
 						>
-							<TabButton active={tab === "edit"} onClick={() => onTabChange("edit")}>
+							<TabButton id='edit' active={tab === "edit"} onClick={() => onTabChange("edit")}>
 								<PencilRuler className='size-3.5' />
 								Edit
 							</TabButton>
 							<TabButton
+								id='visitor'
 								active={tab === "visitor"}
 								onClick={() => onTabChange("visitor")}
 							>
@@ -115,7 +122,12 @@ export function ListingDemoEditorDialog({
 					</div>
 				</DialogHeader>
 
-				<div className='min-h-0 flex-1'>
+				<div
+					role='tabpanel'
+					id='demo-editor-panel'
+					aria-labelledby={`demo-editor-tab-${tab}`}
+					className='min-h-0 flex-1'
+				>
 					{snapshot.isPending ? (
 						<div className='flex flex-col gap-3 p-6'>
 							<Skeleton className='h-8 w-1/3' />
@@ -161,10 +173,12 @@ export function ListingDemoEditorDialog({
 }
 
 function TabButton({
+	id,
 	active,
 	onClick,
 	children,
 }: {
+	id: DemoEditorTab;
 	active: boolean;
 	onClick: () => void;
 	children: React.ReactNode;
@@ -173,7 +187,10 @@ function TabButton({
 		<button
 			type='button'
 			role='tab'
+			id={`demo-editor-tab-${id}`}
 			aria-selected={active}
+			aria-controls='demo-editor-panel'
+			tabIndex={active ? 0 : -1}
 			onClick={onClick}
 			className={cn(
 				"inline-flex h-7 items-center gap-1.5 rounded-md px-3 text-xs font-medium transition-colors",

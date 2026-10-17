@@ -173,12 +173,12 @@ describe("CreatorListingEditorPage", () => {
 		const editor = await screen.findByRole("dialog");
 		// The canvas shows the whole template; clicking a block toggles it.
 		const secretBlock = await within(editor).findAllByRole("button", {
-			name: "Show block",
+			name: /^Show /,
 		});
 		expect(secretBlock).toHaveLength(2);
-		await user.click(within(editor).getByRole("checkbox", { name: /Show Intro section/ }));
+		await user.click(within(editor).getByRole("checkbox", { name: /Show Text: Intro section/ }));
 		// Ticking in the outline flips the matching canvas block to "shown".
-		expect(within(editor).getAllByRole("button", { name: "Hide block" })).toHaveLength(1);
+		expect(within(editor).getAllByRole("button", { name: /^Hide / })).toHaveLength(1);
 		await user.click(within(editor).getByRole("tab", { name: /Visitor view/ }));
 
 		await waitFor(() =>
@@ -318,13 +318,13 @@ describe("CreatorListingEditorPage", () => {
 		await user.click(await screen.findByRole("button", { name: /Choose content/ }));
 		const editor = await screen.findByRole("dialog");
 
-		const [first] = await within(editor).findAllByRole("button", { name: "Show block" });
+		const [first] = await within(editor).findAllByRole("button", { name: /^Show / });
 		await user.click(first);
 
-		expect(within(editor).getByRole("checkbox", { name: /Show First/ })).toBeChecked();
-		expect(within(editor).getByRole("checkbox", { name: /Show Second/ })).not.toBeChecked();
-		await user.click(within(editor).getByRole("button", { name: "Hide block" }));
-		expect(within(editor).getByRole("checkbox", { name: /Show First/ })).not.toBeChecked();
+		expect(within(editor).getByRole("checkbox", { name: /Show Text: First/ })).toBeChecked();
+		expect(within(editor).getByRole("checkbox", { name: /Show Text: Second/ })).not.toBeChecked();
+		await user.click(within(editor).getByRole("button", { name: /^Hide / }));
+		expect(within(editor).getByRole("checkbox", { name: /Show Text: First/ })).not.toBeChecked();
 	});
 	it("selects and clears all toggleable database columns at once", async () => {
 		const prop = (id: string, name: string, type: string) => ({
@@ -373,7 +373,7 @@ describe("CreatorListingEditorPage", () => {
 		await user.click(screen.getByRole("radio", { name: /Limited preview/ }));
 		await user.click(await screen.findByRole("button", { name: /Choose content/ }));
 		const editor = await screen.findByRole("dialog");
-		await user.click(await within(editor).findByRole("checkbox", { name: /Show Tasks/ }));
+		await user.click(await within(editor).findByRole("checkbox", { name: /Show Database: Tasks/ }));
 
 		const status = within(editor).getByRole("button", { name: "Status" });
 		expect(status).toHaveAttribute("aria-pressed", "false");

@@ -81,12 +81,12 @@ export function PublicTemplateDetailPage({
 						The template you are looking for does not exist or has been removed.
 					</p>
 					<div className='mt-6'>
-						<Link href={basePath}>
-							<Button variant='outline' className='rounded-xl'>
+						<Button asChild variant='outline' className='rounded-xl'>
+							<Link href={basePath}>
 								<ArrowLeft className='mr-2 size-4' />
 								Back to templates
-							</Button>
-						</Link>
+							</Link>
+						</Button>
 					</div>
 				</div>
 			</div>
