@@ -28,18 +28,16 @@ const secondaryClass =
 
 interface TemplateDetailActionsProps {
 	template: PublicTemplateListItem;
-	/** FREE only: the user already claimed it, so Use skips the claim. */
-	isClaimed: boolean;
 	previewHref: string | null;
 }
 
 /**
- * Buyer CTAs. FREE: claim (once) then use. PAID: owners pick an official
- * release from the backend's usable versions; others see the price.
+ * Buyer CTAs. FREE: Use directly (the backend claims it on first use).
+ * PAID: owners pick an official release from the backend's usable versions;
+ * others see the price.
  */
 export function TemplateDetailActions({
 	template,
-	isClaimed,
 	previewHref,
 }: TemplateDetailActionsProps) {
 	const { user } = useUser();
@@ -57,7 +55,7 @@ export function TemplateDetailActions({
 			) : isPaid ? (
 				<PaidTemplateActions template={template} userId={user.id} />
 			) : (
-				<FreeTemplateActions template={template} isClaimed={isClaimed} />
+				<FreeTemplateActions template={template} />
 			)}
 
 			{previewHref && (
@@ -72,13 +70,7 @@ export function TemplateDetailActions({
 	);
 }
 
-function FreeTemplateActions({
-	template,
-	isClaimed,
-}: {
-	template: PublicTemplateListItem;
-	isClaimed: boolean;
-}) {
+function FreeTemplateActions({ template }: { template: PublicTemplateListItem }) {
 	const [open, setOpen] = useState(false);
 
 	return (
@@ -93,7 +85,6 @@ function FreeTemplateActions({
 					version={template.version}
 					open={open}
 					onOpenChange={setOpen}
-					requireClaim={!isClaimed}
 				/>
 			)}
 		</>
@@ -167,7 +158,6 @@ function PaidTemplateActions({
 				version={selected}
 				open={open}
 				onOpenChange={setOpen}
-				requireClaim={false}
 			/>
 		</>
 	);

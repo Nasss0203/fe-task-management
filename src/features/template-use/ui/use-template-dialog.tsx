@@ -6,7 +6,7 @@ import { Check, ChevronsUpDown, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 
-import { useClaimFreeTemplate, useUseTemplate } from "@/entities/template";
+import { useUseTemplate } from "@/entities/template";
 import type { PageTemplate, TemplateVersion } from "@/entities/template";
 import { useWorkspaces } from "@/entities/workspace/model/workspace.queries";
 import { useUser } from "@/features/auth";
@@ -32,7 +32,6 @@ interface UseTemplateDialogProps {
 	version: Pick<TemplateVersion, "id">;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	requireClaim?: boolean;
 }
 
 export function UseTemplateDialog({
@@ -40,16 +39,12 @@ export function UseTemplateDialog({
 	version,
 	open,
 	onOpenChange,
-	requireClaim,
 }: UseTemplateDialogProps) {
 	const router = useRouter();
 	const { user } = useUser();
 	const { data: workspaces = [] } = useWorkspaces();
-	const claimMutation = useClaimFreeTemplate();
 	const useMutation = useUseTemplate();
 	const isSubmittingRef = React.useRef(false);
-
-	const shouldClaim = requireClaim ?? false;
 
 	// Select destination workspace, defaulting to user's last active workspace or first available
 	const initialWorkspaceId =
@@ -75,9 +70,7 @@ export function UseTemplateDialog({
 	const selectedWorkspace = workspaces.find(
 		(w) => w.id === selectedWorkspaceId,
 	);
-	const isClaiming = claimMutation.isPending;
-	const isUsing = useMutation.isPending;
-	const isPending = isClaiming || isUsing;
+	const isPending = useMutation.isPending;
 
 	const handleUseTemplate = async () => {
 		if (isPending || isSubmittingRef.current) {
@@ -93,27 +86,7 @@ export function UseTemplateDialog({
 		isSubmittingRef.current = true;
 
 		try {
-			if (shouldClaim) {
-				try {
-					await claimMutation.mutateAsync(template.id);
-				} catch (claimError: unknown) {
-					let message = "Unable to claim template. Please try again.";
-					if (axios.isAxiosError(claimError)) {
-						const data = claimError.response?.data as
-							| { message?: string | string[] }
-							| undefined;
-						if (data?.message) {
-							message = Array.isArray(data.message)
-								? data.message.join(", ")
-								: data.message;
-						}
-					}
-					setErrorMessage(message);
-					toast.error(message);
-					return;
-				}
-			}
-
+			// FREE marketplace templates are claimed by the backend as part of Use.
 			const result = await useMutation.mutateAsync({
 				templateId: template.id,
 				versionId: version.id,
@@ -258,7 +231,7 @@ export function UseTemplateDialog({
 						{isPending ? (
 							<>
 								<Loader2 className='mr-1.5 size-3.5 animate-spin' />
-								{isClaiming ? "Preparing template..." : "Creating page..."}
+								Creating page...
 							</>
 						) : (
 							"Use template"

@@ -211,16 +211,14 @@ describe("Buyer template detail", () => {
 		expect(screen.queryByRole("link", { name: /Try the demo|Interactive preview/ })).not.toBeInTheDocument();
 	});
 
-	it("keeps the FREE claim-then-use flow", async () => {
+	it("uses a FREE template in one call and refreshes the library", async () => {
 		vi.spyOn(templateApi, "listMyClaimedTemplates").mockResolvedValue({
 			items: [],
 			nextCursor: null,
 		});
 		const usable = vi.spyOn(templateApi, "listUsableVersions");
-		const claim = vi
-			.spyOn(templateApi, "claimFreeTemplate")
-			.mockResolvedValue({} as never);
-		vi.spyOn(templateApi, "useTemplate").mockResolvedValue({ pageId: "p" });
+		const claim = vi.spyOn(templateApi, "claimFreeTemplate");
+		const use = vi.spyOn(templateApi, "useTemplate").mockResolvedValue({ pageId: "p" });
 		const user = userEvent.setup();
 
 		renderDetail({ ...publicTemplate, offer_type: "FREE" });
@@ -228,10 +226,18 @@ describe("Buyer template detail", () => {
 		expect(await screen.findByText("Free")).toBeInTheDocument();
 		await user.click(screen.getByRole("button", { name: /^Use template/ }));
 		const dialog = await screen.findByRole("dialog");
-		await user.click(within(dialog).getByRole("button", { name: /Use template|Claim/ }));
+		await user.click(within(dialog).getByRole("button", { name: /Use template/ }));
 
-		await waitFor(() => expect(claim).toHaveBeenCalledWith("public-template"));
-		// FREE entitlement still comes from the claimed library, not usable-versions.
+		await waitFor(() =>
+			expect(use).toHaveBeenCalledWith("public-template", publicTemplate.version.id, {
+				workspace_id: "ws-1",
+			}),
+		);
+		// The backend claims on first use; the claimed library is refetched afterwards.
+		expect(claim).not.toHaveBeenCalled();
+		await waitFor(() =>
+			expect(templateApi.listMyClaimedTemplates).toHaveBeenCalledTimes(2),
+		);
 		expect(usable).not.toHaveBeenCalled();
 	});
 });

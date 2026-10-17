@@ -371,15 +371,9 @@ describe("public detail UI", () => {
 		expect(claimSpy).not.toHaveBeenCalled();
 	});
 
-	it("triggers Claim FREE before Use for authenticated user who has not claimed yet", async () => {
+	it("uses an unclaimed FREE template directly; the backend claims it", async () => {
 		mockUser = { id: "user-new", lastActiveWorkspaceId: "ws-1" };
-		const claimSpy = vi.spyOn(templateApi, "claimFreeTemplate").mockResolvedValue({
-			id: "ent-new",
-			template_id: publicTemplate.id,
-			user_id: "user-new",
-			source: "FREE_CLAIM",
-			created_at: "2026-10-11T00:00:00.000Z",
-		});
+		const claimSpy = vi.spyOn(templateApi, "claimFreeTemplate");
 		const useSpy = vi.spyOn(templateApi, "useTemplate").mockResolvedValue({ pageId: "page-2" });
 		vi.spyOn(templateApi, "listMyClaimedTemplates").mockResolvedValue({
 			items: [],
@@ -402,13 +396,13 @@ describe("public detail UI", () => {
 			within(dialog).getByRole("button", { name: "Use template" }),
 		);
 
-		await waitFor(() => {
-			expect(claimSpy).toHaveBeenCalledWith(publicTemplate.id);
+		await waitFor(() =>
 			expect(useSpy).toHaveBeenCalledWith(
 				publicTemplate.id,
 				publicTemplate.version.id,
 				{ workspace_id: "ws-1" },
-			);
-		});
+			),
+		);
+		expect(claimSpy).not.toHaveBeenCalled();
 	});
 });

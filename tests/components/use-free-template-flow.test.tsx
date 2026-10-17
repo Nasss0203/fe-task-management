@@ -144,7 +144,6 @@ describe("Use FREE Template Flow in Marketplace UI & Auto Claim Logic Fix", () =
 				version={publicTemplate.version}
 				open={true}
 				onOpenChange={vi.fn()}
-				requireClaim={true}
 			/>,
 			{ wrapper },
 		);
@@ -157,23 +156,12 @@ describe("Use FREE Template Flow in Marketplace UI & Auto Claim Logic Fix", () =
 		expect(useSpy).not.toHaveBeenCalled();
 	});
 
-	it("FIX-01: requireClaim={true} triggers Claim FREE before Use", async () => {
+	it("FIX-01: Use calls only the Use endpoint; the backend claims FREE templates", async () => {
 		mockUser = { id: "user-b", lastActiveWorkspaceId: "ws-1" };
-		const callOrder: string[] = [];
-
-		const claimSpy = vi
-			.spyOn(templateApi, "claimFreeTemplate")
-			.mockImplementation(async (id) => {
-				callOrder.push(`claim:${id}`);
-				return mockEntitlement;
-			});
-
+		const claimSpy = vi.spyOn(templateApi, "claimFreeTemplate");
 		const useSpy = vi
 			.spyOn(templateApi, "useTemplate")
-			.mockImplementation(async (tId, vId, payload) => {
-				callOrder.push(`use:${tId}:${vId}:${payload.workspace_id}`);
-				return mockUseResponse;
-			});
+			.mockResolvedValue(mockUseResponse);
 
 		const { wrapper } = setup();
 		render(
@@ -182,31 +170,24 @@ describe("Use FREE Template Flow in Marketplace UI & Auto Claim Logic Fix", () =
 				version={publicTemplate.version}
 				open={true}
 				onOpenChange={vi.fn()}
-				requireClaim={true}
 			/>,
 			{ wrapper },
 		);
 
 		const dialog = screen.getByRole("dialog");
-		const confirmBtn = within(dialog).getByRole("button", { name: "Use template" });
-		await userEvent.click(confirmBtn);
+		await userEvent.click(within(dialog).getByRole("button", { name: "Use template" }));
 
-		await waitFor(() => {
-			expect(claimSpy).toHaveBeenCalledWith(publicTemplate.id);
+		await waitFor(() =>
 			expect(useSpy).toHaveBeenCalledWith(
 				publicTemplate.id,
 				publicTemplate.version.id,
 				{ workspace_id: "ws-1" },
-			);
-		});
-
-		expect(callOrder).toEqual([
-			`claim:${publicTemplate.id}`,
-			`use:${publicTemplate.id}:${publicTemplate.version.id}:ws-1`,
-		]);
+			),
+		);
+		expect(claimSpy).not.toHaveBeenCalled();
 	});
 
-	it("FIX-02: requireClaim={false} uses template directly without claiming even if PUBLIC and user is not creator", async () => {
+	it("FIX-02: uses template directly without claiming even if PUBLIC and user is not creator", async () => {
 		// Public template where user is NOT the creator
 		mockUser = { id: "user-different-from-creator", lastActiveWorkspaceId: "ws-1" };
 		const claimSpy = vi.spyOn(templateApi, "claimFreeTemplate");
@@ -219,7 +200,6 @@ describe("Use FREE Template Flow in Marketplace UI & Auto Claim Logic Fix", () =
 				version={publicTemplate.version}
 				open={true}
 				onOpenChange={vi.fn()}
-				requireClaim={false}
 			/>,
 			{ wrapper },
 		);
@@ -236,11 +216,10 @@ describe("Use FREE Template Flow in Marketplace UI & Auto Claim Logic Fix", () =
 			);
 		});
 
-		// Explicit requireClaim={false} must NOT claim!
 		expect(claimSpy).not.toHaveBeenCalled();
 	});
 
-	it("FIX-03: Omitting requireClaim prop defaults to false and uses directly without claiming", async () => {
+	it("FIX-03: the dialog never claims on the client", async () => {
 		mockUser = { id: "user-b", lastActiveWorkspaceId: "ws-1" };
 		const claimSpy = vi.spyOn(templateApi, "claimFreeTemplate");
 		const useSpy = vi.spyOn(templateApi, "useTemplate");
@@ -268,11 +247,10 @@ describe("Use FREE Template Flow in Marketplace UI & Auto Claim Logic Fix", () =
 			);
 		});
 
-		// Omitting requireClaim must NOT claim!
 		expect(claimSpy).not.toHaveBeenCalled();
 	});
 
-	it("FIX-04: PUBLIC Template without Marketplace Listing (no requireClaim prop) does NOT claim", async () => {
+	it("FIX-04: PUBLIC Template without Marketplace Listing does NOT claim", async () => {
 		mockUser = { id: "user-b", lastActiveWorkspaceId: "ws-1" };
 		const claimSpy = vi.spyOn(templateApi, "claimFreeTemplate");
 		const useSpy = vi.spyOn(templateApi, "useTemplate");
@@ -410,81 +388,56 @@ describe("Use FREE Template Flow in Marketplace UI & Auto Claim Logic Fix", () =
 		expect(claimSpy).not.toHaveBeenCalled();
 	});
 
-	it("FIX-07: PUBLIC Marketplace FREE flow via PublicTemplateDetailPage performs Claim before Use", async () => {
+	it("FIX-07: PUBLIC Marketplace FREE flow via PublicTemplateDetailPage uses directly, without a client claim", async () => {
 		mockUser = { id: "user-b", lastActiveWorkspaceId: "ws-1" };
-		const callOrder: string[] = [];
-
-		const claimSpy = vi
-			.spyOn(templateApi, "claimFreeTemplate")
-			.mockImplementation(async (id) => {
-				callOrder.push(`claim:${id}`);
-				return mockEntitlement;
-			});
-
+		const claimSpy = vi.spyOn(templateApi, "claimFreeTemplate");
 		const useSpy = vi
 			.spyOn(templateApi, "useTemplate")
-			.mockImplementation(async (tId, vId, payload) => {
-				callOrder.push(`use:${tId}:${vId}:${payload.workspace_id}`);
-				return mockUseResponse;
-			});
+			.mockResolvedValue(mockUseResponse);
 
 		const { wrapper } = setup();
 		render(<PublicTemplateDetailPage templateId={publicTemplate.id} />, {
 			wrapper,
 		});
 
-		// Click Use template CTA on PublicTemplateDetailPage
-		const ctaBtn = await screen.findByRole("button", { name: "Use template" });
-		await userEvent.click(ctaBtn);
-
-		// Confirm in UseTemplateDialog
+		await userEvent.click(await screen.findByRole("button", { name: "Use template" }));
 		const dialog = await screen.findByRole("dialog");
-		const confirmBtn = within(dialog).getByRole("button", { name: "Use template" });
-		await userEvent.click(confirmBtn);
+		await userEvent.click(within(dialog).getByRole("button", { name: "Use template" }));
 
-		await waitFor(() => {
-			expect(claimSpy).toHaveBeenCalledWith(publicTemplate.id);
+		await waitFor(() =>
 			expect(useSpy).toHaveBeenCalledWith(
 				publicTemplate.id,
 				publicTemplate.version.id,
 				{ workspace_id: "ws-1" },
-			);
-		});
-
-		expect(callOrder).toEqual([
-			`claim:${publicTemplate.id}`,
-			`use:${publicTemplate.id}:${publicTemplate.version.id}:ws-1`,
-		]);
+			),
+		);
+		expect(claimSpy).not.toHaveBeenCalled();
 	});
 
-	it("FIX-08: Claim failure stops flow, shows error, and does NOT call Use Template", async () => {
+	it("FIX-08: Use failure shows the backend reason and does not navigate", async () => {
 		mockUser = { id: "user-b", lastActiveWorkspaceId: "ws-1" };
-		const claimError = {
-			response: { status: 403, data: { message: "Listing not published" } },
+		vi.spyOn(templateApi, "useTemplate").mockRejectedValue({
+			response: { status: 403, data: { message: "This template is not available on the marketplace" } },
 			isAxiosError: true,
-		};
-
-		vi.spyOn(templateApi, "claimFreeTemplate").mockRejectedValue(claimError);
-		const useSpy = vi.spyOn(templateApi, "useTemplate");
+		});
 
 		const { wrapper } = setup();
 		render(<PublicTemplateDetailPage templateId={publicTemplate.id} />, {
 			wrapper,
 		});
 
-		const ctaBtn = await screen.findByRole("button", { name: "Use template" });
-		await userEvent.click(ctaBtn);
-
+		await userEvent.click(await screen.findByRole("button", { name: "Use template" }));
 		const dialog = await screen.findByRole("dialog");
-		const confirmBtn = within(dialog).getByRole("button", { name: "Use template" });
-		await userEvent.click(confirmBtn);
+		await userEvent.click(within(dialog).getByRole("button", { name: "Use template" }));
 
 		await waitFor(() => {
-			expect(within(dialog).getByRole("alert")).toHaveTextContent("Listing not published");
-			expect(mockToastError).toHaveBeenCalledWith("Listing not published");
+			expect(within(dialog).getByRole("alert")).toHaveTextContent(
+				"This template is not available on the marketplace",
+			);
+			expect(mockToastError).toHaveBeenCalledWith(
+				"This template is not available on the marketplace",
+			);
 		});
-
-		expect(useSpy).not.toHaveBeenCalled();
 		expect(mockPush).not.toHaveBeenCalled();
 	});
 
@@ -511,35 +464,30 @@ describe("Use FREE Template Flow in Marketplace UI & Auto Claim Logic Fix", () =
 	it("FIX-10: Double submission is prevented when confirm button is clicked rapidly", async () => {
 		mockUser = { id: "user-b", lastActiveWorkspaceId: "ws-1" };
 
-		let resolveClaim!: (val: TemplateEntitlementDto) => void;
-		const claimPromise = new Promise<TemplateEntitlementDto>((resolve) => {
-			resolveClaim = resolve;
-		});
-		const claimSpy = vi
-			.spyOn(templateApi, "claimFreeTemplate")
-			.mockReturnValue(claimPromise);
+		let resolveUse!: (val: typeof mockUseResponse) => void;
+		const useSpy = vi.spyOn(templateApi, "useTemplate").mockReturnValue(
+			new Promise((resolve) => {
+				resolveUse = resolve;
+			}),
+		);
 
 		const { wrapper } = setup();
 		render(<PublicTemplateDetailPage templateId={publicTemplate.id} />, {
 			wrapper,
 		});
 
-		const ctaBtn = await screen.findByRole("button", { name: "Use template" });
-		await userEvent.click(ctaBtn);
-
+		await userEvent.click(await screen.findByRole("button", { name: "Use template" }));
 		const dialog = await screen.findByRole("dialog");
 		const confirmBtn = within(dialog).getByRole("button", { name: "Use template" });
 
 		await userEvent.click(confirmBtn);
-
-		expect(within(dialog).getByText("Preparing template...")).toBeInTheDocument();
+		expect(within(dialog).getByText("Creating page...")).toBeInTheDocument();
 		expect(confirmBtn).toBeDisabled();
 
 		await userEvent.click(confirmBtn);
+		expect(useSpy).toHaveBeenCalledTimes(1);
 
-		expect(claimSpy).toHaveBeenCalledTimes(1);
-
-		resolveClaim(mockEntitlement);
+		resolveUse(mockUseResponse);
 	});
 
 	it("UI-11: Public template preview link is preserved and functioning", async () => {

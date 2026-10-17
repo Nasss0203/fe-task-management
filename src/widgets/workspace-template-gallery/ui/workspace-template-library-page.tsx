@@ -129,7 +129,6 @@ export function WorkspaceTemplateLibraryPage() {
 					template={selected}
 					version={selected.version}
 					open
-					requireClaim={false}
 					onOpenChange={(open) => !open && setSelection(null)}
 				/>
 			)}

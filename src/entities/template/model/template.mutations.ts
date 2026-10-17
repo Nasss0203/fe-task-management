@@ -95,7 +95,14 @@ export interface UseTemplateInput {
 }
 
 export function useUseTemplate() {
+	const queryClient = useQueryClient();
+
 	return useMutation<UseTemplateResponse, Error, UseTemplateInput>({
+		// Using a FREE template claims it on the backend: refresh the library and detail badges.
+		onSuccess: () =>
+			queryClient.invalidateQueries({
+				queryKey: [...templateKeys.all, "claimed"],
+			}),
 		mutationFn: ({
 			templateId,
 			versionId,

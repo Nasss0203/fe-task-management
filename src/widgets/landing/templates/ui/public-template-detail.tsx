@@ -292,7 +292,6 @@ function TemplateDetailContent({
 						{/* CTAs */}
 						<TemplateDetailActions
 							template={template}
-							isClaimed={isClaimed}
 							previewHref={previewHref}
 						/>
 
