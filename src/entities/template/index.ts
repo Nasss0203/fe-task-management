@@ -30,6 +30,7 @@ export {
 	useUnpublishTemplateListing,
 	usePublishTemplateToMarketplace,
 	useUpdateTemplateListing,
+	useRecordTemplateView,
 	type PublishTemplateToMarketplaceInput,
 	type UpdateTemplateListingInput,
 	type CreateTemplateFromPageInput,

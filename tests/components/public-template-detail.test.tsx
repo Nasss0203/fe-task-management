@@ -76,6 +76,7 @@ beforeEach(() => {
 		width: 1440,
 		height: 900,
 	});
+	vi.spyOn(templateApi, "recordPublicView").mockResolvedValue(undefined);
 });
 afterEach(() => {
 	mockUser = null;
@@ -285,6 +286,32 @@ describe("public detail UI", () => {
 			screen.queryByRole("button", { name: "Try again" }),
 		).not.toBeInTheDocument();
 		expect(templateApi.listPublic).not.toHaveBeenCalled();
+		expect(templateApi.recordPublicView).not.toHaveBeenCalled();
+	});
+	it("records exactly one view once the template has loaded", async () => {
+		const { wrapper } = setup();
+		render(<PublicTemplateDetailPage templateId={publicTemplate.id} />, {
+			wrapper,
+		});
+		expect(
+			await screen.findByRole("heading", { name: publicTemplate.name }),
+		).toBeInTheDocument();
+		expect(templateApi.recordPublicView).toHaveBeenCalledTimes(1);
+		expect(templateApi.recordPublicView).toHaveBeenCalledWith(
+			publicTemplate.id,
+		);
+	});
+	it("keeps the page usable when recording the view fails", async () => {
+		vi.mocked(templateApi.recordPublicView).mockRejectedValue(
+			new Error("network"),
+		);
+		const { wrapper } = setup();
+		render(<PublicTemplateDetailPage templateId={publicTemplate.id} />, {
+			wrapper,
+		});
+		expect(
+			await screen.findByRole("heading", { name: publicTemplate.name }),
+		).toBeInTheDocument();
 	});
 	it("404 replaces stale cached detail after refetch", async () => {
 		vi.mocked(templateApi.getPublicById).mockRejectedValue(notFound());

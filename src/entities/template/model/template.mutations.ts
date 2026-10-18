@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 import { templateApi } from "../api/template.api";
 import { templateKeys } from "./template.queries";
 import type {
@@ -381,4 +382,19 @@ export function useRestoreTemplate() {
 			]);
 		},
 	});
+}
+
+/**
+ * Records one VIEW per mounted detail page. Fire-and-forget: analytics must
+ * never break the page. The ref stops React Strict Mode's double effect in dev
+ * from sending two requests.
+ */
+export function useRecordTemplateView(templateId: string) {
+	const recordedFor = useRef<string | null>(null);
+
+	useEffect(() => {
+		if (recordedFor.current === templateId) return;
+		recordedFor.current = templateId;
+		templateApi.recordPublicView(templateId).catch(() => undefined);
+	}, [templateId]);
 }

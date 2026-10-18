@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+import { useRecordTemplateView } from "@/entities/template/model/template.mutations";
 import {
 	useMyClaimedTemplates,
 	usePublicTemplate,
@@ -104,6 +105,8 @@ function TemplateDetailContent({
 	basePath: string;
 }) {
 	const { user } = useUser();
+	// Mounted only once the template loaded, so failed or 404 loads are not views.
+	useRecordTemplateView(template.id);
 
 	const { data: claimedData } = useMyClaimedTemplates({
 		userId: user?.id,

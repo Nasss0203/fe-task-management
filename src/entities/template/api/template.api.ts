@@ -427,4 +427,8 @@ export const templateApi = {
 
 		return unwrapResponse<TemplatePreview>(response.data);
 	},
+
+	recordPublicView: async (templateId: string): Promise<void> => {
+		await publicApiClient.post(`${PUBLIC_TEMPLATE_API}/${templateId}/views`);
+	},
 };
