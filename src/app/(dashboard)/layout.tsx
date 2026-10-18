@@ -1,3 +1,4 @@
+import { PaymentResultDialog } from "@/features/workspace-billing";
 import { AppSidebar } from "@/widgets/workspace-sidebar";
 import { HeaderWorkspaceContainer } from "@/widgets/workspace-sidebar/ui/header-workspace-container";
 import {
@@ -22,6 +23,7 @@ const layout = ({
 					{children}
 				</main>
 			</SidebarInset>
+			<PaymentResultDialog />
 		</SidebarProvider>
 	);
 };

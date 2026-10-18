@@ -14,6 +14,7 @@ import {
 import { useRouter } from "next/navigation";
 import * as React from "react";
 
+import { useLogout } from "@/features/auth";
 import {
 	SettingsDialog,
 	useSettingsDialog,
@@ -34,6 +35,7 @@ import type {
 	WorkspaceMembershipType,
 } from "@/entities/workspace/model/workspace.types";
 import { InviteWorkspaceMembersDialog } from "@/features/workspace-invite/ui/InviteWorkspaceMembersDialog";
+import { BillingDialog, useBillingDialog } from "@/features/workspace-billing";
 import {
 	SidebarMenu,
 	SidebarMenuButton,
@@ -57,7 +59,6 @@ interface TeamSwitcherProps {
 
 	onWorkspaceSelect?: (workspaceId: string) => void;
 	onCreateWorkspace?: () => void;
-	onLogout?: () => void;
 }
 export function TeamSwitcher({
 	workspaces,
@@ -70,13 +71,15 @@ export function TeamSwitcher({
 	canRemoveMember = false,
 	onWorkspaceSelect,
 	onCreateWorkspace,
-	onLogout,
 }: TeamSwitcherProps) {
 	const router = useRouter();
+	const logout = useLogout();
 	const setSettingsOpen = useSettingsDialog((state) => state.setOpen);
 	const [inviteDialogOpen, setInviteDialogOpen] = React.useState(false);
 
-	const pendingSettingsOpen = React.useRef(false);
+	// Dialogs open after the menu closes, so focus doesn't return to the trigger.
+	const pendingDialog = React.useRef<"settings" | "billing" | null>(null);
+	const setBillingOpen = useBillingDialog((state) => state.setOpen);
 	const isMember = membershipType === "MEMBER";
 
 	const activeWorkspace =
@@ -117,12 +120,13 @@ export function TeamSwitcher({
 						side='bottom'
 						sideOffset={6}
 						onCloseAutoFocus={(event) => {
-							if (isMember && pendingSettingsOpen.current) {
-								event.preventDefault();
-								pendingSettingsOpen.current = false;
+							const pending = pendingDialog.current;
+							if (!pending) return;
+							event.preventDefault();
+							pendingDialog.current = null;
 
-								setSettingsOpen(true);
-							}
+							if (pending === "billing") setBillingOpen(true);
+							else if (isMember) setSettingsOpen(true);
 						}}
 					>
 						{/* Current workspace */}
@@ -150,51 +154,51 @@ export function TeamSwitcher({
 						<DropdownMenuSeparator className='my-0' />
 
 						{/* Workspace actions */}
-						<div className='p-1'>
-							{canUpgrade && (
-								<DropdownMenuItem
-									className='cursor-pointer gap-2 p-2 text-blue-500 focus:text-blue-500'
-									onSelect={() => router.push("/billing")}
-								>
-									<ArrowUpCircle className='size-4' />
-									Upgrade
-								</DropdownMenuItem>
-							)}
-						</div>
-						{isMember && (
+						{(canUpgrade || isMember) && (
 							<>
 								<div className='p-1'>
-									<DropdownMenuItem className='gap-2 p-2 text-blue-500 focus:text-blue-500'>
-										<ArrowUpCircle className='size-4' />
-										Upgrade
-									</DropdownMenuItem>
-
-									<DropdownMenuItem
-										className='gap-2 p-2'
-										onSelect={() => {
-											pendingSettingsOpen.current = true;
-										}}
-									>
-										<SettingsIcon className='size-4' />
-										Settings
-									</DropdownMenuItem>
-
-									{canInviteMembers && (
+									{canUpgrade && (
 										<DropdownMenuItem
-											className='gap-2 p-2'
-											onSelect={() =>
-												setInviteDialogOpen(true)
-											}
+											className='cursor-pointer gap-2 p-2 text-blue-500 focus:text-blue-500'
+											onSelect={() => {
+												pendingDialog.current = "billing";
+											}}
 										>
-											<Mail className='size-4' />
-											Invite members
+											<ArrowUpCircle className='size-4' />
+											Upgrade
 										</DropdownMenuItem>
 									)}
 
-									<DropdownMenuItem className='gap-2 p-2'>
-										<UserPlus className='size-4' />
-										Add account
-									</DropdownMenuItem>
+									{isMember && (
+										<>
+											<DropdownMenuItem
+												className='gap-2 p-2'
+												onSelect={() => {
+													pendingDialog.current = "settings";
+												}}
+											>
+												<SettingsIcon className='size-4' />
+												Settings
+											</DropdownMenuItem>
+
+											{canInviteMembers && (
+												<DropdownMenuItem
+													className='gap-2 p-2'
+													onSelect={() =>
+														setInviteDialogOpen(true)
+													}
+												>
+													<Mail className='size-4' />
+													Invite members
+												</DropdownMenuItem>
+											)}
+
+											<DropdownMenuItem className='gap-2 p-2'>
+												<UserPlus className='size-4' />
+												Add account
+											</DropdownMenuItem>
+										</>
+									)}
 								</div>
 
 								<DropdownMenuSeparator className='my-0' />
@@ -266,7 +270,8 @@ export function TeamSwitcher({
 						<div className='p-1'>
 							<DropdownMenuItem
 								className='gap-2 p-2'
-								onSelect={onLogout}
+								disabled={logout.isPending}
+								onSelect={() => logout.mutate()}
 							>
 								<LogOut className='size-4' />
 								Log out
@@ -276,6 +281,12 @@ export function TeamSwitcher({
 				</DropdownMenu>
 			</SidebarMenuItem>
 
+			{/* Always mounted so ?upgrade=1 links work on any plan. */}
+			<BillingDialog
+				workspaceId={activeWorkspace.id}
+				workspaceName={activeWorkspace.name}
+				currentPlanCode={activeSubscription?.plan.code}
+			/>
 			{isMember && (
 				<SettingsDialog
 					workspaceId={activeWorkspace.id}

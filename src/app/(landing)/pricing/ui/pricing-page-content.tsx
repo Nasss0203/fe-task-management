@@ -97,7 +97,7 @@ export function PricingPageContent() {
 								? plan.priceYearly
 								: plan.priceMonthly;
 
-						const ctaHref = user ? "/billing" : "/sign-up";
+						const ctaHref = user ? "/dashboard?upgrade=1" : "/sign-up";
 
 						return (
 							<div

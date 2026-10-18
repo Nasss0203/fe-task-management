@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -6,11 +7,21 @@ import type { WorkspaceSubscription } from "@/entities/billing/model/billing.typ
 import type { Workspace } from "@/entities/workspace/model/workspace.types";
 import { SidebarProvider } from "@/widgets/workspace-sidebar/ui/sidebar";
 import { TeamSwitcher } from "@/widgets/workspace-sidebar/ui/team-switcher";
+import { useBillingDialog } from "@/features/workspace-billing";
 
 const routerPush = vi.fn();
+const logout = vi.hoisted(() => ({ mutate: vi.fn(), isPending: false }));
 
 vi.mock("next/navigation", () => ({
 	useRouter: () => ({ push: routerPush }),
+}));
+
+vi.mock("@/features/auth", () => ({ useLogout: () => logout }));
+
+vi.mock("@/entities/billing/api/billing.api", () => ({
+	getBillingPlans: vi.fn().mockResolvedValue({ items: [] }),
+	createBillingCheckout: vi.fn(),
+	navigateToBillingCheckout: vi.fn(),
 }));
 
 vi.mock("@/shared/hooks/use-mobile", () => ({
@@ -60,15 +71,18 @@ function createSubscription(
 }
 
 function renderTeamSwitcher(subscription: WorkspaceSubscription) {
+	const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 	return render(
-		<SidebarProvider>
-			<TeamSwitcher
-				workspaces={[workspace]}
-				currentWorkspaceId={workspace.id}
-				subscription={subscription}
-				user={{ email: "owner@example.com" }}
-			/>
-		</SidebarProvider>,
+		<QueryClientProvider client={client}>
+			<SidebarProvider>
+				<TeamSwitcher
+					workspaces={[workspace]}
+					currentWorkspaceId={workspace.id}
+					subscription={subscription}
+					user={{ email: "owner@example.com" }}
+				/>
+			</SidebarProvider>
+		</QueryClientProvider>,
 	);
 }
 
@@ -80,6 +94,8 @@ async function openWorkspaceMenu() {
 describe("TeamSwitcher subscription presentation", () => {
 	beforeEach(() => {
 		routerPush.mockClear();
+		logout.mutate.mockClear();
+		useBillingDialog.setState({ open: false });
 	});
 
 	it("shows Free Plan and the Upgrade action for the FREE plan", async () => {
@@ -102,6 +118,30 @@ describe("TeamSwitcher subscription presentation", () => {
 		expect(
 			screen.queryByRole("menuitem", { name: /Upgrade/i }),
 		).not.toBeInTheDocument();
+	});
+
+	it("shows a single Upgrade item that opens the billing dialog", async () => {
+		renderTeamSwitcher(createSubscription("FREE", "Free"));
+
+		await openWorkspaceMenu();
+		const items = await screen.findAllByRole("menuitem", { name: /Upgrade/i });
+		expect(items).toHaveLength(1);
+
+		await userEvent.click(items[0]);
+
+		await waitFor(() => expect(useBillingDialog.getState().open).toBe(true));
+		expect(routerPush).not.toHaveBeenCalledWith("/billing");
+	});
+
+	it("logs out from the account menu", async () => {
+		renderTeamSwitcher(createSubscription("FREE", "Free"));
+
+		await openWorkspaceMenu();
+		await userEvent.click(
+			await screen.findByRole("menuitem", { name: /Log out/i }),
+		);
+
+		expect(logout.mutate).toHaveBeenCalledTimes(1);
 	});
 
 	it("navigates to Creator Studio from the account menu", async () => {
