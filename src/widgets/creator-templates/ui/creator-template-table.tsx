@@ -5,7 +5,13 @@ import { RotateCw } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import type { PageTemplate } from "@/entities/template";
+import {
+	type PageTemplate,
+	useCreatorTemplatesAnalytics,
+} from "@/entities/template";
+import type { TemplateAnalyticsTotals } from "@/entities/template/model/template.types";
+import { useUser } from "@/features/auth";
+import { formatVnd } from "@/shared/lib/currency";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 import { Skeleton } from "@/shared/ui/skeleton";
@@ -18,8 +24,20 @@ import {
 } from "./template-meta";
 import { TemplateRowActions } from "./template-row-actions";
 
+// All-time metric columns only appear from xl, where the name column still has room.
 const ROW_GRID =
-	"grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 md:grid-cols-[minmax(0,1fr)_112px_64px_104px_120px]";
+	"grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 md:grid-cols-[minmax(0,1fr)_112px_64px_104px_120px] xl:grid-cols-[minmax(0,1fr)_104px_56px_96px_56px_56px_88px_112px] xl:gap-3";
+
+const METRIC_CELL =
+	"hidden text-right text-sm tabular-nums text-muted-foreground xl:block";
+const METRIC_HINT = "All time, your own visits excluded";
+
+const countFormatter = new Intl.NumberFormat("en", { notation: "compact" });
+const compactVnd = new Intl.NumberFormat("vi-VN", {
+	style: "currency",
+	currency: "VND",
+	notation: "compact",
+});
 
 interface CreatorTemplateTableProps {
 	templates: PageTemplate[];
@@ -39,6 +57,15 @@ export function CreatorTemplateTable({
 	skeletonRows = 3,
 }: CreatorTemplateTableProps) {
 	const showHeader = isPending || (!isError && templates.length > 0);
+	const { user } = useUser();
+	// One request for every row; the table has no period picker, so it shows all-time.
+	const analytics = useCreatorTemplatesAnalytics({
+		userId: user?.id,
+		period: "all",
+	});
+	const totalsById = new Map(
+		analytics.data?.items.map((item) => [item.templateId, item.totals]),
+	);
 
 	return (
 		<div className='overflow-hidden rounded-xl border bg-card'>
@@ -49,6 +76,15 @@ export function CreatorTemplateTable({
 						<span>Visibility</span>
 						<span>Version</span>
 						<span>Status</span>
+						<span className='hidden text-right xl:block' title={METRIC_HINT}>
+							Views
+						</span>
+						<span className='hidden text-right xl:block' title={METRIC_HINT}>
+							Uses
+						</span>
+						<span className='hidden text-right xl:block' title={METRIC_HINT}>
+							Revenue
+						</span>
 						<span className='text-right'>Last updated</span>
 					</div>
 					<span className='w-16 text-center'>Actions</span>
@@ -79,7 +115,11 @@ export function CreatorTemplateTable({
 			) : (
 				<ul className='divide-y'>
 					{templates.map((template) => (
-						<CreatorTemplateRow key={template.id} template={template} />
+						<CreatorTemplateRow
+							key={template.id}
+							template={template}
+							totals={totalsById.get(template.id)}
+						/>
 					))}
 				</ul>
 			)}
@@ -87,7 +127,14 @@ export function CreatorTemplateTable({
 	);
 }
 
-function CreatorTemplateRow({ template }: { template: PageTemplate }) {
+function CreatorTemplateRow({
+	template,
+	totals,
+}: {
+	template: PageTemplate;
+	/** Undefined while analytics load or if they failed; the row still renders. */
+	totals?: TemplateAnalyticsTotals;
+}) {
 	const version = template.version
 		? `v${template.version.version_number}`
 		: "—";
@@ -133,6 +180,18 @@ function CreatorTemplateRow({ template }: { template: PageTemplate }) {
 					)}
 					className='text-xs md:text-sm'
 				/>
+				<span className={METRIC_CELL}>
+					{totals ? countFormatter.format(totals.views) : "—"}
+				</span>
+				<span className={METRIC_CELL}>
+					{totals ? countFormatter.format(totals.uses) : "—"}
+				</span>
+				<span
+					className={cn(METRIC_CELL, "truncate")}
+					title={totals ? formatVnd(totals.grossRevenue) : undefined}
+				>
+					{totals ? compactVnd.format(totals.grossRevenue) : "—"}
+				</span>
 				<span className='hidden text-right text-sm text-muted-foreground md:block'>
 					{updated}
 				</span>

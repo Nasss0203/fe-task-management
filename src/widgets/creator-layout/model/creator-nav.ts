@@ -1,4 +1,9 @@
-import { LayoutDashboard, LayoutTemplate, type LucideIcon } from "lucide-react";
+import {
+	ChartLine,
+	LayoutDashboard,
+	LayoutTemplate,
+	type LucideIcon,
+} from "lucide-react";
 
 export interface CreatorNavItem {
 	title: string;
@@ -13,7 +18,7 @@ export interface CreatorNavGroup {
 	items: CreatorNavItem[];
 }
 
-// Sales/Analytics join the nav once those features exist.
+// Sales joins the nav once that feature exists.
 export const CREATOR_NAV: CreatorNavGroup[] = [
 	{
 		items: [
@@ -23,6 +28,7 @@ export const CREATOR_NAV: CreatorNavGroup[] = [
 				href: "/creator/templates",
 				icon: LayoutTemplate,
 			},
+			{ title: "Analytics", href: "/creator/analytics", icon: ChartLine },
 		],
 	},
 ];

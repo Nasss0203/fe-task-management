@@ -47,6 +47,7 @@ import {
 } from "@/shared/ui/select";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { TemplateAnalyticsPanel } from "./analytics/template-analytics-panel";
 import { ArchiveTemplateDialog } from "./manage/archive-template-dialog";
 import { EditTemplateDialog } from "./manage/edit-template-dialog";
 import { PublishTemplateDialog } from "./manage/publish-template-dialog";
@@ -61,7 +62,7 @@ import {
 } from "./template-meta";
 import { TemplateMarketplaceSummary } from "./template-marketplace-summary";
 
-const TABS = ["overview", "versions", "marketplace"] as const;
+const TABS = ["overview", "versions", "marketplace", "analytics"] as const;
 type Tab = (typeof TABS)[number];
 
 function parseTab(value: string | null): Tab {
@@ -297,6 +298,9 @@ export function CreatorTemplateDetailPage({ templateId }: { templateId: string }
 					<TabsTrigger value='marketplace' className='flex-none'>
 						Marketplace
 					</TabsTrigger>
+					<TabsTrigger value='analytics' className='flex-none'>
+						Analytics
+					</TabsTrigger>
 				</TabsList>
 
 				<TabsContent value='overview'>
@@ -391,6 +395,11 @@ export function CreatorTemplateDetailPage({ templateId }: { templateId: string }
 
 				<TabsContent value='marketplace'>
 					<TemplateMarketplaceSummary template={template} versions={versions} />
+				</TabsContent>
+
+				<TabsContent value='analytics'>
+					{/* Mounted only on this tab, so analytics load when someone looks. */}
+					<TemplateAnalyticsPanel templateId={template.id} />
 				</TabsContent>
 			</Tabs>
 

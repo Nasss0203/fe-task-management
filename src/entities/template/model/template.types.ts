@@ -348,8 +348,7 @@ export interface PreviewTemplateDemoPayload {
 
 export type CreateTemplateListingPayload = UpdateTemplateListingPayload;
 
-export interface PublishTemplateToMarketplacePayload
-	extends UpdateTemplateListingPayload {
+export interface PublishTemplateToMarketplacePayload extends UpdateTemplateListingPayload {
 	version_id: string;
 	offer_type: TemplateOfferType;
 	/** Replaces the listing categories when provided. */
@@ -426,3 +425,61 @@ export interface TemplatePurchaseCheckout {
 	checkoutMethod: string;
 }
 
+/** Creator analytics range: inclusive Vietnam-time calendar dates; `from: null` is all-time. */
+export interface TemplateAnalyticsRange {
+	from: string | null;
+	to: string;
+}
+
+export interface TemplateAnalyticsTotals {
+	views: number;
+	/** Distinct signed-in viewers; guests cannot be told apart. */
+	uniqueViewers: number;
+	guestViews: number;
+	uses: number;
+	paidPurchases: number;
+	/** Gross VND from PAID purchases, before any platform fee. */
+	grossRevenue: number;
+}
+
+export interface TemplateAnalyticsTemplateTotals {
+	templateId: string;
+	name: string;
+	totals: TemplateAnalyticsTotals;
+}
+
+interface TemplateAnalyticsRangeResponse extends TemplateAnalyticsRange {
+	timeZone: string;
+	currency: "VND";
+}
+
+/** GET /templates/me/analytics */
+export interface CreatorTemplatesAnalyticsResponse extends TemplateAnalyticsRangeResponse {
+	items: TemplateAnalyticsTemplateTotals[];
+	/** Summed over all templates; empty when the creator has none. */
+	daily: TemplateAnalyticsDailyPoint[];
+}
+
+export interface TemplateAnalyticsDailyPoint {
+	date: string;
+	views: number;
+	uses: number;
+	paidPurchases: number;
+	grossRevenue: number;
+}
+
+export interface TemplateAnalyticsVersionPoint {
+	versionId: string;
+	versionNumber: number;
+	uses: number;
+	paidPurchases: number;
+	grossRevenue: number;
+}
+
+/** GET /templates/:templateId/analytics */
+export interface CreatorTemplateAnalyticsResponse extends TemplateAnalyticsRangeResponse {
+	templateId: string;
+	totals: TemplateAnalyticsTotals;
+	daily: TemplateAnalyticsDailyPoint[];
+	versions: TemplateAnalyticsVersionPoint[];
+}

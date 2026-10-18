@@ -15,8 +15,23 @@ export {
 	useInfinitePublicTemplates,
 	usePublicTemplate,
 	useTemplateVersionThumbnail,
+	useCreatorTemplatesAnalytics,
+	useCreatorTemplateAnalytics,
 	type UseInfiniteTemplatesOptions,
 } from "./model/template.queries";
+export {
+	TEMPLATE_ANALYTICS_PERIODS,
+	getTemplateAnalyticsRange,
+	type TemplateAnalyticsPeriod,
+} from "./model/template-analytics-period";
+export { TemplateAnalyticsPeriodPicker } from "./ui/template-analytics-period-picker";
+export { TemplateAnalyticsDaily } from "./ui/template-analytics-daily";
+export {
+	TemplateAnalyticsStats,
+	analyticsCountFormatter,
+	EMPTY_ANALYTICS_TOTALS,
+	sumAnalyticsTotals,
+} from "./ui/template-analytics-stats";
 export {
 	useCreateTemplateFromPage,
 	usePublishTemplateVersion,

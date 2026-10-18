@@ -25,6 +25,9 @@ describe("creator nav", () => {
 		expect(getActiveCreatorNavItem("/creator/templates/t-1")?.href).toBe(
 			"/creator/templates",
 		);
+		expect(getActiveCreatorNavItem("/creator/analytics")?.title).toBe(
+			"Analytics",
+		);
 		expect(getActiveCreatorNavItem("/creator/unknown")).toBeUndefined();
 	});
 });

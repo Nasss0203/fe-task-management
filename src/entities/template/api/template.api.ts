@@ -29,6 +29,9 @@ import type {
 	TemplatePurchase,
 	TemplatePurchaseCheckout,
 	TemplatePurchaseHistoryResponse,
+	TemplateAnalyticsRange,
+	CreatorTemplatesAnalyticsResponse,
+	CreatorTemplateAnalyticsResponse,
 } from "../model/template.types";
 
 const TEMPLATE_API = "/templates";
@@ -75,6 +78,35 @@ export const templateApi = {
 			signal,
 		});
 		return unwrapResponse<TemplatePurchaseHistoryResponse>(response.data);
+	},
+
+	getMyAnalytics: async (
+		range: TemplateAnalyticsRange,
+		signal?: AbortSignal,
+	): Promise<CreatorTemplatesAnalyticsResponse> => {
+		const response = await instance.get<
+			| ApiResponse<CreatorTemplatesAnalyticsResponse>
+			| CreatorTemplatesAnalyticsResponse
+		>(`${TEMPLATE_API}/me/analytics`, {
+			params: { from: range.from ?? undefined, to: range.from ? range.to : undefined },
+			signal,
+		});
+		return unwrapResponse<CreatorTemplatesAnalyticsResponse>(response.data);
+	},
+
+	getAnalytics: async (
+		templateId: string,
+		range: TemplateAnalyticsRange,
+		signal?: AbortSignal,
+	): Promise<CreatorTemplateAnalyticsResponse> => {
+		const response = await instance.get<
+			| ApiResponse<CreatorTemplateAnalyticsResponse>
+			| CreatorTemplateAnalyticsResponse
+		>(`${TEMPLATE_API}/${templateId}/analytics`, {
+			params: { from: range.from ?? undefined, to: range.from ? range.to : undefined },
+			signal,
+		});
+		return unwrapResponse<CreatorTemplateAnalyticsResponse>(response.data);
 	},
 
 	list: async (

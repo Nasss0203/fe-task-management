@@ -64,6 +64,9 @@
 	--secondary-foreground: #18181b;
 	--muted: #f4f4f5;
 	--muted-foreground: #525252;
+	/* Chart series: validated categorical pair on the card surface (CVD-safe). */
+	--chart-1: #2a78d6;
+	--chart-2: #eb6834;
 	--accent: #f4f4f5;
 	--accent-foreground: #18181b;
 	--destructive: oklch(0.577 0.245 27.325);
@@ -101,6 +104,8 @@
 	--secondary-foreground: #fafafa;
 	--muted: #262626;
 	--muted-foreground: #a3a3a3;
+	--chart-1: #3987e5;
+	--chart-2: #d95926;
 	--accent: #262626;
 	--accent-foreground: #fafafa;
 	--destructive: oklch(0.6 0.2 25);

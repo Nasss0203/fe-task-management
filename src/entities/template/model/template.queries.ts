@@ -1,8 +1,17 @@
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import {
+	keepPreviousData,
+	useInfiniteQuery,
+	useQuery,
+} from "@tanstack/react-query";
 import axios from "axios";
 import { templateApi } from "../api/template.api";
+import {
+	getTemplateAnalyticsRange,
+	type TemplateAnalyticsPeriod,
+} from "./template-analytics-period";
 import type {
 	PreviewTemplateDemoPayload,
+	TemplateAnalyticsRange,
 	TemplateEntitlementSource,
 	TemplateOfferType,
 } from "./template.types";
@@ -16,6 +25,17 @@ export const templateKeys = {
 	) => [...templateKeys.all, "claimed", userId, { limit, source }] as const,
 	purchases: (userId: string | undefined) =>
 		[...templateKeys.all, "purchases", userId] as const,
+	// Keyed by the resolved dates so a period refetches once the day rolls over.
+	analytics: (userId: string | undefined, range: TemplateAnalyticsRange) =>
+		[...templateKeys.all, "analytics", userId, range.from, range.to] as const,
+	templateAnalytics: (templateId: string, range: TemplateAnalyticsRange) =>
+		[
+			...templateKeys.all,
+			"template-analytics",
+			templateId,
+			range.from,
+			range.to,
+		] as const,
 
 	lists: () => [...templateKeys.all, "list"] as const,
 
@@ -379,5 +399,49 @@ export function useUsableTemplateVersions(
 		enabled:
 			Boolean(templateId && options?.userId) && (options?.enabled ?? true),
 		retry: false,
+	});
+}
+
+/** Totals for every template the signed-in creator owns. */
+export function useCreatorTemplatesAnalytics({
+	userId,
+	period,
+}: {
+	userId?: string;
+	period: TemplateAnalyticsPeriod;
+}) {
+	const range = getTemplateAnalyticsRange(period);
+
+	return useQuery({
+		queryKey: templateKeys.analytics(userId, range),
+		queryFn: ({ signal }) => templateApi.getMyAnalytics(range, signal),
+		enabled: Boolean(userId),
+		// Keep the old numbers on screen while another period loads.
+		placeholderData: keepPreviousData,
+	});
+}
+
+/** Totals, daily series and version breakdown for one owned template. */
+export function useCreatorTemplateAnalytics({
+	templateId,
+	period,
+	enabled = true,
+}: {
+	templateId: string;
+	period: TemplateAnalyticsPeriod;
+	enabled?: boolean;
+}) {
+	const range = getTemplateAnalyticsRange(period);
+
+	return useQuery({
+		queryKey: templateKeys.templateAnalytics(templateId, range),
+		queryFn: ({ signal }) =>
+			templateApi.getAnalytics(templateId, range, signal),
+		enabled: Boolean(templateId) && enabled,
+		placeholderData: keepPreviousData,
+		// 404 means "not your template"; retrying cannot change that.
+		retry: (failureCount, error) =>
+			!(axios.isAxiosError(error) && error.response?.status === 404) &&
+			failureCount < 2,
 	});
 }

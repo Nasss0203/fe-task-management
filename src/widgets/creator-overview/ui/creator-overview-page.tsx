@@ -7,6 +7,7 @@ import { useInfiniteTemplates } from "@/entities/template";
 import { useUser } from "@/features/auth";
 import { Button } from "@/shared/ui/button";
 import { CreatorTemplateTable } from "@/widgets/creator-templates";
+import { CreatorPerformance } from "./creator-performance";
 
 const RECENT_LIMIT = 5;
 
@@ -54,6 +55,8 @@ export function CreatorOverviewPage() {
 					</Link>
 				</Button>
 			</header>
+
+			<CreatorPerformance />
 
 			<section
 				aria-labelledby='creator-guide-title'
