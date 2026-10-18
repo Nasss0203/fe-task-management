@@ -13,7 +13,7 @@ const STATUS: Record<TemplateStatus, { label: string; dot: string }> = {
 	ARCHIVED: { label: "Archived", dot: "bg-muted-foreground/50" },
 };
 
-const VISIBILITY: Record<
+export const VISIBILITY: Record<
 	TemplateVisibility,
 	{ label: string; icon: typeof Lock }
 > = {

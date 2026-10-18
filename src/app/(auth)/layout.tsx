@@ -9,7 +9,7 @@ export default function AuthLayout({
 	children: ReactNode;
 }>) {
 	return (
-		<div className='relative isolate flex h-dvh min-h-dvh flex-col overflow-hidden bg-background text-foreground selection:bg-primary/20'>
+		<div className='relative isolate flex min-h-dvh flex-col bg-background text-foreground selection:bg-primary/20'>
 			{/* Subtle ambient lighting mesh matching landing page */}
 			<div
 				aria-hidden='true'
@@ -37,9 +37,9 @@ export default function AuthLayout({
 				</div>
 			</header>
 
-			{/* Main Content Area - strictly bounded within remaining dvh */}
-			<main className='relative z-10 flex min-h-0 flex-1 items-center justify-center p-3 sm:p-4 md:p-6'>
-				<div className='flex max-h-full w-full justify-center min-h-0'>
+			{/* Tall forms grow the page; the window scrolls, never the card. */}
+			<main className='relative z-10 flex flex-1 items-center justify-center p-3 sm:p-4 md:p-6'>
+				<div className='flex w-full justify-center'>
 					{children}
 				</div>
 			</main>

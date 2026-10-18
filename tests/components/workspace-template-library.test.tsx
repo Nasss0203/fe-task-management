@@ -374,6 +374,8 @@ describe("Workspace template library (claimed templates)", () => {
 		});
 		setup();
 		await screen.findByRole("heading", { name: "Claimed planning" });
+		// The card names the listing's latest release, not the one Use will pin.
+		expect(screen.getByText("Latest v4")).toBeInTheDocument();
 		await userEvent.click(screen.getByRole("button", { name: "Use template" }));
 		const dialog = await screen.findByRole("dialog");
 		expect(within(dialog).queryByLabelText("Version to use")).not.toBeInTheDocument();

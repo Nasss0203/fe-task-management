@@ -42,7 +42,7 @@ export function AuthCard({
 	return (
 		<div
 			className={cn(
-				"relative flex max-h-full w-full max-w-md flex-col rounded-2xl border border-border/80 bg-card/90 shadow-xl shadow-black/5 dark:shadow-black/20 backdrop-blur-xl overflow-hidden",
+				"relative flex w-full max-w-md flex-col rounded-2xl border border-border/80 bg-card/90 shadow-xl shadow-black/5 dark:shadow-black/20 backdrop-blur-xl overflow-hidden",
 				className
 			)}
 		>
@@ -63,9 +63,8 @@ export function AuthCard({
 				</div>
 			)}
 
-			{/* Scrollable Form Content - only scrolls if content overflows available height */}
 			{children && (
-				<div className='min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-2 sm:px-8 [scrollbar-width:thin]'>
+				<div className='px-6 py-2 sm:px-8'>
 					{children}
 				</div>
 			)}

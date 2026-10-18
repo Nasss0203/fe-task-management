@@ -1,6 +1,13 @@
 "use client";
 
-import { LayoutTemplate, Loader2, Plus, Search } from "lucide-react";
+import {
+	ChevronLeft,
+	ChevronRight,
+	LayoutTemplate,
+	Loader2,
+	Plus,
+	Search,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -11,15 +18,36 @@ import { Input } from "@/shared/ui/input";
 
 import { CreatorTemplateTable } from "./creator-template-table";
 
+const PAGE_SIZE = 10;
+
 export function CreatorTemplatesPage() {
 	const [search, setSearch] = useState("");
 	const debouncedSearch = useDebounce(search, 350);
+	// The page index belongs to one search; a new search starts at page 1.
+	const [paging, setPaging] = useState({ search: "", page: 0 });
 	const query = useInfiniteTemplates({
 		scope: "mine",
 		search: debouncedSearch,
+		limit: PAGE_SIZE,
 	});
-	const templates = query.data?.pages.flatMap((page) => page.items) ?? [];
+	// shortcut: the API is cursor-based with no total, so only Previous/Next; add page numbers if it returns a count.
+	const pages = query.data?.pages ?? [];
+	// Clamp when a refetch returns fewer pages (e.g. after archiving).
+	const page = Math.min(
+		paging.search === debouncedSearch ? paging.page : 0,
+		Math.max(pages.length - 1, 0),
+	);
+	const templates = pages[page]?.items ?? [];
+	const hasNext = page < pages.length - 1 || query.hasNextPage;
 	const isSearching = Boolean(debouncedSearch.trim());
+
+	const goTo = async (next: number) => {
+		if (next >= pages.length) {
+			const result = await query.fetchNextPage();
+			if (result.isError) return;
+		}
+		setPaging({ search: debouncedSearch, page: next });
+	};
 
 	return (
 		<div className='flex flex-col gap-6'>
@@ -80,19 +108,37 @@ export function CreatorTemplatesPage() {
 				}
 			/>
 
-			{query.hasNextPage && (
-				<Button
-					variant='outline'
-					size='sm'
-					className='self-center'
-					disabled={query.isFetchingNextPage}
-					onClick={() => query.fetchNextPage()}
+			{(page > 0 || hasNext) && (
+				<nav
+					aria-label='Templates pagination'
+					className='flex items-center justify-center gap-3'
 				>
-					{query.isFetchingNextPage && (
-						<Loader2 className='size-3.5 animate-spin' />
-					)}
-					Load more
-				</Button>
+					<Button
+						variant='outline'
+						size='sm'
+						disabled={page === 0}
+						onClick={() => goTo(page - 1)}
+					>
+						<ChevronLeft className='size-3.5' />
+						Previous
+					</Button>
+					<span className='text-sm tabular-nums text-muted-foreground'>
+						Page {page + 1}
+					</span>
+					<Button
+						variant='outline'
+						size='sm'
+						disabled={!hasNext || query.isFetchingNextPage}
+						onClick={() => goTo(page + 1)}
+					>
+						Next
+						{query.isFetchingNextPage ? (
+							<Loader2 className='size-3.5 animate-spin' />
+						) : (
+							<ChevronRight className='size-3.5' />
+						)}
+					</Button>
+				</nav>
 			)}
 		</div>
 	);

@@ -112,7 +112,7 @@ export function ClaimedTemplateCard({
 						</span>
 						{template.version && (
 							<span className='shrink-0 font-medium'>
-								v{template.version.version_number}
+								Latest v{template.version.version_number}
 							</span>
 						)}
 					</div>

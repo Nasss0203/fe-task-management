@@ -23,6 +23,7 @@ export const templateKeys = {
 		scope: "mine" | "workspace";
 		workspaceId?: string;
 		search?: string;
+		limit?: number;
 	}) =>
 		[
 			...templateKeys.lists(),
@@ -30,6 +31,7 @@ export const templateKeys = {
 				scope: filters.scope,
 				workspaceId: filters.workspaceId,
 				search: filters.search,
+				limit: filters.limit,
 			},
 		] as const,
 
@@ -153,6 +155,7 @@ export function useInfiniteTemplates({
 			scope,
 			workspaceId: scope === "workspace" ? workspaceId : undefined,
 			search: trimmedSearch,
+			limit,
 		}),
 		queryFn: ({ pageParam, signal }) =>
 			templateApi.list(

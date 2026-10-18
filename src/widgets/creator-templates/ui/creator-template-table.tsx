@@ -16,6 +16,7 @@ import {
 	TemplateStatusLabel,
 	TemplateVisibilityLabel,
 } from "./template-meta";
+import { TemplateRowActions } from "./template-row-actions";
 
 const ROW_GRID =
 	"grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 md:grid-cols-[minmax(0,1fr)_112px_64px_104px_120px]";
@@ -42,17 +43,15 @@ export function CreatorTemplateTable({
 	return (
 		<div className='overflow-hidden rounded-xl border bg-card'>
 			{showHeader && (
-				<div
-					className={cn(
-						ROW_GRID,
-						"hidden border-b bg-muted/40 px-4 py-2 text-xs font-medium text-muted-foreground md:grid",
-					)}
-				>
-					<span>Name</span>
-					<span>Visibility</span>
-					<span>Version</span>
-					<span>Status</span>
-					<span className='text-right'>Last updated</span>
+				<div className='hidden items-center border-b bg-muted/40 pr-2 text-xs font-medium text-muted-foreground md:flex'>
+					<div className={cn(ROW_GRID, "flex-1 px-4 py-2")}>
+						<span>Name</span>
+						<span>Visibility</span>
+						<span>Version</span>
+						<span>Status</span>
+						<span className='text-right'>Last updated</span>
+					</div>
+					<span className='w-16 text-center'>Actions</span>
 				</div>
 			)}
 
@@ -97,12 +96,12 @@ function CreatorTemplateRow({ template }: { template: PageTemplate }) {
 	});
 
 	return (
-		<li>
+		<li className='flex items-center pr-2 transition-colors hover:bg-muted/50'>
 			<Link
 				href={`/creator/templates/${template.id}`}
 				className={cn(
 					ROW_GRID,
-					"px-4 py-3 transition-colors hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none",
+					"min-w-0 flex-1 px-4 py-3 focus-visible:bg-muted/50 focus-visible:outline-none",
 				)}
 			>
 				<div className='flex min-w-0 items-center gap-3'>
@@ -138,6 +137,9 @@ function CreatorTemplateRow({ template }: { template: PageTemplate }) {
 					{updated}
 				</span>
 			</Link>
+			<div className='flex w-16 shrink-0 justify-center'>
+				<TemplateRowActions template={template} />
+			</div>
 		</li>
 	);
 }

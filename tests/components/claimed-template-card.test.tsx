@@ -30,7 +30,7 @@ describe("Claimed template card presentation", () => {
 			"datetime",
 			claimedTemplate.claimed_at,
 		);
-		expect(screen.getByText("v1")).toBeInTheDocument();
+		expect(screen.getByText("Latest v1")).toBeInTheDocument();
 		expect(
 			container.querySelector(
 				'[data-slot="skeleton"], .animate-pulse, .bg-foreground\\/20',
@@ -76,7 +76,7 @@ describe("Claimed template card presentation", () => {
 			expect(screen.queryByText("Hidden description")).not.toBeInTheDocument();
 			expect(screen.queryByText("Hidden icon")).not.toBeInTheDocument();
 			expect(container.querySelector("img")).not.toBeInTheDocument();
-			expect(screen.queryByText("v1")).not.toBeInTheDocument();
+			expect(screen.queryByText("Latest v1")).not.toBeInTheDocument();
 			expect(screen.getByRole("button", { name: "Details" })).toBeDisabled();
 			expect(
 				screen.getByRole("button", { name: "Use template" }),
