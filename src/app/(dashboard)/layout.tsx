@@ -6,7 +6,7 @@ import {
 	SidebarProvider,
 } from "@/widgets/workspace-sidebar/ui/sidebar";
 
-import React from "react";
+import React, { Suspense } from "react";
 
 const layout = ({
 	children,
@@ -23,7 +23,10 @@ const layout = ({
 					{children}
 				</main>
 			</SidebarInset>
-			<PaymentResultDialog />
+			{/* useSearchParams needs a Suspense boundary when prerendering. */}
+			<Suspense fallback={null}>
+				<PaymentResultDialog />
+			</Suspense>
 		</SidebarProvider>
 	);
 };

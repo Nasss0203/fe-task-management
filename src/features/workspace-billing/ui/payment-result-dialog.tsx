@@ -10,6 +10,7 @@ import {
 	RefreshCw,
 	XCircle,
 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { billingKeys } from "@/entities/billing/model/billing.queries";
@@ -141,26 +142,27 @@ function getView(status: PaymentStatus): ViewState {
  * /dashboard?paymentResult=1&... .
  */
 export function PaymentResultDialog() {
-	const [info, setInfo] = useState<ReturnInfo | null>(null);
+	// Driven by the URL: the dashboard layout stays mounted while
+	// /billing/payment-result redirects here, so reading it once on mount
+	// missed the redirect and only showed the dialog after a reload.
+	const searchParams = useSearchParams();
 	const setBillingOpen = useBillingDialog((state) => state.setOpen);
 
-	useEffect(() => {
-		const params = new URL(window.location.href).searchParams;
-		if (params.get(PAYMENT_RESULT_PARAM) !== "1") return;
-		// eslint-disable-next-line react-hooks/set-state-in-effect -- reading the URL once on mount
-		setInfo({
-			paymentOrderId: params.get("paymentOrderId"),
-			workspaceId: params.get("workspaceId"),
-			returnStatus: params.get("status"),
-		});
-	}, []);
+	const info: ReturnInfo | null =
+		searchParams.get(PAYMENT_RESULT_PARAM) === "1"
+			? {
+					paymentOrderId: searchParams.get("paymentOrderId"),
+					workspaceId: searchParams.get("workspaceId"),
+					returnStatus: searchParams.get("status"),
+				}
+			: null;
 
 	const close = () => {
-		// Drop the provider params so a refresh doesn't reopen the dialog.
+		// Drop only the provider params; Next syncs replaceState into
+		// useSearchParams, which closes the dialog and keeps it closed.
 		const url = new URL(window.location.href);
 		for (const key of RETURN_PARAMS) url.searchParams.delete(key);
 		window.history.replaceState(null, "", url.pathname + url.search + url.hash);
-		setInfo(null);
 	};
 
 	return (
