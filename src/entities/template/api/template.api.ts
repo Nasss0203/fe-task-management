@@ -276,6 +276,18 @@ export const templateApi = {
 		return unwrapResponse<TemplatePurchase>(response.data);
 	},
 
+	/** The buyer's own purchase (404 for anyone else). Read-only. */
+	getPurchase: async (
+		purchaseId: string,
+		signal?: AbortSignal,
+	): Promise<TemplatePurchase> => {
+		const response = await instance.get<
+			ApiResponse<TemplatePurchase> | TemplatePurchase
+		>(`${TEMPLATE_API}/purchases/${purchaseId}`, { signal });
+
+		return unwrapResponse<TemplatePurchase>(response.data);
+	},
+
 	createPurchaseCheckout: async (
 		purchaseId: string,
 	): Promise<TemplatePurchaseCheckout> => {

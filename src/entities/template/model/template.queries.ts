@@ -36,6 +36,8 @@ export const templateKeys = {
 			},
 		] as const,
 
+	purchase: (purchaseId: string, userId?: string) =>
+		[...templateKeys.all, "purchase", purchaseId, userId] as const,
 	usableVersions: (templateId: string, userId?: string) =>
 		[...templateKeys.all, "usable-versions", templateId, userId] as const,
 

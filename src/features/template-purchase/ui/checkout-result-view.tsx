@@ -64,17 +64,9 @@ export function CheckoutResultView({
 		case "invalid":
 			return (
 				<ResultCard icon={AlertTriangle} title='Payment link not recognised'>
-					<p>This checkout link is incomplete or not yours.</p>
-					<Actions>{libraryLink}</Actions>
-				</ResultCard>
-			);
-		case "unverifiable":
-			return (
-				<ResultCard icon={Clock} title="We can't check this payment here">
 					<p>
-						This purchase was started in another tab or browser. If you paid,
-						the template shows up in your templates once the payment is
-						confirmed.
+						This checkout link is incomplete or not yours. Open the template
+						page to check your purchase.
 					</p>
 					<Actions>{libraryLink}</Actions>
 				</ResultCard>
@@ -84,27 +76,27 @@ export function CheckoutResultView({
 				<ResultCard icon={AlertTriangle} title="Couldn't check your payment">
 					<p>Please try again in a moment.</p>
 					<Actions>
-						<Button onClick={() => window.location.reload()}>Try again</Button>
-						<BackToTemplate href={result.intent.returnPath} />
+						<Button onClick={result.retry}>Try again</Button>
+						<BackToTemplate href={result.returnPath} />
 					</Actions>
 				</ResultCard>
 			);
 		case "timeout":
 			return (
-				<ResultCard icon={Clock} title='Your payment is being confirmed'>
+				<ResultCard icon={Clock} title='Payment is taking longer than expected'>
 					<p>
-						This is taking longer than usual. You don&apos;t need to pay again;
-						check back in a few minutes.
+						You can check again. You don&apos;t need to pay again while we
+						wait for confirmation.
 					</p>
 					<Actions>
-						<Button onClick={() => window.location.reload()}>Check again</Button>
-						<BackToTemplate href={result.intent.returnPath} />
+						<Button onClick={result.retry}>Check again</Button>
+						<BackToTemplate href={result.returnPath} />
 					</Actions>
 				</ResultCard>
 			);
 	}
 
-	const back = <BackToTemplate href={result.intent.returnPath} />;
+	const back = <BackToTemplate href={result.returnPath} />;
 
 	switch (result.purchase.status) {
 		case "PAID":
@@ -113,7 +105,7 @@ export function CheckoutResultView({
 					<p>The template is yours. You can use it in any workspace.</p>
 					<Actions>
 						<Button asChild>
-							<Link href={result.intent.returnPath}>Use template</Link>
+							<Link href={result.returnPath}>Use template</Link>
 						</Button>
 					</Actions>
 				</ResultCard>

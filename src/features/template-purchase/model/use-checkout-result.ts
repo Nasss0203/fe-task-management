@@ -1,19 +1,23 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 import { useEffect, useState } from "react";
 
-import { templateApi, type TemplatePurchase } from "@/entities/template";
+import {
+	templateApi,
+	templateKeys,
+	type TemplatePurchase,
+} from "@/entities/template";
 
 import {
 	clearPurchaseIntent,
 	findPurchaseIntentByPurchaseId,
-	type PurchaseIntent,
 } from "./purchase-intent";
 import { refreshTemplateAccess } from "./use-buy-template";
 
 const POLL_INTERVAL_MS = 3000;
-/** ~60s of waiting for the webhook; the page then says so instead of spinning. */
+/** ~60s of waiting for the webhook; the page then offers a manual check. */
 export const MAX_STATUS_CHECKS = 20;
 
 const UUID_PATTERN =
@@ -21,21 +25,16 @@ const UUID_PATTERN =
 
 export type CheckoutResult =
 	| { kind: "loading" }
+	/** Malformed id, or a purchase that does not exist or is not this user's. */
 	| { kind: "invalid" }
-	/** This browser has no record of the purchase, so it cannot ask about it. */
-	| { kind: "unverifiable" }
-	| { kind: "error"; intent: PurchaseIntent }
-	| { kind: "timeout"; intent: PurchaseIntent }
-	| { kind: "status"; intent: PurchaseIntent; purchase: TemplatePurchase };
+	| { kind: "error"; returnPath: string; retry: () => void }
+	| { kind: "timeout"; returnPath: string; retry: () => void }
+	| { kind: "status"; returnPath: string; purchase: TemplatePurchase };
 
 /**
- * Status of a purchase after returning from Stripe. The Stripe redirect is
- * never proof of payment: only the backend purchase status counts, and it
- * turns PAID only after the webhook settled it.
- *
- * shortcut: there is no buyer GET for a purchase, so this re-sends the
- * original idempotent create (same key returns the same purchase, never a
- * new one); switch to a dedicated read endpoint once the backend has one.
+ * Status of a purchase after returning from Stripe, read from the backend
+ * (GET, no side effects). The Stripe redirect is never proof of payment:
+ * the purchase turns PAID only after the webhook settled it.
  */
 export function useCheckoutResult(
 	purchaseId: string | null,
@@ -43,60 +42,86 @@ export function useCheckoutResult(
 	{ poll }: { poll: boolean },
 ): CheckoutResult {
 	const queryClient = useQueryClient();
-	const [intent, setIntent] = useState<PurchaseIntent | null | undefined>();
+	const isValidId = Boolean(purchaseId && UUID_PATTERN.test(purchaseId));
+	// Checks already spent before the last manual "check again".
+	const [checksBeforeRetry, setChecksBeforeRetry] = useState(0);
+	// The tab that started the purchase remembers which detail page to return to.
+	const [storedReturnPath, setStoredReturnPath] = useState<string | null>(null);
 
 	useEffect(() => {
 		// eslint-disable-next-line react-hooks/set-state-in-effect -- sessionStorage exists only in the browser; read once on mount
-		setIntent(
+		setStoredReturnPath(
 			userId && purchaseId
-				? findPurchaseIntentByPurchaseId(userId, purchaseId)
+				? (findPurchaseIntentByPurchaseId(userId, purchaseId)?.returnPath ??
+						null)
 				: null,
 		);
 	}, [purchaseId, userId]);
 
-	const queryKey = ["template-purchase-status", userId, purchaseId];
 	const query = useQuery({
-		queryKey,
-		queryFn: () =>
-			templateApi.createPurchase(intent!.templateId, intent!.idempotencyKey),
-		enabled: Boolean(intent),
-		gcTime: 0,
-		retry: 1,
+		queryKey: templateKeys.purchase(purchaseId ?? "", userId),
+		queryFn: ({ signal }) => templateApi.getPurchase(purchaseId!, signal),
+		enabled: isValidId && Boolean(userId),
+		retry: (failureCount, error) =>
+			!(axios.isAxiosError(error) && error.response?.status === 404) &&
+			failureCount < 1,
 		refetchOnWindowFocus: false,
 		refetchInterval: (current) =>
 			poll &&
 			current.state.data?.status === "PENDING" &&
-			current.state.dataUpdateCount < MAX_STATUS_CHECKS
+			current.state.dataUpdateCount - checksBeforeRetry <
+				MAX_STATUS_CHECKS
 				? POLL_INTERVAL_MS
 				: false,
 	});
 
-	const status = query.data?.status;
+	const purchase = query.data;
+	const status = purchase?.status;
+	const templateId = purchase?.templateId;
 
 	useEffect(() => {
-		if (!intent || !status || status === "PENDING") return;
+		if (!userId || !templateId || !status || status === "PENDING") return;
 		if (status === "PAID") {
-			void refreshTemplateAccess(queryClient, intent.templateId, intent.userId);
+			void refreshTemplateAccess(queryClient, templateId, userId);
 		}
 		// Settled either way; a later Buy starts a fresh intent.
 		if (status !== "RECONCILIATION_REQUIRED") {
-			clearPurchaseIntent(intent.userId, intent.templateId);
+			clearPurchaseIntent(userId, templateId);
 		}
-	}, [intent, queryClient, status]);
+	}, [queryClient, status, templateId, userId]);
 
-	if (!purchaseId || !UUID_PATTERN.test(purchaseId)) return { kind: "invalid" };
-	if (!userId || intent === undefined) return { kind: "loading" };
-	if (intent === null) return { kind: "unverifiable" };
-	if (query.isError) return { kind: "error", intent };
-	if (!query.data) return { kind: "loading" };
-	if (query.data.id !== purchaseId) return { kind: "invalid" };
+	if (!isValidId) return { kind: "invalid" };
+	if (!userId) return { kind: "loading" };
+
+	const returnPath =
+		storedReturnPath ??
+		(purchase ? `/templates/${purchase.templateId}` : "/templates");
+	// Reading dataUpdatedAt subscribes to every fetch, so identical PENDING
+	// responses still re-render and the timeout can show.
+	const checks = query.dataUpdatedAt
+		? (queryClient.getQueryState(templateKeys.purchase(purchaseId!, userId))
+				?.dataUpdateCount ?? 0)
+		: 0;
+	const retry = () => {
+		// GET only; restarts the polling window.
+		setChecksBeforeRetry(checks);
+		void query.refetch();
+	};
+
+	if (query.isError) {
+		return axios.isAxiosError(query.error) &&
+			query.error.response?.status === 404
+			? { kind: "invalid" }
+			: { kind: "error", returnPath, retry };
+	}
+	if (!purchase) return { kind: "loading" };
+	if (purchase.id !== purchaseId) return { kind: "invalid" };
 	if (
 		poll &&
-		query.data.status === "PENDING" &&
-		(queryClient.getQueryState(queryKey)?.dataUpdateCount ?? 0) >=
-			MAX_STATUS_CHECKS
+		purchase.status === "PENDING" &&
+		checks - checksBeforeRetry >= MAX_STATUS_CHECKS
 	) {
-		return { kind: "timeout", intent };
+		return { kind: "timeout", returnPath, retry };
 	}
-	return { kind: "status", intent, purchase: query.data };
+	return { kind: "status", returnPath, purchase };
 }

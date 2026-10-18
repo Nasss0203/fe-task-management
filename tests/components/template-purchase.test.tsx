@@ -64,6 +64,7 @@ function purchase(
 		currency: "VND",
 		status,
 		expiresAt: "2026-10-18T10:00:00.000Z",
+		paidAt: status === "PAID" ? "2026-10-18T09:05:00.000Z" : null,
 		createdAt: "2026-10-18T09:00:00.000Z",
 	};
 }
@@ -294,6 +295,10 @@ describe("checkout return page", () => {
 		});
 	}
 
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
 	it("success route renders the result view (no 404)", async () => {
 		const element = await CheckoutSuccessPage({
 			searchParams: Promise.resolve({ purchaseId: PURCHASE_ID, status: "success" }),
@@ -301,28 +306,35 @@ describe("checkout return page", () => {
 		expect(element.props).toMatchObject({ purchaseId: PURCHASE_ID, outcome: "success" });
 	});
 
-	it("waits while the backend still reports PENDING", async () => {
+	it("reads the status with GET and never re-creates the purchase", async () => {
 		storeIntent();
-		const create = vi
-			.spyOn(templateApi, "createPurchase")
+		const get = vi
+			.spyOn(templateApi, "getPurchase")
 			.mockResolvedValue(purchase("PENDING"));
+		const create = vi.spyOn(templateApi, "createPurchase");
 
 		renderResult("success");
 
 		expect(
 			await screen.findByRole("heading", { name: "Your payment is being confirmed" }),
 		).toBeInTheDocument();
-		// Status comes from the original idempotent create, never a new purchase.
-		expect(create).toHaveBeenCalledWith(paidTemplate.id, "key-1");
+		expect(get).toHaveBeenCalledWith(PURCHASE_ID, expect.anything());
+		expect(create).not.toHaveBeenCalled();
 		expect(screen.queryByText("Payment successful")).not.toBeInTheDocument();
 	});
 
-	it("shows success only once the backend says PAID, then refreshes access", async () => {
+	it("polls PENDING until the backend says PAID, then stops and refreshes access", async () => {
+		vi.useFakeTimers({ shouldAdvanceTime: true });
 		storeIntent();
-		vi.spyOn(templateApi, "createPurchase").mockResolvedValue(purchase("PAID"));
+		const get = vi
+			.spyOn(templateApi, "getPurchase")
+			.mockResolvedValueOnce(purchase("PENDING"))
+			.mockResolvedValue(purchase("PAID"));
 		const invalidate = vi.spyOn(client, "invalidateQueries");
 
 		renderResult("success");
+		await screen.findByRole("heading", { name: "Your payment is being confirmed" });
+		await vi.advanceTimersByTimeAsync(3000);
 
 		expect(
 			await screen.findByRole("heading", { name: "Payment successful" }),
@@ -336,6 +348,54 @@ describe("checkout return page", () => {
 				queryKey: ["templates", "usable-versions", paidTemplate.id, "buyer"],
 			}),
 		);
+		const calls = get.mock.calls.length;
+		await vi.advanceTimersByTimeAsync(9000);
+		expect(get).toHaveBeenCalledTimes(calls);
+	});
+
+	it("stops after ~60s of PENDING and offers a GET-only check again", async () => {
+		vi.useFakeTimers({ shouldAdvanceTime: true });
+		storeIntent();
+		const get = vi
+			.spyOn(templateApi, "getPurchase")
+			.mockResolvedValue(purchase("PENDING"));
+		const create = vi.spyOn(templateApi, "createPurchase");
+
+		renderResult("success");
+		await screen.findByRole("heading", { name: "Your payment is being confirmed" });
+		await vi.advanceTimersByTimeAsync(3000 * 20);
+
+		expect(
+			await screen.findByRole("heading", {
+				name: "Payment is taking longer than expected",
+			}),
+		).toBeInTheDocument();
+		const calls = get.mock.calls.length;
+		expect(calls).toBe(20);
+		await vi.advanceTimersByTimeAsync(9000);
+		expect(get).toHaveBeenCalledTimes(calls);
+
+		get.mockResolvedValue(purchase("PAID"));
+		await userEvent.click(screen.getByRole("button", { name: "Check again" }));
+
+		expect(
+			await screen.findByRole("heading", { name: "Payment successful" }),
+		).toBeInTheDocument();
+		expect(create).not.toHaveBeenCalled();
+	});
+
+	it("works after a refresh or in a new tab without the stored intent", async () => {
+		vi.spyOn(templateApi, "getPurchase").mockResolvedValue(purchase("PAID"));
+
+		renderResult("success");
+
+		expect(
+			await screen.findByRole("heading", { name: "Payment successful" }),
+		).toBeInTheDocument();
+		expect(screen.getByRole("link", { name: "Use template" })).toHaveAttribute(
+			"href",
+			`/templates/${paidTemplate.id}`,
+		);
 	});
 
 	it.each([
@@ -345,7 +405,7 @@ describe("checkout return page", () => {
 		["FAILED", "Payment failed"],
 	] as const)("%s shows its own state", async (status, heading) => {
 		storeIntent();
-		vi.spyOn(templateApi, "createPurchase").mockResolvedValue(purchase(status));
+		vi.spyOn(templateApi, "getPurchase").mockResolvedValue(purchase(status));
 
 		renderResult("success");
 
@@ -353,45 +413,39 @@ describe("checkout return page", () => {
 	});
 
 	it("a cancelled checkout with a still-pending purchase says cancelled, not paid", async () => {
-		storeIntent();
-		vi.spyOn(templateApi, "createPurchase").mockResolvedValue(purchase("PENDING"));
+		const get = vi
+			.spyOn(templateApi, "getPurchase")
+			.mockResolvedValue(purchase("PENDING"));
 
 		renderResult("cancelled");
 
 		expect(
 			await screen.findByRole("heading", { name: "Payment cancelled" }),
 		).toBeInTheDocument();
+		expect(get).toHaveBeenCalledTimes(1);
 	});
 
-	it("never trusts the redirect when this browser has no purchase record", async () => {
-		const create = vi.spyOn(templateApi, "createPurchase");
+	it("someone else's or a missing purchase (404) is not recognised", async () => {
+		vi.spyOn(templateApi, "getPurchase").mockRejectedValue(
+			apiError(404, "Template purchase not found"),
+		);
 
 		renderResult("success");
 
-		expect(
-			await screen.findByRole("heading", { name: "We can't check this payment here" }),
-		).toBeInTheDocument();
-		expect(create).not.toHaveBeenCalled();
-	});
-
-	it("rejects a malformed purchase id", async () => {
-		renderResult("success", "not-a-uuid");
 		expect(
 			await screen.findByRole("heading", { name: "Payment link not recognised" }),
 		).toBeInTheDocument();
 	});
 
-	it("does not read another user's purchase intent", async () => {
-		storeIntent();
-		mockUser = { id: "someone-else" };
-		const create = vi.spyOn(templateApi, "createPurchase");
+	it("rejects a malformed purchase id without calling the API", async () => {
+		const get = vi.spyOn(templateApi, "getPurchase");
 
-		renderResult("success");
+		renderResult("success", "not-a-uuid");
 
 		expect(
-			await screen.findByRole("heading", { name: "We can't check this payment here" }),
+			await screen.findByRole("heading", { name: "Payment link not recognised" }),
 		).toBeInTheDocument();
-		expect(create).not.toHaveBeenCalled();
+		expect(get).not.toHaveBeenCalled();
 	});
 });
 

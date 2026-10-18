@@ -367,7 +367,7 @@ export type TemplatePurchaseStatus =
 	| "RECONCILIATION_REQUIRED"
 	| "REFUNDED";
 
-/** POST /templates/:id/purchases. The price is a server snapshot. */
+/** POST /templates/:id/purchases and GET /templates/purchases/:id. The price is a server snapshot. */
 export interface TemplatePurchase {
 	id: string;
 	orderCode: string;
@@ -378,6 +378,7 @@ export interface TemplatePurchase {
 	currency: string;
 	status: TemplatePurchaseStatus;
 	expiresAt: string;
+	paidAt: string | null;
 	createdAt: string;
 }
 
