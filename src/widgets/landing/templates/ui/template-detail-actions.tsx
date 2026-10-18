@@ -1,12 +1,14 @@
 "use client";
 
-import { ArrowRight, Eye, Loader2, Lock } from "lucide-react";
+import { ArrowRight, Eye, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import {
 	useUsableTemplateVersions,
 	type PublicTemplateListItem,
+	type UsableTemplateVersion,
 } from "@/entities/template";
 import { useUser } from "@/features/auth";
 import { Button } from "@/shared/ui/button";
@@ -17,6 +19,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/ui/select";
+import { BuyTemplateButton } from "@/features/template-purchase";
 import { UseTemplateDialog } from "@/features/template-use";
 
 import { getTemplatePriceLabel } from "./template-card";
@@ -33,21 +36,28 @@ interface TemplateDetailActionsProps {
 
 /**
  * Buyer CTAs. FREE: Use directly (the backend claims it on first use).
- * PAID: owners pick an official release from the backend's usable versions;
- * others see the price.
+ * PAID: buyers who own the current release pick one of the backend's usable
+ * versions; everyone else buys through Stripe Checkout.
  */
 export function TemplateDetailActions({
 	template,
 	previewHref,
 }: TemplateDetailActionsProps) {
 	const { user } = useUser();
+	const pathname = usePathname();
 	const isPaid = template.offer_type === "PAID";
 
 	return (
 		<div className='flex flex-col gap-3 pt-2 border-t border-border/60'>
 			{!user ? (
 				<Button asChild size='lg' className={primaryClass}>
-					<Link href={isPaid ? "/sign-in" : "/sign-up"}>
+					<Link
+						href={
+							isPaid
+								? `/sign-in?next=${encodeURIComponent(pathname)}`
+								: "/sign-up"
+						}
+					>
 						{isPaid ? "Sign in to buy" : "Use template"}
 						<ArrowRight className='ml-2 size-4.5' />
 					</Link>
@@ -98,14 +108,9 @@ function PaidTemplateActions({
 	template: PublicTemplateListItem;
 	userId: string;
 }) {
-	const [open, setOpen] = useState(false);
 	const usable = useUsableTemplateVersions(template.id, { userId });
 	// Every official release the backend grants, including one used as a LIMITED demo.
 	const versions = usable.data?.items ?? [];
-	const current = versions.find((version) => version.is_current) ?? versions[0];
-	const [selectedId, setSelectedId] = useState<string | undefined>();
-	const selected =
-		versions.find((version) => version.id === selectedId) ?? current;
 
 	if (usable.isPending) {
 		return (
@@ -116,21 +121,53 @@ function PaidTemplateActions({
 		);
 	}
 
-	// 403 = not purchased. Checkout isn't wired in the frontend yet, so the
-	// button stays disabled instead of pretending a purchase can happen.
-	if (!selected) {
-		return (
-			<div className='flex flex-col gap-2'>
-				<Button size='lg' disabled className={primaryClass}>
-					<Lock className='mr-2 size-4' />
-					Buy for {getTemplatePriceLabel(template)}
-				</Button>
-				<p className='text-center text-xs text-muted-foreground'>
-					Checkout is coming soon. Try the demo in the meantime.
-				</p>
-			</div>
-		);
+	// PAID_PURCHASE (and the creator) can use the current release. A FREE_CLAIM
+	// only covers releases made while the template was free: buy to upgrade.
+	const ownsCurrentRelease = versions.some((version) => version.is_current);
+
+	if (ownsCurrentRelease) {
+		return <UseVersionActions template={template} versions={versions} />;
 	}
+
+	return (
+		<>
+			<BuyTemplateButton
+				templateId={template.id}
+				userId={userId}
+				priceLabel={getTemplatePriceLabel(template)}
+				className={primaryClass}
+			/>
+			{versions.length > 0 && (
+				<UseVersionActions
+					template={template}
+					versions={versions}
+					label='Use your free version'
+					buttonClassName={secondaryClass}
+					buttonVariant='outline'
+				/>
+			)}
+		</>
+	);
+}
+
+function UseVersionActions({
+	template,
+	versions,
+	label = "Use template",
+	buttonClassName = primaryClass,
+	buttonVariant = "default",
+}: {
+	template: PublicTemplateListItem;
+	versions: UsableTemplateVersion[];
+	label?: string;
+	buttonClassName?: string;
+	buttonVariant?: "default" | "outline";
+}) {
+	const [open, setOpen] = useState(false);
+	const current = versions.find((version) => version.is_current) ?? versions[0];
+	const [selectedId, setSelectedId] = useState<string | undefined>();
+	const selected =
+		versions.find((version) => version.id === selectedId) ?? current;
 
 	return (
 		<>
@@ -149,8 +186,13 @@ function PaidTemplateActions({
 					</SelectContent>
 				</Select>
 			)}
-			<Button size='lg' onClick={() => setOpen(true)} className={primaryClass}>
-				Use template
+			<Button
+				size='lg'
+				variant={buttonVariant}
+				onClick={() => setOpen(true)}
+				className={buttonClassName}
+			>
+				{label}
 				<ArrowRight className='ml-2 size-4.5' />
 			</Button>
 			<UseTemplateDialog

@@ -21,6 +21,7 @@ import { publicTemplate } from "../fixtures/public-template";
 const mockPush = vi.fn();
 vi.mock("next/navigation", () => ({
 	useRouter: () => ({ push: mockPush }),
+	usePathname: () => "/templates/free-template",
 }));
 
 const mockToastSuccess = vi.fn();

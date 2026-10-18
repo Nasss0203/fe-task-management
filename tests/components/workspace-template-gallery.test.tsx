@@ -148,7 +148,7 @@ describe("Buyer template detail", () => {
 		);
 	};
 
-	it("shows price and the demo but no purchase or creator actions when not owned", async () => {
+	it("offers Buy with the price and the demo, but no creator actions, when not owned", async () => {
 		vi.spyOn(templateApi, "listUsableVersions").mockRejectedValue(httpError(403));
 		const privateDetail = vi.spyOn(templateApi, "getById");
 		const privatePreview = vi.spyOn(templateApi, "getPreview");
@@ -157,8 +157,8 @@ describe("Buyer template detail", () => {
 
 		expect(
 			// Intl puts a non-breaking space before the currency sign.
-			await screen.findByRole("button", { name: /Buy for 99\.000\s₫/ }),
-		).toBeDisabled();
+			await screen.findByRole("button", { name: /Buy template — 99\.000\s₫/ }),
+		).toBeEnabled();
 		expect(screen.getByRole("link", { name: /Try the demo/ })).toHaveAttribute(
 			"href",
 			"/templates/paid-template/versions/release-v2/preview?back=%2Fdashboard%2Ftemplates%2Fpaid-template",
@@ -207,7 +207,7 @@ describe("Buyer template detail", () => {
 
 		renderDetail({ ...paidTemplate, preview_mode: "IMAGE" });
 
-		await screen.findByRole("button", { name: /Buy for/ });
+		await screen.findByRole("button", { name: /Buy template/ });
 		expect(screen.queryByRole("link", { name: /Try the demo|Interactive preview/ })).not.toBeInTheDocument();
 	});
 

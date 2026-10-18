@@ -20,7 +20,11 @@ import {
 	EmptyValue,
 } from "@/entities/page-block/ui/read-only-block-content";
 import { Separator } from "@/shared/ui/separator";
-import { ReadOnlyDatabaseViewBlock } from "@/widgets/database-view/ui/read-only-database-view-block";
+import type { PublicDatabase } from "@/entities/public-site/model/public-site.types";
+import {
+	ReadOnlyDatabaseTable,
+	ReadOnlyDatabaseViewBlock,
+} from "@/widgets/database-view/ui/read-only-database-view-block";
 
 export interface ReadOnlyPageBlockNode {
 	id: string;
@@ -30,6 +34,8 @@ export interface ReadOnlyPageBlockNode {
 	data_config: unknown;
 	is_open: boolean;
 	children: ReadOnlyPageBlockNode[];
+	/** Snapshot sent by public pages, rendered without fetching. */
+	database?: PublicDatabase | null;
 }
 
 interface ReadOnlyPageBlockRendererProps {
@@ -122,9 +128,20 @@ export function ReadOnlyPageBlockRenderer({
 			return <ReadOnlyBookmarkBlock block={block} />;
 		case PageBlockType.DATABASE_VIEW: {
 			if (disableDatabaseView) {
+				if (block.database) {
+					return (
+						<ReadOnlyDatabaseTable
+							viewName={block.database.view.name}
+							properties={block.database.properties}
+							viewProperties={block.database.view.properties}
+							rows={block.database.rows}
+						/>
+					);
+				}
+
 				return (
 					<div className='rounded-md border border-dashed p-3 text-sm text-muted-foreground'>
-						Database views are not available on public pages.
+						This database is not available.
 					</div>
 				);
 			}

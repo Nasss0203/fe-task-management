@@ -1,4 +1,33 @@
+import type {
+	DatabaseProperty,
+	DatabaseViewProperty,
+	DatabaseViewType,
+	PropertyOption,
+} from "@/entities/database/model/database.types";
 import type { PageBlockType } from "@/entities/page-block/model/page-block.types";
+
+/** Read-only database snapshot sent with a public DATABASE_VIEW block. */
+export type PublicDatabase = {
+	id: string;
+	name: string;
+	view: {
+		id: string;
+		name: string;
+		type: DatabaseViewType;
+		properties: Pick<
+			DatabaseViewProperty,
+			"propertyId" | "position" | "visible"
+		>[];
+	};
+	properties: (Pick<
+		DatabaseProperty,
+		"id" | "name" | "type" | "isHideable" | "position"
+	> & { options: Pick<PropertyOption, "id" | "name" | "color">[] })[];
+	rows: {
+		id: string;
+		values: { propertyId: string; value: unknown }[];
+	}[];
+};
 
 export type PublicPage = {
 	id: string;
@@ -38,6 +67,8 @@ export type PublicPageBlock = {
 	data_config: unknown;
 
 	is_open: boolean;
+
+	database?: PublicDatabase | null;
 };
 
 export type PublicPageCapabilities = {

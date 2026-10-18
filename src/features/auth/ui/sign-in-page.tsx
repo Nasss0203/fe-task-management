@@ -22,6 +22,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { getSafeRedirectPath } from "@/shared/lib/safe-redirect";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { formSchema } from "../model/sign-in.schema";
@@ -43,7 +44,9 @@ export default function SignIn() {
 	function onSubmit(data: z.infer<typeof formSchema>) {
 		mutate(data, {
 			onSuccess: () => {
-				router.push("/");
+				// e.g. back to the template the user wanted to buy.
+				const next = new URLSearchParams(window.location.search).get("next");
+				router.push(getSafeRedirectPath(next));
 			},
 			onError: (err: unknown) => {
 				const errorCode = getApiErrorCode(err);

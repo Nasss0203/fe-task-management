@@ -357,3 +357,33 @@ export interface PublishTemplateToMarketplaceResponse {
 	version: TemplateVersion;
 	listing: TemplateListingDto;
 }
+
+/** Mirrors the backend TemplatePurchaseStatus. */
+export type TemplatePurchaseStatus =
+	| "PENDING"
+	| "PAID"
+	| "FAILED"
+	| "EXPIRED"
+	| "RECONCILIATION_REQUIRED"
+	| "REFUNDED";
+
+/** POST /templates/:id/purchases. The price is a server snapshot. */
+export interface TemplatePurchase {
+	id: string;
+	orderCode: string;
+	templateId: string;
+	listingId: string;
+	publishedVersionId: string;
+	amount: number;
+	currency: string;
+	status: TemplatePurchaseStatus;
+	expiresAt: string;
+	createdAt: string;
+}
+
+/** POST /templates/purchases/:id/checkout */
+export interface TemplatePurchaseCheckout {
+	checkoutUrl: string;
+	checkoutMethod: string;
+}
+

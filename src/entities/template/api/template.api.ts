@@ -26,6 +26,8 @@ import type {
 	TemplateCategory,
 	PreviewTemplateDemoPayload,
 	UsableTemplateVersionsResponse,
+	TemplatePurchase,
+	TemplatePurchaseCheckout,
 } from "../model/template.types";
 
 const TEMPLATE_API = "/templates";
@@ -255,6 +257,35 @@ export const templateApi = {
 		>(`${TEMPLATE_API}/${templateId}/listing`, payload);
 
 		return unwrapResponse<TemplateListingDto>(response.data);
+	},
+
+	/**
+	 * Creates a PENDING purchase, or returns the buyer's existing purchase for
+	 * the same idempotency key (any status) without creating a new one.
+	 */
+	createPurchase: async (
+		templateId: string,
+		idempotencyKey: string,
+	): Promise<TemplatePurchase> => {
+		const response = await instance.post<
+			ApiResponse<TemplatePurchase> | TemplatePurchase
+		>(`${TEMPLATE_API}/${templateId}/purchases`, undefined, {
+			headers: { "Idempotency-Key": idempotencyKey },
+		});
+
+		return unwrapResponse<TemplatePurchase>(response.data);
+	},
+
+	createPurchaseCheckout: async (
+		purchaseId: string,
+	): Promise<TemplatePurchaseCheckout> => {
+		const response = await instance.post<
+			ApiResponse<TemplatePurchaseCheckout> | TemplatePurchaseCheckout
+		>(`${TEMPLATE_API}/purchases/${purchaseId}/checkout`, {
+			provider: "STRIPE",
+		});
+
+		return unwrapResponse<TemplatePurchaseCheckout>(response.data);
 	},
 
 	/** 403 when the user has no entitlement (not claimed / not purchased). */

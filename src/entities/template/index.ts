@@ -41,6 +41,9 @@ export {
 	type UnpublishTemplateListingInput,
 } from "./model/template.mutations";
 export type {
+	TemplatePurchase,
+	TemplatePurchaseCheckout,
+	TemplatePurchaseStatus,
 	ClaimedTemplateDto,
 	MyClaimedTemplatesResponse,
 	ListMyClaimedTemplatesParams,

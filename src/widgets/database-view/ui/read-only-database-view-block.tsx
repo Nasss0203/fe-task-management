@@ -12,7 +12,31 @@ import {
 import {
 	PropertyType,
 	type DatabaseProperty,
+	type DatabaseRow,
+	type DatabaseRowValue,
+	type DatabaseViewProperty,
+	type PropertyOption,
 } from "@/entities/database/model/database.types";
+
+/** The fields the read-only table needs; public pages send only these. */
+export type ReadOnlyTableProperty = Pick<
+	DatabaseProperty,
+	"id" | "name" | "type" | "isHideable" | "position"
+> & { options: Pick<PropertyOption, "id" | "name">[] };
+
+export type ReadOnlyTableRow = Pick<DatabaseRow, "id"> & {
+	values: Pick<DatabaseRowValue, "propertyId" | "value">[];
+};
+
+interface ReadOnlyDatabaseTableProps {
+	viewName: string;
+	properties: ReadOnlyTableProperty[];
+	viewProperties: Pick<
+		DatabaseViewProperty,
+		"propertyId" | "position" | "visible"
+	>[];
+	rows: ReadOnlyTableRow[];
+}
 
 interface ReadOnlyDatabaseViewBlockProps {
 	databaseId: string;
@@ -20,7 +44,10 @@ interface ReadOnlyDatabaseViewBlockProps {
 	shareToken?: string;
 }
 
-function formatCellValue(property: DatabaseProperty, value: unknown): string {
+function formatCellValue(
+	property: ReadOnlyTableProperty,
+	value: unknown,
+): string {
 	if (value === null || value === undefined || value === "") {
 		return "";
 	}
@@ -133,14 +160,30 @@ export function ReadOnlyDatabaseViewBlock({
 		);
 	}
 
+	return (
+		<ReadOnlyDatabaseTable
+			viewName={view.name}
+			properties={database.properties}
+			viewProperties={view.properties}
+			rows={rows}
+		/>
+	);
+}
+
+export function ReadOnlyDatabaseTable({
+	viewName,
+	properties,
+	viewProperties,
+	rows,
+}: ReadOnlyDatabaseTableProps) {
 	const viewPropertiesByPropertyId = new Map(
-		view.properties.map((viewProperty) => [
+		viewProperties.map((viewProperty) => [
 			viewProperty.propertyId,
 			viewProperty,
 		]),
 	);
 
-	const visibleProperties = [...database.properties]
+	const visibleProperties = [...properties]
 		.filter((property) => {
 			if (!property.isHideable) {
 				return true;
@@ -160,7 +203,7 @@ export function ReadOnlyDatabaseViewBlock({
 
 	return (
 		<div className='w-full min-w-0 max-w-full'>
-			<div className='mb-2 text-sm font-medium'>{view.name}</div>
+			<div className='mb-2 text-sm font-medium'>{viewName}</div>
 			<div className='w-full min-w-0 max-w-full overflow-x-auto'>
 				<table className='min-w-max border-collapse text-sm'>
 					<thead>
