@@ -28,6 +28,7 @@ import type {
 	UsableTemplateVersionsResponse,
 	TemplatePurchase,
 	TemplatePurchaseCheckout,
+	TemplatePurchaseHistoryResponse,
 } from "../model/template.types";
 
 const TEMPLATE_API = "/templates";
@@ -53,10 +54,27 @@ export const templateApi = {
 		const response = await instance.get<
 			ApiResponse<MyClaimedTemplatesResponse> | MyClaimedTemplatesResponse
 		>(`${TEMPLATE_API}/me/claimed`, {
-			params: { limit: params.limit ?? 20, cursor: params.cursor || undefined },
+			params: {
+				limit: params.limit ?? 20,
+				cursor: params.cursor || undefined,
+				source: params.source,
+			},
 			signal,
 		});
 		return unwrapResponse<MyClaimedTemplatesResponse>(response.data);
+	},
+
+	listMyPurchases: async (
+		params: { limit?: number; cursor?: string | null } = {},
+		signal?: AbortSignal,
+	): Promise<TemplatePurchaseHistoryResponse> => {
+		const response = await instance.get<
+			ApiResponse<TemplatePurchaseHistoryResponse> | TemplatePurchaseHistoryResponse
+		>(`${TEMPLATE_API}/me/purchases`, {
+			params: { limit: params.limit ?? 20, cursor: params.cursor || undefined },
+			signal,
+		});
+		return unwrapResponse<TemplatePurchaseHistoryResponse>(response.data);
 	},
 
 	list: async (

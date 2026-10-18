@@ -2,6 +2,7 @@ export { templateApi } from "./api/template.api";
 export {
 	templateKeys,
 	useMyClaimedTemplates,
+	useMyTemplatePurchases,
 	type UseMyClaimedTemplatesOptions,
 	useInfiniteTemplates,
 	useTemplateDetail,
@@ -44,6 +45,8 @@ export type {
 	TemplatePurchase,
 	TemplatePurchaseCheckout,
 	TemplatePurchaseStatus,
+	TemplatePurchaseHistoryItem,
+	TemplateEntitlementSource,
 	ClaimedTemplateDto,
 	MyClaimedTemplatesResponse,
 	ListMyClaimedTemplatesParams,

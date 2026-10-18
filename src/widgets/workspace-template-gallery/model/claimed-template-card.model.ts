@@ -1,4 +1,4 @@
-import type { ClaimedTemplateDto } from "@/entities/template";
+import type { ClaimedTemplateDto, PageTemplate } from "@/entities/template";
 
 /** Keep the library summary separate from creator aggregates and permission grants. */
 export function toClaimedTemplateCard(template: ClaimedTemplateDto) {
@@ -50,7 +50,37 @@ export function toClaimedTemplateCard(template: ClaimedTemplateDto) {
 						? "Unpublished · In your library"
 						: null,
 		isFree: template.source === "FREE_CLAIM",
+		sourceLabel: (template.source === "PAID_PURCHASE"
+			? "Purchased"
+			: "Claimed") as LibrarySourceLabel,
 	};
 }
 
+export type LibrarySourceLabel = "Purchased" | "Claimed" | "Created";
 export type ClaimedTemplateCardModel = ReturnType<typeof toClaimedTemplateCard>;
+
+/** The user's own templates; the creator may use every official release. */
+export function toCreatedTemplateCard(
+	template: PageTemplate,
+): ClaimedTemplateCardModel {
+	const isArchived = template.status === "ARCHIVED";
+	return {
+		id: template.id,
+		name: template.name,
+		description: template.description,
+		icon: template.icon,
+		cover_url: template.cover_url,
+		visibility: template.visibility,
+		claimed_at: template.created_at,
+		version: template.version?.status === "PUBLISHED" ? template.version : null,
+		isRestricted: false,
+		isArchived,
+		isUnpublished: false,
+		canNavigateToPublicDetail: false,
+		allowUseAttempt: !isArchived,
+		allowDetails: true,
+		statusMessage: isArchived ? "Archived · Unavailable" : null,
+		isFree: false,
+		sourceLabel: "Created",
+	};
+}

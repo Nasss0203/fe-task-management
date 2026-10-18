@@ -91,7 +91,7 @@ export function ClaimedTemplateCard({
 						variant='secondary'
 						className='bg-background/90 text-foreground border border-border/60 text-[10px] backdrop-blur-md shadow-xs font-medium'
 					>
-						Claimed
+						{template.sourceLabel}
 					</Badge>
 					{template.isFree && (
 						<Badge
@@ -107,7 +107,8 @@ export function ClaimedTemplateCard({
 				<div className='w-full min-w-0 text-[10px] text-muted-foreground'>
 					<div className='flex min-h-5 flex-wrap items-center justify-between gap-x-2 gap-y-1'>
 						<span className='min-w-0 truncate'>
-							Claimed <time dateTime={template.claimed_at}>{date}</time>
+							{template.sourceLabel}{" "}
+							<time dateTime={template.claimed_at}>{date}</time>
 						</span>
 						{template.version && (
 							<span className='shrink-0 font-medium'>

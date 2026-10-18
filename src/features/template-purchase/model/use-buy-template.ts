@@ -155,5 +155,8 @@ export function refreshTemplateAccess(
 		queryClient.invalidateQueries({
 			queryKey: [...templateKeys.all, "claimed", userId],
 		}),
+		queryClient.invalidateQueries({
+			queryKey: templateKeys.purchases(userId),
+		}),
 	]);
 }

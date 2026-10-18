@@ -3,13 +3,19 @@ import axios from "axios";
 import { templateApi } from "../api/template.api";
 import type {
 	PreviewTemplateDemoPayload,
+	TemplateEntitlementSource,
 	TemplateOfferType,
 } from "./template.types";
 
 export const templateKeys = {
 	all: ["templates"] as const,
-	claimed: (userId: string | undefined, limit = 20) =>
-		[...templateKeys.all, "claimed", userId, { limit }] as const,
+	claimed: (
+		userId: string | undefined,
+		limit = 20,
+		source?: TemplateEntitlementSource,
+	) => [...templateKeys.all, "claimed", userId, { limit, source }] as const,
+	purchases: (userId: string | undefined) =>
+		[...templateKeys.all, "purchases", userId] as const,
 
 	lists: () => [...templateKeys.all, "list"] as const,
 
@@ -90,18 +96,42 @@ export interface UseMyClaimedTemplatesOptions {
 	/** Cache isolation only; identity is never sent in the request. */
 	userId?: string;
 	limit?: number;
+	source?: TemplateEntitlementSource;
 	enabled?: boolean;
 }
 
 export function useMyClaimedTemplates({
 	userId,
 	limit = 20,
+	source,
 	enabled = true,
 }: UseMyClaimedTemplatesOptions) {
 	return useInfiniteQuery({
-		queryKey: templateKeys.claimed(userId, limit),
+		queryKey: templateKeys.claimed(userId, limit, source),
 		queryFn: ({ pageParam, signal }) =>
-			templateApi.listMyClaimedTemplates({ limit, cursor: pageParam }, signal),
+			templateApi.listMyClaimedTemplates(
+				{ limit, cursor: pageParam, source },
+				signal,
+			),
+		initialPageParam: undefined as string | undefined,
+		getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+		enabled: Boolean(userId) && enabled,
+		staleTime: 0,
+	});
+}
+
+/** The signed-in buyer's purchase history; cache keyed by user only. */
+export function useMyTemplatePurchases({
+	userId,
+	enabled = true,
+}: {
+	userId?: string;
+	enabled?: boolean;
+}) {
+	return useInfiniteQuery({
+		queryKey: templateKeys.purchases(userId),
+		queryFn: ({ pageParam, signal }) =>
+			templateApi.listMyPurchases({ cursor: pageParam }, signal),
 		initialPageParam: undefined as string | undefined,
 		getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
 		enabled: Boolean(userId) && enabled,

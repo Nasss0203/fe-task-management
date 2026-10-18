@@ -150,11 +150,13 @@ export interface UseTemplateResponse {
 	pageId: string;
 }
 
+export type TemplateEntitlementSource = "FREE_CLAIM" | "PAID_PURCHASE";
+
 export interface TemplateEntitlementDto {
 	id: string;
 	template_id: string;
 	user_id: string;
-	source: "FREE_CLAIM";
+	source: TemplateEntitlementSource;
 	created_at: string;
 }
 
@@ -185,6 +187,7 @@ export interface MyClaimedTemplatesResponse {
 export interface ListMyClaimedTemplatesParams {
 	limit?: number;
 	cursor?: string | null;
+	source?: TemplateEntitlementSource;
 }
 
 export interface UpdateTemplatePayload {
@@ -394,6 +397,27 @@ export interface TemplatePurchase {
 	expiresAt: string;
 	paidAt: string | null;
 	createdAt: string;
+}
+
+/** GET /templates/me/purchases — the buyer's own orders, newest first. */
+export interface TemplatePurchaseHistoryItem {
+	id: string;
+	orderCode: string;
+	templateId: string;
+	/** Null when the template is no longer public. */
+	templateName: string | null;
+	templateIcon: string | null;
+	versionNumber: number | null;
+	amount: number;
+	currency: string;
+	status: TemplatePurchaseStatus;
+	createdAt: string;
+	paidAt: string | null;
+}
+
+export interface TemplatePurchaseHistoryResponse {
+	items: TemplatePurchaseHistoryItem[];
+	nextCursor: string | null;
 }
 
 /** POST /templates/purchases/:id/checkout */

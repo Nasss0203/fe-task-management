@@ -7,7 +7,11 @@ import { toast } from "sonner";
 import axios from "axios";
 
 import { useUseTemplate } from "@/entities/template";
-import type { PageTemplate, TemplateVersion } from "@/entities/template";
+import type {
+	PageTemplate,
+	TemplateVersion,
+	UsableTemplateVersion,
+} from "@/entities/template";
 import { useWorkspaces } from "@/entities/workspace/model/workspace.queries";
 import { useUser } from "@/features/auth";
 import { Button } from "@/shared/ui/button";
@@ -26,10 +30,19 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/shared/ui/select";
 
 interface UseTemplateDialogProps {
 	template: Pick<PageTemplate, "id" | "name">;
 	version: Pick<TemplateVersion, "id">;
+	/** Releases the user may use; shows a picker when there is more than one. */
+	versions?: UsableTemplateVersion[];
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 }
@@ -37,9 +50,13 @@ interface UseTemplateDialogProps {
 export function UseTemplateDialog({
 	template,
 	version,
+	versions = [],
 	open,
 	onOpenChange,
 }: UseTemplateDialogProps) {
+	const [selectedVersionId, setSelectedVersionId] = useState(version.id);
+	const versionId =
+		versions.find((item) => item.id === selectedVersionId)?.id ?? version.id;
 	const router = useRouter();
 	const { user } = useUser();
 	const { data: workspaces = [] } = useWorkspaces();
@@ -89,7 +106,7 @@ export function UseTemplateDialog({
 			// FREE marketplace templates are claimed by the backend as part of Use.
 			const result = await useMutation.mutateAsync({
 				templateId: template.id,
-				versionId: version.id,
+				versionId,
 				workspace_id: selectedWorkspaceId,
 			});
 
@@ -156,6 +173,31 @@ export function UseTemplateDialog({
 							className='rounded-md border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive'
 						>
 							{errorMessage}
+						</div>
+					)}
+
+					{versions.length > 1 && (
+						<div className='space-y-2'>
+							<Label className='text-xs font-medium text-foreground'>
+								Version
+							</Label>
+							<Select
+								value={versionId}
+								onValueChange={setSelectedVersionId}
+								disabled={isPending}
+							>
+								<SelectTrigger aria-label='Version to use' className='h-9 w-full text-xs'>
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent position='popper'>
+									{versions.map((item) => (
+										<SelectItem key={item.id} value={item.id}>
+											v{item.version_number}
+											{item.is_current ? " · latest" : ""}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
 						</div>
 					)}
 

@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { toast } from "sonner";
 import { templateApi, templateKeys } from "@/entities/template";
 import { WorkspaceTemplateLibraryPage } from "@/widgets/workspace-template-gallery";
 import { publicTemplate } from "../fixtures/public-template";
@@ -31,6 +32,16 @@ vi.mock("@/entities/workspace/model/workspace.queries", () => ({
 	useWorkspaces: () => ({ data: navigation.workspaces, isLoading: false }),
 }));
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
+
+function usableVersion(id: string, version_number: number, is_current: boolean) {
+	return {
+		id,
+		version_number,
+		is_current,
+		status: "PUBLISHED" as const,
+		released_at: "2026-10-10T00:00:00.000Z",
+	};
+}
 
 let client: QueryClient;
 function setup() {
@@ -63,6 +74,13 @@ beforeEach(() => {
 		mimeType: "image/png",
 		width: 100,
 		height: 100,
+	});
+	vi.spyOn(templateApi, "listUsableVersions").mockResolvedValue({
+		items: [usableVersion("pinned-v1", 1, true)],
+	});
+	vi.spyOn(templateApi, "listMyPurchases").mockResolvedValue({
+		items: [],
+		nextCursor: null,
 	});
 	vi.spyOn(templateApi, "claimFreeTemplate");
 	vi.spyOn(templateApi, "useTemplate").mockResolvedValue({
@@ -335,5 +353,173 @@ describe("Workspace template library (claimed templates)", () => {
 		await userEvent.click(within(dialog).getByRole("button", { name: "Use template" }));
 		const useDialog = await screen.findByRole("dialog");
 		expect(within(useDialog).getByRole("heading", { name: "Use template" })).toBeInTheDocument();
+	});
+
+	it("7.2F: a free claim uses its free release, not the newer paid published version", async () => {
+		vi.mocked(templateApi.listMyClaimedTemplates).mockResolvedValue({
+			items: [
+				{
+					...claimedTemplate,
+					published_version: {
+						...claimedTemplate.published_version!,
+						id: "paid-v4",
+						version_number: 4,
+					},
+				},
+			],
+			nextCursor: null,
+		});
+		vi.mocked(templateApi.listUsableVersions).mockResolvedValue({
+			items: [usableVersion("free-v1", 1, false)],
+		});
+		setup();
+		await screen.findByRole("heading", { name: "Claimed planning" });
+		await userEvent.click(screen.getByRole("button", { name: "Use template" }));
+		const dialog = await screen.findByRole("dialog");
+		expect(within(dialog).queryByLabelText("Version to use")).not.toBeInTheDocument();
+		await userEvent.click(within(dialog).getByRole("button", { name: "Use template" }));
+		await waitFor(() =>
+			expect(templateApi.useTemplate).toHaveBeenCalledWith("template-a", "free-v1", {
+				workspace_id: "ws-1",
+			}),
+		);
+	});
+
+	it("7.2F: picks a usable release, defaulting to the latest", async () => {
+		vi.mocked(templateApi.listUsableVersions).mockResolvedValue({
+			items: [usableVersion("v2", 2, true), usableVersion("v1", 1, false)],
+		});
+		setup();
+		await screen.findByRole("heading", { name: "Claimed planning" });
+		await userEvent.click(screen.getByRole("button", { name: "Use template" }));
+		const dialog = await screen.findByRole("dialog");
+		const picker = within(dialog).getByLabelText("Version to use");
+		expect(picker).toHaveTextContent("v2 · latest");
+		await userEvent.click(picker);
+		await userEvent.click(await screen.findByRole("option", { name: "v1" }));
+		await userEvent.click(within(dialog).getByRole("button", { name: "Use template" }));
+		await waitFor(() =>
+			expect(templateApi.useTemplate).toHaveBeenCalledWith("template-a", "v1", {
+				workspace_id: "ws-1",
+			}),
+		);
+	});
+
+	it("7.2F: explains when no release is usable and opens no dialog", async () => {
+		vi.mocked(templateApi.listUsableVersions).mockResolvedValue({ items: [] });
+		setup();
+		await screen.findByRole("heading", { name: "Claimed planning" });
+		await userEvent.click(screen.getByRole("button", { name: "Use template" }));
+		await waitFor(() => expect(toast.error).toHaveBeenCalled());
+		expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+		expect(templateApi.useTemplate).not.toHaveBeenCalled();
+	});
+
+	it("7.2F: labels each card by how it entered the library", async () => {
+		vi.mocked(templateApi.listMyClaimedTemplates).mockResolvedValue({
+			items: [
+				{ ...claimedTemplate, source: "PAID_PURCHASE" },
+				{
+					...claimedTemplate,
+					entitlement_id: "ent-b",
+					template_id: "template-b",
+					name: "Free planning",
+				},
+			],
+			nextCursor: null,
+		});
+		setup();
+		await screen.findByRole("heading", { name: "Free planning" });
+		expect(screen.getByText("Purchased", { selector: '[data-slot="badge"]' })).toBeInTheDocument();
+		expect(screen.getByText("Claimed", { selector: '[data-slot="badge"]' })).toBeInTheDocument();
+	});
+
+	it.each([
+		["purchased", "PAID_PURCHASE", "Purchased"],
+		["claimed", "FREE_CLAIM", "Claimed"],
+	] as const)("7.2F: tab=%s filters the library by source", async (tab, source, label) => {
+		navigation.params = "tab=" + tab;
+		setup();
+		await screen.findByRole("heading", { name: "Claimed planning" });
+		expect(templateApi.listMyClaimedTemplates).toHaveBeenCalledWith(
+			{ limit: 20, cursor: undefined, source },
+			expect.any(AbortSignal),
+		);
+		expect(screen.getByRole("tab", { selected: true })).toHaveTextContent(label);
+	});
+
+	it("7.2F: switching tabs keeps other query params in the URL", async () => {
+		navigation.params = "tag=crm";
+		setup();
+		await screen.findByRole("heading", { name: "Claimed planning" });
+		await userEvent.click(screen.getByRole("tab", { name: "Purchase history" }));
+		expect(navigation.replace).toHaveBeenCalledWith(
+			"/dashboard/templates?tag=crm&tab=history",
+			{ scroll: false },
+		);
+	});
+
+	it("7.2F: the Created tab lists own templates and opens them in Creator Studio", async () => {
+		navigation.params = "tab=created";
+		setup();
+		await screen.findByRole("heading", { name: "Created planning" });
+		expect(templateApi.list).toHaveBeenCalledWith(
+			expect.objectContaining({ scope: "mine" }),
+			expect.any(AbortSignal),
+		);
+		expect(templateApi.listMyClaimedTemplates).not.toHaveBeenCalled();
+		expect(screen.getByText("Created", { selector: '[data-slot="badge"]' })).toBeInTheDocument();
+		await userEvent.click(screen.getByRole("button", { name: "Details" }));
+		expect(navigation.push).toHaveBeenCalledWith("/creator/templates/" + publicTemplate.id);
+	});
+
+	it("7.2F: the purchase history tab shows orders with status, amount and version", async () => {
+		navigation.params = "tab=history";
+		vi.mocked(templateApi.listMyPurchases).mockResolvedValue({
+			items: [
+				{
+					id: "purchase-1",
+					orderCode: "TP0001",
+					templateId: "template-a",
+					templateName: "Claimed planning",
+					templateIcon: "📋",
+					versionNumber: 3,
+					amount: 50000,
+					currency: "VND",
+					status: "PAID",
+					createdAt: "2026-10-18T09:00:00.000Z",
+					paidAt: "2026-10-18T09:02:00.000Z",
+				},
+				{
+					id: "purchase-2",
+					orderCode: "TP0002",
+					templateId: "template-hidden",
+					templateName: null,
+					templateIcon: null,
+					versionNumber: null,
+					amount: 20000,
+					currency: "VND",
+					status: "EXPIRED",
+					createdAt: "2026-10-17T09:00:00.000Z",
+					paidAt: null,
+				},
+			],
+			nextCursor: null,
+		});
+		setup();
+		const link = await screen.findByRole("link", { name: "Claimed planning" });
+		expect(link).toHaveAttribute("href", "/dashboard/templates/template-a");
+		expect(screen.getByText("Paid")).toBeInTheDocument();
+		expect(screen.getByText("Expired")).toBeInTheDocument();
+		expect(screen.getByText("Unavailable template")).toBeInTheDocument();
+		expect(screen.getByText(/v3 ·/)).toBeInTheDocument();
+		expect(screen.getByText(/50\.000/)).toBeInTheDocument();
+		expect(templateApi.listMyClaimedTemplates).not.toHaveBeenCalled();
+	});
+
+	it("7.2F: shows an empty purchase history", async () => {
+		navigation.params = "tab=history";
+		setup();
+		await screen.findByText("No purchases yet");
 	});
 });
