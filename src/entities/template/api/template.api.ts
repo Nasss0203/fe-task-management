@@ -374,6 +374,8 @@ export const templateApi = {
 			params: {
 				search: params.search || undefined,
 				category: params.category || undefined,
+				tag: params.tag || undefined,
+				offer_type: params.offer_type || undefined,
 				cursor: params.cursor || undefined,
 				limit: params.limit ?? 20,
 			},

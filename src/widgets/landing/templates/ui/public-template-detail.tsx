@@ -289,6 +289,30 @@ function TemplateDetailContent({
 							</div>
 						)}
 
+						{template.tags && template.tags.length > 0 && (
+							<ul aria-label='Tags' className='flex flex-wrap gap-1.5'>
+								{template.tags.map((tag) => (
+									<li key={tag}>
+										<Link
+											href={`${basePath}?tag=${encodeURIComponent(tag)}`}
+											className='rounded-full border border-border/70 px-2.5 py-0.5 text-xs text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+										>
+											#{tag}
+										</Link>
+									</li>
+								))}
+							</ul>
+						)}
+
+						{template.creator && (
+							<p className='text-xs text-muted-foreground'>
+								By{" "}
+								<span className='font-medium text-foreground'>
+									{template.creator.username}
+								</span>
+							</p>
+						)}
+
 						{/* CTAs */}
 						<TemplateDetailActions
 							template={template}

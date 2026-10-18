@@ -241,6 +241,47 @@ describe("CreatorListingEditorPage", () => {
 		).toBeInTheDocument();
 		expect(updateListing).not.toHaveBeenCalled();
 	});
+	it("edits tags and sends them with the release", async () => {
+		vi.spyOn(templateApi, "getListing").mockResolvedValue({
+			...listing,
+			tags: ["crm"],
+		});
+		const publish = vi
+			.spyOn(templateApi, "publishToMarketplace")
+			.mockResolvedValue({ template, version: versions[0], listing } as never);
+		const user = userEvent.setup();
+
+		renderEditor();
+
+		expect(await screen.findByText("#crm")).toBeInTheDocument();
+		const input = screen.getByLabelText("Tags");
+		await user.type(input, "x{Enter}");
+		expect(
+			screen.getByText("Use 2–32 letters, numbers or dashes."),
+		).toBeInTheDocument();
+		await user.clear(input);
+		await user.type(input, " Sales Ops {Enter}crm{Enter}");
+		expect(screen.getByText("#sales-ops")).toBeInTheDocument();
+		expect(screen.getAllByText("#crm")).toHaveLength(1);
+		expect(screen.getByText("Applied when you release")).toBeInTheDocument();
+
+		await user.click(screen.getByRole("button", { name: /Release v2/ }));
+		const dialog = await screen.findByRole("alertdialog").catch(() =>
+			screen.findByRole("dialog"),
+		);
+		await user.click(within(dialog).getByRole("button", { name: "Release" }));
+
+		await waitFor(() =>
+			expect(publish).toHaveBeenCalledWith(
+				"tpl-1",
+				expect.objectContaining({
+					version_id: "ver-2",
+					tags: ["crm", "sales-ops"],
+				}),
+			),
+		);
+	});
+
 	describe("releasing the first version", () => {
 		const paidSeparateDemo = (demoVersionId: string) => ({
 			...listing,

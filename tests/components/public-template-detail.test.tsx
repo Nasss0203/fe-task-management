@@ -20,9 +20,11 @@ import {
 import TemplatesSection from "@/widgets/landing/templates/ui/templates-section";
 import { PublicTemplateDetailPage } from "@/widgets/landing/templates/ui/public-template-detail";
 import { publicTemplate } from "../fixtures/public-template";
+let mockSearchParams = new URLSearchParams();
 vi.mock("next/navigation", () => ({
 	useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 	usePathname: () => "/templates/public-template",
+	useSearchParams: () => mockSearchParams,
 }));
 let mockUser: { id: string; lastActiveWorkspaceId?: string } | null = null;
 vi.mock("@/features/auth", () => ({

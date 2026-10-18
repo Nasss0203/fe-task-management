@@ -1,7 +1,10 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { templateApi } from "../api/template.api";
-import type { PreviewTemplateDemoPayload } from "./template.types";
+import type {
+	PreviewTemplateDemoPayload,
+	TemplateOfferType,
+} from "./template.types";
 
 export const templateKeys = {
 	all: ["templates"] as const,
@@ -26,12 +29,20 @@ export const templateKeys = {
 
 	publicLists: () => [...templateKeys.all, "public-list"] as const,
 
-	publicList: (filters: { search?: string; category?: string; limit?: number }) =>
+	publicList: (filters: {
+		search?: string;
+		category?: string;
+		tag?: string;
+		offerType?: TemplateOfferType;
+		limit?: number;
+	}) =>
 		[
 			...templateKeys.publicLists(),
 			{
 				search: filters.search,
 				category: filters.category,
+				tag: filters.tag,
+				offerType: filters.offerType,
 				limit: filters.limit,
 			},
 		] as const,
@@ -205,6 +216,8 @@ export function useTemplateVersionThumbnail(
 export interface UseInfinitePublicTemplatesOptions {
 	search?: string;
 	category?: string;
+	tag?: string;
+	offerType?: TemplateOfferType;
 	limit?: number;
 	enabled?: boolean;
 }
@@ -212,6 +225,8 @@ export interface UseInfinitePublicTemplatesOptions {
 export function useInfinitePublicTemplates({
 	search,
 	category,
+	tag,
+	offerType,
 	limit = 20,
 	enabled = true,
 }: UseInfinitePublicTemplatesOptions = {}) {
@@ -221,6 +236,8 @@ export function useInfinitePublicTemplates({
 		queryKey: templateKeys.publicList({
 			search: trimmedSearch,
 			category,
+			tag,
+			offerType,
 			limit,
 		}),
 
@@ -229,6 +246,8 @@ export function useInfinitePublicTemplates({
 				{
 					search: trimmedSearch,
 					...(category ? { category } : {}),
+					...(tag ? { tag } : {}),
+					...(offerType ? { offer_type: offerType } : {}),
 					cursor: pageParam,
 					limit,
 				},

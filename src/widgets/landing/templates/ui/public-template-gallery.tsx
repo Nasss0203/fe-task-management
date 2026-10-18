@@ -1,11 +1,13 @@
 "use client";
 
-import { Search } from "lucide-react";
-import { useDeferredValue, useState } from "react";
+import { Search, X } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useDeferredValue, useState } from "react";
 
 import {
 	useInfinitePublicTemplates,
 	useTemplateCategories,
+	type TemplateOfferType,
 } from "@/entities/template";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
@@ -18,14 +20,46 @@ interface PublicTemplateGalleryProps {
 	detailHref: (templateId: string) => string;
 }
 
+const TAG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+const OFFER_FILTERS: { label: string; value?: TemplateOfferType }[] = [
+	{ label: "Any price" },
+	{ label: "Free", value: "FREE" },
+	{ label: "Paid", value: "PAID" },
+];
+
 /**
  * Marketplace gallery shared by the landing page and the workspace. Data comes
- * only from GET /public/templates; search and category are filtered server-side.
+ * only from GET /public/templates; search, category, price and tag are
+ * filtered server-side. The tag lives in the URL (?tag=) so tag links on a
+ * template page open a filtered gallery.
  */
-export function PublicTemplateGallery({ detailHref }: PublicTemplateGalleryProps) {
+export function PublicTemplateGallery(props: PublicTemplateGalleryProps) {
+	return (
+		<Suspense fallback={null}>
+			<PublicTemplateGalleryContent {...props} />
+		</Suspense>
+	);
+}
+
+function PublicTemplateGalleryContent({ detailHref }: PublicTemplateGalleryProps) {
+	const router = useRouter();
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+	const rawTag = searchParams.get("tag")?.trim().toLowerCase();
+	const tag = rawTag && TAG_PATTERN.test(rawTag) ? rawTag : undefined;
+
 	const [searchQuery, setSearchQuery] = useState("");
 	const [category, setCategory] = useState<string | undefined>();
+	const [offerType, setOfferType] = useState<TemplateOfferType | undefined>();
 	const deferredSearch = useDeferredValue(searchQuery);
+
+	const clearTag = () => {
+		const params = new URLSearchParams(searchParams.toString());
+		params.delete("tag");
+		const query = params.toString();
+		router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+	};
 
 	const { data: categories = [] } = useTemplateCategories();
 	const {
@@ -39,11 +73,15 @@ export function PublicTemplateGallery({ detailHref }: PublicTemplateGalleryProps
 	} = useInfinitePublicTemplates({
 		search: deferredSearch,
 		category,
+		tag,
+		offerType,
 		limit: 20,
 	});
 
 	const templates = data?.pages.flatMap((page) => page.items) ?? [];
-	const isFiltered = Boolean(deferredSearch.trim() || category);
+	const isFiltered = Boolean(
+		deferredSearch.trim() || category || tag || offerType,
+	);
 
 	return (
 		<div className='flex flex-col gap-6'>
@@ -58,6 +96,32 @@ export function PublicTemplateGallery({ detailHref }: PublicTemplateGalleryProps
 						onChange={(e) => setSearchQuery(e.target.value)}
 						className='h-11 w-full rounded-xl border border-border/80 bg-background pl-10 pr-4 text-sm text-foreground shadow-xs transition-all placeholder:text-muted-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20'
 					/>
+				</div>
+
+				<div className='flex flex-wrap items-center gap-2'>
+					<div role='group' aria-label='Filter by price' className='flex gap-2'>
+						{OFFER_FILTERS.map((filter) => (
+							<CategoryChip
+								key={filter.label}
+								label={filter.label}
+								selected={offerType === filter.value}
+								onClick={() => setOfferType(filter.value)}
+							/>
+						))}
+					</div>
+					{tag && (
+						<span className='inline-flex h-8 items-center gap-1 rounded-full border border-primary/40 bg-primary/10 pl-3 pr-1 text-sm text-primary'>
+							#{tag}
+							<button
+								type='button'
+								onClick={clearTag}
+								aria-label={`Remove tag filter ${tag}`}
+								className='inline-flex size-6 items-center justify-center rounded-full hover:bg-primary/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+							>
+								<X className='size-3.5' aria-hidden />
+							</button>
+						</span>
+					)}
 				</div>
 
 				{categories.length > 0 && (
@@ -138,7 +202,7 @@ export function PublicTemplateGallery({ detailHref }: PublicTemplateGalleryProps
 								</p>
 								<p className='mt-1 text-xs text-muted-foreground'>
 									{isFiltered
-										? "Try another search keyword or category."
+										? "Try another search keyword, category, price or tag."
 										: "Templates appear here once creators publish them."}
 								</p>
 							</div>

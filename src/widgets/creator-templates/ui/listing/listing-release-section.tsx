@@ -28,6 +28,7 @@ import { formatVnd, isLimitedDemoConfig } from "../../model/listing-form";
 import { getApiErrorMessage } from "@/shared/lib/api-error-message";
 import { ConfirmActionDialog } from "./confirm-action-dialog";
 import { ListingSection } from "./listing-primitives";
+import { ListingTagsField } from "./listing-tags-field";
 
 interface ListingReleaseSectionProps {
 	template: PageTemplate;
@@ -58,6 +59,11 @@ export function ListingReleaseSection({
 	);
 	const savedCategoryIds = listing?.category_ids ?? [];
 	const [categoryIds, setCategoryIds] = useState<string[]>(savedCategoryIds);
+	const savedTags = listing?.tags ?? [];
+	const [tags, setTags] = useState<string[]>(savedTags);
+	const tagsChanged =
+		tags.length !== savedTags.length ||
+		tags.some((tag) => !savedTags.includes(tag));
 	const [confirmOpen, setConfirmOpen] = useState(false);
 
 	const categoriesQuery = useTemplateCategories();
@@ -101,6 +107,7 @@ export function ListingReleaseSection({
 					price_amount: price,
 					currency: "VND",
 					category_ids: categoryIds,
+					tags,
 				},
 			});
 			toast.success(`v${selectedVersion.version_number} is live on the marketplace`);
@@ -227,6 +234,13 @@ export function ListingReleaseSection({
 						)}
 					</div>
 
+					<ListingTagsField
+						tags={tags}
+						onChange={setTags}
+						disabled={disabled}
+						changed={tagsChanged}
+					/>
+
 					<div className='flex flex-col gap-2 border-t pt-5 sm:flex-row sm:items-center sm:justify-between'>
 						<p className='text-xs text-muted-foreground'>
 							{blocker ??
@@ -264,6 +278,10 @@ export function ListingReleaseSection({
 					<dt className='text-muted-foreground'>Categories</dt>
 					<dd className='font-medium'>
 						{categoryNames.length > 0 ? categoryNames.join(", ") : "None"}
+					</dd>
+					<dt className='text-muted-foreground'>Tags</dt>
+					<dd className='font-medium'>
+						{tags.length > 0 ? tags.map((tag) => `#${tag}`).join(" ") : "None"}
 					</dd>
 				</dl>
 			</ConfirmActionDialog>

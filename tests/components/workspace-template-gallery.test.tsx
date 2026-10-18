@@ -13,9 +13,11 @@ import { WorkspaceTemplateGalleryPage } from "@/widgets/workspace-template-galle
 import { publicTemplate } from "../fixtures/public-template";
 
 const routerPush = vi.fn();
+let mockSearchParams = new URLSearchParams();
 vi.mock("next/navigation", () => ({
 	useRouter: () => ({ push: routerPush, replace: vi.fn() }),
 	usePathname: () => "/dashboard/templates",
+	useSearchParams: () => mockSearchParams,
 }));
 
 let mockUser: { id: string; lastActiveWorkspaceId?: string } | null = null;
@@ -117,8 +119,61 @@ describe("Workspace template gallery", () => {
 			),
 		);
 		expect(
-			await screen.findByText("Try another search keyword or category."),
+			await screen.findByText("Try another search keyword, category, price or tag."),
 		).toBeInTheDocument();
+	});
+
+	it("filters by price on the backend", async () => {
+		const listPublic = vi
+			.spyOn(templateApi, "listPublic")
+			.mockResolvedValue({ items: [], nextCursor: null });
+		const user = userEvent.setup();
+
+		renderWithClient(<WorkspaceTemplateGalleryPage />);
+		await user.click(await screen.findByRole("button", { name: "Paid" }));
+
+		await waitFor(() =>
+			expect(listPublic).toHaveBeenLastCalledWith(
+				expect.objectContaining({ offer_type: "PAID" }),
+				expect.anything(),
+			),
+		);
+	});
+
+	it("filters by the ?tag= in the URL and ignores a malformed tag", async () => {
+		const listPublic = vi
+			.spyOn(templateApi, "listPublic")
+			.mockResolvedValue({ items: [], nextCursor: null });
+
+		mockSearchParams = new URLSearchParams("tag=CRM");
+		const { unmount } = renderWithClient(<WorkspaceTemplateGalleryPage />);
+		expect(await screen.findByText("#crm")).toBeInTheDocument();
+		await waitFor(() =>
+			expect(listPublic).toHaveBeenLastCalledWith(
+				expect.objectContaining({ tag: "crm" }),
+				expect.anything(),
+			),
+		);
+		expect(
+			screen.getByRole("button", { name: "Remove tag filter crm" }),
+		).toBeInTheDocument();
+		unmount();
+
+		listPublic.mockClear();
+		mockSearchParams = new URLSearchParams("tag=bad tag");
+		renderWithClient(<WorkspaceTemplateGalleryPage />);
+		await waitFor(() => expect(listPublic).toHaveBeenCalled());
+		expect(listPublic.mock.calls[0][0]).not.toHaveProperty("tag");
+		mockSearchParams = new URLSearchParams();
+	});
+
+	it("shows tags on cards and creator plus tag links on the detail page", async () => {
+		vi.spyOn(templateApi, "listPublic").mockResolvedValue({
+			items: [{ ...paidTemplate, tags: ["crm", "sales-ops"] }],
+			nextCursor: null,
+		});
+		renderWithClient(<WorkspaceTemplateGalleryPage />);
+		expect(await screen.findByText("#crm #sales-ops")).toBeInTheDocument();
 	});
 
 	it("falls back to the cover without retrying a hidden paid thumbnail", async () => {
@@ -147,6 +202,25 @@ describe("Buyer template detail", () => {
 			/>,
 		);
 	};
+
+	it("links each tag to the filtered gallery and shows the creator byline", async () => {
+		vi.spyOn(templateApi, "listUsableVersions").mockRejectedValue(httpError(403));
+		renderDetail({
+			...paidTemplate,
+			tags: ["crm", "sales-ops"],
+			creator: { username: "nam", avatar_url: null },
+		});
+
+		expect(await screen.findByRole("link", { name: "#crm" })).toHaveAttribute(
+			"href",
+			"/dashboard/templates?tag=crm",
+		);
+		expect(screen.getByRole("link", { name: "#sales-ops" })).toHaveAttribute(
+			"href",
+			"/dashboard/templates?tag=sales-ops",
+		);
+		expect(screen.getByText("nam")).toBeInTheDocument();
+	});
 
 	it("offers Buy with the price and the demo, but no creator actions, when not owned", async () => {
 		vi.spyOn(templateApi, "listUsableVersions").mockRejectedValue(httpError(403));

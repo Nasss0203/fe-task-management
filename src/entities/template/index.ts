@@ -76,6 +76,7 @@ export type {
 	TemplateDemoDatabaseRules,
 	PreviewTemplateDemoPayload,
 	PublicTemplateCategory,
+	PublicTemplateCreator,
 	UsableTemplateVersion,
 	TemplateCurrency,
 	TemplateCategory,

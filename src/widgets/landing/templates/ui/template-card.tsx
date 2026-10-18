@@ -87,6 +87,15 @@ export default function TemplateCard({ item, href }: TemplateCardProps) {
 					</div>
 				)}
 
+				{item.tags && item.tags.length > 0 && (
+					<p className='mt-2 line-clamp-1 text-[11px] text-muted-foreground'>
+						{item.tags
+							.slice(0, 3)
+							.map((tag) => `#${tag}`)
+							.join(" ")}
+					</p>
+				)}
+
 				<div className='mt-4 flex items-center justify-between gap-2 border-t border-border/40 pt-3 text-xs font-medium'>
 					<span
 						className={

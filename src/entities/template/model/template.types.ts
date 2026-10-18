@@ -206,6 +206,9 @@ export interface ListPublicTemplatesParams {
 	search?: string;
 	/** Category slug, filtered by the backend. */
 	category?: string;
+	/** Listing tag (lowercase slug), filtered by the backend. */
+	tag?: string;
+	offer_type?: TemplateOfferType;
 	cursor?: string | null;
 	limit?: number;
 }
@@ -218,7 +221,15 @@ export type PublicTemplateListItem = Omit<PageTemplate, "version"> & {
 	currency?: TemplateCurrency;
 	preview_mode?: TemplatePreviewMode;
 	categories?: PublicTemplateCategory[];
+	tags?: string[];
+	creator?: PublicTemplateCreator | null;
 };
+
+/** Public byline of a template (no id or email). */
+export interface PublicTemplateCreator {
+	username: string;
+	avatar_url: string | null;
+}
 
 export interface PublicTemplateCategory {
 	id: string;
@@ -312,6 +323,7 @@ export interface TemplateListingDto {
 	demo_config?: Record<string, unknown> | null;
 	category_ids?: string[];
 	categories?: TemplateListingCategory[];
+	tags?: string[];
 }
 
 /** PATCH /templates/:id/listing. Categories are not accepted here. */
@@ -339,6 +351,8 @@ export interface PublishTemplateToMarketplacePayload
 	offer_type: TemplateOfferType;
 	/** Replaces the listing categories when provided. */
 	category_ids?: string[];
+	/** Replaces the listing tags when provided (normalized by the backend). */
+	tags?: string[];
 }
 
 export interface TemplateCategory {
