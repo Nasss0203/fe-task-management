@@ -13,6 +13,7 @@ import {
 	useCreatorTemplateAnalytics,
 } from "@/entities/template";
 import type { TemplateAnalyticsSale } from "@/entities/template/model/template.types";
+import { TemplateReviewsSection } from "@/features/template-feedback";
 import { formatVnd } from "@/shared/lib/currency";
 import { Button } from "@/shared/ui/button";
 import { Skeleton } from "@/shared/ui/skeleton";
@@ -141,6 +142,8 @@ export function TemplateAnalyticsPanel({ templateId }: { templateId: string }) {
 					</section>
 
 					<TemplateSalesTable sales={sales} isLoading={query.isPending} />
+
+					<TemplateReviewsSection templateId={templateId} />
 				</>
 			)}
 		</section>

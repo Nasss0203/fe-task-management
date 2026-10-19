@@ -33,7 +33,12 @@ const response: CreatorTemplatesAnalyticsResponse = {
 	timeZone: "Asia/Ho_Chi_Minh",
 	currency: "VND",
 	items: [
-		{ templateId: "t-1", name: "Planner", totals: totals(10, 50000) },
+		{
+			templateId: "t-1",
+			name: "Planner",
+			totals: totals(10, 50000),
+			feedback: { ratingAverage: 4.5, ratingCount: 2, likeCount: 7 },
+		},
 		{ templateId: "t-2", name: "Roadmap", totals: totals(5, 100000) },
 	],
 	daily: [
@@ -201,6 +206,8 @@ describe("CreatorAnalyticsPage", () => {
 		const rows = within(table).getAllByRole("row");
 		expect(rows[1]).toHaveTextContent("Roadmap");
 		expect(rows[2]).toHaveTextContent("Planner");
+		expect(rows[2]).toHaveTextContent("★ 4.5 (2)");
+		expect(rows[1]).toHaveTextContent("—");
 		expect(
 			within(rows[1]).getByRole("link", { name: "Roadmap" }),
 		).toHaveAttribute("href", "/creator/templates/t-2?tab=analytics");

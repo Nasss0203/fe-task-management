@@ -16,6 +16,8 @@ import type {
 	UpdateTemplatePayload,
 	UseTemplatePayload,
 	UseTemplateResponse,
+	TemplateLikeResponse,
+	UpsertTemplateReviewInput,
 } from "./template.types";
 
 export interface CreateTemplateFromPageInput {
@@ -144,6 +146,48 @@ export function useClaimFreeTemplate() {
 				queryKey: [...templateKeys.all, "claimed"],
 			});
 		},
+	});
+}
+
+function useInvalidateTemplateFeedback() {
+	const queryClient = useQueryClient();
+
+	return (templateId: string) =>
+		Promise.all([
+			queryClient.invalidateQueries({
+				queryKey: templateKeys.publicReviewsRoot(templateId),
+			}),
+			queryClient.invalidateQueries({
+				queryKey: templateKeys.publicDetail(templateId),
+			}),
+			queryClient.invalidateQueries({ queryKey: templateKeys.publicLists() }),
+		]);
+}
+
+export function useUpsertTemplateReview(templateId: string) {
+	const invalidate = useInvalidateTemplateFeedback();
+
+	return useMutation<void, Error, UpsertTemplateReviewInput>({
+		mutationFn: (input) => templateApi.upsertReview(templateId, input),
+		onSuccess: () => invalidate(templateId),
+	});
+}
+
+export function useDeleteTemplateReview(templateId: string) {
+	const invalidate = useInvalidateTemplateFeedback();
+
+	return useMutation<void, Error, void>({
+		mutationFn: () => templateApi.deleteReview(templateId),
+		onSuccess: () => invalidate(templateId),
+	});
+}
+
+export function useSetTemplateLike(templateId: string) {
+	const invalidate = useInvalidateTemplateFeedback();
+
+	return useMutation<TemplateLikeResponse, Error, boolean>({
+		mutationFn: (liked) => templateApi.setLike(templateId, liked),
+		onSuccess: () => invalidate(templateId),
 	});
 }
 

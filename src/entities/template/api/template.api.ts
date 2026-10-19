@@ -32,6 +32,9 @@ import type {
 	TemplateAnalyticsRange,
 	CreatorTemplatesAnalyticsResponse,
 	CreatorTemplateAnalyticsResponse,
+	TemplateLikeResponse,
+	TemplateReviewsResponse,
+	UpsertTemplateReviewInput,
 } from "../model/template.types";
 
 const TEMPLATE_API = "/templates";
@@ -426,6 +429,7 @@ export const templateApi = {
 				category: params.category || undefined,
 				tag: params.tag || undefined,
 				offer_type: params.offer_type || undefined,
+				sort: params.sort || undefined,
 				cursor: params.cursor || undefined,
 				limit: params.limit ?? 20,
 			},
@@ -462,5 +466,43 @@ export const templateApi = {
 
 	recordPublicView: async (templateId: string): Promise<void> => {
 		await publicApiClient.post(`${PUBLIC_TEMPLATE_API}/${templateId}/views`);
+	},
+
+	getPublicReviews: async (
+		templateId: string,
+		page: number,
+		signal?: AbortSignal,
+	): Promise<TemplateReviewsResponse> => {
+		const response = await publicApiClient.get<
+			ApiResponse<TemplateReviewsResponse> | TemplateReviewsResponse
+		>(`${PUBLIC_TEMPLATE_API}/${templateId}/reviews`, {
+			params: { page, limit: 10 },
+			signal,
+		});
+
+		return unwrapResponse<TemplateReviewsResponse>(response.data);
+	},
+
+	upsertReview: async (
+		templateId: string,
+		input: UpsertTemplateReviewInput,
+	): Promise<void> => {
+		await instance.put(`${TEMPLATE_API}/${templateId}/review`, input);
+	},
+
+	deleteReview: async (templateId: string): Promise<void> => {
+		await instance.delete(`${TEMPLATE_API}/${templateId}/review`);
+	},
+
+	setLike: async (
+		templateId: string,
+		liked: boolean,
+	): Promise<TemplateLikeResponse> => {
+		const url = `${TEMPLATE_API}/${templateId}/like`;
+		const response = liked
+			? await instance.put<ApiResponse<TemplateLikeResponse> | TemplateLikeResponse>(url)
+			: await instance.delete<ApiResponse<TemplateLikeResponse> | TemplateLikeResponse>(url);
+
+		return unwrapResponse<TemplateLikeResponse>(response.data);
 	},
 };

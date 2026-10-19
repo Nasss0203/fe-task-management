@@ -13,6 +13,7 @@ import type {
 	PreviewTemplateDemoPayload,
 	TemplateAnalyticsRange,
 	TemplateEntitlementSource,
+	PublicTemplateSort,
 	TemplateOfferType,
 } from "./template.types";
 
@@ -62,6 +63,7 @@ export const templateKeys = {
 		category?: string;
 		tag?: string;
 		offerType?: TemplateOfferType;
+		sort?: PublicTemplateSort;
 		limit?: number;
 	}) =>
 		[
@@ -71,6 +73,7 @@ export const templateKeys = {
 				category: filters.category,
 				tag: filters.tag,
 				offerType: filters.offerType,
+				sort: filters.sort,
 				limit: filters.limit,
 			},
 		] as const,
@@ -82,6 +85,12 @@ export const templateKeys = {
 
 	publicDetail: (templateId: string) =>
 		[...templateKeys.all, "public-detail", templateId] as const,
+
+	publicReviewsRoot: (templateId: string) =>
+		[...templateKeys.all, "public-reviews", templateId] as const,
+
+	publicReviews: (templateId: string, userId: string | undefined, page: number) =>
+		[...templateKeys.publicReviewsRoot(templateId), userId, page] as const,
 
 	publicPreview: (templateId: string, versionId: string) =>
 		[...templateKeys.all, "public-preview", templateId, versionId] as const,
@@ -271,6 +280,7 @@ export interface UseInfinitePublicTemplatesOptions {
 	category?: string;
 	tag?: string;
 	offerType?: TemplateOfferType;
+	sort?: PublicTemplateSort;
 	limit?: number;
 	enabled?: boolean;
 }
@@ -280,6 +290,7 @@ export function useInfinitePublicTemplates({
 	category,
 	tag,
 	offerType,
+	sort,
 	limit = 20,
 	enabled = true,
 }: UseInfinitePublicTemplatesOptions = {}) {
@@ -291,6 +302,7 @@ export function useInfinitePublicTemplates({
 			category,
 			tag,
 			offerType,
+			sort,
 			limit,
 		}),
 
@@ -301,6 +313,7 @@ export function useInfinitePublicTemplates({
 					...(category ? { category } : {}),
 					...(tag ? { tag } : {}),
 					...(offerType ? { offer_type: offerType } : {}),
+					...(sort ? { sort } : {}),
 					cursor: pageParam,
 					limit,
 				},
@@ -327,6 +340,20 @@ export function usePublicTemplatePreview(
 			templateApi.getPublicPreview(templateId, versionId!, signal),
 
 		enabled: Boolean(templateId && versionId) && (options?.enabled ?? true),
+	});
+}
+
+export function usePublicTemplateReviews(
+	templateId: string,
+	userId: string | undefined,
+	page: number,
+) {
+	return useQuery({
+		queryKey: templateKeys.publicReviews(templateId, userId, page),
+		queryFn: ({ signal }) =>
+			templateApi.getPublicReviews(templateId, page, signal),
+		placeholderData: keepPreviousData,
+		enabled: Boolean(templateId),
 	});
 }
 

@@ -1,11 +1,12 @@
 "use client";
 
-import { ArrowRight, LayoutTemplate } from "lucide-react";
+import { ArrowRight, Heart, LayoutTemplate, Star } from "lucide-react";
 import Link from "next/link";
 
 import { useTemplateVersionThumbnail } from "@/entities/template/model/template.queries";
 import type { PublicTemplateListItem } from "@/entities/template/model/template.types";
 import { formatVnd } from "@/shared/lib/currency";
+import { formatRatingSummary } from "@/features/template-feedback";
 
 type TemplateCardProps = {
 	item: PublicTemplateListItem;
@@ -95,6 +96,25 @@ export default function TemplateCard({ item, href }: TemplateCardProps) {
 							.join(" ")}
 					</p>
 				)}
+
+				<div className='mt-3 flex items-center gap-3 text-[11px] text-muted-foreground'>
+					<span className='inline-flex items-center gap-1'>
+						<Star
+							className={
+								item.rating_count
+									? "size-3.5 fill-amber-400 text-amber-400"
+									: "size-3.5"
+							}
+							aria-hidden
+						/>
+						{formatRatingSummary(item.rating_average, item.rating_count)}
+					</span>
+					<span className='inline-flex items-center gap-1'>
+						<Heart className='size-3.5' aria-hidden />
+						{item.like_count ?? 0}
+						<span className='sr-only'>likes</span>
+					</span>
+				</div>
 
 				<div className='mt-4 flex items-center justify-between gap-2 border-t border-border/40 pt-3 text-xs font-medium'>
 					<span

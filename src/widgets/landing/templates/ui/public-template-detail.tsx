@@ -23,6 +23,10 @@ import { Button } from "@/shared/ui/button";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { getTemplatePriceLabel } from "./template-card";
 import { TemplateDetailActions } from "./template-detail-actions";
+import {
+	TemplateFeedbackSummary,
+	TemplateReviewsSection,
+} from "@/features/template-feedback";
 
 interface PublicTemplateDetailPageProps {
 	templateId: string;
@@ -316,6 +320,8 @@ function TemplateDetailContent({
 							</p>
 						)}
 
+						<TemplateFeedbackSummary templateId={template.id} />
+
 						{/* CTAs */}
 						<TemplateDetailActions
 							template={template}
@@ -355,6 +361,10 @@ function TemplateDetailContent({
 						</div>
 					</div>
 				)}
+
+				<div className='md:col-span-7 md:col-start-1 md:row-start-3'>
+					<TemplateReviewsSection templateId={template.id} />
+				</div>
 			</div>
 
 

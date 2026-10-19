@@ -9,6 +9,7 @@ import {
 	useTemplateCategories,
 	type TemplateOfferType,
 } from "@/entities/template";
+import type { PublicTemplateSort } from "@/entities/template/model/template.types";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 import { Skeleton } from "@/shared/ui/skeleton";
@@ -21,6 +22,12 @@ interface PublicTemplateGalleryProps {
 }
 
 const TAG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+const SORT_OPTIONS: { label: string; value: PublicTemplateSort }[] = [
+	{ label: "Newest", value: "newest" },
+	{ label: "Top rated", value: "top_rated" },
+	{ label: "Most liked", value: "most_liked" },
+];
 
 const OFFER_FILTERS: { label: string; value?: TemplateOfferType }[] = [
 	{ label: "Any price" },
@@ -52,6 +59,7 @@ function PublicTemplateGalleryContent({ detailHref }: PublicTemplateGalleryProps
 	const [searchQuery, setSearchQuery] = useState("");
 	const [category, setCategory] = useState<string | undefined>();
 	const [offerType, setOfferType] = useState<TemplateOfferType | undefined>();
+	const [sort, setSort] = useState<PublicTemplateSort>("newest");
 	const deferredSearch = useDeferredValue(searchQuery);
 
 	const clearTag = () => {
@@ -75,6 +83,7 @@ function PublicTemplateGalleryContent({ detailHref }: PublicTemplateGalleryProps
 		category,
 		tag,
 		offerType,
+		sort,
 		limit: 20,
 	});
 
@@ -99,6 +108,17 @@ function PublicTemplateGalleryContent({ detailHref }: PublicTemplateGalleryProps
 				</div>
 
 				<div className='flex flex-wrap items-center gap-2'>
+					<div role='group' aria-label='Sort templates' className='flex gap-2'>
+						{SORT_OPTIONS.map((option) => (
+							<CategoryChip
+								key={option.value}
+								label={option.label}
+								selected={sort === option.value}
+								onClick={() => setSort(option.value)}
+							/>
+						))}
+					</div>
+					<span aria-hidden className='mx-1 h-5 w-px bg-border' />
 					<div role='group' aria-label='Filter by price' className='flex gap-2'>
 						{OFFER_FILTERS.map((filter) => (
 							<CategoryChip

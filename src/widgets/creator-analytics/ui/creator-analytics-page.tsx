@@ -25,26 +25,63 @@ import { Skeleton } from "@/shared/ui/skeleton";
 
 const PAGE_SIZE = 10;
 
-type SortKey = keyof Pick<
+type TotalsKey = keyof Pick<
 	TemplateAnalyticsTotals,
 	"views" | "uniqueViewers" | "uses" | "paidPurchases" | "grossRevenue" | "earnings"
 >;
 
-const COLUMNS: { key: SortKey; label: string; format: (value: number) => string }[] = [
-	{ key: "views", label: "Views", format: (v) => analyticsCountFormatter.format(v) },
+type SortKey = TotalsKey | "rating" | "likes";
+
+type Column = {
+	key: SortKey;
+	label: string;
+	title?: string;
+	value: (row: TemplateAnalyticsTemplateTotals) => number;
+	format: (row: TemplateAnalyticsTemplateTotals) => string;
+};
+
+const totalsColumn = (
+	key: TotalsKey,
+	label: string,
+	format: (value: number) => string,
+): Column => ({
+	key,
+	label,
+	value: (row) => row.totals[key],
+	format: (row) => format(row.totals[key]),
+});
+
+const count = (value: number) => analyticsCountFormatter.format(value);
+
+const ratingFormatter = new Intl.NumberFormat("en", {
+	minimumFractionDigits: 1,
+	maximumFractionDigits: 1,
+});
+
+const COLUMNS: Column[] = [
+	totalsColumn("views", "Views", count),
+	totalsColumn("uniqueViewers", "Signed-in viewers", count),
+	totalsColumn("uses", "Uses", count),
+	totalsColumn("paidPurchases", "Purchases", count),
+	totalsColumn("grossRevenue", "Gross", formatVnd),
+	totalsColumn("earnings", "Earnings", formatVnd),
 	{
-		key: "uniqueViewers",
-		label: "Signed-in viewers",
-		format: (v) => analyticsCountFormatter.format(v),
+		key: "rating",
+		label: "Rating",
+		title: "Average rating, all time",
+		value: (row) => row.feedback?.ratingAverage ?? 0,
+		format: (row) =>
+			row.feedback?.ratingAverage == null
+				? "—"
+				: `★ ${ratingFormatter.format(row.feedback.ratingAverage)} (${count(row.feedback.ratingCount)})`,
 	},
-	{ key: "uses", label: "Uses", format: (v) => analyticsCountFormatter.format(v) },
 	{
-		key: "paidPurchases",
-		label: "Purchases",
-		format: (v) => analyticsCountFormatter.format(v),
+		key: "likes",
+		label: "Likes",
+		title: "Likes, all time",
+		value: (row) => row.feedback?.likeCount ?? 0,
+		format: (row) => count(row.feedback?.likeCount ?? 0),
 	},
-	{ key: "grossRevenue", label: "Gross", format: formatVnd },
-	{ key: "earnings", label: "Earnings", format: formatVnd },
 ];
 
 export function CreatorAnalyticsPage() {
@@ -59,8 +96,9 @@ export function CreatorAnalyticsPage() {
 	const items = query.data?.items ?? [];
 	const totals = sumAnalyticsTotals(items);
 
+	const sortColumn = COLUMNS.find((column) => column.key === sort.key) ?? COLUMNS[0];
 	const rows = [...items].sort((a, b) => {
-		const diff = a.totals[sort.key] - b.totals[sort.key];
+		const diff = sortColumn.value(a) - sortColumn.value(b);
 		// Ties fall back to name so the order is stable between refetches.
 		return (sort.desc ? -diff : diff) || a.name.localeCompare(b.name);
 	});
@@ -214,7 +252,7 @@ function ComparisonTable({
 	onSort: (key: SortKey) => void;
 }) {
 	return (
-		<table className='w-full min-w-[720px] text-sm'>
+		<table className='w-full min-w-[880px] text-sm'>
 			<thead className='bg-muted/40 text-xs text-muted-foreground'>
 				<tr>
 					<th scope='col' className='px-4 py-2 text-left font-medium'>
@@ -234,6 +272,7 @@ function ComparisonTable({
 							>
 								<button
 									type='button'
+									title={column.title}
 									onClick={() => onSort(column.key)}
 									className={cn(
 										"inline-flex items-center gap-1 whitespace-nowrap rounded hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
@@ -267,7 +306,7 @@ function ComparisonTable({
 								key={column.key}
 								className='px-4 py-2.5 text-right tabular-nums whitespace-nowrap'
 							>
-								{column.format(row.totals[column.key])}
+								{column.format(row)}
 							</td>
 						))}
 					</tr>

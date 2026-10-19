@@ -205,6 +205,8 @@ export type TemplateVersionThumbnail = {
 	height: number;
 };
 
+export type PublicTemplateSort = "newest" | "top_rated" | "most_liked";
+
 export interface ListPublicTemplatesParams {
 	search?: string;
 	/** Category slug, filtered by the backend. */
@@ -212,6 +214,7 @@ export interface ListPublicTemplatesParams {
 	/** Listing tag (lowercase slug), filtered by the backend. */
 	tag?: string;
 	offer_type?: TemplateOfferType;
+	sort?: PublicTemplateSort;
 	cursor?: string | null;
 	limit?: number;
 }
@@ -226,7 +229,53 @@ export type PublicTemplateListItem = Omit<PageTemplate, "version"> & {
 	categories?: PublicTemplateCategory[];
 	tags?: string[];
 	creator?: PublicTemplateCreator | null;
+	rating_average?: number | null;
+	rating_count?: number;
+	like_count?: number;
 };
+
+export interface TemplateReview {
+	id: string;
+	rating: number;
+	body: string | null;
+	version_number: number | null;
+	is_owner: boolean;
+	author: PublicTemplateCreator | null;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface TemplateReviewViewer {
+	liked: boolean;
+	review: { rating: number; body: string | null } | null;
+	is_creator: boolean;
+	can_comment: boolean;
+}
+
+/** GET /public/templates/:id/reviews */
+export interface TemplateReviewsResponse {
+	rating_average: number | null;
+	rating_count: number;
+	like_count: number;
+	/** Counts for 1★ … 5★. */
+	distribution: number[];
+	items: TemplateReview[];
+	total: number;
+	page: number;
+	limit: number;
+	total_pages: number;
+	viewer: TemplateReviewViewer | null;
+}
+
+export interface UpsertTemplateReviewInput {
+	rating: number;
+	body?: string | null;
+}
+
+export interface TemplateLikeResponse {
+	liked: boolean;
+	like_count: number;
+}
 
 /** Public byline of a template (no id or email). */
 export interface PublicTemplateCreator {
@@ -443,10 +492,18 @@ export interface TemplateAnalyticsTotals {
 	earnings: number;
 }
 
+/** All-time rating and likes; not filtered by the analytics period. */
+export interface TemplateFeedbackSummary {
+	ratingAverage: number | null;
+	ratingCount: number;
+	likeCount: number;
+}
+
 export interface TemplateAnalyticsTemplateTotals {
 	templateId: string;
 	name: string;
 	totals: TemplateAnalyticsTotals;
+	feedback?: TemplateFeedbackSummary;
 }
 
 interface TemplateAnalyticsRangeResponse extends TemplateAnalyticsRange {
