@@ -24,6 +24,7 @@ const totals = (views: number, revenue: number) => ({
 	uses: 3,
 	paidPurchases: 1,
 	grossRevenue: revenue,
+	earnings: revenue * 0.95,
 });
 
 const response: CreatorTemplatesAnalyticsResponse = {
@@ -36,7 +37,7 @@ const response: CreatorTemplatesAnalyticsResponse = {
 		{ templateId: "t-2", name: "Roadmap", totals: totals(5, 100000) },
 	],
 	daily: [
-		{ date: "2026-10-18", views: 15, uses: 6, paidPurchases: 2, grossRevenue: 150000 },
+		{ date: "2026-10-18", views: 15, uses: 6, paidPurchases: 2, grossRevenue: 150000, earnings: 142500 },
 	],
 };
 
@@ -88,7 +89,7 @@ describe("CreatorPerformance", () => {
 		await waitFor(() => expect(tileValue("Views")).toBe("15"));
 		expect(tileValue("Uses")).toBe("6");
 		expect(tileValue("Purchases")).toBe("2");
-		expect(tileValue("Gross revenue")).toMatch(/150\.000/);
+		expect(tileValue("Earnings")).toMatch(/142\.500/);
 		expect(screen.getByText("4 from guests")).toBeInTheDocument();
 		expect(spy).toHaveBeenCalledWith(
 			{ from: "2026-09-20", to: "2026-10-19" },
@@ -111,7 +112,7 @@ describe("CreatorPerformance", () => {
 		renderWithClient(<CreatorPerformance />);
 
 		await waitFor(() => expect(tileValue("Views")).toBe("0"));
-		expect(tileValue("Gross revenue")).toMatch(/0/);
+		expect(tileValue("Earnings")).toMatch(/0/);
 	});
 
 	it("offers a retry when loading fails", async () => {
@@ -204,7 +205,7 @@ describe("CreatorAnalyticsPage", () => {
 			within(rows[1]).getByRole("link", { name: "Roadmap" }),
 		).toHaveAttribute("href", "/creator/templates/t-2?tab=analytics");
 		expect(
-			within(table).getByRole("columnheader", { name: /Revenue/ }),
+			within(table).getByRole("columnheader", { name: /Earnings/ }),
 		).toHaveAttribute("aria-sort", "descending");
 	});
 

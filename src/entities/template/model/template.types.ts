@@ -440,6 +440,7 @@ export interface TemplateAnalyticsTotals {
 	paidPurchases: number;
 	/** Gross VND from PAID purchases, before any platform fee. */
 	grossRevenue: number;
+	earnings: number;
 }
 
 export interface TemplateAnalyticsTemplateTotals {
@@ -466,6 +467,7 @@ export interface TemplateAnalyticsDailyPoint {
 	uses: number;
 	paidPurchases: number;
 	grossRevenue: number;
+	earnings: number;
 }
 
 export interface TemplateAnalyticsVersionPoint {
@@ -474,6 +476,18 @@ export interface TemplateAnalyticsVersionPoint {
 	uses: number;
 	paidPurchases: number;
 	grossRevenue: number;
+	earnings: number;
+}
+
+export interface TemplateAnalyticsSale {
+	purchaseId: string;
+	orderCode: string;
+	paidAt: string;
+	versionNumber: number | null;
+	amount: number;
+	commissionRateBps: number;
+	platformFeeAmount: number;
+	earnings: number;
 }
 
 /** GET /templates/:templateId/analytics */
@@ -482,4 +496,5 @@ export interface CreatorTemplateAnalyticsResponse extends TemplateAnalyticsRange
 	totals: TemplateAnalyticsTotals;
 	daily: TemplateAnalyticsDailyPoint[];
 	versions: TemplateAnalyticsVersionPoint[];
+	sales: TemplateAnalyticsSale[];
 }

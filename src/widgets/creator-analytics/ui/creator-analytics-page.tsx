@@ -27,7 +27,7 @@ const PAGE_SIZE = 10;
 
 type SortKey = keyof Pick<
 	TemplateAnalyticsTotals,
-	"views" | "uniqueViewers" | "uses" | "paidPurchases" | "grossRevenue"
+	"views" | "uniqueViewers" | "uses" | "paidPurchases" | "grossRevenue" | "earnings"
 >;
 
 const COLUMNS: { key: SortKey; label: string; format: (value: number) => string }[] = [
@@ -43,14 +43,15 @@ const COLUMNS: { key: SortKey; label: string; format: (value: number) => string 
 		label: "Purchases",
 		format: (v) => analyticsCountFormatter.format(v),
 	},
-	{ key: "grossRevenue", label: "Revenue", format: formatVnd },
+	{ key: "grossRevenue", label: "Gross", format: formatVnd },
+	{ key: "earnings", label: "Earnings", format: formatVnd },
 ];
 
 export function CreatorAnalyticsPage() {
 	const { user } = useUser();
 	const [period, setPeriod] = useState<TemplateAnalyticsPeriod>("30d");
 	const [sort, setSort] = useState<{ key: SortKey; desc: boolean }>({
-		key: "grossRevenue",
+		key: "earnings",
 		desc: true,
 	});
 	const [page, setPage] = useState(0);
@@ -213,7 +214,7 @@ function ComparisonTable({
 	onSort: (key: SortKey) => void;
 }) {
 	return (
-		<table className='w-full min-w-[640px] text-sm'>
+		<table className='w-full min-w-[720px] text-sm'>
 			<thead className='bg-muted/40 text-xs text-muted-foreground'>
 				<tr>
 					<th scope='col' className='px-4 py-2 text-left font-medium'>

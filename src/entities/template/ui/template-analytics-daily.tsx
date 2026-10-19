@@ -168,7 +168,8 @@ function DailyTable({ daily }: { daily: TemplateAnalyticsDailyPoint[] }) {
 						<th className='px-3 py-2 text-right font-medium'>Views</th>
 						<th className='px-3 py-2 text-right font-medium'>Uses</th>
 						<th className='px-3 py-2 text-right font-medium'>Purchases</th>
-						<th className='px-3 py-2 text-right font-medium'>Revenue</th>
+						<th className='px-3 py-2 text-right font-medium'>Gross</th>
+						<th className='px-3 py-2 text-right font-medium'>Earnings</th>
 					</tr>
 				</thead>
 				<tbody className='divide-y'>
@@ -187,6 +188,9 @@ function DailyTable({ daily }: { daily: TemplateAnalyticsDailyPoint[] }) {
 							</td>
 							<td className='px-3 py-1.5 text-right tabular-nums'>
 								{formatVnd(point.grossRevenue)}
+							</td>
+							<td className='px-3 py-1.5 text-right tabular-nums'>
+								{formatVnd(point.earnings)}
 							</td>
 						</tr>
 					))}

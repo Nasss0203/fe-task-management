@@ -21,14 +21,27 @@ const response: CreatorTemplateAnalyticsResponse = {
 		uses: 3,
 		paidPurchases: 2,
 		grossRevenue: 100000,
+		earnings: 95000,
 	},
 	daily: [
-		{ date: "2026-10-17", views: 7, uses: 1, paidPurchases: 0, grossRevenue: 0 },
-		{ date: "2026-10-18", views: 5, uses: 2, paidPurchases: 2, grossRevenue: 100000 },
+		{ date: "2026-10-17", views: 7, uses: 1, paidPurchases: 0, grossRevenue: 0, earnings: 0 },
+		{ date: "2026-10-18", views: 5, uses: 2, paidPurchases: 2, grossRevenue: 100000, earnings: 95000 },
 	],
 	versions: [
-		{ versionId: "v-2", versionNumber: 2, uses: 2, paidPurchases: 2, grossRevenue: 100000 },
-		{ versionId: "v-1", versionNumber: 1, uses: 1, paidPurchases: 0, grossRevenue: 0 },
+		{ versionId: "v-2", versionNumber: 2, uses: 2, paidPurchases: 2, grossRevenue: 100000, earnings: 95000 },
+		{ versionId: "v-1", versionNumber: 1, uses: 1, paidPurchases: 0, grossRevenue: 0, earnings: 0 },
+	],
+	sales: [
+		{
+			purchaseId: "p-1",
+			orderCode: "TP1",
+			paidAt: "2026-10-18T03:00:00.000Z",
+			versionNumber: 2,
+			amount: 100000,
+			commissionRateBps: 500,
+			platformFeeAmount: 5000,
+			earnings: 95000,
+		},
 	],
 };
 
@@ -82,6 +95,20 @@ describe("TemplateAnalyticsPanel", () => {
 		// Newest day first.
 		expect(days[1]).toHaveTextContent("Oct 18");
 		expect(days[2]).toHaveTextContent("Oct 17");
+	});
+
+	it("lists each paid order with its snapshot fee", async () => {
+		vi.spyOn(templateApi, "getAnalytics").mockResolvedValue(response);
+
+		renderPanel();
+
+		const sales = within(
+			await screen.findByRole("region", { name: "Sales" }),
+		).getAllByRole("row");
+		expect(sales[1]).toHaveTextContent("TP1");
+		expect(sales[1]).toHaveTextContent("v2");
+		expect(sales[1]).toHaveTextContent(/5\.000\s*₫\s*\(5%\)/);
+		expect(sales[1]).toHaveTextContent(/95\.000\s*₫$/);
 	});
 
 	it("explains an empty version list", async () => {

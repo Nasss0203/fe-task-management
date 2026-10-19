@@ -15,6 +15,7 @@ export const EMPTY_ANALYTICS_TOTALS: TemplateAnalyticsTotals = {
 	uses: 0,
 	paidPurchases: 0,
 	grossRevenue: 0,
+	earnings: 0,
 };
 
 /**
@@ -32,12 +33,13 @@ export function sumAnalyticsTotals(
 			uses: sum.uses + totals.uses,
 			paidPurchases: sum.paidPurchases + totals.paidPurchases,
 			grossRevenue: sum.grossRevenue + totals.grossRevenue,
+			earnings: sum.earnings + totals.earnings,
 		}),
 		EMPTY_ANALYTICS_TOTALS,
 	);
 }
 
-/** Four stat tiles: views, uses, purchases, gross revenue. */
+/** Four stat tiles: views, uses, purchases, earnings. */
 export function TemplateAnalyticsStats({
 	totals,
 	viewsCaption,
@@ -67,9 +69,9 @@ export function TemplateAnalyticsStats({
 			caption: "Paid orders",
 		},
 		{
-			label: "Gross revenue",
-			value: formatVnd(totals.grossRevenue),
-			caption: "Before platform fees",
+			label: "Earnings",
+			value: formatVnd(totals.earnings),
+			caption: `${formatVnd(totals.grossRevenue)} gross · after platform fee`,
 		},
 	];
 

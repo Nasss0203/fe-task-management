@@ -52,6 +52,7 @@ import type { OpenRowHandler } from "./database-view-renderer";
 import { PropertyOptionMenu } from "./property-option-menu";
 import { RowActionsMenu } from "./row-actions-menu";
 import { RowPropertySummary } from "./row-property-summary";
+import { RenameRowButton, RowTitle } from "./row-title";
 
 const NO_GROUP_ID = "__no_group__";
 
@@ -179,6 +180,8 @@ function BoardColumns({
 	const setValueMutation = useSetDatabaseRowValue(database.id);
 	const { addRow, isPending } = useQuickAddRow(database);
 	const [activeRowId, setActiveRowId] = useState<string | null>(null);
+	// Card whose name is being edited inline (pencil button or a just-added card).
+	const [editingRowId, setEditingRowId] = useState<string | null>(null);
 
 	const sensors = useSensors(
 		// Small distance so clicks still focus the title input inside a card;
@@ -302,7 +305,7 @@ function BoardColumns({
 										value: column.id === NO_GROUP_ID ? undefined : column.id,
 									},
 								]);
-								if (rowId) onOpenRow(rowId, true);
+								if (rowId) setEditingRowId(rowId);
 							}}
 						>
 							{column.rows.map((row) => (
@@ -313,6 +316,10 @@ function BoardColumns({
 									titleProperty={titleProperty}
 									cardProperties={cardProperties}
 									onOpen={() => onOpenRow(row.id)}
+									editing={row.id === editingRowId}
+									onEditingChange={(editing) =>
+										setEditingRowId(editing ? row.id : null)
+									}
 								/>
 							))}
 						</BoardColumn>
@@ -454,6 +461,8 @@ interface BoardCardProps {
 	titleProperty?: DatabaseProperty;
 	cardProperties: DatabaseProperty[];
 	onOpen: () => void;
+	editing: boolean;
+	onEditingChange: (editing: boolean) => void;
 }
 
 function BoardCard({
@@ -462,9 +471,12 @@ function BoardCard({
 	titleProperty,
 	cardProperties,
 	onOpen,
+	editing,
+	onEditingChange,
 }: BoardCardProps) {
 	const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
 		id: row.id,
+		disabled: editing,
 	});
 	const values = getRowValueMap(row);
 	const title = titleProperty && (values.get(titleProperty.id) as string);
@@ -487,14 +499,15 @@ function BoardCard({
 				isDragging && "opacity-40",
 			)}
 		>
-			<p
-				className={cn(
-					"truncate pr-6 text-sm font-medium leading-6",
-					!title && "text-muted-foreground",
-				)}
-			>
-				{title || "Untitled"}
-			</p>
+			<div className='flex min-w-0 pr-14'>
+				<RowTitle
+					database={database}
+					row={row}
+					titleProperty={titleProperty}
+					editing={editing}
+					onEditingChange={onEditingChange}
+				/>
+			</div>
 
 			<div>
 				<RowPropertySummary
@@ -509,12 +522,15 @@ function BoardCard({
 
 			{/* Opening the menu must not start a drag (Mouse/Touch sensors). */}
 			<div
-				className='absolute right-1 top-1 [&_button]:size-6'
+				className='absolute right-1 top-1 flex items-center gap-0.5 [&_button]:size-6'
 				onMouseDown={(event) => event.stopPropagation()}
 				onTouchStart={(event) => event.stopPropagation()}
 				onClick={(event) => event.stopPropagation()}
 				onKeyDown={(event) => event.stopPropagation()}
 			>
+				{titleProperty && !editing && (
+					<RenameRowButton onClick={() => onEditingChange(true)} />
+				)}
 				<RowActionsMenu databaseId={database.id} rowId={row.id} />
 			</div>
 		</article>
