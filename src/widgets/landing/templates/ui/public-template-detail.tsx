@@ -314,9 +314,12 @@ function TemplateDetailContent({
 						{template.creator && (
 							<p className='text-xs text-muted-foreground'>
 								By{" "}
-								<span className='font-medium text-foreground'>
-									{template.creator.username}
-								</span>
+								<Link
+									href={`/creators/${encodeURIComponent(template.creator.handle)}`}
+									className='font-medium text-foreground underline-offset-4 hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm'
+								>
+									{template.creator.display_name ?? template.creator.username}
+								</Link>
 							</p>
 						)}
 

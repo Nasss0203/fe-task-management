@@ -208,7 +208,12 @@ describe("Buyer template detail", () => {
 		renderDetail({
 			...paidTemplate,
 			tags: ["crm", "sales-ops"],
-			creator: { username: "nam", avatar_url: null },
+			creator: {
+				username: "nam",
+				avatar_url: null,
+				handle: "nam-design",
+				display_name: "Nam",
+			},
 		});
 
 		expect(await screen.findByRole("link", { name: "#crm" })).toHaveAttribute(
@@ -219,7 +224,10 @@ describe("Buyer template detail", () => {
 			"href",
 			"/dashboard/templates?tag=sales-ops",
 		);
-		expect(screen.getByText("nam")).toBeInTheDocument();
+		expect(screen.getByRole("link", { name: "Nam" })).toHaveAttribute(
+			"href",
+			"/creators/nam-design",
+		);
 	});
 
 	it("offers Buy with the price and the demo, but no creator actions, when not owned", async () => {

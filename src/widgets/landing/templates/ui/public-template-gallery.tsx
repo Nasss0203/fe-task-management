@@ -23,7 +23,7 @@ interface PublicTemplateGalleryProps {
 
 const TAG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-const SORT_OPTIONS: { label: string; value: PublicTemplateSort }[] = [
+export const SORT_OPTIONS: { label: string; value: PublicTemplateSort }[] = [
 	{ label: "Newest", value: "newest" },
 	{ label: "Top rated", value: "top_rated" },
 	{ label: "Most liked", value: "most_liked" },
@@ -247,7 +247,7 @@ function PublicTemplateGalleryContent({ detailHref }: PublicTemplateGalleryProps
 	);
 }
 
-function CategoryChip({
+export function CategoryChip({
 	label,
 	selected,
 	onClick,

@@ -430,6 +430,7 @@ export const templateApi = {
 				tag: params.tag || undefined,
 				offer_type: params.offer_type || undefined,
 				sort: params.sort || undefined,
+				creator: params.creator || undefined,
 				cursor: params.cursor || undefined,
 				limit: params.limit ?? 20,
 			},

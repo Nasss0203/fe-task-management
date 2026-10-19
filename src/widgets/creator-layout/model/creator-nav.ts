@@ -3,6 +3,7 @@ import {
 	LayoutDashboard,
 	LayoutTemplate,
 	type LucideIcon,
+	UserRound,
 } from "lucide-react";
 
 export interface CreatorNavItem {
@@ -29,6 +30,7 @@ export const CREATOR_NAV: CreatorNavGroup[] = [
 				icon: LayoutTemplate,
 			},
 			{ title: "Analytics", href: "/creator/analytics", icon: ChartLine },
+			{ title: "Profile", href: "/creator/profile", icon: UserRound },
 		],
 	},
 ];

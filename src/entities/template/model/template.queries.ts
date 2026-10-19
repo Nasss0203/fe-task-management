@@ -63,6 +63,7 @@ export const templateKeys = {
 		category?: string;
 		tag?: string;
 		offerType?: TemplateOfferType;
+		creator?: string;
 		sort?: PublicTemplateSort;
 		limit?: number;
 	}) =>
@@ -73,6 +74,7 @@ export const templateKeys = {
 				category: filters.category,
 				tag: filters.tag,
 				offerType: filters.offerType,
+				creator: filters.creator,
 				sort: filters.sort,
 				limit: filters.limit,
 			},
@@ -280,6 +282,7 @@ export interface UseInfinitePublicTemplatesOptions {
 	category?: string;
 	tag?: string;
 	offerType?: TemplateOfferType;
+	creator?: string;
 	sort?: PublicTemplateSort;
 	limit?: number;
 	enabled?: boolean;
@@ -290,6 +293,7 @@ export function useInfinitePublicTemplates({
 	category,
 	tag,
 	offerType,
+	creator,
 	sort,
 	limit = 20,
 	enabled = true,
@@ -302,6 +306,7 @@ export function useInfinitePublicTemplates({
 			category,
 			tag,
 			offerType,
+			creator,
 			sort,
 			limit,
 		}),
@@ -314,6 +319,7 @@ export function useInfinitePublicTemplates({
 					...(tag ? { tag } : {}),
 					...(offerType ? { offer_type: offerType } : {}),
 					...(sort ? { sort } : {}),
+					...(creator ? { creator } : {}),
 					cursor: pageParam,
 					limit,
 				},

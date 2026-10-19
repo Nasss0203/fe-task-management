@@ -214,6 +214,8 @@ export interface ListPublicTemplatesParams {
 	/** Listing tag (lowercase slug), filtered by the backend. */
 	tag?: string;
 	offer_type?: TemplateOfferType;
+	/** Creator handle; lists only that creator's public templates. */
+	creator?: string;
 	sort?: PublicTemplateSort;
 	cursor?: string | null;
 	limit?: number;
@@ -240,7 +242,7 @@ export interface TemplateReview {
 	body: string | null;
 	version_number: number | null;
 	is_owner: boolean;
-	author: PublicTemplateCreator | null;
+	author: { username: string; avatar_url: string | null } | null;
 	created_at: string;
 	updated_at: string;
 }
@@ -281,6 +283,9 @@ export interface TemplateLikeResponse {
 export interface PublicTemplateCreator {
 	username: string;
 	avatar_url: string | null;
+	/** Public profile URL segment: /creators/:handle */
+	handle: string;
+	display_name: string | null;
 }
 
 export interface PublicTemplateCategory {
