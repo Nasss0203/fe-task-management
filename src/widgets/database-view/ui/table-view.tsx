@@ -4,20 +4,29 @@ import {
 	DatabaseHeaderCell,
 	DatabaseTableSurface,
 	DatabaseValueCell,
+	getDefaultColumnWidth,
 } from "@/entities/database/ui/database-visuals";
 
-import { Plus } from "lucide-react";
+import { PanelRightOpen, Plus } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
-import { useCreateDatabaseRow } from "@/entities/database/model/database.mutations";
+import { useSetViewPropertyWidth } from "@/entities/database/model/database.mutations";
 
-import type {
-	Database,
-	DatabaseRow,
-	DatabaseViewDetail,
+import {
+	PropertyType,
+	type Database,
+	type DatabaseRow,
+	type DatabaseViewDetail,
 } from "@/entities/database/model/database.types";
 
 import { InteractionMode } from "@/shared/model/interaction-mode";
 import { AddPropertyPopover } from "./add-property-popover";
+import { ColumnResizeHandle } from "./column-resize-handle";
+import { RowActionsMenu } from "./row-actions-menu";
+import { getRowValueMap, getVisibleProperties } from "../lib/view-properties";
+import { useQuickAddRow } from "../model/use-quick-add-row";
+import type { OpenRowHandler } from "./database-view-renderer";
 import { DatabaseCell } from "./database-cell";
 import { DatabasePropertyHeader } from "./database-property-header";
 
@@ -35,6 +44,8 @@ interface TableViewProps {
 	rows: DatabaseRow[];
 
 	mode?: InteractionMode;
+	/** Opens the row side peek (editable mode only). */
+	onOpenRow?: OpenRowHandler;
 
 	onDatabaseValueChange?: (input: DatabaseValueChangeInput) => void;
 }
@@ -45,10 +56,16 @@ export function TableView({
 	viewDetail,
 	rows,
 	mode = "editable",
+	onOpenRow,
 	onDatabaseValueChange,
 }: TableViewProps) {
 	const editable = mode === "editable";
-	const createRowMutation = useCreateDatabaseRow(database.id);
+	const setWidthMutation = useSetViewPropertyWidth(database.id, viewId);
+	// Widths being dragged or saved; shown until the view detail catches up.
+	const { addRow, focusRowId, isPending: isAddingRow } = useQuickAddRow(database);
+	const [draftWidths, setDraftWidths] = useState<
+		Record<string, number | null>
+	>({});
 
 	const viewPropertiesByPropertyId = new Map(
 		viewDetail.properties.map((viewProperty) => [
@@ -57,92 +74,172 @@ export function TableView({
 		]),
 	);
 
-	const visibleProperties = [...database.properties]
-		.filter((property) => {
-			// Property bắt buộc như Name luôn phải hiện
-			if (!property.isHideable) {
-				return true;
-			}
+	const visibleProperties = getVisibleProperties(database, viewDetail);
+	const storedWidth = (property: (typeof visibleProperties)[number]) =>
+		property.id in draftWidths
+			? draftWidths[property.id]
+			: (viewPropertiesByPropertyId.get(property.id)?.width ?? null);
 
-			const viewProperty = viewPropertiesByPropertyId.get(property.id);
-
-			return viewProperty?.visible ?? false;
-		})
-		.sort((a, b) => {
-			const aViewProperty = viewPropertiesByPropertyId.get(a.id);
-
-			const bViewProperty = viewPropertiesByPropertyId.get(b.id);
-
-			return (
-				Number(aViewProperty?.position ?? a.position) -
-				Number(bViewProperty?.position ?? b.position)
-			);
+	const clearDraft = (propertyId: string) =>
+		setDraftWidths((current) => {
+			const next = { ...current };
+			delete next[propertyId];
+			return next;
 		});
+
+	const commitWidth = (propertyId: string, width: number | null) => {
+		setDraftWidths((current) => ({ ...current, [propertyId]: width }));
+		setWidthMutation.mutate(
+			{ propertyId, width },
+			{
+				onSuccess: () => clearDraft(propertyId),
+				onError: () => {
+					clearDraft(propertyId);
+					toast.error("Couldn't save column width");
+				},
+			},
+		);
+	};
+
+	// When every column has a fixed width, the trailing "+" column takes the
+	// leftover space instead of the browser stretching the fixed columns.
+	const allColumnsFixed = visibleProperties.every(
+		(property) => storedWidth(property) !== null,
+	);
+
+	// Columns without a stored width share the free space evenly; the table only
+	// scrolls once it is narrower than the per-type minimums.
+	const minTableWidth =
+		visibleProperties.reduce(
+			(total, property) =>
+				total +
+				(storedWidth(property) ?? getDefaultColumnWidth(property.type)),
+			0,
+		) + (editable ? 40 : 0);
+
 	return (
 		<div className='w-full min-w-0 max-w-full'>
 			{/* Chỉ table được scroll ngang */}
-			<DatabaseTableSurface>
+			<DatabaseTableSurface
+				tableClassName='w-full'
+				tableStyle={{ minWidth: minTableWidth }}
+			>
+				<colgroup>
+					{visibleProperties.map((property) => {
+						const width = storedWidth(property);
+
+						return (
+							<col
+								key={property.id}
+								style={width ? { width } : undefined}
+							/>
+						);
+					})}
+					{editable && (
+						<col style={allColumnsFixed ? undefined : { width: 40 }} />
+					)}
+				</colgroup>
+
 				<thead>
-					<tr className='border-b'>
+					<tr>
 						{visibleProperties.map((property) => (
-							<DatabaseHeaderCell key={property.id}>
+							<DatabaseHeaderCell
+								key={property.id}
+								className={
+									editable
+										? "relative p-0 hover:bg-muted/60"
+										: undefined
+								}
+							>
 								<DatabasePropertyHeader
 									databaseId={database.id}
 									viewId={viewId}
 									property={property}
 									mode={mode}
 								/>
+
+								{editable && (
+									<ColumnResizeHandle
+										label={property.name}
+										onResize={(width) =>
+											setDraftWidths((current) => ({
+												...current,
+												[property.id]: width,
+											}))
+										}
+										onCommit={(width) =>
+											commitWidth(property.id, width)
+										}
+									/>
+								)}
 							</DatabaseHeaderCell>
 						))}
 
-						<th className='w-10 min-w-10 px-1'>
-							{editable && (
-								<th className='w-10 min-w-10 px-1'>
-									<AddPropertyPopover
-										databaseId={database.id}
-									/>
-								</th>
-							)}
-						</th>
+						{editable && (
+							<DatabaseHeaderCell className='min-w-10 p-0'>
+								<AddPropertyPopover
+									databaseId={database.id}
+									properties={database.properties}
+								/>
+							</DatabaseHeaderCell>
+						)}
 					</tr>
 				</thead>
 
 				<tbody>
 					{rows.map((row) => {
-						const valueMap = new Map<string, unknown>(
-							row.values.map((item) => [
-								item.propertyId,
-								item.value,
-							]),
-						);
+						const valueMap = getRowValueMap(row);
 
 						return (
 							<tr
 								key={row.id}
-								className='border-b last:border-b-0'
+								className='group/row transition-colors hover:bg-muted/40'
 							>
-								{visibleProperties.map((property) => {
-									const value = valueMap.get(property.id);
+								{visibleProperties.map((property) => (
+									<DatabaseValueCell
+										key={property.id}
+										// Notion-style "selected cell" ring while editing.
+										className='relative focus-within:shadow-[inset_0_0_0_2px_var(--ring)]'
+									>
+										{onOpenRow &&
+											property.type === PropertyType.TITLE && (
+												<button
+													type='button'
+													onClick={() => onOpenRow(row.id)}
+													className='absolute right-1 top-1/2 z-10 flex h-6 -translate-y-1/2 items-center gap-1 rounded-sm border bg-background px-1.5 text-xs font-medium text-muted-foreground opacity-0 shadow-xs hover:bg-muted hover:text-foreground focus-visible:opacity-100 group-hover/row:opacity-100 [@media(hover:none)]:opacity-100'
+												>
+													<PanelRightOpen className='size-3.5' />
+													Open
+												</button>
+											)}
+										<DatabaseCell
+											databaseId={database.id}
+											pageId={database.pageId}
+											rowId={row.id}
+											property={property}
+											value={valueMap.get(property.id)}
+											mode={mode}
+											autoFocus={
+												row.id === focusRowId &&
+												property.type === PropertyType.TITLE
+											}
+											onValueChange={
+												mode === "preview"
+													? onDatabaseValueChange
+													: undefined
+											}
+										/>
+									</DatabaseValueCell>
+								))}
 
-									return (
-										<DatabaseValueCell key={property.id}>
-											<DatabaseCell
-												databaseId={database.id}
-												rowId={row.id}
-												property={property}
-												value={value}
-												mode={mode}
-												onValueChange={
-													mode === "preview"
-														? onDatabaseValueChange
-														: undefined
-												}
-											/>
-										</DatabaseValueCell>
-									);
-								})}
-
-								{editable && <td className='w-10 min-w-10' />}
+								{editable && (
+									<DatabaseValueCell className='min-w-10'>
+										<RowActionsMenu
+											databaseId={database.id}
+											rowId={row.id}
+										/>
+									</DatabaseValueCell>
+								)}
 							</tr>
 						);
 					})}
@@ -150,13 +247,10 @@ export function TableView({
 					{rows.length === 0 && (
 						<tr>
 							<td
-								colSpan={Math.max(
-									visibleProperties.length + 1,
-									1,
-								)}
-								className='h-20 text-center text-muted-foreground'
+								colSpan={visibleProperties.length + (editable ? 1 : 0)}
+								className='h-16 border-b border-border px-2 text-sm text-muted-foreground'
 							>
-								No rows
+								No rows yet
 							</td>
 						</tr>
 					)}
@@ -165,13 +259,13 @@ export function TableView({
 			{editable && (
 				<button
 					type='button'
-					disabled={createRowMutation.isPending}
-					onClick={() => createRowMutation.mutate()}
-					className='flex h-9 w-full items-center gap-2 px-3 text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground disabled:opacity-50'
+					disabled={isAddingRow}
+					onClick={() => addRow()}
+					className='flex h-9 w-full items-center gap-1.5 rounded-sm px-2 text-sm text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground disabled:opacity-50'
 				>
 					<Plus className='size-4' />
 
-					{createRowMutation.isPending ? "Adding..." : "New row"}
+					{isAddingRow ? "Adding..." : "New row"}
 				</button>
 			)}
 		</div>

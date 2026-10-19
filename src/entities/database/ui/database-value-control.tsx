@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, ChevronDown } from "lucide-react";
+import { useState } from "react";
 import {
 	canInteract,
 	type InteractionMode,
@@ -34,6 +35,7 @@ export function DatabaseValueControl({
 	disabled = false,
 	onValueChange,
 }: DatabaseValueControlProps) {
+	const [open, setOpen] = useState(false);
 	const interactive = canInteract(mode) && Boolean(onValueChange);
 	const emit = (next: unknown) => {
 		if (interactive && !disabled) onValueChange?.(next);
@@ -72,20 +74,22 @@ export function DatabaseValueControl({
 	);
 	if (!interactive) return badges;
 	return (
-		<Popover>
+		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
 				<button
 					type='button'
 					disabled={disabled}
 					aria-label={name}
-					className='flex min-h-8 w-full items-center gap-2 rounded px-1 text-left hover:bg-muted/50'
+					className='group/select flex min-h-8 w-full items-center gap-2 rounded-sm px-1 text-left outline-none hover:bg-muted/60 focus-visible:bg-muted/60'
 				>
 					{selected.length ? (
 						badges
 					) : (
-						<span className='text-muted-foreground'>Select</span>
+						<span className='text-muted-foreground opacity-0 group-hover/select:opacity-100 group-focus-visible/select:opacity-100'>
+							Select an option
+						</span>
 					)}
-					<ChevronDown className='ml-auto size-3.5 text-muted-foreground' />
+					<ChevronDown className='ml-auto size-3.5 shrink-0 text-muted-foreground opacity-0 group-hover/select:opacity-100' />
 				</button>
 			</PopoverTrigger>
 			<PopoverContent align='start' className='w-56 p-1'>
@@ -104,7 +108,9 @@ export function DatabaseValueControl({
 									type='button'
 									disabled={disabled}
 									aria-pressed={active}
-									onClick={() =>
+									onClick={() => {
+										// Single choice is done after one pick; multi-select stays open.
+										if (!multiple) setOpen(false);
 										emit(
 											multiple
 												? active
@@ -117,9 +123,11 @@ export function DatabaseValueControl({
 															...selectedIds,
 															option.id,
 														]
-												: option.id,
-										)
-									}
+												: active && type !== "STATUS"
+													? null
+													: option.id,
+										);
+									}}
 									className='flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm hover:bg-muted disabled:opacity-50'
 								>
 									<PropertyOptionBadge

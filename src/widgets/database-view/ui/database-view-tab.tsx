@@ -107,19 +107,10 @@ export function DatabaseViewTab({
 			},
 		);
 	};
-	const handleDelete = () => {
-		deleteMutation.mutate(view.id, {
-			onSuccess: () => {
-				setOpen(false);
-				onDeleted?.(view.id);
-			},
-		});
-	};
-
 	return (
 		<div
 			className={[
-				"flex items-center rounded-md",
+				"flex shrink-0 items-center whitespace-nowrap rounded-md",
 				active ? "bg-muted text-foreground" : "text-muted-foreground",
 			].join(" ")}
 		>
@@ -179,21 +170,6 @@ export function DatabaseViewTab({
 						</button>
 					)}
 
-					<div className='my-2 border-t' />
-
-					<button
-						type='button'
-						className='flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-muted'
-					>
-						Display as
-					</button>
-
-					<button
-						type='button'
-						className='flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-muted'
-					>
-						Edit view
-					</button>
 					<div className='my-2 border-t' />
 
 					<button

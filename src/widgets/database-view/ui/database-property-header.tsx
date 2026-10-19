@@ -2,26 +2,15 @@
 
 import { PropertyIcon } from "@/entities/database/ui/database-visuals";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 
-import {
-	useDeleteDatabaseProperty,
-	useRenameDatabaseProperty,
-	useSetViewPropertyVisibility,
-} from "@/entities/database/model/database.mutations";
-
-import {
-	PropertyType,
-	type DatabaseProperty,
-} from "@/entities/database/model/database.types";
-
-import { Input } from "@/shared/ui/input";
+import type { DatabaseProperty } from "@/entities/database/model/database.types";
 
 import { InteractionMode } from "@/shared/model/interaction-mode";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
-import { PropertyOptionsEditor } from "./property-options-editor";
+import { PropertySettings } from "./property-settings";
 
 interface DatabasePropertyHeaderProps {
 	databaseId: string;
@@ -36,40 +25,9 @@ export function DatabasePropertyHeader({
 	property,
 	mode = "editable",
 }: DatabasePropertyHeaderProps) {
-	const editable = mode === "editable";
 	const [open, setOpen] = useState(false);
 
-	const [name, setName] = useState(property.name);
-
-	const renameMutation = useRenameDatabaseProperty(databaseId);
-	const deleteMutation = useDeleteDatabaseProperty(databaseId);
-	const setVisibilityMutation = useSetViewPropertyVisibility(
-		databaseId,
-		viewId,
-	);
-	const hasOptions =
-		property.type === PropertyType.SELECT ||
-		property.type === PropertyType.MULTI_SELECT ||
-		property.type === PropertyType.STATUS;
-
-	useEffect(() => {
-		setName(property.name);
-	}, [property.name]);
-
-	const saveName = () => {
-		const nextName = name.trim();
-
-		if (!nextName || nextName === property.name) {
-			return;
-		}
-
-		renameMutation.mutate({
-			propertyId: property.id,
-			name: nextName,
-		});
-	};
-
-	if (!editable) {
+	if (mode !== "editable") {
 		return (
 			<div className='flex w-full items-center gap-2 text-left'>
 				<PropertyIcon type={property.type} />
@@ -84,114 +42,23 @@ export function DatabasePropertyHeader({
 			<PopoverTrigger asChild>
 				<button
 					type='button'
-					className='group flex w-full items-center gap-2 text-left'
+					className='group flex h-9 w-full items-center gap-1.5 px-2 text-left outline-none focus-visible:bg-muted/60'
 				>
 					<PropertyIcon type={property.type} />
 
-					<span className='min-w-0 flex-1 truncate'>
-						{property.name}
-					</span>
+					<span className='min-w-0 flex-1 truncate'>{property.name}</span>
 
-					<MoreHorizontal className='size-4 opacity-0 group-hover:opacity-100' />
+					<MoreHorizontal className='size-4 shrink-0 opacity-0 group-hover:opacity-100' />
 				</button>
 			</PopoverTrigger>
 
-			<PopoverContent align='start' className='w-72 p-2'>
-				{/* Rename */}
-				<div className='flex items-center gap-2'>
-					<div className='flex size-8 shrink-0 items-center justify-center rounded-md border'>
-						<PropertyIcon type={property.type} />
-					</div>
-
-					<Input
-						value={name}
-						onChange={(event) => setName(event.target.value)}
-						onBlur={saveName}
-						onKeyDown={(event) => {
-							if (event.key === "Enter") {
-								saveName();
-								event.currentTarget.blur();
-							}
-						}}
-						className='h-8'
-						autoFocus
-					/>
-				</div>
-
-				{hasOptions && (
-					<>
-						<div className='my-2 border-t' />
-
-						<PropertyOptionsEditor
-							databaseId={databaseId}
-							property={property}
-						/>
-					</>
-				)}
-
-				<div className='my-2 border-t' />
-
-				{property.isHideable && (
-					<button
-						type='button'
-						disabled={setVisibilityMutation.isPending}
-						onClick={() => {
-							setVisibilityMutation.mutate(
-								{
-									propertyId: property.id,
-									visible: false,
-								},
-								{
-									onSuccess: () => setOpen(false),
-								},
-							);
-						}}
-						className='flex w-full items-center rounded-md px-2 py-2 text-sm hover:bg-muted disabled:opacity-50'
-					>
-						Hide in view
-					</button>
-				)}
-
-				{!property.isDefault && (
-					<button
-						type='button'
-						disabled={deleteMutation.isPending}
-						onClick={() => {
-							deleteMutation.mutate(property.id, {
-								onSuccess: () => setOpen(false),
-							});
-						}}
-						className='flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50'
-					>
-						<Trash2 className='size-4' />
-						Delete property
-					</button>
-				)}
-
-				<div className='my-2 border-t' />
-
-				<button
-					type='button'
-					className='flex w-full items-center rounded-md px-2 py-2 text-sm hover:bg-muted'
-				>
-					Edit property
-				</button>
-
-				<div className='my-2 border-t' />
-
-				<button
-					type='button'
-					className='flex w-full items-center rounded-md px-2 py-2 text-sm hover:bg-muted'
-				>
-					Insert left
-				</button>
-
-				<button
-					type='button'
-					className='flex w-full items-center rounded-md px-2 py-2 text-sm hover:bg-muted'
-				>
-					Insert right
-				</button>
+			<PopoverContent align='start' className='w-64 p-1'>
+				<PropertySettings
+					databaseId={databaseId}
+					viewId={viewId}
+					property={property}
+					onDone={() => setOpen(false)}
+				/>
 			</PopoverContent>
 		</Popover>
 	);

@@ -112,6 +112,10 @@ export const databaseApi = {
 		return response.data.data;
 	},
 
+	deleteRow: async (rowId: string): Promise<void> => {
+		await instance.delete(`/database-rows/${rowId}`);
+	},
+
 	setRowValue: async (
 		rowId: string,
 		propertyId: string,
@@ -124,6 +128,10 @@ export const databaseApi = {
 		});
 
 		return response.data.data;
+	},
+
+	clearRowValue: async (rowId: string, propertyId: string): Promise<void> => {
+		await instance.delete(`/database-rows/${rowId}/values/${propertyId}`);
 	},
 
 	addProperty: async (
@@ -217,6 +225,20 @@ export const databaseApi = {
 		const response = await instance.patch<ApiResponse<DatabaseViewDetail>>(
 			`${DATABASE_API}/${databaseId}/views/${viewId}/properties/${propertyId}/visibility`,
 			{ visible },
+		);
+
+		return response.data.data;
+	},
+
+	setViewPropertyWidth: async (
+		databaseId: string,
+		viewId: string,
+		propertyId: string,
+		width: number | null,
+	): Promise<DatabaseViewDetail> => {
+		const response = await instance.patch<ApiResponse<DatabaseViewDetail>>(
+			`${DATABASE_API}/${databaseId}/views/${viewId}/properties/${propertyId}/width`,
+			{ width },
 		);
 
 		return response.data.data;

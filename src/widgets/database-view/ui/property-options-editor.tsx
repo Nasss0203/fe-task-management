@@ -1,163 +1,139 @@
 "use client";
 
-import { Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ChevronRight, Plus } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
-import {
-	useAddPropertyOption,
-	useDeletePropertyOption,
-	useUpdatePropertyOption,
-} from "@/entities/database/model/database.mutations";
-
+import { useAddPropertyOption } from "@/entities/database/model/database.mutations";
 import type {
 	DatabaseProperty,
 	PropertyOption,
 } from "@/entities/database/model/database.types";
+import { PropertyOptionBadge } from "@/entities/database/ui/database-visuals";
+import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 
-import { Input } from "@/shared/ui/input";
+import { MenuSectionLabel } from "./menu-item";
+import { PropertyOptionMenu } from "./property-option-menu";
 
 interface PropertyOptionsEditorProps {
 	databaseId: string;
 	property: DatabaseProperty;
 }
 
+/** Notion-style option list: badges that open a rename/color/delete menu. */
 export function PropertyOptionsEditor({
 	databaseId,
 	property,
 }: PropertyOptionsEditorProps) {
-	const [newOptionName, setNewOptionName] = useState("");
-
+	const [adding, setAdding] = useState(false);
+	const [newName, setNewName] = useState("");
 	const addOptionMutation = useAddPropertyOption(databaseId, property.id);
+	const options = [...property.options].sort(
+		(a, b) => Number(a.position) - Number(b.position),
+	);
 
-	const handleAdd = () => {
-		const name = newOptionName.trim();
-
+	const add = () => {
+		const name = newName.trim();
 		if (!name) {
+			setAdding(false);
 			return;
 		}
-
+		if (options.some((option) => option.name.toLowerCase() === name.toLowerCase())) {
+			toast.error(`"${name}" already exists`);
+			return;
+		}
 		addOptionMutation.mutate(
+			{ name, color: null },
 			{
-				name,
-				color: null,
-			},
-			{
-				onSuccess: () => {
-					setNewOptionName("");
-				},
+				onSuccess: () => setNewName(""),
+				onError: () => toast.error("Couldn't add option"),
 			},
 		);
 	};
 
 	return (
-		<div className='space-y-2'>
-			<div className='px-1 text-xs font-medium text-muted-foreground'>
-				Options
+		<div>
+			<div className='flex items-center justify-between pr-1'>
+				<MenuSectionLabel>Options</MenuSectionLabel>
+				<button
+					type='button'
+					aria-label='Add option'
+					onClick={() => setAdding(true)}
+					className='flex size-6 items-center justify-center rounded-sm text-muted-foreground hover:bg-muted hover:text-foreground'
+				>
+					<Plus className='size-3.5' />
+				</button>
 			</div>
 
-			<div className='space-y-1'>
-				{property.options.map((option) => (
-					<PropertyOptionItem
+			{adding && (
+				<input
+					value={newName}
+					onChange={(event) => setNewName(event.target.value)}
+					onBlur={add}
+					onKeyDown={(event) => {
+						if (event.key === "Enter") add();
+						if (event.key === "Escape") {
+							setNewName("");
+							setAdding(false);
+						}
+					}}
+					disabled={addOptionMutation.isPending}
+					placeholder='Type a new option'
+					aria-label='New option'
+					autoFocus
+					className='mb-1 h-7 w-full rounded-md border border-input bg-transparent px-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/40'
+				/>
+			)}
+
+			<div className='max-h-60 overflow-y-auto'>
+				{options.map((option) => (
+					<OptionRow
 						key={option.id}
 						databaseId={databaseId}
-						propertyId={property.id}
+						property={property}
 						option={option}
 					/>
 				))}
-			</div>
-
-			<div className='flex items-center gap-2'>
-				<Input
-					value={newOptionName}
-					onChange={(event) => setNewOptionName(event.target.value)}
-					onKeyDown={(event) => {
-						if (event.key === "Enter") {
-							handleAdd();
-						}
-					}}
-					placeholder='Add option...'
-					className='h-8'
-				/>
-
-				<button
-					type='button'
-					disabled={
-						!newOptionName.trim() || addOptionMutation.isPending
-					}
-					onClick={handleAdd}
-					className='flex size-8 shrink-0 items-center justify-center rounded-md hover:bg-muted disabled:opacity-50'
-				>
-					<Plus className='size-4' />
-				</button>
+				{options.length === 0 && !adding && (
+					<p className='px-2 py-1 text-xs text-muted-foreground'>
+						No options yet
+					</p>
+				)}
 			</div>
 		</div>
 	);
 }
 
-interface PropertyOptionItemProps {
-	databaseId: string;
-	propertyId: string;
-	option: PropertyOption;
-}
-
-function PropertyOptionItem({
+function OptionRow({
 	databaseId,
-	propertyId,
+	property,
 	option,
-}: PropertyOptionItemProps) {
-	const [name, setName] = useState(option.name);
-
-	const updateMutation = useUpdatePropertyOption(databaseId, propertyId);
-
-	const deleteMutation = useDeletePropertyOption(databaseId, propertyId);
-
-	useEffect(() => {
-		setName(option.name);
-	}, [option.name]);
-
-	const save = () => {
-		const nextName = name.trim();
-
-		if (!nextName) {
-			setName(option.name);
-			return;
-		}
-
-		if (nextName === option.name) {
-			return;
-		}
-
-		updateMutation.mutate({
-			optionId: option.id,
-			name: nextName,
-			color: option.color,
-		});
-	};
+}: {
+	databaseId: string;
+	property: DatabaseProperty;
+	option: PropertyOption;
+}) {
+	const [open, setOpen] = useState(false);
 
 	return (
-		<div className='flex items-center gap-2 rounded-md px-1 py-1 hover:bg-muted/50'>
-			<span className='size-2 shrink-0 rounded-full bg-muted-foreground' />
-
-			<Input
-				value={name}
-				onChange={(event) => setName(event.target.value)}
-				onBlur={save}
-				onKeyDown={(event) => {
-					if (event.key === "Enter") {
-						event.currentTarget.blur();
-					}
-				}}
-				className='h-7 border-0 bg-transparent px-1 shadow-none focus-visible:ring-0'
-			/>
-
-			<button
-				type='button'
-				disabled={deleteMutation.isPending}
-				onClick={() => deleteMutation.mutate(option.id)}
-				className='flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive'
-			>
-				<Trash2 className='size-3.5' />
-			</button>
-		</div>
+		<Popover open={open} onOpenChange={setOpen}>
+			<PopoverTrigger asChild>
+				<button
+					type='button'
+					className='group/option flex h-8 w-full items-center gap-2 rounded-md px-2 text-left hover:bg-muted data-[state=open]:bg-muted'
+				>
+					<PropertyOptionBadge name={option.name} color={option.color} />
+					<ChevronRight className='ml-auto size-3.5 text-muted-foreground opacity-0 group-hover/option:opacity-100 group-data-[state=open]/option:opacity-100' />
+				</button>
+			</PopoverTrigger>
+			<PopoverContent side='right' align='start' className='w-48 p-1.5'>
+				<PropertyOptionMenu
+					databaseId={databaseId}
+					property={property}
+					option={option}
+					onDone={() => setOpen(false)}
+				/>
+			</PopoverContent>
+		</Popover>
 	);
 }

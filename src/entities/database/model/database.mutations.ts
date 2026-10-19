@@ -7,6 +7,7 @@ import { databaseKeys } from "./database.queries";
 import {
 	DatabaseViewType,
 	PropertyType,
+	type DatabaseRow,
 	type DatabaseViewDetail,
 } from "./database.types";
 
@@ -24,6 +25,20 @@ export function useCreateDatabaseRow(databaseId: string) {
 	});
 }
 
+export function useDeleteDatabaseRow(databaseId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (rowId: string) => databaseApi.deleteRow(rowId),
+
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: databaseKeys.rows(databaseId),
+			});
+		},
+	});
+}
+
 interface SetDatabaseRowValueInput {
 	rowId: string;
 	propertyId: string;
@@ -32,15 +47,58 @@ interface SetDatabaseRowValueInput {
 
 export function useSetDatabaseRowValue(databaseId: string) {
 	const queryClient = useQueryClient();
+	const rowsKey = databaseKeys.rows(databaseId);
 
 	return useMutation({
-		mutationFn: ({ rowId, propertyId, value }: SetDatabaseRowValueInput) =>
-			databaseApi.setRowValue(rowId, propertyId, value),
+		// null = empty cell; the backend rejects null for most types, so clear instead.
+		mutationFn: async ({
+			rowId,
+			propertyId,
+			value,
+		}: SetDatabaseRowValueInput): Promise<void> => {
+			if (value === null) {
+				await databaseApi.clearRowValue(rowId, propertyId);
+				return;
+			}
 
-		onSuccess: async () => {
-			await queryClient.invalidateQueries({
-				queryKey: databaseKeys.rows(databaseId),
-			});
+			await databaseApi.setRowValue(rowId, propertyId, value);
+		},
+
+		// Optimistic so cards dragged between board columns / calendar days stay put.
+		onMutate: async ({ rowId, propertyId, value }) => {
+			await queryClient.cancelQueries({ queryKey: rowsKey });
+			const previous = queryClient.getQueryData<DatabaseRow[]>(rowsKey);
+
+			queryClient.setQueryData<DatabaseRow[]>(rowsKey, (rows) =>
+				rows?.map((row) => {
+					if (row.id !== rowId) return row;
+					const others = row.values.filter(
+						(item) => item.propertyId !== propertyId,
+					);
+					return {
+						...row,
+						values:
+							value === null
+								? others
+								: [
+										...others,
+										{ id: `optimistic-${propertyId}`, propertyId, value },
+									],
+					};
+				}),
+			);
+
+			return { previous };
+		},
+
+		onError: (_error, _input, context) => {
+			if (context?.previous) {
+				queryClient.setQueryData(rowsKey, context.previous);
+			}
+		},
+
+		onSettled: async () => {
+			await queryClient.invalidateQueries({ queryKey: rowsKey });
 		},
 	});
 }
@@ -189,6 +247,32 @@ export function useSetViewPropertyVisibility(
 			await queryClient.invalidateQueries({
 				queryKey: databaseKeys.viewDetail(databaseId, viewId),
 			});
+		},
+	});
+}
+
+interface SetViewPropertyWidthInput {
+	propertyId: string;
+	width: number | null;
+}
+
+export function useSetViewPropertyWidth(databaseId: string, viewId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({ propertyId, width }: SetViewPropertyWidthInput) =>
+			databaseApi.setViewPropertyWidth(
+				databaseId,
+				viewId,
+				propertyId,
+				width,
+			),
+
+		onSuccess: (view: DatabaseViewDetail) => {
+			queryClient.setQueryData(
+				databaseKeys.viewDetail(databaseId, viewId),
+				view,
+			);
 		},
 	});
 }

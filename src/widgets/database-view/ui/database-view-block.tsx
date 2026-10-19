@@ -70,8 +70,8 @@ export function DatabaseViewBlock({
 
 	return (
 		<div className='w-full min-w-0 max-w-full'>
-			<div className='mb-2 flex items-center justify-between'>
-				<div className='flex items-center gap-1'>
+			<div className='mb-1 flex items-center justify-between gap-2'>
+				<div className='flex min-w-0 items-center gap-1 overflow-x-auto [scrollbar-width:none]'>
 					{views.map((view) => (
 						<DatabaseViewTab
 							key={view.id}
@@ -82,14 +82,18 @@ export function DatabaseViewBlock({
 						/>
 					))}
 
-					<AddDatabaseViewPopover databaseId={database.id} />
+					<AddDatabaseViewPopover
+						databaseId={database.id}
+						views={views}
+						onCreated={(view) => setActiveViewId(view.id)}
+					/>
 				</div>
 
-				<div className='flex items-center gap-1'>
+				<div className='flex shrink-0 items-center gap-1'>
 					{activeViewDetail && (
 						<DatabaseViewPropertiesPopover
 							databaseId={database.id}
-							viewId={activeView.id}
+							view={activeView}
 							properties={database.properties}
 							viewProperties={activeViewDetail.properties}
 						/>

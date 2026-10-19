@@ -1,0 +1,37 @@
+/*
+ * FullCalendar "forma" theme mapped onto the app's design tokens, so the
+ * calendar follows light/dark mode with the rest of the UI (.dark on <html>).
+ */
+.db-calendar {
+	/* primary */
+	--fc-forma-primary: var(--primary);
+	--fc-forma-primary-over: color-mix(in srgb, var(--primary) 88%, var(--foreground));
+	--fc-forma-primary-down: color-mix(in srgb, var(--primary) 76%, var(--foreground));
+	--fc-forma-primary-foreground: var(--primary-foreground);
+
+	/* events: soft tinted chips, readable in both modes */
+	--fc-forma-event: color-mix(in srgb, var(--primary) 16%, var(--card));
+	--fc-forma-event-contrast: var(--foreground);
+	--fc-forma-background-event: var(--primary);
+	--fc-forma-highlight: color-mix(in srgb, var(--primary) 14%, transparent);
+
+	/* neutral backgrounds */
+	--fc-forma-background: var(--background);
+	--fc-forma-faint: color-mix(in srgb, var(--foreground) 3%, transparent);
+	--fc-forma-muted: color-mix(in srgb, var(--foreground) 6%, transparent);
+	--fc-forma-strong: color-mix(in srgb, var(--foreground) 10%, transparent);
+	--fc-forma-stronger: color-mix(in srgb, var(--foreground) 14%, transparent);
+	--fc-forma-strongest: color-mix(in srgb, var(--foreground) 18%, transparent);
+
+	/* neutral foregrounds */
+	--fc-forma-foreground: var(--foreground);
+	--fc-forma-faint-foreground: color-mix(in srgb, var(--muted-foreground) 60%, transparent);
+	--fc-forma-muted-foreground: var(--muted-foreground);
+
+	/* neutral borders */
+	--fc-forma-border: var(--border);
+	--fc-forma-muted-border: var(--border);
+	--fc-forma-strong-border: color-mix(in srgb, var(--foreground) 30%, transparent);
+
+	font-size: 0.8125rem;
+}
