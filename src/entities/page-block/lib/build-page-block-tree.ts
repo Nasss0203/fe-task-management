@@ -1,7 +1,11 @@
 import type { PageBlock } from "../model/page-block.types";
+import { assignListNumbers } from "./assign-list-numbers";
+import { assignTocHeadings, type TocHeading } from "./assign-toc-headings";
 
 export interface PageBlockNode extends PageBlock {
 	children: PageBlockNode[];
+	list_number?: number;
+	toc_headings?: TocHeading[];
 }
 
 export function buildPageBlockTree(blocks: PageBlock[]): PageBlockNode[] {
@@ -38,6 +42,7 @@ export function buildPageBlockTree(blocks: PageBlock[]): PageBlockNode[] {
 
 	const sortNodes = (nodes: PageBlockNode[]) => {
 		nodes.sort((a, b) => a.order_index - b.order_index);
+		assignListNumbers(nodes);
 
 		for (const node of nodes) {
 			sortNodes(node.children);
@@ -45,6 +50,7 @@ export function buildPageBlockTree(blocks: PageBlock[]): PageBlockNode[] {
 	};
 
 	sortNodes(roots);
+	assignTocHeadings(roots);
 
 	return roots;
 }

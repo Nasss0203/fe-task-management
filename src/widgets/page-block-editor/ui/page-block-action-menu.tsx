@@ -2,16 +2,11 @@
 
 import {
 	ArrowLeft,
-	CheckSquare,
 	ChevronRight,
 	Code2,
 	Copy,
-	Heading,
 	Link,
-	Minus,
-	Quote,
 	RotateCcw,
-	Text,
 	Trash2,
 } from "lucide-react";
 
@@ -38,6 +33,11 @@ import {
 
 import { useState } from "react";
 
+import {
+	type CommandItemData,
+	TURN_INTO_BLOCKS,
+} from "./page-block-command-menu";
+
 interface PageBlockActionMenuProps {
 	block: PageBlockNode;
 	shareToken?: string;
@@ -45,44 +45,6 @@ interface PageBlockActionMenuProps {
 }
 
 type MenuMode = "actions" | "turn-into";
-
-const TURN_INTO_OPTIONS = [
-	{
-		label: "Text",
-		type: PageBlockType.TEXT,
-		icon: Text,
-	},
-	{
-		label: "Heading",
-		type: PageBlockType.HEADER,
-		icon: Heading,
-	},
-	{
-		label: "To-do",
-		type: PageBlockType.TODO,
-		icon: CheckSquare,
-	},
-	{
-		label: "Toggle",
-		type: PageBlockType.TOGGLE,
-		icon: ChevronRight,
-	},
-	{
-		label: "Quote",
-		type: PageBlockType.QUOTE,
-		icon: Quote,
-	},
-	{
-		label: "Code",
-		type: PageBlockType.CODE,
-		icon: Code2,
-	},
-	{
-		label: "Divider",
-		type: PageBlockType.DIVIDER,
-		icon: Minus,
-	},
-];
 
 function getText(block: PageBlockNode): string {
 	const content = block.content;
@@ -159,8 +121,15 @@ export function PageBlockActionMenu({
 		onClose?.();
 	};
 
-	const handleTurnInto = async (type: PageBlockType) => {
-		if (type === block.type) {
+	const isCurrentOption = (option: CommandItemData) =>
+		option.type === block.type &&
+		(option.type !== PageBlockType.HEADER ||
+			Number(block.style_config?.level ?? 1) === option.styleConfig?.level);
+
+	const handleTurnInto = async (option: CommandItemData) => {
+		const { type } = option;
+
+		if (isCurrentOption(option)) {
 			onClose?.();
 			return;
 		}
@@ -171,6 +140,7 @@ export function PageBlockActionMenu({
 
 		switch (type) {
 			case PageBlockType.DIVIDER:
+			case PageBlockType.TABLE_OF_CONTENTS:
 				content = null;
 				break;
 
@@ -202,6 +172,8 @@ export function PageBlockActionMenu({
 
 			content,
 
+			styleConfig: option.styleConfig ?? null,
+
 			/**
 			 * Nếu block trước đó là loại
 			 * có data config riêng thì
@@ -218,6 +190,7 @@ export function PageBlockActionMenu({
 			<Command
 				className='
                     w-[280px]
+                    max-h-[var(--radix-popover-content-available-height)]
                     rounded-xl
                     border
                     bg-popover
@@ -247,19 +220,19 @@ export function PageBlockActionMenu({
 
 				<CommandInput placeholder='Search blocks...' className='h-9' />
 
-				<CommandList className='max-h-[300px]'>
+				<CommandList className='max-h-[300px] min-h-0'>
 					<CommandEmpty>No results.</CommandEmpty>
 
 					<CommandGroup>
-						{TURN_INTO_OPTIONS.map((option) => {
+						{TURN_INTO_BLOCKS.map((option) => {
 							const Icon = option.icon;
 
 							return (
 								<CommandItem
-									key={option.type}
+									key={option.id}
 									value={option.label}
 									onSelect={() =>
-										void handleTurnInto(option.type)
+										void handleTurnInto(option)
 									}
 									className='
                                             h-10
@@ -272,7 +245,7 @@ export function PageBlockActionMenu({
 
 									<span>{option.label}</span>
 
-									{block.type === option.type && (
+									{isCurrentOption(option) && (
 										<span className='ml-auto text-xs text-muted-foreground'>
 											Current
 										</span>
@@ -290,6 +263,7 @@ export function PageBlockActionMenu({
 		<Command
 			className='
                 w-[300px]
+                max-h-[var(--radix-popover-content-available-height)]
                 rounded-xl
                 border
                 bg-popover
@@ -304,7 +278,7 @@ export function PageBlockActionMenu({
 		>
 			<CommandInput placeholder='Search actions...' className='h-9' />
 
-			<CommandList className='max-h-[380px]'>
+			<CommandList className='max-h-[380px] min-h-0'>
 				<CommandEmpty>No actions found.</CommandEmpty>
 
 				{/* Block specific */}

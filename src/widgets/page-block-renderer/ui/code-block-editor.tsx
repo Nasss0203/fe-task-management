@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import CodeMirror, { oneDark } from "@uiw/react-codemirror";
+import CodeMirror, { EditorView, oneDark, Prec } from "@uiw/react-codemirror";
+import { useTheme } from "next-themes";
 
 import { css } from "@codemirror/lang-css";
 import { html } from "@codemirror/lang-html";
@@ -31,7 +32,16 @@ import { usePageBlockEditor } from "@/widgets/page-block-editor/ui/page-block-ed
 interface CodeBlockEditorProps {
 	block: PageBlockNode;
 	shareToken?: string;
+	showLanguage?: boolean;
 }
+
+const transparentEditorTheme = Prec.highest(
+	EditorView.theme({
+		"&": { backgroundColor: "transparent" },
+		".cm-gutters": { backgroundColor: "transparent", border: "none" },
+		".cm-activeLine": { backgroundColor: "transparent" },
+	}),
+);
 
 type CodeLanguage =
 	| "plaintext"
@@ -117,7 +127,11 @@ function getLanguage(block: PageBlockNode): CodeLanguage {
 	return "typescript";
 }
 
-export function CodeBlockEditor({ block, shareToken }: CodeBlockEditorProps) {
+export function CodeBlockEditor({
+	block,
+	shareToken,
+	showLanguage = true,
+}: CodeBlockEditorProps) {
 	const [value, setValue] = useState(() => getCode(block));
 
 	const [language, setLanguage] = useState<CodeLanguage>(() =>
@@ -127,6 +141,8 @@ export function CodeBlockEditor({ block, shareToken }: CodeBlockEditorProps) {
 	const [languageOpen, setLanguageOpen] = useState(false);
 
 	const [copied, setCopied] = useState(false);
+
+	const { resolvedTheme } = useTheme();
 
 	const updateBlock = useUpdatePageBlock(shareToken);
 
@@ -283,6 +299,7 @@ export function CodeBlockEditor({ block, shareToken }: CodeBlockEditorProps) {
                 '
 			>
 				{/* Language */}
+				{showLanguage && (
 				<Popover open={languageOpen} onOpenChange={setLanguageOpen}>
 					<PopoverTrigger asChild>
 						<Button
@@ -344,6 +361,7 @@ export function CodeBlockEditor({ block, shareToken }: CodeBlockEditorProps) {
 						))}
 					</PopoverContent>
 				</Popover>
+				)}
 
 				{/* Copy */}
 				<Button
@@ -376,7 +394,8 @@ export function CodeBlockEditor({ block, shareToken }: CodeBlockEditorProps) {
 			>
 				<CodeMirror
 					value={value}
-					extensions={[oneDark, ...extensions]}
+					theme={resolvedTheme === "dark" ? oneDark : "light"}
+					extensions={[transparentEditorTheme, ...extensions]}
 					basicSetup={{
 						lineNumbers: false,
 						foldGutter: false,

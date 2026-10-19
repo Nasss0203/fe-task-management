@@ -1,7 +1,14 @@
+import { assignListNumbers } from "@/entities/page-block/lib/assign-list-numbers";
+import {
+	assignTocHeadings,
+	type TocHeading,
+} from "@/entities/page-block/lib/assign-toc-headings";
 import type { PublicPageBlock } from "../model/public-site.types";
 
 export interface PublicPageBlockNode extends PublicPageBlock {
 	children: PublicPageBlockNode[];
+	list_number?: number;
+	toc_headings?: TocHeading[];
 }
 
 export function buildPublicPageBlockTree(
@@ -40,6 +47,7 @@ export function buildPublicPageBlockTree(
 
 	const sortNodes = (nodes: PublicPageBlockNode[]) => {
 		nodes.sort((a, b) => a.order_index - b.order_index);
+		assignListNumbers(nodes);
 
 		for (const node of nodes) {
 			sortNodes(node.children);
@@ -47,6 +55,7 @@ export function buildPublicPageBlockTree(
 	};
 
 	sortNodes(roots);
+	assignTocHeadings(roots);
 
 	return roots;
 }

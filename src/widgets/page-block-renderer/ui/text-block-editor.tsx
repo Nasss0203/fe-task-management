@@ -9,11 +9,16 @@ import {
 	useTransformToDatabaseBlock,
 	useUpdatePageBlock,
 } from "@/entities/page-block/model/page-block.mutations";
+import {
+	type MarkdownShortcut,
+	matchMarkdownShortcut,
+} from "@/entities/page-block/lib/match-markdown-shortcut";
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
 import {
 	PageBlockCommand,
 	PageBlockCommandMenu,
 } from "@/widgets/page-block-editor/ui/page-block-command-menu";
+import { Popover, PopoverAnchor, PopoverContent } from "@/shared/ui/popover";
 import { usePageBlockEditor } from "@/widgets/page-block-editor/ui/page-block-editor-context";
 
 interface TextBlockEditorProps {
@@ -69,6 +74,22 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 		resizeTextarea();
 	}, [value]);
 
+	const applyShortcut = async ({
+		type,
+		content,
+		styleConfig,
+	}: MarkdownShortcut) => {
+		await updateBlock.mutateAsync({
+			blockId: block.id,
+			pageId: block.page_id,
+			type,
+			content,
+			styleConfig,
+		});
+
+		requestFocus(block.id);
+	};
+
 	const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
 		const textarea = event.target;
 
@@ -79,6 +100,15 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 		setValue(nextValue);
 
 		resizeTextarea(textarea);
+
+		const shortcut = matchMarkdownShortcut(nextValue, cursor);
+
+		if (shortcut) {
+			setCommandOpen(false);
+			setSlashIndex(null);
+			void applyShortcut(shortcut);
+			return;
+		}
 
 		if (cursor > 0 && nextValue[cursor - 1] === "/") {
 			setSlashIndex(cursor - 1);
@@ -250,54 +280,64 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 		clearFocus();
 	}, [focusBlockId, block.id, clearFocus]);
 
-	return (
-		<div className='relative w-full'>
-			<textarea
-				ref={textareaRef}
-				value={value}
-				rows={1}
-				placeholder="Type '/' for commands"
-				onChange={handleChange}
-				onKeyDown={handleKeyDown}
-				onBlur={handleBlur}
-				className='
-        block
-        min-h-7
-        w-full
-        resize-none
-        overflow-hidden
-        border-0
-        bg-transparent
-        p-0
-        text-base
-        leading-7
-        outline-none
-        placeholder:text-muted-foreground/50
-        focus-visible:ring-0
-      '
-			/>
+	const closeCommand = () => {
+		setCommandOpen(false);
+		setSlashIndex(null);
+	};
 
-			{commandOpen && (
-				<div
-					className='
-          absolute
-          left-0
-          top-full
-          z-50
-          mt-1
-          w-64
-          rounded-lg
-          border
-          bg-popover
-          shadow-xl
-        '
-				>
-					<PageBlockCommandMenu
-						onSelect={handleSlashSelect}
-						allowDatabase={!shareToken}
+	return (
+		<Popover
+			open={commandOpen}
+			onOpenChange={(open) => {
+				if (!open) closeCommand();
+			}}
+		>
+			<PopoverAnchor asChild>
+				<div className='relative w-full'>
+					<textarea
+						ref={textareaRef}
+						value={value}
+						rows={1}
+						placeholder="Type '/' for commands"
+						onChange={handleChange}
+						onKeyDown={handleKeyDown}
+						onBlur={handleBlur}
+						className='
+		        block
+		        min-h-7
+		        w-full
+		        resize-none
+		        overflow-hidden
+		        border-0
+		        bg-transparent
+		        p-0
+		        text-base
+		        leading-7
+		        outline-none
+		        placeholder:text-muted-foreground/50
+		        focus-visible:ring-0
+		      '
 					/>
 				</div>
-			)}
-		</div>
+			</PopoverAnchor>
+
+			<PopoverContent
+				side='bottom'
+				align='start'
+				sideOffset={4}
+				collisionPadding={12}
+				onCloseAutoFocus={(event) => {
+					event.preventDefault();
+					textareaRef.current?.focus();
+				}}
+				className='w-auto border-0 bg-transparent p-0 shadow-none'
+			>
+				<PageBlockCommandMenu
+					onSelect={handleSlashSelect}
+					onClose={closeCommand}
+					allowDatabase={!shareToken}
+				/>
+			</PopoverContent>
+		</Popover>
 	);
 }

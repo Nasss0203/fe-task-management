@@ -20,12 +20,12 @@ function blockListKey(pageId: string, shareToken?: string) {
 		: pageBlockKeys.byPage(pageId);
 }
 
-function notifySharedWriteError(shareToken?: string) {
-	if (shareToken) {
-		toast.error(
-			"Unable to save this block change. Please check your access and try again.",
-		);
-	}
+function notifyBlockWriteError(shareToken?: string) {
+	toast.error(
+		shareToken
+			? "Unable to save this block change. Please check your access and try again."
+			: "Unable to save this block change. Please try again.",
+	);
 }
 
 interface CreateDatabaseBlockInput {
@@ -87,6 +87,8 @@ export function useCreateDatabaseBlock() {
 				queryKey: pageBlockKeys.byPage(variables.pageId),
 			});
 		},
+
+		onError: () => notifyBlockWriteError(),
 	});
 }
 
@@ -133,7 +135,7 @@ export function useCreatePageBlock(shareToken?: string) {
 				exact: true,
 			});
 		},
-		onError: () => notifySharedWriteError(shareToken),
+		onError: () => notifyBlockWriteError(shareToken),
 	});
 }
 
@@ -182,7 +184,7 @@ export function useUpdatePageBlock(shareToken?: string) {
 				exact: true,
 			});
 		},
-		onError: () => notifySharedWriteError(shareToken),
+		onError: () => notifyBlockWriteError(shareToken),
 	});
 }
 
@@ -238,6 +240,8 @@ export function useTransformToDatabaseBlock() {
 				queryKey: pageBlockKeys.byPage(variables.pageId),
 			});
 		},
+
+		onError: () => notifyBlockWriteError(),
 	});
 }
 
@@ -260,7 +264,7 @@ export function useDeletePageBlock(shareToken?: string) {
 				exact: true,
 			});
 		},
-		onError: () => notifySharedWriteError(shareToken),
+		onError: () => notifyBlockWriteError(shareToken),
 	});
 }
 

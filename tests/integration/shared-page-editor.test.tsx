@@ -19,6 +19,8 @@ vi.mock("@/widgets/database-view/ui/database-view-block", () => ({
 }));
 vi.mock("@uiw/react-codemirror", () => ({
 	oneDark: [],
+	Prec: { highest: (extension: unknown) => extension },
+	EditorView: { theme: () => [] },
 	default: ({ value, onChange }: { value: string; onChange: (value: string) => void }) => (
 		<textarea aria-label='Code' value={value} onChange={(event) => onChange(event.target.value)} />
 	),
@@ -127,9 +129,9 @@ describe("shared PageBlock editor", () => {
 		expect(http.post).toHaveBeenCalledWith("/pageBlock", expect.objectContaining({ after_block_id: "block-1", content: { text: "Original text" } }), headers);
 		await user.click(screen.getAllByRole("button", { name: "Block actions" })[0]);
 		await user.click(screen.getByRole("option", { name: /Turn into/ }));
-		await user.click(screen.getByRole("option", { name: "Heading" }));
+		await user.click(screen.getByRole("option", { name: "Heading 1" }));
 		await screen.findByPlaceholderText("Heading 1");
-		expect(http.patch).toHaveBeenCalledWith("/pageBlock/block-1", expect.objectContaining({ type: "HEADER" }), headers);
+		expect(http.patch).toHaveBeenCalledWith("/pageBlock/block-1", expect.objectContaining({ type: "HEADER", style_config: { level: 1 } }), headers);
 	});
 
 	it("creates after a row and hides database creation in its menu", async () => {

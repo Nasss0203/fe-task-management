@@ -189,6 +189,7 @@ export function HeadingBlockEditor({ block, shareToken }: HeadingBlockEditorProp
 	return (
 		<input
 			ref={inputRef}
+			id={`block-${block.id}`}
 			value={value}
 			type='text'
 			placeholder={`Heading ${level}`}

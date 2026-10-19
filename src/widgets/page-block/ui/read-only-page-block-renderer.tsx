@@ -2,6 +2,8 @@
 
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { EMBED_BLOCK_TYPES } from "@/entities/page-block/lib/resolve-embed";
+import type { TocHeading } from "@/entities/page-block/lib/assign-toc-headings";
 import { getDatabaseViewConfig } from "@/entities/page-block/lib/get-database-view-config";
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
 import {
@@ -17,6 +19,11 @@ import {
 	ReadOnlyFileBlock,
 	ReadOnlyVideoBlock,
 	ReadOnlyBookmarkBlock,
+	ReadOnlyCalloutBlock,
+	ReadOnlyEmbedBlock,
+	ReadOnlyListBlock,
+	ReadOnlyMermaidBlock,
+	TableOfContentsBlock,
 	EmptyValue,
 } from "@/entities/page-block/ui/read-only-block-content";
 import { Separator } from "@/shared/ui/separator";
@@ -34,6 +41,8 @@ export interface ReadOnlyPageBlockNode {
 	data_config: unknown;
 	is_open: boolean;
 	children: ReadOnlyPageBlockNode[];
+	list_number?: number;
+	toc_headings?: TocHeading[];
 	/** Snapshot sent by public pages, rendered without fetching. */
 	database?: PublicDatabase | null;
 }
@@ -95,15 +104,32 @@ export function ReadOnlyPageBlockRenderer({
 	shareToken,
 	disableDatabaseView = false,
 }: ReadOnlyPageBlockRendererProps) {
+	if (EMBED_BLOCK_TYPES.includes(block.type)) {
+		return <ReadOnlyEmbedBlock block={block} />;
+	}
+
 	switch (block.type) {
 		case PageBlockType.TEXT:
 			return <ReadOnlyTextBlock block={block} />;
 		case PageBlockType.HEADER:
-			return <ReadOnlyHeadingBlock block={block} />;
+			return (
+				<ReadOnlyHeadingBlock block={block} anchorId={`block-${block.id}`} />
+			);
 		case PageBlockType.DIVIDER:
 			return <Separator className='w-full' />;
 		case PageBlockType.TODO:
 			return <ReadOnlyTodoBlock block={block} />;
+		case PageBlockType.BULLETED_LIST:
+		case PageBlockType.NUMBERED_LIST:
+			return (
+				<ReadOnlyListBlock block={block} number={block.list_number} />
+			);
+		case PageBlockType.CALLOUT:
+			return <ReadOnlyCalloutBlock block={block} />;
+		case PageBlockType.TABLE_OF_CONTENTS:
+			return <TableOfContentsBlock headings={block.toc_headings ?? []} />;
+		case PageBlockType.MERMAID:
+			return <ReadOnlyMermaidBlock block={block} />;
 		case PageBlockType.TOGGLE:
 			return (
 				<ReadOnlyToggleBlock

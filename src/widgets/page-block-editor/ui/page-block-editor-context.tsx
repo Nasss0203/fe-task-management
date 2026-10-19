@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import {
+	createContext,
+	type RefObject,
+	useContext,
+	useEffect,
+	useState,
+} from "react";
 
 interface PageBlockEditorContextValue {
 	focusBlockId: string | null;
@@ -68,4 +74,23 @@ export function usePageBlockEditor() {
 	}
 
 	return context;
+}
+
+export function useBlockAutoFocus(
+	blockId: string,
+	ref: RefObject<HTMLTextAreaElement | HTMLInputElement | null>,
+) {
+	const { focusBlockId, clearFocus } = usePageBlockEditor();
+
+	useEffect(() => {
+		if (focusBlockId !== blockId) return;
+
+		const element = ref.current;
+
+		if (!element) return;
+
+		element.focus();
+		element.setSelectionRange(element.value.length, element.value.length);
+		clearFocus();
+	}, [focusBlockId, blockId, clearFocus, ref]);
 }

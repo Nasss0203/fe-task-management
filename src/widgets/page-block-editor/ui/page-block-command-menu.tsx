@@ -2,10 +2,16 @@
 
 import {
 	BookmarkIcon,
+	AppWindow,
 	CheckSquare,
 	ChevronRight,
 	Code2,
 	FileIcon,
+	GitFork,
+	Lightbulb,
+	List,
+	ListTree,
+	ListOrdered,
 	Heading1,
 	Heading2,
 	Heading3,
@@ -43,7 +49,7 @@ interface PageBlockCommandMenuProps {
 	onClose?: () => void;
 }
 
-interface CommandItemData {
+export interface CommandItemData {
 	id: string;
 
 	label: string;
@@ -141,6 +147,34 @@ const BASIC_BLOCKS: CommandItemData[] = [
 	},
 
 	{
+		id: "bulleted-list",
+
+		label: "Bulleted list",
+
+		description: "Create a simple bulleted list.",
+
+		type: PageBlockType.BULLETED_LIST,
+
+		icon: List,
+
+		shortcut: "-",
+	},
+
+	{
+		id: "numbered-list",
+
+		label: "Numbered list",
+
+		description: "Create a list with numbering.",
+
+		type: PageBlockType.NUMBERED_LIST,
+
+		icon: ListOrdered,
+
+		shortcut: "1.",
+	},
+
+	{
 		id: "toggle",
 
 		label: "Toggle",
@@ -162,6 +196,30 @@ const BASIC_BLOCKS: CommandItemData[] = [
 		type: PageBlockType.QUOTE,
 
 		icon: Quote,
+	},
+
+	{
+		id: "callout",
+
+		label: "Callout",
+
+		description: "Make writing stand out.",
+
+		type: PageBlockType.CALLOUT,
+
+		icon: Lightbulb,
+	},
+
+	{
+		id: "table-of-contents",
+
+		label: "Table of contents",
+
+		description: "Show an outline of the headings on this page.",
+
+		type: PageBlockType.TABLE_OF_CONTENTS,
+
+		icon: ListTree,
 	},
 
 	{
@@ -201,7 +259,23 @@ const ADVANCED_BLOCKS: CommandItemData[] = [
 
 		icon: Code2,
 	},
+
+	{
+		id: "mermaid",
+
+		label: "Mermaid diagram",
+
+		description: "Draw flowcharts and diagrams from text.",
+
+		type: PageBlockType.MERMAID,
+
+		icon: GitFork,
+	},
 ];
+
+export const TURN_INTO_BLOCKS = [...BASIC_BLOCKS, ...ADVANCED_BLOCKS].filter(
+	(command) => command.type !== PageBlockType.TABLE_SIMPLE,
+);
 
 const DATABASE_BLOCKS: CommandItemData[] = [
 	{
@@ -244,6 +318,13 @@ const MEDIA_BLOCKS: CommandItemData[] = [
 		description: "Save a web link as a bookmark.",
 		type: PageBlockType.BOOKMARK,
 		icon: BookmarkIcon,
+	},
+	{
+		id: "embed",
+		label: "Embed",
+		description: "Figma, Google Maps, GitHub Gist or a tweet.",
+		type: PageBlockType.EMBED,
+		icon: AppWindow,
 	},
 ];
 
@@ -322,6 +403,7 @@ export function PageBlockCommandMenu({
 		<Command
 			className='
                 w-[280px]
+                max-h-[var(--radix-popover-content-available-height)]
                 rounded-xl
                 border
                 bg-popover
@@ -341,7 +423,7 @@ export function PageBlockCommandMenu({
 				className='h-9 text-sm'
 			/>
 
-			<CommandList className='max-h-[340px]'>
+			<CommandList className='max-h-[340px] min-h-0'>
 				<CommandEmpty className='py-6 text-sm text-muted-foreground'>
 					No results found.
 				</CommandEmpty>

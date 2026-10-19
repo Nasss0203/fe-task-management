@@ -1,11 +1,20 @@
+import { assignListNumbers } from "@/entities/page-block/lib/assign-list-numbers";
+import {
+	assignTocHeadings,
+	type TocHeading,
+} from "@/entities/page-block/lib/assign-toc-headings";
 import {
 	ReadOnlyBookmarkBlock,
+	ReadOnlyCalloutBlock,
+	ReadOnlyEmbedBlock,
+	ReadOnlyListBlock,
+	ReadOnlyMermaidBlock,
+	TableOfContentsBlock,
 	ReadOnlyCodeBlock,
 	ReadOnlyFileBlock,
 	ReadOnlyHeadingBlock,
 	ReadOnlyImageBlock,
 	ReadOnlyQuoteBlock,
-	ReadOnlyRichText,
 	ReadOnlySimpleTableBlock,
 	ReadOnlyTextBlock,
 	ReadOnlyTodoBlock,
@@ -22,6 +31,8 @@ import { TemplateDatabasePreview } from "./template-database-preview";
 
 export interface TemplateBlockNode extends TemplateBlock {
 	children?: TemplateBlockNode[];
+	list_number?: number;
+	toc_headings?: TocHeading[];
 }
 interface TemplateBlockRendererProps extends TemplatePreviewInteractions {
 	block: TemplateBlockNode;
@@ -135,28 +146,23 @@ export function TemplateBlockRenderer({
 		case "BULLETED_LIST":
 		case "NUMBERED_LIST":
 			return (
-				<div className='flex min-h-7 items-start gap-2'>
-					<span className='text-base leading-7'>
-						{type === "NUMBERED_LIST"
-							? String(block.order_index + 1) + "."
-							: "•"}
-					</span>
-					<p className='whitespace-pre-wrap text-base leading-7'>
-						<ReadOnlyRichText text={text} />
-					</p>
-				</div>
+				<ReadOnlyListBlock
+					block={visualBlock}
+					number={type === "NUMBERED_LIST" ? block.list_number : undefined}
+				/>
 			);
 		case "CALLOUT":
-			return (
-				<div className='flex items-start gap-3 rounded-md border border-border bg-muted/20 p-3'>
-					<span>
-						{typeof content.icon === "string" ? content.icon : "💡"}
-					</span>
-					<p className='whitespace-pre-wrap text-base leading-7'>
-						<ReadOnlyRichText text={text} />
-					</p>
-				</div>
-			);
+			return <ReadOnlyCalloutBlock block={visualBlock} />;
+		case "TABLE_OF_CONTENTS":
+			return <TableOfContentsBlock headings={block.toc_headings ?? []} />;
+		case "MERMAID":
+			return <ReadOnlyMermaidBlock block={visualBlock} />;
+		case "EMBED":
+		case "FIGMA":
+		case "GOOGLE_MAPS":
+		case "GITHUB_GIST":
+		case "TWEET":
+			return <ReadOnlyEmbedBlock block={visualBlock} />;
 		default:
 			return (
 				<div className='min-h-7 text-sm text-muted-foreground'>
@@ -194,6 +200,7 @@ export function buildTemplateBlockTree(
 
 	const sortTree = (nodes: TemplateBlockNode[]) => {
 		nodes.sort((a, b) => (a.order_index ?? 0) - (b.order_index ?? 0));
+		assignListNumbers(nodes);
 		for (const n of nodes) {
 			if (n.children && n.children.length > 0) {
 				sortTree(n.children);
@@ -202,5 +209,6 @@ export function buildTemplateBlockTree(
 	};
 
 	sortTree(rootNodes);
+	assignTocHeadings(rootNodes);
 	return rootNodes;
 }

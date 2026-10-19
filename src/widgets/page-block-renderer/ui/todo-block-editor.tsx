@@ -13,7 +13,10 @@ import {
 
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
 
-import { usePageBlockEditor } from "@/widgets/page-block-editor/ui/page-block-editor-context";
+import {
+	useBlockAutoFocus,
+	usePageBlockEditor,
+} from "@/widgets/page-block-editor/ui/page-block-editor-context";
 
 interface TodoBlockEditorProps {
 	block: PageBlockNode;
@@ -169,6 +172,8 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 
 		requestFocus(newBlock.id);
 	};
+
+	useBlockAutoFocus(block.id, textareaRef);
 
 	return (
 		<div className='flex min-h-7 w-full items-start gap-2'>

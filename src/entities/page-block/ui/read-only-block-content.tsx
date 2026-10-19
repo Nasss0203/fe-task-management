@@ -1,4 +1,7 @@
+import type { TocHeading } from "@/entities/page-block/lib/assign-toc-headings";
+import { resolveEmbed, type ResolvedEmbed } from "@/entities/page-block/lib/resolve-embed";
 import { canInteract, InteractionMode } from "@/shared/model/interaction-mode";
+import { MermaidDiagram } from "@/shared/ui/mermaid-diagram";
 import { NativeCheckbox } from "@/shared/ui/native-checkbox";
 import { BookmarkIcon, FileIcon, ImageIcon, VideoIcon } from "lucide-react";
 import { Fragment } from "react";
@@ -141,14 +144,17 @@ export function ReadOnlyTextBlock({ block }: BlockContentProps) {
 	);
 }
 
-export function ReadOnlyHeadingBlock({ block }: BlockContentProps) {
+export function ReadOnlyHeadingBlock({
+	block,
+	anchorId,
+}: BlockContentProps & { anchorId?: string }) {
 	const text = getString(getContent(block), "text");
 	const styleConfig = block.style_config ?? {};
 	const level = styleConfig.level;
 
 	if (level === 2 || level === "2") {
 		return (
-			<h2 className='min-h-8 whitespace-pre-wrap text-2xl font-semibold leading-8'>
+			<h2 id={anchorId} className='min-h-8 whitespace-pre-wrap text-2xl font-semibold leading-8'>
 				{text ? (
 					<ReadOnlyRichText text={text} />
 				) : (
@@ -160,7 +166,7 @@ export function ReadOnlyHeadingBlock({ block }: BlockContentProps) {
 
 	if (level === 3 || level === "3") {
 		return (
-			<h3 className='min-h-7 whitespace-pre-wrap text-xl font-semibold leading-7'>
+			<h3 id={anchorId} className='min-h-7 whitespace-pre-wrap text-xl font-semibold leading-7'>
 				{text ? (
 					<ReadOnlyRichText text={text} />
 				) : (
@@ -171,7 +177,7 @@ export function ReadOnlyHeadingBlock({ block }: BlockContentProps) {
 	}
 
 	return (
-		<h1 className='min-h-10 whitespace-pre-wrap text-3xl font-bold leading-10'>
+		<h1 id={anchorId} className='min-h-10 whitespace-pre-wrap text-3xl font-bold leading-10'>
 			{text ? (
 				<ReadOnlyRichText text={text} />
 			) : (
@@ -489,4 +495,171 @@ export function ReadOnlyRichText({ text }: { text: string }) {
 	}
 
 	return <Fragment>{parts}</Fragment>;
+}
+
+export const CALLOUT_TONES = {
+	default: { label: "Note", icon: "💡", className: "bg-muted/50" },
+	info: { label: "Info", icon: "ℹ️", className: "bg-blue-500/10" },
+	success: { label: "Success", icon: "✅", className: "bg-emerald-500/10" },
+	warning: { label: "Warning", icon: "⚠️", className: "bg-amber-500/10" },
+	danger: { label: "Danger", icon: "🚫", className: "bg-red-500/10" },
+} as const;
+
+export type CalloutTone = keyof typeof CALLOUT_TONES;
+
+export function getCalloutTone(
+	styleConfig: Record<string, unknown> | null,
+): CalloutTone {
+	const tone = styleConfig?.tone;
+
+	return typeof tone === "string" && tone in CALLOUT_TONES
+		? (tone as CalloutTone)
+		: "default";
+}
+
+export function getCalloutIcon(block: BlockContentProps["block"]): string {
+	return (
+		getString(getContent(block), "icon") ||
+		CALLOUT_TONES[getCalloutTone(block.style_config)].icon
+	);
+}
+
+export function ListMarker({ number }: { number?: number }) {
+	return (
+		<span
+			aria-hidden='true'
+			className='flex h-7 min-w-6 shrink-0 select-none items-center justify-center text-base leading-7'
+		>
+			{number ? `${number}.` : "•"}
+		</span>
+	);
+}
+
+export function ReadOnlyListBlock({
+	block,
+	number,
+}: BlockContentProps & { number?: number }) {
+	const text = getString(getContent(block), "text");
+
+	return (
+		<div className='flex min-h-7 w-full items-start gap-1'>
+			<ListMarker number={number} />
+
+			<p className='min-w-0 flex-1 whitespace-pre-wrap text-base leading-7'>
+				{text ? <ReadOnlyRichText text={text} /> : <EmptyValue>List</EmptyValue>}
+			</p>
+		</div>
+	);
+}
+
+export function ReadOnlyCalloutBlock({ block }: BlockContentProps) {
+	const text = getString(getContent(block), "text");
+	const tone = CALLOUT_TONES[getCalloutTone(block.style_config)];
+
+	return (
+		<div className={`flex w-full items-start gap-3 rounded-md px-4 py-3 ${tone.className}`}>
+			<span aria-hidden='true' className='text-lg leading-7'>
+				{getCalloutIcon(block)}
+			</span>
+
+			<p className='min-w-0 flex-1 whitespace-pre-wrap text-base leading-7'>
+				{text ? <ReadOnlyRichText text={text} /> : <EmptyValue>Callout</EmptyValue>}
+			</p>
+		</div>
+	);
+}
+
+export function EmbedFrame({
+	embed,
+	title,
+}: {
+	embed: ResolvedEmbed;
+	title: string;
+}) {
+	return (
+		<div className='w-full max-w-3xl overflow-hidden rounded-md border'>
+			<iframe
+				title={title}
+				src={embed.src}
+				srcDoc={embed.srcDoc}
+				height={embed.height}
+				loading='lazy'
+				referrerPolicy='strict-origin-when-cross-origin'
+				sandbox={
+					embed.srcDoc
+						? "allow-scripts allow-popups allow-popups-to-escape-sandbox"
+						: "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation"
+				}
+				allowFullScreen
+				className='block w-full border-0 bg-background'
+			/>
+		</div>
+	);
+}
+
+export function ReadOnlyEmbedBlock({ block }: BlockContentProps) {
+	const url = getString(getContent(block), "url");
+	const embed = url ? resolveEmbed(url) : null;
+
+	if (!url) {
+		return <EmptyValue>Embed</EmptyValue>;
+	}
+
+	if (!embed) {
+		return (
+			<div className='rounded-md border border-dashed p-3 text-sm text-muted-foreground'>
+				This embed link is not supported.
+			</div>
+		);
+	}
+
+	return <EmbedFrame embed={embed} title={getHostname(url)} />;
+}
+
+export function ReadOnlyMermaidBlock({ block }: BlockContentProps) {
+	const text = getString(getContent(block), "text");
+
+	return text.trim() ? <MermaidDiagram code={text} /> : <EmptyValue>Mermaid diagram</EmptyValue>;
+}
+
+const TOC_INDENT = { 1: "pl-0", 2: "pl-4", 3: "pl-8" } as const;
+
+export function TableOfContentsBlock({ headings }: { headings: TocHeading[] }) {
+	const visible = headings.filter((heading) => heading.text.trim());
+
+	if (visible.length === 0) {
+		return (
+			<p className='min-h-7 text-sm leading-7 text-muted-foreground'>
+				Add headings to this page to build a table of contents.
+			</p>
+		);
+	}
+
+	return (
+		<nav aria-label='Table of contents' className='w-full'>
+			<ul className='space-y-0.5'>
+				{visible.map((heading) => (
+					<li
+						key={heading.id}
+						className={TOC_INDENT[heading.level as keyof typeof TOC_INDENT]}
+					>
+						<a
+							href={`#block-${heading.id}`}
+							onClick={(event) => {
+								const target = document.getElementById(`block-${heading.id}`);
+
+								if (!target) return;
+
+								event.preventDefault();
+								target.scrollIntoView({ behavior: "smooth", block: "start" });
+							}}
+							className='block truncate rounded-sm py-0.5 text-sm leading-6 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+						>
+							{heading.text}
+						</a>
+					</li>
+				))}
+			</ul>
+		</nav>
+	);
 }
