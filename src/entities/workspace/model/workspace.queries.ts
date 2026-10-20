@@ -5,6 +5,8 @@ import { workspaceApi } from "../api/workspace.api";
 export const workspaceKeys = {
 	all: ["workspaces"] as const,
 
+	starters: ["workspace-starters"] as const,
+
 	detail: (workspaceId: string) => ["workspaces", workspaceId] as const,
 
 	access: (workspaceId: string) =>
@@ -15,6 +17,15 @@ export function useWorkspaces() {
 	return useQuery({
 		queryKey: workspaceKeys.all,
 		queryFn: ({ signal }) => workspaceApi.getAll(signal),
+	});
+}
+
+export function useWorkspaceStarters(enabled = true) {
+	return useQuery({
+		queryKey: workspaceKeys.starters,
+		queryFn: ({ signal }) => workspaceApi.getStarters(signal),
+		staleTime: Infinity,
+		enabled,
 	});
 }
 

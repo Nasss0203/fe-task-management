@@ -1,6 +1,11 @@
 import { ApiResponse } from "@/shared/api";
 import instance from "@/shared/api/api-client";
-import type { Workspace, WorkspaceAccess } from "../model/workspace.types";
+import type {
+	CreateWorkspaceInput,
+	Workspace,
+	WorkspaceAccess,
+	WorkspaceStarterDefinition,
+} from "../model/workspace.types";
 
 const WORKSPACE_API = "/workspaces";
 
@@ -39,6 +44,25 @@ export const workspaceApi = {
 			{
 				signal,
 			},
+		);
+
+		return response.data.data;
+	},
+
+	getStarters: async (
+		signal?: AbortSignal,
+	): Promise<WorkspaceStarterDefinition[]> => {
+		const response = await instance.get<
+			ApiResponse<WorkspaceStarterDefinition[]>
+		>(`${WORKSPACE_API}/starters`, { signal });
+
+		return response.data.data;
+	},
+
+	create: async (input: CreateWorkspaceInput): Promise<Workspace> => {
+		const response = await instance.post<ApiResponse<Workspace>>(
+			WORKSPACE_API,
+			input,
 		);
 
 		return response.data.data;

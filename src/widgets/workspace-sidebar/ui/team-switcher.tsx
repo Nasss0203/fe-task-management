@@ -36,6 +36,7 @@ import type {
 } from "@/entities/workspace/model/workspace.types";
 import { InviteWorkspaceMembersDialog } from "@/features/workspace-invite/ui/InviteWorkspaceMembersDialog";
 import { BillingDialog, useBillingDialog } from "@/features/workspace-billing";
+import { CreateWorkspaceDialog } from "@/features/workspace-create";
 import {
 	SidebarMenu,
 	SidebarMenuButton,
@@ -58,7 +59,6 @@ interface TeamSwitcherProps {
 	};
 
 	onWorkspaceSelect?: (workspaceId: string) => void;
-	onCreateWorkspace?: () => void;
 }
 export function TeamSwitcher({
 	workspaces,
@@ -70,15 +70,15 @@ export function TeamSwitcher({
 	canUpdateMemberRole = false,
 	canRemoveMember = false,
 	onWorkspaceSelect,
-	onCreateWorkspace,
 }: TeamSwitcherProps) {
 	const router = useRouter();
 	const logout = useLogout();
 	const setSettingsOpen = useSettingsDialog((state) => state.setOpen);
 	const [inviteDialogOpen, setInviteDialogOpen] = React.useState(false);
+	const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
 
 	// Dialogs open after the menu closes, so focus doesn't return to the trigger.
-	const pendingDialog = React.useRef<"settings" | "billing" | null>(null);
+	const pendingDialog = React.useRef<"settings" | "billing" | "create" | null>(null);
 	const setBillingOpen = useBillingDialog((state) => state.setOpen);
 	const isMember = membershipType === "MEMBER";
 
@@ -126,6 +126,7 @@ export function TeamSwitcher({
 							pendingDialog.current = null;
 
 							if (pending === "billing") setBillingOpen(true);
+							else if (pending === "create") setCreateDialogOpen(true);
 							else if (isMember) setSettingsOpen(true);
 						}}
 					>
@@ -240,7 +241,9 @@ export function TeamSwitcher({
 							{isMember && (
 								<DropdownMenuItem
 									className='gap-2 p-2 text-blue-500 focus:text-blue-500'
-									onSelect={onCreateWorkspace}
+									onSelect={() => {
+										pendingDialog.current = "create";
+									}}
 								>
 									<Plus className='size-4' />
 									New workspace
@@ -294,6 +297,12 @@ export function TeamSwitcher({
 					canInviteMembers={canInviteMembers}
 					canUpdateMemberRole={canUpdateMemberRole}
 					canRemoveMember={canRemoveMember}
+				/>
+			)}
+			{isMember && (
+				<CreateWorkspaceDialog
+					open={createDialogOpen}
+					onOpenChange={setCreateDialogOpen}
 				/>
 			)}
 			{isMember && (
