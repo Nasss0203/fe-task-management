@@ -6,7 +6,6 @@ import { useState } from "react";
 
 import { buildPageTree } from "@/entities/page/lib/build-page-tree";
 import {
-	useCreatePage,
 	useMovePageToTrash,
 } from "@/entities/page/model/page.mutations";
 import type { Page } from "@/entities/page/model/page.types";
@@ -15,7 +14,7 @@ import { PageTree } from "@/entities/page/ui/page-tree";
 import { useCreateTeamspace } from "@/entities/teamspace/model/teamspace.mutations";
 import type { Teamspace } from "@/entities/teamspace/model/teamspace.types";
 
-import { CreatePageDialog } from "@/features/page/create-page/ui/create-page-dialog";
+import { CreatePageDialog } from "@/widgets/create-page";
 import { CreateTeamspaceDialog } from "@/features/teamspace/create-teamspace/ui/create-teamspace-dialog";
 
 import { Button } from "@/shared/ui/button";
@@ -42,7 +41,6 @@ export function NavTeamspaces({
 }: NavTeamspacesProps) {
 	const router = useRouter();
 
-	const createPageMutation = useCreatePage();
 	const movePageToTrashMutation = useMovePageToTrash();
 
 	const [createPageDialogOpen, setCreatePageDialogOpen] = useState(false);
@@ -87,31 +85,9 @@ export function NavTeamspaces({
 	/**
 	 * Create Page.
 	 */
-	const handleCreatePage = (title: string) => {
-		if (!selectedTeamspaceId) {
-			return;
-		}
-
-		createPageMutation.mutate(
-			{
-				workspace_id: workspaceId,
-				teamspace_id: selectedTeamspaceId,
-				parent_page_id: selectedParentPageId,
-				title,
-			},
-			{
-				onSuccess: (page) => {
-					setCreatePageDialogOpen(false);
-
-					setSelectedTeamspaceId(null);
-
-					setSelectedParentPageId(null);
-
-					router.push(`/page/${page.id}`);
-				},
-			},
-		);
-	};
+	const selectedParentPage = pages.find(
+		(page) => page.id === selectedParentPageId,
+	);
 
 	/**
 	 * Create Teamspace.
@@ -188,7 +164,6 @@ export function NavTeamspaces({
 								allPages={pages}
 								teamspaces={teamspaces}
 								activePageId={activePageId}
-								isCreatingPage={createPageMutation.isPending}
 								onOpenPage={(page) => {
 									router.push(`/page/${page.id}`);
 								}}
@@ -220,7 +195,11 @@ export function NavTeamspaces({
 						setSelectedParentPageId(null);
 					}
 				}}
-				onCreate={handleCreatePage}
+				workspaceId={workspaceId}
+				defaultLocation={{
+					teamspaceId: selectedTeamspaceId,
+					parentPage: selectedParentPage ?? null,
+				}}
 			/>
 
 			<CreateTeamspaceDialog

@@ -5,6 +5,8 @@ import { pageApi } from "../api/page.api";
 export const pageKeys = {
 	all: ["pages"] as const,
 
+	presets: ["page-presets"] as const,
+
 	byWorkspace: (workspaceId: string) =>
 		["pages", "workspace", workspaceId] as const,
 
@@ -70,5 +72,14 @@ export function useTrashPages(workspaceId?: string) {
 		queryFn: ({ signal }) => pageApi.getTrash(workspaceId!, signal),
 
 		enabled: Boolean(workspaceId),
+	});
+}
+
+export function usePagePresets(enabled = true) {
+	return useQuery({
+		queryKey: pageKeys.presets,
+		queryFn: ({ signal }) => pageApi.getPresets(signal),
+		staleTime: Infinity,
+		enabled,
 	});
 }

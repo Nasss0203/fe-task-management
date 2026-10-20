@@ -49,6 +49,23 @@ export interface UpdatePageInput {
 	cover_url?: string | null;
 }
 
+export type PagePreset =
+	| "empty"
+	| "getting-started"
+	| "todo-list"
+	| "journal"
+	| "meeting-notes"
+	| "project-overview"
+	| "tasks"
+	| "team-home"
+	| "onboarding";
+
+export interface PagePresetOption {
+	key: PagePreset;
+	title: string;
+	icon: string;
+}
+
 export interface MovePageInput {
 	parent_page_id: string | null;
 	teamspace_id: string | null;

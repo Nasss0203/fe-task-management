@@ -4,10 +4,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { pageApi } from "../api/page.api";
 import { pageKeys } from "./page.queries";
+import { pageBlockKeys } from "@/entities/page-block/model/page-block.queries";
 import { pagePublicationKeys } from "@/entities/page-publication/model/page-publication.queries";
 import type {
 	CreatePageInput,
 	MovePageInput,
+	PagePreset,
 	UpdatePageInput,
 	Page,
 } from "./page.types";
@@ -234,6 +236,21 @@ export function useDuplicatePage() {
 		onSuccess: (_, variables) => {
 			queryClient.invalidateQueries({
 				queryKey: pageKeys.byWorkspace(variables.workspaceId),
+			});
+		},
+	});
+}
+
+export function useApplyPagePreset() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({ pageId, preset }: { pageId: string; preset: PagePreset }) =>
+			pageApi.applyPreset(pageId, preset),
+
+		onSuccess: async (_, variables) => {
+			await queryClient.invalidateQueries({
+				queryKey: pageBlockKeys.byPage(variables.pageId),
 			});
 		},
 	});

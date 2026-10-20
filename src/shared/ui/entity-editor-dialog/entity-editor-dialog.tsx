@@ -1,12 +1,6 @@
 "use client";
 
-import {
-	ChevronDown,
-	FileText,
-	Maximize2,
-	MoreHorizontal,
-	Star,
-} from "lucide-react";
+import { FileText } from "lucide-react";
 
 import type { ReactNode } from "react";
 
@@ -28,6 +22,8 @@ interface EntityEditorDialogProps {
 
 	icon?: ReactNode;
 
+	location?: ReactNode;
+
 	children: ReactNode;
 
 	headerActions?: ReactNode;
@@ -39,6 +35,7 @@ export function EntityEditorDialog({
 	title,
 	breadcrumbLabel,
 	icon,
+	location,
 	children,
 	headerActions,
 }: EntityEditorDialogProps) {
@@ -66,105 +63,26 @@ export function EntityEditorDialog({
 					<DialogTitle>{title}</DialogTitle>
 				</DialogHeader>
 
-				<header className='flex h-12 shrink-0 items-center justify-between px-4'>
+				<header className='flex h-12 shrink-0 items-center justify-between gap-2 px-4'>
 					<div className='flex min-w-0 items-center gap-2'>
-						<button
-							type='button'
-							aria-label='Open as full page'
-							className='
-                                flex size-7 shrink-0
-                                items-center justify-center
-                                rounded-md
-                                text-muted-foreground
-                                transition-colors
-                                hover:bg-muted
-                                hover:text-foreground
-                            '
-						>
-							<Maximize2 className='size-4' />
-						</button>
-
-						<div className='mx-1 h-4 w-px shrink-0 bg-border' />
-
-						<button
-							type='button'
-							className='
-                                shrink-0 rounded-md
-                                px-1.5 py-1
-                                text-sm text-muted-foreground
-                                transition-colors
-                                hover:bg-muted
-                                hover:text-foreground
-                            '
-						>
-							Add to
-						</button>
-
-						{icon ?? (
-							<FileText className='size-4 shrink-0 text-muted-foreground' />
-						)}
-
-						<button
-							type='button'
-							className='
-                                flex min-w-0 items-center gap-1
-                                rounded-md px-1.5 py-1
-                                text-sm font-medium
-                                transition-colors
-                                hover:bg-muted
-                            '
-						>
-							<span className='truncate'>
-								{breadcrumbLabel ?? title}
-							</span>
-
-							<ChevronDown className='size-3.5 shrink-0 text-muted-foreground' />
-						</button>
-					</div>
-
-					<div className='flex shrink-0 items-center gap-1'>
-						{headerActions ?? (
+						{location ?? (
 							<>
-								<button
-									type='button'
-									className='
-                                        rounded-md px-2 py-1
-                                        text-sm font-medium
-                                        transition-colors
-                                        hover:bg-muted
-                                    '
-								>
-									Share
-								</button>
+								{icon ?? (
+									<FileText className='size-4 shrink-0 text-muted-foreground' />
+								)}
 
-								<button
-									type='button'
-									aria-label='Favorite'
-									className='
-                                        flex size-8 items-center
-                                        justify-center rounded-md
-                                        transition-colors
-                                        hover:bg-muted
-                                    '
-								>
-									<Star className='size-4' />
-								</button>
-
-								<button
-									type='button'
-									aria-label='More'
-									className='
-                                        flex size-8 items-center
-                                        justify-center rounded-md
-                                        transition-colors
-                                        hover:bg-muted
-                                    '
-								>
-									<MoreHorizontal className='size-4' />
-								</button>
+								<span className='truncate text-sm font-medium'>
+									{breadcrumbLabel ?? title}
+								</span>
 							</>
 						)}
 					</div>
+
+					{headerActions && (
+						<div className='flex shrink-0 items-center gap-1'>
+							{headerActions}
+						</div>
+					)}
 				</header>
 
 				<div className='min-h-0 flex-1 overflow-y-auto'>

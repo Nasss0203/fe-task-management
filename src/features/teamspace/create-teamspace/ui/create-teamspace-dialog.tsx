@@ -74,7 +74,6 @@ export function CreateTeamspaceDialog({
 			title='Create teamspace'
 			breadcrumbLabel='New teamspace'
 			icon={<span className='text-sm'>{icon}</span>}
-			headerActions={null}
 		>
 			{/* Title */}
 			<div className='flex items-start gap-3'>

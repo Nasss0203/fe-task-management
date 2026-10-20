@@ -6,13 +6,12 @@ import { useState } from "react";
 
 import { buildPageTree } from "@/entities/page/lib/build-page-tree";
 import {
-	useCreatePage,
 	useMovePageToTrash,
 } from "@/entities/page/model/page.mutations";
 import type { Page } from "@/entities/page/model/page.types";
 import { PageTree } from "@/entities/page/ui/page-tree";
 
-import { CreatePageDialog } from "@/features/page/create-page/ui/create-page-dialog";
+import { CreatePageDialog } from "@/widgets/create-page";
 import { PageActionsMenu } from "@/features/page/page-actions/ui/page-actions-menu";
 
 import { Button } from "@/shared/ui/button";
@@ -39,7 +38,6 @@ export function NavPrivatePages({
 }: NavPrivatePagesProps) {
 	const router = useRouter();
 
-	const createPageMutation = useCreatePage();
 	const movePageToTrashMutation = useMovePageToTrash();
 
 	const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -62,25 +60,9 @@ export function NavPrivatePages({
 		setCreateDialogOpen(true);
 	};
 
-	const handleCreatePage = (title: string) => {
-		createPageMutation.mutate(
-			{
-				workspace_id: workspaceId,
-				teamspace_id: null,
-				parent_page_id: selectedParentPageId,
-				title,
-			},
-			{
-				onSuccess: (page) => {
-					setCreateDialogOpen(false);
-
-					setSelectedParentPageId(null);
-
-					router.push(`/page/${page.id}`);
-				},
-			},
-		);
-	};
+	const selectedParentPage = pages.find(
+		(page) => page.id === selectedParentPageId,
+	);
 
 	const handleDialogOpenChange = (open: boolean) => {
 		setCreateDialogOpen(open);
@@ -119,7 +101,6 @@ export function NavPrivatePages({
 							type='button'
 							variant='ghost'
 							size='icon'
-							disabled={createPageMutation.isPending}
 							className={[
 								"h-6 w-6",
 								"hover:bg-sidebar-accent",
@@ -170,7 +151,12 @@ export function NavPrivatePages({
 			<CreatePageDialog
 				open={createDialogOpen}
 				onOpenChange={handleDialogOpenChange}
-				onCreate={handleCreatePage}
+				workspaceId={workspaceId}
+				defaultLocation={
+					selectedParentPage
+						? { teamspaceId: null, parentPage: selectedParentPage }
+						: undefined
+				}
 			/>
 		</>
 	);

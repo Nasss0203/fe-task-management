@@ -6,7 +6,6 @@ import { useMemo, useState } from "react";
 
 import { buildPageTree } from "@/entities/page/lib/build-page-tree";
 import {
-	useCreatePage,
 	useMovePageToTrash,
 } from "@/entities/page/model/page.mutations";
 import { usePageFavorites } from "@/entities/page/model/page.queries";
@@ -15,7 +14,7 @@ import { PageTree } from "@/entities/page/ui/page-tree";
 
 import type { Teamspace } from "@/entities/teamspace/model/teamspace.types";
 
-import { CreatePageDialog } from "@/features/page/create-page/ui/create-page-dialog";
+import { CreatePageDialog } from "@/widgets/create-page";
 import { PageActionsMenu } from "@/features/page/page-actions/ui/page-actions-menu";
 
 import { SidebarPageSection } from "@/widgets/workspace-sidebar/ui/sidebar-page-section";
@@ -37,7 +36,6 @@ export function NavFavorites({
 
 	const { data: favorites = [], isLoading } = usePageFavorites(workspaceId);
 
-	const createPage = useCreatePage();
 
 	const movePageToTrash = useMovePageToTrash();
 
@@ -116,36 +114,6 @@ export function NavFavorites({
 		setCreateDialogOpen(true);
 	};
 
-	/**
-	 * Create child Page.
-	 */
-	const handleCreatePage = (title: string) => {
-		if (!selectedParentPage) {
-			return;
-		}
-
-		createPage.mutate(
-			{
-				workspace_id: selectedParentPage.workspace_id,
-
-				teamspace_id: selectedParentPage.teamspace_id,
-
-				parent_page_id: selectedParentPage.id,
-
-				title,
-			},
-			{
-				onSuccess: (page) => {
-					setCreateDialogOpen(false);
-
-					setSelectedParentPage(null);
-
-					router.push(`/page/${page.id}`);
-				},
-			},
-		);
-	};
-
 	const handleDialogOpenChange = (open: boolean) => {
 		setCreateDialogOpen(open);
 
@@ -206,7 +174,15 @@ export function NavFavorites({
 			<CreatePageDialog
 				open={createDialogOpen}
 				onOpenChange={handleDialogOpenChange}
-				onCreate={handleCreatePage}
+				workspaceId={workspaceId}
+				defaultLocation={
+					selectedParentPage
+						? {
+								teamspaceId: selectedParentPage.teamspace_id,
+								parentPage: selectedParentPage,
+							}
+						: undefined
+				}
 			/>
 		</>
 	);

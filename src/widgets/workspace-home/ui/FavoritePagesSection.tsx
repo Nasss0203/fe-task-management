@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { usePageFavorites } from "@/entities/page/model/page.queries";
 import { Skeleton } from "@/shared/ui/skeleton";
-import { formatRelativeTime } from "../lib/format-relative-time";
+import { formatRelativeTime } from "@/shared/lib/format-relative-time";
 
 interface FavoritePagesSectionProps {
 	workspaceId?: string;

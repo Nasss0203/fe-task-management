@@ -6,6 +6,8 @@ import type {
 	CreatePageInput,
 	MovePageInput,
 	Page,
+	PagePreset,
+	PagePresetOption,
 	UpdatePageInput,
 } from "../model/page.types";
 
@@ -19,6 +21,19 @@ export const pageApi = {
 		);
 
 		return response.data.data;
+	},
+
+	getPresets: async (signal?: AbortSignal): Promise<PagePresetOption[]> => {
+		const response = await instance.get<ApiResponse<PagePresetOption[]>>(
+			`${PAGE_API}/presets`,
+			{ signal },
+		);
+
+		return response.data.data;
+	},
+
+	applyPreset: async (pageId: string, preset: PagePreset): Promise<void> => {
+		await instance.put(`${PAGE_API}/${pageId}/preset`, { preset });
 	},
 
 	update: async (pageId: string, input: UpdatePageInput): Promise<Page> => {
