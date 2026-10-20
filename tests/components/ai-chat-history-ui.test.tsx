@@ -70,9 +70,13 @@ describe("Phase 4 Chat History UI and refresh selection", () => {
         onOpenGeneration={onOpenGeneration}
       />,
     );
-    fireEvent.click(screen.getByText(/Chat history/));
+    const openHistory = () =>
+      fireEvent.click(screen.getByRole("button", { name: /History/ }));
+    openHistory();
     fireEvent.click(screen.getByRole("button", { name: /Page AI History/ }));
     expect(onSelectConversation).toHaveBeenCalledWith(conversation.id);
+    // Selecting a conversation closes the popover; loading more keeps it open.
+    openHistory();
     fireEvent.click(screen.getByRole("button", { name: "Load more conversations" }));
     expect(onLoadConversations).toHaveBeenCalledOnce();
     fireEvent.click(screen.getByRole("button", { name: "Load more drafts" }));

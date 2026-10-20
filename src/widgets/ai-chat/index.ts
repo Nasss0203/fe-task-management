@@ -1,4 +1,5 @@
 export { AiChat } from "./ui/AiChat";
+export { AiChatHome, AI_CHAT_THREAD_PATH } from "./ui/AiChatHome";
 export { AiChatHeader } from "./ui/AiChatHeader";
 export { AiChatEmptyState } from "./ui/AiChatEmptyState";
 export { AiMessageList } from "./ui/AiMessageList";

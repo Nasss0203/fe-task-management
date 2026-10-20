@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { AiChat } from "@/widgets/ai-chat";
+import { AiChatHome } from "@/widgets/ai-chat";
 
 export const metadata: Metadata = {
 	title: "Ask AI - Taskmanly",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function DashboardAiPage() {
-	return <AiChat />;
+	return <AiChatHome />;
 }

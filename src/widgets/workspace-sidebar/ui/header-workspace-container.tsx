@@ -1,8 +1,9 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import { useParams, usePathname } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 
+import { useAiHistoryConversations } from "@/entities/ai-assistant/model/ai-assistant.queries";
 import { usePage } from "@/entities/page/model/page.queries";
 import { usePublicTemplate } from "@/entities/template";
 import {
@@ -26,6 +27,7 @@ import { HeaderWorkspace } from "./header-workspace";
 
 export function HeaderWorkspaceContainer() {
 	const pathname = usePathname();
+	const router = useRouter();
 
 	const { user } = useUser();
 	const { data: workspaces = [] } = useWorkspaces();
@@ -74,6 +76,16 @@ export function HeaderWorkspaceContainer() {
 
 	const { data: workspace } = useWorkspace(currentWorkspaceId ?? "");
 
+	// Same query keys as useAiChat, so the chat title comes from its cache.
+	const isAiChatRoute = isAiRoute && pathname !== "/dashboard/ai";
+	const chatFilters = (scope: "GLOBAL" | "PAGE") =>
+		isAiChatRoute && currentWorkspaceId ? { workspaceId: currentWorkspaceId, scope } : null;
+	const { data: globalChats } = useAiHistoryConversations(user?.id, chatFilters("GLOBAL"));
+	const { data: pageChats } = useAiHistoryConversations(user?.id, chatFilters("PAGE"));
+	const chatTitle = [...(globalChats?.pages ?? []), ...(pageChats?.pages ?? [])]
+		.flatMap((chatPage) => chatPage.items)
+		.find((conversation) => conversation.id === selectedDashboardConversationId)?.title;
+
 	const pageTitle = isPageRoute
 		? page?.title
 		: isAiRoute
@@ -95,7 +107,13 @@ export function HeaderWorkspaceContainer() {
 					label: templateDetail?.name || "Template",
 				},
 			]
-		: undefined;
+		: isAiChatRoute
+			? [
+					...(workspace?.name ? [{ label: workspace.name }] : []),
+					{ label: "Ask AI", href: "/dashboard/ai" },
+					{ label: chatTitle || "New chat" },
+				]
+			: undefined;
 
 	/**
 	 * Read only the Global AI Chat thread.
@@ -115,9 +133,11 @@ export function HeaderWorkspaceContainer() {
 		if (chatBusy) return;
 		saveSelectedAiConversation(dashboardHistoryKey, null);
 		newChat(dashboardChatScope);
+		router.push("/dashboard/ai");
 	};
 
-	const rightAction = isAiRoute ? (
+	// The Ask AI home is already a new chat; only the chat page needs the button.
+	const rightAction = isAiChatRoute ? (
 		<Button
 			type='button'
 			variant='ghost'

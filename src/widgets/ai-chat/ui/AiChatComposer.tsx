@@ -3,11 +3,12 @@
 import {
   AlignLeft,
   ArrowUp,
+  FilePen,
+  Languages,
   ListPlus,
   Maximize2,
   MessageSquareMore,
   Minimize2,
-  Plus,
   WandSparkles,
 } from "lucide-react";
 import React, { useEffect, useRef } from "react";
@@ -16,7 +17,10 @@ import { Button } from "@/shared/ui/button";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/shared/ui/select";
@@ -113,7 +117,7 @@ export function AiChatComposer({
   const canSend = Boolean(value.trim()) && !disabled;
 
   return (
-    <div className="sticky bottom-0 z-10 w-full bg-background pt-2 pb-1">
+    <div className="sticky bottom-0 z-10 w-full bg-background pt-2 pb-3">
       <form
         onSubmit={(event) => {
           event.preventDefault();
@@ -122,7 +126,7 @@ export function AiChatComposer({
             onSend();
           }
         }}
-        className="relative rounded-xl border border-border/70 bg-card p-3 shadow-none transition-colors focus-within:border-ring/60 focus-within:ring-1 focus-within:ring-ring/25 sm:rounded-2xl"
+        className="relative rounded-2xl border border-border/70 bg-card px-3.5 pt-3 pb-2.5 shadow-sm transition-colors focus-within:border-ring/60 focus-within:ring-1 focus-within:ring-ring/25"
       >
         <label htmlFor="ai-chat-input" className="sr-only">
           {placeholder}
@@ -141,19 +145,8 @@ export function AiChatComposer({
           className="block min-h-[36px] max-h-40 w-full resize-none border-0 bg-transparent p-0 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/70 outline-none focus:ring-0"
         />
 
-        <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-border/40 pt-2">
+        <div className="mt-2 flex items-center justify-between gap-2">
           <div className="flex items-center gap-1">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-xs"
-              className="size-7 rounded-md text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-              aria-label="Add attachment"
-              title="Add attachment"
-            >
-              <Plus className="size-3.5" />
-            </Button>
-
             <Select
               value={mode}
               onValueChange={(value) => onModeChange(value as AiChatMode)}
@@ -161,25 +154,34 @@ export function AiChatComposer({
               <SelectTrigger
                 size="sm"
                 aria-label="Select AI capability"
-                className="h-7 gap-1 rounded-md border-0 bg-transparent px-2 text-xs font-medium text-muted-foreground shadow-none hover:bg-accent/50 hover:text-foreground"
+                className="h-7 gap-1 rounded-full border border-border/60 bg-transparent px-2.5 text-xs font-medium text-muted-foreground shadow-none hover:bg-accent/50 hover:text-foreground"
               >
                 <SelectValue />
               </SelectTrigger>
 
               <SelectContent className="rounded-lg border-border/60 bg-popover">
-                <SelectItem value="GENERATE_PAGE_COMPOSITION">
-                  <span className="flex items-center gap-1.5">
-                    <ListPlus className="size-3.5 text-muted-foreground" />
-                    <span>Create page</span>
-                  </span>
-                </SelectItem>
+                <SelectGroup>
+                  <SelectLabel className="text-[11px]">Page</SelectLabel>
+
+                  <SelectItem value="GENERATE_PAGE_COMPOSITION">
+                    <span className="flex items-center gap-1.5">
+                      <ListPlus className="size-3.5 text-muted-foreground" />
+                      <span>Create page</span>
+                    </span>
+                  </SelectItem>
 
                   <SelectItem value="GENERATE_PAGE_MODIFICATION_PLAN">
                     <span className="flex items-center gap-1.5">
-                      <WandSparkles className="size-3.5 text-muted-foreground" />
+                      <FilePen className="size-3.5 text-muted-foreground" />
                       <span>{currentPageId ? "Modify current page" : "Modify a page by name"}</span>
                     </span>
                   </SelectItem>
+                </SelectGroup>
+
+                <SelectSeparator />
+
+                <SelectGroup>
+                <SelectLabel className="text-[11px]">Writing</SelectLabel>
 
                 <SelectItem value="writing.improve">
                   <span className="flex items-center gap-1.5">
@@ -218,23 +220,30 @@ export function AiChatComposer({
 
                 <SelectItem value="writing.translate">
                   <span className="flex items-center gap-1.5">
-                    <AlignLeft className="size-3.5 text-muted-foreground" />
+                    <Languages className="size-3.5 text-muted-foreground" />
                     <span>Translate</span>
                   </span>
                 </SelectItem>
+                </SelectGroup>
               </SelectContent>
             </Select>
           </div>
 
-          <Button
-            type="submit"
-            size="icon-xs"
-            disabled={!canSend}
-            aria-label="Send message"
-            className="flex size-7 items-center justify-center rounded-md bg-foreground text-background shadow-none transition-opacity hover:bg-foreground/90 disabled:opacity-30 disabled:hover:bg-foreground"
-          >
-            <ArrowUp className="size-3.5" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <span className="hidden text-[11px] text-muted-foreground/70 sm:inline">
+              Enter to send · Shift + Enter for new line
+            </span>
+
+            <Button
+              type="submit"
+              size="icon-xs"
+              disabled={!canSend}
+              aria-label="Send message"
+              className="flex size-8 items-center justify-center rounded-full bg-foreground text-background shadow-none transition-opacity hover:bg-foreground/90 disabled:opacity-30 disabled:hover:bg-foreground"
+            >
+              <ArrowUp className="size-4" />
+            </Button>
+          </div>
         </div>
       </form>
     </div>

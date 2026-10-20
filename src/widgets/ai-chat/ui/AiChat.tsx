@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { getAiGeneration } from "@/entities/ai-assistant/api/ai-assistant.api";
@@ -25,6 +26,7 @@ interface AiChatProps {
 }
 
 export function AiChat({ showHeader = false, currentPageId }: AiChatProps) {
+	const router = useRouter();
 	const [draftPreview, setDraftPreview] = useState<{
 		requestId: number;
 		scope: string;
@@ -55,7 +57,6 @@ export function AiChat({ showHeader = false, currentPageId }: AiChatProps) {
 
 	const {
 		chatScope,
-		workspacePageConversationsQuery,
 			sendMessage,
 			selectPageCandidate,
 		confirmPageComposition,
@@ -139,52 +140,64 @@ export function AiChat({ showHeader = false, currentPageId }: AiChatProps) {
 	const isComposerDisabled = isPending || !currentWorkspaceId;
 
 	const showEmptyState = messages.length === 0 && pendingStage === null;
+	// Dashboard chat lives on its own page: a new chat starts from the Ask AI home,
+	// which also lists the history. Page chat has no home, so it keeps History here.
+	const handleNewChat = () => {
+		startNewChat();
+		if (!currentPageId) router.push("/dashboard/ai");
+	};
 
 	return (
 		<div className='mx-auto flex h-full w-full max-w-3xl flex-col px-4 sm:px-6'>
-			{showHeader && (
-				<AiChatHeader
-					onNewChat={startNewChat}
-					hasMessages={messages.length > 0 || Boolean(selectedConversationId)}
-				/>
+			{(currentPageId || showHeader) && (
+				<div className='flex shrink-0 items-center justify-end gap-1 pt-3'>
+					{currentPageId && (
+						<AiChatHistory
+							conversations={conversations}
+							generations={savedGenerations}
+							selectedConversationId={selectedConversationId}
+							loading={conversationsQuery.isPending}
+							error={conversationsQuery.isError}
+							hasMoreConversations={Boolean(conversationsQuery.hasNextPage)}
+							hasMoreGenerations={Boolean(generationsQuery.hasNextPage)}
+							loadingMoreConversations={conversationsQuery.isFetchingNextPage}
+							loadingMoreGenerations={generationsQuery.isFetchingNextPage}
+							disabled={isPending}
+							onSelectConversation={selectHistoryConversation}
+							onNewChat={handleNewChat}
+							onLoadConversations={() => { void conversationsQuery.fetchNextPage(); }}
+							onLoadGenerations={() => { void generationsQuery.fetchNextPage(); }}
+							onOpenGeneration={(generationId) => { void openDraft(generationId); }}
+						/>
+					)}
+					{showHeader && (
+						<AiChatHeader
+							onNewChat={handleNewChat}
+							hasMessages={messages.length > 0 || Boolean(selectedConversationId)}
+						/>
+					)}
+				</div>
 			)}
 
-			<AiChatHistory
-				conversations={conversations}
-				generations={savedGenerations}
-				selectedConversationId={selectedConversationId}
-				loading={conversationsQuery.isPending || (!currentPageId && workspacePageConversationsQuery.isPending)}
-				error={conversationsQuery.isError || (!currentPageId && workspacePageConversationsQuery.isError)}
-				hasMoreConversations={Boolean(conversationsQuery.hasNextPage || (!currentPageId && workspacePageConversationsQuery.hasNextPage))}
-				hasMoreGenerations={Boolean(generationsQuery.hasNextPage)}
-				loadingMoreConversations={conversationsQuery.isFetchingNextPage || workspacePageConversationsQuery.isFetchingNextPage}
-				loadingMoreGenerations={generationsQuery.isFetchingNextPage}
-				disabled={isPending}
-				onSelectConversation={selectHistoryConversation}
-				onNewChat={startNewChat}
-				onLoadConversations={() => {
-					if (conversationsQuery.hasNextPage) void conversationsQuery.fetchNextPage();
-					else if (!currentPageId && workspacePageConversationsQuery.hasNextPage) void workspacePageConversationsQuery.fetchNextPage();
-				}}
-				onLoadGenerations={() => { void generationsQuery.fetchNextPage(); }}
-				onOpenGeneration={(generationId) => { void openDraft(generationId); }}
-			/>
-
 			{(isLoadingDraft || visibleDraft) && (
-				<div className="max-h-[45%] overflow-y-auto border-b border-border/60 py-3">
+				<div className="mt-3 max-h-[45%] shrink-0 overflow-y-auto rounded-xl border border-border/60 bg-muted/20 p-3">
 					{isLoadingDraft ? (
 						<p className="flex items-center gap-2 text-xs text-muted-foreground">
 							<Loader2 className="size-4 animate-spin" /> Loading draft...
 						</p>
 					) : visibleDraft ? (
 						<>
-							<Button variant="ghost" size="sm" onClick={() => setDraftPreview(null)}
-								className="mb-2 gap-1 text-xs"><X className="size-3.5" /> Close preview</Button>
+							<div className="mb-3 flex items-center justify-between gap-2">
+								<p className="text-xs font-medium text-muted-foreground">Saved generation preview</p>
+								<Button variant="ghost" size="icon-xs" onClick={() => setDraftPreview(null)}
+									aria-label="Close preview" title="Close preview"
+									className="text-muted-foreground hover:text-foreground"><X className="size-3.5" /></Button>
+							</div>
 							<AiMessageItem
 								message={{
 									id: `preview-${visibleDraft.id}`,
 									role: "assistant",
-									content: "Saved generation preview",
+									content: "",
 									capability: visibleDraft.capability,
 									generation: visibleDraft,
 									createdAt: visibleDraft.created_at,
@@ -209,7 +222,7 @@ export function AiChat({ showHeader = false, currentPageId }: AiChatProps) {
 				</p>
 			)}
 			{selectedConversationId && (messagesQuery.isError || generationsQuery.isError) && (
-				<p role="alert" className="p-3 text-xs text-destructive">
+				<p role="alert" className="mt-3 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
 					Unable to restore this conversation. Select another chat or start a new one.
 				</p>
 			)}

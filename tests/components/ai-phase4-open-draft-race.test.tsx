@@ -7,6 +7,7 @@ import { useAiChat } from "@/widgets/ai-chat/model/use-ai-chat";
 import { useAiChatStore } from "@/widgets/ai-chat/model/use-ai-chat-store";
 import { AiChat } from "@/widgets/ai-chat/ui/AiChat";
 
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 vi.mock("@/entities/ai-assistant/api/ai-assistant.api", () => ({ getAiGeneration: vi.fn() }));
 vi.mock("@/widgets/ai-chat/model/use-ai-chat", () => ({ useAiChat: vi.fn() }));
 vi.mock("@/widgets/ai-chat/ui/AiChatComposer", () => ({ AiChatComposer: () => null }));
@@ -57,26 +58,26 @@ describe("Phase 4 saved-draft request races", () => {
 	it("does not show a stale loading state or preview after switching conversations", async () => {
 		let resolveDraft!: (value: AiGeneration) => void;
 		vi.mocked(getAiGeneration).mockReturnValue(new Promise((resolve) => { resolveDraft = resolve; }));
-		const { rerender } = render(<AiChat />);
-		fireEvent.click(screen.getByText(/Chat history/));
+		const { rerender } = render(<AiChat currentPageId="page-1" />);
+		fireEvent.click(screen.getByRole("button", { name: /History/ }));
 		fireEvent.click(screen.getByRole("button", { name: /Page modification/ }));
 		expect(screen.getByText("Loading draft...")).toBeTruthy();
 
 		selectedId = "conversation-b";
-		rerender(<AiChat />);
+		rerender(<AiChat currentPageId="page-1" />);
 		expect(screen.queryByText("Loading draft...")).toBeNull();
 		await act(async () => { resolveDraft(draft); });
 		expect(screen.queryByText("Saved generation preview")).toBeNull();
 
 		selectedId = conversation.id;
-		rerender(<AiChat />);
+		rerender(<AiChat currentPageId="page-1" />);
 		expect(screen.queryByText("Saved generation preview")).toBeNull();
 	});
 
-	it("can open a saved Dashboard draft with actions requiring confirmation", async () => {
+	it("can open a saved draft from Page chat History with actions requiring confirmation", async () => {
 		vi.mocked(getAiGeneration).mockResolvedValue(draft);
-		render(<AiChat />);
-		fireEvent.click(screen.getByText(/Chat history/));
+		render(<AiChat currentPageId="page-1" />);
+		fireEvent.click(screen.getByRole("button", { name: /History/ }));
 		fireEvent.click(screen.getByRole("button", { name: /Page modification/ }));
 		expect(await screen.findByText("Saved generation preview")).toBeTruthy();
 		expect(screen.getByRole("button", { name: /Apply changes/ })).toBeTruthy();
