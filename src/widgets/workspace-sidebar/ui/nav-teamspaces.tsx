@@ -4,11 +4,16 @@ import { ChevronRight, Ellipsis, MoreHorizontal, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { buildPageTree } from "@/entities/page/lib/build-page-tree";
+import {
+	buildPageTree,
+	getPageTreeHref,
+	type PageTreeBase,
+	withDatabaseNodes,
+} from "@/entities/page/lib/build-page-tree";
 import {
 	useMovePageToTrash,
 } from "@/entities/page/model/page.mutations";
-import type { Page } from "@/entities/page/model/page.types";
+import type { Page, WorkspaceDatabase } from "@/entities/page/model/page.types";
 import { PageTree } from "@/entities/page/ui/page-tree";
 
 import { useCreateTeamspace } from "@/entities/teamspace/model/teamspace.mutations";
@@ -30,6 +35,7 @@ interface NavTeamspacesProps {
 	workspaceId: string;
 	teamspaces: Teamspace[];
 	pages: Page[];
+	databases: WorkspaceDatabase[];
 	activePageId?: string;
 }
 
@@ -37,6 +43,7 @@ export function NavTeamspaces({
 	workspaceId,
 	teamspaces,
 	pages,
+	databases,
 	activePageId,
 }: NavTeamspacesProps) {
 	const router = useRouter();
@@ -161,11 +168,12 @@ export function NavTeamspaces({
 								key={teamspace.id}
 								teamspace={teamspace}
 								pages={teamspacePages}
+								databases={databases}
 								allPages={pages}
 								teamspaces={teamspaces}
 								activePageId={activePageId}
 								onOpenPage={(page) => {
-									router.push(`/page/${page.id}`);
+									router.push(getPageTreeHref(page));
 								}}
 								onCreateRootPage={() => {
 									handleOpenCreateRootPage(teamspace.id);
@@ -217,6 +225,8 @@ interface TeamspaceItemProps {
 
 	pages: Page[];
 
+	databases: WorkspaceDatabase[];
+
 	allPages: Page[];
 
 	teamspaces: Teamspace[];
@@ -225,7 +235,7 @@ interface TeamspaceItemProps {
 
 	isCreatingPage?: boolean;
 
-	onOpenPage: (page: Page) => void;
+	onOpenPage: (page: PageTreeBase) => void;
 
 	onCreateRootPage: () => void;
 
@@ -239,6 +249,7 @@ interface TeamspaceItemProps {
 function TeamspaceItem({
 	teamspace,
 	pages,
+	databases,
 	allPages,
 	teamspaces,
 	activePageId,
@@ -251,7 +262,7 @@ function TeamspaceItem({
 }: TeamspaceItemProps) {
 	const [expanded, setExpanded] = useState(true);
 
-	const pageTree = buildPageTree(pages);
+	const pageTree = buildPageTree(withDatabaseNodes(pages, databases));
 
 	const hasPages = pageTree.length > 0;
 
@@ -359,31 +370,37 @@ function TeamspaceItem({
 						pages={pageTree}
 						activePageId={activePageId}
 						onOpenPage={onOpenPage}
-						onCreateChild={onCreateChildPage}
-						renderActions={(page) => (
-							<PageActionsMenu
-								page={page}
-								pages={allPages}
-								teamspaces={teamspaces}
-								onMoveToTrash={onMovePageToTrash}
-							>
-								<button
-									type='button'
-									aria-label='More page actions'
-									className={[
-										"flex size-6 shrink-0 items-center justify-center rounded-sm",
-										"text-muted-foreground",
-										"hover:bg-sidebar-accent-foreground/10",
-										"hover:text-sidebar-foreground",
-									].join(" ")}
-									onClick={(event) => {
-										event.stopPropagation();
-									}}
+						onCreateChild={(page) => {
+							if (!("kind" in page)) {
+								onCreateChildPage(page);
+							}
+						}}
+						renderActions={(page) =>
+							"kind" in page ? null : (
+								<PageActionsMenu
+									page={page}
+									pages={allPages}
+									teamspaces={teamspaces}
+									onMoveToTrash={onMovePageToTrash}
 								>
-									<MoreHorizontal className='size-3.5' />
-								</button>
-							</PageActionsMenu>
-						)}
+									<button
+										type='button'
+										aria-label='More page actions'
+										className={[
+											"flex size-6 shrink-0 items-center justify-center rounded-sm",
+											"text-muted-foreground",
+											"hover:bg-sidebar-accent-foreground/10",
+											"hover:text-sidebar-foreground",
+										].join(" ")}
+										onClick={(event) => {
+											event.stopPropagation();
+										}}
+									>
+										<MoreHorizontal className='size-3.5' />
+									</button>
+								</PageActionsMenu>
+							)
+						}
 					/>
 				</div>
 			)}

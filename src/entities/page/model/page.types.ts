@@ -32,6 +32,17 @@ export interface Page {
 	deletedBy: string | null;
 }
 
+export interface WorkspaceDatabase {
+	id: string;
+
+	pageId: string;
+
+	name: string;
+
+	/** Set only for databases in Trash. */
+	deletedAt: string | null;
+}
+
 export interface CreatePageInput {
 	workspace_id: string;
 

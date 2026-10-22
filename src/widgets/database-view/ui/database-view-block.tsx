@@ -16,7 +16,8 @@ import { DatabaseViewTab } from "./database-view-tab";
 
 interface DatabaseViewBlockProps {
 	databaseId: string;
-	viewId: string;
+	/** Defaults to the first view. */
+	viewId?: string;
 }
 
 export function DatabaseViewBlock({

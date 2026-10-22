@@ -14,7 +14,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { useWorkspaceSubscription } from "@/entities/billing/model/billing.queries";
-import { usePagesByWorkspace } from "@/entities/page/model/page.queries";
+import {
+	usePagesByWorkspace,
+	useWorkspaceDatabases,
+} from "@/entities/page/model/page.queries";
 import { useTeamspaces } from "@/entities/teamspace/model/teamspace.queries";
 import { useSelectWorkspace } from "@/entities/workspace/model/workspace.mutations";
 import {
@@ -134,9 +137,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 	const [view, setView] = useState<SidebarView>(SidebarView.WORKSPACE);
 
-	const activePageId = pathname.startsWith("/page/")
-		? pathname.split("/")[2]
-		: undefined;
+	const activePageId =
+		pathname.startsWith("/page/") || pathname.startsWith("/database/")
+			? pathname.split("/")[2]
+			: undefined;
 
 	/**
 	 * Workspace hiện tại.
@@ -216,6 +220,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		isLoading: isPagesLoading,
 		isError: isPagesError,
 	} = usePagesByWorkspace(currentWorkspaceId ?? undefined, isMember);
+
+	const { data: databases = [] } = useWorkspaceDatabases(
+		currentWorkspaceId ?? undefined,
+		isMember,
+	);
 
 	/**
 	 * Teamspaces chỉ load đối với MEMBER.
@@ -377,6 +386,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 							<NavPrivatePages
 								workspaceId={currentWorkspaceId as string}
 								pages={pages}
+								databases={databases}
 								teamspaces={teamspaces}
 								activePageId={activePageId}
 							/>
@@ -392,6 +402,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 									workspaceId={currentWorkspaceId}
 									teamspaces={teamspaces}
 									pages={pages}
+									databases={databases}
 									activePageId={activePageId}
 								/>
 							)}

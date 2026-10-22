@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { type Query, useQuery } from "@tanstack/react-query";
 
 import { pageApi } from "../api/page.api";
 
@@ -9,6 +9,13 @@ export const pageKeys = {
 
 	byWorkspace: (workspaceId: string) =>
 		["pages", "workspace", workspaceId] as const,
+
+	// Nested under byWorkspace so every page-list invalidation refreshes it too.
+	databases: (workspaceId: string) =>
+		["pages", "workspace", workspaceId, "databases"] as const,
+
+	deletedDatabases: (workspaceId: string) =>
+		["pages", "workspace", workspaceId, "databases", "trash"] as const,
 
 	favorites: (workspaceId: string) =>
 		["pages", "favorites", workspaceId] as const,
@@ -29,6 +36,33 @@ export function usePagesByWorkspace(workspaceId?: string, enabled = true) {
 
 		enabled: Boolean(workspaceId) && enabled,
 	});
+}
+
+export function useWorkspaceDatabases(workspaceId?: string, enabled = true) {
+	return useQuery({
+		queryKey: pageKeys.databases(workspaceId ?? ""),
+
+		queryFn: ({ signal }) =>
+			pageApi.getDatabasesByWorkspace(workspaceId!, signal),
+
+		enabled: Boolean(workspaceId) && enabled,
+	});
+}
+
+export function useDeletedWorkspaceDatabases(workspaceId?: string) {
+	return useQuery({
+		queryKey: pageKeys.deletedDatabases(workspaceId ?? ""),
+
+		queryFn: ({ signal }) =>
+			pageApi.getDeletedDatabasesByWorkspace(workspaceId!, signal),
+
+		enabled: Boolean(workspaceId),
+	});
+}
+
+/** Sidebar + Trash database lists of any workspace, for callers that only know a page. */
+export function isDatabaseListQuery(query: Query) {
+	return query.queryKey[0] === "pages" && query.queryKey[3] === "databases";
 }
 
 export function usePageFavorites(workspaceId?: string) {
