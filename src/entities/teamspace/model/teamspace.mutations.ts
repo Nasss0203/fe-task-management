@@ -8,6 +8,7 @@ import type {
 	CreateTeamspaceInviteLinkInput,
 	TeamspaceRole,
 	TeamspaceVisibility,
+	UpdateTeamspacePayload,
 } from "./teamspace.types";
 
 export function useCreateTeamspace() {
@@ -216,6 +217,19 @@ export function useUpdateTeamspaceJoinSettings(teamspaceId: string) {
 
 		onSettled: () => {
 			// Visibility shows in the sidebar list and the discover list.
+			queryClient.invalidateQueries({ queryKey: teamspaceKeys.all });
+		},
+	});
+}
+
+export function useUpdateTeamspace(teamspaceId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (body: UpdateTeamspacePayload) =>
+			teamspaceApi.update(teamspaceId, body),
+
+		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: teamspaceKeys.all });
 		},
 	});

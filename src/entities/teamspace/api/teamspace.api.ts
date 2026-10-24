@@ -16,6 +16,7 @@ import type {
 	TeamspaceMember,
 	TeamspaceRole,
 	TeamspaceVisibility,
+	UpdateTeamspacePayload,
 } from "../model/teamspace.types";
 
 const TEAMSPACE_API = "/teamspaces";
@@ -245,6 +246,17 @@ export const teamspaceApi = {
 			{ visibility },
 		);
 
+		return response.data.data;
+	},
+
+	update: async (
+		teamspaceId: string,
+		body: UpdateTeamspacePayload,
+	): Promise<Teamspace> => {
+		const response = await instance.patch<ApiResponse<Teamspace>>(
+			`${TEAMSPACE_API}/${teamspaceId}`,
+			body,
+		);
 		return response.data.data;
 	},
 };

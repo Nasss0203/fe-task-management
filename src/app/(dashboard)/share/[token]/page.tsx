@@ -14,6 +14,7 @@ import {
 	useResolvePageShareLink,
 } from "@/entities/page-share/model/page-share.queries";
 import { usePage, useSharedPage } from "@/entities/page/model/page.queries";
+import { PageSkeleton } from "@/entities/page/ui/page-surface";
 import { PageAccessGate } from "@/features/page-access/ui/page-access-gate";
 import { PageShareInvitationGate } from "@/features/page-share/ui/page-share-invitation-gate";
 import { Button } from "@/shared/ui/button";
@@ -64,7 +65,7 @@ export default function SharedPageDetail() {
 	);
 
 	if (resolveQuery.isLoading) {
-		return <div className='p-6'>Loading...</div>;
+		return <PageSkeleton />;
 	}
 
 	if (resolveQuery.isError || !resolvedShare || !pageId) {
@@ -130,7 +131,7 @@ export default function SharedPageDetail() {
 	}
 
 	if (pageQuery.isLoading || blocksQuery.isLoading) {
-		return <div className='p-6'>Loading page...</div>;
+		return <PageSkeleton />;
 	}
 
 	if (pageQuery.isError || blocksQuery.isError || !page) {

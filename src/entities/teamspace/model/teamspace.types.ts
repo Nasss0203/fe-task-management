@@ -171,3 +171,9 @@ export interface MyTeamspaceInvitation extends TeamspaceInvitation {
 
 	inviterName: string | null;
 }
+
+export type UpdateTeamspacePayload = {
+	name?: string;
+	description?: string | null;
+	icon?: string | null;
+};

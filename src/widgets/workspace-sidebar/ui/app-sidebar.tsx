@@ -41,6 +41,7 @@ import {
 	SidebarHeader,
 	SidebarResizeHandle,
 } from "@/widgets/workspace-sidebar/ui/sidebar";
+import { Skeleton } from "@/shared/ui/skeleton";
 import { TeamSwitcher } from "@/widgets/workspace-sidebar/ui/team-switcher";
 
 import { useUnreadNotificationCount } from "@/entities/notification/model/notification.queries";
@@ -355,12 +356,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				) : (
 					<>
 						{isAccessLoading ? (
-							<p
+							<div
 								role='status'
-								className='px-4 py-2 text-sm text-muted-foreground'
+								aria-label='Loading workspace'
+								className='space-y-5 px-4 py-3'
 							>
-								Loading workspace access...
-							</p>
+								{[4, 3, 5].map((rows, group) => (
+									<div key={group} className='space-y-2.5'>
+										<Skeleton className='h-3 w-16' />
+										{Array.from({ length: rows }, (_, row) => (
+											<div key={row} className='flex items-center gap-2'>
+												<Skeleton className='size-4 rounded' />
+												<Skeleton
+													className={row % 2 ? "h-3.5 w-2/3" : "h-3.5 w-4/5"}
+												/>
+											</div>
+										))}
+									</div>
+								))}
+							</div>
 						) : !isGuest && !isMember ? (
 							<p
 								role='alert'
