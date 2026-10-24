@@ -133,7 +133,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 	const selectWorkspaceMutation = useSelectWorkspace();
 
-	const { data: unreadNotificationCount } = useUnreadNotificationCount();
+	// `user` clears on sign-out, which stops the unread-count polling.
+	const { data: unreadNotificationCount } = useUnreadNotificationCount(
+		Boolean(user),
+	);
 
 	const [view, setView] = useState<SidebarView>(SidebarView.WORKSPACE);
 
@@ -348,7 +351,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 			<SidebarContent>
 				{view === SidebarView.INBOX ? (
-					<InboxSidebar />
+					<InboxSidebar unreadCount={unreadCount} />
 				) : (
 					<>
 						{isAccessLoading ? (

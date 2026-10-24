@@ -2,13 +2,25 @@ import {
 	AtSign,
 	Bell,
 	CheckCircle2,
+	KeyRound,
 	MessageCircle,
-	ShieldQuestion,
+	UserMinus,
 	UserPlus,
+	Users,
 	XCircle,
 } from "lucide-react";
 
 import type { Notification } from "../model/notification.types";
+
+export type NotificationCategory =
+	| "page"
+	| "workspace"
+	| "teamspace"
+	| "comment"
+	| "system";
+
+/** Colour family of the icon tile: the category, or an outcome colour. */
+export type NotificationTone = NotificationCategory | "success" | "danger";
 
 export interface NotificationPresentation {
 	icon: typeof Bell;
@@ -17,7 +29,9 @@ export interface NotificationPresentation {
 
 	description?: string | null;
 
-	category: "page" | "workspace" | "comment" | "system";
+	category: NotificationCategory;
+
+	tone: NotificationTone;
 }
 
 export function getNotificationPresentation(
@@ -26,11 +40,12 @@ export function getNotificationPresentation(
 	switch (notification.type) {
 		case "page.access.requested":
 			return {
-				icon: ShieldQuestion,
+				icon: KeyRound,
 				title: notification.title,
 				description:
 					notification.message ?? "Requested access to a page.",
 				category: "page",
+				tone: "page",
 			};
 
 		case "page.access.approved":
@@ -40,6 +55,7 @@ export function getNotificationPresentation(
 				description:
 					notification.message ?? "Your page access was approved.",
 				category: "page",
+				tone: "success",
 			};
 
 		case "page.access.rejected":
@@ -50,24 +66,36 @@ export function getNotificationPresentation(
 					notification.message ??
 					"Your page access request was rejected.",
 				category: "page",
+				tone: "danger",
 			};
 
 		case "workspace.invite":
-			return {
-				icon: UserPlus,
-				title: notification.title,
-				description: notification.message,
-				category: "workspace",
-			};
-
 		case "workspace.invite_accepted":
 		case "workspace.member_joined":
-		case "workspace.member_removed":
 			return {
 				icon: UserPlus,
 				title: notification.title,
 				description: notification.message,
 				category: "workspace",
+				tone: "workspace",
+			};
+
+		case "workspace.member_removed":
+			return {
+				icon: UserMinus,
+				title: notification.title,
+				description: notification.message,
+				category: "workspace",
+				tone: "danger",
+			};
+
+		case "teamspace.invitation_received":
+			return {
+				icon: Users,
+				title: notification.title,
+				description: notification.message,
+				category: "teamspace",
+				tone: "teamspace",
 			};
 
 		case "comment.mentioned":
@@ -76,6 +104,7 @@ export function getNotificationPresentation(
 				title: notification.title,
 				description: notification.message,
 				category: "comment",
+				tone: "comment",
 			};
 
 		case "comment.replied":
@@ -84,6 +113,7 @@ export function getNotificationPresentation(
 				title: notification.title,
 				description: notification.message,
 				category: "comment",
+				tone: "comment",
 			};
 
 		case "system.announcement":
@@ -97,6 +127,7 @@ export function getNotificationPresentation(
 				title: notification.title,
 				description: notification.message,
 				category: "system",
+				tone: "system",
 			};
 	}
 }

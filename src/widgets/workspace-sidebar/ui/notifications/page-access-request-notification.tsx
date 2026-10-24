@@ -1,9 +1,8 @@
 "use client";
 
-import { CheckCircle2, ShieldQuestion, XCircle } from "lucide-react";
+import { CheckCircle2, KeyRound, XCircle } from "lucide-react";
 import { useState } from "react";
 
-import { formatNotificationTime } from "@/entities/notification/lib/notification-date";
 import type { Notification } from "@/entities/notification/model/notification.types";
 
 import {
@@ -22,6 +21,11 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/ui/select";
+
+import {
+	NotificationItemShell,
+	NotificationStatusPill,
+} from "./notification-item-shell";
 
 type PageAccessRequestStatus = "PENDING" | "APPROVED" | "REJECTED";
 
@@ -112,14 +116,6 @@ export function PageAccessRequestNotification({
 	const isActionPending =
 		approveMutation.isPending || rejectMutation.isPending;
 
-	const handleRead = () => {
-		if (notification.readAt || isMarkingRead) {
-			return;
-		}
-
-		onRead(notification);
-	};
-
 	const handleApprove = () => {
 		if (!accessRequestId || !canReview || isActionPending) {
 			return;
@@ -160,140 +156,84 @@ export function PageAccessRequestNotification({
 		);
 	};
 
-	const Icon =
-		requestStatus === "APPROVED"
-			? CheckCircle2
-			: requestStatus === "REJECTED"
-				? XCircle
-				: ShieldQuestion;
-
 	return (
-		<div className='border-b px-3 py-3 transition-colors hover:bg-sidebar-accent/50'>
-			<div className='flex items-start gap-2'>
-				<div className='mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-md bg-muted'>
-					<Icon className='size-4' />
-				</div>
-
-				<div className='min-w-0 flex-1'>
-					<button
-						type='button'
-						disabled={isMarkingRead}
-						onClick={handleRead}
-						className='block w-full text-left disabled:cursor-default'
+		<NotificationItemShell
+			notification={notification}
+			icon={KeyRound}
+			tone='page'
+			description={notification.message ?? "Requested access to a page."}
+			isMarkingRead={isMarkingRead}
+			onRead={onRead}
+		>
+			{/* PENDING */}
+			{canReview && (
+				<div className='mt-2.5 space-y-2'>
+					<Select
+						value={accessLevel}
+						disabled={isActionPending}
+						onValueChange={(value) =>
+							setAccessLevel(value as PageShareAccessLevel)
+						}
 					>
-						<p
-							className={
-								isUnread ? "text-sm font-medium" : "text-sm"
-							}
+						<SelectTrigger
+							className='h-8 w-full text-xs'
+							aria-label='Access level'
 						>
-							{notification.title}
-						</p>
+							<SelectValue />
+						</SelectTrigger>
 
-						{notification.message && (
-							<p className='mt-1 text-xs text-muted-foreground'>
-								{notification.message}
-							</p>
-						)}
+						<SelectContent>
+							<SelectItem value='VIEWER'>Viewer</SelectItem>
 
-						<p className='mt-1 text-xs text-muted-foreground'>
-							{formatNotificationTime(notification.createdAt)}
-						</p>
-					</button>
+							<SelectItem value='COMMENTER'>Commenter</SelectItem>
 
-					{/* PENDING */}
-					{canReview && (
-						<div className='mt-3 space-y-2'>
-							<Select
-								value={accessLevel}
-								disabled={isActionPending}
-								onValueChange={(value) =>
-									setAccessLevel(
-										value as PageShareAccessLevel,
-									)
-								}
-							>
-								<SelectTrigger className='h-8 w-full'>
-									<SelectValue />
-								</SelectTrigger>
+							<SelectItem value='EDITOR'>Editor</SelectItem>
 
-								<SelectContent>
-									<SelectItem value='VIEWER'>
-										Viewer
-									</SelectItem>
+							<SelectItem value='FULL_ACCESS'>Full access</SelectItem>
+						</SelectContent>
+					</Select>
 
-									<SelectItem value='COMMENTER'>
-										Commenter
-									</SelectItem>
+					<div className='flex items-center gap-2'>
+						<Button
+							type='button'
+							size='sm'
+							className='h-8 flex-1'
+							disabled={isActionPending}
+							onClick={handleApprove}
+						>
+							{approveMutation.isPending ? "Approving..." : "Approve"}
+						</Button>
 
-									<SelectItem value='EDITOR'>
-										Editor
-									</SelectItem>
-
-									<SelectItem value='FULL_ACCESS'>
-										Full access
-									</SelectItem>
-								</SelectContent>
-							</Select>
-
-							<div className='flex items-center gap-2'>
-								<Button
-									type='button'
-									size='sm'
-									className='h-8 flex-1'
-									disabled={isActionPending}
-									onClick={handleApprove}
-								>
-									{approveMutation.isPending
-										? "Approving..."
-										: "Approve"}
-								</Button>
-
-								<Button
-									type='button'
-									size='sm'
-									variant='outline'
-									className='h-8 flex-1'
-									disabled={isActionPending}
-									onClick={handleReject}
-								>
-									{rejectMutation.isPending
-										? "Rejecting..."
-										: "Reject"}
-								</Button>
-							</div>
-						</div>
-					)}
-
-					{/* APPROVED */}
-					{requestStatus === "APPROVED" && (
-						<div className='mt-2 flex items-center gap-1.5 text-xs text-muted-foreground'>
-							<CheckCircle2 className='size-3.5' />
-
-							<span>
-								Approved
-								{approvedAccessLevel
-									? ` · ${getAccessLevelLabel(
-											approvedAccessLevel,
-										)}`
-									: ""}
-							</span>
-						</div>
-					)}
-
-					{/* REJECTED */}
-					{requestStatus === "REJECTED" && (
-						<div className='mt-2 flex items-center gap-1.5 text-xs text-muted-foreground'>
-							<XCircle className='size-3.5' />
-
-							<span>Rejected</span>
-						</div>
-					)}
+						<Button
+							type='button'
+							size='sm'
+							variant='outline'
+							className='h-8 flex-1'
+							disabled={isActionPending}
+							onClick={handleReject}
+						>
+							{rejectMutation.isPending ? "Rejecting..." : "Reject"}
+						</Button>
+					</div>
 				</div>
+			)}
 
-				{isUnread && (
-					<span className='mt-1.5 size-2 shrink-0 rounded-full bg-primary' />
-				)}
-			</div>
-		</div>
+			{/* APPROVED */}
+			{requestStatus === "APPROVED" && (
+				<NotificationStatusPill tone='success' icon={CheckCircle2}>
+					Approved
+					{approvedAccessLevel
+						? ` · ${getAccessLevelLabel(approvedAccessLevel)}`
+						: ""}
+				</NotificationStatusPill>
+			)}
+
+			{/* REJECTED */}
+			{requestStatus === "REJECTED" && (
+				<NotificationStatusPill tone='danger' icon={XCircle}>
+					Rejected
+				</NotificationStatusPill>
+			)}
+		</NotificationItemShell>
 	);
 }

@@ -4,6 +4,7 @@ export type NotificationSourceType =
 	| "system"
 	| "account"
 	| "workspace"
+	| "teamspace"
 	| "page"
 	| "page_block"
 	| "comment";
@@ -18,6 +19,7 @@ export type NotificationType =
 	| "workspace.invite_accepted"
 	| "workspace.member_joined"
 	| "workspace.member_removed"
+	| "teamspace.invitation_received"
 	| "page.access.requested"
 	| "page.access.approved"
 	| "page.access.rejected"
