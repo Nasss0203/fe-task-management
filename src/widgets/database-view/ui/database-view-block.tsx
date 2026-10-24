@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
 	useDatabase,
@@ -9,9 +9,11 @@ import {
 	useDatabaseViews,
 } from "@/entities/database/model/database.queries";
 
+import { sortRows } from "../lib/sort-rows";
 import { AddDatabaseViewPopover } from "./add-database-view-popover";
 import { DatabaseViewPropertiesPopover } from "./database-view-properties-popover";
 import { DatabaseViewRenderer } from "./database-view-renderer";
+import { DatabaseViewSortPopover } from "./database-view-sort-popover";
 import { DatabaseViewTab } from "./database-view-tab";
 
 interface DatabaseViewBlockProps {
@@ -45,6 +47,11 @@ export function DatabaseViewBlock({
 	const { data: activeViewDetail } = useDatabaseView(
 		database?.id,
 		activeView?.id,
+	);
+
+	const sortedRows = useMemo(
+		() => sortRows(rows, database?.properties ?? [], activeViewDetail?.sorts),
+		[rows, database?.properties, activeViewDetail?.sorts],
 	);
 
 	if (isDatabaseLoading || isViewsLoading || isRowsLoading) {
@@ -92,6 +99,14 @@ export function DatabaseViewBlock({
 
 				<div className='flex shrink-0 items-center gap-1'>
 					{activeViewDetail && (
+						<DatabaseViewSortPopover
+							databaseId={database.id}
+							viewId={activeView.id}
+							properties={database.properties}
+							sorts={activeViewDetail.sorts ?? []}
+						/>
+					)}
+					{activeViewDetail && (
 						<DatabaseViewPropertiesPopover
 							databaseId={database.id}
 							view={activeView}
@@ -101,7 +116,6 @@ export function DatabaseViewBlock({
 					)}
 					{/* sau này */}
 					{/* Filter */}
-					{/* Sort */}
 					{/* Search */}
 					{/* Settings */}
 					{/* New */}
@@ -112,7 +126,7 @@ export function DatabaseViewBlock({
 				database={database}
 				view={activeView}
 				viewDetail={activeViewDetail}
-				rows={rows}
+				rows={sortedRows}
 			/>
 		</div>
 	);

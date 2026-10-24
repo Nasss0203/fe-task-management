@@ -7,6 +7,7 @@ import type {
 	DatabaseRow,
 	DatabaseView,
 	DatabaseViewDetail,
+	DatabaseViewSort,
 	DatabaseViewType,
 	PropertyOption,
 	PropertyType,
@@ -239,6 +240,19 @@ export const databaseApi = {
 		const response = await instance.patch<ApiResponse<DatabaseViewDetail>>(
 			`${DATABASE_API}/${databaseId}/views/${viewId}/properties/${propertyId}/width`,
 			{ width },
+		);
+
+		return response.data.data;
+	},
+
+	setViewSorts: async (
+		databaseId: string,
+		viewId: string,
+		sorts: DatabaseViewSort[],
+	): Promise<DatabaseViewDetail> => {
+		const response = await instance.patch<ApiResponse<DatabaseViewDetail>>(
+			`${DATABASE_API}/${databaseId}/views/${viewId}/sorts`,
+			{ sorts },
 		);
 
 		return response.data.data;

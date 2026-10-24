@@ -9,6 +9,7 @@ import {
 	PropertyType,
 	type DatabaseRow,
 	type DatabaseViewDetail,
+	type DatabaseViewSort,
 } from "./database.types";
 
 export function useCreateDatabaseRow(databaseId: string) {
@@ -273,6 +274,40 @@ export function useSetViewPropertyWidth(databaseId: string, viewId: string) {
 				databaseKeys.viewDetail(databaseId, viewId),
 				view,
 			);
+		},
+	});
+}
+
+export function useSetViewSorts(databaseId: string, viewId: string) {
+	const queryClient = useQueryClient();
+	const key = databaseKeys.viewDetail(databaseId, viewId);
+
+	return useMutation({
+		mutationFn: (sorts: DatabaseViewSort[]) =>
+			databaseApi.setViewSorts(databaseId, viewId, sorts),
+
+		onMutate: async (sorts) => {
+			await queryClient.cancelQueries({ queryKey: key });
+			const previous = queryClient.getQueryData<DatabaseViewDetail>(key);
+
+			if (previous) {
+				queryClient.setQueryData<DatabaseViewDetail>(key, {
+					...previous,
+					sorts,
+				});
+			}
+
+			return { previous };
+		},
+
+		onError: (_error, _sorts, context) => {
+			if (context?.previous) {
+				queryClient.setQueryData(key, context.previous);
+			}
+		},
+
+		onSuccess: (view: DatabaseViewDetail) => {
+			queryClient.setQueryData(key, view);
 		},
 	});
 }

@@ -65,8 +65,16 @@ export interface DatabaseViewProperty {
 	width: number | null;
 }
 
+export type DatabaseViewSortDirection = "asc" | "desc";
+
+export interface DatabaseViewSort {
+	propertyId: string;
+	direction: DatabaseViewSortDirection;
+}
+
 export interface DatabaseViewDetail extends DatabaseView {
 	properties: DatabaseViewProperty[];
+	sorts?: DatabaseViewSort[];
 }
 
 export interface DatabaseRowValue {
