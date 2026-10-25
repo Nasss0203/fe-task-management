@@ -32,6 +32,7 @@ vi.mock("@/entities/ai-assistant/model/ai-assistant.mutations", () => {
 	const unused = { mutateAsync: vi.fn(), isPending: false };
 	return {
 		useConfirmAiModificationPlan: () => unused,
+		useAskAi: () => unused,
 		useConfirmPageComposition: () => unused,
 		useCreateAiConversation: () => ({ mutateAsync: state.createConversation, isPending: false }),
 		useDiscardAiGeneration: () => unused,
@@ -75,6 +76,8 @@ const pageGenerationsResult = { data: { pages: [{ items: [savedGeneration] }] },
 const emptyMessagesResult = { data: { pages: [{ items: [] }] }, isPending: false, isSuccess: true };
 
 vi.mock("@/entities/ai-assistant/model/ai-assistant.queries", () => ({
+	useAiConversation: (_userId: string, id: string | null) => ({ isSuccess: Boolean(id), isError: false, isPending: false,
+		data: id ? id === pageConversation.id ? pageConversation : { ...globalConversation, id } : undefined }),
 	aiHistoryKeys: {
 		conversations: (...args: unknown[]) => ["conversation", ...args],
 		messages: (...args: unknown[]) => ["messages", ...args],
@@ -96,6 +99,43 @@ describe("Phase 4 F5 restoration from Backend history", () => {
 		localStorage.clear();
 		useAiChatStore.setState({ threads: {} });
 		state.invalidateQueries.mockResolvedValue(undefined);
+	});
+
+	it.each(["clarification", "unsupported", "timeout"] as const)("keeps local %s when stale-success history hydration runs after finish", async (feedbackKind) => {
+		saveSelectedAiConversation(key, pageConversation.id);
+		const { result } = renderHook(() => useAiChat());
+		await waitFor(() => expect(useAiChatStore.getState().threads[scope]?.messages).toHaveLength(2));
+		act(() => {
+			const store = useAiChatStore.getState();
+			store.beginRequest(scope, "feedback-request", "preparing");
+			store.addMessage(scope, { id: "local-user", role: "user", content: "Clarify this", capability: null,
+				createdAt: "2026-10-18T10:00:02Z" }, "feedback-request");
+			store.addMessage(scope, { id: "local-feedback", role: "assistant", content: feedbackKind, capability: null,
+				createdAt: "2026-10-18T10:00:03Z", origin: { source: "feedback", feedbackKind, localId: "local-feedback",
+					conversationId: pageConversation.id, requestId: "feedback-request" } }, "feedback-request");
+		});
+		act(() => useAiChatStore.getState().finishRequest(scope, "feedback-request"));
+		await waitFor(() => expect(useAiChatStore.getState().threads[scope]?.messages).toHaveLength(4));
+		expect(useAiChatStore.getState().threads[scope].messages.at(-1)?.content).toBe(feedbackKind);
+		act(() => result.current.startNewChat());
+		expect(useAiChatStore.getState().threads[scope].messages).toEqual([]);
+	});
+
+	it("keeps a new preview absent from cached history without duplicating the existing preview", async () => {
+		saveSelectedAiConversation(key, pageConversation.id);
+		renderHook(() => useAiChat());
+		await waitFor(() => expect(useAiChatStore.getState().threads[scope]?.messages).toHaveLength(2));
+		act(() => {
+			const store = useAiChatStore.getState();
+			store.beginRequest(scope, "preview-request", "loading-preview");
+			store.addMessage(scope, { id: "new-preview", role: "assistant", content: "New preview", capability: "GENERATE_PAGE_MODIFICATION_PLAN",
+				generation: { ...savedGeneration, id: "new-generation" }, createdAt: "2026-10-18T10:00:03Z" }, "preview-request");
+		});
+		act(() => useAiChatStore.getState().finishRequest(scope, "preview-request"));
+		await waitFor(() => expect(useAiChatStore.getState().threads[scope]?.messages).toHaveLength(3));
+		const messages = useAiChatStore.getState().threads[scope].messages;
+		expect(messages.filter((message) => message.role === "assistant" && message.generation?.id === "generation-1")).toHaveLength(1);
+		expect(messages.filter((message) => message.generation?.id === "new-generation")).toHaveLength(1);
 	});
 
 	it("rebuilds PAGE messages with an actionable draft after a fresh mount", async () => {

@@ -172,7 +172,15 @@ export interface GeneratePagePlanFromInstructionRequest {
   conversationId?: string;
 }
 
+/** M1b: TITLE_IN_SENTENCE is a real Page found in the sentence, planned only after the user picked it. */
+export type AiPageResolutionMethod = "CURRENT_CONTEXT" | "EXACT_TITLE" | "TITLE_IN_SENTENCE";
+
 export type GeneratePagePlanFromInstructionResponse =
+  | {
+      status: "UNSUPPORTED_OPERATION";
+      intent: AiPageIntent;
+      reason: "INSERT_ONLY";
+    }
   | { status: "NOT_A_PAGE_MODIFICATION"; intent: AiPageIntent }
   | {
       status: "NEEDS_CLARIFICATION";
@@ -184,13 +192,22 @@ export type GeneratePagePlanFromInstructionResponse =
       status: "AMBIGUOUS_PAGE";
       intent: AiPageIntent;
       candidates: AiPageResolutionCandidate[];
+      /** Present when the candidates were found in the sentence (M1b). */
+      resolutionMethod?: "TITLE_IN_SENTENCE";
     }
   | {
-      status: "PLAN_GENERATED" | "PLAN_NEEDS_MORE_CONTEXT";
+      status: "PLAN_GENERATED";
       intent: AiPageIntent;
       page: AiPageResolutionCandidate;
-      resolutionMethod: "CURRENT_CONTEXT" | "EXACT_TITLE";
-      plan: GenerateAiModificationPlanResponse;
+      resolutionMethod: AiPageResolutionMethod;
+      plan: Extract<GenerateAiModificationPlanResponse, { status: "PLAN_READY" }>;
+    }
+  | {
+      status: "PLAN_NEEDS_MORE_CONTEXT";
+      intent: AiPageIntent;
+      page: AiPageResolutionCandidate;
+      resolutionMethod: AiPageResolutionMethod;
+      plan: Extract<GenerateAiModificationPlanResponse, { status: "NEED_MORE_CONTEXT" }>;
     };
 
 export interface PageCompositionPreview {
@@ -225,6 +242,7 @@ export interface AiModificationPlanPreview {
   };
 
   operations: AiModificationOperation[];
+  contextRequests?: AiModificationContextRequest[];
 }
 
 export type AiGenerationOutputData =
@@ -314,3 +332,68 @@ export interface AiApiResponse<T> {
   message: string;
   data: T;
 }
+
+/** Public NestJS Ask body. Authentication is supplied by the shared API client. */
+export interface AskAiRequest {
+  workspaceId: string;
+  instruction: string;
+  selectedText?: string | null;
+  currentPageId?: string | null;
+  selectedPageId?: string | null;
+  conversationId?: string | null;
+  requestId?: string | null;
+}
+
+export type AiAskIntent =
+  | "CREATE_PAGE"
+  | "MODIFY_PAGE"
+  | "WRITING"
+  | "OTHER"
+  | "UNCLEAR";
+
+/** Wire capability is open-ended; consumers must validate before using legacy UI. */
+export type AiAskGeneration = Omit<AiGeneration, "capability"> & {
+  capability: string;
+};
+
+interface AiAskResponseBase {
+  requestId: string;
+  intent: AiAskIntent;
+  assistantMessage: string;
+}
+
+/** Chat nhiều lượt: the sent conversation did not fit, so the server opened a new one. */
+interface AiAskConversationSwitch {
+  conversationSwitched?: boolean;
+}
+
+type AiAskPlanningResponse = {
+  [Status in GeneratePagePlanFromInstructionResponse["status"]]: {
+    status: Status;
+    capability: "GENERATE_PAGE_MODIFICATION_PLAN";
+    planning: Extract<GeneratePagePlanFromInstructionResponse, { status: Status }>;
+  } & (Status extends "PLAN_GENERATED" | "PLAN_NEEDS_MORE_CONTEXT"
+    ? {
+        generationId: string;
+        conversationId: string;
+        preview: AiModificationPlanPreview;
+      } & AiAskConversationSwitch
+    : object);
+}[GeneratePagePlanFromInstructionResponse["status"]];
+
+/** Narrow overlapping statuses with capability or the presence of planning. */
+export type AiAskResponse = AiAskResponseBase & (
+  | {
+      status: "NEEDS_CLARIFICATION" | "UNSUPPORTED_REQUEST" | "UNSUPPORTED_OPERATION";
+      capability: null;
+      reason: string;
+    }
+  | ({
+      status: "GENERATION_CREATED";
+      capability: string;
+      generationId: string;
+      conversationId: string;
+      generation: AiAskGeneration;
+    } & AiAskConversationSwitch)
+  | AiAskPlanningResponse
+);

@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { AiGeneration } from "@/entities/ai-assistant/model/ai-assistant.types";
 import { AiModificationPlanPreview } from "@/widgets/ai-chat/ui/AiModificationPlanPreview";
+import { useAiChatStore } from "@/widgets/ai-chat/model/use-ai-chat-store";
 
 const readyDraft = {
 	id: "generation-preview",
@@ -23,6 +24,19 @@ const readyDraft = {
 		}],
 	},
 } as AiGeneration;
+
+describe("Outdated modification draft", () => {
+	it("shows Outdated and offers only Discard once the server rejected it as stale", () => {
+		useAiChatStore.setState(useAiChatStore.getInitialState(), true);
+		useAiChatStore.getState().markGenerationStale(readyDraft.id);
+		render(<AiModificationPlanPreview generation={readyDraft} onConfirm={vi.fn()} onDiscard={vi.fn()} />);
+		expect(screen.getByText("Outdated")).toBeTruthy();
+		expect(screen.getByText(/The page changed after this draft was created/)).toBeTruthy();
+		expect(screen.queryByRole("button", { name: /Apply changes/ })).toBeNull();
+		expect(screen.getByRole("button", { name: /Discard/ })).toBeTruthy();
+		useAiChatStore.setState(useAiChatStore.getInitialState(), true);
+	});
+});
 
 describe("Phase 4 Dashboard modification Preview", () => {
 	it("shows operation counts and proposed content but never Apply or Discard", () => {

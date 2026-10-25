@@ -12,16 +12,20 @@ vi.mock("@/entities/ai-assistant/api/ai-assistant.api", () => ({ getAiGeneration
 vi.mock("@/widgets/ai-chat/model/use-ai-chat", () => ({ useAiChat: vi.fn() }));
 vi.mock("@/widgets/ai-chat/ui/AiChatComposer", () => ({ AiChatComposer: () => null }));
 vi.mock("@/widgets/ai-chat/ui/AiChatEmptyState", () => ({ AiChatEmptyState: () => null }));
+vi.mock("@/entities/page-block/model/page-block.queries", () => ({ usePageBlocks: () => ({ data: [], isPending: false }) }));
+vi.mock("@/entities/page/model/page.queries", () => ({ usePage: () => ({ data: undefined, isPending: false }) }));
 
-const draft = {
+const draft: AiGeneration = {
 	id: "draft-a", conversation_id: "conversation-a",
+	workspace_id: "workspace-1", provider: null, model: null, error_code: null, error_message: null, applied_at: null,
 	capability: "GENERATE_PAGE_MODIFICATION_PLAN", status: "COMPLETED",
 	created_at: "2026-10-18T10:00:00Z",
+	updated_at: "2026-10-18T10:00:00Z",
 	output_data: {
 		type: "AI_MODIFICATION_PLAN", schemaVersion: 1, status: "PLAN_READY",
-		pageId: "page-1", summary: "QA", operations: [],
+		pageId: "page-1", summary: "QA", operations: [{ type: "INSERT_BLOCKS", parentBlockId: null, afterBlockId: null, blocks: [{ type: "TEXT", content: { text: "QA details" } }] }],
 	},
-} as AiGeneration;
+};
 
 const conversation = {
 	id: "conversation-a", workspace_id: "workspace-1", scope: "PAGE", page_id: "page-1",
@@ -41,6 +45,7 @@ function stubChatHook() {
 		conversationsQuery: query, workspacePageConversationsQuery: query,
 		messagesQuery: query, generationsQuery: query,
 		isPending: false, pendingStage: null, sendMessage: vi.fn(),
+		consumeUnifiedAskSubmission: () => Promise.resolve(false),
 		selectPageCandidate: vi.fn(), confirmPageComposition: vi.fn(),
 		confirmAiModificationPlan: vi.fn(), discardGeneration: vi.fn(),
 		startNewChat: vi.fn(), selectHistoryConversation: vi.fn(),

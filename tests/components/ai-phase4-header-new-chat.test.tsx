@@ -79,4 +79,18 @@ describe("Phase 4 Dashboard header New Chat", () => {
 		expect(localStorage.getItem(key!)).toBe("conversation-from-server");
 		expect(push).not.toHaveBeenCalled();
 	});
+
+	it.each(["confirm", "discard"] as const)("preserves storage/store during %s preflight", (type) => {
+		saveSelectedAiConversation(key, "conversation-from-server");
+		useAiChatStore.getState().setConversation(scope, "conversation-from-server", "workspace-a");
+		useAiChatStore.getState().acquireOperation({ type, generationId: "draft-1", userId: "user-a", workspaceId: "workspace-a",
+			pageId: null, chatScope: scope, epoch: 0 });
+		render(<HeaderWorkspaceContainer />);
+		const button = screen.getByRole("button", { name: "New chat" });
+		expect(button).toBeDisabled();
+		fireEvent.click(button);
+		expect(localStorage.getItem(key!)).toBe("conversation-from-server");
+		expect(useAiChatStore.getState().threads[scope].conversationId).toBe("conversation-from-server");
+		expect(push).not.toHaveBeenCalled();
+	});
 });

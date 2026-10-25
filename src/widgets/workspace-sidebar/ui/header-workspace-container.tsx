@@ -19,7 +19,7 @@ import {
 } from "@/widgets/ai-chat/model/use-ai-chat-store";
 import {
 	aiHistorySelectionKey,
-	saveSelectedAiConversation,
+	resetAiChatSelection,
 	useSelectedAiConversation,
 } from "@/widgets/ai-chat/model/ai-history-selection";
 
@@ -125,14 +125,10 @@ export function HeaderWorkspaceContainer() {
 		(state) =>
 				(state.threads[dashboardChatScope]?.messages.length ?? 0) > 0,
 	);
-	const chatBusy = useAiChatStore((state) => Boolean(state.threads[dashboardChatScope]?.activeRequestId));
-
-	const newChat = useAiChatStore((state) => state.newChat);
+	const chatBusy = useAiChatStore((state) => Boolean(state.threads[dashboardChatScope]?.activeRequestId || state.threads[dashboardChatScope]?.operation));
 
 	const handleNewChat = () => {
-		if (chatBusy) return;
-		saveSelectedAiConversation(dashboardHistoryKey, null);
-		newChat(dashboardChatScope);
+		if (chatBusy || !resetAiChatSelection(dashboardChatScope, dashboardHistoryKey)) return;
 		router.push("/dashboard/ai");
 	};
 

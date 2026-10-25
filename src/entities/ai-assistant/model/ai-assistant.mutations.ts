@@ -7,6 +7,7 @@ import { pageBlockKeys } from "@/entities/page-block/model/page-block.queries";
 import { pageKeys } from "@/entities/page/model/page.queries";
 
 import {
+	askAi,
 	confirmAiModificationPlan,
 	confirmPageComposition,
 	createAiConversation,
@@ -17,6 +18,7 @@ import {
 } from "../api/ai-assistant.api";
 
 import type {
+	AskAiRequest,
 	ConfirmPageCompositionRequest,
 	CreateAiConversationRequest,
 	GenerateAiModificationPlanRequest,
@@ -26,46 +28,54 @@ import type {
 
 export function useCreateAiConversation() {
 	return useMutation({
-		mutationFn: (input: CreateAiConversationRequest) =>
-			createAiConversation(input),
+		retry: false,
+		mutationFn: ({ shareToken, ...input }: CreateAiConversationRequest & { shareToken?: string }) =>
+			createAiConversation(input, ...(shareToken ? [shareToken] as const : [] as const)),
 	});
 }
 
 interface SubmitAiMessageMutationInput {
+	shareToken?: string;
 	conversationId: string;
 	input: SubmitAiMessageRequest;
 }
 
 export function useSubmitAiMessage() {
 	return useMutation({
-		mutationFn: ({ conversationId, input }: SubmitAiMessageMutationInput) =>
-			submitAiMessage(conversationId, input),
+		retry: false,
+		mutationFn: ({ conversationId, input, shareToken }: SubmitAiMessageMutationInput) =>
+			submitAiMessage(conversationId, input, ...(shareToken ? [shareToken] as const : [] as const)),
 	});
 }
 
 interface GenerateAiModificationPlanMutationInput {
+	shareToken?: string;
 	pageId: string;
 	input: GenerateAiModificationPlanRequest;
 }
 
 export function useGenerateAiModificationPlan() {
 	return useMutation({
+		retry: false,
 		mutationFn: ({
 			pageId,
 			input,
+			shareToken,
 		}: GenerateAiModificationPlanMutationInput) =>
-			generateAiModificationPlan(pageId, input),
+			generateAiModificationPlan(pageId, input, ...(shareToken ? [shareToken] as const : [] as const)),
 	});
 }
 
 export function useGeneratePagePlanFromInstruction() {
 	return useMutation({
-		mutationFn: (input: GeneratePagePlanFromInstructionRequest) =>
-			generatePagePlanFromInstruction(input),
+		retry: false,
+		mutationFn: ({ shareToken, ...input }: GeneratePagePlanFromInstructionRequest & { shareToken?: string }) =>
+			generatePagePlanFromInstruction(input, ...(shareToken ? [shareToken] as const : [] as const)),
 	});
 }
 
 interface ConfirmPageCompositionMutationInput {
+	shareToken?: string;
 	generationId: string;
 	input?: ConfirmPageCompositionRequest;
 }
@@ -74,11 +84,13 @@ export function useConfirmPageComposition() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
+		retry: false,
 		mutationFn: ({
 			generationId,
 			input = {},
+			shareToken,
 		}: ConfirmPageCompositionMutationInput) =>
-			confirmPageComposition(generationId, input),
+			confirmPageComposition(generationId, input, ...(shareToken ? [shareToken] as const : [] as const)),
 
 		onSuccess: async (result) => {
 			const workspaceId = result.generation.workspace_id;
@@ -95,6 +107,7 @@ export function useConfirmPageComposition() {
 }
 
 interface ConfirmAiModificationPlanMutationInput {
+	shareToken?: string;
 	generationId: string;
 	pageId: string;
 }
@@ -103,10 +116,12 @@ export function useConfirmAiModificationPlan() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
+		retry: false,
 		mutationFn: ({
 			generationId,
+			shareToken,
 		}: ConfirmAiModificationPlanMutationInput) =>
-			confirmAiModificationPlan(generationId),
+			confirmAiModificationPlan(generationId, ...(shareToken ? [shareToken] as const : [] as const)),
 
 		onSuccess: async (result, variables) => {
 			const plan: unknown = result.generation.output_data;
@@ -171,6 +186,18 @@ export function useConfirmAiModificationPlan() {
 
 export function useDiscardAiGeneration() {
 	return useMutation({
-		mutationFn: (generationId: string) => discardAiGeneration(generationId),
+		retry: false,
+		mutationFn: (variables: string | { generationId: string; shareToken?: string }) =>
+			typeof variables === "string" ? discardAiGeneration(variables) :
+				discardAiGeneration(variables.generationId, ...(variables.shareToken ? [variables.shareToken] as const : [] as const)),
 	});
+}
+
+/** Ask only prepares a response/draft; history synchronization belongs to the caller. */
+export function useAskAi() {
+  return useMutation({
+		retry: false,
+    mutationFn: ({ shareToken, ...input }: AskAiRequest & { shareToken?: string }) =>
+			askAi(input, ...(shareToken ? [shareToken] as const : [] as const)),
+  });
 }

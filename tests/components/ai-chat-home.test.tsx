@@ -24,12 +24,14 @@ const conversation = {
 
 const calls: string[] = [];
 const hook = {
-	startNewChat: vi.fn(() => {
+	prepareUnifiedAskSubmission: vi.fn((instruction: string) => {
 		calls.push("reset");
 		useAiChatStore.getState().newChat(scope);
+		useAiChatStore.getState().setInput(scope, instruction);
+		return true;
 	}),
 	sendMessage: vi.fn(async () => { calls.push("send"); }),
-	selectHistoryConversation: vi.fn(),
+	selectHistoryConversation: vi.fn(() => true),
 };
 
 describe("Ask AI home", () => {
@@ -47,7 +49,7 @@ describe("Ask AI home", () => {
 		}) as unknown as ReturnType<typeof useAiChat>);
 	});
 
-	it("starts a fresh chat, keeps the typed text, sends it and opens the chat page", async () => {
+		it("queues a fresh chat, keeps the typed text and navigates before any request", async () => {
 		await act(async () => {
 			render(<AiChatHome />);
 		});
@@ -55,7 +57,9 @@ describe("Ask AI home", () => {
 			fireEvent.click(screen.getByRole("button", { name: "Send" }));
 		});
 
-		expect(calls).toEqual(["reset", "send"]);
+			expect(calls).toEqual(["reset"]);
+			expect(hook.prepareUnifiedAskSubmission).toHaveBeenCalledWith("Thêm checklist vào page Release");
+			expect(hook.sendMessage).not.toHaveBeenCalled();
 		expect(useAiChatStore.getState().threads[scope]?.input).toBe("Thêm checklist vào page Release");
 		expect(push).toHaveBeenCalledWith("/dashboard/ai/chat");
 	});

@@ -5,6 +5,9 @@ import { getAiGeneration } from "@/entities/ai-assistant/api/ai-assistant.api";
 import { AiModificationActionDialog } from "@/widgets/ai-chat/ui/AiModificationActionDialog";
 
 vi.mock("@/entities/ai-assistant/api/ai-assistant.api", () => ({ getAiGeneration: vi.fn() }));
+vi.mock("@/entities/page/model/page.queries", () => ({
+  usePage: (id?: string) => ({ data: id ? { id, title: "Release Plan" } : undefined, isPending: false }),
+}));
 
 const action = { kind: "apply" as const, generationId: "gen-1", pageId: "page-1" };
 const valid = {
@@ -30,6 +33,9 @@ describe("Phase 5.3 action confirmation dialog", () => {
     expect(screen.getByRole("button", { name: "Confirm apply" }).hasAttribute("disabled")).toBe(true);
     await waitFor(() => expect(screen.getByRole("button", { name: "Confirm apply" }).hasAttribute("disabled")).toBe(false));
     expect(screen.getByText("Add a QA heading")).toBeTruthy();
+    // Target shows the Page title, not its ID, and still links to the Page.
+    expect(screen.getByRole("link", { name: "Release Plan" }).getAttribute("href")).toBe("/page/page-1");
+    expect(screen.queryByText("page-1")).toBeNull();
     expect(screen.getByText(/1 operations/)).toBeTruthy();
     expect(onConfirm).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Confirm apply" }));

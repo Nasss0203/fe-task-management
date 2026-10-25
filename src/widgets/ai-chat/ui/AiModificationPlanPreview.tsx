@@ -29,6 +29,7 @@ import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 
 import { AiDraftStatusBadge, type AiDraftStatus } from "./AiDraftStatusBadge";
+import { useAiChatStore } from "../model/use-ai-chat-store";
 
 interface AiModificationPlanPreviewProps {
 	generation: AiGeneration;
@@ -232,7 +233,7 @@ function InsertLocation({
 	return after ? <>After {after}</> : <>At the end of the page</>;
 }
 
-function BlockContentPreview({ block }: { block: AiModificationBlockInput }) {
+export function BlockContentPreview({ block }: { block: AiModificationBlockInput }) {
 	const text = textOf(block.content);
 
 	if (text === null) {
@@ -539,6 +540,8 @@ export function AiModificationPlanPreview({
 	onConfirm,
 	onDiscard,
 }: AiModificationPlanPreviewProps) {
+	const isStale = useAiChatStore((state) => Boolean(state.staleGenerationIds[generation.id]));
+
 	if (generation.capability !== "GENERATE_PAGE_MODIFICATION_PLAN") {
 		return null;
 	}
@@ -550,7 +553,7 @@ export function AiModificationPlanPreview({
 	}
 
 	const isCompleted = generation.status === "COMPLETED";
-	const status = getDraftStatus(generation, plan, previewOnly);
+	const status = isCompleted && isStale ? "stale" : getDraftStatus(generation, plan, previewOnly);
 	// Changes awaiting a decision stay expanded; settled drafts collapse.
 	const expandOperations = isCompleted;
 
@@ -685,9 +688,11 @@ export function AiModificationPlanPreview({
 			{isCompleted && !previewOnly && (
 				<div className='flex flex-wrap items-center justify-between gap-2 border-t border-border/50 bg-muted/30 px-4 py-2.5'>
 					<p className='text-xs text-muted-foreground'>
-						{plan.status === "PLAN_READY"
-							? "Nothing changes until you apply."
-							: "Reply below with the details, or discard this draft."}
+						{isStale
+							? "The page changed after this draft was created. Send your request again to get a new draft."
+							: plan.status === "PLAN_READY"
+								? "Nothing changes until you apply."
+								: "Send a complete request with the additional details, or discard this draft."}
 					</p>
 
 					<div className='flex items-center gap-2'>
@@ -703,7 +708,7 @@ export function AiModificationPlanPreview({
 							Discard
 						</Button>
 
-						{plan.status === "PLAN_READY" && (
+						{plan.status === "PLAN_READY" && !isStale && (
 							<Button
 								type='button'
 								size='sm'

@@ -24,6 +24,8 @@ interface AiChatHistoryProps {
 	selectedConversationId: string | null;
 	loading: boolean;
 	error: boolean;
+	conversationsDenied?: boolean;
+	onRetryConversations?: () => void;
 	hasMoreConversations: boolean;
 	hasMoreGenerations: boolean;
 	loadingMoreConversations: boolean;
@@ -49,12 +51,13 @@ const rowClassName =
 
 /** A compact History button; the list opens in a popover instead of taking a row. */
 export function AiChatHistory({
-	conversations, generations, selectedConversationId, loading, error,
+	conversations: cachedConversations, generations, selectedConversationId, loading, error, conversationsDenied = false, onRetryConversations,
 	hasMoreConversations, hasMoreGenerations, loadingMoreConversations,
 	loadingMoreGenerations, disabled, onSelectConversation, onNewChat,
 	onLoadConversations, onLoadGenerations, onOpenGeneration,
 }: AiChatHistoryProps) {
 	const [open, setOpen] = useState(false);
+	const conversations = conversationsDenied ? [] : cachedConversations;
 	const drafts = generations.filter((generation) =>
 		generation.capability === "GENERATE_PAGE_COMPOSITION" ||
 		generation.capability === "GENERATE_PAGE_MODIFICATION_PLAN"
@@ -126,7 +129,11 @@ export function AiChatHistory({
 						);
 					})}
 
-					{hasMoreConversations && (
+					{(conversationsDenied || error) && onRetryConversations && (
+						<button type="button" disabled={loadingMoreConversations} onClick={onRetryConversations}
+							className={cn(rowClassName, "justify-center text-muted-foreground")}>Retry chat history</button>
+					)}
+					{!conversationsDenied && hasMoreConversations && (
 						<button type="button"
 							disabled={disabled || loadingMoreConversations}
 							onClick={onLoadConversations}

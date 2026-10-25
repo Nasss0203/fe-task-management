@@ -22,6 +22,9 @@ interface AiMessageListProps {
 
 	onDiscardGeneration: (generationId: string) => void;
 	onSelectPageCandidate?: (messageId: string, pageId: string) => void;
+	onSelectUnifiedAskPageCandidate?: (messageId: string, pageId: string) => void;
+	onRetryUnifiedAskPreview?: (messageId: string) => void;
+	generationContext?: { workspaceId: string | null; pageId?: string; conversationId?: string | null };
 }
 
 const pendingStageContent: Record<
@@ -98,6 +101,9 @@ export function AiMessageList({
 	onConfirmAiModificationPlan,
 	onDiscardGeneration,
 	onSelectPageCandidate,
+	onSelectUnifiedAskPageCandidate,
+	onRetryUnifiedAskPreview,
+	generationContext,
 }: AiMessageListProps) {
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -132,6 +138,9 @@ export function AiMessageList({
 						}
 							onDiscardGeneration={onDiscardGeneration}
 							onSelectPageCandidate={onSelectPageCandidate}
+							onSelectUnifiedAskPageCandidate={onSelectUnifiedAskPageCandidate}
+							onRetryUnifiedAskPreview={onRetryUnifiedAskPreview}
+							generationContext={generationContext}
 					/>
 				))}
 

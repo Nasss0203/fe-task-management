@@ -5,27 +5,29 @@ import { useRouter } from "next/navigation";
 import { Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { getAiGeneration } from "@/entities/ai-assistant/api/ai-assistant.api";
+import type { AiPageAccessContext } from "@/entities/ai-assistant/model/ai-assistant.access";
 import type { AiGeneration } from "@/entities/ai-assistant/model/ai-assistant.types";
 import { getAiChatErrorMessage } from "../model/ai-chat-error";
 import { Button } from "@/shared/ui/button";
 import { useAiChat } from "../model/use-ai-chat";
 
-import { EMPTY_AI_CHAT_THREAD, useAiChatStore } from "../model/use-ai-chat-store";
+import { EMPTY_AI_CHAT_THREAD, getAiGenerationPageId, useAiChatStore } from "../model/use-ai-chat-store";
 
 import { AiChatComposer } from "./AiChatComposer";
 import { AiChatEmptyState } from "./AiChatEmptyState";
 import { AiChatHeader } from "./AiChatHeader";
 import { AiChatHistory } from "./AiChatHistory";
-import { AiMessageItem } from "./AiMessageItem";
+import { AiMessageItem, isReviewableAiGeneration } from "./AiMessageItem";
 import { AiMessageList } from "./AiMessageList";
 import { AiModificationActionDialog } from "./AiModificationActionDialog";
 
 interface AiChatProps {
 	showHeader?: boolean;
 	currentPageId?: string;
+	pageAccess?: AiPageAccessContext;
 }
 
-export function AiChat({ showHeader = false, currentPageId }: AiChatProps) {
+export function AiChat({ showHeader = false, currentPageId, pageAccess }: AiChatProps) {
 	const router = useRouter();
 	const [draftPreview, setDraftPreview] = useState<{
 		requestId: number;
@@ -37,9 +39,10 @@ export function AiChat({ showHeader = false, currentPageId }: AiChatProps) {
 		requestId: number;
 		scope: string;
 		conversationId: string;
+		generationId: string;
 	} | null>(null);
 	const draftRequestRef = useRef(0);
-	const [action, setAction] = useState<{ kind: "apply" | "discard"; generationId: string; pageId: string } | null>(null);
+	const [action, setAction] = useState<{ kind: "apply" | "discard"; generationId: string; pageId: string; scope: string } | null>(null);
 	const [actionPending, setActionPending] = useState(false);
 	/**
 	 * Get the chat scope for the current page.
@@ -48,17 +51,18 @@ export function AiChat({ showHeader = false, currentPageId }: AiChatProps) {
 	 */
 	const setInput = useAiChatStore((state) => state.setInput);
 
-	const setMode = useAiChatStore((state) => state.setMode);
-
-
 	const selectQuickAction = useAiChatStore(
 		(state) => state.selectQuickAction,
 	);
 
 	const {
+		shareToken,
 		chatScope,
-			sendMessage,
-			selectPageCandidate,
+		sendUnifiedAsk,
+		consumeUnifiedAskSubmission,
+		selectPageCandidate,
+		selectUnifiedAskPageCandidate,
+		retryUnifiedAskPreview,
 		confirmPageComposition,
 		confirmAiModificationPlan,
 		discardGeneration,
@@ -72,48 +76,82 @@ export function AiChat({ showHeader = false, currentPageId }: AiChatProps) {
 		conversationsQuery,
 		messagesQuery,
 		generationsQuery,
-				savedGenerations,
-	} = useAiChat(currentPageId);
+		savedGenerations,
+		accessDenied,
+		visibleMessages,
+		canReadGeneration,
+		handleGenerationAccessError,
+	} = useAiChat(currentPageId, pageAccess);
 	const thread = useAiChatStore((state) => state.threads[chatScope] ?? EMPTY_AI_CHAT_THREAD);
-	const { messages, mode, input } = thread;
+	const accessDenials = useAiChatStore((state) => state.accessDenials);
+	const { input } = thread;
+	const messages = accessDenied ? [] : shareToken ? visibleMessages ?? [] : thread.messages;
+	useEffect(() => {
+		let cancelled = false;
+		// Strict Mode's trial effect is cleaned up before this microtask can consume the ticket.
+		queueMicrotask(() => { if (!cancelled) void consumeUnifiedAskSubmission(); });
+		return () => { cancelled = true; };
+	}, [chatScope, consumeUnifiedAskSubmission]);
 	// A draft opened in another chat/workspace must not appear after navigation
 	// or a New Chat action, even if its API request finishes afterward.
 	useEffect(() => {
 		draftRequestRef.current += 1;
 		setAction(null);
-	}, [chatScope, selectedConversationId]);
+		setDraftPreview(null);
+		setLoadingDraft(null);
+		return () => { draftRequestRef.current += 1; };
+	}, [chatScope, selectedConversationId, thread.epoch, currentWorkspaceId, currentPageId]);
+	useEffect(() => {
+		if (accessDenied || draftPreview && canReadGeneration?.(draftPreview.generation.id) === false ||
+			loadingDraft && canReadGeneration?.(loadingDraft.generationId) === false ||
+			action && canReadGeneration?.(action.generationId) === false) {
+			draftRequestRef.current += 1;
+			setDraftPreview(null);
+			setLoadingDraft(null);
+			setAction(null);
+		}
+	}, [accessDenied, accessDenials, canReadGeneration, draftPreview, loadingDraft, action]);
 	const requestAction = (kind: "apply" | "discard", generationId: string, pageId: string) => {
-		if (!isPending && !actionPending) setAction({ kind, generationId, pageId });
+		if (!accessDenied && canReadGeneration?.(generationId) !== false && !isPending && !actionPending) setAction({ kind, generationId, pageId, scope: chatScope });
 	};
 	const performAction = async () => {
-		if (!action || actionPending || isPending) return;
+		if (!action || action.scope !== chatScope || accessDenied || canReadGeneration?.(action.generationId) === false || actionPending || isPending) return;
 		setActionPending(true);
+		const actionViewRequest = draftRequestRef.current;
 		try {
 			const generation = action.kind === "apply"
 				? await confirmAiModificationPlan(action.generationId, action.pageId)
 				: await discardGeneration(action.generationId);
-			if (generation) {
+			if (generation && draftRequestRef.current === actionViewRequest) {
 				setDraftPreview((previous) => previous?.generation.id === generation.id ? { ...previous, generation } : previous);
+				setAction(null);
+			} else if (useAiChatStore.getState().staleGenerationIds[action.generationId]) {
+				// An outdated draft can never be applied; retrying from the dialog is pointless.
 				setAction(null);
 			}
 		} finally { setActionPending(false); }
 	};
 
 	const openDraft = async (generationId: string) => {
-		if (!selectedConversationId) return;
+		const currentThread = useAiChatStore.getState().threads[chatScope];
+		if (!selectedConversationId || accessDenied || canReadGeneration?.(generationId) === false || isPending || currentThread?.operation || currentThread?.activeRequestId) return;
+		const epoch = currentThread?.epoch;
 		const requestId = ++draftRequestRef.current;
 		const conversationId = selectedConversationId;
 		const scope = chatScope;
-		setLoadingDraft({ requestId, conversationId, scope });
+		setLoadingDraft({ requestId, conversationId, scope, generationId });
 		setDraftPreview(null);
 		try {
-			const generation = await getAiGeneration(generationId);
-			if (draftRequestRef.current !== requestId) return;
-			if (generation.conversation_id !== conversationId) {
+			const generation = await (shareToken ? getAiGeneration(generationId, undefined, shareToken) : getAiGeneration(generationId));
+			if (draftRequestRef.current !== requestId || useAiChatStore.getState().threads[scope]?.epoch !== epoch ||
+				canReadGeneration?.(generationId, conversationId, getAiGenerationPageId(generation) ?? currentPageId ?? null) === false) return;
+			if (generation.id !== generationId || generation.conversation_id !== conversationId ||
+				!isReviewableAiGeneration(generation, { workspaceId: currentWorkspaceId, pageId: currentPageId })) {
 				throw new Error("This draft belongs to another conversation.");
 			}
 			setDraftPreview({ requestId, scope, conversationId, generation });
 		} catch (error) {
+			if (!shareToken || draftRequestRef.current === requestId) handleGenerationAccessError?.(error, generationId, conversationId);
 			if (draftRequestRef.current === requestId) {
 				toast.error(getAiChatErrorMessage(error, "Unable to open AI draft."));
 			}
@@ -121,29 +159,29 @@ export function AiChat({ showHeader = false, currentPageId }: AiChatProps) {
 			if (draftRequestRef.current === requestId) setLoadingDraft(null);
 		}
 	};
-	const isLoadingDraft = loadingDraft?.requestId === draftRequestRef.current &&
+	const isLoadingDraft = !accessDenied && Boolean(loadingDraft && canReadGeneration?.(loadingDraft.generationId) !== false) && loadingDraft?.requestId === draftRequestRef.current &&
 		loadingDraft?.scope === chatScope &&
 		loadingDraft?.conversationId === selectedConversationId;
 	const visibleDraft =
-		draftPreview?.requestId === draftRequestRef.current &&
+		!accessDenied && draftPreview && canReadGeneration?.(draftPreview.generation.id) !== false && draftPreview.requestId === draftRequestRef.current &&
 		draftPreview.scope === chatScope &&
 		draftPreview.conversationId === selectedConversationId
 			? draftPreview.generation
 			: null;
-	const isHistoryLoading = Boolean(selectedConversationId) &&
+	const isHistoryLoading = !accessDenied && Boolean(selectedConversationId) &&
 		(messagesQuery.isPending || generationsQuery.isPending);
 
 	/**
 	 * Modification Planner requires a page context.
 	 * Other capabilities require a workspace context.
 	 */
-	const isComposerDisabled = isPending || !currentWorkspaceId;
+	const isComposerDisabled = accessDenied || isPending || !currentWorkspaceId || Boolean(thread.pendingSubmission);
 
 	const showEmptyState = messages.length === 0 && pendingStage === null;
 	// Dashboard chat lives on its own page: a new chat starts from the Ask AI home,
 	// which also lists the history. Page chat has no home, so it keeps History here.
 	const handleNewChat = () => {
-		startNewChat();
+		if (!startNewChat()) return;
 		if (!currentPageId) router.push("/dashboard/ai");
 	};
 
@@ -158,6 +196,8 @@ export function AiChat({ showHeader = false, currentPageId }: AiChatProps) {
 							selectedConversationId={selectedConversationId}
 							loading={conversationsQuery.isPending}
 							error={conversationsQuery.isError}
+							conversationsDenied={conversationsQuery.isAccessDenied}
+							onRetryConversations={() => { void conversationsQuery.refetch(); }}
 							hasMoreConversations={Boolean(conversationsQuery.hasNextPage)}
 							hasMoreGenerations={Boolean(generationsQuery.hasNextPage)}
 							loadingMoreConversations={conversationsQuery.isFetchingNextPage}
@@ -173,7 +213,7 @@ export function AiChat({ showHeader = false, currentPageId }: AiChatProps) {
 					{showHeader && (
 						<AiChatHeader
 							onNewChat={handleNewChat}
-							hasMessages={messages.length > 0 || Boolean(selectedConversationId)}
+								hasMessages={!isPending && (messages.length > 0 || Boolean(selectedConversationId))}
 						/>
 					)}
 				</div>
@@ -203,6 +243,7 @@ export function AiChat({ showHeader = false, currentPageId }: AiChatProps) {
 									createdAt: visibleDraft.created_at,
 								}}
 								disabled={isPending}
+									generationContext={{ workspaceId: currentWorkspaceId, pageId: currentPageId, conversationId: selectedConversationId }}
 								onConfirmPageComposition={(id) => { void confirmPageComposition(id); }}
 									onConfirmAiModificationPlan={(id, pageId) => requestAction("apply", id, pageId)}
 									onDiscardGeneration={(id) => {
@@ -229,6 +270,7 @@ export function AiChat({ showHeader = false, currentPageId }: AiChatProps) {
 
 			{!isHistoryLoading && showEmptyState ? (
 				<AiChatEmptyState
+					disabled={isPending}
 					onSelectQuickAction={(action) =>
 						selectQuickAction(chatScope, action)
 					}
@@ -242,6 +284,7 @@ export function AiChat({ showHeader = false, currentPageId }: AiChatProps) {
 					onLoadMore={() => { void messagesQuery.fetchNextPage(); }}
 					pendingStage={pendingStage}
 					disabled={isPending}
+						generationContext={{ workspaceId: currentWorkspaceId, pageId: currentPageId, conversationId: selectedConversationId }}
 					onConfirmPageComposition={(generationId) => {
 						void confirmPageComposition(generationId);
 					}}
@@ -255,21 +298,21 @@ export function AiChat({ showHeader = false, currentPageId }: AiChatProps) {
 								else void discardGeneration(generationId);
 						}}
 						onSelectPageCandidate={selectPageCandidate}
+						onSelectUnifiedAskPageCandidate={selectUnifiedAskPageCandidate}
+						onRetryUnifiedAskPreview={retryUnifiedAskPreview}
 				/>
 			) : null}
 
 			<AiChatComposer
 				value={input}
 				onChange={(value) => setInput(chatScope, value)}
-				mode={mode}
-				onModeChange={(nextMode) => setMode(chatScope, nextMode)}
 				onSend={() => {
-					void sendMessage();
+						void sendUnifiedAsk({ instruction: useAiChatStore.getState().threads[chatScope]?.input ?? "" });
 				}}
 				currentPageId={currentPageId}
 				disabled={isComposerDisabled || isHistoryLoading || Boolean(selectedConversationId && messagesQuery.isError)}
 			/>
-			<AiModificationActionDialog action={action} workspaceId={currentWorkspaceId} currentPageId={currentPageId} pending={actionPending} onClose={() => { if (!actionPending) setAction(null); }} onConfirm={() => { void performAction(); }} />
+			<AiModificationActionDialog shareToken={shareToken} action={!accessDenied && action?.scope === chatScope && canReadGeneration?.(action.generationId) !== false ? action : null} onAccessError={handleGenerationAccessError} workspaceId={currentWorkspaceId} currentPageId={currentPageId} pending={actionPending} onClose={() => { if (!actionPending) setAction(null); }} onConfirm={() => { void performAction(); }} />
 			</div>
 	);
 }

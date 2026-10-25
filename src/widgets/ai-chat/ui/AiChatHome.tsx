@@ -22,48 +22,38 @@ export function AiChatHome() {
 		chatScope,
 		currentWorkspaceId,
 		isPending,
-		sendMessage,
-		startNewChat,
+		prepareUnifiedAskSubmission,
 		selectHistoryConversation,
 		conversations,
 		conversationsQuery,
 		workspacePageConversationsQuery,
 	} = useAiChat();
-	const { input, mode } = useAiChatStore(
+	const { input, pendingSubmission } = useAiChatStore(
 		(state) => state.threads[chatScope] ?? EMPTY_AI_CHAT_THREAD,
 	);
 	const setInput = useAiChatStore((state) => state.setInput);
-	const setMode = useAiChatStore((state) => state.setMode);
 	const selectQuickAction = useAiChatStore((state) => state.selectQuickAction);
-	const sendQueued = useRef(false);
+	const navigatingRef = useRef(false);
+	// Returning to Home must not revive an abandoned auto-submit ticket.
+	useEffect(() => { useAiChatStore.getState().clearPendingSubmissions(); }, []);
 
-	const disabled = isPending || !currentWorkspaceId;
+	const disabled = isPending || !currentWorkspaceId || Boolean(pendingSubmission);
 	const loading = conversationsQuery.isPending || workspacePageConversationsQuery.isPending;
 	const error = conversationsQuery.isError || workspacePageConversationsQuery.isError;
+	const listDenied = conversationsQuery.isAccessDenied || workspacePageConversationsQuery.isAccessDenied;
 	const hasMore = Boolean(conversationsQuery.hasNextPage || workspacePageConversationsQuery.hasNextPage);
 	const loadingMore = conversationsQuery.isFetchingNextPage || workspacePageConversationsQuery.isFetchingNextPage;
 
-	// Home always starts a new chat. Reset first, then send after the reset render
-	// so sendMessage reads the cleared conversation instead of the last selected one.
+	// Transfer only. Chat owns the operation after its view has mounted.
 	const send = () => {
-		if (!input.trim() || disabled) return;
-		const draft = { input, mode };
-		startNewChat();
-		setInput(chatScope, draft.input);
-		setMode(chatScope, draft.mode);
-		sendQueued.current = true;
+		if (disabled || navigatingRef.current || !prepareUnifiedAskSubmission(input)) return;
+		navigatingRef.current = true;
+		router.push(AI_CHAT_THREAD_PATH);
 	};
 
-	useEffect(() => {
-		if (!sendQueued.current) return;
-		sendQueued.current = false;
-		void sendMessage();
-		router.push(AI_CHAT_THREAD_PATH);
-	});
-
 	const openConversation = (id: string) => {
-		if (disabled) return;
-		selectHistoryConversation(id);
+		if (disabled || navigatingRef.current || !selectHistoryConversation(id)) return;
+		navigatingRef.current = true;
 		router.push(AI_CHAT_THREAD_PATH);
 	};
 
@@ -96,8 +86,6 @@ export function AiChatHome() {
 				<AiChatComposer
 					value={input}
 					onChange={(value) => setInput(chatScope, value)}
-					mode={mode}
-					onModeChange={(nextMode) => setMode(chatScope, nextMode)}
 					onSend={send}
 					disabled={disabled}
 				/>
@@ -126,15 +114,17 @@ export function AiChatHome() {
 						<p className='flex items-center gap-2 px-1 py-3 text-xs text-muted-foreground'>
 							<Loader2 className='size-3.5 animate-spin' /> Loading conversations...
 						</p>
-					) : error ? (
+					) : null}
+					{error && (
 						<p role='alert' className='px-1 py-3 text-xs text-destructive'>
 							Unable to load chat history.
 						</p>
-					) : conversations.length === 0 ? (
+					)}
+					{!loading && !error && conversations.length === 0 ? (
 						<p className='rounded-xl border border-dashed border-border/60 px-4 py-8 text-center text-xs text-muted-foreground'>
 							No chats yet. Your conversations will appear here.
 						</p>
-					) : (
+					) : !loading && (!error || listDenied) && conversations.length > 0 ? (
 						<ul className='overflow-hidden rounded-xl border border-border/60 bg-card'>
 							{conversations.map((conversation) => (
 								<li key={conversation.id} className='border-b border-border/40 last:border-b-0'>
@@ -160,6 +150,15 @@ export function AiChatHome() {
 								</li>
 							))}
 						</ul>
+					) : null}
+
+					{listDenied && (
+						<button type="button" disabled={conversationsQuery.isFetching || workspacePageConversationsQuery.isFetching}
+							onClick={() => {
+								if (conversationsQuery.isAccessDenied) void conversationsQuery.refetch();
+								if (workspacePageConversationsQuery.isAccessDenied) void workspacePageConversationsQuery.refetch();
+							}}
+							className="mt-3 text-xs text-muted-foreground underline">Retry chat history</button>
 					)}
 
 					{hasMore && (

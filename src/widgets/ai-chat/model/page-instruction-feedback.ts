@@ -4,6 +4,8 @@ export function getPageInstructionFeedback(
 	result: GeneratePagePlanFromInstructionResponse,
 ): string {
 	switch (result.status) {
+		case "UNSUPPORTED_OPERATION":
+			return "Only adding blocks or database rows is currently supported.";
 		case "NOT_A_PAGE_MODIFICATION":
 			return "This request does not modify an existing page. Choose Create page or a Writing action instead.";
 		case "NEEDS_CLARIFICATION":

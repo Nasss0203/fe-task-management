@@ -1,7 +1,11 @@
 "use client";
 
 import { FileText, Sparkles } from "lucide-react";
+import { useRef } from "react";
 import { Button } from "@/shared/ui/button";
+import type { AiGeneration } from "@/entities/ai-assistant/model/ai-assistant.types";
+import { isValidAiCompositionGeneration, isValidAiGeneration } from "../model/ai-ask-response-mapper";
+import { isAiModificationPlan, isRecord } from "../model/ai-capability";
 
 import type { AiChatMessage } from "../model/types";
 import { AiModificationPlanPreview } from "./AiModificationPlanPreview";
@@ -17,6 +21,20 @@ interface AiMessageItemProps {
 
 	onDiscardGeneration: (generationId: string) => void;
 	onSelectPageCandidate?: (messageId: string, pageId: string) => void;
+	onSelectUnifiedAskPageCandidate?: (messageId: string, pageId: string) => void;
+	onRetryUnifiedAskPreview?: (messageId: string) => void;
+	generationContext?: { workspaceId: string | null; pageId?: string; conversationId?: string | null };
+}
+
+/** UI eligibility only; explicit actions still perform the Phase B GET preflight. */
+export function isReviewableAiGeneration(generation: AiGeneration, context: { workspaceId: string | null; pageId?: string; conversationId?: string | null }): boolean {
+	if (!isValidAiGeneration(generation) || !context.workspaceId || generation.workspace_id !== context.workspaceId ||
+		(context.conversationId && generation.conversation_id !== context.conversationId) ||
+		!["COMPLETED", "APPLIED", "DISCARDED"].includes(generation.status)) return false;
+	if (generation.capability === "GENERATE_PAGE_COMPOSITION") return isValidAiCompositionGeneration(generation);
+	if (generation.capability === "GENERATE_PAGE_MODIFICATION_PLAN") return isAiModificationPlan(generation.output_data) &&
+		(!context.pageId || generation.output_data.pageId === context.pageId);
+	return generation.capability.startsWith("writing.") && isRecord(generation.output_data) && typeof generation.output_data.text === "string";
 }
 
 export function AiAssistantAvatar() {
@@ -37,7 +55,17 @@ export function AiMessageItem({
 	onConfirmAiModificationPlan,
 	onDiscardGeneration,
 	onSelectPageCandidate,
+	onSelectUnifiedAskPageCandidate,
+	onRetryUnifiedAskPreview,
+	generationContext,
 }: AiMessageItemProps) {
+	const actionRef = useRef(false);
+	const runOnce = (callback: () => void) => {
+		if (disabled || actionRef.current) return;
+		actionRef.current = true;
+		queueMicrotask(() => { actionRef.current = false; });
+		callback();
+	};
 	const isUser = message.role === "user";
 
 	if (isUser) {
@@ -52,7 +80,11 @@ export function AiMessageItem({
 		);
 	}
 
-	const generation = message.generation;
+	const invalidGeneration = Boolean(message.generation && generationContext &&
+		!isReviewableAiGeneration(message.generation, generationContext));
+	const generation = invalidGeneration || message.previewRecovery ? undefined : message.generation;
+	const candidates = message.unifiedSelection?.candidates ?? message.pageSelection?.candidates;
+	const selectCandidate = message.unifiedSelection ? onSelectUnifiedAskPageCandidate : onSelectPageCandidate;
 
 	const isPageComposition =
 		generation?.capability === "GENERATE_PAGE_COMPOSITION";
@@ -64,8 +96,10 @@ export function AiMessageItem({
 	const planSummary = isModificationPlan
 		? (generation.output_data as { summary?: unknown } | null)?.summary
 		: undefined;
+	// The composition card shows the draft; older history stored its raw JSON as content.
 	const showContent =
-		Boolean(message.content.trim()) &&
+		!invalidGeneration && Boolean(message.content.trim()) && !isPageComposition &&
+		!(isModificationPlan && (generation?.status === "APPLIED" || generation?.status === "DISCARDED")) &&
 		!(
 			typeof planSummary === "string" &&
 			planSummary.trim() === message.content.trim()
@@ -82,9 +116,21 @@ export function AiMessageItem({
 					</p>
 				)}
 
-				{message.pageSelection && (
+				{invalidGeneration && <p role="alert" className="text-sm text-muted-foreground">
+					This draft could not be verified. Refresh history before taking any action.
+				</p>}
+				{message.origin?.source === "feedback" && message.origin.feedbackKind === "clarification" && (
+					<p className="text-xs text-muted-foreground">Send a complete request with the additional details.</p>
+				)}
+				{message.previewRecovery && (
+					<Button type="button" size="sm" variant="outline" disabled={disabled || !onRetryUnifiedAskPreview}
+						onClick={() => runOnce(() => onRetryUnifiedAskPreview?.(message.id))}>
+						Retry loading preview
+					</Button>
+				)}
+				{candidates && (
 					<ul className='overflow-hidden rounded-xl border border-border/60 bg-card'>
-						{message.pageSelection.candidates.map((page) => (
+						{candidates.map((page) => (
 							<li
 								key={page.pageId}
 								title={page.pageId}
@@ -97,8 +143,8 @@ export function AiMessageItem({
 										{page.title || "Untitled"}
 									</p>
 									<p className='text-[11px] text-muted-foreground'>
-										{page.parentPageId ? "Subpage" : "Top-level page"}
-										{page.teamspaceId ? " · Teamspace" : ""}
+										{page.parentPageId ? `Subpage · Parent: ${page.parentPageId}` : "Top-level page"}
+										{page.teamspaceId ? ` · Teamspace: ${page.teamspaceId}` : ""}
 									</p>
 								</div>
 
@@ -106,10 +152,8 @@ export function AiMessageItem({
 									type='button'
 									size='sm'
 									variant='outline'
-									disabled={disabled}
-									onClick={() =>
-										onSelectPageCandidate?.(message.id, page.pageId)
-									}
+									disabled={disabled || !selectCandidate}
+									onClick={() => runOnce(() => selectCandidate?.(message.id, page.pageId))}
 								>
 									Select
 								</Button>
@@ -122,6 +166,7 @@ export function AiMessageItem({
 					<AiPageCompositionPreview
 						generation={generation}
 						disabled={disabled}
+						requireContentReview={Boolean(generationContext)}
 						onConfirm={onConfirmPageComposition}
 						onDiscard={onDiscardGeneration}
 					/>

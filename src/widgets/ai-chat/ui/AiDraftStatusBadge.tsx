@@ -9,6 +9,7 @@ export type AiDraftStatus =
 	| "preview"
 	| "needs-info"
 	| "processing"
+	| "stale"
 	| "applied"
 	| "discarded"
 	| "failed";
@@ -18,6 +19,7 @@ const STATUS: Record<AiDraftStatus, { label: string; className: string }> = {
 	preview: { label: "Preview", className: "bg-muted text-muted-foreground" },
 	"needs-info": { label: "Needs more info", className: "bg-warning/10 text-warning" },
 	processing: { label: "Generating", className: "bg-muted text-muted-foreground" },
+	stale: { label: "Outdated", className: "bg-warning/10 text-warning" },
 	applied: { label: "Applied", className: "bg-success/10 text-success" },
 	discarded: { label: "Discarded", className: "bg-muted text-muted-foreground" },
 	failed: { label: "Failed", className: "bg-destructive/10 text-destructive" },

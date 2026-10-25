@@ -13,35 +13,32 @@ import type { QuickActionItem } from "../model/types";
 
 interface AiChatEmptyStateProps {
 	onSelectQuickAction: (action: QuickActionItem) => void;
+	disabled?: boolean;
 }
 
 export const QUICK_ACTIONS: QuickActionItem[] = [
 	{
 		id: "create-page",
 		label: "Create a page",
-		prompt: "Create a page for ",
-		mode: "GENERATE_PAGE_COMPOSITION",
+		prompt: "Create a new page about [topic], including [sections].",
 		iconName: "list-plus",
 	},
 	{
 		id: "improve-writing",
 		label: "Improve writing",
-		prompt: "",
-		mode: "writing.improve",
+		prompt: "Improve the wording of the following text:\n[text to improve]",
 		iconName: "wand",
 	},
 	{
 		id: "summarize",
 		label: "Summarize",
-		prompt: "",
-		mode: "writing.summarize",
+		prompt: "Summarize the following text:\n[text to summarize]",
 		iconName: "align-left",
 	},
 	{
 		id: "expand-writing",
 		label: "Expand writing",
-		prompt: "",
-		mode: "writing.expand",
+		prompt: "Expand the following text while keeping its main ideas:\n[text to expand]",
 		iconName: "maximize",
 	},
 ];
@@ -77,6 +74,7 @@ export function getQuickActionIcon(iconName: QuickActionItem["iconName"]) {
 
 export function AiChatEmptyState({
 	onSelectQuickAction,
+	disabled = false,
 }: AiChatEmptyStateProps) {
 	return (
 		<div className='flex flex-1 flex-col items-center pt-8 pb-4 text-center sm:pt-14'>
@@ -98,6 +96,7 @@ export function AiChatEmptyState({
 					<Button
 						key={action.id}
 						type='button'
+						disabled={disabled}
 						variant='outline'
 						onClick={() => onSelectQuickAction(action)}
 						className='flex h-12 items-center justify-start gap-2.5 rounded-lg border border-border/60 bg-background px-3.5 text-left font-normal text-foreground/90 shadow-none transition-colors hover:border-border hover:bg-accent/50 hover:text-foreground'
