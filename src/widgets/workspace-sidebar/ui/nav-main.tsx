@@ -8,7 +8,7 @@ import {
 	SidebarMenuItem,
 } from "@/widgets/workspace-sidebar/ui/sidebar";
 
-export type NavMainAction = "home" | "inbox" | "ai";
+export type NavMainAction = "home" | "inbox" | "ai" | "search";
 
 export interface NavMainItem {
 	title: string;

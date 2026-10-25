@@ -1,4 +1,4 @@
-import { type Query, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, type Query, useQuery } from "@tanstack/react-query";
 
 import { pageApi } from "../api/page.api";
 
@@ -26,7 +26,24 @@ export const pageKeys = {
 		["pages", "shared-detail", pageId, shareToken] as const,
 
 	trash: (workspaceId: string) => ["pages", "trash", workspaceId] as const,
+
+	search: (workspaceId: string, query: string) =>
+		["pages", "search", workspaceId, query] as const,
 };
+
+export function usePageSearch(
+	workspaceId: string | undefined,
+	query: string,
+	enabled = true,
+) {
+	return useQuery({
+		queryKey: pageKeys.search(workspaceId ?? "", query),
+		queryFn: ({ signal }) => pageApi.search(workspaceId!, query, signal),
+		enabled: Boolean(workspaceId) && enabled,
+		placeholderData: keepPreviousData,
+		staleTime: 30_000,
+	});
+}
 
 export function usePagesByWorkspace(workspaceId?: string, enabled = true) {
 	return useQuery({

@@ -8,6 +8,7 @@ import type {
 	Page,
 	PagePreset,
 	PagePresetOption,
+	PageSearchResult,
 	UpdatePageInput,
 	WorkspaceDatabase,
 } from "../model/page.types";
@@ -41,6 +42,19 @@ export const pageApi = {
 		const response = await instance.patch<ApiResponse<Page>>(
 			`${PAGE_API}/${pageId}`,
 			input,
+		);
+
+		return response.data.data;
+	},
+
+	search: async (
+		workspaceId: string,
+		query: string,
+		signal?: AbortSignal,
+	): Promise<PageSearchResult[]> => {
+		const response = await instance.get<ApiResponse<PageSearchResult[]>>(
+			`${PAGE_API}/workspace/${workspaceId}/search`,
+			{ params: { q: query }, signal },
 		);
 
 		return response.data.data;

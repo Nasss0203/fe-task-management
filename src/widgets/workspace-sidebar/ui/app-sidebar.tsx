@@ -26,6 +26,7 @@ import {
 } from "@/entities/workspace/model/workspace.queries";
 
 import { useUser } from "@/features/auth";
+import { PageSearchDialog, usePageSearchDialog } from "@/features/page-search";
 
 import { NavFavorites } from "@/widgets/workspace-sidebar/ui/nav-favorites";
 import {
@@ -76,6 +77,8 @@ const data = {
 			title: "Search",
 			url: "#",
 			icon: Search,
+			action: "search",
+			badge: "Ctrl K",
 		},
 		{
 			title: "Ask AI",
@@ -256,6 +259,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const isAiRoute =
 		pathname === "/dashboard/ai" || pathname.startsWith("/dashboard/ai/");
 
+	const setSearchOpen = usePageSearchDialog((state) => state.setOpen);
+
 	const handleMainAction = (action: NavMainAction) => {
 		switch (action) {
 			case "home":
@@ -272,6 +277,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			case "ai":
 				setView(SidebarView.WORKSPACE);
 				router.push("/dashboard/ai");
+				break;
+
+			case "search":
+				setSearchOpen(true);
 				break;
 		}
 	};
@@ -337,6 +346,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 						activeAction={activeMainAction}
 						onAction={handleMainAction}
 					/>
+				)}
+
+				{isMember && currentWorkspaceId && (
+					<PageSearchDialog workspaceId={currentWorkspaceId} />
 				)}
 
 				{isGuest && (

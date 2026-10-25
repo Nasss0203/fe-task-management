@@ -77,6 +77,17 @@ export interface PagePresetOption {
 	icon: string;
 }
 
+export interface PageSearchResult {
+	pageId: string;
+	title: string;
+	icon: string | null;
+	teamspaceId: string | null;
+	parentPageId: string | null;
+	updatedAt: string;
+	matchedIn: "title" | "content" | null;
+	snippet: string | null;
+}
+
 export interface MovePageInput {
 	parent_page_id: string | null;
 	teamspace_id: string | null;
