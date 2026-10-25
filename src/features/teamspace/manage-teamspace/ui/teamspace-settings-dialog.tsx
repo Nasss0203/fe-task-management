@@ -91,6 +91,7 @@ export function TeamspaceSettingsDialog({
 							<TeamspaceGeneralTab
 								teamspace={teamspace}
 								canManage={management.canManage}
+								onArchived={() => onOpenChange(false)}
 							/>
 						</TabsContent>
 					</div>

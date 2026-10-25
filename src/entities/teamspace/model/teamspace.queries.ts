@@ -24,7 +24,20 @@ export const teamspaceKeys = {
 		["teamspaces", "discover", workspaceId] as const,
 
 	myInvitations: () => ["teamspaces", "invitations", "me"] as const,
+
+	archived: (workspaceId: string) =>
+		["teamspaces", "archived", workspaceId] as const,
 };
+
+export function useArchivedTeamspaces(workspaceId: string, enabled = true) {
+	return useQuery({
+		queryKey: teamspaceKeys.archived(workspaceId),
+
+		queryFn: ({ signal }) => teamspaceApi.getArchived(workspaceId, signal),
+
+		enabled: Boolean(workspaceId) && enabled,
+	});
+}
 
 export function useTeamspaces(workspaceId: string, enabled = true) {
 	return useQuery({

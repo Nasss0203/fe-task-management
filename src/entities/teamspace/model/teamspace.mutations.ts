@@ -234,3 +234,28 @@ export function useUpdateTeamspace(teamspaceId: string) {
 		},
 	});
 }
+
+export function useArchiveTeamspace() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (teamspaceId: string) => teamspaceApi.archive(teamspaceId),
+
+		onSettled: () => {
+			// Sidebar list, discover list and the archived list.
+			queryClient.invalidateQueries({ queryKey: teamspaceKeys.all });
+		},
+	});
+}
+
+export function useRestoreTeamspace() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (teamspaceId: string) => teamspaceApi.restore(teamspaceId),
+
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: teamspaceKeys.all });
+		},
+	});
+}

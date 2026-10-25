@@ -1,11 +1,20 @@
 "use client";
 
-import { Check, Globe2 } from "lucide-react";
+import { Archive, Check, Globe2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { useJoinTeamspace } from "@/entities/teamspace/model/teamspace.mutations";
-import { useDiscoverTeamspaces } from "@/entities/teamspace/model/teamspace.queries";
-import type { DiscoverTeamspaceItem } from "@/entities/teamspace/model/teamspace.types";
+import {
+	useJoinTeamspace,
+	useRestoreTeamspace,
+} from "@/entities/teamspace/model/teamspace.mutations";
+import {
+	useArchivedTeamspaces,
+	useDiscoverTeamspaces,
+} from "@/entities/teamspace/model/teamspace.queries";
+import type {
+	DiscoverTeamspaceItem,
+	Teamspace,
+} from "@/entities/teamspace/model/teamspace.types";
 import { getApiErrorMessage } from "@/shared/lib/api-error-message";
 import { Button } from "@/shared/ui/button";
 import {
@@ -34,6 +43,21 @@ export function BrowseTeamspacesDialog({
 	const joinMutation = useJoinTeamspace();
 
 	const teamspaces = discoverQuery.data?.items ?? [];
+
+	// Only teamspaces the user can restore (owners); empty for everyone else.
+	const archivedQuery = useArchivedTeamspaces(workspaceId, open);
+	const restoreMutation = useRestoreTeamspace();
+	const archived = archivedQuery.data ?? [];
+
+	const handleRestore = (teamspace: Teamspace) => {
+		restoreMutation.mutate(teamspace.id, {
+			onSuccess: () => toast.success(`${teamspace.name} restored`),
+			onError: (error) =>
+				toast.error(
+					getApiErrorMessage(error, "Could not restore the teamspace."),
+				),
+		});
+	};
 
 	const handleJoin = (teamspace: DiscoverTeamspaceItem) => {
 		joinMutation.mutate(teamspace.id, {
@@ -130,6 +154,50 @@ export function BrowseTeamspacesDialog({
 								);
 							})}
 						</ul>
+					)}
+
+					{archived.length > 0 && (
+						<section className='mt-4 border-t pt-4'>
+							<h3 className='mb-1 text-xs font-medium text-muted-foreground'>
+								Archived
+							</h3>
+
+							<ul className='divide-y'>
+								{archived.map((teamspace) => {
+									const isRestoring =
+										restoreMutation.isPending &&
+										restoreMutation.variables === teamspace.id;
+
+									return (
+										<li
+											key={teamspace.id}
+											className='flex items-center gap-3 py-3'
+										>
+											<span className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground'>
+												<Archive className='size-4' />
+											</span>
+
+											<p className='min-w-0 flex-1 truncate text-sm font-medium'>
+												<span aria-hidden='true'>
+													{teamspace.icon || "🏠"}{" "}
+												</span>
+												{teamspace.name}
+											</p>
+
+											<Button
+												size='sm'
+												variant='outline'
+												className='h-8 shrink-0'
+												disabled={restoreMutation.isPending}
+												onClick={() => handleRestore(teamspace)}
+											>
+												{isRestoring ? "Restoring..." : "Restore"}
+											</Button>
+										</li>
+									);
+								})}
+							</ul>
+						</section>
 					)}
 				</div>
 			</DialogContent>

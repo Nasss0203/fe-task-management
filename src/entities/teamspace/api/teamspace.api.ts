@@ -259,4 +259,26 @@ export const teamspaceApi = {
 		);
 		return response.data.data;
 	},
+
+	archive: async (teamspaceId: string): Promise<void> => {
+		await instance.post(`${TEAMSPACE_API}/${teamspaceId}/archive`);
+	},
+
+	restore: async (teamspaceId: string): Promise<Teamspace> => {
+		const response = await instance.post<ApiResponse<Teamspace>>(
+			`${TEAMSPACE_API}/${teamspaceId}/restore`,
+		);
+		return response.data.data;
+	},
+
+	getArchived: async (
+		workspaceId: string,
+		signal?: AbortSignal,
+	): Promise<Teamspace[]> => {
+		const response = await instance.get<ApiResponse<Teamspace[]>>(
+			`${TEAMSPACE_API}/archived`,
+			{ params: { workspaceId }, signal },
+		);
+		return response.data.data;
+	},
 };
