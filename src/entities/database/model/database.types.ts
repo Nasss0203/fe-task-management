@@ -94,6 +94,7 @@ export interface DatabaseRowValue {
 export interface DatabaseRow {
 	id: string;
 	databaseId: string;
+	position?: number;
 	values: DatabaseRowValue[];
 }
 

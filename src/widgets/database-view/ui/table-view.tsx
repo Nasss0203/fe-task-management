@@ -7,11 +7,27 @@ import {
 	getDefaultColumnWidth,
 } from "@/entities/database/ui/database-visuals";
 
+import {
+	closestCenter,
+	DndContext,
+	PointerSensor,
+	useSensor,
+	useSensors,
+	type DragEndEvent,
+} from "@dnd-kit/core";
+import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
+import {
+	horizontalListSortingStrategy,
+	SortableContext,
+} from "@dnd-kit/sortable";
 import { PanelRightOpen, Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { useSetViewPropertyWidth } from "@/entities/database/model/database.mutations";
+import {
+	useReorderViewProperties,
+	useSetViewPropertyWidth,
+} from "@/entities/database/model/database.mutations";
 
 import {
 	PropertyType,
@@ -24,11 +40,13 @@ import { InteractionMode } from "@/shared/model/interaction-mode";
 import { AddPropertyPopover } from "./add-property-popover";
 import { ColumnResizeHandle } from "./column-resize-handle";
 import { RowActionsMenu } from "./row-actions-menu";
+import { moveViewProperty } from "../lib/reorder-properties";
 import { getRowValueMap, getVisibleProperties } from "../lib/view-properties";
 import { useQuickAddRow } from "../model/use-quick-add-row";
 import type { OpenRowHandler } from "./database-view-renderer";
 import { DatabaseCell } from "./database-cell";
 import { DatabasePropertyHeader } from "./database-property-header";
+import { SortableHeaderCell } from "./sortable-header-cell";
 
 type DatabaseValueChangeInput = {
 	databaseId: string;
@@ -61,6 +79,10 @@ export function TableView({
 }: TableViewProps) {
 	const editable = mode === "editable";
 	const setWidthMutation = useSetViewPropertyWidth(database.id, viewId);
+	const reorderMutation = useReorderViewProperties(database.id, viewId);
+	const sensors = useSensors(
+		useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+	);
 	// Widths being dragged or saved; shown until the view detail catches up.
 	const { addRow, focusRowId, isPending: isAddingRow } = useQuickAddRow(database);
 	const [draftWidths, setDraftWidths] = useState<
@@ -101,6 +123,32 @@ export function TableView({
 		);
 	};
 
+	const handleColumnDragEnd = ({ active, over }: DragEndEvent) => {
+		if (!over) return;
+		const next = moveViewProperty(
+			viewDetail.properties,
+			String(active.id),
+			String(over.id),
+		);
+		if (!next) return;
+		reorderMutation.mutate(next, {
+			onError: () => toast.error("Couldn't move column"),
+		});
+	};
+
+	const resizeHandle = (propertyId: string, label: string) => (
+		<ColumnResizeHandle
+			label={label}
+			onResize={(width) =>
+				setDraftWidths((current) => ({
+					...current,
+					[propertyId]: width,
+				}))
+			}
+			onCommit={(width) => commitWidth(propertyId, width)}
+		/>
+	);
+
 	// When every column has a fixed width, the trailing "+" column takes the
 	// leftover space instead of the browser stretching the fixed columns.
 	const allColumnsFixed = visibleProperties.every(
@@ -120,6 +168,12 @@ export function TableView({
 	return (
 		<div className='w-full min-w-0 max-w-full'>
 			{/* Chỉ table được scroll ngang */}
+			<DndContext
+				sensors={sensors}
+				collisionDetection={closestCenter}
+				modifiers={[restrictToHorizontalAxis]}
+				onDragEnd={handleColumnDragEnd}
+			>
 			<DatabaseTableSurface
 				tableClassName='w-full'
 				tableStyle={{ minWidth: minTableWidth }}
@@ -142,38 +196,39 @@ export function TableView({
 
 				<thead>
 					<tr>
-						{visibleProperties.map((property) => (
-							<DatabaseHeaderCell
-								key={property.id}
-								className={
-									editable
-										? "relative p-0 hover:bg-muted/60"
-										: undefined
-								}
+						{editable ? (
+							<SortableContext
+								items={visibleProperties.map((property) => property.id)}
+								strategy={horizontalListSortingStrategy}
 							>
-								<DatabasePropertyHeader
-									databaseId={database.id}
-									viewId={viewId}
-									property={property}
-									mode={mode}
-								/>
-
-								{editable && (
-									<ColumnResizeHandle
+								{visibleProperties.map((property) => (
+									<SortableHeaderCell
+										key={property.id}
+										id={property.id}
 										label={property.name}
-										onResize={(width) =>
-											setDraftWidths((current) => ({
-												...current,
-												[property.id]: width,
-											}))
-										}
-										onCommit={(width) =>
-											commitWidth(property.id, width)
-										}
+										resizeHandle={resizeHandle(property.id, property.name)}
+									>
+										<DatabasePropertyHeader
+											databaseId={database.id}
+											viewId={viewId}
+											property={property}
+											mode={mode}
+										/>
+									</SortableHeaderCell>
+								))}
+							</SortableContext>
+						) : (
+							visibleProperties.map((property) => (
+								<DatabaseHeaderCell key={property.id}>
+									<DatabasePropertyHeader
+										databaseId={database.id}
+										viewId={viewId}
+										property={property}
+										mode={mode}
 									/>
-								)}
-							</DatabaseHeaderCell>
-						))}
+								</DatabaseHeaderCell>
+							))
+						)}
 
 						{editable && (
 							<DatabaseHeaderCell className='min-w-10 p-0'>
@@ -256,6 +311,7 @@ export function TableView({
 					)}
 				</tbody>
 			</DatabaseTableSurface>
+			</DndContext>
 			{editable && (
 				<button
 					type='button'

@@ -8,7 +8,6 @@ import {
 	TouchSensor,
 	closestCorners,
 	pointerWithin,
-	useDraggable,
 	useDroppable,
 	useSensor,
 	useSensors,
@@ -16,6 +15,12 @@ import {
 	type DragEndEvent,
 	type DragStartEvent,
 } from "@dnd-kit/core";
+import {
+	SortableContext,
+	useSortable,
+	verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { KanbanSquare, MoreHorizontal, Plus } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
@@ -23,6 +28,7 @@ import { toast } from "sonner";
 import {
 	useAddDatabaseProperty,
 	useAddPropertyOption,
+	useMoveDatabaseRow,
 	useSetDatabaseRowValue,
 } from "@/entities/database/model/database.mutations";
 import {
@@ -65,10 +71,14 @@ const CARD_PROPERTY_TYPES = new Set<PropertyType>([
 	PropertyType.MULTI_SELECT,
 ]);
 
-// Drop into the column under the pointer; keyboard drags have no pointer, so
-// fall back to the nearest column.
+// Prefer the card under the pointer, then its column; keyboard drags have no
+// pointer, so fall back to the nearest target.
 const collisionDetection: CollisionDetection = (args) => {
 	const hits = pointerWithin(args);
+	const cardHits = hits.filter(
+		(hit) => hit.data?.droppableContainer?.data.current?.type === "card",
+	);
+	if (cardHits.length) return cardHits;
 	return hits.length ? hits : closestCorners(args);
 };
 
@@ -169,6 +179,8 @@ function BoardColumns({
 			property.id !== groupProperty.id && CARD_PROPERTY_TYPES.has(property.type),
 	);
 	const setValueMutation = useSetDatabaseRowValue(database.id);
+	const moveRowMutation = useMoveDatabaseRow(database.id);
+	const manualOrder = (viewDetail.sorts?.length ?? 0) === 0;
 	const { addRow, isPending } = useQuickAddRow(database);
 	const [activeRowId, setActiveRowId] = useState<string | null>(null);
 	// Card whose name is being edited inline (pencil button or a just-added card).
@@ -225,20 +237,60 @@ function BoardColumns({
 	const handleDragStart = (event: DragStartEvent) =>
 		setActiveRowId(String(event.active.id));
 
-	const handleDragEnd = (event: DragEndEvent) => {
+	const handleDragEnd = ({ active, over }: DragEndEvent) => {
 		setActiveRowId(null);
-		const row = rows.find((item) => item.id === event.active.id);
-		const target = event.over ? String(event.over.id) : null;
-		if (!row || !target || target === groupOf(row)) return;
+		const row = rows.find((item) => item.id === active.id);
+		if (!row || !over) return;
 
-		setValueMutation.mutate(
-			{
-				rowId: row.id,
-				propertyId: groupProperty.id,
-				value: target === NO_GROUP_ID ? null : target,
-			},
-			{ onError: () => toast.error("Couldn't move card") },
+		const overId = String(over.id);
+		const overRow = rows.find((item) => item.id === overId);
+		const targetColumn = overRow ? groupOf(overRow) : overId;
+		if (!overRow && !columns.some((column) => column.id === overId)) return;
+
+		const sourceColumn = groupOf(row);
+		const sameColumn = sourceColumn === targetColumn;
+		const sourceRows = rows.filter((item) => groupOf(item) === sourceColumn);
+		const targetRows = rows.filter(
+			(item) => item.id !== row.id && groupOf(item) === targetColumn,
 		);
+
+		let insertAt = targetRows.length;
+		if (overRow && overRow.id !== row.id) {
+			const overIndex = targetRows.findIndex((item) => item.id === overRow.id);
+			const movingDown =
+				sameColumn &&
+				sourceRows.indexOf(row) < sourceRows.findIndex((item) => item.id === overRow.id);
+			insertAt = movingDown ? overIndex + 1 : overIndex;
+		} else if (sameColumn) {
+			return;
+		}
+
+		const previousRowId = targetRows[insertAt - 1]?.id ?? null;
+		const nextRowId = targetRows[insertAt]?.id ?? null;
+
+		if (!sameColumn) {
+			setValueMutation.mutate(
+				{
+					rowId: row.id,
+					propertyId: groupProperty.id,
+					value: targetColumn === NO_GROUP_ID ? null : targetColumn,
+				},
+				{ onError: () => toast.error("Couldn't move card") },
+			);
+		}
+
+		const index = sourceRows.indexOf(row);
+		const unchanged =
+			sameColumn &&
+			(sourceRows[index - 1]?.id ?? null) === previousRowId &&
+			(sourceRows[index + 1]?.id ?? null) === nextRowId;
+
+		if (manualOrder && !unchanged) {
+			moveRowMutation.mutate(
+				{ rowId: row.id, previousRowId, nextRowId },
+				{ onError: () => toast.error("Couldn't save card order") },
+			);
+		}
 	};
 
 	return (
@@ -282,20 +334,25 @@ function BoardColumns({
 								if (rowId) setEditingRowId(rowId);
 							}}
 						>
-							{column.rows.map((row) => (
-								<BoardCard
-									key={row.id}
-									row={row}
-									database={database}
-									titleProperty={titleProperty}
-									cardProperties={cardProperties}
-									onOpen={() => onOpenRow(row.id)}
-									editing={row.id === editingRowId}
-									onEditingChange={(editing) =>
-										setEditingRowId(editing ? row.id : null)
-									}
-								/>
-							))}
+							<SortableContext
+								items={column.rows.map((row) => row.id)}
+								strategy={verticalListSortingStrategy}
+							>
+								{column.rows.map((row) => (
+									<BoardCard
+										key={row.id}
+										row={row}
+										database={database}
+										titleProperty={titleProperty}
+										cardProperties={cardProperties}
+										onOpen={() => onOpenRow(row.id)}
+										editing={row.id === editingRowId}
+										onEditingChange={(editing) =>
+											setEditingRowId(editing ? row.id : null)
+										}
+									/>
+								))}
+							</SortableContext>
 						</BoardColumn>
 					))}
 
@@ -448,9 +505,17 @@ function BoardCard({
 	editing,
 	onEditingChange,
 }: BoardCardProps) {
-	const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+	const {
+		attributes,
+		listeners,
+		setNodeRef,
+		transform,
+		transition,
+		isDragging,
+	} = useSortable({
 		id: row.id,
 		disabled: editing,
+		data: { type: "card" },
 	});
 	const values = getRowValueMap(row);
 	const title = titleProperty && (values.get(titleProperty.id) as string);
@@ -458,6 +523,7 @@ function BoardCard({
 	return (
 		<article
 			ref={setNodeRef}
+			style={{ transform: CSS.Translate.toString(transform), transition }}
 			{...attributes}
 			{...listeners}
 			aria-roledescription='Draggable card'

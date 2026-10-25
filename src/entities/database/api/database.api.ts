@@ -118,6 +118,17 @@ export const databaseApi = {
 		await instance.delete(`/database-rows/${rowId}`);
 	},
 
+	moveRow: async (
+		rowId: string,
+		input: { previousRowId: string | null; nextRowId: string | null },
+	): Promise<{ id: string; position: number }> => {
+		const response = await instance.patch<
+			ApiResponse<{ id: string; position: number }>
+		>(`/database-rows/${rowId}/position`, input);
+
+		return response.data.data;
+	},
+
 	setRowValue: async (
 		rowId: string,
 		propertyId: string,
@@ -265,6 +276,19 @@ export const databaseApi = {
 		const response = await instance.patch<ApiResponse<DatabaseViewDetail>>(
 			`${DATABASE_API}/${databaseId}/views/${viewId}/sorts`,
 			{ sorts },
+		);
+
+		return response.data.data;
+	},
+
+	reorderViewProperties: async (
+		databaseId: string,
+		viewId: string,
+		propertyIds: string[],
+	): Promise<DatabaseViewDetail> => {
+		const response = await instance.patch<ApiResponse<DatabaseViewDetail>>(
+			`${DATABASE_API}/${databaseId}/views/${viewId}/properties/order`,
+			{ propertyIds },
 		);
 
 		return response.data.data;
