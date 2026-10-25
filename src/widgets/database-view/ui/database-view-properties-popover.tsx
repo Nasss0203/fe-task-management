@@ -31,6 +31,7 @@ import {
 	MenuSeparator,
 } from "./menu-item";
 import { PropertySettings } from "./property-settings";
+import { toolbarIconButtonClass } from "./toolbar-button";
 
 interface DatabaseViewPropertiesPopoverProps {
 	databaseId: string;
@@ -252,10 +253,9 @@ export function DatabaseViewPropertiesPopover({
 					type='button'
 					aria-label='View settings'
 					title='View settings'
-					className='flex h-8 items-center gap-2 rounded-md px-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground data-[state=open]:bg-muted'
+					className={toolbarIconButtonClass()}
 				>
 					<SlidersHorizontal className='size-4' />
-					<span className='hidden sm:inline'>Settings</span>
 				</button>
 			</PopoverTrigger>
 

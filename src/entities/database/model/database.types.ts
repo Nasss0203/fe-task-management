@@ -72,9 +72,16 @@ export interface DatabaseViewSort {
 	direction: DatabaseViewSortDirection;
 }
 
+export interface DatabaseViewFilter {
+	propertyId: string;
+	operator: string;
+	value?: string | number | null;
+}
+
 export interface DatabaseViewDetail extends DatabaseView {
 	properties: DatabaseViewProperty[];
 	sorts?: DatabaseViewSort[];
+	filters?: DatabaseViewFilter[];
 }
 
 export interface DatabaseRowValue {

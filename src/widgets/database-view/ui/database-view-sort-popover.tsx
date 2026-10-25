@@ -10,11 +10,11 @@ import type {
 	DatabaseViewSort,
 } from "@/entities/database/model/database.types";
 import { PropertyIcon } from "@/entities/database/ui/database-visuals";
-import { cn } from "@/shared/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 
 import { SORTABLE_PROPERTY_TYPES } from "../lib/sort-rows";
 import { MenuItem, MenuPageHeader, MenuSeparator } from "./menu-item";
+import { ToolbarCount, toolbarIconButtonClass } from "./toolbar-button";
 
 const MAX_SORTS = 5;
 
@@ -173,17 +173,14 @@ export function DatabaseViewSortPopover({
 			<PopoverTrigger asChild>
 				<button
 					type='button'
-					aria-label='Sort'
+					aria-label={
+						activeSorts.length > 0 ? `Sort (${activeSorts.length} active)` : "Sort"
+					}
 					title='Sort'
-					className={cn(
-						"flex h-8 items-center gap-2 rounded-md px-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground data-[state=open]:bg-muted",
-						activeSorts.length > 0 && "text-primary hover:text-primary",
-					)}
+					className={toolbarIconButtonClass(activeSorts.length > 0)}
 				>
 					<ArrowUpDown className='size-4' />
-					<span className='hidden sm:inline'>
-						{activeSorts.length > 0 ? `Sort · ${activeSorts.length}` : "Sort"}
-					</span>
+					<ToolbarCount count={activeSorts.length} />
 				</button>
 			</PopoverTrigger>
 

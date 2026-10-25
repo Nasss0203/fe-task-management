@@ -9,8 +9,10 @@ import {
 	useDatabaseViews,
 } from "@/entities/database/model/database.queries";
 
+import { filterRows } from "../lib/filter-rows";
 import { sortRows } from "../lib/sort-rows";
 import { AddDatabaseViewPopover } from "./add-database-view-popover";
+import { DatabaseViewFilterPopover } from "./database-view-filter-popover";
 import { DatabaseViewPropertiesPopover } from "./database-view-properties-popover";
 import { DatabaseViewRenderer } from "./database-view-renderer";
 import { DatabaseViewSortPopover } from "./database-view-sort-popover";
@@ -49,10 +51,14 @@ export function DatabaseViewBlock({
 		activeView?.id,
 	);
 
-	const sortedRows = useMemo(
-		() => sortRows(rows, database?.properties ?? [], activeViewDetail?.sorts),
-		[rows, database?.properties, activeViewDetail?.sorts],
-	);
+	const visibleRows = useMemo(() => {
+		const properties = database?.properties ?? [];
+		return sortRows(
+			filterRows(rows, properties, activeViewDetail?.filters),
+			properties,
+			activeViewDetail?.sorts,
+		);
+	}, [rows, database?.properties, activeViewDetail?.filters, activeViewDetail?.sorts]);
 
 	if (isDatabaseLoading || isViewsLoading || isRowsLoading) {
 		return (
@@ -99,6 +105,14 @@ export function DatabaseViewBlock({
 
 				<div className='flex shrink-0 items-center gap-1'>
 					{activeViewDetail && (
+						<DatabaseViewFilterPopover
+							databaseId={database.id}
+							viewId={activeView.id}
+							properties={database.properties}
+							filters={activeViewDetail.filters ?? []}
+						/>
+					)}
+					{activeViewDetail && (
 						<DatabaseViewSortPopover
 							databaseId={database.id}
 							viewId={activeView.id}
@@ -115,7 +129,6 @@ export function DatabaseViewBlock({
 						/>
 					)}
 					{/* sau này */}
-					{/* Filter */}
 					{/* Search */}
 					{/* Settings */}
 					{/* New */}
@@ -126,7 +139,7 @@ export function DatabaseViewBlock({
 				database={database}
 				view={activeView}
 				viewDetail={activeViewDetail}
-				rows={sortedRows}
+				rows={visibleRows}
 			/>
 		</div>
 	);

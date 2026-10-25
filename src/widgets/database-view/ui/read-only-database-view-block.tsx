@@ -18,6 +18,7 @@ import {
 	type PropertyOption,
 } from "@/entities/database/model/database.types";
 
+import { filterRows } from "../lib/filter-rows";
 import { sortRows } from "../lib/sort-rows";
 
 /** The fields the read-only table needs; public pages send only these. */
@@ -167,7 +168,11 @@ export function ReadOnlyDatabaseViewBlock({
 			viewName={view.name}
 			properties={database.properties}
 			viewProperties={view.properties}
-			rows={sortRows(rows, database.properties, view.sorts)}
+			rows={sortRows(
+				filterRows(rows, database.properties, view.filters),
+				database.properties,
+				view.sorts,
+			)}
 		/>
 	);
 }

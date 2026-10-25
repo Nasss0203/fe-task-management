@@ -9,6 +9,7 @@ import {
 	PropertyType,
 	type DatabaseRow,
 	type DatabaseViewDetail,
+	type DatabaseViewFilter,
 	type DatabaseViewSort,
 } from "./database.types";
 
@@ -301,6 +302,40 @@ export function useSetViewSorts(databaseId: string, viewId: string) {
 		},
 
 		onError: (_error, _sorts, context) => {
+			if (context?.previous) {
+				queryClient.setQueryData(key, context.previous);
+			}
+		},
+
+		onSuccess: (view: DatabaseViewDetail) => {
+			queryClient.setQueryData(key, view);
+		},
+	});
+}
+
+export function useSetViewFilters(databaseId: string, viewId: string) {
+	const queryClient = useQueryClient();
+	const key = databaseKeys.viewDetail(databaseId, viewId);
+
+	return useMutation({
+		mutationFn: (filters: DatabaseViewFilter[]) =>
+			databaseApi.setViewFilters(databaseId, viewId, filters),
+
+		onMutate: async (filters) => {
+			await queryClient.cancelQueries({ queryKey: key });
+			const previous = queryClient.getQueryData<DatabaseViewDetail>(key);
+
+			if (previous) {
+				queryClient.setQueryData<DatabaseViewDetail>(key, {
+					...previous,
+					filters,
+				});
+			}
+
+			return { previous };
+		},
+
+		onError: (_error, _filters, context) => {
 			if (context?.previous) {
 				queryClient.setQueryData(key, context.previous);
 			}
