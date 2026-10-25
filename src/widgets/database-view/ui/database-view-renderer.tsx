@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 import {
 	DatabaseViewType,
@@ -9,8 +9,10 @@ import {
 	type DatabaseView,
 	type DatabaseViewDetail,
 } from "@/entities/database/model/database.types";
+import { GROUPABLE_PROPERTY_TYPES } from "../lib/group-rows";
 import { BoardView } from "./board-view";
 import { CalendarView } from "./calendar-view";
+import { GroupedRows } from "./grouped-rows";
 import { ListView } from "./list-view";
 import { RowDetailSheet } from "./row-detail-sheet";
 import { TableView } from "./table-view";
@@ -31,9 +33,10 @@ export function DatabaseViewRenderer({
 	viewDetail,
 	rows,
 }: DatabaseViewRendererProps) {
-	const [openRow, setOpenRow] = useState<{ id: string; isNew: boolean } | null>(
-		null,
-	);
+	const [openRow, setOpenRow] = useState<{
+		id: string;
+		isNew: boolean;
+	} | null>(null);
 	const onOpenRow: OpenRowHandler = (id, isNew = false) =>
 		setOpenRow({ id, isNew });
 
@@ -45,18 +48,39 @@ export function DatabaseViewRenderer({
 		);
 	}
 
+	const groupProperty = database.properties.find(
+		(property) =>
+			property.id === viewDetail.groupBy &&
+			GROUPABLE_PROPERTY_TYPES.has(property.type),
+	);
+
+	const withGroups = (render: (groupRows: DatabaseRow[]) => ReactNode) =>
+		groupProperty ? (
+			<GroupedRows
+				key={groupProperty.id}
+				property={groupProperty}
+				rows={rows}
+			>
+				{render}
+			</GroupedRows>
+		) : (
+			render(rows)
+		);
+
 	const content = (() => {
 		switch (view.type) {
 			case DatabaseViewType.TABLE:
-				return (
-					<TableView
-						database={database}
-						viewId={view.id}
-						viewDetail={viewDetail}
-						rows={rows}
-						onOpenRow={onOpenRow}
-					/>
-				);
+				return withGroups((groupRows) => {
+					return (
+						<TableView
+							database={database}
+							viewId={view.id}
+							viewDetail={viewDetail}
+							rows={groupRows}
+							onOpenRow={onOpenRow}
+						/>
+					);
+				});
 
 			case DatabaseViewType.BOARD:
 				return (
@@ -70,18 +94,22 @@ export function DatabaseViewRenderer({
 
 			case DatabaseViewType.CALENDAR:
 				return (
-					<CalendarView database={database} rows={rows} onOpenRow={onOpenRow} />
-				);
-
-			case DatabaseViewType.LIST:
-				return (
-					<ListView
+					<CalendarView
 						database={database}
-						viewDetail={viewDetail}
 						rows={rows}
 						onOpenRow={onOpenRow}
 					/>
 				);
+
+			case DatabaseViewType.LIST:
+				return withGroups((groupRows) => (
+					<ListView
+						database={database}
+						viewDetail={viewDetail}
+						rows={groupRows}
+						onOpenRow={onOpenRow}
+					/>
+				));
 
 			default:
 				return null;

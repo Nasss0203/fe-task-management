@@ -7,6 +7,7 @@ import { databaseKeys } from "./database.queries";
 import {
 	DatabaseViewType,
 	PropertyType,
+	type Database,
 	type DatabaseRow,
 	type DatabaseViewDetail,
 	type DatabaseViewFilter,
@@ -171,6 +172,21 @@ interface RenameDatabaseViewInput {
 	name: string;
 }
 
+export function useRenameDatabase(databaseId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (name: string) => databaseApi.renameDatabase(databaseId, name),
+
+		onSuccess: async ({ name }) => {
+			queryClient.setQueryData<Database>(databaseKeys.detail(databaseId), (database) =>
+				database ? { ...database, name } : database,
+			);
+			await queryClient.invalidateQueries({ queryKey: ["pages", "workspace"] });
+		},
+	});
+}
+
 export function useRenameDatabaseView(databaseId: string) {
 	const queryClient = useQueryClient();
 
@@ -302,6 +318,40 @@ export function useSetViewSorts(databaseId: string, viewId: string) {
 		},
 
 		onError: (_error, _sorts, context) => {
+			if (context?.previous) {
+				queryClient.setQueryData(key, context.previous);
+			}
+		},
+
+		onSuccess: (view: DatabaseViewDetail) => {
+			queryClient.setQueryData(key, view);
+		},
+	});
+}
+
+export function useSetViewGroup(databaseId: string, viewId: string) {
+	const queryClient = useQueryClient();
+	const key = databaseKeys.viewDetail(databaseId, viewId);
+
+	return useMutation({
+		mutationFn: (propertyId: string | null) =>
+			databaseApi.setViewGroup(databaseId, viewId, propertyId),
+
+		onMutate: async (groupBy) => {
+			await queryClient.cancelQueries({ queryKey: key });
+			const previous = queryClient.getQueryData<DatabaseViewDetail>(key);
+
+			if (previous) {
+				queryClient.setQueryData<DatabaseViewDetail>(key, {
+					...previous,
+					groupBy,
+				});
+			}
+
+			return { previous };
+		},
+
+		onError: (_error, _groupBy, context) => {
 			if (context?.previous) {
 				queryClient.setQueryData(key, context.previous);
 			}

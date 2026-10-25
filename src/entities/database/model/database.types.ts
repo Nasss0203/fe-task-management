@@ -82,6 +82,7 @@ export interface DatabaseViewDetail extends DatabaseView {
 	properties: DatabaseViewProperty[];
 	sorts?: DatabaseViewSort[];
 	filters?: DatabaseViewFilter[];
+	groupBy?: string | null;
 }
 
 export interface DatabaseRowValue {

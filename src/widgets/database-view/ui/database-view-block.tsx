@@ -8,11 +8,14 @@ import {
 	useDatabaseView,
 	useDatabaseViews,
 } from "@/entities/database/model/database.queries";
+import { DatabaseViewType } from "@/entities/database/model/database.types";
 
 import { filterRows } from "../lib/filter-rows";
 import { sortRows } from "../lib/sort-rows";
 import { AddDatabaseViewPopover } from "./add-database-view-popover";
+import { DatabaseTitle } from "./database-title";
 import { DatabaseViewFilterPopover } from "./database-view-filter-popover";
+import { DatabaseViewGroupPopover } from "./database-view-group-popover";
 import { DatabaseViewPropertiesPopover } from "./database-view-properties-popover";
 import { DatabaseViewRenderer } from "./database-view-renderer";
 import { DatabaseViewSortPopover } from "./database-view-sort-popover";
@@ -84,6 +87,7 @@ export function DatabaseViewBlock({
 
 	return (
 		<div className='w-full min-w-0 max-w-full'>
+			<DatabaseTitle databaseId={database.id} name={database.name} />
 			<div className='mb-1 flex items-center justify-between gap-2'>
 				<div className='flex min-w-0 items-center gap-1 overflow-x-auto [scrollbar-width:none]'>
 					{views.map((view) => (
@@ -120,6 +124,16 @@ export function DatabaseViewBlock({
 							sorts={activeViewDetail.sorts ?? []}
 						/>
 					)}
+					{activeViewDetail &&
+						activeView.type !== DatabaseViewType.CALENDAR && (
+							<DatabaseViewGroupPopover
+								databaseId={database.id}
+								viewId={activeView.id}
+								viewType={activeView.type}
+								properties={database.properties}
+								groupBy={activeViewDetail.groupBy ?? null}
+							/>
+						)}
 					{activeViewDetail && (
 						<DatabaseViewPropertiesPopover
 							databaseId={database.id}

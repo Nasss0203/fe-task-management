@@ -94,11 +94,8 @@ export function BoardView({
 	onOpenRow,
 }: BoardViewProps) {
 	const candidates = getGroupCandidates(database);
-	// shortcut: the backend has no per-view group-by setting, so the choice lives
-	// in component state; persist it once views get a config field.
-	const [groupById, setGroupById] = useState<string | null>(null);
 	const groupProperty =
-		candidates.find((property) => property.id === groupById) ??
+		candidates.find((property) => property.id === viewDetail.groupBy) ??
 		candidates[0];
 
 	if (!groupProperty) {
@@ -113,8 +110,6 @@ export function BoardView({
 			rows={rows}
 			onOpenRow={onOpenRow}
 			groupProperty={groupProperty}
-			candidates={candidates}
-			onGroupByChange={setGroupById}
 		/>
 	);
 }
@@ -159,8 +154,6 @@ function BoardSetupGuide({ database }: { database: Database }) {
 
 interface BoardColumnsProps extends BoardViewProps {
 	groupProperty: DatabaseProperty;
-	candidates: DatabaseProperty[];
-	onGroupByChange: (propertyId: string) => void;
 }
 
 function BoardColumns({
@@ -169,8 +162,6 @@ function BoardColumns({
 	rows,
 	onOpenRow,
 	groupProperty,
-	candidates,
-	onGroupByChange,
 }: BoardColumnsProps) {
 	const titleProperty = getTitleProperty(database);
 	const cardProperties = getVisibleProperties(database, viewDetail).filter(
@@ -254,29 +245,12 @@ function BoardColumns({
 		<div className='w-full min-w-0'>
 			<div className='mb-2 flex items-center gap-2 text-xs text-muted-foreground'>
 				<PropertyIcon type={groupProperty.type} className='size-3.5' />
-				{candidates.length > 1 ? (
-					<label className='flex items-center gap-1'>
-						Group by
-						<select
-							value={groupProperty.id}
-							onChange={(event) => onGroupByChange(event.target.value)}
-							className='rounded-sm bg-transparent py-0.5 font-medium text-foreground outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/40'
-						>
-							{candidates.map((property) => (
-								<option key={property.id} value={property.id}>
-									{property.name}
-								</option>
-							))}
-						</select>
-					</label>
-				) : (
-					<span>
-						Grouped by{" "}
-						<span className='font-medium text-foreground'>
-							{groupProperty.name}
-						</span>
+				<span>
+					Grouped by{" "}
+					<span className='font-medium text-foreground'>
+						{groupProperty.name}
 					</span>
-				)}
+				</span>
 			</div>
 
 			<DndContext

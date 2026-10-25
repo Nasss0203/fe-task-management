@@ -177,6 +177,17 @@ export const databaseApi = {
 		return response.data.data;
 	},
 
+	renameDatabase: async (
+		databaseId: string,
+		name: string,
+	): Promise<{ id: string; name: string }> => {
+		const response = await instance.patch<
+			ApiResponse<{ id: string; name: string }>
+		>(`${DATABASE_API}/${databaseId}`, { name });
+
+		return response.data.data;
+	},
+
 	renameView: async (
 		databaseId: string,
 		viewId: string,
@@ -254,6 +265,19 @@ export const databaseApi = {
 		const response = await instance.patch<ApiResponse<DatabaseViewDetail>>(
 			`${DATABASE_API}/${databaseId}/views/${viewId}/sorts`,
 			{ sorts },
+		);
+
+		return response.data.data;
+	},
+
+	setViewGroup: async (
+		databaseId: string,
+		viewId: string,
+		propertyId: string | null,
+	): Promise<DatabaseViewDetail> => {
+		const response = await instance.patch<ApiResponse<DatabaseViewDetail>>(
+			`${DATABASE_API}/${databaseId}/views/${viewId}/group`,
+			{ propertyId },
 		);
 
 		return response.data.data;
