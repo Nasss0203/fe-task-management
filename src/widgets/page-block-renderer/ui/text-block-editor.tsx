@@ -20,6 +20,8 @@ import {
 } from "@/widgets/page-block-editor/ui/page-block-command-menu";
 import { Popover, PopoverAnchor, PopoverContent } from "@/shared/ui/popover";
 import { usePageBlockEditor } from "@/widgets/page-block-editor/ui/page-block-editor-context";
+import { cn } from "@/shared/lib/utils";
+import { useInlineMarks } from "@/widgets/page-block-renderer/model/use-inline-marks";
 
 interface TextBlockEditorProps {
 	block: PageBlockNode;
@@ -50,6 +52,11 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 	const [value, setValue] = useState(() => getText(block));
 
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	const inlineMarks = useInlineMarks(
+		value,
+		setValue,
+		"text-base leading-7",
+	);
 	const [commandOpen, setCommandOpen] = useState(false);
 	const [slashIndex, setSlashIndex] = useState<number | null>(null);
 
@@ -194,6 +201,8 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 	const handleKeyDown = async (
 		event: React.KeyboardEvent<HTMLTextAreaElement>,
 	) => {
+		if (inlineMarks.handleKeyDown(event)) return;
+
 		if (event.key === "Backspace" && value.length === 0) {
 			event.preventDefault();
 
@@ -301,8 +310,13 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 						placeholder="Type '/' for commands"
 						onChange={handleChange}
 						onKeyDown={handleKeyDown}
-						onBlur={handleBlur}
-						className='
+						onFocus={inlineMarks.onFocus}
+				onBlur={() => {
+					inlineMarks.onBlur();
+					handleBlur();
+				}}
+						className={cn(
+					`
 		        block
 		        min-h-7
 		        w-full
@@ -316,8 +330,11 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 		        outline-none
 		        placeholder:text-muted-foreground/50
 		        focus-visible:ring-0
-		      '
+		      `,
+					inlineMarks.textareaClassName,
+				)}
 					/>
+					{inlineMarks.preview}
 				</div>
 			</PopoverAnchor>
 

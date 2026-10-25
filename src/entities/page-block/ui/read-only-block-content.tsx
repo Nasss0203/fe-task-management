@@ -1,4 +1,8 @@
 import type { TocHeading } from "@/entities/page-block/lib/assign-toc-headings";
+import {
+	type InlineNode,
+	parseInlineMarks,
+} from "@/entities/page-block/lib/parse-inline-marks";
 import { resolveEmbed, type ResolvedEmbed } from "@/entities/page-block/lib/resolve-embed";
 import { canInteract, InteractionMode } from "@/shared/model/interaction-mode";
 import { MermaidDiagram } from "@/shared/ui/mermaid-diagram";
@@ -463,38 +467,59 @@ export function ReadOnlyBookmarkBlock({ block }: BlockContentProps) {
 }
 
 export function ReadOnlyRichText({ text }: { text: string }) {
-	const parts = [];
-	const linkPattern =
-		/\[([^\]]+)]\(((?:https?:\/\/|mailto:)[^\s)]+)\)|((?:https?:\/\/|mailto:)[^\s]+)/gi;
-	let previousIndex = 0;
+	return <InlineNodes nodes={parseInlineMarks(text)} />;
+}
 
-	for (const match of text.matchAll(linkPattern)) {
-		const matchIndex = match.index;
-		if (matchIndex > previousIndex) {
-			parts.push(text.slice(previousIndex, matchIndex));
-		}
-
-		const href = match[2] ?? match[3];
-		const label = match[1] ?? href;
-		parts.push(
-			<a
-				key={`${matchIndex}-${href}`}
-				href={href}
-				target='_blank'
-				rel='noopener noreferrer'
-				className='text-primary underline decoration-primary/50 underline-offset-2 hover:decoration-primary'
-			>
-				{label}
-			</a>,
-		);
-		previousIndex = matchIndex + match[0].length;
-	}
-
-	if (previousIndex < text.length) {
-		parts.push(text.slice(previousIndex));
-	}
-
-	return <Fragment>{parts}</Fragment>;
+function InlineNodes({ nodes }: { nodes: InlineNode[] }) {
+	return (
+		<Fragment>
+			{nodes.map((node, index) => {
+				switch (node.type) {
+					case "text":
+						return <Fragment key={index}>{node.text}</Fragment>;
+					case "code":
+						return (
+							<code
+								key={index}
+								className='rounded bg-muted px-1 py-0.5 font-mono text-[0.85em] text-red-500 dark:text-red-400'
+							>
+								{node.text}
+							</code>
+						);
+					case "bold":
+						return (
+							<strong key={index} className='font-semibold'>
+								<InlineNodes nodes={node.children} />
+							</strong>
+						);
+					case "italic":
+						return (
+							<em key={index}>
+								<InlineNodes nodes={node.children} />
+							</em>
+						);
+					case "strike":
+						return (
+							<s key={index}>
+								<InlineNodes nodes={node.children} />
+							</s>
+						);
+					case "link":
+						return (
+							<a
+								key={index}
+								href={node.href}
+								target='_blank'
+								rel='noopener noreferrer'
+								className='text-primary underline decoration-primary/50 underline-offset-2 hover:decoration-primary'
+							>
+								<InlineNodes nodes={node.children} />
+							</a>
+						);
+				}
+			})}
+		</Fragment>
+	);
 }
 
 export const CALLOUT_TONES = {

@@ -45,6 +45,8 @@ export default function ShareButton({ pageId }: ShareButtonProps) {
 
 	const canManageShares = effectiveAccessLevel === "FULL_ACCESS";
 
+	const canPublish = pageAccess?.canPublish ?? false;
+
 	const {
 		data: pageShares = emptyShares,
 		isPending: isSharesPending,
@@ -90,7 +92,7 @@ export default function ShareButton({ pageId }: ShareButtonProps) {
 				className='w-[calc(100vw-2rem)] overflow-visible rounded-xl border-[#3d3d3d] bg-[#252525] p-0 text-[#f1f1f1] shadow-xl sm:w-[500px]'
 			>
 				<Tabs defaultValue='share' className='gap-0'>
-					<SharePopoverHeader />
+					<SharePopoverHeader showPublish={canPublish} />
 
 					<TabsContent value='share'>
 						<div className='space-y-4 px-4 py-4'>
@@ -136,9 +138,11 @@ export default function ShareButton({ pageId }: ShareButtonProps) {
 						<SharePopoverFooter pageId={pageId} />
 					</TabsContent>
 
-					<TabsContent value='publish'>
-						<PagePublishTab pageId={pageId} />
-					</TabsContent>
+					{canPublish && (
+						<TabsContent value='publish'>
+							<PagePublishTab pageId={pageId} />
+						</TabsContent>
+					)}
 				</Tabs>
 			</PopoverContent>
 		</Popover>
