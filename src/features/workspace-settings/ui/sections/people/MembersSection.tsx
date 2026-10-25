@@ -27,6 +27,7 @@ import { useSelectWorkspace } from "@/entities/workspace/model/workspace.mutatio
 import { useUser } from "@/features/auth";
 import { useSettingsDialog } from "@/features/workspace-settings/model/use-settings-dialog";
 import { InviteWorkspaceMembersDialog } from "@/features/workspace-invite/ui/InviteWorkspaceMembersDialog";
+import { getApiErrorMessage } from "@/shared/lib/api-error-message";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
@@ -251,8 +252,13 @@ const MembersSection = ({
 				userId: personToRemove.user_id,
 			});
 			setPersonToRemove(null);
-		} catch {
-			setRemoveError("Unable to remove this person from the workspace.");
+		} catch (error) {
+			setRemoveError(
+				getApiErrorMessage(
+					error,
+					"Unable to remove this person from the workspace.",
+				),
+			);
 		}
 	};
 

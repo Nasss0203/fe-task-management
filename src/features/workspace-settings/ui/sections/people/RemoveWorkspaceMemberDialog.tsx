@@ -38,6 +38,9 @@ export function RemoveWorkspaceMemberDialog({
 					<AlertDialogTitle>Remove from workspace?</AlertDialogTitle>
 					<AlertDialogDescription>
 						{displayName} will lose access to this workspace and its content.
+						{person?.role_name === "OWNER"
+							? " They are a workspace owner, so they also lose owner rights."
+							: null}
 					</AlertDialogDescription>
 					{errorMessage ? (
 						<p role='alert' className='text-sm text-destructive'>

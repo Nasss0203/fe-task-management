@@ -5,8 +5,20 @@ import type {
 	BillingCheckout,
 	BillingPlansResponse,
 	CreateBillingCheckoutInput,
+	PaymentOrderHistoryItem,
 	WorkspaceSubscription,
 } from "../model/billing.types";
+
+export async function getWorkspacePaymentOrders(
+	workspaceId: string,
+	signal?: AbortSignal,
+): Promise<PaymentOrderHistoryItem[]> {
+	const response = await apiClient.get<
+		BillingApiResponse<PaymentOrderHistoryItem[]>
+	>(`/billing/workspaces/${workspaceId}/payment-orders`, { signal });
+
+	return response.data.data;
+}
 
 export async function getBillingPlans(): Promise<BillingPlansResponse> {
 	const response =

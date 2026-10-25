@@ -7,6 +7,7 @@ import {
 } from "@/shared/ui/dialog";
 import { useSettingsDialog } from "../model/use-settings-dialog";
 import SettingsSidebar from "./SettingsSidebar";
+import BillingSection from "./sections/BillingSection";
 import MembersSection from "./sections/MembersSection";
 import ProfileSection from "./sections/ProfileSection";
 import WorkspaceSection from "./sections/WorkspaceSection";
@@ -41,13 +42,18 @@ const SettingsDialog = ({
 
 				<div className='min-w-0 flex-1 overflow-y-auto'>
 					{section === "profile" && (
-						<div className='px-20 py-10'>
+						<div className='mx-auto w-full max-w-4xl px-6 py-8 sm:px-8'>
 							<ProfileSection />
 						</div>
 					)}
 					{section === "workspace" && (
-						<div className='px-20 py-10'>
-							<WorkspaceSection />
+						<div className='mx-auto w-full max-w-4xl px-6 py-8 sm:px-8'>
+							<WorkspaceSection workspaceId={workspaceId} />
+						</div>
+					)}
+					{section === "billing" && (
+						<div className='mx-auto w-full max-w-4xl px-6 py-8 sm:px-8'>
+							<BillingSection workspaceId={workspaceId} />
 						</div>
 					)}
 					{section === "members" && (

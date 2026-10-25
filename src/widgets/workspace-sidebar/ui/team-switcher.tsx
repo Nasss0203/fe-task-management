@@ -103,7 +103,10 @@ export function TeamSwitcher({
 					<DropdownMenuTrigger asChild>
 						<SidebarMenuButton className='flex w-full items-center justify-between px-1.5'>
 							<div className='flex min-w-0 items-center gap-2'>
-								<WorkspaceIcon name={activeWorkspace.name} />
+								<WorkspaceIcon
+									name={activeWorkspace.name}
+									icon={activeWorkspace.icon}
+								/>
 
 								<span className='truncate font-medium'>
 									{activeWorkspace.name}
@@ -135,6 +138,7 @@ export function TeamSwitcher({
 							<div className='flex items-center gap-3 px-2 py-1.5'>
 								<WorkspaceIcon
 									name={activeWorkspace.name}
+									icon={activeWorkspace.icon}
 									size='lg'
 								/>
 
@@ -225,7 +229,10 @@ export function TeamSwitcher({
 											onWorkspaceSelect?.(workspace.id);
 										}}
 									>
-										<WorkspaceIcon name={workspace.name} />
+										<WorkspaceIcon
+											name={workspace.name}
+											icon={workspace.icon}
+										/>
 
 										<span className='min-w-0 flex-1 truncate'>
 											{workspace.name}
@@ -318,9 +325,11 @@ export function TeamSwitcher({
 
 function WorkspaceIcon({
 	name,
+	icon,
 	size = "sm",
 }: {
 	name: string;
+	icon?: string | null;
 	size?: "sm" | "lg";
 }) {
 	return (
@@ -333,7 +342,7 @@ function WorkspaceIcon({
 					: "flex size-5 shrink-0 items-center justify-center rounded text-xs"
 			}
 		>
-			🏠
+			{icon || "🏠"}
 		</div>
 	);
 }

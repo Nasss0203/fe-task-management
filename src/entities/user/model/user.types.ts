@@ -19,3 +19,11 @@ export interface User {
 }
 
 export type GetMeResponse = User;
+
+export interface Account {
+	id: string;
+	email: string;
+	username: string;
+	avatarUrl: string | null;
+	hasPassword: boolean;
+}
