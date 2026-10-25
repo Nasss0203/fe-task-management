@@ -1,6 +1,7 @@
 "use client";
 
 import { PanelLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { Fragment } from "react/jsx-runtime";
 import type { PublicSitePage } from "@/entities/public-site/model/public-site.types";
@@ -22,6 +23,7 @@ import {
 	SheetTitle,
 } from "@/shared/ui/sheet";
 import { Skeleton } from "@/shared/ui/skeleton";
+import { PublicEditAccessDialog } from "./PublicEditAccessDialog";
 import { PublicPageBlockList } from "./PublicPageBlockList";
 import { PublicSiteSidebar } from "./PublicSiteSidebar";
 
@@ -38,6 +40,13 @@ export function PublicPage({ publicSite }: PublicPageProps) {
 	const { page, blocks, breadcrumbs, subdomain, path, capabilities } = publicSite;
 	const canInteract = true;
 	const canMutate = capabilities.can_update;
+	const router = useRouter();
+	const [editAccessOpen, setEditAccessOpen] = useState(false);
+	const handleBlockClick = !capabilities.updates_enabled
+		? undefined
+		: canMutate
+			? () => router.push(`/page/${page.id}`)
+			: () => setEditAccessOpen(true);
 	const isMobile = useIsMobile();
 	const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
 	const [lastSidebarWidth, setLastSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
@@ -259,12 +268,26 @@ export function PublicPage({ publicSite }: PublicPageProps) {
 							</header>
 
 							<div className='mt-12'>
-								<PublicPageBlockList blocks={blocks} />
+								<PublicPageBlockList
+									blocks={blocks}
+									onBlockClick={handleBlockClick}
+								/>
 							</div>
 						</div>
 					</div>
 				</main>
 			</div>
+
+			{capabilities.updates_enabled && !canMutate ? (
+				<PublicEditAccessDialog
+					pageId={page.id}
+					subdomain={subdomain}
+					path={path}
+					authenticated={capabilities.authenticated}
+					open={editAccessOpen}
+					onOpenChange={setEditAccessOpen}
+				/>
+			) : null}
 		</div>
 	);
 }

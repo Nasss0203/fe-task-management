@@ -3,6 +3,7 @@
 import { Check, Search } from "lucide-react";
 import { useState } from "react";
 
+import { useDatabasePeople } from "@/entities/database/model/database.queries";
 import { usePage } from "@/entities/page/model/page.queries";
 import { useWorkspacePeople } from "@/entities/workspace-member/model/workspace-member.queries";
 import type { WorkspacePerson } from "@/entities/workspace-member/model/workspace-member.types";
@@ -15,7 +16,11 @@ import {
 } from "@/shared/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 
+import { useDatabaseShareToken } from "../model/share-token-context";
+
 const MAX_STACKED_AVATARS = 4;
+
+type DisplayPerson = Pick<WorkspacePerson, "user_id" | "full_name" | "avatar_url">;
 
 function normalize(text: string) {
 	return text
@@ -27,6 +32,7 @@ function normalize(text: string) {
 }
 
 interface PersonCellProps {
+	databaseId: string;
 	/** Page that owns the database; its workspace supplies the people list. */
 	pageId: string;
 	name: string;
@@ -36,7 +42,7 @@ interface PersonCellProps {
 	onChange: (value: string[] | null) => void;
 }
 
-function PersonAvatar({ person }: { person: WorkspacePerson }) {
+function PersonAvatar({ person }: { person: DisplayPerson }) {
 	return (
 		<Avatar size='sm' className='size-5'>
 			{person.avatar_url && <AvatarImage src={person.avatar_url} />}
@@ -47,7 +53,7 @@ function PersonAvatar({ person }: { person: WorkspacePerson }) {
 	);
 }
 
-function PersonChip({ person }: { person: WorkspacePerson }) {
+function PersonChip({ person }: { person: DisplayPerson }) {
 	return (
 		<span className='inline-flex min-w-0 items-center gap-1.5'>
 			<PersonAvatar person={person} />
@@ -56,7 +62,7 @@ function PersonChip({ person }: { person: WorkspacePerson }) {
 	);
 }
 
-function SelectedPeople({ people }: { people: WorkspacePerson[] }) {
+function SelectedPeople({ people }: { people: DisplayPerson[] }) {
 	if (people.length === 0) return null;
 
 	if (people.length === 1) {
@@ -89,6 +95,7 @@ function SelectedPeople({ people }: { people: WorkspacePerson[] }) {
 }
 
 export function PersonCell({
+	databaseId,
 	pageId,
 	name,
 	value,
@@ -100,17 +107,28 @@ export function PersonCell({
 		? value.filter((id): id is string => typeof id === "string")
 		: [];
 
-	const { data: page } = usePage(pageId);
+	// The workspace list is only for picking; names shown come from the database
+	// itself, so viewers outside the workspace still see who is assigned.
+	const { data: page } = usePage(pageId, interactive);
 	const { data: people = [], isLoading } = useWorkspacePeople(
 		page?.workspace_id ?? "",
-		interactive || selectedIds.length > 0,
+		interactive,
+	);
+	const { data: databasePeople = [] } = useDatabasePeople(
+		databaseId,
+		useDatabaseShareToken(),
+		selectedIds.length > 0,
 	);
 
 	const [query, setQuery] = useState("");
 
 	const selected = selectedIds
-		.map((id) => people.find((person) => person.user_id === id))
-		.filter((person): person is WorkspacePerson => Boolean(person));
+		.map(
+			(id): DisplayPerson | undefined =>
+				people.find((person) => person.user_id === id) ??
+				databasePeople.find((person) => person.user_id === id),
+		)
+		.filter((person): person is DisplayPerson => Boolean(person));
 
 	const chips = <SelectedPeople people={selected} />;
 

@@ -28,7 +28,7 @@ export function RequestEditAccessDialog({
 	const createEditRequest = useCreatePageEditRequest();
 
 	const handleRequest = () => {
-		if (hasPendingEditRequest || createEditRequest.isPending) {
+		if (createEditRequest.isPending) {
 			return;
 		}
 
@@ -65,7 +65,14 @@ export function RequestEditAccessDialog({
 							>
 								Close
 							</Button>
-							<Button disabled>Request sent</Button>
+							<Button
+								disabled={createEditRequest.isPending}
+								onClick={handleRequest}
+							>
+								{createEditRequest.isPending
+									? "Sending..."
+									: "Remind owner"}
+							</Button>
 						</>
 					) : (
 						<>

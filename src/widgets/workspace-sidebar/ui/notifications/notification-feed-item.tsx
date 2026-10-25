@@ -5,6 +5,7 @@ import type { Notification } from "@/entities/notification/model/notification.ty
 
 import { NotificationItemShell } from "./notification-item-shell";
 import { PageAccessRequestNotification } from "./page-access-request-notification";
+import { PageEditRequestNotification } from "./page-edit-request-notification";
 import { WorkspaceInviteNotification } from "./workspace-invite-notification";
 
 interface NotificationFeedItemProps {
@@ -21,6 +22,16 @@ export function NotificationFeedItem({
 	if (notification.type === "page.access.requested") {
 		return (
 			<PageAccessRequestNotification
+				notification={notification}
+				isMarkingRead={isPending}
+				onRead={onRead}
+			/>
+		);
+	}
+
+	if (notification.type === "page.edit.requested") {
+		return (
+			<PageEditRequestNotification
 				notification={notification}
 				isMarkingRead={isPending}
 				onRead={onRead}

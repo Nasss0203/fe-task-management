@@ -3,6 +3,7 @@ import instance from "@/shared/api/api-client";
 import { ApiResponse } from "@/shared/api";
 import type {
 	Database,
+	DatabasePerson,
 	DatabaseProperty,
 	DatabaseRow,
 	DatabaseView,
@@ -97,6 +98,22 @@ export const databaseApi = {
 	): Promise<DatabaseRow[]> => {
 		const response = await instance.get<ApiResponse<DatabaseRow[]>>(
 			`${DATABASE_API}/${databaseId}/rows`,
+			{
+				signal,
+				headers: getShareHeaders(shareToken),
+			},
+		);
+
+		return response.data.data;
+	},
+
+	getPeople: async (
+		databaseId: string,
+		signal?: AbortSignal,
+		shareToken?: string,
+	): Promise<DatabasePerson[]> => {
+		const response = await instance.get<ApiResponse<DatabasePerson[]>>(
+			`${DATABASE_API}/${databaseId}/rows/people`,
 			{
 				signal,
 				headers: getShareHeaders(shareToken),

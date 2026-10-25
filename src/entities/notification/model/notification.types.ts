@@ -23,6 +23,9 @@ export type NotificationType =
 	| "page.access.requested"
 	| "page.access.approved"
 	| "page.access.rejected"
+	| "page.edit.requested"
+	| "page.edit.approved"
+	| "page.edit.rejected"
 	| "comment.mentioned"
 	| "comment.replied";
 

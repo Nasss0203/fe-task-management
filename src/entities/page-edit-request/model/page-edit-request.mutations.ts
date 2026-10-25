@@ -1,6 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { createPageEditRequest } from "../api/page-edit-request.api";
+import { notificationKeys } from "@/entities/notification/model/notification.keys";
+
+import {
+	createPageEditRequest,
+	reviewPageEditRequest,
+} from "../api/page-edit-request.api";
 import { pageEditRequestKeys } from "./page-edit-request.queries";
 import type { PageEditRequest } from "./page-edit-request.types";
 
@@ -17,6 +22,26 @@ export function useCreatePageEditRequest() {
 					request,
 				],
 			);
+		},
+	});
+}
+
+export function useReviewPageEditRequest() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({
+			requestId,
+			decision,
+		}: {
+			requestId: string;
+			decision: "approve" | "reject";
+		}) => reviewPageEditRequest(requestId, decision),
+
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: notificationKeys.all,
+			});
 		},
 	});
 }

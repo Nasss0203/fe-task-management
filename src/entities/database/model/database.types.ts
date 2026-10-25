@@ -98,6 +98,13 @@ export interface DatabaseRow {
 	values: DatabaseRowValue[];
 }
 
+/** A user referenced by a Person cell, readable by anyone who can read the rows. */
+export interface DatabasePerson {
+	user_id: string;
+	full_name: string;
+	avatar_url: string | null;
+}
+
 export interface SetDatabaseRowValueResponse {
 	id: string;
 	rowId: string;

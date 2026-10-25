@@ -1,15 +1,6 @@
 "use client";
 
 import {
-	useDatabase,
-	useDatabaseRows,
-	useDatabaseView,
-	useSharedDatabase,
-	useSharedDatabaseRows,
-	useSharedDatabaseView,
-} from "@/entities/database/model/database.queries";
-
-import {
 	PropertyType,
 	type DatabaseProperty,
 	type DatabaseRow,
@@ -18,8 +9,7 @@ import {
 	type PropertyOption,
 } from "@/entities/database/model/database.types";
 
-import { filterRows } from "../lib/filter-rows";
-import { sortRows } from "../lib/sort-rows";
+import { DatabaseViewBlock } from "./database-view-block";
 
 /** The fields the read-only table needs; public pages send only these. */
 export type ReadOnlyTableProperty = Pick<
@@ -90,89 +80,18 @@ function formatCellValue(
 	return String(value);
 }
 
+/** Same database UI as edit mode (views, cells, peek), with every edit turned off. */
 export function ReadOnlyDatabaseViewBlock({
 	databaseId,
 	viewId,
 	shareToken,
 }: ReadOnlyDatabaseViewBlockProps) {
-	const isShared = Boolean(shareToken);
-
-	/*
-	 * Normal Page
-	 */
-	const normalDatabaseQuery = useDatabase(databaseId, !isShared);
-
-	const normalRowsQuery = useDatabaseRows(databaseId, !isShared);
-
-	const normalViewQuery = useDatabaseView(databaseId, viewId, !isShared);
-
-	/*
-	 * Shared Page
-	 *
-	 * Các query này sẽ gửi:
-	 * X-Page-Share-Token
-	 */
-	const sharedDatabaseQuery = useSharedDatabase(
-		databaseId,
-		shareToken,
-		isShared,
-	);
-
-	const sharedRowsQuery = useSharedDatabaseRows(
-		databaseId,
-		shareToken,
-		isShared,
-	);
-
-	const sharedViewQuery = useSharedDatabaseView(
-		databaseId,
-		viewId,
-		shareToken,
-		isShared,
-	);
-
-	/*
-	 * Chọn query result phù hợp.
-	 *
-	 * Hook vẫn luôn được gọi đúng thứ tự,
-	 * chỉ có query bị disable/enable.
-	 */
-	const databaseQuery = isShared ? sharedDatabaseQuery : normalDatabaseQuery;
-
-	const rowsQuery = isShared ? sharedRowsQuery : normalRowsQuery;
-
-	const viewQuery = isShared ? sharedViewQuery : normalViewQuery;
-
-	const { data: database, isLoading: isDatabaseLoading } = databaseQuery;
-
-	const { data: rows = [], isLoading: isRowsLoading } = rowsQuery;
-
-	const { data: view, isLoading: isViewLoading } = viewQuery;
-
-	if (isDatabaseLoading || isRowsLoading || isViewLoading) {
-		return (
-			<div className='text-sm text-muted-foreground'>
-				Loading database...
-			</div>
-		);
-	}
-
-	if (!database || !view) {
-		return (
-			<div className='text-sm text-destructive'>Database not found</div>
-		);
-	}
-
 	return (
-		<ReadOnlyDatabaseTable
-			viewName={view.name}
-			properties={database.properties}
-			viewProperties={view.properties}
-			rows={sortRows(
-				filterRows(rows, database.properties, view.filters),
-				database.properties,
-				view.sorts,
-			)}
+		<DatabaseViewBlock
+			databaseId={databaseId}
+			viewId={viewId}
+			shareToken={shareToken}
+			readOnly
 		/>
 	);
 }

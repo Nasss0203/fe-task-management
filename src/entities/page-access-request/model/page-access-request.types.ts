@@ -10,9 +10,9 @@ export interface PageAccessRequest {
 	createdAt: string;
 }
 
-export interface CreatePageAccessRequestPayload {
-	token: string;
-}
+export type CreatePageAccessRequestPayload =
+	| { token: string }
+	| { subdomain: string; path: string };
 
 export interface ApprovePageAccessRequestPayload {
 	accessLevel: PageShareAccessLevel;

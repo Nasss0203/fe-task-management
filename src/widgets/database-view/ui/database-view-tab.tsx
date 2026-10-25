@@ -41,6 +41,7 @@ interface DatabaseViewTabProps {
 	active: boolean;
 	onSelect: () => void;
 	onDeleted?: (deletedViewId: string) => void;
+	readOnly?: boolean;
 }
 
 function ViewIcon({ type }: { type: DatabaseViewType }) {
@@ -65,6 +66,7 @@ export function DatabaseViewTab({
 	active,
 	onSelect,
 	onDeleted,
+	readOnly = false,
 }: DatabaseViewTabProps) {
 	const [open, setOpen] = useState(false);
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -124,68 +126,70 @@ export function DatabaseViewTab({
 				<span>{view.name}</span>
 			</button>
 
-			<Popover open={open} onOpenChange={setOpen}>
-				<PopoverTrigger asChild>
-					<button
-						type='button'
-						className='mr-1 flex size-6 items-center justify-center rounded hover:bg-background'
-					>
-						<MoreHorizontal className='size-4' />
-					</button>
-				</PopoverTrigger>
-
-				<PopoverContent align='start' className='w-64 p-2'>
-					{renaming ? (
-						<div className='flex items-center gap-2'>
-							<ViewIcon type={view.type} />
-
-							<Input
-								value={name}
-								onChange={(event) =>
-									setName(event.target.value)
-								}
-								onBlur={saveName}
-								onKeyDown={(event) => {
-									if (event.key === "Enter") {
-										saveName();
-									}
-
-									if (event.key === "Escape") {
-										setName(view.name);
-										setRenaming(false);
-									}
-								}}
-								autoFocus
-								className='h-8'
-							/>
-						</div>
-					) : (
+			{!readOnly && (
+				<Popover open={open} onOpenChange={setOpen}>
+					<PopoverTrigger asChild>
 						<button
 							type='button'
-							onClick={() => setRenaming(true)}
-							className='flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-muted'
+							className='mr-1 flex size-6 items-center justify-center rounded hover:bg-background'
 						>
-							<Pencil className='size-4' />
-							Rename
+							<MoreHorizontal className='size-4' />
 						</button>
-					)}
+					</PopoverTrigger>
 
-					<div className='my-2 border-t' />
+					<PopoverContent align='start' className='w-64 p-2'>
+						{renaming ? (
+							<div className='flex items-center gap-2'>
+								<ViewIcon type={view.type} />
 
-					<button
-						type='button'
-						disabled={deleteMutation.isPending}
-						onClick={() => {
-							setOpen(false);
-							setDeleteDialogOpen(true);
-						}}
-						className='flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50'
-					>
-						<Trash2 className='size-4' />
-						Delete view
-					</button>
-				</PopoverContent>
-			</Popover>
+								<Input
+									value={name}
+									onChange={(event) =>
+										setName(event.target.value)
+									}
+									onBlur={saveName}
+									onKeyDown={(event) => {
+										if (event.key === "Enter") {
+											saveName();
+										}
+
+										if (event.key === "Escape") {
+											setName(view.name);
+											setRenaming(false);
+										}
+									}}
+									autoFocus
+									className='h-8'
+								/>
+							</div>
+						) : (
+							<button
+								type='button'
+								onClick={() => setRenaming(true)}
+								className='flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-muted'
+							>
+								<Pencil className='size-4' />
+								Rename
+							</button>
+						)}
+
+						<div className='my-2 border-t' />
+
+						<button
+							type='button'
+							disabled={deleteMutation.isPending}
+							onClick={() => {
+								setOpen(false);
+								setDeleteDialogOpen(true);
+							}}
+							className='flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50'
+						>
+							<Trash2 className='size-4' />
+							Delete view
+						</button>
+					</PopoverContent>
+				</Popover>
+			)}
 			<AlertDialog
 				open={deleteDialogOpen}
 				onOpenChange={setDeleteDialogOpen}

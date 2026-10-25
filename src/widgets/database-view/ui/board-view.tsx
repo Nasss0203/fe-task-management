@@ -87,6 +87,7 @@ interface BoardViewProps {
 	viewDetail: DatabaseViewDetail;
 	rows: DatabaseRow[];
 	onOpenRow: OpenRowHandler;
+	readOnly?: boolean;
 }
 
 /** Status first (Notion's default board grouping), then Select. */
@@ -102,6 +103,7 @@ export function BoardView({
 	viewDetail,
 	rows,
 	onOpenRow,
+	readOnly = false,
 }: BoardViewProps) {
 	const candidates = getGroupCandidates(database);
 	const groupProperty =
@@ -109,7 +111,15 @@ export function BoardView({
 		candidates[0];
 
 	if (!groupProperty) {
-		return <BoardSetupGuide database={database} />;
+		return readOnly ? (
+			<DatabaseViewEmptyGuide
+				icon={KanbanSquare}
+				title='Board needs a Status or Select property'
+				description='Ask someone who can edit this page to add one.'
+			/>
+		) : (
+			<BoardSetupGuide database={database} />
+		);
 	}
 
 	return (
@@ -120,6 +130,7 @@ export function BoardView({
 			rows={rows}
 			onOpenRow={onOpenRow}
 			groupProperty={groupProperty}
+			readOnly={readOnly}
 		/>
 	);
 }
@@ -172,6 +183,7 @@ function BoardColumns({
 	rows,
 	onOpenRow,
 	groupProperty,
+	readOnly = false,
 }: BoardColumnsProps) {
 	const titleProperty = getTitleProperty(database);
 	const cardProperties = getVisibleProperties(database, viewDetail).filter(
@@ -324,6 +336,7 @@ function BoardColumns({
 							option={groupProperty.options.find((item) => item.id === column.id)}
 							count={column.rows.length}
 							isPending={isPending}
+							readOnly={readOnly}
 							onAdd={async () => {
 								const rowId = await addRow([
 									{
@@ -350,16 +363,19 @@ function BoardColumns({
 										onEditingChange={(editing) =>
 											setEditingRowId(editing ? row.id : null)
 										}
+										readOnly={readOnly}
 									/>
 								))}
 							</SortableContext>
 						</BoardColumn>
 					))}
 
-					<NewGroupColumn
-						databaseId={database.id}
-						property={groupProperty}
-					/>
+					{!readOnly && (
+						<NewGroupColumn
+							databaseId={database.id}
+							property={groupProperty}
+						/>
+					)}
 				</div>
 
 				<DragOverlay>
@@ -386,6 +402,7 @@ interface BoardColumnProps {
 	option?: PropertyOption;
 	count: number;
 	isPending: boolean;
+	readOnly: boolean;
 	onAdd: () => void;
 	children: ReactNode;
 }
@@ -399,6 +416,7 @@ function BoardColumn({
 	option,
 	count,
 	isPending,
+	readOnly,
 	onAdd,
 	children,
 }: BoardColumnProps) {
@@ -422,7 +440,9 @@ function BoardColumn({
 			)}
 		>
 			<header className='flex h-7 items-center gap-1.5 px-1'>
-				{noGroup || !option ? (
+				{readOnly && option ? (
+					<PropertyOptionBadge name={name} color={color} />
+				) : noGroup || !option ? (
 					<span className='truncate text-xs font-medium text-muted-foreground'>
 						{name}
 					</span>
@@ -450,7 +470,7 @@ function BoardColumn({
 				<span className='text-xs tabular-nums text-muted-foreground'>
 					{count}
 				</span>
-				{option && (
+				{option && !readOnly && (
 					<button
 						type='button'
 						aria-label={`${name} options`}
@@ -460,6 +480,7 @@ function BoardColumn({
 						<MoreHorizontal className='size-3.5' />
 					</button>
 				)}
+				{!readOnly && (
 				<button
 					type='button'
 					aria-label={`Add to ${name}`}
@@ -469,19 +490,22 @@ function BoardColumn({
 				>
 					<Plus className='size-3.5' />
 				</button>
+				)}
 			</header>
 
 			{children}
 
-			<button
-				type='button'
-				disabled={isPending}
-				onClick={onAdd}
-				className='flex h-7 items-center gap-1.5 rounded-md px-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground disabled:opacity-50'
-			>
-				<Plus className='size-3.5' />
-				New
-			</button>
+			{!readOnly && (
+				<button
+					type='button'
+					disabled={isPending}
+					onClick={onAdd}
+					className='flex h-7 items-center gap-1.5 rounded-md px-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground disabled:opacity-50'
+				>
+					<Plus className='size-3.5' />
+					New
+				</button>
+			)}
 		</section>
 	);
 }
@@ -494,6 +518,7 @@ interface BoardCardProps {
 	onOpen: () => void;
 	editing: boolean;
 	onEditingChange: (editing: boolean) => void;
+	readOnly: boolean;
 }
 
 function BoardCard({
@@ -504,6 +529,7 @@ function BoardCard({
 	onOpen,
 	editing,
 	onEditingChange,
+	readOnly,
 }: BoardCardProps) {
 	const {
 		attributes,
@@ -514,7 +540,7 @@ function BoardCard({
 		isDragging,
 	} = useSortable({
 		id: row.id,
-		disabled: editing,
+		disabled: editing || readOnly,
 		data: { type: "card" },
 	});
 	const values = getRowValueMap(row);
@@ -526,7 +552,7 @@ function BoardCard({
 			style={{ transform: CSS.Translate.toString(transform), transition }}
 			{...attributes}
 			{...listeners}
-			aria-roledescription='Draggable card'
+			aria-roledescription={readOnly ? undefined : "Draggable card"}
 			aria-label={title || "Untitled"}
 			// A click without dragging (the sensors need 6px / a long-press) opens it.
 			onClick={onOpen}
@@ -535,11 +561,12 @@ function BoardCard({
 				if (event.key === "Enter") onOpen();
 			}}
 			className={cn(
-				"group/row relative flex cursor-grab flex-col gap-1 rounded-md border border-border/70 bg-card px-2 py-1.5 shadow-[0_1px_2px_rgb(0_0_0/0.06)] outline-none transition-colors hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring/50 active:cursor-grabbing dark:shadow-none",
+				"group/row relative flex flex-col gap-1 rounded-md border border-border/70 bg-card px-2 py-1.5 shadow-[0_1px_2px_rgb(0_0_0/0.06)] outline-none transition-colors hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring/50 dark:shadow-none",
+				readOnly ? "cursor-pointer" : "cursor-grab active:cursor-grabbing",
 				isDragging && "opacity-40",
 			)}
 		>
-			<div className='flex min-w-0 pr-14'>
+			<div className={cn("flex min-w-0", !readOnly && "pr-14")}>
 				<RowTitle
 					database={database}
 					row={row}
@@ -561,6 +588,7 @@ function BoardCard({
 			</div>
 
 			{/* Opening the menu must not start a drag (Mouse/Touch sensors). */}
+			{!readOnly && (
 			<div
 				className='absolute right-1 top-1 flex items-center gap-0.5 [&_button]:size-6'
 				onMouseDown={(event) => event.stopPropagation()}
@@ -573,6 +601,7 @@ function BoardCard({
 				)}
 				<RowActionsMenu databaseId={database.id} rowId={row.id} />
 			</div>
+			)}
 		</article>
 	);
 }

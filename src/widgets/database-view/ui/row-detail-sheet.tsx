@@ -26,6 +26,7 @@ interface RowDetailSheetProps {
 	row?: DatabaseRow;
 	/** Focus the title right away, e.g. for a row that was just created. */
 	autoFocusTitle?: boolean;
+	readOnly?: boolean;
 	onClose: () => void;
 }
 
@@ -34,8 +35,10 @@ export function RowDetailSheet({
 	database,
 	row,
 	autoFocusTitle = false,
+	readOnly = false,
 	onClose,
 }: RowDetailSheetProps) {
+	const mode = readOnly ? "readonly" : "editable";
 	const deleteRowMutation = useDeleteDatabaseRow(database.id);
 	const titleProperty = getTitleProperty(database);
 	const values = row ? getRowValueMap(row) : new Map<string, unknown>();
@@ -77,6 +80,7 @@ export function RowDetailSheet({
 										property={titleProperty}
 										value={values.get(titleProperty.id)}
 										autoFocus={autoFocusTitle}
+										mode={mode}
 									/>
 								</div>
 							)}
@@ -102,6 +106,7 @@ export function RowDetailSheet({
 												rowId={row.id}
 												property={property}
 												value={values.get(property.id)}
+												mode={mode}
 											/>
 										</div>
 									</div>
@@ -113,22 +118,24 @@ export function RowDetailSheet({
 								)}
 							</section>
 
-							<div className='mt-auto flex justify-end pt-8'>
-								<button
-									type='button'
-									disabled={deleteRowMutation.isPending}
-									onClick={() =>
-										deleteRowMutation.mutate(row.id, {
-											onSuccess: onClose,
-											onError: () => toast.error("Couldn't delete row"),
-										})
-									}
-									className='flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm text-muted-foreground hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:opacity-50'
-								>
-									<Trash2 className='size-4' />
-									Delete row
-								</button>
-							</div>
+							{!readOnly && (
+								<div className='mt-auto flex justify-end pt-8'>
+									<button
+										type='button'
+										disabled={deleteRowMutation.isPending}
+										onClick={() =>
+											deleteRowMutation.mutate(row.id, {
+												onSuccess: onClose,
+												onError: () => toast.error("Couldn't delete row"),
+											})
+										}
+										className='flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm text-muted-foreground hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:opacity-50'
+									>
+										<Trash2 className='size-4' />
+										Delete row
+									</button>
+								</div>
+							)}
 						</div>
 					</div>
 				)}

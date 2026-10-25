@@ -25,6 +25,7 @@ interface DatabaseViewRendererProps {
 	view: DatabaseView;
 	viewDetail?: DatabaseViewDetail;
 	rows: DatabaseRow[];
+	readOnly?: boolean;
 }
 
 export function DatabaseViewRenderer({
@@ -32,6 +33,7 @@ export function DatabaseViewRenderer({
 	view,
 	viewDetail,
 	rows,
+	readOnly = false,
 }: DatabaseViewRendererProps) {
 	const [openRow, setOpenRow] = useState<{
 		id: string;
@@ -77,6 +79,7 @@ export function DatabaseViewRenderer({
 							viewId={view.id}
 							viewDetail={viewDetail}
 							rows={groupRows}
+							mode={readOnly ? "readonly" : "editable"}
 							onOpenRow={onOpenRow}
 						/>
 					);
@@ -89,6 +92,7 @@ export function DatabaseViewRenderer({
 						viewDetail={viewDetail}
 						rows={rows}
 						onOpenRow={onOpenRow}
+						readOnly={readOnly}
 					/>
 				);
 
@@ -98,6 +102,7 @@ export function DatabaseViewRenderer({
 						database={database}
 						rows={rows}
 						onOpenRow={onOpenRow}
+						readOnly={readOnly}
 					/>
 				);
 
@@ -108,6 +113,7 @@ export function DatabaseViewRenderer({
 						viewDetail={viewDetail}
 						rows={groupRows}
 						onOpenRow={onOpenRow}
+						readOnly={readOnly}
 					/>
 				));
 
@@ -123,6 +129,7 @@ export function DatabaseViewRenderer({
 				database={database}
 				row={rows.find((row) => row.id === openRow?.id)}
 				autoFocusTitle={openRow?.isNew}
+				readOnly={readOnly}
 				onClose={() => setOpenRow(null)}
 			/>
 		</>

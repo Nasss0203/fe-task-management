@@ -1,4 +1,4 @@
-import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -15,7 +15,13 @@ const toastError = vi.hoisted(() => vi.fn());
 vi.mock("@/shared/api/api-client", () => ({ default: http }));
 vi.mock("sonner", () => ({ toast: { error: toastError } }));
 vi.mock("@/widgets/database-view/ui/database-view-block", () => ({
-	DatabaseViewBlock: () => <div data-testid='editable-database' />,
+	DatabaseViewBlock: (props: { readOnly?: boolean; shareToken?: string; viewId?: string }) => (
+		<div
+			data-testid={props.readOnly ? "readonly-database" : "editable-database"}
+			data-share-token={props.shareToken}
+			data-view-id={props.viewId}
+		/>
+	),
 }));
 vi.mock("@uiw/react-codemirror", () => ({
 	oneDark: [],
@@ -195,14 +201,11 @@ describe("shared PageBlock editor", () => {
 		const database = makePageBlock({ id: "db-block", type: PageBlockType.DATABASE_VIEW, data_config: { database_id: "db-1", view_id: "view-1" }, parent_block_id: nested ? "block-1" : null });
 		persisted = nested ? [makePageBlock({ type: PageBlockType.TOGGLE, is_open: true }), database] : [database];
 		renderWithClient(<Surface shareToken={token} />);
-		const table = await screen.findByRole("table");
-		expect(within(table).getByText("Read-only row")).toBeInTheDocument();
-		expect(within(table).queryByRole("textbox")).not.toBeInTheDocument();
-		expect(within(table).queryByRole("button")).not.toBeInTheDocument();
+		// Same database UI as edit mode, switched to read-only and reading through the share token.
+		const block = await screen.findByTestId("readonly-database");
+		expect(block).toHaveAttribute("data-share-token", token);
+		expect(block).toHaveAttribute("data-view-id", "view-1");
 		expect(screen.queryByTestId("editable-database")).not.toBeInTheDocument();
-		for (const url of ["/databases/db-1", "/databases/db-1/rows", "/databases/db-1/views/view-1"]) {
-			expect(http.get).toHaveBeenCalledWith(url, expect.objectContaining(headers));
-		}
 		expect(http.post).not.toHaveBeenCalled();
 		expect(http.patch).not.toHaveBeenCalled();
 	});

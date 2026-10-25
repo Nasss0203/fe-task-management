@@ -48,6 +48,36 @@ export function getNotificationPresentation(
 				tone: "page",
 			};
 
+		case "page.edit.requested":
+			return {
+				icon: KeyRound,
+				title: notification.title,
+				description:
+					notification.message ?? "Requested edit access to a page.",
+				category: "page",
+				tone: "page",
+			};
+
+		case "page.edit.approved":
+			return {
+				icon: CheckCircle2,
+				title: notification.title,
+				description:
+					notification.message ?? "You can now edit this page.",
+				category: "page",
+				tone: "success",
+			};
+
+		case "page.edit.rejected":
+			return {
+				icon: XCircle,
+				title: notification.title,
+				description:
+					notification.message ?? "Your edit access request was rejected.",
+				category: "page",
+				tone: "danger",
+			};
+
 		case "page.access.approved":
 			return {
 				icon: CheckCircle2,
