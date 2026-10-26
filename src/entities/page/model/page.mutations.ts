@@ -141,6 +141,49 @@ export function useDeletePagePermanently() {
 	});
 }
 
+interface TrashedDatabaseInput {
+	pageId: string;
+	databaseId: string;
+	workspaceId: string;
+}
+
+export function useRestoreDatabase() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({ pageId, databaseId }: TrashedDatabaseInput) =>
+			pageApi.restoreDatabase(pageId, databaseId),
+
+		onSuccess: async (_, variables) => {
+			await Promise.all([
+				// Prefix also covers the Trash list.
+				queryClient.invalidateQueries({
+					queryKey: pageKeys.databases(variables.workspaceId),
+				}),
+
+				queryClient.invalidateQueries({
+					queryKey: pageBlockKeys.byPage(variables.pageId),
+				}),
+			]);
+		},
+	});
+}
+
+export function useDeleteDatabasePermanently() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({ pageId, databaseId }: TrashedDatabaseInput) =>
+			pageApi.deleteDatabasePermanently(pageId, databaseId),
+
+		onSuccess: async (_, variables) => {
+			await queryClient.invalidateQueries({
+				queryKey: pageKeys.deletedDatabases(variables.workspaceId),
+			});
+		},
+	});
+}
+
 interface TogglePageFavoriteInput {
 	page: Page;
 	isFavorite: boolean;

@@ -27,6 +27,10 @@ export const databaseKeys = {
 
 	rows: (databaseId: string) => ["databases", databaseId, "rows"] as const,
 
+	// Under "rows" so it refreshes whenever the rows do.
+	people: (databaseId: string, shareToken: string) =>
+		["databases", databaseId, "rows", "people", shareToken] as const,
+
 	sharedRows: (databaseId: string, shareToken: string) =>
 		["databases", databaseId, "shared-rows", shareToken] as const,
 };
@@ -142,5 +146,20 @@ export function useSharedDatabaseRows(
 			databaseApi.getRows(databaseId!, signal, shareToken!),
 
 		enabled: Boolean(databaseId) && Boolean(shareToken) && enabled,
+	});
+}
+
+export function useDatabasePeople(
+	databaseId?: string,
+	shareToken?: string,
+	enabled = true,
+) {
+	return useQuery({
+		queryKey: databaseKeys.people(databaseId ?? "", shareToken ?? ""),
+
+		queryFn: ({ signal }) =>
+			databaseApi.getPeople(databaseId!, signal, shareToken),
+
+		enabled: Boolean(databaseId) && enabled,
 	});
 }

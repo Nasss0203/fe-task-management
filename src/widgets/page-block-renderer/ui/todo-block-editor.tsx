@@ -17,6 +17,8 @@ import {
 	useBlockAutoFocus,
 	usePageBlockEditor,
 } from "@/widgets/page-block-editor/ui/page-block-editor-context";
+import { cn } from "@/shared/lib/utils";
+import { useInlineMarks } from "@/widgets/page-block-renderer/model/use-inline-marks";
 
 interface TodoBlockEditorProps {
 	block: PageBlockNode;
@@ -54,6 +56,11 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 	const [checked, setChecked] = useState(initial.checked);
 
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	const inlineMarks = useInlineMarks(
+		text,
+		setText,
+		"text-base leading-7",
+	);
 
 	const updateBlock = useUpdatePageBlock(shareToken);
 
@@ -123,6 +130,8 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 	const handleKeyDown = async (
 		event: React.KeyboardEvent<HTMLTextAreaElement>,
 	) => {
+		if (inlineMarks.handleKeyDown(event)) return;
+
 		if (event.key !== "Enter" || event.shiftKey) {
 			return;
 		}
@@ -188,30 +197,40 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
         '
 			/>
 
-			<textarea
-				ref={textareaRef}
-				value={text}
-				rows={1}
-				placeholder='To-do'
-				onChange={handleChange}
-				onKeyDown={handleKeyDown}
-				onBlur={handleBlur}
-				className='
-          block
-          min-h-7
-          w-full
-          resize-none
-          overflow-hidden
-          border-0
-          bg-transparent
-          p-0
-          text-base
-          leading-7
-          outline-none
-          placeholder:text-muted-foreground/40
-          focus-visible:ring-0
-        '
-			/>
+			<div className='relative min-w-0 flex-1'>
+				<textarea
+					ref={textareaRef}
+					value={text}
+					rows={1}
+					placeholder='To-do'
+					onChange={handleChange}
+					onKeyDown={handleKeyDown}
+					onFocus={inlineMarks.onFocus}
+					onBlur={() => {
+						inlineMarks.onBlur();
+						handleBlur();
+					}}
+					className={cn(
+						`
+	          block
+	          min-h-7
+	          w-full
+	          resize-none
+	          overflow-hidden
+	          border-0
+	          bg-transparent
+	          p-0
+	          text-base
+	          leading-7
+	          outline-none
+	          placeholder:text-muted-foreground/40
+	          focus-visible:ring-0
+	        `,
+						inlineMarks.textareaClassName,
+					)}
+				/>
+				{inlineMarks.preview}
+			</div>
 		</div>
 	);
 }

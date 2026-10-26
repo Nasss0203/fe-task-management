@@ -14,7 +14,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { useWorkspaceSubscription } from "@/entities/billing/model/billing.queries";
-import { usePagesByWorkspace } from "@/entities/page/model/page.queries";
+import {
+	usePagesByWorkspace,
+	useWorkspaceDatabases,
+} from "@/entities/page/model/page.queries";
 import { useTeamspaces } from "@/entities/teamspace/model/teamspace.queries";
 import { useSelectWorkspace } from "@/entities/workspace/model/workspace.mutations";
 import {
@@ -23,6 +26,7 @@ import {
 } from "@/entities/workspace/model/workspace.queries";
 
 import { useUser } from "@/features/auth";
+import { PageSearchDialog, usePageSearchDialog } from "@/features/page-search";
 
 import { NavFavorites } from "@/widgets/workspace-sidebar/ui/nav-favorites";
 import {
@@ -38,6 +42,7 @@ import {
 	SidebarHeader,
 	SidebarResizeHandle,
 } from "@/widgets/workspace-sidebar/ui/sidebar";
+import { Skeleton } from "@/shared/ui/skeleton";
 import { TeamSwitcher } from "@/widgets/workspace-sidebar/ui/team-switcher";
 
 import { useUnreadNotificationCount } from "@/entities/notification/model/notification.queries";
@@ -72,6 +77,8 @@ const data = {
 			title: "Search",
 			url: "#",
 			icon: Search,
+			action: "search",
+			badge: "Ctrl K",
 		},
 		{
 			title: "Ask AI",
@@ -130,13 +137,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 	const selectWorkspaceMutation = useSelectWorkspace();
 
-	const { data: unreadNotificationCount } = useUnreadNotificationCount();
+	// `user` clears on sign-out, which stops the unread-count polling.
+	const { data: unreadNotificationCount } = useUnreadNotificationCount(
+		Boolean(user),
+	);
 
 	const [view, setView] = useState<SidebarView>(SidebarView.WORKSPACE);
 
-	const activePageId = pathname.startsWith("/page/")
-		? pathname.split("/")[2]
-		: undefined;
+	const activePageId =
+		pathname.startsWith("/page/") || pathname.startsWith("/database/")
+			? pathname.split("/")[2]
+			: undefined;
 
 	/**
 	 * Workspace hiện tại.
@@ -217,6 +228,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		isError: isPagesError,
 	} = usePagesByWorkspace(currentWorkspaceId ?? undefined, isMember);
 
+	const { data: databases = [] } = useWorkspaceDatabases(
+		currentWorkspaceId ?? undefined,
+		isMember,
+	);
+
 	/**
 	 * Teamspaces chỉ load đối với MEMBER.
 	 */
@@ -243,6 +259,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const isAiRoute =
 		pathname === "/dashboard/ai" || pathname.startsWith("/dashboard/ai/");
 
+	const setSearchOpen = usePageSearchDialog((state) => state.setOpen);
+
 	const handleMainAction = (action: NavMainAction) => {
 		switch (action) {
 			case "home":
@@ -259,6 +277,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			case "ai":
 				setView(SidebarView.WORKSPACE);
 				router.push("/dashboard/ai");
+				break;
+
+			case "search":
+				setSearchOpen(true);
 				break;
 		}
 	};
@@ -326,6 +348,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 					/>
 				)}
 
+				{isMember && currentWorkspaceId && (
+					<PageSearchDialog workspaceId={currentWorkspaceId} />
+				)}
+
 				{isGuest && (
 					<NavMain
 						items={guestNavMainItems}
@@ -339,16 +365,29 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 			<SidebarContent>
 				{view === SidebarView.INBOX ? (
-					<InboxSidebar />
+					<InboxSidebar unreadCount={unreadCount} />
 				) : (
 					<>
 						{isAccessLoading ? (
-							<p
+							<div
 								role='status'
-								className='px-4 py-2 text-sm text-muted-foreground'
+								aria-label='Loading workspace'
+								className='space-y-5 px-4 py-3'
 							>
-								Loading workspace access...
-							</p>
+								{[4, 3, 5].map((rows, group) => (
+									<div key={group} className='space-y-2.5'>
+										<Skeleton className='h-3 w-16' />
+										{Array.from({ length: rows }, (_, row) => (
+											<div key={row} className='flex items-center gap-2'>
+												<Skeleton className='size-4 rounded' />
+												<Skeleton
+													className={row % 2 ? "h-3.5 w-2/3" : "h-3.5 w-4/5"}
+												/>
+											</div>
+										))}
+									</div>
+								))}
+							</div>
 						) : !isGuest && !isMember ? (
 							<p
 								role='alert'
@@ -377,6 +416,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 							<NavPrivatePages
 								workspaceId={currentWorkspaceId as string}
 								pages={pages}
+								databases={databases}
 								teamspaces={teamspaces}
 								activePageId={activePageId}
 							/>
@@ -392,6 +432,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 									workspaceId={currentWorkspaceId}
 									teamspaces={teamspaces}
 									pages={pages}
+									databases={databases}
 									activePageId={activePageId}
 								/>
 							)}

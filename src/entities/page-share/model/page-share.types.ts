@@ -134,6 +134,8 @@ export interface PageShareSetting {
  */
 export interface PageAccess {
 	effectiveAccessLevel: PageShareAccessLevel | null;
+	/** Only workspace/teamspace roles may publish; a page share (guest) never can. */
+	canPublish?: boolean;
 }
 
 /**

@@ -1,23 +1,59 @@
 "use client";
 
-import { ChevronRight, Ellipsis, MoreHorizontal, Plus } from "lucide-react";
+import {
+	ChevronRight,
+	Compass,
+	Ellipsis,
+	Link2,
+	LogOut,
+	Mail,
+	MoreHorizontal,
+	Plus,
+	Shield,
+	Users,
+} from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
-import { buildPageTree } from "@/entities/page/lib/build-page-tree";
+import {
+	buildPageTree,
+	getPageTreeHref,
+	type PageTreeBase,
+	withDatabaseNodes,
+} from "@/entities/page/lib/build-page-tree";
 import {
 	useMovePageToTrash,
 } from "@/entities/page/model/page.mutations";
-import type { Page } from "@/entities/page/model/page.types";
+import type { Page, WorkspaceDatabase } from "@/entities/page/model/page.types";
 import { PageTree } from "@/entities/page/ui/page-tree";
 
-import { useCreateTeamspace } from "@/entities/teamspace/model/teamspace.mutations";
+import {
+	useCreateTeamspace,
+	useLeaveTeamspace,
+} from "@/entities/teamspace/model/teamspace.mutations";
+import { useMyTeamspaceInvitations } from "@/entities/teamspace/model/teamspace.queries";
 import type { Teamspace } from "@/entities/teamspace/model/teamspace.types";
 
 import { CreatePageDialog } from "@/widgets/create-page";
+import { BrowseTeamspacesDialog } from "@/features/teamspace/browse-teamspaces/ui/browse-teamspaces-dialog";
 import { CreateTeamspaceDialog } from "@/features/teamspace/create-teamspace/ui/create-teamspace-dialog";
+import { ConfirmActionDialog } from "@/features/teamspace/manage-teamspace/ui/confirm-action-dialog";
+import {
+	TeamspaceSettingsDialog,
+	type TeamspaceSettingsTab,
+} from "@/features/teamspace/manage-teamspace/ui/teamspace-settings-dialog";
 
+import { getApiErrorMessage } from "@/shared/lib/api-error-message";
 import { Button } from "@/shared/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/shared/ui/dropdown-menu";
 
 import { PageActionsMenu } from "@/features/page/page-actions/ui/page-actions-menu";
 import {
@@ -30,6 +66,7 @@ interface NavTeamspacesProps {
 	workspaceId: string;
 	teamspaces: Teamspace[];
 	pages: Page[];
+	databases: WorkspaceDatabase[];
 	activePageId?: string;
 }
 
@@ -37,6 +74,7 @@ export function NavTeamspaces({
 	workspaceId,
 	teamspaces,
 	pages,
+	databases,
 	activePageId,
 }: NavTeamspacesProps) {
 	const router = useRouter();
@@ -57,6 +95,37 @@ export function NavTeamspaces({
 
 	const [createTeamspaceDialogOpen, setCreateTeamspaceDialogOpen] =
 		useState(false);
+
+	const [browseDialogOpen, setBrowseDialogOpen] = useState(false);
+
+	// Stores the id so the dialog always renders the latest teamspace data.
+	const [settingsTarget, setSettingsTarget] = useState<{
+		teamspaceId: string;
+		tab: TeamspaceSettingsTab;
+	} | null>(null);
+
+	const settingsTeamspace = settingsTarget
+		? teamspaces.find((teamspace) => teamspace.id === settingsTarget.teamspaceId)
+		: undefined;
+
+	const leaveTeamspaceMutation = useLeaveTeamspace();
+
+	const [teamspaceToLeave, setTeamspaceToLeave] = useState<Teamspace | null>(
+		null,
+	);
+
+	const handleLeaveTeamspace = () => {
+		if (!teamspaceToLeave) return;
+
+		leaveTeamspaceMutation.mutate(teamspaceToLeave.id, {
+			onSuccess: () => toast.success(`You left ${teamspaceToLeave.name}`),
+			onError: (error) =>
+				toast.error(
+					getApiErrorMessage(error, "Could not leave the teamspace."),
+				),
+			onSettled: () => setTeamspaceToLeave(null),
+		});
+	};
 
 	/**
 	 * Tạo Page root trong Teamspace.
@@ -124,14 +193,33 @@ export function NavTeamspaces({
 				<SidebarGroupLabel>Teamspaces</SidebarGroupLabel>
 
 				<div className='flex items-center gap-0.5'>
-					<Button
-						type='button'
-						variant='ghost'
-						size='icon'
-						className='hidden h-6 w-6 group-hover/teamspaces:flex'
-					>
-						<Ellipsis size={13} />
-					</Button>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button
+								type='button'
+								variant='ghost'
+								size='icon'
+								aria-label='Teamspace options'
+								className='hidden h-6 w-6 group-hover/teamspaces:flex data-[state=open]:flex'
+							>
+								<Ellipsis size={13} />
+							</Button>
+						</DropdownMenuTrigger>
+
+						<DropdownMenuContent align='start' className='w-52'>
+							<DropdownMenuItem onSelect={() => setBrowseDialogOpen(true)}>
+								<Compass className='size-4' />
+								Browse teamspaces
+							</DropdownMenuItem>
+
+							<DropdownMenuItem asChild>
+								<Link href='/teamspaces/invitations'>
+									<Mail className='size-4' />
+									Your invitations
+								</Link>
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 
 					<Button
 						type='button'
@@ -150,6 +238,12 @@ export function NavTeamspaces({
 
 			{/* Teamspace list */}
 			<SidebarGroupContent>
+				{teamspaces.length === 0 && (
+					<TeamspacesEmptyState
+						onCreate={() => setCreateTeamspaceDialogOpen(true)}
+					/>
+				)}
+
 				<div className='space-y-0.5'>
 					{teamspaces.map((teamspace) => {
 						const teamspacePages = pages.filter(
@@ -161,23 +255,25 @@ export function NavTeamspaces({
 								key={teamspace.id}
 								teamspace={teamspace}
 								pages={teamspacePages}
+								databases={databases}
 								allPages={pages}
 								teamspaces={teamspaces}
 								activePageId={activePageId}
 								onOpenPage={(page) => {
-									router.push(`/page/${page.id}`);
+									router.push(getPageTreeHref(page));
 								}}
 								onCreateRootPage={() => {
 									handleOpenCreateRootPage(teamspace.id);
 								}}
 								onCreateChildPage={handleOpenCreateChildPage}
 								onMovePageToTrash={handleMovePageToTrash}
-								onOpenTeamspaceActions={() => {
-									console.log(
-										"Teamspace actions:",
-										teamspace,
-									);
+								onOpenSettings={(tab) => {
+									setSettingsTarget({
+										teamspaceId: teamspace.id,
+										tab,
+									});
 								}}
+								onLeave={() => setTeamspaceToLeave(teamspace)}
 							/>
 						);
 					})}
@@ -208,7 +304,74 @@ export function NavTeamspaces({
 				onCreate={handleCreateTeamspace}
 				isLoading={createTeamspaceMutation.isPending}
 			/>
+
+			{settingsTarget && settingsTeamspace && (
+				<TeamspaceSettingsDialog
+					key={`${settingsTarget.teamspaceId}:${settingsTarget.tab}`}
+					teamspace={settingsTeamspace}
+					initialTab={settingsTarget.tab}
+					open
+					onOpenChange={(open) => {
+						if (!open) setSettingsTarget(null);
+					}}
+				/>
+			)}
+
+			<BrowseTeamspacesDialog
+				workspaceId={workspaceId}
+				open={browseDialogOpen}
+				onOpenChange={setBrowseDialogOpen}
+			/>
+
+			<ConfirmActionDialog
+				open={teamspaceToLeave !== null}
+				title='Leave teamspace?'
+				description={`You will lose access to the pages in ${teamspaceToLeave?.name ?? "this teamspace"} unless someone invites you again.`}
+				confirmLabel='Leave teamspace'
+				pendingLabel='Leaving...'
+				isPending={leaveTeamspaceMutation.isPending}
+				onOpenChange={(open) => !open && setTeamspaceToLeave(null)}
+				onConfirm={handleLeaveTeamspace}
+			/>
 		</SidebarGroup>
+	);
+}
+
+/**
+ * The list already contains every open teamspace, so an empty list means the
+ * workspace has none the user can see: point to creating one or to invitations,
+ * which may belong to another workspace.
+ */
+function TeamspacesEmptyState({ onCreate }: { onCreate: () => void }) {
+	const { data: invitations = [] } = useMyTeamspaceInvitations();
+
+	const pendingCount = invitations.filter(
+		(invitation) => invitation.status === "PENDING",
+	).length;
+
+	return (
+		<div className='flex flex-col gap-1.5 px-2 py-1.5 text-xs text-muted-foreground'>
+			<p>No teamspaces in this workspace yet.</p>
+
+			<button
+				type='button'
+				onClick={onCreate}
+				className='flex w-fit items-center gap-1.5 rounded-sm font-medium text-sidebar-foreground/80 hover:text-sidebar-foreground'
+			>
+				<Plus className='size-3.5' />
+				Create a teamspace
+			</button>
+
+			{pendingCount > 0 && (
+				<Link
+					href='/teamspaces/invitations'
+					className='flex w-fit items-center gap-1.5 rounded-sm font-medium text-primary hover:underline'
+				>
+					<Mail className='size-3.5' />
+					{pendingCount} pending invitation{pendingCount === 1 ? "" : "s"}
+				</Link>
+			)}
+		</div>
 	);
 }
 
@@ -216,6 +379,8 @@ interface TeamspaceItemProps {
 	teamspace: Teamspace;
 
 	pages: Page[];
+
+	databases: WorkspaceDatabase[];
 
 	allPages: Page[];
 
@@ -225,7 +390,7 @@ interface TeamspaceItemProps {
 
 	isCreatingPage?: boolean;
 
-	onOpenPage: (page: Page) => void;
+	onOpenPage: (page: PageTreeBase) => void;
 
 	onCreateRootPage: () => void;
 
@@ -233,12 +398,15 @@ interface TeamspaceItemProps {
 
 	onMovePageToTrash: (page: Page) => void;
 
-	onOpenTeamspaceActions: () => void;
+	onOpenSettings: (tab: TeamspaceSettingsTab) => void;
+
+	onLeave: () => void;
 }
 
 function TeamspaceItem({
 	teamspace,
 	pages,
+	databases,
 	allPages,
 	teamspaces,
 	activePageId,
@@ -247,11 +415,12 @@ function TeamspaceItem({
 	onCreateRootPage,
 	onCreateChildPage,
 	onMovePageToTrash,
-	onOpenTeamspaceActions,
+	onOpenSettings,
+	onLeave,
 }: TeamspaceItemProps) {
 	const [expanded, setExpanded] = useState(true);
 
-	const pageTree = buildPageTree(pages);
+	const pageTree = buildPageTree(withDatabaseNodes(pages, databases));
 
 	const hasPages = pageTree.length > 0;
 
@@ -320,19 +489,44 @@ function TeamspaceItem({
 				</button>
 
 				{/* Actions */}
-				<div className='mr-1 hidden shrink-0 items-center gap-0.5 group-hover/teamspace:flex'>
+				<div className='mr-1 hidden shrink-0 items-center gap-0.5 group-hover/teamspace:flex has-[[data-state=open]]:flex'>
 					{/* More */}
-					<button
-						type='button'
-						className='flex size-6 items-center justify-center rounded-sm text-muted-foreground hover:bg-sidebar-accent-foreground/10 hover:text-sidebar-foreground'
-						onClick={(event) => {
-							event.stopPropagation();
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<button
+								type='button'
+								aria-label={`${teamspace.name} options`}
+								className='flex size-6 items-center justify-center rounded-sm text-muted-foreground hover:bg-sidebar-accent-foreground/10 hover:text-sidebar-foreground'
+								onClick={(event) => event.stopPropagation()}
+							>
+								<MoreHorizontal size={13} />
+							</button>
+						</DropdownMenuTrigger>
 
-							onOpenTeamspaceActions();
-						}}
-					>
-						<MoreHorizontal size={13} />
-					</button>
+						<DropdownMenuContent align='start' className='w-52'>
+							<DropdownMenuItem onSelect={() => onOpenSettings("members")}>
+								<Users className='size-4' />
+								Members
+							</DropdownMenuItem>
+
+							<DropdownMenuItem onSelect={() => onOpenSettings("links")}>
+								<Link2 className='size-4' />
+								Invite links
+							</DropdownMenuItem>
+
+							<DropdownMenuItem onSelect={() => onOpenSettings("access")}>
+								<Shield className='size-4' />
+								Access
+							</DropdownMenuItem>
+
+							<DropdownMenuSeparator />
+
+							<DropdownMenuItem variant='destructive' onSelect={onLeave}>
+								<LogOut className='size-4' />
+								Leave teamspace
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 
 					{/* Create root Page */}
 					<button
@@ -359,31 +553,37 @@ function TeamspaceItem({
 						pages={pageTree}
 						activePageId={activePageId}
 						onOpenPage={onOpenPage}
-						onCreateChild={onCreateChildPage}
-						renderActions={(page) => (
-							<PageActionsMenu
-								page={page}
-								pages={allPages}
-								teamspaces={teamspaces}
-								onMoveToTrash={onMovePageToTrash}
-							>
-								<button
-									type='button'
-									aria-label='More page actions'
-									className={[
-										"flex size-6 shrink-0 items-center justify-center rounded-sm",
-										"text-muted-foreground",
-										"hover:bg-sidebar-accent-foreground/10",
-										"hover:text-sidebar-foreground",
-									].join(" ")}
-									onClick={(event) => {
-										event.stopPropagation();
-									}}
+						onCreateChild={(page) => {
+							if (!("kind" in page)) {
+								onCreateChildPage(page);
+							}
+						}}
+						renderActions={(page) =>
+							"kind" in page ? null : (
+								<PageActionsMenu
+									page={page}
+									pages={allPages}
+									teamspaces={teamspaces}
+									onMoveToTrash={onMovePageToTrash}
 								>
-									<MoreHorizontal className='size-3.5' />
-								</button>
-							</PageActionsMenu>
-						)}
+									<button
+										type='button'
+										aria-label='More page actions'
+										className={[
+											"flex size-6 shrink-0 items-center justify-center rounded-sm",
+											"text-muted-foreground",
+											"hover:bg-sidebar-accent-foreground/10",
+											"hover:text-sidebar-foreground",
+										].join(" ")}
+										onClick={(event) => {
+											event.stopPropagation();
+										}}
+									>
+										<MoreHorizontal className='size-3.5' />
+									</button>
+								</PageActionsMenu>
+							)
+						}
 					/>
 				</div>
 			)}

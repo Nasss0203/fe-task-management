@@ -15,6 +15,8 @@ import {
 	useBlockAutoFocus,
 	usePageBlockEditor,
 } from "@/widgets/page-block-editor/ui/page-block-editor-context";
+import { cn } from "@/shared/lib/utils";
+import { useInlineMarks } from "@/widgets/page-block-renderer/model/use-inline-marks";
 
 interface QuoteBlockEditorProps {
 	block: PageBlockNode;
@@ -41,6 +43,11 @@ export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 	const [value, setValue] = useState(() => getText(block));
 
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	const inlineMarks = useInlineMarks(
+		value,
+		setValue,
+		"text-base leading-7",
+	);
 
 	const updateBlock = useUpdatePageBlock(shareToken);
 
@@ -92,6 +99,8 @@ export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 	const handleKeyDown = async (
 		event: React.KeyboardEvent<HTMLTextAreaElement>,
 	) => {
+		if (inlineMarks.handleKeyDown(event)) return;
+
 		if (event.key !== "Enter" || event.shiftKey) {
 			return;
 		}
@@ -145,30 +154,40 @@ export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 		<div className='flex min-h-7 w-full'>
 			<div className='mr-3 w-[3px] shrink-0 rounded-full bg-foreground' />
 
-			<textarea
-				ref={textareaRef}
-				value={value}
-				rows={1}
-				placeholder='Quote'
-				onChange={handleChange}
-				onKeyDown={handleKeyDown}
-				onBlur={handleBlur}
-				className='
-          block
-          min-h-7
-          w-full
-          resize-none
-          overflow-hidden
-          border-0
-          bg-transparent
-          p-0
-          text-base
-          leading-7
-          outline-none
-          placeholder:text-muted-foreground/40
-          focus-visible:ring-0
-        '
-			/>
+			<div className='relative min-w-0 flex-1'>
+				<textarea
+					ref={textareaRef}
+					value={value}
+					rows={1}
+					placeholder='Quote'
+					onChange={handleChange}
+					onKeyDown={handleKeyDown}
+					onFocus={inlineMarks.onFocus}
+					onBlur={() => {
+						inlineMarks.onBlur();
+						handleBlur();
+					}}
+					className={cn(
+						`
+	          block
+	          min-h-7
+	          w-full
+	          resize-none
+	          overflow-hidden
+	          border-0
+	          bg-transparent
+	          p-0
+	          text-base
+	          leading-7
+	          outline-none
+	          placeholder:text-muted-foreground/40
+	          focus-visible:ring-0
+	        `,
+						inlineMarks.textareaClassName,
+					)}
+				/>
+				{inlineMarks.preview}
+			</div>
 		</div>
 	);
 }

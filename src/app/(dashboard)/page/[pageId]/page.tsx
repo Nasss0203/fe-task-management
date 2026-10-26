@@ -11,6 +11,7 @@ import {
 	PageContent,
 	PageCover,
 	PageHeader,
+	PageSkeleton,
 } from "@/entities/page/ui/page-surface";
 
 import { PageEditAccessBoundary } from "@/features/page-access/ui/page-edit-access-boundary";
@@ -48,7 +49,7 @@ export default function PageDetail() {
 		isBlocksLoading ||
 		(Boolean(page && !page.canEdit) && isEditRequestsLoading)
 	) {
-		return <div className='p-6'>Loading...</div>;
+		return <PageSkeleton />;
 	}
 
 	if (isError || !page) {

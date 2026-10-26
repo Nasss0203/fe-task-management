@@ -39,7 +39,7 @@ function formatPrice(amount: number, currency: string): string {
 	}).format(amount);
 }
 
-function formatFeature(feature: BillingFeature): string {
+export function formatFeature(feature: BillingFeature): string {
 	const value = feature.value;
 
 	switch (feature.code) {

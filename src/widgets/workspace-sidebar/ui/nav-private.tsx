@@ -4,11 +4,15 @@ import { Ellipsis, MoreHorizontal, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { buildPageTree } from "@/entities/page/lib/build-page-tree";
+import {
+	buildPageTree,
+	getPageTreeHref,
+	withDatabaseNodes,
+} from "@/entities/page/lib/build-page-tree";
 import {
 	useMovePageToTrash,
 } from "@/entities/page/model/page.mutations";
-import type { Page } from "@/entities/page/model/page.types";
+import type { Page, WorkspaceDatabase } from "@/entities/page/model/page.types";
 import { PageTree } from "@/entities/page/ui/page-tree";
 
 import { CreatePageDialog } from "@/widgets/create-page";
@@ -26,6 +30,7 @@ interface TeamspaceOption {
 interface NavPrivatePagesProps {
 	workspaceId: string;
 	pages: Page[];
+	databases: WorkspaceDatabase[];
 	teamspaces: TeamspaceOption[];
 	activePageId?: string;
 }
@@ -33,6 +38,7 @@ interface NavPrivatePagesProps {
 export function NavPrivatePages({
 	workspaceId,
 	pages,
+	databases,
 	teamspaces,
 	activePageId,
 }: NavPrivatePagesProps) {
@@ -48,7 +54,9 @@ export function NavPrivatePages({
 
 	const privatePages = pages.filter((page) => page.teamspace_id === null);
 
-	const privatePageTree = buildPageTree(privatePages);
+	const privatePageTree = buildPageTree(
+		withDatabaseNodes(privatePages, databases),
+	);
 
 	const handleOpenCreateRootPage = () => {
 		setSelectedParentPageId(null);
@@ -116,35 +124,37 @@ export function NavPrivatePages({
 					pages={privatePageTree}
 					activePageId={activePageId}
 					onOpenPage={(page) => {
-						router.push(`/page/${page.id}`);
+						router.push(getPageTreeHref(page));
 					}}
 					onCreateChild={(page) => {
 						handleOpenCreateChildPage(page.id);
 					}}
-					renderActions={(page) => (
-						<PageActionsMenu
-							page={page}
-							pages={pages}
-							teamspaces={teamspaces}
-							onMoveToTrash={handleMovePageToTrash}
-						>
-							<button
-								type='button'
-								aria-label='More page actions'
-								className={[
-									"flex size-6 shrink-0 items-center justify-center rounded-sm",
-									"text-muted-foreground",
-									"hover:bg-sidebar-accent-foreground/10",
-									"hover:text-sidebar-foreground",
-								].join(" ")}
-								onClick={(event) => {
-									event.stopPropagation();
-								}}
+					renderActions={(page) =>
+						"kind" in page ? null : (
+							<PageActionsMenu
+								page={page}
+								pages={pages}
+								teamspaces={teamspaces}
+								onMoveToTrash={handleMovePageToTrash}
 							>
-								<MoreHorizontal className='size-3.5' />
-							</button>
-						</PageActionsMenu>
-					)}
+								<button
+									type='button'
+									aria-label='More page actions'
+									className={[
+										"flex size-6 shrink-0 items-center justify-center rounded-sm",
+										"text-muted-foreground",
+										"hover:bg-sidebar-accent-foreground/10",
+										"hover:text-sidebar-foreground",
+									].join(" ")}
+									onClick={(event) => {
+										event.stopPropagation();
+									}}
+								>
+									<MoreHorizontal className='size-3.5' />
+								</button>
+							</PageActionsMenu>
+						)
+					}
 				/>
 			</SidebarPageSection>
 

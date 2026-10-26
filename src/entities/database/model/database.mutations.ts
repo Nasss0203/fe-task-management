@@ -7,8 +7,11 @@ import { databaseKeys } from "./database.queries";
 import {
 	DatabaseViewType,
 	PropertyType,
+	type Database,
 	type DatabaseRow,
 	type DatabaseViewDetail,
+	type DatabaseViewFilter,
+	type DatabaseViewSort,
 } from "./database.types";
 
 export function useCreateDatabaseRow(databaseId: string) {
@@ -35,6 +38,62 @@ export function useDeleteDatabaseRow(databaseId: string) {
 			await queryClient.invalidateQueries({
 				queryKey: databaseKeys.rows(databaseId),
 			});
+		},
+	});
+}
+
+interface MoveDatabaseRowInput {
+	rowId: string;
+	previousRowId: string | null;
+	nextRowId: string | null;
+}
+
+export function moveRowInList<T extends { id: string }>(
+	rows: T[],
+	{ rowId, previousRowId, nextRowId }: MoveDatabaseRowInput,
+): T[] {
+	const moving = rows.find((row) => row.id === rowId);
+	if (!moving) return rows;
+
+	const others = rows.filter((row) => row.id !== rowId);
+	const afterPrevious = others.findIndex((row) => row.id === previousRowId) + 1;
+	const beforeNext = others.findIndex((row) => row.id === nextRowId);
+	const index = previousRowId
+		? afterPrevious
+		: nextRowId && beforeNext !== -1
+			? beforeNext
+			: others.length;
+
+	return [...others.slice(0, index), moving, ...others.slice(index)];
+}
+
+export function useMoveDatabaseRow(databaseId: string) {
+	const queryClient = useQueryClient();
+	const rowsKey = databaseKeys.rows(databaseId);
+
+	return useMutation({
+		mutationFn: ({ rowId, previousRowId, nextRowId }: MoveDatabaseRowInput) =>
+			databaseApi.moveRow(rowId, { previousRowId, nextRowId }),
+
+		onMutate: async (input) => {
+			await queryClient.cancelQueries({ queryKey: rowsKey });
+			const previous = queryClient.getQueryData<DatabaseRow[]>(rowsKey);
+
+			queryClient.setQueryData<DatabaseRow[]>(rowsKey, (rows) =>
+				rows ? moveRowInList(rows, input) : rows,
+			);
+
+			return { previous };
+		},
+
+		onError: (_error, _input, context) => {
+			if (context?.previous) {
+				queryClient.setQueryData(rowsKey, context.previous);
+			}
+		},
+
+		onSettled: async () => {
+			await queryClient.invalidateQueries({ queryKey: rowsKey });
 		},
 	});
 }
@@ -169,6 +228,21 @@ interface RenameDatabaseViewInput {
 	name: string;
 }
 
+export function useRenameDatabase(databaseId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (name: string) => databaseApi.renameDatabase(databaseId, name),
+
+		onSuccess: async ({ name }) => {
+			queryClient.setQueryData<Database>(databaseKeys.detail(databaseId), (database) =>
+				database ? { ...database, name } : database,
+			);
+			await queryClient.invalidateQueries({ queryKey: ["pages", "workspace"] });
+		},
+	});
+}
+
 export function useRenameDatabaseView(databaseId: string) {
 	const queryClient = useQueryClient();
 
@@ -273,6 +347,148 @@ export function useSetViewPropertyWidth(databaseId: string, viewId: string) {
 				databaseKeys.viewDetail(databaseId, viewId),
 				view,
 			);
+		},
+	});
+}
+
+export function useSetViewSorts(databaseId: string, viewId: string) {
+	const queryClient = useQueryClient();
+	const key = databaseKeys.viewDetail(databaseId, viewId);
+
+	return useMutation({
+		mutationFn: (sorts: DatabaseViewSort[]) =>
+			databaseApi.setViewSorts(databaseId, viewId, sorts),
+
+		onMutate: async (sorts) => {
+			await queryClient.cancelQueries({ queryKey: key });
+			const previous = queryClient.getQueryData<DatabaseViewDetail>(key);
+
+			if (previous) {
+				queryClient.setQueryData<DatabaseViewDetail>(key, {
+					...previous,
+					sorts,
+				});
+			}
+
+			return { previous };
+		},
+
+		onError: (_error, _sorts, context) => {
+			if (context?.previous) {
+				queryClient.setQueryData(key, context.previous);
+			}
+		},
+
+		onSuccess: (view: DatabaseViewDetail) => {
+			queryClient.setQueryData(key, view);
+		},
+	});
+}
+
+export function useReorderViewProperties(databaseId: string, viewId: string) {
+	const queryClient = useQueryClient();
+	const key = databaseKeys.viewDetail(databaseId, viewId);
+
+	return useMutation({
+		mutationFn: (propertyIds: string[]) =>
+			databaseApi.reorderViewProperties(databaseId, viewId, propertyIds),
+
+		onMutate: async (propertyIds) => {
+			await queryClient.cancelQueries({ queryKey: key });
+			const previous = queryClient.getQueryData<DatabaseViewDetail>(key);
+
+			if (previous) {
+				const positionOf = new Map(
+					propertyIds.map((propertyId, index) => [propertyId, String(index)]),
+				);
+				queryClient.setQueryData<DatabaseViewDetail>(key, {
+					...previous,
+					properties: previous.properties.map((item) => ({
+						...item,
+						position: positionOf.get(item.propertyId) ?? item.position,
+					})),
+				});
+			}
+
+			return { previous };
+		},
+
+		onError: (_error, _propertyIds, context) => {
+			if (context?.previous) {
+				queryClient.setQueryData(key, context.previous);
+			}
+		},
+
+		onSuccess: (view: DatabaseViewDetail) => {
+			queryClient.setQueryData(key, view);
+		},
+	});
+}
+
+export function useSetViewGroup(databaseId: string, viewId: string) {
+	const queryClient = useQueryClient();
+	const key = databaseKeys.viewDetail(databaseId, viewId);
+
+	return useMutation({
+		mutationFn: (propertyId: string | null) =>
+			databaseApi.setViewGroup(databaseId, viewId, propertyId),
+
+		onMutate: async (groupBy) => {
+			await queryClient.cancelQueries({ queryKey: key });
+			const previous = queryClient.getQueryData<DatabaseViewDetail>(key);
+
+			if (previous) {
+				queryClient.setQueryData<DatabaseViewDetail>(key, {
+					...previous,
+					groupBy,
+				});
+			}
+
+			return { previous };
+		},
+
+		onError: (_error, _groupBy, context) => {
+			if (context?.previous) {
+				queryClient.setQueryData(key, context.previous);
+			}
+		},
+
+		onSuccess: (view: DatabaseViewDetail) => {
+			queryClient.setQueryData(key, view);
+		},
+	});
+}
+
+export function useSetViewFilters(databaseId: string, viewId: string) {
+	const queryClient = useQueryClient();
+	const key = databaseKeys.viewDetail(databaseId, viewId);
+
+	return useMutation({
+		mutationFn: (filters: DatabaseViewFilter[]) =>
+			databaseApi.setViewFilters(databaseId, viewId, filters),
+
+		onMutate: async (filters) => {
+			await queryClient.cancelQueries({ queryKey: key });
+			const previous = queryClient.getQueryData<DatabaseViewDetail>(key);
+
+			if (previous) {
+				queryClient.setQueryData<DatabaseViewDetail>(key, {
+					...previous,
+					filters,
+				});
+			}
+
+			return { previous };
+		},
+
+		onError: (_error, _filters, context) => {
+			if (context?.previous) {
+				queryClient.setQueryData(key, context.previous);
+			}
+		},
+
+		onSuccess: (view: DatabaseViewDetail) => {
+			queryClient.setQueryData(key, view);
 		},
 	});
 }

@@ -1,7 +1,5 @@
 "use client";
 
-import type { Page } from "@/entities/page/model/page.types";
-
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -15,7 +13,7 @@ import {
 import { Button } from "@/shared/ui/button";
 
 interface DeletePagePermanentlyDialogProps {
-	page: Page | null;
+	item: { kind: "page" | "database"; title: string } | null;
 
 	open: boolean;
 
@@ -27,7 +25,7 @@ interface DeletePagePermanentlyDialogProps {
 }
 
 export function DeletePagePermanentlyDialog({
-	page,
+	item,
 	open,
 	onOpenChange,
 	onConfirm,
@@ -38,12 +36,12 @@ export function DeletePagePermanentlyDialog({
 			<AlertDialogContent>
 				<AlertDialogHeader>
 					<AlertDialogTitle>
-						Delete page permanently?
+						Delete {item?.kind ?? "page"} permanently?
 					</AlertDialogTitle>
 
 					<AlertDialogDescription>
 						&quot;
-						{page?.title || "Untitled"}
+						{item?.title || "Untitled"}
 						&quot; will be permanently deleted. This action cannot
 						be undone.
 					</AlertDialogDescription>

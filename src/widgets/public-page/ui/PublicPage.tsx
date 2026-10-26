@@ -1,6 +1,7 @@
 "use client";
 
 import { PanelLeft } from "lucide-react";
+import Link from "next/link";
 import { useRef, useState } from "react";
 import { Fragment } from "react/jsx-runtime";
 import type { PublicSitePage } from "@/entities/public-site/model/public-site.types";
@@ -22,7 +23,9 @@ import {
 	SheetTitle,
 } from "@/shared/ui/sheet";
 import { Skeleton } from "@/shared/ui/skeleton";
+import { PublicEditAccessDialog } from "./PublicEditAccessDialog";
 import { PublicPageBlockList } from "./PublicPageBlockList";
+import { PublicPageEditor } from "./PublicPageEditor";
 import { PublicSiteSidebar } from "./PublicSiteSidebar";
 
 export const DEFAULT_SIDEBAR_WIDTH = 224;
@@ -38,6 +41,12 @@ export function PublicPage({ publicSite }: PublicPageProps) {
 	const { page, blocks, breadcrumbs, subdomain, path, capabilities } = publicSite;
 	const canInteract = true;
 	const canMutate = capabilities.can_update;
+	const [editAccessOpen, setEditAccessOpen] = useState(false);
+	// Members who may edit get the editor in place; others are asked to sign in or request access.
+	const handleBlockClick =
+		capabilities.updates_enabled && !canMutate
+			? () => setEditAccessOpen(true)
+			: undefined;
 	const isMobile = useIsMobile();
 	const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
 	const [lastSidebarWidth, setLastSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
@@ -225,6 +234,20 @@ export function PublicPage({ publicSite }: PublicPageProps) {
 							</BreadcrumbList>
 						</Breadcrumb>
 					) : null}
+
+					{canMutate ? (
+						<div className='ml-auto flex shrink-0 items-center gap-2 text-xs'>
+							<span className='rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary'>
+								Editing
+							</span>
+							<Link
+								href={`/page/${page.id}`}
+								className='text-muted-foreground hover:text-foreground'
+							>
+								Open in app
+							</Link>
+						</div>
+					) : null}
 				</header>
 
 				{/* Page Content */}
@@ -259,12 +282,30 @@ export function PublicPage({ publicSite }: PublicPageProps) {
 							</header>
 
 							<div className='mt-12'>
-								<PublicPageBlockList blocks={blocks} />
+								{canMutate ? (
+									<PublicPageEditor pageId={page.id} />
+								) : (
+									<PublicPageBlockList
+										blocks={blocks}
+										onBlockClick={handleBlockClick}
+									/>
+								)}
 							</div>
 						</div>
 					</div>
 				</main>
 			</div>
+
+			{capabilities.updates_enabled && !canMutate ? (
+				<PublicEditAccessDialog
+					pageId={page.id}
+					subdomain={subdomain}
+					path={path}
+					authenticated={capabilities.authenticated}
+					open={editAccessOpen}
+					onOpenChange={setEditAccessOpen}
+				/>
+			) : null}
 		</div>
 	);
 }

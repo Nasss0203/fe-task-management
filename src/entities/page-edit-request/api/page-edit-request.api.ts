@@ -11,3 +11,14 @@ export async function createPageEditRequest(
 
 	return response.data.data;
 }
+
+export async function reviewPageEditRequest(
+	requestId: string,
+	decision: "approve" | "reject",
+): Promise<PageEditRequest> {
+	const response = await instance.patch<ApiResponse<PageEditRequest>>(
+		`/page-edit-requests/${requestId}/${decision}`,
+	);
+
+	return response.data.data;
+}

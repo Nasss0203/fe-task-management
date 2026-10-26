@@ -7,6 +7,7 @@ import { DatabaseViewType } from "@/entities/database/model/database.types";
 
 import { databaseApi } from "@/entities/database/api/database.api";
 import { pageBlockApi } from "@/entities/page-block/api/page-block.api";
+import { isDatabaseListQuery } from "@/entities/page/model/page.queries";
 import {
 	PageBlockJson,
 	PageBlockStyleConfig,
@@ -83,9 +84,14 @@ export function useCreateDatabaseBlock() {
 		},
 
 		onSuccess: async (_, variables) => {
-			await queryClient.invalidateQueries({
-				queryKey: pageBlockKeys.byPage(variables.pageId),
-			});
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: pageBlockKeys.byPage(variables.pageId),
+				}),
+				queryClient.invalidateQueries({
+					predicate: isDatabaseListQuery,
+				}),
+			]);
 		},
 
 		onError: () => notifyBlockWriteError(),
@@ -239,6 +245,10 @@ export function useTransformToDatabaseBlock() {
 			queryClient.invalidateQueries({
 				queryKey: pageBlockKeys.byPage(variables.pageId),
 			});
+
+			queryClient.invalidateQueries({
+				predicate: isDatabaseListQuery,
+			});
 		},
 
 		onError: () => notifyBlockWriteError(),
@@ -259,10 +269,16 @@ export function useDeletePageBlock(shareToken?: string) {
 			pageBlockApi.delete(blockId, shareToken),
 
 		onSuccess: async (_, variables) => {
-			await queryClient.invalidateQueries({
-				queryKey: blockListKey(variables.pageId, shareToken),
-				exact: true,
-			});
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: blockListKey(variables.pageId, shareToken),
+					exact: true,
+				}),
+				// The deleted block (or its children) may hold a database → moves it to Trash.
+				queryClient.invalidateQueries({
+					predicate: isDatabaseListQuery,
+				}),
+			]);
 		},
 		onError: () => notifyBlockWriteError(shareToken),
 	});

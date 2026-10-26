@@ -225,6 +225,7 @@ export function DatabaseCell({
 		case PropertyType.PERSON:
 			return (
 				<PersonCell
+					databaseId={databaseId}
 					pageId={pageId}
 					name={property.name}
 					value={value}

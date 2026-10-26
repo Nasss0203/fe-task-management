@@ -1,4 +1,4 @@
-export { BillingDialog } from "./ui/billing-dialog";
+export { BillingDialog, formatFeature } from "./ui/billing-dialog";
 export { PaymentResultDialog } from "./ui/payment-result-dialog";
 export {
 	BILLING_DIALOG_PARAM,

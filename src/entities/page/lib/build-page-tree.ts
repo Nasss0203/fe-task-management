@@ -1,13 +1,53 @@
+import type { WorkspaceDatabase } from "../model/page.types";
+
 export interface PageTreeBase {
 	id: string;
 	parent_page_id: string | null;
 	title: string;
 	icon: string | null;
+	kind?: "database";
 }
 
 export type PageTreeNode<T extends PageTreeBase> = T & {
 	children: PageTreeNode<T>[];
 };
+
+export interface PageTreeDatabaseNode extends PageTreeBase {
+	kind: "database";
+}
+
+/**
+ * Appends databases as children of their page, after the child pages.
+ * Databases whose page is not in `pages` are dropped so they never
+ * surface as roots of another section.
+ */
+export function withDatabaseNodes<T extends PageTreeBase>(
+	pages: T[],
+	databases: WorkspaceDatabase[],
+): (T | PageTreeDatabaseNode)[] {
+	const pageIds = new Set(pages.map((page) => page.id));
+
+	return [
+		...pages,
+		...databases
+			.filter((database) => pageIds.has(database.pageId))
+			.map(
+				(database): PageTreeDatabaseNode => ({
+					id: database.id,
+					parent_page_id: database.pageId,
+					title: database.name,
+					icon: null,
+					kind: "database",
+				}),
+			),
+	];
+}
+
+export function getPageTreeHref(node: PageTreeBase) {
+	return node.kind === "database"
+		? `/database/${node.id}`
+		: `/page/${node.id}`;
+}
 
 export function buildPageTree<T extends PageTreeBase>(
 	pages: T[],

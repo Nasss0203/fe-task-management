@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/shared/lib/utils";
+import { Skeleton } from "@/shared/ui/skeleton";
 
 export function PageCover({
 	url,
@@ -54,6 +55,24 @@ export function PageContent({
 			)}
 		>
 			{children}
+		</div>
+	);
+}
+
+export function PageSkeleton() {
+	return (
+		<div role='status' aria-label='Loading page' className='w-full min-w-0'>
+			<div className='flex items-center gap-3 px-12 pt-10 md:px-16 lg:px-24'>
+				<Skeleton className='size-12 rounded-lg' />
+				<Skeleton className='h-9 w-2/5 max-w-sm' />
+			</div>
+			<PageContent className='space-y-3'>
+				{["w-full", "w-11/12", "w-4/5", "w-full", "w-2/3", "w-3/4"].map(
+					(width, index) => (
+						<Skeleton key={index} className={cn("h-4", width)} />
+					),
+				)}
+			</PageContent>
 		</div>
 	);
 }

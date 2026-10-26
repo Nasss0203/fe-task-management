@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, FileText, Plus } from "lucide-react";
+import { ChevronRight, Database, FileText, Plus } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 
@@ -79,6 +79,8 @@ function PageTreeItem<T extends PageTreeBase>({
 
 	const isActive = page.id === activePageId;
 
+	const isDatabase = page.kind === "database";
+
 	const rowSizeClass =
 		depth === 0
 			? "h-8 text-sm"
@@ -154,6 +156,8 @@ function PageTreeItem<T extends PageTreeBase>({
 							<span className={pageIconTextClass}>
 								{page.icon}
 							</span>
+						) : isDatabase ? (
+							<Database className={iconSizeClass} />
 						) : (
 							<FileText className={iconSizeClass} />
 						)}
@@ -204,7 +208,7 @@ function PageTreeItem<T extends PageTreeBase>({
 					{renderActions?.(page)}
 
 					{/* Create Child */}
-					{onCreateChild && (
+					{onCreateChild && !isDatabase && (
 						<button
 							type='button'
 							aria-label='Create child page'

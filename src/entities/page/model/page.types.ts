@@ -32,6 +32,17 @@ export interface Page {
 	deletedBy: string | null;
 }
 
+export interface WorkspaceDatabase {
+	id: string;
+
+	pageId: string;
+
+	name: string;
+
+	/** Set only for databases in Trash. */
+	deletedAt: string | null;
+}
+
 export interface CreatePageInput {
 	workspace_id: string;
 
@@ -64,6 +75,17 @@ export interface PagePresetOption {
 	key: PagePreset;
 	title: string;
 	icon: string;
+}
+
+export interface PageSearchResult {
+	pageId: string;
+	title: string;
+	icon: string | null;
+	teamspaceId: string | null;
+	parentPageId: string | null;
+	updatedAt: string;
+	matchedIn: "title" | "content" | null;
+	snippet: string | null;
 }
 
 export interface MovePageInput {

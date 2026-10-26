@@ -14,7 +14,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
-import { pageBlockApi } from "@/entities/page-block/api/page-block.api";
 import { buildPageBlockTree } from "@/entities/page-block/lib/build-page-block-tree";
 import {
 	pageBlockKeys,
@@ -30,7 +29,6 @@ import {
 } from "@/entities/page/model/page.mutations";
 import { usePagePresets } from "@/entities/page/model/page.queries";
 import type { Page, PagePreset } from "@/entities/page/model/page.types";
-import type { PageBlock } from "@/entities/page-block/model/page-block.types";
 import { cn } from "@/shared/lib/utils";
 import { useTeamspaces } from "@/entities/teamspace/model/teamspace.queries";
 import {
@@ -66,10 +64,6 @@ const PRIVATE_LOCATION: CreatePageLocation = {
 };
 
 const TITLE_SAVE_DELAY = 600;
-
-function getBlocksSignature(blocks: PageBlock[]) {
-	return blocks.map((block) => `${block.id}:${block.updated_at}`).join("|");
-}
 
 export function CreatePageDialog(props: CreatePageDialogProps) {
 	const [session, setSession] = useState(0);
@@ -112,8 +106,6 @@ function CreatePageSession({
 	const deletePagePermanently = useDeletePagePermanently();
 	const applyPreset = useApplyPagePreset();
 
-	const [activePreset, setActivePreset] = useState<PagePreset>("empty");
-	const [presetSignature, setPresetSignature] = useState("");
 	const { data: presets = [] } = usePagePresets(open);
 
 	const { data: teamspaces = [] } = useTeamspaces(
@@ -125,9 +117,7 @@ function CreatePageSession({
 		pageId ?? undefined,
 	);
 	const blockTree = useMemo(() => buildPageBlockTree(blocks), [blocks]);
-	const isPresetPristine =
-		blocks.length === 0 || getBlocksSignature(blocks) === presetSignature;
-	const highlightedPreset = blocks.length === 0 ? "empty" : activePreset;
+	const isPresetPristine = blocks.length === 0;
 
 	useEffect(
 		() => () => {
@@ -276,11 +266,6 @@ function CreatePageSession({
 			return;
 		}
 
-		if (preset === "empty" && !pageIdRef.current) {
-			setActivePreset(preset);
-			return;
-		}
-
 		let id: string;
 		try {
 			id = await ensurePage();
@@ -289,18 +274,17 @@ function CreatePageSession({
 		}
 
 		try {
-			await applyPreset.mutateAsync({ pageId: id, preset });
-
-			const freshBlocks = await queryClient.fetchQuery({
-				queryKey: pageBlockKeys.byPage(id),
-				queryFn: ({ signal }) => pageBlockApi.getByPage(id, signal),
-			});
-
-			setPresetSignature(getBlocksSignature(freshBlocks));
-			setActivePreset(preset);
+			if (preset !== "empty") {
+				await applyPreset.mutateAsync({ pageId: id, preset });
+			}
+			await saveTitle(id);
 		} catch {
 			toast.error("Unable to apply this template. Please try again.");
+			return;
 		}
+
+		onOpenChange(false);
+		router.push(`/page/${id}`);
 	};
 
 	const handleOpenFullPage = async () => {
@@ -477,7 +461,7 @@ function CreatePageSession({
 
 					<div className='max-h-[280px] space-y-0.5 overflow-y-auto'>
 						{presets.map((preset) => {
-							const selected = highlightedPreset === preset.key;
+							const selected = preset.key === "empty";
 							const isApplying =
 								applyPreset.isPending &&
 								applyPreset.variables?.preset === preset.key;

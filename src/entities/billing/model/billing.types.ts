@@ -56,6 +56,27 @@ export interface WorkspaceSubscription {
 	cancelAtPeriodEnd: boolean;
 }
 
+export type PaymentOrderStatus =
+	| "PENDING"
+	| "PAID"
+	| "FAILED"
+	| "EXPIRED"
+	| "CANCELED";
+
+export interface PaymentOrderHistoryItem {
+	id: string;
+	orderCode: string;
+	planCode: string;
+	planName: string;
+	billingInterval: BillingInterval;
+	provider: BillingProvider;
+	amount: number;
+	currency: string;
+	status: PaymentOrderStatus;
+	paidAt: string | null;
+	createdAt: string;
+}
+
 export interface BillingApiResponse<T> {
 	statusCode: number;
 	message: string;

@@ -39,8 +39,7 @@ export function PersonRow({
 }: PersonRowProps) {
 	const displayName = person.full_name.trim() || person.email;
 	const isSelf = currentUserId === person.user_id;
-	const canRemoveTarget =
-		!isSelf && canRemoveMember && person.role_name !== "OWNER";
+	const canRemoveTarget = !isSelf && canRemoveMember;
 	const canOpenRoleMenu =
 		(person.membership_type === "MEMBER" &&
 			person.role_name !== null &&

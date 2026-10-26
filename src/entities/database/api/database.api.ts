@@ -3,10 +3,13 @@ import instance from "@/shared/api/api-client";
 import { ApiResponse } from "@/shared/api";
 import type {
 	Database,
+	DatabasePerson,
 	DatabaseProperty,
 	DatabaseRow,
 	DatabaseView,
 	DatabaseViewDetail,
+	DatabaseViewFilter,
+	DatabaseViewSort,
 	DatabaseViewType,
 	PropertyOption,
 	PropertyType,
@@ -104,6 +107,22 @@ export const databaseApi = {
 		return response.data.data;
 	},
 
+	getPeople: async (
+		databaseId: string,
+		signal?: AbortSignal,
+		shareToken?: string,
+	): Promise<DatabasePerson[]> => {
+		const response = await instance.get<ApiResponse<DatabasePerson[]>>(
+			`${DATABASE_API}/${databaseId}/rows/people`,
+			{
+				signal,
+				headers: getShareHeaders(shareToken),
+			},
+		);
+
+		return response.data.data;
+	},
+
 	createRow: async (databaseId: string): Promise<DatabaseRow> => {
 		const response = await instance.post<ApiResponse<DatabaseRow>>(
 			`${DATABASE_API}/${databaseId}/rows`,
@@ -114,6 +133,17 @@ export const databaseApi = {
 
 	deleteRow: async (rowId: string): Promise<void> => {
 		await instance.delete(`/database-rows/${rowId}`);
+	},
+
+	moveRow: async (
+		rowId: string,
+		input: { previousRowId: string | null; nextRowId: string | null },
+	): Promise<{ id: string; position: number }> => {
+		const response = await instance.patch<
+			ApiResponse<{ id: string; position: number }>
+		>(`/database-rows/${rowId}/position`, input);
+
+		return response.data.data;
 	},
 
 	setRowValue: async (
@@ -171,6 +201,17 @@ export const databaseApi = {
 		const response = await instance.delete<ApiResponse<{ id: string }>>(
 			`${DATABASE_API}/${databaseId}/properties/${propertyId}`,
 		);
+
+		return response.data.data;
+	},
+
+	renameDatabase: async (
+		databaseId: string,
+		name: string,
+	): Promise<{ id: string; name: string }> => {
+		const response = await instance.patch<
+			ApiResponse<{ id: string; name: string }>
+		>(`${DATABASE_API}/${databaseId}`, { name });
 
 		return response.data.data;
 	},
@@ -239,6 +280,58 @@ export const databaseApi = {
 		const response = await instance.patch<ApiResponse<DatabaseViewDetail>>(
 			`${DATABASE_API}/${databaseId}/views/${viewId}/properties/${propertyId}/width`,
 			{ width },
+		);
+
+		return response.data.data;
+	},
+
+	setViewSorts: async (
+		databaseId: string,
+		viewId: string,
+		sorts: DatabaseViewSort[],
+	): Promise<DatabaseViewDetail> => {
+		const response = await instance.patch<ApiResponse<DatabaseViewDetail>>(
+			`${DATABASE_API}/${databaseId}/views/${viewId}/sorts`,
+			{ sorts },
+		);
+
+		return response.data.data;
+	},
+
+	reorderViewProperties: async (
+		databaseId: string,
+		viewId: string,
+		propertyIds: string[],
+	): Promise<DatabaseViewDetail> => {
+		const response = await instance.patch<ApiResponse<DatabaseViewDetail>>(
+			`${DATABASE_API}/${databaseId}/views/${viewId}/properties/order`,
+			{ propertyIds },
+		);
+
+		return response.data.data;
+	},
+
+	setViewGroup: async (
+		databaseId: string,
+		viewId: string,
+		propertyId: string | null,
+	): Promise<DatabaseViewDetail> => {
+		const response = await instance.patch<ApiResponse<DatabaseViewDetail>>(
+			`${DATABASE_API}/${databaseId}/views/${viewId}/group`,
+			{ propertyId },
+		);
+
+		return response.data.data;
+	},
+
+	setViewFilters: async (
+		databaseId: string,
+		viewId: string,
+		filters: DatabaseViewFilter[],
+	): Promise<DatabaseViewDetail> => {
+		const response = await instance.patch<ApiResponse<DatabaseViewDetail>>(
+			`${DATABASE_API}/${databaseId}/views/${viewId}/filters`,
+			{ filters },
 		);
 
 		return response.data.data;

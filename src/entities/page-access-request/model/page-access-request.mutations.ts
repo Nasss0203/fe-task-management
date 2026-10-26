@@ -23,6 +23,25 @@ export function useCreatePageAccessRequest(pageId: string, token: string) {
 	});
 }
 
+export function useRequestEditAccessFromSite(
+	pageId: string,
+	subdomain: string,
+	path: string,
+) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: () =>
+			pageAccessRequestApi.create(pageId, { subdomain, path }),
+
+		onSettled: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: pageAccessRequestKeys.mine(pageId),
+			});
+		},
+	});
+}
+
 interface ApprovePageAccessRequestVariables {
 	requestId: string;
 	accessLevel: PageShareAccessLevel;

@@ -8,7 +8,9 @@ import type {
 	Page,
 	PagePreset,
 	PagePresetOption,
+	PageSearchResult,
 	UpdatePageInput,
+	WorkspaceDatabase,
 } from "../model/page.types";
 
 const PAGE_API = "/page";
@@ -45,6 +47,19 @@ export const pageApi = {
 		return response.data.data;
 	},
 
+	search: async (
+		workspaceId: string,
+		query: string,
+		signal?: AbortSignal,
+	): Promise<PageSearchResult[]> => {
+		const response = await instance.get<ApiResponse<PageSearchResult[]>>(
+			`${PAGE_API}/workspace/${workspaceId}/search`,
+			{ params: { q: query }, signal },
+		);
+
+		return response.data.data;
+	},
+
 	getByWorkspace: async (
 		workspaceId: string,
 		signal?: AbortSignal,
@@ -57,6 +72,44 @@ export const pageApi = {
 		);
 
 		return response.data.data;
+	},
+
+	getDatabasesByWorkspace: async (
+		workspaceId: string,
+		signal?: AbortSignal,
+	): Promise<WorkspaceDatabase[]> => {
+		const response = await instance.get<ApiResponse<WorkspaceDatabase[]>>(
+			`${PAGE_API}/workspace/${workspaceId}/databases`,
+			{
+				signal,
+			},
+		);
+
+		return response.data.data;
+	},
+
+	getDeletedDatabasesByWorkspace: async (
+		workspaceId: string,
+		signal?: AbortSignal,
+	): Promise<WorkspaceDatabase[]> => {
+		const response = await instance.get<ApiResponse<WorkspaceDatabase[]>>(
+			`${PAGE_API}/workspace/${workspaceId}/databases/trash`,
+			{
+				signal,
+			},
+		);
+
+		return response.data.data;
+	},
+
+	restoreDatabase: async (pageId: string, databaseId: string) => {
+		await instance.patch(
+			`${PAGE_API}/${pageId}/databases/${databaseId}/restore`,
+		);
+	},
+
+	deleteDatabasePermanently: async (pageId: string, databaseId: string) => {
+		await instance.delete(`${PAGE_API}/${pageId}/databases/${databaseId}`);
 	},
 
 	getById: async (

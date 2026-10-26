@@ -8,7 +8,6 @@ import {
 	TouchSensor,
 	closestCorners,
 	pointerWithin,
-	useDraggable,
 	useDroppable,
 	useSensor,
 	useSensors,
@@ -16,6 +15,12 @@ import {
 	type DragEndEvent,
 	type DragStartEvent,
 } from "@dnd-kit/core";
+import {
+	SortableContext,
+	useSortable,
+	verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { KanbanSquare, MoreHorizontal, Plus } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
@@ -23,6 +28,7 @@ import { toast } from "sonner";
 import {
 	useAddDatabaseProperty,
 	useAddPropertyOption,
+	useMoveDatabaseRow,
 	useSetDatabaseRowValue,
 } from "@/entities/database/model/database.mutations";
 import {
@@ -65,10 +71,14 @@ const CARD_PROPERTY_TYPES = new Set<PropertyType>([
 	PropertyType.MULTI_SELECT,
 ]);
 
-// Drop into the column under the pointer; keyboard drags have no pointer, so
-// fall back to the nearest column.
+// Prefer the card under the pointer, then its column; keyboard drags have no
+// pointer, so fall back to the nearest target.
 const collisionDetection: CollisionDetection = (args) => {
 	const hits = pointerWithin(args);
+	const cardHits = hits.filter(
+		(hit) => hit.data?.droppableContainer?.data.current?.type === "card",
+	);
+	if (cardHits.length) return cardHits;
 	return hits.length ? hits : closestCorners(args);
 };
 
@@ -77,6 +87,7 @@ interface BoardViewProps {
 	viewDetail: DatabaseViewDetail;
 	rows: DatabaseRow[];
 	onOpenRow: OpenRowHandler;
+	readOnly?: boolean;
 }
 
 /** Status first (Notion's default board grouping), then Select. */
@@ -92,17 +103,23 @@ export function BoardView({
 	viewDetail,
 	rows,
 	onOpenRow,
+	readOnly = false,
 }: BoardViewProps) {
 	const candidates = getGroupCandidates(database);
-	// shortcut: the backend has no per-view group-by setting, so the choice lives
-	// in component state; persist it once views get a config field.
-	const [groupById, setGroupById] = useState<string | null>(null);
 	const groupProperty =
-		candidates.find((property) => property.id === groupById) ??
+		candidates.find((property) => property.id === viewDetail.groupBy) ??
 		candidates[0];
 
 	if (!groupProperty) {
-		return <BoardSetupGuide database={database} />;
+		return readOnly ? (
+			<DatabaseViewEmptyGuide
+				icon={KanbanSquare}
+				title='Board needs a Status or Select property'
+				description='Ask someone who can edit this page to add one.'
+			/>
+		) : (
+			<BoardSetupGuide database={database} />
+		);
 	}
 
 	return (
@@ -113,8 +130,7 @@ export function BoardView({
 			rows={rows}
 			onOpenRow={onOpenRow}
 			groupProperty={groupProperty}
-			candidates={candidates}
-			onGroupByChange={setGroupById}
+			readOnly={readOnly}
 		/>
 	);
 }
@@ -159,8 +175,6 @@ function BoardSetupGuide({ database }: { database: Database }) {
 
 interface BoardColumnsProps extends BoardViewProps {
 	groupProperty: DatabaseProperty;
-	candidates: DatabaseProperty[];
-	onGroupByChange: (propertyId: string) => void;
 }
 
 function BoardColumns({
@@ -169,8 +183,7 @@ function BoardColumns({
 	rows,
 	onOpenRow,
 	groupProperty,
-	candidates,
-	onGroupByChange,
+	readOnly = false,
 }: BoardColumnsProps) {
 	const titleProperty = getTitleProperty(database);
 	const cardProperties = getVisibleProperties(database, viewDetail).filter(
@@ -178,6 +191,8 @@ function BoardColumns({
 			property.id !== groupProperty.id && CARD_PROPERTY_TYPES.has(property.type),
 	);
 	const setValueMutation = useSetDatabaseRowValue(database.id);
+	const moveRowMutation = useMoveDatabaseRow(database.id);
+	const manualOrder = (viewDetail.sorts?.length ?? 0) === 0;
 	const { addRow, isPending } = useQuickAddRow(database);
 	const [activeRowId, setActiveRowId] = useState<string | null>(null);
 	// Card whose name is being edited inline (pencil button or a just-added card).
@@ -234,49 +249,72 @@ function BoardColumns({
 	const handleDragStart = (event: DragStartEvent) =>
 		setActiveRowId(String(event.active.id));
 
-	const handleDragEnd = (event: DragEndEvent) => {
+	const handleDragEnd = ({ active, over }: DragEndEvent) => {
 		setActiveRowId(null);
-		const row = rows.find((item) => item.id === event.active.id);
-		const target = event.over ? String(event.over.id) : null;
-		if (!row || !target || target === groupOf(row)) return;
+		const row = rows.find((item) => item.id === active.id);
+		if (!row || !over) return;
 
-		setValueMutation.mutate(
-			{
-				rowId: row.id,
-				propertyId: groupProperty.id,
-				value: target === NO_GROUP_ID ? null : target,
-			},
-			{ onError: () => toast.error("Couldn't move card") },
+		const overId = String(over.id);
+		const overRow = rows.find((item) => item.id === overId);
+		const targetColumn = overRow ? groupOf(overRow) : overId;
+		if (!overRow && !columns.some((column) => column.id === overId)) return;
+
+		const sourceColumn = groupOf(row);
+		const sameColumn = sourceColumn === targetColumn;
+		const sourceRows = rows.filter((item) => groupOf(item) === sourceColumn);
+		const targetRows = rows.filter(
+			(item) => item.id !== row.id && groupOf(item) === targetColumn,
 		);
+
+		let insertAt = targetRows.length;
+		if (overRow && overRow.id !== row.id) {
+			const overIndex = targetRows.findIndex((item) => item.id === overRow.id);
+			const movingDown =
+				sameColumn &&
+				sourceRows.indexOf(row) < sourceRows.findIndex((item) => item.id === overRow.id);
+			insertAt = movingDown ? overIndex + 1 : overIndex;
+		} else if (sameColumn) {
+			return;
+		}
+
+		const previousRowId = targetRows[insertAt - 1]?.id ?? null;
+		const nextRowId = targetRows[insertAt]?.id ?? null;
+
+		if (!sameColumn) {
+			setValueMutation.mutate(
+				{
+					rowId: row.id,
+					propertyId: groupProperty.id,
+					value: targetColumn === NO_GROUP_ID ? null : targetColumn,
+				},
+				{ onError: () => toast.error("Couldn't move card") },
+			);
+		}
+
+		const index = sourceRows.indexOf(row);
+		const unchanged =
+			sameColumn &&
+			(sourceRows[index - 1]?.id ?? null) === previousRowId &&
+			(sourceRows[index + 1]?.id ?? null) === nextRowId;
+
+		if (manualOrder && !unchanged) {
+			moveRowMutation.mutate(
+				{ rowId: row.id, previousRowId, nextRowId },
+				{ onError: () => toast.error("Couldn't save card order") },
+			);
+		}
 	};
 
 	return (
 		<div className='w-full min-w-0'>
 			<div className='mb-2 flex items-center gap-2 text-xs text-muted-foreground'>
 				<PropertyIcon type={groupProperty.type} className='size-3.5' />
-				{candidates.length > 1 ? (
-					<label className='flex items-center gap-1'>
-						Group by
-						<select
-							value={groupProperty.id}
-							onChange={(event) => onGroupByChange(event.target.value)}
-							className='rounded-sm bg-transparent py-0.5 font-medium text-foreground outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/40'
-						>
-							{candidates.map((property) => (
-								<option key={property.id} value={property.id}>
-									{property.name}
-								</option>
-							))}
-						</select>
-					</label>
-				) : (
-					<span>
-						Grouped by{" "}
-						<span className='font-medium text-foreground'>
-							{groupProperty.name}
-						</span>
+				<span>
+					Grouped by{" "}
+					<span className='font-medium text-foreground'>
+						{groupProperty.name}
 					</span>
-				)}
+				</span>
 			</div>
 
 			<DndContext
@@ -298,6 +336,7 @@ function BoardColumns({
 							option={groupProperty.options.find((item) => item.id === column.id)}
 							count={column.rows.length}
 							isPending={isPending}
+							readOnly={readOnly}
 							onAdd={async () => {
 								const rowId = await addRow([
 									{
@@ -308,27 +347,35 @@ function BoardColumns({
 								if (rowId) setEditingRowId(rowId);
 							}}
 						>
-							{column.rows.map((row) => (
-								<BoardCard
-									key={row.id}
-									row={row}
-									database={database}
-									titleProperty={titleProperty}
-									cardProperties={cardProperties}
-									onOpen={() => onOpenRow(row.id)}
-									editing={row.id === editingRowId}
-									onEditingChange={(editing) =>
-										setEditingRowId(editing ? row.id : null)
-									}
-								/>
-							))}
+							<SortableContext
+								items={column.rows.map((row) => row.id)}
+								strategy={verticalListSortingStrategy}
+							>
+								{column.rows.map((row) => (
+									<BoardCard
+										key={row.id}
+										row={row}
+										database={database}
+										titleProperty={titleProperty}
+										cardProperties={cardProperties}
+										onOpen={() => onOpenRow(row.id)}
+										editing={row.id === editingRowId}
+										onEditingChange={(editing) =>
+											setEditingRowId(editing ? row.id : null)
+										}
+										readOnly={readOnly}
+									/>
+								))}
+							</SortableContext>
 						</BoardColumn>
 					))}
 
-					<NewGroupColumn
-						databaseId={database.id}
-						property={groupProperty}
-					/>
+					{!readOnly && (
+						<NewGroupColumn
+							databaseId={database.id}
+							property={groupProperty}
+						/>
+					)}
 				</div>
 
 				<DragOverlay>
@@ -355,6 +402,7 @@ interface BoardColumnProps {
 	option?: PropertyOption;
 	count: number;
 	isPending: boolean;
+	readOnly: boolean;
 	onAdd: () => void;
 	children: ReactNode;
 }
@@ -368,6 +416,7 @@ function BoardColumn({
 	option,
 	count,
 	isPending,
+	readOnly,
 	onAdd,
 	children,
 }: BoardColumnProps) {
@@ -391,7 +440,9 @@ function BoardColumn({
 			)}
 		>
 			<header className='flex h-7 items-center gap-1.5 px-1'>
-				{noGroup || !option ? (
+				{readOnly && option ? (
+					<PropertyOptionBadge name={name} color={color} />
+				) : noGroup || !option ? (
 					<span className='truncate text-xs font-medium text-muted-foreground'>
 						{name}
 					</span>
@@ -419,7 +470,7 @@ function BoardColumn({
 				<span className='text-xs tabular-nums text-muted-foreground'>
 					{count}
 				</span>
-				{option && (
+				{option && !readOnly && (
 					<button
 						type='button'
 						aria-label={`${name} options`}
@@ -429,6 +480,7 @@ function BoardColumn({
 						<MoreHorizontal className='size-3.5' />
 					</button>
 				)}
+				{!readOnly && (
 				<button
 					type='button'
 					aria-label={`Add to ${name}`}
@@ -438,19 +490,22 @@ function BoardColumn({
 				>
 					<Plus className='size-3.5' />
 				</button>
+				)}
 			</header>
 
 			{children}
 
-			<button
-				type='button'
-				disabled={isPending}
-				onClick={onAdd}
-				className='flex h-7 items-center gap-1.5 rounded-md px-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground disabled:opacity-50'
-			>
-				<Plus className='size-3.5' />
-				New
-			</button>
+			{!readOnly && (
+				<button
+					type='button'
+					disabled={isPending}
+					onClick={onAdd}
+					className='flex h-7 items-center gap-1.5 rounded-md px-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground disabled:opacity-50'
+				>
+					<Plus className='size-3.5' />
+					New
+				</button>
+			)}
 		</section>
 	);
 }
@@ -463,6 +518,7 @@ interface BoardCardProps {
 	onOpen: () => void;
 	editing: boolean;
 	onEditingChange: (editing: boolean) => void;
+	readOnly: boolean;
 }
 
 function BoardCard({
@@ -473,10 +529,19 @@ function BoardCard({
 	onOpen,
 	editing,
 	onEditingChange,
+	readOnly,
 }: BoardCardProps) {
-	const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+	const {
+		attributes,
+		listeners,
+		setNodeRef,
+		transform,
+		transition,
+		isDragging,
+	} = useSortable({
 		id: row.id,
-		disabled: editing,
+		disabled: editing || readOnly,
+		data: { type: "card" },
 	});
 	const values = getRowValueMap(row);
 	const title = titleProperty && (values.get(titleProperty.id) as string);
@@ -484,9 +549,10 @@ function BoardCard({
 	return (
 		<article
 			ref={setNodeRef}
+			style={{ transform: CSS.Translate.toString(transform), transition }}
 			{...attributes}
 			{...listeners}
-			aria-roledescription='Draggable card'
+			aria-roledescription={readOnly ? undefined : "Draggable card"}
 			aria-label={title || "Untitled"}
 			// A click without dragging (the sensors need 6px / a long-press) opens it.
 			onClick={onOpen}
@@ -495,11 +561,12 @@ function BoardCard({
 				if (event.key === "Enter") onOpen();
 			}}
 			className={cn(
-				"group/row relative flex cursor-grab flex-col gap-1 rounded-md border border-border/70 bg-card px-2 py-1.5 shadow-[0_1px_2px_rgb(0_0_0/0.06)] outline-none transition-colors hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring/50 active:cursor-grabbing dark:shadow-none",
+				"group/row relative flex flex-col gap-1 rounded-md border border-border/70 bg-card px-2 py-1.5 shadow-[0_1px_2px_rgb(0_0_0/0.06)] outline-none transition-colors hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring/50 dark:shadow-none",
+				readOnly ? "cursor-pointer" : "cursor-grab active:cursor-grabbing",
 				isDragging && "opacity-40",
 			)}
 		>
-			<div className='flex min-w-0 pr-14'>
+			<div className={cn("flex min-w-0", !readOnly && "pr-14")}>
 				<RowTitle
 					database={database}
 					row={row}
@@ -521,6 +588,7 @@ function BoardCard({
 			</div>
 
 			{/* Opening the menu must not start a drag (Mouse/Touch sensors). */}
+			{!readOnly && (
 			<div
 				className='absolute right-1 top-1 flex items-center gap-0.5 [&_button]:size-6'
 				onMouseDown={(event) => event.stopPropagation()}
@@ -533,6 +601,7 @@ function BoardCard({
 				)}
 				<RowActionsMenu databaseId={database.id} rowId={row.id} />
 			</div>
+			)}
 		</article>
 	);
 }

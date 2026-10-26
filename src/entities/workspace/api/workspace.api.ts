@@ -75,4 +75,20 @@ export const workspaceApi = {
 
 		return response.data.data;
 	},
+
+	update: async (
+		workspaceId: string,
+		input: { name?: string; icon?: string | null },
+	): Promise<Workspace> => {
+		const response = await instance.patch<ApiResponse<Workspace>>(
+			`${WORKSPACE_API}/${workspaceId}`,
+			input,
+		);
+
+		return response.data.data;
+	},
+
+	moveToTrash: async (workspaceId: string): Promise<void> => {
+		await instance.delete(`${WORKSPACE_API}/${workspaceId}`);
+	},
 };

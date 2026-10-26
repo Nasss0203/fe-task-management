@@ -73,9 +73,15 @@ interface CalendarViewProps {
 	database: Database;
 	rows: DatabaseRow[];
 	onOpenRow: OpenRowHandler;
+	readOnly?: boolean;
 }
 
-export function CalendarView({ database, rows, onOpenRow }: CalendarViewProps) {
+export function CalendarView({
+	database,
+	rows,
+	onOpenRow,
+	readOnly = false,
+}: CalendarViewProps) {
 	const candidates = database.properties.filter(
 		(property) => property.type === PropertyType.DATE,
 	);
@@ -87,7 +93,15 @@ export function CalendarView({ database, rows, onOpenRow }: CalendarViewProps) {
 		candidates[0];
 
 	if (!dateProperty) {
-		return <CalendarSetupGuide database={database} />;
+		return readOnly ? (
+			<DatabaseViewEmptyGuide
+				icon={CalendarDays}
+				title='Calendar needs a Date property'
+				description='Ask someone who can edit this page to add one.'
+			/>
+		) : (
+			<CalendarSetupGuide database={database} />
+		);
 	}
 
 	return (
@@ -98,6 +112,7 @@ export function CalendarView({ database, rows, onOpenRow }: CalendarViewProps) {
 			dateProperty={dateProperty}
 			candidates={candidates}
 			onDatePropertyChange={setDatePropertyId}
+			readOnly={readOnly}
 		/>
 	);
 }
@@ -177,6 +192,7 @@ function CalendarMonth({
 	dateProperty,
 	candidates,
 	onDatePropertyChange,
+	readOnly = false,
 }: CalendarMonthProps) {
 	const calendarRef = useRef<CalendarRef>(null);
 	const gridRef = useRef<HTMLDivElement>(null);
@@ -211,7 +227,7 @@ function CalendarMonth({
 
 	// Rows without a date can be dragged from the tray onto a day.
 	useEffect(() => {
-		if (!trayRef.current) return;
+		if (!trayRef.current || readOnly) return;
 		const draggable = new Draggable(trayRef.current, {
 			itemSelector: "[data-row-id]",
 			eventData: (el) => ({
@@ -220,7 +236,7 @@ function CalendarMonth({
 			}),
 		});
 		return () => draggable.destroy();
-	}, []);
+	}, [readOnly]);
 
 	const api = () => calendarRef.current?.getApi();
 
@@ -362,7 +378,9 @@ function CalendarMonth({
 				<span className='mr-1 text-xs text-muted-foreground'>
 					{undated.length
 						? `No date · ${undated.length}`
-						: "Drag an event here to clear its date"}
+						: readOnly
+							? "No undated rows"
+							: "Drag an event here to clear its date"}
 				</span>
 				{undated.map((row) => (
 					<button
@@ -375,7 +393,8 @@ function CalendarMonth({
 							onOpenRow(row.id);
 						}}
 						className={cn(
-							"max-w-48 cursor-grab truncate rounded-sm border bg-card px-1.5 py-0.5 text-xs font-medium hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+							"max-w-48 truncate rounded-sm border bg-card px-1.5 py-0.5 text-xs font-medium hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+							readOnly ? "cursor-pointer" : "cursor-grab",
 							titleOf(row) === "Untitled" && "text-muted-foreground",
 						)}
 					>
@@ -396,9 +415,9 @@ function CalendarMonth({
 						height='auto'
 						dayMaxEvents={3}
 						events={events}
-						editable
-						droppable
-						selectable
+						editable={!readOnly}
+						droppable={!readOnly}
+						selectable={!readOnly}
 						unselectAuto={false}
 						datesSet={({ view }) => setTitle(view.title)}
 						select={handleSelect}

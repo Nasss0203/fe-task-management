@@ -65,8 +65,24 @@ export interface DatabaseViewProperty {
 	width: number | null;
 }
 
+export type DatabaseViewSortDirection = "asc" | "desc";
+
+export interface DatabaseViewSort {
+	propertyId: string;
+	direction: DatabaseViewSortDirection;
+}
+
+export interface DatabaseViewFilter {
+	propertyId: string;
+	operator: string;
+	value?: string | number | null;
+}
+
 export interface DatabaseViewDetail extends DatabaseView {
 	properties: DatabaseViewProperty[];
+	sorts?: DatabaseViewSort[];
+	filters?: DatabaseViewFilter[];
+	groupBy?: string | null;
 }
 
 export interface DatabaseRowValue {
@@ -78,7 +94,15 @@ export interface DatabaseRowValue {
 export interface DatabaseRow {
 	id: string;
 	databaseId: string;
+	position?: number;
 	values: DatabaseRowValue[];
+}
+
+/** A user referenced by a Person cell, readable by anyone who can read the rows. */
+export interface DatabasePerson {
+	user_id: string;
+	full_name: string;
+	avatar_url: string | null;
 }
 
 export interface SetDatabaseRowValueResponse {

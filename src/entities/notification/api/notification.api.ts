@@ -12,6 +12,7 @@ const NOTIFICATION_API = "/notifications";
 export const notificationApi = {
 	getNotifications: async (
 		filters: NotificationFilters = {},
+		cursorId?: string,
 	): Promise<Notification[]> => {
 		const response = await instance.get<ApiResponse<Notification[]>>(
 			"/notifications",
@@ -19,6 +20,7 @@ export const notificationApi = {
 				params: {
 					limit: 30,
 					...filters,
+					cursorId,
 				},
 			},
 		);

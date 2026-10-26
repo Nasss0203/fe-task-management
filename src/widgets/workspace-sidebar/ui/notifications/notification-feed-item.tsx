@@ -1,10 +1,11 @@
 "use client";
 
-import { formatNotificationTime } from "@/entities/notification/lib/notification-date";
 import { getNotificationPresentation } from "@/entities/notification/lib/notification-presentation";
 import type { Notification } from "@/entities/notification/model/notification.types";
 
+import { NotificationItemShell } from "./notification-item-shell";
 import { PageAccessRequestNotification } from "./page-access-request-notification";
+import { PageEditRequestNotification } from "./page-edit-request-notification";
 import { WorkspaceInviteNotification } from "./workspace-invite-notification";
 
 interface NotificationFeedItemProps {
@@ -28,6 +29,16 @@ export function NotificationFeedItem({
 		);
 	}
 
+	if (notification.type === "page.edit.requested") {
+		return (
+			<PageEditRequestNotification
+				notification={notification}
+				isMarkingRead={isPending}
+				onRead={onRead}
+			/>
+		);
+	}
+
 	if (notification.type === "workspace.invite") {
 		return (
 			<WorkspaceInviteNotification
@@ -43,42 +54,15 @@ export function NotificationFeedItem({
 	 */
 	const presentation = getNotificationPresentation(notification);
 
-	const Icon = presentation.icon;
-
-	const isUnread = notification.readAt === null;
-
 	return (
-		<button
-			type='button'
-			disabled={isPending}
-			onClick={() => onRead(notification)}
-			className='w-full border-b px-3 py-3 text-left transition-colors hover:bg-sidebar-accent/50 disabled:opacity-70'
-		>
-			<div className='flex items-start gap-2'>
-				<div className='mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-md bg-muted'>
-					<Icon className='size-4' />
-				</div>
-
-				<div className='min-w-0 flex-1'>
-					<p className={isUnread ? "text-sm font-medium" : "text-sm"}>
-						{presentation.title}
-					</p>
-
-					{presentation.description && (
-						<p className='mt-1 text-xs text-muted-foreground'>
-							{presentation.description}
-						</p>
-					)}
-
-					<p className='mt-1 text-xs text-muted-foreground'>
-						{formatNotificationTime(notification.createdAt)}
-					</p>
-				</div>
-
-				{isUnread && (
-					<span className='mt-1.5 size-2 shrink-0 rounded-full bg-primary' />
-				)}
-			</div>
-		</button>
+		<NotificationItemShell
+			notification={notification}
+			icon={presentation.icon}
+			tone={presentation.tone}
+			title={presentation.title}
+			description={presentation.description}
+			isMarkingRead={isPending}
+			onRead={onRead}
+		/>
 	);
 }

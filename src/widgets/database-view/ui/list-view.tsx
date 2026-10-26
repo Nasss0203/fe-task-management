@@ -25,6 +25,7 @@ interface ListViewProps {
 	viewDetail: DatabaseViewDetail;
 	rows: DatabaseRow[];
 	onOpenRow: OpenRowHandler;
+	readOnly?: boolean;
 }
 
 export function ListView({
@@ -32,6 +33,7 @@ export function ListView({
 	viewDetail,
 	rows,
 	onOpenRow,
+	readOnly = false,
 }: ListViewProps) {
 	const titleProperty = getTitleProperty(database);
 	const visibleProperties = getVisibleProperties(database, viewDetail);
@@ -96,7 +98,7 @@ export function ListView({
 										onEditingChange={() => undefined}
 										className='min-w-[60px] shrink'
 									/>
-									{titleProperty && (
+									{titleProperty && !readOnly && (
 										<RenameRowButton onClick={() => setEditingRowId(row.id)} />
 									)}
 									<span className='ml-auto hidden min-w-0 max-w-[65%] sm:block'>
@@ -106,9 +108,11 @@ export function ListView({
 								</div>
 							)}
 
-							<div className='w-8 shrink-0'>
-								<RowActionsMenu databaseId={database.id} rowId={row.id} />
-							</div>
+							{!readOnly && (
+								<div className='w-8 shrink-0'>
+									<RowActionsMenu databaseId={database.id} rowId={row.id} />
+								</div>
+							)}
 						</li>
 					);
 				})}
@@ -120,18 +124,20 @@ export function ListView({
 				)}
 			</ul>
 
-			<button
-				type='button'
-				disabled={isPending}
-				onClick={async () => {
-					const rowId = await addRow();
-					if (rowId) setEditingRowId(rowId);
-				}}
-				className='flex h-9 w-full items-center gap-1.5 rounded-sm px-2 text-sm text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground disabled:opacity-50'
-			>
-				<Plus className='size-4' />
-				{isPending ? "Adding..." : "New row"}
-			</button>
+			{!readOnly && (
+				<button
+					type='button'
+					disabled={isPending}
+					onClick={async () => {
+						const rowId = await addRow();
+						if (rowId) setEditingRowId(rowId);
+					}}
+					className='flex h-9 w-full items-center gap-1.5 rounded-sm px-2 text-sm text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground disabled:opacity-50'
+				>
+					<Plus className='size-4' />
+					{isPending ? "Adding..." : "New row"}
+				</button>
+			)}
 		</div>
 	);
 }

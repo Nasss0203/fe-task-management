@@ -29,11 +29,18 @@ export function ListingPreviewSection({
 	disabled,
 }: ListingPreviewSectionProps) {
 	const { control, setValue, formState } = useFormContext<ListingFormValues>();
-	const [previewMode, offerType] = useWatch({
+	const [previewMode, offerType, demoMode, demoVersionId] = useWatch({
 		control,
-		name: ["preview_mode", "offer_type"],
+		name: ["preview_mode", "offer_type", "demo_mode", "demo_version_id"],
 	});
-	const imageVersionId = officialVersionId ?? publishedVersions[0]?.id;
+	// Visitors of a paid listing with a separate demo see that demo's screenshot.
+	const isSeparateDemo =
+		previewMode === "INTERACTIVE" &&
+		offerType === "PAID" &&
+		demoMode === "SEPARATE";
+	const imageVersionId = isSeparateDemo
+		? demoVersionId || undefined
+		: (officialVersionId ?? publishedVersions[0]?.id);
 
 	return (
 		<ListingSection
@@ -74,10 +81,6 @@ export function ListingPreviewSection({
 				/>
 			</div>
 
-			{previewMode === "IMAGE" && (
-				<ThumbnailPreview templateId={template.id} versionId={imageVersionId} />
-			)}
-
 			{previewMode === "INTERACTIVE" && offerType === "FREE" && (
 				<p className='rounded-lg bg-muted/50 px-4 py-3 text-sm text-muted-foreground'>
 					Visitors can browse a read-only copy of the version you release.
@@ -92,6 +95,12 @@ export function ListingPreviewSection({
 					disabled={disabled}
 				/>
 			)}
+
+			<ThumbnailPreview
+				templateId={template.id}
+				versionId={imageVersionId}
+				fromDemo={isSeparateDemo}
+			/>
 		</ListingSection>
 	);
 }
@@ -99,9 +108,11 @@ export function ListingPreviewSection({
 function ThumbnailPreview({
 	templateId,
 	versionId,
+	fromDemo,
 }: {
 	templateId: string;
 	versionId?: string;
+	fromDemo: boolean;
 }) {
 	const { data: thumbnail, isPending, isError } = useTemplateVersionThumbnail(
 		templateId,
@@ -115,7 +126,9 @@ function ThumbnailPreview({
 					<div className='flex aspect-video items-center justify-center px-6 text-center text-sm text-muted-foreground'>
 						{versionId
 							? "The screenshot isn't ready yet."
-							: "A screenshot is generated after you publish a version."}
+							: fromDemo
+								? "Choose a demo version to see its screenshot."
+								: "A screenshot is generated after you publish a version."}
 					</div>
 				) : isPending ? (
 					<Skeleton className='aspect-video w-full rounded-none' />
@@ -129,7 +142,8 @@ function ThumbnailPreview({
 				)}
 			</div>
 			<p className='text-xs text-muted-foreground'>
-				Generated automatically from the released version.
+				Generated automatically from the{" "}
+				{fromDemo ? "demo" : "released"} version.
 			</p>
 		</div>
 	);

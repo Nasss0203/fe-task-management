@@ -72,9 +72,9 @@ describe("workspace remove member action", () => {
 		expect(screen.queryByRole("button", { name: /Role for/i })).not.toBeInTheDocument();
 	});
 
-	it("does not show Remove for another owner", async () => {
+	it("shows Remove for another owner when the current user can remove members", async () => {
 		await openPersonMenu(person("OWNER"));
-		expect(screen.queryByRole("menuitem", { name: "Remove from workspace" })).not.toBeInTheDocument();
+		expect(screen.getByRole("menuitem", { name: "Remove from workspace" })).toBeInTheDocument();
 	});
 
 	it("shows Remove for a guest with permission", async () => {
