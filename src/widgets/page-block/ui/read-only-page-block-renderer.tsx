@@ -86,12 +86,17 @@ function ReadOnlyToggleBlock({
 			{isOpen && block.children.length > 0 && (
 				<div id={`toggle-children-${block.id}`} className='ml-7 pl-2'>
 					{block.children.map((child) => (
-						<ReadOnlyPageBlockRenderer
+						<div
 							key={child.id}
-							block={child}
-							shareToken={shareToken}
-							disableDatabaseView={disableDatabaseView}
-						/>
+							id={`block-${child.id}`}
+							className='rounded-md transition-colors duration-500'
+						>
+							<ReadOnlyPageBlockRenderer
+								block={child}
+								shareToken={shareToken}
+								disableDatabaseView={disableDatabaseView}
+							/>
+						</div>
 					))}
 				</div>
 			)}

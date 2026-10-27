@@ -80,8 +80,9 @@ export function PageBlockEditorRow({ block, shareToken }: PageBlockEditorRowProp
 
 	return (
 		<div
+			id={`block-${block.id}`}
 			data-block-row=''
-			className='grid w-full grid-cols-[28px_28px_minmax(0,1fr)] items-start'
+			className='grid w-full grid-cols-[28px_28px_minmax(0,1fr)] items-start rounded-md transition-colors duration-500'
 		>
 			{/* Add block */}
 			<Popover open={open} onOpenChange={setOpen}>

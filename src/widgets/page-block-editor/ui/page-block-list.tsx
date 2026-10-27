@@ -4,6 +4,7 @@ import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-t
 
 import { ReadOnlyPageBlockRenderer } from "@/widgets/page-block/ui/read-only-page-block-renderer";
 
+import { useScrollToBlockHash } from "../model/use-scroll-to-block-hash";
 import { EmptyPageBlockRow } from "./empty-page-block-row";
 import { PageBlockEditorProvider } from "./page-block-editor-context";
 import { PageBlockEditorRow } from "./page-block-editor-row";
@@ -41,7 +42,10 @@ interface ReadOnlyBlockRowProps {
 
 function ReadOnlyBlockRow({ block, shareToken }: ReadOnlyBlockRowProps) {
 	return (
-		<div className='group -mx-2 grid min-h-8 w-[calc(100%+1rem)] grid-cols-[28px_28px_minmax(0,1fr)] items-center rounded-md px-2 transition-colors duration-150 hover:bg-muted/40'>
+		<div
+			id={`block-${block.id}`}
+			className='group -mx-2 grid min-h-8 w-[calc(100%+1rem)] grid-cols-[28px_28px_minmax(0,1fr)] items-center rounded-md px-2 transition-colors duration-150 hover:bg-muted/40'
+		>
 			<div className='size-7' aria-hidden='true' />
 
 			<div
@@ -67,6 +71,8 @@ export function PageBlockList({
 	canEdit,
 	shareToken,
 }: PageBlockListProps) {
+	useScrollToBlockHash(blocks.length > 0);
+
 	if (!canEdit) {
 		return (
 			<div className='w-full min-w-0 max-w-full space-y-1'>

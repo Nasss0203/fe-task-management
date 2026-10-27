@@ -1,5 +1,6 @@
 "use client";
 
+import { isAxiosError } from "axios";
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
 
@@ -13,6 +14,7 @@ import {
 	PageHeader,
 	PageSkeleton,
 } from "@/entities/page/ui/page-surface";
+import { PageUnavailable } from "@/entities/page/ui/page-unavailable";
 
 import { PageEditAccessBoundary } from "@/features/page-access/ui/page-edit-access-boundary";
 import { RequestEditAccessDialog } from "@/features/page-edit-access/ui/request-edit-access-dialog";
@@ -26,7 +28,7 @@ export default function PageDetail() {
 
 	const [requestEditOpen, setRequestEditOpen] = useState(false);
 
-	const { data: page, isLoading, isError } = usePage(params.pageId);
+	const { data: page, isLoading, isError, error } = usePage(params.pageId);
 
 	const { data: blocks = [], isLoading: isBlocksLoading } = usePageBlocks(
 		params.pageId,
@@ -53,7 +55,9 @@ export default function PageDetail() {
 	}
 
 	if (isError || !page) {
-		return <div className='p-6'>Page not found</div>;
+		const forbidden = isAxiosError(error) && error.response?.status === 403;
+
+		return <PageUnavailable reason={forbidden ? "no-access" : "not-found"} />;
 	}
 
 	return (

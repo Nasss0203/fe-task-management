@@ -124,7 +124,7 @@ export function DatabaseViewBlock({
 				<DatabaseTitle databaseId={database.id} name={database.name} />
 			)}
 			<div className='mb-1 flex items-center justify-between gap-2'>
-				<div className='flex min-w-0 items-center gap-1 overflow-x-auto [scrollbar-width:none]'>
+				<div className='flex min-w-0 items-center gap-1 overflow-x-auto pb-1 [scrollbar-width:thin]'>
 					{views.map((view) => (
 						<DatabaseViewTab
 							key={view.id}

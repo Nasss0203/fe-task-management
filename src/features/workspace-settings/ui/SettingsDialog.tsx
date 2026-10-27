@@ -31,7 +31,7 @@ const SettingsDialog = ({
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogContent className='flex min-h-[80dvh] min-w-[70%] gap-0 overflow-hidden p-0'>
+			<DialogContent className='flex h-[80dvh] min-w-[70%] gap-0 overflow-hidden p-0'>
 				<DialogHeader className='sr-only'>
 					<DialogTitle>Settings</DialogTitle>
 					<DialogDescription>
