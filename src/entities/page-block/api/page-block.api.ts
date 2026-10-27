@@ -76,6 +76,16 @@ export const pageBlockApi = {
 		return response.data.data;
 	},
 
+	duplicate: async (blockId: string, shareToken?: string): Promise<PageBlock> => {
+		const response = await instance.post<ApiResponse<PageBlock>>(
+			`/pageBlock/${blockId}/duplicate`,
+			{},
+			{ headers: getShareHeaders(shareToken) },
+		);
+
+		return response.data.data;
+	},
+
 	attachDatabaseView: async (
 		blockId: string,
 		input: {

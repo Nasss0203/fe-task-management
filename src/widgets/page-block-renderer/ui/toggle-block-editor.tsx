@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 import { useEffect, useRef, useState } from "react";
 
@@ -13,8 +13,10 @@ import {
 
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
 
+import { cn } from "@/shared/lib/utils";
+
 import { usePageBlockEditor } from "@/widgets/page-block-editor/ui/page-block-editor-context";
-import { PageBlockRenderer } from "@/widgets/page-block/ui/page-block-renderer";
+import { PageBlockEditorRow } from "@/widgets/page-block-editor/ui/page-block-editor-row";
 
 interface ToggleBlockEditorProps {
 	block: PageBlockNode;
@@ -40,6 +42,8 @@ function getText(block: PageBlockNode): string {
 export function ToggleBlockEditor({ block, shareToken }: ToggleBlockEditorProps) {
 	const [value, setValue] = useState(() => getText(block));
 
+	const inputRef = useRef<HTMLInputElement>(null);
+
 	/**
 	 * Tránh create child nhiều lần khi
 	 * query đang invalidate/refetch.
@@ -50,36 +54,34 @@ export function ToggleBlockEditor({ block, shareToken }: ToggleBlockEditorProps)
 
 	const createBlock = useCreatePageBlock(shareToken);
 
-	const { requestFocus } = usePageBlockEditor();
+	const { focusBlockId, requestFocus, clearFocus } = usePageBlockEditor();
 
 	useEffect(() => {
 		setValue(getText(block));
 	}, [block]);
 
 	/**
-	 * Nếu Toggle vừa được transform từ "/"
-	 * và mặc định đã mở nhưng chưa có child,
-	 * tự tạo TEXT child.
+	 * Backspace ở child đầu tiên sẽ focus về title.
 	 */
 	useEffect(() => {
-		if (!block.is_open) {
+		if (focusBlockId !== block.id) {
 			return;
 		}
 
-		if (block.children.length > 0) {
-			creatingChildRef.current = false;
+		inputRef.current?.focus();
 
-			return;
-		}
+		clearFocus();
+	}, [focusBlockId, block.id, clearFocus]);
 
+	const addChild = async () => {
 		if (creatingChildRef.current) {
 			return;
 		}
 
 		creatingChildRef.current = true;
 
-		void createBlock
-			.mutateAsync({
+		try {
+			const newBlock = await createBlock.mutateAsync({
 				pageId: block.page_id,
 
 				parentBlockId: block.id,
@@ -89,76 +91,25 @@ export function ToggleBlockEditor({ block, shareToken }: ToggleBlockEditorProps)
 				content: {
 					text: "",
 				},
-
-				styleConfig: {},
-				dataConfig: {},
-			})
-			.then((newBlock) => {
-				requestFocus(newBlock.id);
-			})
-			.catch(() => {
-				creatingChildRef.current = false;
-			});
-	}, [block.id, block.page_id, block.is_open, block.children.length]);
-
-	const handleToggle = async () => {
-		/**
-		 * Đóng Toggle.
-		 */
-		if (block.is_open) {
-			await updateBlock.mutateAsync({
-				blockId: block.id,
-
-				pageId: block.page_id,
-
-				isOpen: false,
 			});
 
-			return;
+			requestFocus(newBlock.id);
+		} finally {
+			creatingChildRef.current = false;
 		}
+	};
 
-		/**
-		 * Mở Toggle.
-		 */
-		await updateBlock.mutateAsync({
+	const handleToggle = () => {
+		updateBlock.mutate({
 			blockId: block.id,
 
 			pageId: block.page_id,
 
-			isOpen: true,
+			isOpen: !block.is_open,
 		});
-
-		/**
-		 * Nếu chưa có child,
-		 * tạo TEXT child ngay lập tức.
-		 */
-		if (block.children.length === 0 && !creatingChildRef.current) {
-			creatingChildRef.current = true;
-
-			try {
-				const newBlock = await createBlock.mutateAsync({
-					pageId: block.page_id,
-
-					parentBlockId: block.id,
-
-					type: PageBlockType.TEXT,
-
-					content: {
-						text: "",
-					},
-
-					styleConfig: {},
-					dataConfig: {},
-				});
-
-				requestFocus(newBlock.id);
-			} finally {
-				creatingChildRef.current = false;
-			}
-		}
 	};
 
-	const handleBlur = () => {
+	const saveTitle = () => {
 		const oldValue = getText(block);
 
 		if (value === oldValue) {
@@ -176,15 +127,52 @@ export function ToggleBlockEditor({ block, shareToken }: ToggleBlockEditorProps)
 		});
 	};
 
+	/**
+	 * Enter ở title: mở Toggle rồi đi vào child đầu tiên
+	 * (chưa có child thì tạo mới).
+	 */
+	const handleTitleKeyDown = async (
+		event: React.KeyboardEvent<HTMLInputElement>,
+	) => {
+		// Bỏ qua Enter dùng để chốt chữ của bộ gõ tiếng Việt
+		if (event.key !== "Enter" || event.nativeEvent.isComposing) {
+			return;
+		}
+
+		event.preventDefault();
+
+		saveTitle();
+
+		if (!block.is_open) {
+			await updateBlock.mutateAsync({
+				blockId: block.id,
+
+				pageId: block.page_id,
+
+				isOpen: true,
+			});
+		}
+
+		const firstChild = block.children[0];
+
+		if (firstChild) {
+			requestFocus(firstChild.id);
+
+			return;
+		}
+
+		await addChild();
+	};
+
 	return (
 		<div className='w-full'>
 			{/* Toggle title */}
-			<div className='flex min-h-7 items-start'>
+			<div className='flex min-h-7 items-start gap-1'>
 				<button
 					type='button'
-					onClick={() => {
-						void handleToggle();
-					}}
+					aria-label={block.is_open ? "Collapse toggle" : "Expand toggle"}
+					aria-expanded={block.is_open}
+					onClick={handleToggle}
 					className='
                         flex
                         size-7
@@ -193,23 +181,30 @@ export function ToggleBlockEditor({ block, shareToken }: ToggleBlockEditorProps)
                         justify-center
                         rounded-md
                         text-muted-foreground
+                        transition-colors
                         hover:bg-muted
+                        hover:text-foreground
                     '
 				>
-					{block.is_open ? (
-						<ChevronDown className='size-4' />
-					) : (
-						<ChevronRight className='size-4' />
-					)}
+					<ChevronRight
+						className={cn(
+							"size-4 transition-transform duration-200",
+							block.is_open && "rotate-90",
+						)}
+					/>
 				</button>
 
 				<input
+					ref={inputRef}
 					value={value}
 					placeholder='Toggle'
 					onChange={(event) => {
 						setValue(event.target.value);
 					}}
-					onBlur={handleBlur}
+					onKeyDown={(event) => {
+						void handleTitleKeyDown(event);
+					}}
+					onBlur={saveTitle}
 					className='
                         min-h-7
                         w-full
@@ -217,6 +212,7 @@ export function ToggleBlockEditor({ block, shareToken }: ToggleBlockEditorProps)
                         bg-transparent
                         p-0
                         text-base
+                        font-medium
                         leading-7
                         outline-none
                         placeholder:text-muted-foreground/40
@@ -225,17 +221,42 @@ export function ToggleBlockEditor({ block, shareToken }: ToggleBlockEditorProps)
 				/>
 			</div>
 
-			{/* Children */}
-			{block.is_open && (
-				<div className='ml-7 pl-2'>
+			{/* Children: dùng cùng row với block gốc để có "+", menu block và "/" */}
+			{block.is_open && block.children.length > 0 && (
+				<div className='-ml-7 mt-1 space-y-1'>
 					{block.children.map((child) => (
-						<PageBlockRenderer
+						<PageBlockEditorRow
 							key={child.id}
 							block={child}
 							shareToken={shareToken}
 						/>
 					))}
 				</div>
+			)}
+
+			{block.is_open && block.children.length === 0 && (
+				<button
+					type='button'
+					onClick={() => {
+						void addChild();
+					}}
+					className='
+                        mt-1
+                        ml-8
+                        block
+                        rounded-md
+                        px-1
+                        text-left
+                        text-sm
+                        leading-7
+                        text-muted-foreground/60
+                        transition-colors
+                        hover:bg-muted/60
+                        hover:text-muted-foreground
+                    '
+				>
+					Empty toggle. Click or press Enter to add a block.
+				</button>
 			)}
 		</div>
 	);

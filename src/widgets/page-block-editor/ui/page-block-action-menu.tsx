@@ -13,8 +13,8 @@ import {
 import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-tree";
 
 import {
-	useCreatePageBlock,
 	useDeletePageBlock,
+	useDuplicatePageBlock,
 	useUpdatePageBlock,
 } from "@/entities/page-block/model/page-block.mutations";
 
@@ -37,6 +37,7 @@ import {
 	type CommandItemData,
 	TURN_INTO_BLOCKS,
 } from "./page-block-command-menu";
+import { usePageBlockEditor } from "./page-block-editor-context";
 
 interface PageBlockActionMenuProps {
 	block: PageBlockNode;
@@ -69,7 +70,9 @@ export function PageBlockActionMenu({
 }: PageBlockActionMenuProps) {
 	const [mode, setMode] = useState<MenuMode>("actions");
 
-	const createBlock = useCreatePageBlock(shareToken);
+	const { requestFocus } = usePageBlockEditor();
+
+	const duplicateBlock = useDuplicatePageBlock(shareToken);
 
 	const updateBlock = useUpdatePageBlock(shareToken);
 
@@ -93,21 +96,12 @@ export function PageBlockActionMenu({
 	};
 
 	const handleDuplicate = async () => {
-		await createBlock.mutateAsync({
+		const copy = await duplicateBlock.mutateAsync({
+			blockId: block.id,
 			pageId: block.page_id,
-
-			parentBlockId: block.parent_block_id,
-
-			afterBlockId: block.id,
-
-			type: block.type,
-
-			content: block.content,
-
-			styleConfig: block.style_config,
-
-			dataConfig: block.data_config,
 		});
+
+		requestFocus(copy.id);
 
 		onClose?.();
 	};

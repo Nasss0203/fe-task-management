@@ -6,6 +6,7 @@ import { useState } from "react";
 import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-tree";
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
 
+import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 
@@ -19,6 +20,13 @@ import {
 	PageBlockCommand,
 	PageBlockCommandMenu,
 } from "./page-block-command-menu";
+
+/**
+ * Chỉ hiện "+" và menu block của row đang hover sâu nhất,
+ * để hover vào child của Toggle thì nút của Toggle ẩn đi.
+ */
+const ROW_HANDLE_CLASS =
+	"opacity-0 transition-opacity focus-visible:opacity-100 data-[state=open]:opacity-100 [@media(hover:none)]:opacity-100 [[data-block-row]:hover:not(:has([data-block-row]:hover))>&]:opacity-100";
 
 interface PageBlockEditorRowProps {
 	block: PageBlockNode;
@@ -71,7 +79,10 @@ export function PageBlockEditorRow({ block, shareToken }: PageBlockEditorRowProp
 	};
 
 	return (
-		<div className='grid w-full grid-cols-[28px_28px_minmax(0,1fr)] items-center'>
+		<div
+			data-block-row=''
+			className='grid w-full grid-cols-[28px_28px_minmax(0,1fr)] items-start'
+		>
 			{/* Add block */}
 			<Popover open={open} onOpenChange={setOpen}>
 				<PopoverTrigger asChild>
@@ -80,7 +91,7 @@ export function PageBlockEditorRow({ block, shareToken }: PageBlockEditorRowProp
 						aria-label='Add block'
 						variant='ghost'
 						size='icon'
-						className='size-7'
+						className={cn("size-7 text-muted-foreground", ROW_HANDLE_CLASS)}
 					>
 						<Plus className='size-4' />
 					</Button>
@@ -107,11 +118,10 @@ export function PageBlockEditorRow({ block, shareToken }: PageBlockEditorRowProp
 						aria-label='Block actions'
 						variant='ghost'
 						size='icon'
-						className='
-                size-7
-                cursor-pointer
-                text-muted-foreground
-            '
+						className={cn(
+							"size-7 cursor-pointer text-muted-foreground",
+							ROW_HANDLE_CLASS,
+						)}
 					>
 						<GripVertical className='size-4' />
 					</Button>

@@ -255,6 +255,29 @@ export function useTransformToDatabaseBlock() {
 	});
 }
 
+interface DuplicatePageBlockInput {
+	blockId: string;
+	pageId: string;
+}
+
+export function useDuplicatePageBlock(shareToken?: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationKey: [...pageBlockKeys.all, "duplicate", shareToken ?? null],
+		mutationFn: ({ blockId }: DuplicatePageBlockInput) =>
+			pageBlockApi.duplicate(blockId, shareToken),
+
+		onSuccess: async (_, variables) => {
+			await queryClient.invalidateQueries({
+				queryKey: blockListKey(variables.pageId, shareToken),
+				exact: true,
+			});
+		},
+		onError: () => notifyBlockWriteError(shareToken),
+	});
+}
+
 interface DeletePageBlockInput {
 	blockId: string;
 	pageId: string;

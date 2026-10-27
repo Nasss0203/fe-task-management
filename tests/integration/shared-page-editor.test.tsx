@@ -69,8 +69,10 @@ beforeEach(() => {
 		throw new Error("Unexpected GET " + url);
 	});
 	http.post.mockImplementation(async (url: string, input: Partial<PageBlock>) => {
-		if (url !== "/pageBlock") throw new Error("Unexpected POST " + url);
-		const block = makePageBlock({ ...input, id: "block-" + nextId++, order_index: persisted.length });
+		const duplicateOf = url.match(/^\/pageBlock\/(.+)\/duplicate$/)?.[1];
+		const source = persisted.find((block) => block.id === duplicateOf);
+		if (url !== "/pageBlock" && !source) throw new Error("Unexpected POST " + url);
+		const block = makePageBlock({ ...(source ?? input), id: "block-" + nextId++, order_index: persisted.length });
 		persisted.push(block);
 		return envelope(block);
 	});
@@ -132,7 +134,7 @@ describe("shared PageBlock editor", () => {
 		await user.click(await screen.findByRole("button", { name: "Block actions" }));
 		await user.click(screen.getByRole("option", { name: /Duplicate/ }));
 		await waitFor(() => expect(screen.getAllByDisplayValue("Original text")).toHaveLength(2));
-		expect(http.post).toHaveBeenCalledWith("/pageBlock", expect.objectContaining({ after_block_id: "block-1", content: { text: "Original text" } }), headers);
+		expect(http.post).toHaveBeenCalledWith("/pageBlock/block-1/duplicate", {}, headers);
 		await user.click(screen.getAllByRole("button", { name: "Block actions" })[0]);
 		await user.click(screen.getByRole("option", { name: /Turn into/ }));
 		await user.click(screen.getByRole("option", { name: "Heading 1" }));
@@ -171,10 +173,14 @@ describe("shared PageBlock editor", () => {
 		await waitFor(() => expect(http.delete).toHaveBeenCalledWith("/pageBlock/block-2", headers));
 	});
 
-	it("passes the token through nested toggle children and automatic child creation", async () => {
+	it("passes the token through nested toggle children created from the empty toggle", async () => {
 		persisted = [makePageBlock({ type: PageBlockType.TOGGLE, is_open: true })];
+		const user = userEvent.setup();
 		renderWithClient(<Surface shareToken={token} />);
+		await user.click(await screen.findByRole("button", { name: /Empty toggle/ }));
 		await waitFor(() => expect(screen.getAllByRole("textbox")).toHaveLength(2));
+		// Child rows get their own add/action handles
+		expect(screen.getAllByRole("button", { name: "Add block" })).toHaveLength(2);
 		expect(http.post).toHaveBeenCalledWith("/pageBlock", expect.objectContaining({ parent_block_id: "block-1" }), headers);
 		const childInput = screen.getAllByRole("textbox")[1];
 		fireEvent.change(childInput, { target: { value: "Nested edit" } });

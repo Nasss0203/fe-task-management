@@ -23,6 +23,17 @@ interface PageBlockListProps {
 	shareToken?: string;
 }
 
+/**
+ * Thứ tự hiển thị (gồm child của Toggle đang mở),
+ * để Backspace ở child nhảy về đúng block phía trên.
+ */
+function getVisibleBlockIds(blocks: PageBlockNode[]): string[] {
+	return blocks.flatMap((block) => [
+		block.id,
+		...(block.is_open ? getVisibleBlockIds(block.children) : []),
+	]);
+}
+
 interface ReadOnlyBlockRowProps {
 	block: PageBlockNode;
 	shareToken?: string;
@@ -88,7 +99,7 @@ export function PageBlockList({
 		);
 	}
 
-	const orderedBlockIds = blocks.map((block) => block.id);
+	const orderedBlockIds = getVisibleBlockIds(blocks);
 
 	return (
 		<PageBlockEditorProvider
