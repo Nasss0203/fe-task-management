@@ -95,7 +95,9 @@ describe("Unified Ask: real useAiChat/useAskAi orchestration", () => {
     expect(api.createAiConversation).not.toHaveBeenCalled();
     expect(api.submitAiMessage).not.toHaveBeenCalled();
     const request = ask.mock.calls[0][0];
-    expect(Object.keys(request).sort()).toEqual(["instruction", "requestId", "workspaceId"]);
+    // M2: the browser's time zone goes with every Ask.
+    expect(Object.keys(request).sort()).toEqual(["instruction", "requestId", "timeZone", "workspaceId"]);
+    expect(request.timeZone).toBe(Intl.DateTimeFormat().resolvedOptions().timeZone);
     expect(request).toMatchObject({ instruction: "Original complete instruction", workspaceId });
     expect(request.requestId).toMatch(/^[0-9a-f-]{36}$/);
     expect(thread().messages.filter((message) => message.role === "user")).toHaveLength(1);

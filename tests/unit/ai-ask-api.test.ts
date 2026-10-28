@@ -17,7 +17,7 @@ describe("Unified Ask API", () => {
       currentPageId: pageId, selectedPageId: pageId, conversationId, requestId,
     };
     expect(await askAi(input)).toBe(response);
-    expect(post).toHaveBeenCalledExactlyOnceWith("/ai-assistant/ask", input, { timeout: 180_000 });
+    expect(post).toHaveBeenCalledExactlyOnceWith("/ai-assistant/ask", input, { timeout: 300_000 });
     expect(post.mock.calls[0][1]).toBe(input);
     expect(post.mock.calls[0][1]).not.toHaveProperty("userId");
     expect(post.mock.calls[0][1]).not.toHaveProperty("capability");

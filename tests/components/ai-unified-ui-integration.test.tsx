@@ -27,8 +27,10 @@ vi.mock("@/entities/workspace/model/workspace.queries", () => ({
 }));
 vi.mock("@/entities/page/model/page.queries", () => ({
   usePage: (id?: string) => ({ data: id ? { id, workspace_id: view.workspace } : undefined }),
+  usePagesByWorkspace: () => ({ data: [] }),
   pageKeys: { detail: (id: string) => ["pages", "detail", id], byWorkspace: (id: string) => ["pages", "workspace", id] },
 }));
+vi.mock("@/entities/teamspace/model/teamspace.queries", () => ({ useTeamspaces: () => ({ data: [] }) }));
 vi.mock("@/entities/page-block/model/page-block.queries", () => ({
   usePageBlocks: () => ({ data: [], isPending: false }), pageBlockKeys: { byPage: (id: string) => ["page-blocks", "page", id] },
 }));
@@ -100,7 +102,7 @@ describe("Activated Chat UI with real useAiChat/useAskAi", () => {
     else if (variant === "context") {
       expect(screen.getByText("Choose a block.")).toBeVisible();
       expect(screen.queryByRole("button", { name: "Apply changes" })).toBeNull();
-      expect(screen.getByText(/Send a complete request with the additional details, or discard/)).toBeVisible();
+      expect(screen.getByText("Or discard this draft.")).toBeVisible();
     } else if (variant === "ambiguous") expect(screen.getByRole("button", { name: "Select" })).toBeEnabled();
     else expect(screen.getByText("Review the result.")).toBeVisible();
   });
@@ -150,7 +152,8 @@ describe("Activated Chat UI with real useAiChat/useAskAi", () => {
     submit(); await screen.findByText("Review the result.");
     await act(async () => { await client.invalidateQueries({ queryKey: aiHistoryKeys.all }); });
     expect(screen.getByText("Review the result.")).toBeVisible();
-    expect(screen.getByText("Send a complete request with the additional details.")).toBeVisible();
+    // The AI's own Vietnamese question says what to send again; no English hint is added.
+    expect(screen.queryByText(/Send a complete request/)).toBeNull();
     expect(thread().messages).toHaveLength(2);
   });
 

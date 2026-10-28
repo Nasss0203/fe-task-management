@@ -24,6 +24,15 @@ describe("pure Unified Ask response mapping", () => {
 		expect(input).toEqual(askResponses[name]);
 	});
 
+	it("maps a request for checklist items (gp02) to feedback, never an unknown reason", () => {
+		const withReason = (reason: string) => ({ ...askResponses.pageClarification,
+			planning: { ...askResponses.pageClarification.planning, reason } }) as AiAskResponse;
+		expect(mapAiAskResponse(withReason("MISSING_CHECKLIST_ITEMS")))
+			.toMatchObject({ kind: "feedback", reason: "MISSING_CHECKLIST_ITEMS", hasGeneration: false });
+		expect(mapAiAskResponse(withReason("MISSING_SOMETHING_ELSE")))
+			.toMatchObject({ kind: "invalid", reason: "INVALID_PLANNING_FEEDBACK" });
+	});
+
 	it("preserves null capability without a fake Writing action", () => {
 		const mapped = mapAiAskResponse(askResponses.clarification);
 		expect(mapped).toMatchObject({ capability: null, hasGeneration: false, canConfirm: false, canDiscard: false,

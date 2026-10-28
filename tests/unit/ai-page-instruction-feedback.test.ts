@@ -9,6 +9,10 @@ describe("Phase 4 Page response feedback", () => {
     expect(getPageInstructionFeedback({ status: "UNSUPPORTED_OPERATION", intent, reason: "INSERT_ONLY" }))
       .toBe("Only adding blocks or database rows is currently supported.");
   });
+	it("asks for the checklist items (gp02)", () => {
+		expect(getPageInstructionFeedback({ status: "NEEDS_CLARIFICATION", reason: "MISSING_CHECKLIST_ITEMS", intent }))
+			.toMatch(/Which items should the checklist have/);
+	});
 	it.each(["UNCLEAR_INTENT", "UNRESOLVED_PAGE", "MISSING_CURRENT_PAGE"] as const)(
 		"handles clarification reason %s", (reason) => {
 			expect(getPageInstructionFeedback({ status: "NEEDS_CLARIFICATION", reason, intent }).length).toBeGreaterThan(12);

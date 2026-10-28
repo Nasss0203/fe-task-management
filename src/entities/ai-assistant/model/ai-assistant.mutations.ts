@@ -12,6 +12,7 @@ import {
 	confirmPageComposition,
 	createAiConversation,
 	discardAiGeneration,
+	undoAiModificationPlan,
 	generateAiModificationPlan,
 	generatePagePlanFromInstruction,
 	submitAiMessage,
@@ -184,6 +185,29 @@ export function useConfirmAiModificationPlan() {
 	});
 }
 
+interface UndoAiModificationPlanInput {
+	generationId: string;
+	pageId: string;
+	shareToken?: string;
+}
+
+/** Restores the blocks an applied AI delete removed, then refreshes the Page. */
+export function useUndoAiModificationPlan() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		retry: false,
+		mutationFn: ({ generationId, shareToken }: UndoAiModificationPlanInput) =>
+			undoAiModificationPlan(generationId, ...(shareToken ? [shareToken] as const : [] as const)),
+		onSuccess: async (_, { pageId }) => {
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: pageKeys.detail(pageId) }),
+				queryClient.invalidateQueries({ queryKey: pageBlockKeys.byPage(pageId) }),
+			]);
+		},
+	});
+}
+
 export function useDiscardAiGeneration() {
 	return useMutation({
 		retry: false,
@@ -193,11 +217,22 @@ export function useDiscardAiGeneration() {
 	});
 }
 
+/** The browser's IANA zone, e.g. "Asia/Ho_Chi_Minh"; the server falls back when absent. */
+export function browserTimeZone(): string | undefined {
+	try {
+		return Intl.DateTimeFormat().resolvedOptions().timeZone || undefined;
+	} catch {
+		return undefined;
+	}
+}
+
 /** Ask only prepares a response/draft; history synchronization belongs to the caller. */
 export function useAskAi() {
   return useMutation({
 		retry: false,
     mutationFn: ({ shareToken, ...input }: AskAiRequest & { shareToken?: string }) =>
-			askAi(input, ...(shareToken ? [shareToken] as const : [] as const)),
+			// M2: "trang tôi sửa hôm qua" means yesterday where the user is.
+			askAi({ ...input, timeZone: input.timeZone ?? browserTimeZone() },
+				...(shareToken ? [shareToken] as const : [] as const)),
   });
 }

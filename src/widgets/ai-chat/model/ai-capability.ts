@@ -36,6 +36,18 @@ export function isAiModificationPlan(value: unknown): value is AiModificationPla
 				Array.isArray(operation.blocks) && operation.blocks.length > 0 && operation.blocks.every((block) =>
 					isRecord(block) && ["TEXT", "HEADER", "QUOTE", "TODO", "TOGGLE"].includes(String(block.type)) && isRecord(block.content));
 		}
+		if (operation.type === "DELETE_BLOCK") {
+			return isNonemptyString(operation.blockId) && isNonemptyString(operation.text) &&
+				Number.isInteger(operation.childCount) && Number(operation.childCount) >= 0;
+		}
+		if (operation.type === "SET_BLOCK_TEXT") {
+			return isNonemptyString(operation.blockId) && isNonemptyString(operation.oldText) &&
+				isNonemptyString(operation.newText);
+		}
+		if (operation.type === "SET_TODO_CHECKED") {
+			return isNonemptyString(operation.blockId) && isNonemptyString(operation.text) &&
+				typeof operation.checked === "boolean";
+		}
 		return operation.type === "CREATE_DATABASE_ROWS" && isNonemptyString(operation.databaseId) &&
 			Array.isArray(operation.rows) && operation.rows.length > 0 &&
 			operation.rows.every((row) => isRecord(row) && isRecord(row.values));

@@ -107,8 +107,49 @@ export interface AiCreateDatabaseRowsOperation {
   }>;
 }
 
+/** Kế hoạch tích to-do: only the checkbox of an existing to-do changes. */
+export interface AiSetTodoCheckedOperation {
+  type: "SET_TODO_CHECKED";
+
+  blockId: string;
+
+  /** The to-do's current text, shown in the draft; the server checks it. */
+  text: string;
+
+  checked: boolean;
+}
+
+/** Kế hoạch sửa chữ block: only the text of an existing block changes. */
+export interface AiSetBlockTextOperation {
+  type: "SET_BLOCK_TEXT";
+
+  blockId: string;
+
+  /** The block's current text; the server checks it. */
+  oldText: string;
+
+  newText: string;
+}
+
+/** Kế hoạch xoá block: soft-deletes a block and everything nested in it. */
+export interface AiDeleteBlockOperation {
+  type: "DELETE_BLOCK";
+
+  blockId: string;
+
+  /** The block's current text; the server checks it. */
+  text: string;
+
+  /** Blocks nested in it, deleted with it; the server checks it. */
+  childCount: number;
+}
+
 export type AiModificationOperation =
-  AiInsertBlocksOperation | AiCreateDatabaseRowsOperation;
+  | AiInsertBlocksOperation
+  | AiCreateDatabaseRowsOperation
+  | AiSetTodoCheckedOperation
+  | AiSetBlockTextOperation
+  | AiDeleteBlockOperation;
 
 interface AiModificationPlanBase {
   schemaVersion: 1;
@@ -155,12 +196,21 @@ export interface AiPageResolutionCandidate {
   teamspaceId: string | null;
 }
 
+/** M2: the Page was named by the user's own edits ("trang tôi sửa hôm qua"). */
+export interface AiPageActivity {
+  relative: "LATEST" | "TODAY" | "YESTERDAY" | "N_DAYS_AGO" | "LAST_WEEK" | "RECENT";
+  days: number | null;
+  titleHint: string | null;
+}
+
 export interface AiPageIntent {
   intent: "MODIFY_PAGE" | "OTHER" | "UNCLEAR";
-  referenceType: "TITLE" | "CURRENT_PAGE" | "UNRESOLVED";
+  referenceType: "TITLE" | "CURRENT_PAGE" | "UNRESOLVED" | "ACTIVITY";
   pageReference: string | null;
   instruction: string | null;
   needsClarification: boolean;
+  /** Only with referenceType ACTIVITY. */
+  activity?: AiPageActivity;
 }
 
 export interface GeneratePagePlanFromInstructionRequest {
@@ -172,8 +222,11 @@ export interface GeneratePagePlanFromInstructionRequest {
   conversationId?: string;
 }
 
-/** M1b: TITLE_IN_SENTENCE is a real Page found in the sentence, planned only after the user picked it. */
-export type AiPageResolutionMethod = "CURRENT_CONTEXT" | "EXACT_TITLE" | "TITLE_IN_SENTENCE";
+/**
+ * M1b: TITLE_IN_SENTENCE is a real Page found in the sentence; M2: ACTIVITY is a
+ * Page the user edited. Both are planned only after the user picked the Page.
+ */
+export type AiPageResolutionMethod = "CURRENT_CONTEXT" | "EXACT_TITLE" | "TITLE_IN_SENTENCE" | "ACTIVITY";
 
 export type GeneratePagePlanFromInstructionResponse =
   | {
@@ -184,7 +237,8 @@ export type GeneratePagePlanFromInstructionResponse =
   | { status: "NOT_A_PAGE_MODIFICATION"; intent: AiPageIntent }
   | {
       status: "NEEDS_CLARIFICATION";
-      reason: "UNCLEAR_INTENT" | "UNRESOLVED_PAGE" | "MISSING_CURRENT_PAGE";
+      // MISSING_CHECKLIST_ITEMS (gp02): "thêm checklist" with neither items nor a topic.
+      reason: "UNCLEAR_INTENT" | "UNRESOLVED_PAGE" | "MISSING_CURRENT_PAGE" | "MISSING_CHECKLIST_ITEMS";
       intent: AiPageIntent;
     }
   | { status: "PAGE_NOT_FOUND"; intent: AiPageIntent }
@@ -192,8 +246,8 @@ export type GeneratePagePlanFromInstructionResponse =
       status: "AMBIGUOUS_PAGE";
       intent: AiPageIntent;
       candidates: AiPageResolutionCandidate[];
-      /** Present when the candidates were found in the sentence (M1b). */
-      resolutionMethod?: "TITLE_IN_SENTENCE";
+      /** Found in the sentence (M1b) or among the user's own edits (M2). */
+      resolutionMethod?: "TITLE_IN_SENTENCE" | "ACTIVITY";
     }
   | {
       status: "PLAN_GENERATED";
@@ -239,6 +293,12 @@ export interface AiModificationPlanPreview {
     operations: number;
     blocks: number;
     databaseRows: number;
+    /** SET_TODO_CHECKED operations. */
+    todoUpdates?: number;
+    /** SET_BLOCK_TEXT operations. */
+    blockEdits?: number;
+    /** DELETE_BLOCK operations. */
+    blockDeletes?: number;
   };
 
   operations: AiModificationOperation[];
@@ -313,6 +373,12 @@ export interface ConfirmPageCompositionResponse {
 export interface AiModificationPlanExecutionResult {
   createdBlockIds: string[];
   createdRowIds: string[];
+  updatedBlockIds?: string[];
+  deletedBlockIds?: string[];
+}
+
+export interface UndoAiModificationPlanResponse {
+  restoredBlockIds: string[];
 }
 
 export interface ConfirmAiModificationPlanResponse {
@@ -342,6 +408,8 @@ export interface AskAiRequest {
   selectedPageId?: string | null;
   conversationId?: string | null;
   requestId?: string | null;
+  /** M2: the browser's IANA zone, so "hôm qua" is the user's yesterday. */
+  timeZone?: string | null;
 }
 
 export type AiAskIntent =

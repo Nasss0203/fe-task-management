@@ -47,12 +47,29 @@ function isPage(value: unknown): value is AiPageResolutionCandidate {
 		(value.teamspaceId === null || isNonemptyString(value.teamspaceId));
 }
 
+// M2: a Page named by the user's own edits; the server picks the dates.
+function validPageActivity(value: unknown): boolean {
+	return isRecord(value) &&
+		["LATEST", "TODAY", "YESTERDAY", "N_DAYS_AGO", "LAST_WEEK", "RECENT"].includes(String(value.relative)) &&
+		(value.relative === "N_DAYS_AGO"
+			? typeof value.days === "number" && Number.isInteger(value.days) && value.days >= 1 && value.days <= 30
+			: value.days === null) &&
+		(value.titleHint === null || isNonemptyString(value.titleHint));
+}
+
 function validPageIntent(value: unknown): boolean {
 	return isRecord(value) && ["MODIFY_PAGE", "OTHER", "UNCLEAR"].includes(String(value.intent)) &&
-		["TITLE", "CURRENT_PAGE", "UNRESOLVED"].includes(String(value.referenceType)) &&
+		["TITLE", "CURRENT_PAGE", "UNRESOLVED", "ACTIVITY"].includes(String(value.referenceType)) &&
 		(value.pageReference === null || typeof value.pageReference === "string") &&
-		(value.instruction === null || typeof value.instruction === "string") && typeof value.needsClarification === "boolean";
+		(value.instruction === null || typeof value.instruction === "string") && typeof value.needsClarification === "boolean" &&
+		(value.referenceType === "ACTIVITY"
+			? value.intent === "MODIFY_PAGE" && value.pageReference === null && value.needsClarification === false &&
+				validPageActivity(value.activity)
+			: value.activity === undefined);
 }
+
+/** M1b / M2: Pages the user must pick from; a draft only follows that choice. */
+const PICKED_PAGE_METHODS = ["TITLE_IN_SENTENCE", "ACTIVITY"];
 
 export function isValidAiGeneration(value: unknown): value is AiGeneration {
 	return isRecord(value) && isNonemptyString(value.id) && isNonemptyString(value.conversation_id) &&
@@ -100,8 +117,12 @@ function validPlanPreview(value: unknown, plan: AiModificationPlan): value is Ai
 		!sameAiPayload(value.operations, plan.operations)) return false;
 	const blocks = plan.operations.reduce((sum, operation) => sum + (operation.type === "INSERT_BLOCKS" ? operation.blocks.length : 0), 0);
 	const rows = plan.operations.reduce((sum, operation) => sum + (operation.type === "CREATE_DATABASE_ROWS" ? operation.rows.length : 0), 0);
+	const ticks = plan.operations.filter((operation) => operation.type === "SET_TODO_CHECKED").length;
+	const edits = plan.operations.filter((operation) => operation.type === "SET_BLOCK_TEXT").length;
+	const deletes = plan.operations.filter((operation) => operation.type === "DELETE_BLOCK").length;
 	return value.counts.operations === plan.operations.length && value.counts.blocks === blocks &&
-		value.counts.databaseRows === rows && (plan.status !== "NEED_MORE_CONTEXT" || sameAiPayload(value.contextRequests, plan.contextRequests));
+		value.counts.databaseRows === rows && (value.counts.todoUpdates ?? 0) === ticks &&
+		(value.counts.blockEdits ?? 0) === edits && (value.counts.blockDeletes ?? 0) === deletes && (plan.status !== "NEED_MORE_CONTEXT" || sameAiPayload(value.contextRequests, plan.contextRequests));
 }
 
 export function isValidAiCompositionGeneration(generation: AiGeneration): boolean {
@@ -180,10 +201,12 @@ export function mapAiAskResponse(response: AiAskResponse, requestContext?: AskAi
 			!isRecord(planning.intent) || planning.intent.intent !== "MODIFY_PAGE" ||
 			// M1b: a Page found in the sentence is planned only for the Page the user picked
 			// (checked against plan.pageId below); the AI's own reading of the name stays unresolved.
-			(planning.resolutionMethod === "TITLE_IN_SENTENCE"
+			(PICKED_PAGE_METHODS.includes(String(planning.resolutionMethod))
 				? !requestContext?.selectedPageId
 				: planning.intent.needsClarification !== false) ||
-			!["CURRENT_CONTEXT", "EXACT_TITLE", "TITLE_IN_SENTENCE"].includes(String(planning.resolutionMethod)) ||
+			!["CURRENT_CONTEXT", "EXACT_TITLE", ...PICKED_PAGE_METHODS].includes(String(planning.resolutionMethod)) ||
+			// M2: only a Page named by the user's edits is planned as ACTIVITY.
+			((planning.resolutionMethod === "ACTIVITY") !== (planning.intent.referenceType === "ACTIVITY")) ||
 			page.pageId !== plan.pageId || (requestContext && page.workspaceId !== requestContext.workspaceId) ||
 			(requestContext?.currentPageId && requestContext.currentPageId !== plan.pageId) ||
 			(requestContext?.selectedPageId && requestContext.selectedPageId !== plan.pageId) ||
@@ -197,18 +220,19 @@ export function mapAiAskResponse(response: AiAskResponse, requestContext?: AskAi
 	if (data.generationId !== undefined || data.conversationId !== undefined || data.generation !== undefined ||
 		data.preview !== undefined || planning.plan !== undefined) return invalid("UNEXPECTED_GENERATION");
 	if (data.status === "AMBIGUOUS_PAGE") {
-		const fromSentence = planning.resolutionMethod === "TITLE_IN_SENTENCE";
+		const picked = PICKED_PAGE_METHODS.includes(String(planning.resolutionMethod));
 		if (!Array.isArray(planning.candidates) || planning.candidates.length === 0 ||
-			(planning.resolutionMethod !== undefined && !fromSentence) ||
-			// M1b offers at most five Pages found in the sentence.
-			(fromSentence && planning.candidates.length > 5) ||
+			(planning.resolutionMethod !== undefined && !picked) ||
+			// M1b and M2 offer at most five Pages.
+			(picked && planning.candidates.length > 5) ||
+			((planning.resolutionMethod === "ACTIVITY") !== (isRecord(planning.intent) && planning.intent.referenceType === "ACTIVITY")) ||
 			!planning.candidates.every((page) => isPage(page) && (!requestContext || page.workspaceId === requestContext.workspaceId))) return invalid("INVALID_CANDIDATES");
 		return { ...base, kind: "page-selection", hasGeneration: false, preview: null,
 			capability: "GENERATE_PAGE_MODIFICATION_PLAN", capabilityValidated: true,
 			candidates: planning.candidates, requestContext: requestContext ? { ...requestContext } : null };
 	}
 	if (!["NEEDS_CLARIFICATION", "PAGE_NOT_FOUND", "UNSUPPORTED_OPERATION", "NOT_A_PAGE_MODIFICATION"].includes(base.status) ||
-		(data.status === "NEEDS_CLARIFICATION" && !["UNCLEAR_INTENT", "UNRESOLVED_PAGE", "MISSING_CURRENT_PAGE"].includes(String(planning.reason))) ||
+		(data.status === "NEEDS_CLARIFICATION" && !["UNCLEAR_INTENT", "UNRESOLVED_PAGE", "MISSING_CURRENT_PAGE", "MISSING_CHECKLIST_ITEMS"].includes(String(planning.reason))) ||
 		(data.status === "UNSUPPORTED_OPERATION" && planning.reason !== "INSERT_ONLY")) return invalid("INVALID_PLANNING_FEEDBACK");
 	return { ...base, kind: "feedback", hasGeneration: false, preview: null,
 		capability: "GENERATE_PAGE_MODIFICATION_PLAN", capabilityValidated: true, channel: "planning",

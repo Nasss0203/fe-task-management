@@ -31,7 +31,8 @@ describe("useAskAi", () => {
     const { result } = renderHook(() => useAskAi(), { wrapper });
     const input = { workspaceId, instruction: "Prepare a draft", requestId };
     await act(async () => { expect(await result.current.mutateAsync(input)).toBe(askResponses[name]); });
-    expect(ask).toHaveBeenCalledExactlyOnceWith(input);
+    // M2: Ask also carries the browser's time zone.
+    expect(ask).toHaveBeenCalledExactlyOnceWith({ ...input, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     for (const spy of [create, confirm, modify, discard, invalidate]) expect(spy).not.toHaveBeenCalled();
     client.clear();

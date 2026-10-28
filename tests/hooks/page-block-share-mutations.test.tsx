@@ -9,6 +9,7 @@ import {
 } from "@/entities/page-block/model/page-block.mutations";
 import { pageBlockKeys } from "@/entities/page-block/model/page-block.queries";
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
+import { pageKeys } from "@/entities/page/model/page.queries";
 import { makePageBlock } from "../utils/page-block-fixture";
 import { createWrapper } from "../utils/test-utils";
 
@@ -115,6 +116,35 @@ it.each(operations)("keeps an in-flight %s bound to token A after the hook switc
 	await act(async () => { finish(); await saved; });
 	expect(queryClient.getQueryState(keyA)?.isInvalidated).toBe(true);
 	expect(queryClient.getQueryState(keyB)?.isInvalidated).toBe(false);
+});
+
+describe("Page \"Edited\" time", () => {
+	const page = { id: pageId, title: "Page", updatedAt: "2020-01-01T00:00:00.000Z" };
+
+	it.each(operations)("%s marks the cached Page edited without refetching it", async (operation) => {
+		const { wrapper, queryClient } = createWrapper();
+		queryClient.setQueryData(pageKeys.detail(pageId), page);
+		queryClient.setQueryData(pageKeys.sharedDetail(pageId, tokenA), page);
+		const { result } = renderHook(() => useWrites(tokenA), { wrapper });
+		const before = Date.now();
+		await act(async () => { await write(result.current, operation); });
+
+		for (const key of [pageKeys.detail(pageId), pageKeys.sharedDetail(pageId, tokenA)]) {
+			const cached = queryClient.getQueryData<typeof page>(key);
+			expect(Date.parse(cached!.updatedAt)).toBeGreaterThanOrEqual(before);
+			expect(cached!.title).toBe("Page");
+			expect(queryClient.getQueryState(key)?.isInvalidated).toBe(false);
+		}
+	});
+
+	it("leaves the Page time alone when the write fails", async () => {
+		http.patch.mockRejectedValueOnce({ response: { status: 500 } });
+		const { wrapper, queryClient } = createWrapper();
+		queryClient.setQueryData(pageKeys.detail(pageId), page);
+		const { result } = renderHook(() => useWrites(), { wrapper });
+		await act(async () => { await expect(write(result.current, "update")).rejects.toBeDefined(); });
+		expect(queryClient.getQueryData(pageKeys.detail(pageId))).toEqual(page);
+	});
 });
 
 describe.each(operations)("%s failure", (operation) => {
