@@ -85,7 +85,7 @@ export function RenamePageMenu({ page, onRenamed }: RenamePageMenuProps) {
 			<DropdownMenuSubContent
 				sideOffset={4}
 				alignOffset={-4}
-				className='w-[280px] rounded-lg p-1.5 shadow-lg'
+				className='w-[280px] rounded-xl p-1.5 shadow-elevated'
 			>
 				<form
 					className={[

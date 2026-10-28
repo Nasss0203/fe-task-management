@@ -175,7 +175,7 @@ export function InviteWorkspaceMembersDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={handleOpenChange}>
-			<DialogContent className='max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] gap-0 overflow-y-auto rounded-xl border-border/80 bg-popover p-5 shadow-2xl sm:max-w-[460px] sm:p-6 [&_[data-slot=dialog-close]]:right-4 [&_[data-slot=dialog-close]]:top-4'>
+			<DialogContent className='max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] gap-0 overflow-y-auto rounded-xl border-border/80 bg-popover p-5 shadow-elevated sm:max-w-[460px] sm:p-6 [&_[data-slot=dialog-close]]:right-4 [&_[data-slot=dialog-close]]:top-4'>
 				<DialogHeader className='items-center gap-0 text-center'>
 					<div className='mb-2 flex size-8 items-center justify-center text-muted-foreground'>
 						<UserPlus className='size-5 stroke-[1.7]' />
@@ -241,11 +241,11 @@ export function InviteWorkspaceMembersDialog({
 							}
 							autoComplete='off'
 							aria-label='Search names or emails'
-							className='h-9 rounded-md border-input bg-background/60 px-3 text-sm shadow-xs placeholder:text-muted-foreground/70 focus-visible:ring-ring/20 dark:bg-white/[0.04]'
+							className='h-9 rounded-lg border-input bg-background/60 px-3 text-sm shadow-xs placeholder:text-muted-foreground/70 focus-visible:ring-ring/20 dark:bg-white/[0.04]'
 						/>
 
 						{showSuggestions && (
-							<div className='absolute left-0 right-0 top-full z-50 mt-1.5 max-h-60 overflow-y-auto rounded-lg border bg-popover p-1.5 shadow-xl'>
+							<div className='absolute left-0 right-0 top-full z-50 mt-1.5 max-h-60 overflow-y-auto rounded-xl border bg-popover p-1.5 shadow-elevated'>
 								{isFetching ? (
 									<p className='px-3 py-2.5 text-sm text-muted-foreground'>
 										Searching...
@@ -320,7 +320,7 @@ export function InviteWorkspaceMembersDialog({
 								setRole(value as WorkspaceInviteRole)
 							}
 						>
-							<SelectTrigger className='min-h-14 w-full rounded-md border-input bg-background/60 px-3 py-2 text-left shadow-xs hover:bg-accent/40 focus-visible:ring-ring/20 dark:bg-white/[0.04] dark:hover:bg-white/[0.06]'>
+							<SelectTrigger className='min-h-14 w-full rounded-lg border-input bg-background/60 px-3 py-2 text-left shadow-xs hover:bg-accent/40 focus-visible:ring-ring/20 dark:bg-white/[0.04] dark:hover:bg-white/[0.06]'>
 								<RolePreview role={role} />
 							</SelectTrigger>
 
@@ -356,7 +356,7 @@ export function InviteWorkspaceMembersDialog({
 						)}
 						<Button
 							type='button'
-							className='h-9 w-full bg-[#2383e2] text-white shadow-sm hover:bg-[#1f74c9] disabled:bg-muted-foreground/35 disabled:text-background disabled:opacity-100 dark:bg-[#2383e2] dark:hover:bg-[#1f74c9]'
+							className='h-9 w-full disabled:bg-muted-foreground/35 disabled:text-background disabled:opacity-100'
 							disabled={
 								selectedRecipients.length === 0 ||
 								inviteMutation.isPending

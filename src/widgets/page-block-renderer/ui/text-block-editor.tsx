@@ -328,7 +328,9 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 		        text-base
 		        leading-7
 		        outline-none
-		        placeholder:text-muted-foreground/50
+		        placeholder:text-transparent
+		        hover:placeholder:text-muted-foreground/40
+		        focus:placeholder:text-muted-foreground/50
 		        focus-visible:ring-0
 		      `,
 					inlineMarks.textareaClassName,

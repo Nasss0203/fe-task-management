@@ -136,7 +136,7 @@ export function MovePageMenu({
 				className={[
 					"flex h-[500px] max-h-[var(--radix-dropdown-menu-content-available-height)]",
 					"w-[360px] max-w-[calc(100vw-24px)] flex-col overflow-hidden",
-					"rounded-xl bg-popover p-0 shadow-xl",
+					"rounded-xl bg-popover p-0 shadow-elevated",
 				].join(" ")}
 			>
 				<div className='shrink-0 border-b p-3'>

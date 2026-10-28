@@ -108,7 +108,7 @@ const appearances = {
 		description:
 			"Hệ thống đã ghi nhận đơn hàng bị hủy. Bạn có thể chọn lại gói khi muốn tiếp tục.",
 		icon: XCircle,
-		color: "bg-zinc-500/10 text-zinc-500",
+		color: "bg-muted text-muted-foreground",
 	},
 	unknown: {
 		title: "Chưa thể xác nhận thanh toán",

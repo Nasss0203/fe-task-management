@@ -25,7 +25,7 @@ export function FavoritePagesSection({ workspaceId }: FavoritePagesSectionProps)
 			</h2>
 
 			{isLoading ? (
-				<div className='divide-y divide-border/40 rounded-lg border border-border/60 bg-card p-1'>
+				<div className='divide-y divide-border/40 rounded-xl border border-border/60 bg-card shadow-soft p-1'>
 					{Array.from({ length: 3 }).map((_, idx) => (
 						<div key={idx} className='flex items-center gap-3 p-3'>
 							<Skeleton className='size-4 rounded' />
@@ -38,13 +38,13 @@ export function FavoritePagesSection({ workspaceId }: FavoritePagesSectionProps)
 					Unable to load favorite pages.
 				</p>
 			) : favorites.length === 0 ? (
-				<div className='rounded-lg border border-dashed border-border/60 p-5 text-center'>
+				<div className='rounded-xl border border-dashed border-border p-5 text-center'>
 					<p className='text-xs text-muted-foreground'>
 						No favorites yet. Star a page to find it quickly here.
 					</p>
 				</div>
 			) : (
-				<div className='divide-y divide-border/40 rounded-lg border border-border/60 bg-card overflow-hidden'>
+				<div className='divide-y divide-border/40 rounded-xl border border-border/60 bg-card shadow-soft overflow-hidden'>
 					{favorites.slice(0, 6).map((page) => (
 						<button
 							key={page.id}

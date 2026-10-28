@@ -41,10 +41,7 @@ import {
 	type DatabaseProperty,
 	type DatabaseRow,
 } from "@/entities/database/model/database.types";
-import {
-	PropertyIcon,
-	formatDatabaseDate,
-} from "@/entities/database/ui/database-visuals";
+import { PropertyIcon } from "@/entities/database/ui/database-visuals";
 import { cn } from "@/shared/lib/utils";
 import {
 	Popover,
@@ -63,6 +60,7 @@ import {
 	type InitialRowValue,
 } from "../model/use-quick-add-row";
 import { DatabaseViewEmptyGuide } from "./database-view-empty-guide";
+import { DateCell } from "./date-cell";
 import type { OpenRowHandler } from "./database-view-renderer";
 
 const DATE_KEY = "yyyy-MM-dd";
@@ -293,10 +291,10 @@ function CalendarMonth({
 		api()?.unselect();
 	};
 
-	const handleCreate = async (name: string) => {
+	const handleCreate = async (name: string, value: DateValue) => {
 		if (!creator) return;
 		const initial: InitialRowValue[] = [
-			{ propertyId: dateProperty.id, value: creator.value },
+			{ propertyId: dateProperty.id, value },
 		];
 		if (name && titleProperty) {
 			initial.push({ propertyId: titleProperty.id, value: name });
@@ -479,7 +477,7 @@ interface CreateRowFormProps {
 	value: DateValue;
 	isPending: boolean;
 	onCancel: () => void;
-	onCreate: (name: string) => void;
+	onCreate: (name: string, value: DateValue) => void;
 }
 
 function CreateRowForm({
@@ -490,10 +488,11 @@ function CreateRowForm({
 	onCreate,
 }: CreateRowFormProps) {
 	const [name, setName] = useState("");
+	const [date, setDate] = useState(value);
 
 	const submit = (event: FormEvent) => {
 		event.preventDefault();
-		onCreate(name.trim());
+		onCreate(name.trim(), date);
 	};
 
 	return (
@@ -511,7 +510,12 @@ function CreateRowForm({
 			</div>
 
 			<PropertyRow property={dateProperty}>
-				<span className='px-1'>{formatDatabaseDate(value)}</span>
+				<DateCell
+					name={dateProperty.name}
+					value={date}
+					interactive
+					onChange={(next) => next && setDate(next)}
+				/>
 			</PropertyRow>
 
 			<div className='mt-2 flex justify-end gap-2 border-t px-3 py-2'>

@@ -210,7 +210,7 @@ export function PageTrashPopover({
 						"flex-col",
 						"overflow-hidden rounded-xl",
 						"border bg-popover p-0",
-						"shadow-xl",
+						"shadow-elevated",
 					].join(" ")}
 				>
 					{/* Header */}

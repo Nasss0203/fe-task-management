@@ -40,7 +40,7 @@ interface GeneralAccessSectionProps {
 	onUpdate: (payload: UpdatePageShareSettingPayload) => void;
 }
 
-const selectStyle = "border-[#414141] bg-[#2b2b2b] text-white";
+const selectStyle = "border-border bg-popover text-popover-foreground";
 
 const menuLevel: Record<PageShareAccessLevel, AccessLevel> = {
 	VIEWER: "view",
@@ -134,12 +134,12 @@ export function GeneralAccessSection({
 
 	return (
 		<section className='space-y-2'>
-			<h2 className='text-[11px] font-semibold text-[#aaa]'>
+			<h2 className='text-[11px] font-semibold text-muted-foreground'>
 				General access
 			</h2>
 
 			{isPending ? (
-				<p className='text-xs text-[#8f8f8f]'>
+				<p className='text-xs text-muted-foreground'>
 					Loading general access...
 				</p>
 			) : isError ? (
@@ -149,7 +149,7 @@ export function GeneralAccessSection({
 			) : (
 				<>
 					<div className='flex min-w-0 items-center gap-2.5'>
-						<div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#3b3b3b] text-[#aaa]'>
+						<div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground'>
 							{icon}
 						</div>
 
@@ -162,7 +162,7 @@ export function GeneralAccessSection({
 								<SelectTrigger
 									size='sm'
 									aria-label='General access'
-									className='max-w-full min-w-0 border-0 bg-transparent px-1 text-xs text-[#e6e6e6]'
+									className='max-w-full min-w-0 border-0 bg-transparent px-1 text-xs text-foreground'
 								>
 									<SelectValue />
 								</SelectTrigger>
@@ -186,7 +186,7 @@ export function GeneralAccessSection({
 						{/* Everyone in workspace */}
 						{generalAccess === "WORKSPACE" &&
 							setting?.workspaceAccessLevel && (
-								<div className='ml-auto shrink-0 text-xs text-[#aaa]'>
+								<div className='ml-auto shrink-0 text-xs text-muted-foreground'>
 									{canManage ? (
 										<AccessLevelMenu
 											currentLevel={
@@ -223,7 +223,7 @@ export function GeneralAccessSection({
 						{/* Anyone with the link */}
 						{generalAccess === "LINK" &&
 							setting?.linkAccessLevel && (
-								<div className='ml-auto shrink-0 text-xs text-[#aaa]'>
+								<div className='ml-auto shrink-0 text-xs text-muted-foreground'>
 									{canManage ? (
 										<AccessLevelMenu
 											currentLevel={

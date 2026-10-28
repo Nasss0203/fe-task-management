@@ -82,7 +82,7 @@ export function PeopleWithAccess({
 
 	return (
 		<section className='space-y-2.5'>
-			<h2 className='text-[11px] font-semibold text-[#aaa]'>
+			<h2 className='text-[11px] font-semibold text-muted-foreground'>
 				People with access
 			</h2>
 
@@ -96,18 +96,18 @@ export function PeopleWithAccess({
 								alt={currentUserName}
 							/>
 
-							<AvatarFallback className='bg-[#1296d4] text-white'>
+							<AvatarFallback className='bg-primary text-primary-foreground'>
 								{currentUserName.charAt(0).toUpperCase()}
 							</AvatarFallback>
 						</Avatar>
 
 						<div className='min-w-0 leading-4'>
-							<p className='truncate text-[13px] text-[#ededed]'>
+							<p className='truncate text-[13px] text-foreground'>
 								{currentUserName}{" "}
-								<span className='text-[#aaa]'>(You)</span>
+								<span className='text-muted-foreground'>(You)</span>
 							</p>
 
-							<p className='truncate text-[11px] text-[#9a9a9a]'>
+							<p className='truncate text-[11px] text-muted-foreground'>
 								{currentUser.email}
 							</p>
 						</div>
@@ -126,7 +126,7 @@ export function PeopleWithAccess({
 
 			{/* Direct shares */}
 			{isPending ? (
-				<p className='py-2 text-xs text-[#8f8f8f]'>
+				<p className='py-2 text-xs text-muted-foreground'>
 					Loading people with access...
 				</p>
 			) : isError ? (
@@ -135,7 +135,7 @@ export function PeopleWithAccess({
 				</p>
 			) : directShares.length === 0 ? (
 				!currentUser && (
-					<p className='py-2 text-xs text-[#8f8f8f]'>
+					<p className='py-2 text-xs text-muted-foreground'>
 						No one has been shared directly yet.
 					</p>
 				)
@@ -159,18 +159,18 @@ export function PeopleWithAccess({
 											alt={name}
 										/>
 
-										<AvatarFallback className='bg-[#1296d4] text-white'>
+										<AvatarFallback className='bg-primary text-primary-foreground'>
 											{name.charAt(0).toUpperCase() ||
 												"?"}
 										</AvatarFallback>
 									</Avatar>
 
 									<div className='min-w-0 leading-4'>
-										<p className='truncate text-[13px] text-[#ededed]'>
+										<p className='truncate text-[13px] text-foreground'>
 											{name}
 										</p>
 
-										<p className='truncate text-[11px] text-[#9a9a9a]'>
+										<p className='truncate text-[11px] text-muted-foreground'>
 											{share.user.email}
 										</p>
 									</div>
@@ -196,7 +196,7 @@ export function PeopleWithAccess({
 										}}
 									/>
 								) : (
-									<span className='shrink-0 text-xs text-[#aaa]'>
+									<span className='shrink-0 text-xs text-muted-foreground'>
 										{accessLabel[share.accessLevel]}
 									</span>
 								)}

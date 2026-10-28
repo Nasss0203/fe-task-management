@@ -42,8 +42,8 @@ export function SharePopoverFooter({ pageId }: SharePopoverFooterProps) {
 	};
 
 	return (
-		<div className='flex min-h-14 flex-wrap items-center justify-between gap-2 border-t border-[#303030] px-4 py-2'>
-			<span className='flex items-center gap-1.5 px-2 text-xs text-[#aaa]'>
+		<div className='flex min-h-14 flex-wrap items-center justify-between gap-2 border-t border-border px-4 py-2'>
+			<span className='flex items-center gap-1.5 px-2 text-xs text-muted-foreground'>
 				<Settings className='size-4' />
 				Advanced
 			</span>
@@ -53,7 +53,7 @@ export function SharePopoverFooter({ pageId }: SharePopoverFooterProps) {
 				variant='outline'
 				onClick={handleCopyLink}
 				disabled={isCopying}
-				className='h-9 gap-1.5 border-[#444] bg-transparent px-3 text-xs text-[#ededed] hover:bg-white/5'
+				className='h-9 gap-1.5 border-border bg-transparent px-3 text-xs text-foreground hover:bg-accent'
 			>
 				{copied ? (
 					<>

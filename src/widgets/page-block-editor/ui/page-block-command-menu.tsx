@@ -407,7 +407,7 @@ export function PageBlockCommandMenu({
                 rounded-xl
                 border
                 bg-popover
-                shadow-xl
+                shadow-elevated
             '
 			onKeyDown={(event) => {
 				if (event.key === "Escape") {

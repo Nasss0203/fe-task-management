@@ -192,7 +192,7 @@ export function PageBlockActionMenu({
                     rounded-xl
                     border
                     bg-popover
-                    shadow-xl
+                    shadow-elevated
                 '
 			>
 				<div className='flex h-9 items-center border-b px-2'>
@@ -265,7 +265,7 @@ export function PageBlockActionMenu({
                 rounded-xl
                 border
                 bg-popover
-                shadow-xl
+                shadow-elevated
             '
 			onKeyDown={(event) => {
 				if (event.key === "Escape") {

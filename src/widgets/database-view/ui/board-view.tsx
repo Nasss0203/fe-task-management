@@ -380,7 +380,7 @@ function BoardColumns({
 
 				<DragOverlay>
 					{activeRow && (
-						<div className='w-[248px] rotate-1 cursor-grabbing rounded-md border bg-card px-2 py-1.5 text-sm font-medium shadow-lg'>
+						<div className='w-[248px] rotate-1 cursor-grabbing rounded-lg border bg-card px-2 py-1.5 text-sm font-medium shadow-elevated'>
 							{(titleProperty &&
 								(getRowValueMap(activeRow).get(titleProperty.id) as string)) ||
 								"Untitled"}
@@ -561,7 +561,7 @@ function BoardCard({
 				if (event.key === "Enter") onOpen();
 			}}
 			className={cn(
-				"group/row relative flex flex-col gap-1 rounded-md border border-border/70 bg-card px-2 py-1.5 shadow-[0_1px_2px_rgb(0_0_0/0.06)] outline-none transition-colors hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring/50 dark:shadow-none",
+				"group/row relative flex flex-col gap-1 rounded-lg border border-border/70 bg-card px-2 py-1.5 shadow-soft outline-none transition-colors hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring/50 dark:shadow-none",
 				readOnly ? "cursor-pointer" : "cursor-grab active:cursor-grabbing",
 				isDragging && "opacity-40",
 			)}

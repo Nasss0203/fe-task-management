@@ -47,85 +47,91 @@
 	--radius-2xl: calc(var(--radius) + 8px);
 	--radius-3xl: calc(var(--radius) + 12px);
 	--radius-4xl: calc(var(--radius) + 16px);
+	--shadow-soft: var(--elevation-soft);
+	--shadow-elevated: var(--elevation-raised);
 }
 :root {
-	--radius: 0.625rem;
-	--background: #fafafa;
-	--foreground: #0a0a0a;
+	--radius: 0.75rem;
+	--background: #f7f8fa;
+	--foreground: #0f172a;
 	--surface: #ffffff;
-	--surface-foreground: #0a0a0a;
+	--surface-foreground: #0f172a;
 	--card: #ffffff;
-	--card-foreground: #0a0a0a;
+	--card-foreground: #0f172a;
 	--popover: #ffffff;
-	--popover-foreground: #0a0a0a;
-	--primary: #4f46e5;
+	--popover-foreground: #0f172a;
+	--primary: #5046e5;
 	--primary-foreground: #ffffff;
-	--secondary: #f4f4f5;
-	--secondary-foreground: #18181b;
-	--muted: #f4f4f5;
-	--muted-foreground: #525252;
+	--secondary: #f1f3f7;
+	--secondary-foreground: #1e293b;
+	--muted: #f1f3f7;
+	--muted-foreground: #5b6474;
 	/* Chart series: validated categorical pair on the card surface (CVD-safe). */
 	--chart-1: #2a78d6;
 	--chart-2: #eb6834;
-	--accent: #f4f4f5;
-	--accent-foreground: #18181b;
+	--accent: #eef0fe;
+	--accent-foreground: #3730a3;
 	--destructive: oklch(0.577 0.245 27.325);
 	--info: #0284c7;
 	--success: #10b981;
 	--warning: #f59e0b;
 	--danger: #ef4444;
-	--border: #e5e5e5;
-	--input: #e5e5e5;
+	--border: #e4e7ed;
+	--input: #dfe3ea;
 	--ring: #6366f1;
-	--sidebar: #fafafa;
-	--sidebar-foreground: #18181b;
-	--sidebar-primary: #4f46e5;
+	--sidebar: #f3f4f8;
+	--sidebar-foreground: #1e293b;
+	--sidebar-primary: #5046e5;
 	--sidebar-primary-foreground: #ffffff;
-	--sidebar-accent: #f4f4f5;
-	--sidebar-accent-foreground: #18181b;
-	--sidebar-border: #e5e5e5;
+	--sidebar-accent: #e8eafd;
+	--sidebar-accent-foreground: #312e81;
+	--sidebar-border: #e4e7ed;
 	--sidebar-ring: #6366f1;
 	--brand-indigo: #6366f1;
 	--brand-violet: #8b5cf6;
+	--elevation-soft: 0 1px 2px rgb(15 23 42 / 0.04), 0 4px 16px -6px rgb(15 23 42 / 0.08);
+	--elevation-raised: 0 2px 4px rgb(15 23 42 / 0.04), 0 12px 32px -8px rgb(15 23 42 / 0.18);
 }
 
 .dark {
-	--background: #181818;
-	--foreground: #fafafa;
-	--surface: #1d1d1d;
-	--surface-foreground: #fafafa;
-	--card: #222222;
-	--card-foreground: #fafafa;
-	--popover: #222222;
-	--popover-foreground: #fafafa;
-	--primary: #6366f1;
+	--background: #0e1014;
+	--foreground: #f1f5f9;
+	--surface: #13161b;
+	--surface-foreground: #f1f5f9;
+	--card: #171a20;
+	--card-foreground: #f1f5f9;
+	--popover: #1a1d24;
+	--popover-foreground: #f1f5f9;
+	--primary: #6d68f6;
 	--primary-foreground: #ffffff;
-	--secondary: #222222;
-	--secondary-foreground: #fafafa;
-	--muted: #262626;
-	--muted-foreground: #a3a3a3;
+	--secondary: #1c2027;
+	--secondary-foreground: #f1f5f9;
+	--muted: #1c2027;
+	--muted-foreground: #9aa3b2;
 	--chart-1: #3987e5;
 	--chart-2: #d95926;
-	--accent: #262626;
-	--accent-foreground: #fafafa;
+	--accent: #22253a;
+	--accent-foreground: #e0e3ff;
 	--destructive: oklch(0.6 0.2 25);
 	--info: #38bdf8;
 	--success: #34d399;
 	--warning: #fbbf24;
 	--danger: #f87171;
-	--border: #343434;
-	--input: #343434;
+	--border: #262a33;
+	--input: #2b303a;
 	--ring: #818cf8;
-	--sidebar: #181818;
-	--sidebar-foreground: #fafafa;
-	--sidebar-primary: #6366f1;
+	--sidebar: #111318;
+	--sidebar-foreground: #e2e8f0;
+	--sidebar-primary: #6d68f6;
 	--sidebar-primary-foreground: #ffffff;
-	--sidebar-accent: #222222;
-	--sidebar-accent-foreground: #fafafa;
-	--sidebar-border: #343434;
+	--sidebar-accent: #1f2233;
+	--sidebar-accent-foreground: #e0e3ff;
+	--sidebar-border: #22262e;
 	--sidebar-ring: #818cf8;
 	--brand-indigo: #6366f1;
 	--brand-violet: #8b5cf6;
+	--elevation-soft: inset 0 1px 0 rgb(255 255 255 / 0.04), 0 4px 16px -6px rgb(0 0 0 / 0.5);
+	--elevation-raised: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 16px 40px -8px rgb(0 0 0 / 0.6);
 }
 
 @layer base {
@@ -161,12 +167,12 @@
 	.dark [role="menu"],
 	.dark .popover {
 		border-top: 1px solid color-mix(in oklab, white 8%, transparent);
-		box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.4);
+		box-shadow: var(--elevation-soft);
 	}
 
 	::-webkit-scrollbar {
-		height: 8px;
-		width: 8px;
+		height: 10px;
+		width: 10px;
 	}
 
 	::-webkit-scrollbar-track {
@@ -174,11 +180,14 @@
 	}
 
 	::-webkit-scrollbar-thumb {
-		background: color-mix(in oklab, var(--foreground) 18%, transparent);
-		border-radius: 4px;
+		background: color-mix(in oklab, var(--foreground) 12%, transparent);
+		background-clip: padding-box;
+		border: 3px solid transparent;
+		border-radius: 9999px;
 	}
 
 	::-webkit-scrollbar-thumb:hover {
-		background: color-mix(in oklab, var(--foreground) 28%, transparent);
+		background: color-mix(in oklab, var(--foreground) 24%, transparent);
+		background-clip: padding-box;
 	}
 }

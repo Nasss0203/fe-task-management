@@ -44,7 +44,7 @@ export function RecentContentSection({ workspaceId }: RecentContentSectionProps)
 					Unable to load recent pages.
 				</p>
 			) : recentPages.length === 0 ? (
-				<div className='rounded-lg border border-dashed border-border/60 p-5 text-center'>
+				<div className='rounded-xl border border-dashed border-border p-5 text-center'>
 					<p className='text-xs text-muted-foreground'>
 						No pages updated recently.
 					</p>
@@ -56,7 +56,7 @@ export function RecentContentSection({ workspaceId }: RecentContentSectionProps)
 							key={page.id}
 							type='button'
 							onClick={() => router.push(`/page/${page.id}`)}
-							className='flex flex-col justify-between rounded-lg border border-border/60 bg-card p-3.5 text-left transition-colors hover:border-border hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
+							className='flex flex-col justify-between rounded-xl border border-border/60 bg-card p-3.5 text-left shadow-soft transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-elevated focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
 						>
 							<div className='flex items-center gap-2 overflow-hidden'>
 								<span className='shrink-0 text-base'>

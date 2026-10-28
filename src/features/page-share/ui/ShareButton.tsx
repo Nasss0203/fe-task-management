@@ -78,7 +78,7 @@ export default function ShareButton({ pageId }: ShareButtonProps) {
 			<PopoverTrigger asChild>
 				<button
 					type='button'
-					className='flex cursor-pointer items-center gap-1.5 rounded-md border border-transparent px-2 py-1.5 text-xs text-neutral-200 hover:border-neutral-700 hover:bg-neutral-900 hover:text-white'
+					className='flex cursor-pointer items-center gap-1.5 rounded-md border border-transparent px-2 py-1.5 text-xs text-muted-foreground hover:border-border hover:bg-accent hover:text-accent-foreground'
 				>
 					<SquareArrowOutUpRight className='size-3.5' />
 					Share
@@ -89,7 +89,7 @@ export default function ShareButton({ pageId }: ShareButtonProps) {
 				align='end'
 				side='bottom'
 				sideOffset={8}
-				className='w-[calc(100vw-2rem)] overflow-visible rounded-xl border-[#3d3d3d] bg-[#252525] p-0 text-[#f1f1f1] shadow-xl sm:w-[500px]'
+				className='w-[calc(100vw-2rem)] overflow-visible rounded-xl border-border bg-popover p-0 text-foreground shadow-elevated sm:w-[500px]'
 			>
 				<Tabs defaultValue='share' className='gap-0'>
 					<SharePopoverHeader showPublish={canPublish} />

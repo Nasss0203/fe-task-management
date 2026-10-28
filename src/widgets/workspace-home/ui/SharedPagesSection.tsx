@@ -45,7 +45,7 @@ export function SharedPagesSection({ workspaceId }: SharedPagesSectionProps) {
 			</h2>
 
 			{isLoading ? (
-				<div className='divide-y divide-border/40 rounded-lg border border-border/60 bg-card p-1'>
+				<div className='divide-y divide-border/40 rounded-xl border border-border/60 bg-card shadow-soft p-1'>
 					{Array.from({ length: 3 }).map((_, idx) => (
 						<div key={idx} className='flex items-center justify-between p-3'>
 							<Skeleton className='h-4 w-40' />
@@ -58,13 +58,13 @@ export function SharedPagesSection({ workspaceId }: SharedPagesSectionProps) {
 					Unable to load shared pages.
 				</p>
 			) : displayedPages.length === 0 ? (
-				<div className='rounded-lg border border-dashed border-border/60 p-5 text-center'>
+				<div className='rounded-xl border border-dashed border-border p-5 text-center'>
 					<p className='text-xs text-muted-foreground'>
 						No pages shared with you yet.
 					</p>
 				</div>
 			) : (
-				<div className='divide-y divide-border/40 rounded-lg border border-border/60 bg-card overflow-hidden'>
+				<div className='divide-y divide-border/40 rounded-xl border border-border/60 bg-card shadow-soft overflow-hidden'>
 					{displayedPages.slice(0, 6).map((page) => (
 						<button
 							key={page.id}
