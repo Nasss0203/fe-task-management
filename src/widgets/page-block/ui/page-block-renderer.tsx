@@ -1,6 +1,10 @@
 import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-tree";
 import { getDatabaseViewConfig } from "@/entities/page-block/lib/get-database-view-config";
-import { PageBlockType } from "@/entities/page-block/model/page-block.types";
+import { useUpdatePageBlock } from "@/entities/page-block/model/page-block.mutations";
+import {
+	PageBlockType,
+	type DatabaseViewBlockDataConfig,
+} from "@/entities/page-block/model/page-block.types";
 import { TableOfContentsBlock } from "@/entities/page-block/ui/read-only-block-content";
 import { Separator } from "@/shared/ui/separator";
 import { DatabaseViewBlock } from "@/widgets/database-view/ui/database-view-block";
@@ -89,12 +93,7 @@ export function PageBlockRenderer({ block, shareToken }: PageBlockRendererProps)
 				);
 			}
 
-			return (
-				<DatabaseViewBlock
-					databaseId={config.database_id}
-					viewId={config.view_id}
-				/>
-			);
+			return <EditableDatabaseViewBlock block={block} config={config} />;
 		}
 
 		default:
@@ -104,4 +103,29 @@ export function PageBlockRenderer({ block, shareToken }: PageBlockRendererProps)
 				</div>
 			);
 	}
+}
+
+/** Tab view đang chọn được lưu vào block: lần sau ai mở cũng thấy view này trước. */
+function EditableDatabaseViewBlock({
+	block,
+	config,
+}: {
+	block: PageBlockNode;
+	config: DatabaseViewBlockDataConfig;
+}) {
+	const updateBlock = useUpdatePageBlock();
+
+	return (
+		<DatabaseViewBlock
+			databaseId={config.database_id}
+			viewId={config.view_id}
+			onActiveViewChange={(viewId) =>
+				updateBlock.mutate({
+					blockId: block.id,
+					pageId: block.page_id,
+					dataConfig: { ...config, view_id: viewId },
+				})
+			}
+		/>
+	);
 }

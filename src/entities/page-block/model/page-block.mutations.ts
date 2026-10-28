@@ -29,11 +29,20 @@ function notifyBlockWriteError(shareToken?: string) {
 	);
 }
 
+// Tên view đầu tiên theo kiểu, giống khi bấm "+" thêm view
+const FIRST_VIEW_NAMES: Record<DatabaseViewType, string> = {
+	[DatabaseViewType.TABLE]: "Table",
+	[DatabaseViewType.BOARD]: "Board",
+	[DatabaseViewType.CALENDAR]: "Calendar",
+	[DatabaseViewType.LIST]: "List",
+};
+
 interface CreateDatabaseBlockInput {
 	pageId: string;
 	parentBlockId?: string | null;
 	afterBlockId?: string | null;
 	name?: string;
+	viewType?: DatabaseViewType;
 }
 export function useCreateDatabaseBlock() {
 	const queryClient = useQueryClient();
@@ -44,14 +53,15 @@ export function useCreateDatabaseBlock() {
 			parentBlockId,
 			afterBlockId,
 			name = "Untitled",
+			viewType = DatabaseViewType.TABLE,
 		}: CreateDatabaseBlockInput) => {
 			const database = await databaseApi.createDatabase(pageId, {
 				name,
 			});
 
 			const view = await databaseApi.createView(database.id, {
-				name: "Table",
-				type: DatabaseViewType.TABLE,
+				name: FIRST_VIEW_NAMES[viewType],
+				type: viewType,
 			});
 
 			const block = await pageBlockApi.create({
@@ -198,6 +208,7 @@ interface TransformToDatabaseBlockInput {
 	blockId: string;
 	pageId: string;
 	name?: string;
+	viewType?: DatabaseViewType;
 }
 
 export function useTransformToDatabaseBlock() {
@@ -208,16 +219,17 @@ export function useTransformToDatabaseBlock() {
 			blockId,
 			pageId,
 			name = "Untitled",
+			viewType = DatabaseViewType.TABLE,
 		}: TransformToDatabaseBlockInput) => {
 			// 1. Tạo Database
 			const database = await databaseApi.createDatabase(pageId, {
 				name,
 			});
 
-			// 2. Tạo default Table View
+			// 2. Tạo view đầu tiên theo kiểu đã chọn (mặc định Table)
 			const view = await databaseApi.createView(database.id, {
-				name: "Table",
-				type: DatabaseViewType.TABLE,
+				name: FIRST_VIEW_NAMES[viewType],
+				type: viewType,
 			});
 
 			// 3. Biến chính TEXT block "/" thành DATABASE_VIEW

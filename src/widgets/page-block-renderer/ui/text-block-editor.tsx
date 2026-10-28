@@ -132,6 +132,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 	const handleSlashSelect = async ({
 		type,
 		styleConfig,
+		viewType,
 	}: PageBlockCommand) => {
 		if (slashIndex === null) {
 			return;
@@ -151,6 +152,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 				blockId: block.id,
 				pageId: block.page_id,
 				name: "Untitled",
+				viewType,
 			});
 
 			return;

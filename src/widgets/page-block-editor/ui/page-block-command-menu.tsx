@@ -2,6 +2,7 @@
 
 import {
 	BookmarkIcon,
+	CalendarDays,
 	AppWindow,
 	CheckSquare,
 	ChevronRight,
@@ -16,6 +17,7 @@ import {
 	Heading2,
 	Heading3,
 	ImageIcon,
+	KanbanSquare,
 	Minus,
 	Quote,
 	Table2,
@@ -23,6 +25,7 @@ import {
 	VideoIcon,
 } from "lucide-react";
 
+import { DatabaseViewType } from "@/entities/database/model/database.types";
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
 
 import {
@@ -40,6 +43,9 @@ export interface PageBlockCommand {
 	type: PageBlockType;
 
 	styleConfig?: Record<string, unknown>;
+
+	/** Kiểu view đầu tiên khi tạo database (mặc định Table). */
+	viewType?: DatabaseViewType;
 }
 
 interface PageBlockCommandMenuProps {
@@ -59,6 +65,8 @@ export interface CommandItemData {
 	type: PageBlockType;
 
 	styleConfig?: Record<string, unknown>;
+
+	viewType?: DatabaseViewType;
 
 	icon: React.ComponentType<{
 		className?: string;
@@ -280,14 +288,35 @@ export const TURN_INTO_BLOCKS = [...BASIC_BLOCKS, ...ADVANCED_BLOCKS].filter(
 const DATABASE_BLOCKS: CommandItemData[] = [
 	{
 		id: "database-table",
-
 		label: "Table view",
-
-		description: "Create a database table.",
-
+		description: "Rows and columns of a database.",
 		type: PageBlockType.DATABASE_VIEW,
-
+		viewType: DatabaseViewType.TABLE,
 		icon: Table2,
+	},
+	{
+		id: "database-board",
+		label: "Board view",
+		description: "Cards grouped into columns.",
+		type: PageBlockType.DATABASE_VIEW,
+		viewType: DatabaseViewType.BOARD,
+		icon: KanbanSquare,
+	},
+	{
+		id: "database-list",
+		label: "List view",
+		description: "A simple list of database items.",
+		type: PageBlockType.DATABASE_VIEW,
+		viewType: DatabaseViewType.LIST,
+		icon: List,
+	},
+	{
+		id: "database-calendar",
+		label: "Calendar view",
+		description: "Database items on a calendar by date.",
+		type: PageBlockType.DATABASE_VIEW,
+		viewType: DatabaseViewType.CALENDAR,
+		icon: CalendarDays,
 	},
 ];
 const MEDIA_BLOCKS: CommandItemData[] = [
@@ -346,6 +375,8 @@ function BlockCommandItem({
 					type: command.type,
 
 					styleConfig: command.styleConfig,
+
+					viewType: command.viewType,
 				})
 			}
 			className='

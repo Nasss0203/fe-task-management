@@ -34,6 +34,8 @@ interface DatabaseViewBlockProps {
 	readOnly?: boolean;
 	/** Reads through a share link instead of workspace membership. */
 	shareToken?: string;
+	/** Called when the user picks or creates a view (the block saves it as its default). */
+	onActiveViewChange?: (viewId: string) => void;
 }
 
 export function DatabaseViewBlock({
@@ -41,6 +43,7 @@ export function DatabaseViewBlock({
 	viewId,
 	readOnly = false,
 	shareToken,
+	onActiveViewChange,
 }: DatabaseViewBlockProps) {
 	const shared = Boolean(shareToken);
 
@@ -70,6 +73,11 @@ export function DatabaseViewBlock({
 
 	const activeView =
 		views.find((view) => view.id === activeViewId) ?? views[0];
+
+	const selectView = (id: string) => {
+		setActiveViewId(id);
+		if (id !== activeView?.id) onActiveViewChange?.(id);
+	};
 
 	const viewDetailQuery = useDatabaseView(database?.id, activeView?.id, !shared);
 	const sharedViewDetailQuery = useSharedDatabaseView(
@@ -131,7 +139,7 @@ export function DatabaseViewBlock({
 							databaseId={database.id}
 							view={view}
 							active={view.id === activeView.id}
-							onSelect={() => setActiveViewId(view.id)}
+							onSelect={() => selectView(view.id)}
 							readOnly={readOnly}
 						/>
 					))}
@@ -140,7 +148,7 @@ export function DatabaseViewBlock({
 						<AddDatabaseViewPopover
 							databaseId={database.id}
 							views={views}
-							onCreated={(view) => setActiveViewId(view.id)}
+							onCreated={(view) => selectView(view.id)}
 						/>
 					)}
 				</div>

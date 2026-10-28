@@ -3,7 +3,10 @@
 import { Plus } from "lucide-react";
 import { useState } from "react";
 
-import { useCreatePageBlock } from "@/entities/page-block/model/page-block.mutations";
+import {
+	useCreateDatabaseBlock,
+	useCreatePageBlock,
+} from "@/entities/page-block/model/page-block.mutations";
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
@@ -22,11 +25,20 @@ export function EmptyPageBlockRow({ pageId, shareToken }: EmptyPageBlockRowProps
 	const [open, setOpen] = useState(false);
 
 	const createBlockMutation = useCreatePageBlock(shareToken);
+	const createDatabaseBlockMutation = useCreateDatabaseBlock();
 
-	const handleSelect = ({ type, styleConfig }: PageBlockCommand) => {
-		// DATABASE_VIEW xử lý riêng
+	const isPending =
+		createBlockMutation.isPending || createDatabaseBlockMutation.isPending;
+
+	const handleSelect = ({ type, styleConfig, viewType }: PageBlockCommand) => {
+		// Database cần tạo database + view trước rồi mới tạo block (giống các dòng khác)
 		if (type === PageBlockType.DATABASE_VIEW) {
-			setOpen(false);
+			if (shareToken) return;
+
+			createDatabaseBlockMutation.mutate(
+				{ pageId, parentBlockId: null, name: "Untitled", viewType },
+				{ onSuccess: () => setOpen(false) },
+			);
 			return;
 		}
 
@@ -54,7 +66,7 @@ export function EmptyPageBlockRow({ pageId, shareToken }: EmptyPageBlockRowProps
 					<button
 						type='button'
 						aria-label='Add block'
-						disabled={createBlockMutation.isPending}
+						disabled={isPending}
 						className='
               mr-2 flex size-7 items-center
               justify-center rounded-md

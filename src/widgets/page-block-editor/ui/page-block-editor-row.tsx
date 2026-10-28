@@ -42,7 +42,7 @@ export function PageBlockEditorRow({ block, shareToken }: PageBlockEditorRowProp
 	const createBlockMutation = useCreatePageBlock(shareToken);
 	const createDatabaseBlockMutation = useCreateDatabaseBlock();
 
-	const handleCreateBlock = ({ type, styleConfig }: PageBlockCommand) => {
+	const handleCreateBlock = ({ type, styleConfig, viewType }: PageBlockCommand) => {
 		if (type === PageBlockType.DATABASE_VIEW) {
 			if (shareToken) return;
 
@@ -52,6 +52,7 @@ export function PageBlockEditorRow({ block, shareToken }: PageBlockEditorRowProp
 					parentBlockId: block.parent_block_id,
 					afterBlockId: block.id,
 					name: "Untitled",
+					viewType,
 				},
 				{
 					onSuccess: () => {
