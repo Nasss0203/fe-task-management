@@ -18,13 +18,14 @@ import { createWrapper, renderWithClient } from "../utils/test-utils";
 
 const mocks = vi.hoisted(() => ({ get: vi.fn(), patch: vi.fn(), push: vi.fn() }));
 
-vi.mock("@/shared/api/api-client", () => ({ default: mocks }));
+vi.mock("@/shared/api/api-client", () => ({ default: mocks, refreshAccessToken: vi.fn() }));
 vi.mock("next/navigation", () => ({
 	usePathname: () => "/page/shared-root",
 	useRouter: () => ({ push: mocks.push }),
 }));
 vi.mock("@/features/auth", async () => ({
 	useUser: (await import("@/features/auth/model/use-user")).useUser,
+	useLogout: () => ({ mutate: vi.fn(), isPending: false }),
 }));
 // Keep the actual sidebar, dropdown, shared tree, query hooks and API adapters.
 // Only isolate the settings dialog's unrelated form content.

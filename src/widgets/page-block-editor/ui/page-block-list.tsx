@@ -1,8 +1,10 @@
 import { FileText, LockKeyhole } from "lucide-react";
+import { useState } from "react";
 
 import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-tree";
 
 import { ReadOnlyPageBlockRenderer } from "@/widgets/page-block/ui/read-only-page-block-renderer";
+import { BlockCommentsButton } from "@/widgets/page-comments/ui/block-comments-button";
 
 import { useScrollToBlockHash } from "../model/use-scroll-to-block-hash";
 import { EmptyPageBlockRow } from "./empty-page-block-row";
@@ -41,10 +43,12 @@ interface ReadOnlyBlockRowProps {
 }
 
 function ReadOnlyBlockRow({ block, shareToken }: ReadOnlyBlockRowProps) {
+	const [commentOpen, setCommentOpen] = useState(false);
+
 	return (
 		<div
 			id={`block-${block.id}`}
-			className='group -mx-2 grid min-h-8 w-[calc(100%+1rem)] grid-cols-[28px_28px_minmax(0,1fr)] items-center rounded-md px-2 transition-colors duration-150 hover:bg-muted/40'
+			className='group -mx-2 grid min-h-8 w-[calc(100%+1rem)] grid-cols-[28px_28px_minmax(0,1fr)_36px] items-center rounded-md px-2 transition-colors duration-150 hover:bg-muted/40'
 		>
 			<div className='size-7' aria-hidden='true' />
 
@@ -61,6 +65,16 @@ function ReadOnlyBlockRow({ block, shareToken }: ReadOnlyBlockRowProps) {
 					shareToken={shareToken}
 				/>
 			</div>
+
+			{/* Người chỉ xem / COMMENTER vẫn đọc (và COMMENTER viết) được comment của block */}
+			<BlockCommentsButton
+				pageId={block.page_id}
+				blockId={block.id}
+				open={commentOpen}
+				onOpenChange={setCommentOpen}
+				hoverOnlyClassName='opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100 [@media(hover:none)]:opacity-100'
+				shareToken={shareToken}
+			/>
 		</div>
 	);
 }

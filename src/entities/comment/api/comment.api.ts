@@ -17,6 +17,13 @@ function targetPath(target: CommentTarget): string {
 	return TARGET_PATHS[target.type](target.id);
 }
 
+// Trang /share/:token: BE cho đọc comment theo quyền của link
+function shareConfig(shareToken?: string) {
+	return shareToken
+		? { headers: { "X-Page-Share-Token": shareToken } }
+		: undefined;
+}
+
 export const commentApi = {
 	mentionCandidates: async (
 		pageId: string,
@@ -30,17 +37,25 @@ export const commentApi = {
 		return response.data.data;
 	},
 
-	blockCounts: async (pageId: string): Promise<BlockCommentCounts> => {
+	blockCounts: async (
+		pageId: string,
+		shareToken?: string,
+	): Promise<BlockCommentCounts> => {
 		const response = await instance.get<ApiResponse<BlockCommentCounts>>(
 			`/page/${pageId}/comments/block-counts`,
+			shareConfig(shareToken),
 		);
 
 		return response.data.data;
 	},
 
-	list: async (target: CommentTarget): Promise<Comment[]> => {
+	list: async (
+		target: CommentTarget,
+		shareToken?: string,
+	): Promise<Comment[]> => {
 		const response = await instance.get<ApiResponse<Comment[]>>(
 			targetPath(target),
+			shareConfig(shareToken),
 		);
 
 		return response.data.data;

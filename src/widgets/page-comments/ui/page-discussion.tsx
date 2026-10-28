@@ -14,19 +14,21 @@ const DISCUSSION_COLUMN = "px-12 md:px-16 lg:px-24 [&>*]:ml-[60px]";
 
 interface PageDiscussionProps {
 	pageId: string;
+	/** Trang share link: chỉ đọc, đọc bằng token của link. */
+	shareToken?: string;
 }
 
 /**
  * Comment cấp page nằm ngay dưới tiêu đề, giống Notion.
  * Đặt trong phần tử cha có class `group/page-title` để nút "Add comment" hiện khi hover tiêu đề.
  */
-export function PageDiscussion({ pageId }: PageDiscussionProps) {
+export function PageDiscussion({ pageId, shareToken }: PageDiscussionProps) {
 	const [composerOpen, setComposerOpen] = useState(false);
 
 	const target: CommentTarget = { type: "PAGE", id: pageId };
 
-	const canComment = useCanComment(pageId);
-	const { data: comments = [] } = useComments(target);
+	const canComment = useCanComment(pageId, !shareToken);
+	const { data: comments = [] } = useComments(target, true, shareToken);
 
 	if (comments.length === 0 && !composerOpen) {
 		if (!canComment) return null;
@@ -54,6 +56,7 @@ export function PageDiscussion({ pageId }: PageDiscussionProps) {
 				target={target}
 				pageId={pageId}
 				canComment={canComment}
+				shareToken={shareToken}
 				autoFocusComposer={composerOpen && comments.length === 0}
 				onComposerCancel={
 					comments.length === 0 ? () => setComposerOpen(false) : undefined

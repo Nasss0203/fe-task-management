@@ -299,8 +299,7 @@ export function PublicPage({ publicSite }: PublicPageProps) {
 			{capabilities.updates_enabled && !canMutate ? (
 				<PublicEditAccessDialog
 					pageId={page.id}
-					subdomain={subdomain}
-					path={path}
+					source={{ subdomain, path }}
 					authenticated={capabilities.authenticated}
 					open={editAccessOpen}
 					onOpenChange={setEditAccessOpen}

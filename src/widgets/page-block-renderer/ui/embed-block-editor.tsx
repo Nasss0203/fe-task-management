@@ -59,7 +59,7 @@ export function EmbedBlockEditor({ block, shareToken }: EmbedBlockEditorProps) {
 						autoFocus={editing}
 						aria-label='Embed link'
 						aria-invalid={invalid}
-						placeholder='Paste a Figma, Google Maps, GitHub Gist or tweet link...'
+						placeholder='Paste a Figma, Maps, Gist, tweet, Vimeo, Loom or Spotify link...'
 						onChange={(event) => {
 							setUrlInput(event.target.value);
 							setInvalid(false);
@@ -83,7 +83,7 @@ export function EmbedBlockEditor({ block, shareToken }: EmbedBlockEditorProps) {
 
 				{(invalid || (url && !embed)) && (
 					<p role='alert' className='mt-2 text-xs text-destructive'>
-						Only Figma, Google Maps, GitHub Gist and X/Twitter links
+						Only Figma, Google Maps, GitHub Gist, X/Twitter, Vimeo, Loom and Spotify links
 						can be embedded.
 					</p>
 				)}

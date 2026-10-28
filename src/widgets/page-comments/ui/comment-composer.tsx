@@ -260,8 +260,9 @@ export function CommentComposer({
 										{user.username.charAt(0).toUpperCase()}
 									</AvatarFallback>
 								</Avatar>
-								<span className='truncate'>{user.username}</span>
-								<span className='ml-auto truncate text-xs text-muted-foreground'>
+								{/* Tên ưu tiên hiện đủ, email co lại trước */}
+								<span className='max-w-[65%] shrink-0 truncate'>{user.username}</span>
+								<span className='min-w-0 flex-1 truncate text-right text-xs text-muted-foreground'>
 									{user.email}
 								</span>
 							</li>

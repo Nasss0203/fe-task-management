@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { useWorkspaceSubscription } from "@/entities/billing/model/billing.queries";
 import {
@@ -20,6 +21,7 @@ import {
 } from "@/entities/page/model/page.queries";
 import { useTeamspaces } from "@/entities/teamspace/model/teamspace.queries";
 import { useSelectWorkspace } from "@/entities/workspace/model/workspace.mutations";
+import { getApiErrorMessage } from "@/shared/lib/api-error-message";
 import {
 	useWorkspaceAccess,
 	useWorkspaces,
@@ -162,10 +164,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		? user?.lastActiveWorkspaceId
 		: workspaces[0]?.id;
 
-	const { data: workspaceSubscription } = useWorkspaceSubscription(
-		currentWorkspaceId ?? "",
-	);
-
 	/**
 	 * Workspace access.
 	 *
@@ -195,6 +193,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const isGuest = membershipType === "GUEST";
 
 	const isMember = membershipType === "MEMBER";
+
+	// Gói cước chỉ thành viên xem được; Guest gọi sẽ bị 403
+	const { data: workspaceSubscription } = useWorkspaceSubscription(
+		currentWorkspaceId ?? "",
+		isMember,
+	);
 
 	/**
 	 * Không dựa vào role OWNER/MEMBER.
@@ -245,12 +249,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	/**
 	 * Switch workspace.
 	 */
-	const handleWorkspaceSelect = async (workspaceId: string) => {
+	const handleWorkspaceSelect = (workspaceId: string) => {
 		if (workspaceId === currentWorkspaceId) {
 			return;
 		}
 
-		await selectWorkspaceMutation.mutateAsync(workspaceId);
+		// Lỗi chỉ báo toast, không để lỗi chưa bắt làm vỡ trang
+		selectWorkspaceMutation.mutate(workspaceId, {
+			onError: (error) =>
+				toast.error(getApiErrorMessage(error, "Could not open this workspace.")),
+		});
 	};
 
 	/**

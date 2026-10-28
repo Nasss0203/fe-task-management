@@ -13,6 +13,8 @@ interface RowCommentsProps {
 	rowId: string;
 	/** Cuộn tới mục này khi mở (link thông báo comment). */
 	scrollIntoView?: boolean;
+	/** Trang share link: chỉ đọc, đọc bằng token của link. */
+	shareToken?: string;
 }
 
 /** Comment của một task (row database) trong drawer chi tiết. */
@@ -20,12 +22,17 @@ export function RowComments({
 	pageId,
 	rowId,
 	scrollIntoView = false,
+	shareToken,
 }: RowCommentsProps) {
 	const target: CommentTarget = { type: "DATABASE_ROW", id: rowId };
 	const sectionRef = useRef<HTMLElement>(null);
 
-	const canComment = useCanComment(pageId);
-	const { data: comments = [], isSuccess } = useComments(target);
+	const canComment = useCanComment(pageId, !shareToken);
+	const { data: comments = [], isSuccess } = useComments(
+		target,
+		true,
+		shareToken,
+	);
 
 	// Đợi comment tải xong để cuộn đúng chỗ (danh sách làm mục này cao lên)
 	useEffect(() => {
@@ -53,6 +60,7 @@ export function RowComments({
 				target={target}
 				pageId={pageId}
 				canComment={canComment}
+				shareToken={shareToken}
 			/>
 		</section>
 	);

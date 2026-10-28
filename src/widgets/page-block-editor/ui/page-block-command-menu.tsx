@@ -322,7 +322,7 @@ const MEDIA_BLOCKS: CommandItemData[] = [
 	{
 		id: "embed",
 		label: "Embed",
-		description: "Figma, Google Maps, GitHub Gist or a tweet.",
+		description: "Figma, Maps, Gist, tweet, Vimeo, Loom or Spotify.",
 		type: PageBlockType.EMBED,
 		icon: AppWindow,
 	},

@@ -15,6 +15,8 @@ interface BlockCommentsButtonProps {
 	onOpenChange: (open: boolean) => void;
 	/** Class để nút chỉ hiện khi hover row (dùng khi block chưa có comment). */
 	hoverOnlyClassName?: string;
+	/** Trang share link: chỉ đọc, đọc bằng token của link. */
+	shareToken?: string;
 }
 
 /** Icon 💬 ở lề phải block; bấm mở thread comment của block cạnh nó. */
@@ -24,9 +26,10 @@ export function BlockCommentsButton({
 	open,
 	onOpenChange,
 	hoverOnlyClassName,
+	shareToken,
 }: BlockCommentsButtonProps) {
-	const canComment = useCanComment(pageId);
-	const { data: counts } = useBlockCommentCounts(pageId);
+	const canComment = useCanComment(pageId, !shareToken);
+	const { data: counts } = useBlockCommentCounts(pageId, true, shareToken);
 
 	const count = counts?.[blockId] ?? 0;
 
@@ -37,6 +40,8 @@ export function BlockCommentsButton({
 			<PopoverTrigger asChild>
 				<button
 					type='button'
+					// Người chỉ xem vẫn mở được comment (xem PageEditAccessBoundary)
+					data-read-only-allowed=''
 					aria-label={count > 0 ? `${count} comments` : "Comment on block"}
 					className={cn(
 						"ml-1 flex h-7 w-8 items-center justify-center gap-0.5 rounded-md text-xs text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -50,6 +55,7 @@ export function BlockCommentsButton({
 			</PopoverTrigger>
 
 			<PopoverContent
+				data-read-only-allowed=''
 				side='right'
 				align='start'
 				sideOffset={8}
@@ -64,6 +70,7 @@ export function BlockCommentsButton({
 					target={{ type: "PAGE_BLOCK", id: blockId }}
 					pageId={pageId}
 					canComment={canComment}
+					shareToken={shareToken}
 					autoFocusComposer={count === 0}
 				/>
 			</PopoverContent>

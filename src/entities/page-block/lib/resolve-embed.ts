@@ -108,5 +108,45 @@ export function resolveEmbed(input: string): ResolvedEmbed | null {
 			: null;
 	}
 
+	// Vimeo, Loom, Spotify dùng block Embed chung (không thêm loại block)
+	if (host === "vimeo.com" || host === "player.vimeo.com") {
+		const id = host === "vimeo.com" ? segments[0] : segments[1];
+
+		return id && /^\d+$/.test(id) && (host === "vimeo.com" || segments[0] === "video")
+			? {
+					type: PageBlockType.EMBED,
+					height: 360,
+					src: `https://player.vimeo.com/video/${id}`,
+				}
+			: null;
+	}
+
+	if (host === "loom.com") {
+		const id = segments[1];
+
+		return ["share", "embed"].includes(segments[0]) && id && /^[0-9a-f]+$/i.test(id)
+			? {
+					type: PageBlockType.EMBED,
+					height: 400,
+					src: `https://www.loom.com/embed/${id}`,
+				}
+			: null;
+	}
+
+	if (host === "open.spotify.com") {
+		// Link có thể có tiền tố ngôn ngữ: /intl-vi/track/<id>
+		const [kind, id] = segments[0]?.startsWith("intl-") ? segments.slice(1) : segments;
+
+		return ["track", "album", "playlist", "episode", "show"].includes(kind) &&
+			id &&
+			/^[A-Za-z0-9]+$/.test(id)
+			? {
+					type: PageBlockType.EMBED,
+					height: kind === "track" || kind === "episode" ? 152 : 352,
+					src: `https://open.spotify.com/embed/${kind}/${id}`,
+				}
+			: null;
+	}
+
 	return null;
 }

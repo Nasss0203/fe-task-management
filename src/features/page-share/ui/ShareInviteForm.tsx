@@ -217,7 +217,9 @@ export function ShareInviteForm({
 				<Button
 					type='submit'
 					disabled={!selectedUser || sharePage.isPending}
-					className='h-9 bg-primary px-3.5 text-xs text-primary-foreground hover:bg-primary/90'
+					// Chỉ bật khi đã chọn người trong gợi ý; lúc tắt phải trông khác hẳn để không tưởng là lỗi
+					title={selectedUser ? undefined : "Choose a person from the list first"}
+					className='h-9 bg-primary px-3.5 text-xs text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100'
 				>
 					{sharePage.isPending ? "Sharing..." : "Share"}
 				</Button>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { useMyPageAccessRequest } from "@/entities/page-access-request/model/page-access-request.queries";
 import { buildPageBlockTree } from "@/entities/page-block/lib/build-page-block-tree";
@@ -16,9 +16,12 @@ import {
 import { usePage, useSharedPage } from "@/entities/page/model/page.queries";
 import { PageSkeleton } from "@/entities/page/ui/page-surface";
 import { PageAccessGate } from "@/features/page-access/ui/page-access-gate";
+import { PageEditAccessBoundary } from "@/features/page-access/ui/page-edit-access-boundary";
 import { PageShareInvitationGate } from "@/features/page-share/ui/page-share-invitation-gate";
 import { Button } from "@/shared/ui/button";
 import { PageBlockList } from "@/widgets/page-block-editor/ui/page-block-list";
+import { PageDiscussion } from "@/widgets/page-comments/ui/page-discussion";
+import { PublicEditAccessDialog } from "@/widgets/public-page/ui/PublicEditAccessDialog";
 
 export default function SharedPageDetail() {
 	const params = useParams<{ token: string }>();
@@ -36,12 +39,18 @@ export default function SharedPageDetail() {
 	const requiresNormalAccess =
 		resolveQuery.isSuccess && resolvedShare?.linkAccessLevel === null;
 
+	const [editAccessOpen, setEditAccessOpen] = useState(false);
+
 	// Invitation metadata is not an effective permission check.
-	const accessQuery = usePageAccess(pageId ?? "", requiresNormalAccess);
+	// Link access cũng cần: người có quyền sửa thật thì sửa được, người chỉ xem thì xin quyền sửa
+	const accessQuery = usePageAccess(pageId ?? "", resolveQuery.isSuccess);
 	const hasNormalAccess =
 		requiresNormalAccess &&
 		accessQuery.isSuccess &&
 		accessQuery.data.effectiveAccessLevel !== null;
+	const normalLevel = accessQuery.data?.effectiveAccessLevel ?? null;
+	const canEditPage =
+		canEditWithLink || normalLevel === "EDITOR" || normalLevel === "FULL_ACCESS";
 
 	const myAccessRequestQuery = useMyPageAccessRequest(
 		pageId,
@@ -162,14 +171,38 @@ export default function SharedPageDetail() {
 				</h1>
 			</div>
 
-			<div className='mt-14 w-full min-w-0 max-w-full px-12 md:px-16 lg:px-24'>
-				<PageBlockList
+			{/* Link share: chỉ đọc comment; có quyền thật trên page thì comment như bình thường */}
+			<div className='mt-4'>
+				<PageDiscussion
 					pageId={page.id}
-					blocks={blockTree}
-					canEdit={canEditWithLink}
 					shareToken={hasLinkAccess ? token : undefined}
 				/>
 			</div>
+
+			<div className='mt-14 w-full min-w-0 max-w-full px-12 md:px-16 lg:px-24'>
+				{/* Link chỉ cho xem: bấm vào nội dung thì hỏi xin quyền sửa */}
+				<PageEditAccessBoundary
+					canEdit={canEditPage || !hasLinkAccess}
+					onRequestEdit={() => setEditAccessOpen(true)}
+				>
+					<PageBlockList
+						pageId={page.id}
+						blocks={blockTree}
+						canEdit={canEditPage}
+						shareToken={hasLinkAccess ? token : undefined}
+					/>
+				</PageEditAccessBoundary>
+			</div>
+
+			{hasLinkAccess && !canEditPage && accessQuery.isSuccess && (
+				<PublicEditAccessDialog
+					pageId={page.id}
+					source={{ token }}
+					authenticated
+					open={editAccessOpen}
+					onOpenChange={setEditAccessOpen}
+				/>
+			)}
 		</div>
 	);
 }

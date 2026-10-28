@@ -5,6 +5,7 @@ import type { PageShareAccessLevel } from "@/entities/page-share/model/page-shar
 
 import { pageAccessRequestApi } from "../api/page-access-request.api";
 import { pageAccessRequestKeys } from "./page-access-request.queries";
+import type { EditAccessSource } from "./page-access-request.types";
 
 export function useCreatePageAccessRequest(pageId: string, token: string) {
 	const queryClient = useQueryClient();
@@ -23,16 +24,16 @@ export function useCreatePageAccessRequest(pageId: string, token: string) {
 	});
 }
 
-export function useRequestEditAccessFromSite(
-	pageId: string,
-	subdomain: string,
-	path: string,
-) {
+export function useRequestEditAccess(pageId: string, source: EditAccessSource) {
 	const queryClient = useQueryClient();
 
 	return useMutation({
 		mutationFn: () =>
-			pageAccessRequestApi.create(pageId, { subdomain, path }),
+			pageAccessRequestApi.create(
+				pageId,
+				// Link share đang cho xem: xin thêm quyền sửa; site luôn là xin sửa
+				"token" in source ? { token: source.token, intent: "edit" } : source,
+			),
 
 		onSettled: async () => {
 			await queryClient.invalidateQueries({

@@ -27,12 +27,15 @@ import { CommentItem } from "./comment-item";
 const VISIBLE_THREADS = 2;
 const VISIBLE_REPLIES = 2;
 
-/** VIEWER chỉ đọc; COMMENTER trở lên (gồm thành viên workspace) mới viết được. */
-export function useCanComment(pageId: string) {
-	const { data: access } = usePageAccess(pageId);
+/**
+ * VIEWER chỉ đọc; COMMENTER trở lên (gồm thành viên workspace) mới viết được.
+ * `enabled = false` (vd trang share link) thì luôn chỉ đọc.
+ */
+export function useCanComment(pageId: string, enabled = true) {
+	const { data: access } = usePageAccess(pageId, enabled);
 	const level = access?.effectiveAccessLevel ?? null;
 
-	return level !== null && level !== "VIEWER";
+	return enabled && level !== null && level !== "VIEWER";
 }
 
 function ToggleButton({
@@ -58,6 +61,8 @@ interface CommentThreadsProps {
 	/** Page chứa target; gợi ý mention theo người xem được page này. */
 	pageId: string;
 	canComment: boolean;
+	/** Đang xem qua link share: đọc comment bằng token của link. */
+	shareToken?: string;
 	/** Focus ô nhập ngay (vd vừa bấm "Add comment"). */
 	autoFocusComposer?: boolean;
 	/** Có thì ô nhập có nút Cancel / Esc. */
@@ -70,6 +75,7 @@ export function CommentThreads({
 	target,
 	pageId,
 	canComment,
+	shareToken,
 	autoFocusComposer = false,
 	onComposerCancel,
 	onPosted,
@@ -82,7 +88,7 @@ export function CommentThreads({
 	);
 
 	const { user } = useUser();
-	const { data: comments = [] } = useComments(target);
+	const { data: comments = [] } = useComments(target, true, shareToken);
 
 	const createComment = useCreateComment(target);
 	const updateComment = useUpdateComment(target);
@@ -99,7 +105,8 @@ export function CommentThreads({
 
 	const commentProps = (comment: Comment) => ({
 		comment,
-		isOwn: comment.author_id === user?.id,
+		// Sửa / xóa cũng cần quyền comment (BE kiểm tra như vậy)
+		isOwn: canComment && comment.author_id === user?.id,
 		onEdit: (body: string) =>
 			updateComment.mutateAsync({ commentId: comment.id, body }),
 		onDelete: () => deleteComment.mutate(comment.id),

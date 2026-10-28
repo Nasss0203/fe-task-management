@@ -93,8 +93,12 @@ export function PageAccessRequestNotification({
 
 	onRead,
 }: PageAccessRequestNotificationProps) {
-	const [accessLevel, setAccessLevel] =
-		useState<PageShareAccessLevel>("VIEWER");
+	// Yêu cầu sửa (từ link chỉ xem / site) chọn sẵn Editor
+	const [accessLevel, setAccessLevel] = useState<PageShareAccessLevel>(
+		notification.metadata?.requestedAccessLevel === "EDITOR"
+			? "EDITOR"
+			: "VIEWER",
+	);
 
 	const approveMutation = useApprovePageAccessRequest();
 

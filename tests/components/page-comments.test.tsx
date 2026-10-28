@@ -217,8 +217,47 @@ describe("BlockCommentsButton", () => {
 		});
 		renderWithClient(<BlockCommentsButton pageId='page-1' blockId='block-1' open={false} onOpenChange={() => {}} />);
 
-		await waitFor(() => expect(http.get).toHaveBeenCalledWith("/page/page-1/comments/block-counts"));
+		await waitFor(() => expect(http.get).toHaveBeenCalledWith("/page/page-1/comments/block-counts", undefined));
 		expect(screen.queryByRole("button")).not.toBeInTheDocument();
+	});
+});
+
+describe("comments on a share link", () => {
+	it("reads page comments with the link token and stays read-only", async () => {
+		comments = [comment("c-1", { author_id: "me", author: { id: "me", username: "Me", email: "me@x" } })];
+		renderWithClient(<PageDiscussion pageId='page-1' shareToken='tok' />);
+
+		expect(await screen.findByText("Body c-1")).toBeInTheDocument();
+		expect(http.get).toHaveBeenCalledWith("/page/page-1/comments", {
+			headers: { "X-Page-Share-Token": "tok" },
+		});
+		// Không hỏi quyền page, không có ô nhập, không sửa / resolve được kể cả comment của mình
+		expect(http.get).not.toHaveBeenCalledWith("/page/page-1/access");
+		expect(screen.queryByLabelText(/Add a comment/)).not.toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: "Comment actions" })).not.toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: "Resolve thread" })).not.toBeInTheDocument();
+	});
+
+	it("shows block comment counts with the link token", async () => {
+		comments = [comment("c-1", { target_type: "PAGE_BLOCK", target_id: "block-1" })];
+		http.get.mockImplementation(async (url: string) => {
+			if (url === "/page/page-1/comments/block-counts") return { data: { data: { "block-1": 1 } } };
+			if (url === "/pageBlock/block-1/comments") return { data: { data: comments } };
+			throw new Error("Unexpected GET " + url);
+		});
+		const user = userEvent.setup();
+		function Harness() {
+			const [open, setOpen] = useState(false);
+			return <BlockCommentsButton pageId='page-1' blockId='block-1' open={open} onOpenChange={setOpen} shareToken='tok' />;
+		}
+		renderWithClient(<Harness />);
+
+		await user.click(await screen.findByRole("button", { name: "1 comments" }));
+		expect(await screen.findByText("Body c-1")).toBeInTheDocument();
+		expect(http.get).toHaveBeenCalledWith("/page/page-1/comments/block-counts", {
+			headers: { "X-Page-Share-Token": "tok" },
+		});
+		expect(screen.queryByLabelText(/Add a comment/)).not.toBeInTheDocument();
 	});
 });
 

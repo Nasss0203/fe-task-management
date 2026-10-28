@@ -33,19 +33,27 @@ export function useMentionCandidates(
 }
 
 /** Số comment của mọi block trong page, một request cho cả page. */
-export function useBlockCommentCounts(pageId: string, enabled = true) {
+export function useBlockCommentCounts(
+	pageId: string,
+	enabled = true,
+	shareToken?: string,
+) {
 	return useQuery({
 		queryKey: commentKeys.blockCounts(pageId),
-		queryFn: () => commentApi.blockCounts(pageId),
+		queryFn: () => commentApi.blockCounts(pageId, shareToken),
 		enabled: Boolean(pageId) && enabled,
 		refetchOnWindowFocus: true,
 	});
 }
 
-export function useComments(target: CommentTarget, enabled = true) {
+export function useComments(
+	target: CommentTarget,
+	enabled = true,
+	shareToken?: string,
+) {
 	return useQuery({
 		queryKey: commentKeys.target(target),
-		queryFn: () => commentApi.list(target),
+		queryFn: () => commentApi.list(target, shareToken),
 		enabled: Boolean(target.id) && enabled,
 		// Chưa có realtime: lấy lại khi quay về tab để thấy comment mới của người khác
 		refetchOnWindowFocus: true,

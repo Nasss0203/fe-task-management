@@ -162,18 +162,15 @@ export function PageBlockEditorRow({ block, shareToken }: PageBlockEditorRowProp
 				<PageBlockRenderer block={block} shareToken={shareToken} />
 			</div>
 
-			{/* Comment block; trang share link chưa hỗ trợ comment */}
-			{shareToken ? (
-				<span aria-hidden='true' />
-			) : (
-				<BlockCommentsButton
-					pageId={block.page_id}
-					blockId={block.id}
-					open={commentOpen}
-					onOpenChange={setCommentOpen}
-					hoverOnlyClassName={ROW_HANDLE_CLASS}
-				/>
-			)}
+			{/* Comment block; trang share link chỉ đọc comment */}
+			<BlockCommentsButton
+				pageId={block.page_id}
+				blockId={block.id}
+				open={commentOpen}
+				onOpenChange={setCommentOpen}
+				hoverOnlyClassName={ROW_HANDLE_CLASS}
+				shareToken={shareToken}
+			/>
 		</div>
 	);
 }

@@ -20,6 +20,7 @@ import {
 import { RowComments } from "@/widgets/page-comments/ui/row-comments";
 
 import { getRowValueMap, getTitleProperty } from "../lib/view-properties";
+import { useDatabaseShareToken } from "../model/share-token-context";
 import { DatabaseCell } from "./database-cell";
 
 interface RowDetailSheetProps {
@@ -45,6 +46,7 @@ export function RowDetailSheet({
 }: RowDetailSheetProps) {
 	const mode = readOnly ? "readonly" : "editable";
 	const deleteRowMutation = useDeleteDatabaseRow(database.id);
+	const shareToken = useDatabaseShareToken();
 	const titleProperty = getTitleProperty(database);
 	const values = row ? getRowValueMap(row) : new Map<string, unknown>();
 	const title =
@@ -123,12 +125,13 @@ export function RowDetailSheet({
 								)}
 							</section>
 
-							{/* Chỉ ở chế độ sửa: drawer chỉ đọc còn dùng cho site public, nơi người xem chưa đăng nhập */}
-							{!readOnly && (
+							{/* Drawer chỉ đọc còn dùng cho site public (người xem chưa đăng nhập): chỉ hiện comment khi sửa được hoặc mở qua link share */}
+							{(!readOnly || shareToken) && (
 								<RowComments
 									pageId={database.pageId}
 									rowId={row.id}
 									scrollIntoView={scrollToComments}
+									shareToken={shareToken}
 								/>
 							)}
 
