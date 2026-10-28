@@ -33,7 +33,8 @@ const FRAME_SOURCES = [
 const contentSecurityPolicy = [
 	"default-src 'self'",
 	// Next.js chèn inline script; dev cần thêm eval cho React Refresh
-	`script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://gist.github.com`,
+	// Vercel Speed Insights chỉ tải script từ va.vercel-scripts.com ở dev; production dùng /_vercel (cùng origin)
+	`script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval' https://va.vercel-scripts.com" : ""} https://gist.github.com`,
 	"style-src 'self' 'unsafe-inline' https://github.githubassets.com",
 	"img-src 'self' data: blob: https:",
 	"media-src 'self' blob: https:",
@@ -42,7 +43,8 @@ const contentSecurityPolicy = [
 	`frame-src 'self' ${FRAME_SOURCES.join(" ")}`,
 	"object-src 'none'",
 	"base-uri 'self'",
-	"form-action 'self'",
+	// SePay checkout gửi form POST sang cổng thanh toán (xem navigateToBillingCheckout)
+	"form-action 'self' https://pay-sandbox.sepay.vn",
 	"frame-ancestors 'self'",
 ].join("; ");
 
@@ -53,9 +55,8 @@ const nextConfig: NextConfig = {
 				source: "/:path*",
 				headers: [
 					{
-						// shortcut: chỉ báo vi phạm trong console, chưa chặn; đổi sang
-						// "Content-Security-Policy" sau khi dùng thử toàn bộ app không còn báo lỗi
-						key: "Content-Security-Policy-Report-Only",
+						// Thêm nguồn mới (embed, CDN, cổng thanh toán) vào danh sách trên, nếu không trình duyệt sẽ chặn
+						key: "Content-Security-Policy",
 						value: contentSecurityPolicy,
 					},
 				],

@@ -20,6 +20,7 @@ import { PageEditAccessBoundary } from "@/features/page-access/ui/page-edit-acce
 import { RequestEditAccessDialog } from "@/features/page-edit-access/ui/request-edit-access-dialog";
 
 import { PageBlockList } from "@/widgets/page-block-editor/ui/page-block-list";
+import { PageDiscussion } from "@/widgets/page-comments/ui/page-discussion";
 
 export default function PageDetail() {
 	const params = useParams<{
@@ -64,7 +65,12 @@ export default function PageDetail() {
 		<div className='w-full min-w-0'>
 			{page.cover_url && <PageCover url={page.cover_url} />}
 
-			<PageHeader icon={page.icon} title={page.title} />
+			{/* Hover tiêu đề thì hiện "Add comment", giống Notion */}
+			<div className='group/page-title'>
+				<PageHeader icon={page.icon} title={page.title} />
+
+				<PageDiscussion pageId={page.id} />
+			</div>
 
 			<PageEditAccessBoundary
 				canEdit={page.canEdit}
@@ -72,7 +78,7 @@ export default function PageDetail() {
 					setRequestEditOpen(true);
 				}}
 			>
-				<PageContent>
+				<PageContent className='mt-8'>
 					<PageBlockList
 						pageId={page.id}
 						blocks={blockTree}
