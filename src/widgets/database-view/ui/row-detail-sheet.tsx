@@ -17,6 +17,8 @@ import {
 	SheetTitle,
 } from "@/shared/ui/sheet";
 
+import { RowComments } from "@/widgets/page-comments/ui/row-comments";
+
 import { getRowValueMap, getTitleProperty } from "../lib/view-properties";
 import { DatabaseCell } from "./database-cell";
 
@@ -117,6 +119,11 @@ export function RowDetailSheet({
 									</p>
 								)}
 							</section>
+
+							{/* Chỉ ở chế độ sửa: drawer chỉ đọc còn dùng cho site public, nơi người xem chưa đăng nhập */}
+							{!readOnly && (
+								<RowComments pageId={database.pageId} rowId={row.id} />
+							)}
 
 							{!readOnly && (
 								<div className='mt-auto flex justify-end pt-8'>

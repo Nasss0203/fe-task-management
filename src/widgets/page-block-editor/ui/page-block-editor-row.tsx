@@ -15,6 +15,7 @@ import {
 	useCreatePageBlock,
 } from "@/entities/page-block/model/page-block.mutations";
 import { PageBlockRenderer } from "@/widgets/page-block/ui/page-block-renderer";
+import { BlockCommentsButton } from "@/widgets/page-comments/ui/block-comments-button";
 import { PageBlockActionMenu } from "./page-block-action-menu";
 import {
 	PageBlockCommand,
@@ -36,6 +37,7 @@ interface PageBlockEditorRowProps {
 export function PageBlockEditorRow({ block, shareToken }: PageBlockEditorRowProps) {
 	const [open, setOpen] = useState(false);
 	const [actionOpen, setActionOpen] = useState(false);
+	const [commentOpen, setCommentOpen] = useState(false);
 
 	const createBlockMutation = useCreatePageBlock(shareToken);
 	const createDatabaseBlockMutation = useCreateDatabaseBlock();
@@ -82,7 +84,7 @@ export function PageBlockEditorRow({ block, shareToken }: PageBlockEditorRowProp
 		<div
 			id={`block-${block.id}`}
 			data-block-row=''
-			className='grid w-full grid-cols-[28px_28px_minmax(0,1fr)] items-start rounded-md transition-colors duration-500'
+			className='grid w-full grid-cols-[28px_28px_minmax(0,1fr)_36px] items-start rounded-md transition-colors duration-500'
 		>
 			{/* Add block */}
 			<Popover open={open} onOpenChange={setOpen}>
@@ -145,6 +147,12 @@ export function PageBlockEditorRow({ block, shareToken }: PageBlockEditorRowProp
 						block={block}
 						shareToken={shareToken}
 						onClose={() => setActionOpen(false)}
+						onComment={
+							shareToken
+								? undefined
+								: // Đợi menu đóng xong (trả focus) rồi mới mở, kẻo popover comment đóng ngay
+									() => requestAnimationFrame(() => setCommentOpen(true))
+						}
 					/>
 				</PopoverContent>
 			</Popover>
@@ -153,6 +161,19 @@ export function PageBlockEditorRow({ block, shareToken }: PageBlockEditorRowProp
 			<div className='min-w-0 pl-1'>
 				<PageBlockRenderer block={block} shareToken={shareToken} />
 			</div>
+
+			{/* Comment block; trang share link chưa hỗ trợ comment */}
+			{shareToken ? (
+				<span aria-hidden='true' />
+			) : (
+				<BlockCommentsButton
+					pageId={block.page_id}
+					blockId={block.id}
+					open={commentOpen}
+					onOpenChange={setCommentOpen}
+					hoverOnlyClassName={ROW_HANDLE_CLASS}
+				/>
+			)}
 		</div>
 	);
 }

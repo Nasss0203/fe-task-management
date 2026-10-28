@@ -12,7 +12,7 @@ import { renderWithClient } from "../utils/test-utils";
 
 const http = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() }));
 const toastError = vi.hoisted(() => vi.fn());
-vi.mock("@/shared/api/api-client", () => ({ default: http }));
+vi.mock("@/shared/api/api-client", () => ({ default: http, refreshAccessToken: vi.fn() }));
 vi.mock("sonner", () => ({ toast: { error: toastError } }));
 vi.mock("@/widgets/database-view/ui/database-view-block", () => ({
 	DatabaseViewBlock: (props: { readOnly?: boolean; shareToken?: string; viewId?: string }) => (

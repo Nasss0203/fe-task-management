@@ -6,6 +6,7 @@ import {
 	Code2,
 	Copy,
 	Link,
+	MessageSquare,
 	RotateCcw,
 	Trash2,
 } from "lucide-react";
@@ -43,6 +44,8 @@ interface PageBlockActionMenuProps {
 	block: PageBlockNode;
 	shareToken?: string;
 	onClose?: () => void;
+	/** Có thì hiện mục "Comment" để mở thread comment của block. */
+	onComment?: () => void;
 }
 
 type MenuMode = "actions" | "turn-into";
@@ -67,6 +70,7 @@ export function PageBlockActionMenu({
 	block,
 	shareToken,
 	onClose,
+	onComment,
 }: PageBlockActionMenuProps) {
 	const [mode, setMode] = useState<MenuMode>("actions");
 
@@ -321,6 +325,19 @@ export function PageBlockActionMenu({
 						Duplicate
 						<CommandShortcut>Ctrl+D</CommandShortcut>
 					</CommandItem>
+
+					{onComment && (
+						<CommandItem
+							onSelect={() => {
+								onClose?.();
+								onComment();
+							}}
+							className='h-10 cursor-pointer gap-2.5'
+						>
+							<MessageSquare className='size-4' />
+							Comment
+						</CommandItem>
+					)}
 				</CommandGroup>
 
 				<CommandSeparator />

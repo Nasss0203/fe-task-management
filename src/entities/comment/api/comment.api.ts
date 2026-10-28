@@ -1,22 +1,44 @@
 import { ApiResponse } from "@/shared/api";
 import instance from "@/shared/api/api-client";
-import type { Comment } from "../model/comment.types";
+import type {
+	BlockCommentCounts,
+	Comment,
+	CommentTarget,
+} from "../model/comment.types";
+
+const TARGET_PATHS: Record<CommentTarget["type"], (id: string) => string> = {
+	PAGE: (id) => `/page/${id}/comments`,
+	PAGE_BLOCK: (id) => `/pageBlock/${id}/comments`,
+	DATABASE_ROW: (id) => `/database-rows/${id}/comments`,
+};
+
+function targetPath(target: CommentTarget): string {
+	return TARGET_PATHS[target.type](target.id);
+}
 
 export const commentApi = {
-	listPageComments: async (pageId: string): Promise<Comment[]> => {
-		const response = await instance.get<ApiResponse<Comment[]>>(
-			`/page/${pageId}/comments`,
+	blockCounts: async (pageId: string): Promise<BlockCommentCounts> => {
+		const response = await instance.get<ApiResponse<BlockCommentCounts>>(
+			`/page/${pageId}/comments/block-counts`,
 		);
 
 		return response.data.data;
 	},
 
-	createPageComment: async (
-		pageId: string,
+	list: async (target: CommentTarget): Promise<Comment[]> => {
+		const response = await instance.get<ApiResponse<Comment[]>>(
+			targetPath(target),
+		);
+
+		return response.data.data;
+	},
+
+	create: async (
+		target: CommentTarget,
 		input: { body: string; parentCommentId?: string | null },
 	): Promise<Comment> => {
 		const response = await instance.post<ApiResponse<Comment>>(
-			`/page/${pageId}/comments`,
+			targetPath(target),
 			{
 				body: input.body,
 				parent_comment_id: input.parentCommentId ?? undefined,

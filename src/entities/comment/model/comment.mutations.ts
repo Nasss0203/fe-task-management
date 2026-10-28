@@ -5,42 +5,52 @@ import { getApiErrorMessage } from "@/shared/lib/api-error-message";
 
 import { commentApi } from "../api/comment.api";
 import { commentKeys } from "./comment.queries";
+import type { CommentTarget } from "./comment.types";
 
 function notifyCommentError(error: unknown) {
 	toast.error(getApiErrorMessage(error, "Could not save the comment."));
 }
 
-export function useCreatePageComment(pageId: string) {
+function useInvalidateComments(target: CommentTarget) {
 	const queryClient = useQueryClient();
+
+	return () =>
+		Promise.all([
+			queryClient.invalidateQueries({ queryKey: commentKeys.target(target) }),
+			// Số comment cạnh block đổi theo
+			target.type === "PAGE_BLOCK" &&
+				queryClient.invalidateQueries({ queryKey: commentKeys.blockCounts() }),
+		]);
+}
+
+export function useCreateComment(target: CommentTarget) {
+	const invalidate = useInvalidateComments(target);
 
 	return useMutation({
 		mutationFn: (input: { body: string; parentCommentId?: string | null }) =>
-			commentApi.createPageComment(pageId, input),
-		onSuccess: () =>
-			queryClient.invalidateQueries({ queryKey: commentKeys.page(pageId) }),
+			commentApi.create(target, input),
+		onSuccess: invalidate,
 		onError: notifyCommentError,
 	});
 }
 
-export function useUpdateComment(pageId: string) {
-	const queryClient = useQueryClient();
+export function useUpdateComment(target: CommentTarget) {
+	const invalidate = useInvalidateComments(target);
 
 	return useMutation({
 		mutationFn: ({ commentId, body }: { commentId: string; body: string }) =>
 			commentApi.update(commentId, body),
-		onSuccess: () =>
-			queryClient.invalidateQueries({ queryKey: commentKeys.page(pageId) }),
+		onSuccess: invalidate,
 		onError: notifyCommentError,
 	});
 }
 
-export function useDeleteComment(pageId: string) {
-	const queryClient = useQueryClient();
+export function useDeleteComment(target: CommentTarget) {
+	const invalidate = useInvalidateComments(target);
 
 	return useMutation({
 		mutationFn: (commentId: string) => commentApi.delete(commentId),
-		onSuccess: () =>
-			queryClient.invalidateQueries({ queryKey: commentKeys.page(pageId) }),
+		onSuccess: invalidate,
 		onError: notifyCommentError,
 	});
 }

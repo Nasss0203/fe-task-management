@@ -5,6 +5,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { groupCommentThreads } from "@/entities/comment/model/comment.queries";
 import type { Comment } from "@/entities/comment/model/comment.types";
 import { PageDiscussion } from "@/widgets/page-comments/ui/page-discussion";
+import { RowComments } from "@/widgets/page-comments/ui/row-comments";
+import { BlockCommentsButton } from "@/widgets/page-comments/ui/block-comments-button";
+import { useState } from "react";
 import { renderWithClient } from "../utils/test-utils";
 
 const http = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() }));
@@ -38,8 +41,8 @@ beforeEach(() => {
 	comments = [];
 	accessLevel = "EDITOR";
 	http.get.mockImplementation(async (url: string) => {
-		if (url === "/page/page-1/comments") return { data: { data: comments } };
-		if (url === "/page/page-1/access") return { data: { data: { effectiveAccessLevel: accessLevel } } };
+		if (url === "/page/page-1/comments" || url === "/database-rows/row-1/comments") return { data: { data: comments } };
+		if (url === "/page/page-1/access" || url === "/page/page-db/access") return { data: { data: { effectiveAccessLevel: accessLevel } } };
 		throw new Error("Unexpected GET " + url);
 	});
 	http.post.mockImplementation(async (_url: string, input: { body: string; parent_comment_id?: string }) => {
@@ -149,5 +152,72 @@ describe("PageDiscussion", () => {
 
 		await user.click(screen.getByRole("button", { name: "Show less" }));
 		expect(screen.queryByText("Body t1")).not.toBeInTheDocument();
+	});
+});
+
+describe("RowComments", () => {
+	it("posts a task comment to the row and checks access on the database page", async () => {
+		const user = userEvent.setup();
+		renderWithClient(<RowComments pageId='page-db' rowId='row-1' />);
+
+		expect(await screen.findByRole("heading", { name: "Comments" })).toBeInTheDocument();
+
+		await user.type(screen.getByLabelText(/Add a comment/), "Needs a mobile layout{Enter}");
+		await waitFor(() =>
+			expect(http.post).toHaveBeenCalledWith("/database-rows/row-1/comments", {
+				body: "Needs a mobile layout",
+				parent_comment_id: undefined,
+			}),
+		);
+		expect(await screen.findByText("Needs a mobile layout")).toBeInTheDocument();
+		expect(http.get).toHaveBeenCalledWith("/page/page-db/access");
+	});
+
+	it("is hidden for a viewer when the task has no comments", async () => {
+		accessLevel = "VIEWER";
+		const { container } = renderWithClient(<RowComments pageId='page-db' rowId='row-1' />);
+
+		await waitFor(() => expect(http.get).toHaveBeenCalledWith("/page/page-db/access"));
+		expect(container).toBeEmptyDOMElement();
+	});
+});
+
+describe("BlockCommentsButton", () => {
+	it("shows the count from one page request and posts to the block", async () => {
+		comments = [comment("c-1", { target_type: "PAGE_BLOCK", target_id: "block-1" })];
+		http.get.mockImplementation(async (url: string) => {
+			if (url === "/page/page-1/comments/block-counts") return { data: { data: { "block-1": comments.length } } };
+			if (url === "/pageBlock/block-1/comments") return { data: { data: comments } };
+			if (url === "/page/page-1/access") return { data: { data: { effectiveAccessLevel: accessLevel } } };
+			throw new Error("Unexpected GET " + url);
+		});
+		const user = userEvent.setup();
+		function Harness() {
+			const [open, setOpen] = useState(false);
+			return <BlockCommentsButton pageId='page-1' blockId='block-1' open={open} onOpenChange={setOpen} />;
+		}
+		renderWithClient(<Harness />);
+
+		await user.click(await screen.findByRole("button", { name: "1 comments" }));
+		expect(await screen.findByText("Body c-1")).toBeInTheDocument();
+
+		await user.type(screen.getByLabelText(/Add a comment/), "Typo here{Enter}");
+		await waitFor(() =>
+			expect(http.post).toHaveBeenCalledWith("/pageBlock/block-1/comments", { body: "Typo here", parent_comment_id: undefined }),
+		);
+		expect(await screen.findByRole("button", { name: "2 comments" })).toBeInTheDocument();
+	});
+
+	it("renders no button for a viewer on a block without comments", async () => {
+		accessLevel = "VIEWER";
+		http.get.mockImplementation(async (url: string) => {
+			if (url === "/page/page-1/comments/block-counts") return { data: { data: {} } };
+			if (url === "/page/page-1/access") return { data: { data: { effectiveAccessLevel: accessLevel } } };
+			throw new Error("Unexpected GET " + url);
+		});
+		renderWithClient(<BlockCommentsButton pageId='page-1' blockId='block-1' open={false} onOpenChange={() => {}} />);
+
+		await waitFor(() => expect(http.get).toHaveBeenCalledWith("/page/page-1/comments/block-counts"));
+		expect(screen.queryByRole("button")).not.toBeInTheDocument();
 	});
 });

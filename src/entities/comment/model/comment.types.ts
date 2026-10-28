@@ -1,5 +1,14 @@
 export type CommentTargetType = "PAGE" | "PAGE_BLOCK" | "DATABASE_ROW";
 
+/** Thứ được comment: page, block hoặc row của database. */
+export interface CommentTarget {
+	type: CommentTargetType;
+	id: string;
+}
+
+/** `{ [blockId]: số comment }`; block không có comment thì không có key. */
+export type BlockCommentCounts = Record<string, number>;
+
 export interface CommentAuthor {
 	id: string;
 	username: string;
