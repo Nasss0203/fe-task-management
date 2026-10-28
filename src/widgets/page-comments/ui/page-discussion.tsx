@@ -52,6 +52,7 @@ export function PageDiscussion({ pageId }: PageDiscussionProps) {
 		>
 			<CommentThreads
 				target={target}
+				pageId={pageId}
 				canComment={canComment}
 				autoFocusComposer={composerOpen && comments.length === 0}
 				onComposerCancel={

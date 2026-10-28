@@ -9,6 +9,14 @@ export interface CommentTarget {
 /** `{ [blockId]: số comment }`; block không có comment thì không có key. */
 export type BlockCommentCounts = Record<string, number>;
 
+/** Người có thể mention trong page (thành viên workspace / teamspace xem được page). */
+export interface MentionCandidate {
+	id: string;
+	username: string;
+	email: string;
+	avatar_url: string | null;
+}
+
 export interface CommentAuthor {
 	id: string;
 	username: string;

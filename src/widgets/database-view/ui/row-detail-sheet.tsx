@@ -28,6 +28,8 @@ interface RowDetailSheetProps {
 	row?: DatabaseRow;
 	/** Focus the title right away, e.g. for a row that was just created. */
 	autoFocusTitle?: boolean;
+	/** Cuộn tới mục Comments khi mở (từ link thông báo comment). */
+	scrollToComments?: boolean;
 	readOnly?: boolean;
 	onClose: () => void;
 }
@@ -37,6 +39,7 @@ export function RowDetailSheet({
 	database,
 	row,
 	autoFocusTitle = false,
+	scrollToComments = false,
 	readOnly = false,
 	onClose,
 }: RowDetailSheetProps) {
@@ -122,7 +125,11 @@ export function RowDetailSheet({
 
 							{/* Chỉ ở chế độ sửa: drawer chỉ đọc còn dùng cho site public, nơi người xem chưa đăng nhập */}
 							{!readOnly && (
-								<RowComments pageId={database.pageId} rowId={row.id} />
+								<RowComments
+									pageId={database.pageId}
+									rowId={row.id}
+									scrollIntoView={scrollToComments}
+								/>
 							)}
 
 							{!readOnly && (

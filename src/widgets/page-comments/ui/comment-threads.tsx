@@ -53,6 +53,8 @@ function ToggleButton({
 
 interface CommentThreadsProps {
 	target: CommentTarget;
+	/** Page chứa target; gợi ý mention theo người xem được page này. */
+	pageId: string;
 	canComment: boolean;
 	/** Focus ô nhập ngay (vd vừa bấm "Add comment"). */
 	autoFocusComposer?: boolean;
@@ -64,6 +66,7 @@ interface CommentThreadsProps {
 /** Danh sách thread (đã thu gọn) + ô nhập comment mới cho một target. */
 export function CommentThreads({
 	target,
+	pageId,
 	canComment,
 	autoFocusComposer = false,
 	onComposerCancel,
@@ -92,6 +95,7 @@ export function CommentThreads({
 		onEdit: (body: string) =>
 			updateComment.mutateAsync({ commentId: comment.id, body }),
 		onDelete: () => deleteComment.mutate(comment.id),
+		mentionPageId: pageId,
 	});
 
 	const hiddenThreadCount = showAllThreads
@@ -152,6 +156,7 @@ export function CommentThreads({
 									<CommentComposer
 										autoFocus
 										authorName={authorName}
+										mentionPageId={pageId}
 										placeholder='Reply…'
 										submitLabel='Reply'
 										pending={createComment.isPending}
@@ -175,6 +180,7 @@ export function CommentThreads({
 				<CommentComposer
 					autoFocus={autoFocusComposer}
 					authorName={authorName}
+					mentionPageId={pageId}
 					placeholder='Add a comment…'
 					submitLabel='Comment'
 					pending={createComment.isPending}

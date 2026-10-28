@@ -221,3 +221,51 @@ describe("BlockCommentsButton", () => {
 		expect(screen.queryByRole("button")).not.toBeInTheDocument();
 	});
 });
+
+describe("mentions in comments", () => {
+	const LAN = "11111111-1111-4111-8111-111111111111";
+
+	it("suggests people after @, inserts the pick and sends it as a token", async () => {
+		http.get.mockImplementation(async (url: string, config?: { params?: { q?: string } }) => {
+			if (url === "/page/page-1/comments") return { data: { data: comments } };
+			if (url === "/page/page-1/access") return { data: { data: { effectiveAccessLevel: accessLevel } } };
+			if (url === "/page/page-1/mention-candidates") {
+				const users = [{ id: LAN, username: "Lan", email: "lan@x", avatar_url: null }];
+				return { data: { data: users.filter((u) => u.username.toLowerCase().startsWith((config?.params?.q ?? "").toLowerCase())) } };
+			}
+			throw new Error("Unexpected GET " + url);
+		});
+		comments = [comment("c-1")];
+		const user = userEvent.setup();
+		renderWithClient(<PageDiscussion pageId='page-1' />);
+
+		const input = await screen.findByLabelText(/Add a comment/);
+		await user.type(input, "Hi @la");
+
+		const option = await screen.findByRole("option", { name: /Lan/ });
+		expect(option).toHaveAttribute("aria-selected", "true");
+
+		await user.keyboard("{Enter}");
+		expect(input).toHaveValue("Hi @Lan ");
+		// Tô màu ngay trong ô nhập: lớp phủ có span cho "@Lan", chữ textarea trong suốt
+		expect(screen.getByText("@Lan", { selector: "span" })).toHaveClass("text-primary");
+		expect(input).toHaveClass("text-transparent");
+
+		await user.type(input, "check this{Enter}");
+		await waitFor(() =>
+			expect(http.post).toHaveBeenCalledWith("/page/page-1/comments", {
+				body: `Hi @[Lan](user:${LAN}) check this`,
+				parent_comment_id: undefined,
+			}),
+		);
+	});
+
+	it("shows mentions in a comment as highlighted names", async () => {
+		comments = [comment("c-1", { body: `Thanks @[Lan](user:${LAN})!` })];
+		renderWithClient(<PageDiscussion pageId='page-1' />);
+
+		const mention = await screen.findByText("@Lan");
+		expect(mention.tagName).toBe("SPAN");
+		expect(mention.parentElement).toHaveTextContent("Thanks @Lan!");
+	});
+});

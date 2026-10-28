@@ -3,6 +3,7 @@
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 
+import { splitMentions } from "@/entities/comment/lib/mention-text";
 import type { Comment } from "@/entities/comment/model/comment.types";
 import { formatRelativeTime } from "@/shared/lib/format-relative-time";
 import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
@@ -23,6 +24,8 @@ interface CommentItemProps {
 	onDelete: () => void;
 	/** Có thì hiện nút Reply cạnh thời gian khi hover (chỉ comment gốc). */
 	onReply?: () => void;
+	/** Page để gợi ý mention khi sửa comment. */
+	mentionPageId?: string;
 }
 
 export function CommentItem({
@@ -31,6 +34,7 @@ export function CommentItem({
 	onEdit,
 	onDelete,
 	onReply,
+	mentionPageId,
 }: CommentItemProps) {
 	const [editing, setEditing] = useState(false);
 
@@ -100,6 +104,7 @@ export function CommentItem({
 						className='mt-1.5'
 						autoFocus
 						initialValue={comment.body}
+						mentionPageId={mentionPageId}
 						placeholder='Edit comment'
 						submitLabel='Save'
 						onCancel={() => setEditing(false)}
@@ -110,7 +115,18 @@ export function CommentItem({
 					/>
 				) : (
 					<p className='whitespace-pre-wrap break-words text-sm leading-6 text-foreground/90'>
-						{comment.body}
+						{splitMentions(comment.body).map((part, index) =>
+							part.type === "mention" ? (
+								<span
+									key={index}
+									className='rounded bg-primary/10 px-0.5 font-medium text-primary'
+								>
+									@{part.name}
+								</span>
+							) : (
+								part.text
+							),
+						)}
 					</p>
 				)}
 			</div>

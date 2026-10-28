@@ -62,6 +62,7 @@ export function BlockCommentsButton({
 
 				<CommentThreads
 					target={{ type: "PAGE_BLOCK", id: blockId }}
+					pageId={pageId}
 					canComment={canComment}
 					autoFocusComposer={count === 0}
 				/>

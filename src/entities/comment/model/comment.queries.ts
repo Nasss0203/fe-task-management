@@ -13,7 +13,24 @@ export const commentKeys = {
 		pageId
 			? ([...commentKeys.all, "block-counts", pageId] as const)
 			: ([...commentKeys.all, "block-counts"] as const),
+
+	mentionCandidates: (pageId: string, search: string) =>
+		[...commentKeys.all, "mention-candidates", pageId, search] as const,
 };
+
+/** Gợi ý người để mention khi gõ `@` (BE đã lọc theo workspace / teamspace và quyền xem page). */
+export function useMentionCandidates(
+	pageId: string,
+	search: string,
+	enabled = true,
+) {
+	return useQuery({
+		queryKey: commentKeys.mentionCandidates(pageId, search),
+		queryFn: () => commentApi.mentionCandidates(pageId, search),
+		enabled: Boolean(pageId) && enabled,
+		staleTime: 60_000,
+	});
+}
 
 /** Số comment của mọi block trong page, một request cho cả page. */
 export function useBlockCommentCounts(pageId: string, enabled = true) {

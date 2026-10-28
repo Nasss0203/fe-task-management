@@ -4,6 +4,7 @@ import type {
 	BlockCommentCounts,
 	Comment,
 	CommentTarget,
+	MentionCandidate,
 } from "../model/comment.types";
 
 const TARGET_PATHS: Record<CommentTarget["type"], (id: string) => string> = {
@@ -17,6 +18,18 @@ function targetPath(target: CommentTarget): string {
 }
 
 export const commentApi = {
+	mentionCandidates: async (
+		pageId: string,
+		search: string,
+	): Promise<MentionCandidate[]> => {
+		const response = await instance.get<ApiResponse<MentionCandidate[]>>(
+			`/page/${pageId}/mention-candidates`,
+			{ params: { q: search } },
+		);
+
+		return response.data.data;
+	},
+
 	blockCounts: async (pageId: string): Promise<BlockCommentCounts> => {
 		const response = await instance.get<ApiResponse<BlockCommentCounts>>(
 			`/page/${pageId}/comments/block-counts`,
