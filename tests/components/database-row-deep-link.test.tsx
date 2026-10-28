@@ -61,7 +61,23 @@ describe("database row deep link from a comment notification", () => {
 		await waitFor(() => expect(screen.getByTestId("sheet")).toHaveAttribute("data-row", "row-1"));
 	});
 
-	it("ignores a row that is not in this view", () => {
+	it("opens a row hidden by the view filter", async () => {
+		window.history.replaceState(null, "", "/page/page-1?row=row-2");
+
+		render(
+			<DatabaseViewRenderer
+				database={database}
+				view={view}
+				viewDetail={viewDetail}
+				rows={[rows[0]]}
+				allRows={rows}
+			/>,
+		);
+
+		await waitFor(() => expect(screen.getByTestId("sheet")).toHaveAttribute("data-row", "row-2"));
+	});
+
+	it("ignores a row that is not in the database", () => {
 		window.history.replaceState(null, "", "/page/page-1?row=row-9");
 
 		render(renderer());

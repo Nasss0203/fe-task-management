@@ -56,6 +56,8 @@ interface DatabaseViewRendererProps {
 	view: DatabaseView;
 	viewDetail?: DatabaseViewDetail;
 	rows: DatabaseRow[];
+	/** Mọi row (kể cả bị filter) để link `?row` và drawer vẫn mở được; mặc định là `rows`. */
+	allRows?: DatabaseRow[];
 	readOnly?: boolean;
 }
 
@@ -64,6 +66,7 @@ export function DatabaseViewRenderer({
 	view,
 	viewDetail,
 	rows,
+	allRows = rows,
 	readOnly = false,
 }: DatabaseViewRendererProps) {
 	const [openRow, setOpenRow] = useState<{
@@ -161,13 +164,13 @@ export function DatabaseViewRenderer({
 			{/* Suspense riêng: useSearchParams không làm cả trang phải render động */}
 			<Suspense fallback={null}>
 				<RowLinkOpener
-					rows={rows}
+					rows={allRows}
 					onOpen={(id) => setOpenRow({ id, isNew: false, showComments: true })}
 				/>
 			</Suspense>
 			<RowDetailSheet
 				database={database}
-				row={rows.find((row) => row.id === openRow?.id)}
+				row={allRows.find((row) => row.id === openRow?.id)}
 				autoFocusTitle={openRow?.isNew}
 				scrollToComments={openRow?.showComments}
 				readOnly={readOnly}

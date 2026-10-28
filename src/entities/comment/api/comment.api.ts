@@ -70,6 +70,15 @@ export const commentApi = {
 		return response.data.data;
 	},
 
+	resolve: async (commentId: string, resolved: boolean): Promise<Comment> => {
+		const response = await instance.patch<ApiResponse<Comment>>(
+			`/comments/${commentId}/resolved`,
+			{ resolved },
+		);
+
+		return response.data.data;
+	},
+
 	delete: async (commentId: string): Promise<void> => {
 		await instance.delete(`/comments/${commentId}`);
 	},

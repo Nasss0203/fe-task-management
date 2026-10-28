@@ -54,3 +54,20 @@ export function useDeleteComment(target: CommentTarget) {
 		onError: notifyCommentError,
 	});
 }
+
+/** Đánh dấu thread đã xong / mở lại (chỉ comment gốc). */
+export function useResolveComment(target: CommentTarget) {
+	const invalidate = useInvalidateComments(target);
+
+	return useMutation({
+		mutationFn: ({
+			commentId,
+			resolved,
+		}: {
+			commentId: string;
+			resolved: boolean;
+		}) => commentApi.resolve(commentId, resolved),
+		onSuccess: invalidate,
+		onError: notifyCommentError,
+	});
+}

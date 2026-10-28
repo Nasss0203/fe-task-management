@@ -38,3 +38,29 @@ export function getNotificationHref(actionUrl: string | null): string | null {
 
 	return `${url.pathname}${url.search}${url.hash}`;
 }
+
+/**
+ * Link tới block (`#block-…`) của chính trang đang mở: Next đổi hash bằng `pushState`
+ * nên không có `hashchange`, trang không cuộn tới block. Tự đổi hash / phát sự kiện.
+ * Trả về true nếu đã xử lý (bỏ điều hướng của Link).
+ */
+export function followSamePageHash(href: string): boolean {
+	const target = new URL(href, window.location.href);
+
+	if (
+		!target.hash ||
+		target.pathname !== window.location.pathname ||
+		target.search !== window.location.search
+	) {
+		return false;
+	}
+
+	if (target.hash === window.location.hash) {
+		// Cùng hash thì trình duyệt không phát hashchange
+		window.dispatchEvent(new HashChangeEvent("hashchange"));
+	} else {
+		window.location.hash = target.hash;
+	}
+
+	return true;
+}

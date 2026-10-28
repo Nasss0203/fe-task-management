@@ -5,7 +5,10 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { formatNotificationTime } from "@/entities/notification/lib/notification-date";
-import { getNotificationHref } from "@/entities/notification/lib/notification-navigation";
+import {
+	followSamePageHash,
+	getNotificationHref,
+} from "@/entities/notification/lib/notification-navigation";
 import type { NotificationTone } from "@/entities/notification/lib/notification-presentation";
 import type { Notification } from "@/entities/notification/model/notification.types";
 import { cn } from "@/shared/lib/utils";
@@ -117,7 +120,10 @@ export function NotificationItemShell({
 					{href ? (
 						<Link
 							href={href}
-							onClick={markRead}
+							onClick={(event) => {
+								markRead();
+								if (followSamePageHash(href)) event.preventDefault();
+							}}
 							className={triggerClassName}
 						>
 							{content}

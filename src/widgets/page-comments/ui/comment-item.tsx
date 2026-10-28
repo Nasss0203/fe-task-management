@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Check, MoreHorizontal, Pencil, RotateCcw, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { splitMentions } from "@/entities/comment/lib/mention-text";
@@ -26,6 +26,8 @@ interface CommentItemProps {
 	onReply?: () => void;
 	/** Page để gợi ý mention khi sửa comment. */
 	mentionPageId?: string;
+	/** Có thì hiện nút Resolve / Reopen (chỉ comment gốc). */
+	onToggleResolved?: () => void;
 }
 
 export function CommentItem({
@@ -34,6 +36,7 @@ export function CommentItem({
 	onEdit,
 	onDelete,
 	onReply,
+	onToggleResolved,
 	mentionPageId,
 }: CommentItemProps) {
 	const [editing, setEditing] = useState(false);
@@ -67,6 +70,22 @@ export function CommentItem({
 						</button>
 					)}
 
+					{onToggleResolved && !editing && (
+						<button
+							type='button'
+							onClick={onToggleResolved}
+							aria-label={comment.resolved_at ? "Reopen thread" : "Resolve thread"}
+							title={comment.resolved_at ? "Reopen" : "Resolve"}
+							className='flex size-5 items-center justify-center rounded text-muted-foreground opacity-0 transition-opacity hover:bg-muted hover:text-foreground focus-visible:opacity-100 group-hover/comment:opacity-100 [@media(hover:none)]:opacity-100'
+						>
+							{comment.resolved_at ? (
+								<RotateCcw className='size-3.5' />
+							) : (
+								<Check className='size-3.5' />
+							)}
+						</button>
+					)}
+
 					{isOwn && !editing && (
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
@@ -75,13 +94,13 @@ export function CommentItem({
 									variant='ghost'
 									size='icon'
 									aria-label='Comment actions'
-									className='ml-auto size-6 opacity-0 transition-opacity group-hover/comment:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100'
+									className='size-5 opacity-0 transition-opacity group-hover/comment:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100 [@media(hover:none)]:opacity-100'
 								>
 									<MoreHorizontal className='size-3.5' />
 								</Button>
 							</DropdownMenuTrigger>
 
-							<DropdownMenuContent align='end' className='w-36'>
+							<DropdownMenuContent align='start' className='w-36'>
 								<DropdownMenuItem onSelect={() => setEditing(true)}>
 									<Pencil className='size-3.5' />
 									Edit

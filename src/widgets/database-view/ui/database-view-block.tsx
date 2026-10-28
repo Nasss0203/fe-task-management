@@ -194,6 +194,7 @@ export function DatabaseViewBlock({
 				view={activeView}
 				viewDetail={activeViewDetail}
 				rows={visibleRows}
+				allRows={rows}
 				readOnly={readOnly}
 			/>
 		</div>

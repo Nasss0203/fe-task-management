@@ -222,6 +222,49 @@ describe("BlockCommentsButton", () => {
 	});
 });
 
+describe("resolving threads", () => {
+	it("hides resolved threads behind a toggle and resolves an open one", async () => {
+		comments = [
+			comment("done", { resolved_at: new Date().toISOString() }),
+			comment("open"),
+		];
+		http.patch.mockImplementation(async (url: string, input: { resolved: boolean }) => {
+			const id = url.split("/")[2];
+			comments = comments.map((item) =>
+				item.id === id ? { ...item, resolved_at: input.resolved ? new Date().toISOString() : null } : item,
+			);
+			return { data: { data: comments.find((item) => item.id === id) } };
+		});
+		const user = userEvent.setup();
+		renderWithClient(<PageDiscussion pageId='page-1' />);
+
+		expect(await screen.findByText("Body open")).toBeInTheDocument();
+		expect(screen.queryByText("Body done")).not.toBeInTheDocument();
+
+		await user.click(screen.getByRole("button", { name: "Show 1 resolved" }));
+		expect(screen.getByText("Body done")).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Reopen thread" })).toBeInTheDocument();
+
+		await user.click(screen.getByRole("button", { name: "Resolve thread" }));
+		await waitFor(() =>
+			expect(http.patch).toHaveBeenCalledWith("/comments/open/resolved", { resolved: true }),
+		);
+		expect(await screen.findByRole("button", { name: "Hide resolved" })).toBeInTheDocument();
+		await user.click(screen.getByRole("button", { name: "Hide resolved" }));
+		expect(await screen.findByRole("button", { name: "Show 2 resolved" })).toBeInTheDocument();
+		expect(screen.queryByText("Body open")).not.toBeInTheDocument();
+	});
+
+	it("does not let a viewer resolve", async () => {
+		accessLevel = "VIEWER";
+		comments = [comment("open")];
+		renderWithClient(<PageDiscussion pageId='page-1' />);
+
+		expect(await screen.findByText("Body open")).toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: "Resolve thread" })).not.toBeInTheDocument();
+	});
+});
+
 describe("mentions in comments", () => {
 	const LAN = "11111111-1111-4111-8111-111111111111";
 
