@@ -59,17 +59,39 @@ function validPageActivity(value: unknown): boolean {
 
 function validPageIntent(value: unknown): boolean {
 	return isRecord(value) && ["MODIFY_PAGE", "OTHER", "UNCLEAR"].includes(String(value.intent)) &&
-		["TITLE", "CURRENT_PAGE", "UNRESOLVED", "ACTIVITY"].includes(String(value.referenceType)) &&
+		["TITLE", "CURRENT_PAGE", "UNRESOLVED", "ACTIVITY", "DESCRIPTION"].includes(String(value.referenceType)) &&
 		(value.pageReference === null || typeof value.pageReference === "string") &&
 		(value.instruction === null || typeof value.instruction === "string") && typeof value.needsClarification === "boolean" &&
 		(value.referenceType === "ACTIVITY"
 			? value.intent === "MODIFY_PAGE" && value.pageReference === null && value.needsClarification === false &&
 				validPageActivity(value.activity)
-			: value.activity === undefined);
+			: value.activity === undefined) &&
+		(value.referenceType === "DESCRIPTION"
+			? value.intent === "MODIFY_PAGE" && value.pageReference === null && value.needsClarification === false &&
+				isNonemptyString(value.description)
+			: value.description === undefined);
 }
 
-/** M1b / M2: Pages the user must pick from; a draft only follows that choice. */
-const PICKED_PAGE_METHODS = ["TITLE_IN_SENTENCE", "ACTIVITY"];
+/** M1b / M2 / M3 / M6: Pages the user must pick from; a draft only follows that choice. */
+const PICKED_PAGE_METHODS = ["TITLE_IN_SENTENCE", "ACTIVITY", "FUZZY_TITLE", "SEMANTIC"];
+
+/**
+ * M6: a described Page is only ever found by SEMANTIC, unless the sentence
+ * ended with a real title (the intent then comes back as that TITLE); SEMANTIC
+ * answers a description or a name nothing else matched.
+ */
+function semanticMismatch(method: unknown, intent: unknown): boolean {
+	const described = isRecord(intent) && intent.referenceType === "DESCRIPTION";
+	return method === "SEMANTIC"
+		? !(described || (isRecord(intent) && intent.referenceType === "TITLE" && isNonemptyString(intent.pageReference)))
+		: described;
+}
+
+/** M3: close titles answer a name the user typed (an explicit TITLE intent). */
+function fuzzyTitleMismatch(method: unknown, intent: unknown): boolean {
+	return method === "FUZZY_TITLE" &&
+		!(isRecord(intent) && intent.referenceType === "TITLE" && isNonemptyString(intent.pageReference));
+}
 
 export function isValidAiGeneration(value: unknown): value is AiGeneration {
 	return isRecord(value) && isNonemptyString(value.id) && isNonemptyString(value.conversation_id) &&
@@ -207,6 +229,8 @@ export function mapAiAskResponse(response: AiAskResponse, requestContext?: AskAi
 			!["CURRENT_CONTEXT", "EXACT_TITLE", ...PICKED_PAGE_METHODS].includes(String(planning.resolutionMethod)) ||
 			// M2: only a Page named by the user's edits is planned as ACTIVITY.
 			((planning.resolutionMethod === "ACTIVITY") !== (planning.intent.referenceType === "ACTIVITY")) ||
+			fuzzyTitleMismatch(planning.resolutionMethod, planning.intent) ||
+			semanticMismatch(planning.resolutionMethod, planning.intent) ||
 			page.pageId !== plan.pageId || (requestContext && page.workspaceId !== requestContext.workspaceId) ||
 			(requestContext?.currentPageId && requestContext.currentPageId !== plan.pageId) ||
 			(requestContext?.selectedPageId && requestContext.selectedPageId !== plan.pageId) ||
@@ -226,6 +250,8 @@ export function mapAiAskResponse(response: AiAskResponse, requestContext?: AskAi
 			// M1b and M2 offer at most five Pages.
 			(picked && planning.candidates.length > 5) ||
 			((planning.resolutionMethod === "ACTIVITY") !== (isRecord(planning.intent) && planning.intent.referenceType === "ACTIVITY")) ||
+			fuzzyTitleMismatch(planning.resolutionMethod, planning.intent) ||
+			semanticMismatch(planning.resolutionMethod, planning.intent) ||
 			!planning.candidates.every((page) => isPage(page) && (!requestContext || page.workspaceId === requestContext.workspaceId))) return invalid("INVALID_CANDIDATES");
 		return { ...base, kind: "page-selection", hasGeneration: false, preview: null,
 			capability: "GENERATE_PAGE_MODIFICATION_PLAN", capabilityValidated: true,

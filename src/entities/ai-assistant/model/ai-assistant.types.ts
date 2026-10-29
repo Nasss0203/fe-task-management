@@ -205,12 +205,16 @@ export interface AiPageActivity {
 
 export interface AiPageIntent {
   intent: "MODIFY_PAGE" | "OTHER" | "UNCLEAR";
-  referenceType: "TITLE" | "CURRENT_PAGE" | "UNRESOLVED" | "ACTIVITY";
+  referenceType: "TITLE" | "CURRENT_PAGE" | "UNRESOLVED" | "ACTIVITY" | "DESCRIPTION";
   pageReference: string | null;
   instruction: string | null;
   needsClarification: boolean;
   /** Only with referenceType ACTIVITY. */
   activity?: AiPageActivity;
+  /** M4: where a TITLE Page is, an ancestor Page's title or a teamspace. */
+  scope?: { parentTitle: string | null; teamspaceName: string | null };
+  /** M6: only with referenceType DESCRIPTION, what the Page is for in the user's words. */
+  description?: string;
 }
 
 export interface GeneratePagePlanFromInstructionRequest {
@@ -224,9 +228,12 @@ export interface GeneratePagePlanFromInstructionRequest {
 
 /**
  * M1b: TITLE_IN_SENTENCE is a real Page found in the sentence; M2: ACTIVITY is a
- * Page the user edited. Both are planned only after the user picked the Page.
+ * Page the user edited; M3: FUZZY_TITLE is a title close to a misspelled name;
+ * M6: SEMANTIC is a Page close to a description. All four are planned only
+ * after the user picked the Page.
  */
-export type AiPageResolutionMethod = "CURRENT_CONTEXT" | "EXACT_TITLE" | "TITLE_IN_SENTENCE" | "ACTIVITY";
+export type AiPageResolutionMethod =
+  | "CURRENT_CONTEXT" | "EXACT_TITLE" | "TITLE_IN_SENTENCE" | "ACTIVITY" | "FUZZY_TITLE" | "SEMANTIC";
 
 export type GeneratePagePlanFromInstructionResponse =
   | {
@@ -246,8 +253,11 @@ export type GeneratePagePlanFromInstructionResponse =
       status: "AMBIGUOUS_PAGE";
       intent: AiPageIntent;
       candidates: AiPageResolutionCandidate[];
-      /** Found in the sentence (M1b) or among the user's own edits (M2). */
-      resolutionMethod?: "TITLE_IN_SENTENCE" | "ACTIVITY";
+      /**
+       * Found in the sentence (M1b), among the user's own edits (M2), close to a
+       * misspelled name (M3), or close to a description (M6).
+       */
+      resolutionMethod?: "TITLE_IN_SENTENCE" | "ACTIVITY" | "FUZZY_TITLE" | "SEMANTIC";
     }
   | {
       status: "PLAN_GENERATED";

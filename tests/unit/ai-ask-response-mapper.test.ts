@@ -168,7 +168,8 @@ describe("M1b: real Page names found in the sentence", () => {
 		{ ...sentenceResponses.ambiguous, planning: { ...sentenceResponses.ambiguous.planning, resolutionMethod: "FUZZY_TITLE" } },
 		{ ...sentenceResponses.ambiguous, planning: { ...sentenceResponses.ambiguous.planning,
 			candidates: Array.from({ length: 6 }, (_, index) => ({ ...candidate, pageId: `page-${index}` })) } },
-		{ ...askResponses.plan, planning: { ...askResponses.plan.planning, resolutionMethod: "FUZZY_TITLE" } },
+		// M6: SEMANTIC answers a description or a typed name, never an unresolved Page.
+		{ ...sentenceResponses.plan, planning: { ...sentenceResponses.plan.planning, resolutionMethod: "SEMANTIC" } },
 		// Any other method still never plans an intent that needed clarification.
 		{ ...sentenceResponses.plan, planning: { ...sentenceResponses.plan.planning, resolutionMethod: "EXACT_TITLE" } },
 	])("rejects unexpected sentence payload %#", (payload) => {
