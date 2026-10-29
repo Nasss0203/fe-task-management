@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronRight, Table2, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { toast } from "sonner";
 
 import { useDeleteDatabaseRow } from "@/entities/database/model/database.mutations";
@@ -20,12 +20,20 @@ import {
 
 import { RowComments } from "@/widgets/page-comments/ui/row-comments";
 
+import {
+	clampRowSheetWidth,
+	readRowSheetWidth,
+	ROW_SHEET_DEFAULT_WIDTH,
+	saveRowSheetWidth,
+} from "../lib/row-sheet-width";
 import { getChildRows } from "../lib/row-tree";
 import { getRowValueMap, getTitleProperty } from "../lib/view-properties";
 import { useDatabaseShareToken } from "../model/share-token-context";
 import { DatabaseCell } from "./database-cell";
 import type { OpenRowHandler } from "./database-view-renderer";
+import { RowContent } from "./row-content";
 import { RowSubtasks } from "./row-subtasks";
+import { SheetResizeHandle } from "./sheet-resize-handle";
 
 interface RowDetailSheetProps {
 	database: Database;
@@ -70,6 +78,12 @@ export function RowDetailSheet({
 	const subtaskCount = row ? getChildRows(allRows, row.id).length : 0;
 	// Deleting a parent deletes its sub-tasks too: ask with a second click.
 	const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+	// Read once: the sheet only renders in the browser, after it opens.
+	const [width, setWidth] = useState(() =>
+		typeof window === "undefined"
+			? ROW_SHEET_DEFAULT_WIDTH
+			: clampRowSheetWidth(readRowSheetWidth(), window.innerWidth),
+	);
 	const properties = [...database.properties]
 		.filter((property) => property.type !== PropertyType.TITLE)
 		.sort((a, b) => Number(a.position) - Number(b.position));
@@ -82,15 +96,27 @@ export function RowDetailSheet({
 				onOpenAutoFocus={(event) => {
 					if (!autoFocusTitle) event.preventDefault();
 				}}
-				className='w-full gap-0 overflow-y-auto sm:max-w-xl'
+				// Phone: full width. Wider screens: the width dragged from the left edge.
+				className='w-full gap-0 sm:w-(--row-sheet-width) sm:max-w-[90vw]'
+				style={{ "--row-sheet-width": `${width}px` } as CSSProperties}
 			>
 				<SheetTitle className='sr-only'>{title}</SheetTitle>
 				<SheetDescription className='sr-only'>
 					Row details in {database.name}
 				</SheetDescription>
 
+				<SheetResizeHandle
+					width={width}
+					onResize={setWidth}
+					onCommit={(next) => {
+						setWidth(next ?? ROW_SHEET_DEFAULT_WIDTH);
+						saveRowSheetWidth(next);
+					}}
+				/>
+
 				{row && (
-					<div className='flex min-h-full flex-col'>
+					// Scrolls inside, so the resize handle and close button stay put.
+					<div className='flex h-full min-h-0 flex-col overflow-y-auto'>
 						<div className='flex h-12 items-center gap-1.5 border-b px-6 pr-12 text-sm text-muted-foreground sm:px-8'>
 							<Table2 className='size-4 shrink-0' />
 							<span className='truncate'>{database.name}</span>
@@ -162,6 +188,13 @@ export function RowDetailSheet({
 								allRows={allRows}
 								readOnly={readOnly}
 								onOpenRow={onOpenRow}
+							/>
+
+							<RowContent
+								pageId={database.pageId}
+								rowId={row.id}
+								readOnly={readOnly}
+								shareToken={shareToken}
 							/>
 
 							{/* Drawer chỉ đọc còn dùng cho site public (người xem chưa đăng nhập): chỉ hiện comment khi sửa được hoặc mở qua link share */}

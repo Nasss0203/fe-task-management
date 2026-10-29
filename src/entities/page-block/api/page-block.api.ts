@@ -39,6 +39,23 @@ export const pageBlockApi = {
 		return response.data.data;
 	},
 
+	/** A task's content (blocks of one database row). */
+	getByRow: async (
+		rowId: string,
+		signal?: AbortSignal,
+		shareToken?: string,
+	): Promise<PageBlock[]> => {
+		const response = await instance.get<ApiResponse<PageBlock[]>>(
+			`${PAGE_BLOCK_API}/row/${rowId}`,
+			{
+				signal,
+				headers: getShareHeaders(shareToken),
+			},
+		);
+
+		return response.data.data;
+	},
+
 	getById: async (
 		blockId: string,
 		signal?: AbortSignal,
@@ -58,6 +75,7 @@ export const pageBlockApi = {
 	create: async (
 		input: {
 			page_id: string;
+			row_id?: string | null;
 			parent_block_id?: string | null;
 			after_block_id?: string | null;
 			type: PageBlockType;

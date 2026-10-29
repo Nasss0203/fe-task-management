@@ -39,6 +39,8 @@ export interface PageBlock {
 
 	page_id: string;
 	parent_block_id: string | null;
+	/** Task (database row) whose content this block is; null for page content. */
+	row_id?: string | null;
 
 	type: PageBlockType;
 

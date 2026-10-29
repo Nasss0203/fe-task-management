@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 
 import { DatabaseViewType } from "@/entities/database/model/database.types";
+import { usePageBlockRowId } from "@/entities/page-block/model/page-block-row-scope";
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
 
 import {
@@ -430,6 +431,8 @@ export function PageBlockCommandMenu({
 	onClose,
 	allowDatabase = true,
 }: PageBlockCommandMenuProps) {
+	// No database inside a task's content (the API refuses it too).
+	const inTask = usePageBlockRowId() !== null;
 	return (
 		<Command
 			className='
@@ -501,7 +504,7 @@ export function PageBlockCommandMenu({
 
 				<CommandSeparator />
 
-				{allowDatabase && (
+				{allowDatabase && !inTask && (
 					<>
 						<CommandGroup
 							heading='Database'

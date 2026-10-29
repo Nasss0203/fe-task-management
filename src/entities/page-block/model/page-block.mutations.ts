@@ -13,9 +13,16 @@ import {
 	PageBlockStyleConfig,
 	PageBlockType,
 } from "@/entities/page-block/model/page-block.types";
+import { usePageBlockRowId } from "./page-block-row-scope";
 import { pageBlockKeys } from "./page-block.queries";
 
-function blockListKey(pageId: string, shareToken?: string) {
+/** The list a block lives in: a task's content when `rowId` is set, else the page's. */
+function blockListKey(pageId: string, shareToken?: string, rowId?: string | null) {
+	if (rowId) {
+		return shareToken
+			? pageBlockKeys.sharedByRow(rowId, shareToken)
+			: pageBlockKeys.byRow(rowId);
+	}
 	return shareToken
 		? pageBlockKeys.sharedByPage(pageId, shareToken)
 		: pageBlockKeys.byPage(pageId);
@@ -120,6 +127,7 @@ interface CreatePageBlockInput {
 
 export function useCreatePageBlock(shareToken?: string) {
 	const queryClient = useQueryClient();
+	const rowId = usePageBlockRowId();
 
 	return useMutation({
 		mutationKey: [...pageBlockKeys.all, "create", shareToken ?? null],
@@ -135,6 +143,7 @@ export function useCreatePageBlock(shareToken?: string) {
 			pageBlockApi.create(
 				{
 					page_id: pageId,
+					row_id: rowId,
 					parent_block_id: parentBlockId,
 					after_block_id: afterBlockId,
 					type,
@@ -147,7 +156,7 @@ export function useCreatePageBlock(shareToken?: string) {
 
 		onSuccess: async (_, variables) => {
 			await queryClient.invalidateQueries({
-				queryKey: blockListKey(variables.pageId, shareToken),
+				queryKey: blockListKey(variables.pageId, shareToken, rowId),
 				exact: true,
 			});
 		},
@@ -169,6 +178,7 @@ interface UpdatePageBlockInput {
 
 export function useUpdatePageBlock(shareToken?: string) {
 	const queryClient = useQueryClient();
+	const rowId = usePageBlockRowId();
 
 	return useMutation({
 		mutationKey: [...pageBlockKeys.all, "update", shareToken ?? null],
@@ -196,7 +206,7 @@ export function useUpdatePageBlock(shareToken?: string) {
 
 		onSuccess: async (_, variables) => {
 			await queryClient.invalidateQueries({
-				queryKey: blockListKey(variables.pageId, shareToken),
+				queryKey: blockListKey(variables.pageId, shareToken, rowId),
 				exact: true,
 			});
 		},
@@ -274,6 +284,7 @@ interface DuplicatePageBlockInput {
 
 export function useDuplicatePageBlock(shareToken?: string) {
 	const queryClient = useQueryClient();
+	const rowId = usePageBlockRowId();
 
 	return useMutation({
 		mutationKey: [...pageBlockKeys.all, "duplicate", shareToken ?? null],
@@ -282,7 +293,7 @@ export function useDuplicatePageBlock(shareToken?: string) {
 
 		onSuccess: async (_, variables) => {
 			await queryClient.invalidateQueries({
-				queryKey: blockListKey(variables.pageId, shareToken),
+				queryKey: blockListKey(variables.pageId, shareToken, rowId),
 				exact: true,
 			});
 		},
@@ -297,6 +308,7 @@ interface DeletePageBlockInput {
 
 export function useDeletePageBlock(shareToken?: string) {
 	const queryClient = useQueryClient();
+	const rowId = usePageBlockRowId();
 
 	return useMutation({
 		mutationKey: [...pageBlockKeys.all, "delete", shareToken ?? null],
@@ -306,7 +318,7 @@ export function useDeletePageBlock(shareToken?: string) {
 		onSuccess: async (_, variables) => {
 			await Promise.all([
 				queryClient.invalidateQueries({
-					queryKey: blockListKey(variables.pageId, shareToken),
+					queryKey: blockListKey(variables.pageId, shareToken, rowId),
 					exact: true,
 				}),
 				// The deleted block (or its children) may hold a database → moves it to Trash.

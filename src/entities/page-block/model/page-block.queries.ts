@@ -10,6 +10,11 @@ export const pageBlockKeys = {
 	sharedByPage: (pageId: string, shareToken: string) =>
 		[...pageBlockKeys.all, "shared-page", pageId, shareToken] as const,
 
+	byRow: (rowId: string) => [...pageBlockKeys.all, "row", rowId] as const,
+
+	sharedByRow: (rowId: string, shareToken: string) =>
+		[...pageBlockKeys.all, "shared-row", rowId, shareToken] as const,
+
 	detail: (blockId: string) =>
 		[...pageBlockKeys.all, "detail", blockId] as const,
 
@@ -39,6 +44,19 @@ export function useSharedPageBlocks(
 			pageBlockApi.getByPage(pageId!, signal, shareToken!),
 
 		enabled: Boolean(pageId) && Boolean(shareToken) && enabled,
+	});
+}
+
+/** A task's content; through the share link when `shareToken` is set. */
+export function useRowPageBlocks(rowId?: string, shareToken?: string) {
+	return useQuery({
+		queryKey: shareToken
+			? pageBlockKeys.sharedByRow(rowId ?? "", shareToken)
+			: pageBlockKeys.byRow(rowId ?? ""),
+
+		queryFn: ({ signal }) => pageBlockApi.getByRow(rowId!, signal, shareToken),
+
+		enabled: Boolean(rowId),
 	});
 }
 
