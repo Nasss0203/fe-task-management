@@ -1,6 +1,7 @@
 "use client";
 
-import { Table2, Trash2 } from "lucide-react";
+import { ChevronRight, Table2, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { useDeleteDatabaseRow } from "@/entities/database/model/database.mutations";
@@ -19,14 +20,21 @@ import {
 
 import { RowComments } from "@/widgets/page-comments/ui/row-comments";
 
+import { getChildRows } from "../lib/row-tree";
 import { getRowValueMap, getTitleProperty } from "../lib/view-properties";
 import { useDatabaseShareToken } from "../model/share-token-context";
 import { DatabaseCell } from "./database-cell";
+import type { OpenRowHandler } from "./database-view-renderer";
+import { RowSubtasks } from "./row-subtasks";
 
 interface RowDetailSheetProps {
 	database: Database;
 	/** Undefined closes the sheet (also when the row was deleted). */
 	row?: DatabaseRow;
+	/** Every row of the database: finds the parent task and the sub-tasks. */
+	allRows?: DatabaseRow[];
+	/** Opens another row in this peek (a sub-task or the parent task). */
+	onOpenRow?: OpenRowHandler;
 	/** Focus the title right away, e.g. for a row that was just created. */
 	autoFocusTitle?: boolean;
 	/** Cuộn tới mục Comments khi mở (từ link thông báo comment). */
@@ -39,6 +47,8 @@ interface RowDetailSheetProps {
 export function RowDetailSheet({
 	database,
 	row,
+	allRows = [],
+	onOpenRow,
 	autoFocusTitle = false,
 	scrollToComments = false,
 	readOnly = false,
@@ -51,6 +61,15 @@ export function RowDetailSheet({
 	const values = row ? getRowValueMap(row) : new Map<string, unknown>();
 	const title =
 		(titleProperty && (values.get(titleProperty.id) as string)) || "Untitled";
+	const parentRow = allRows.find((item) => item.id === row?.parentRowId);
+	const parentTitle =
+		(parentRow &&
+			titleProperty &&
+			(getRowValueMap(parentRow).get(titleProperty.id) as string)) ||
+		"Untitled";
+	const subtaskCount = row ? getChildRows(allRows, row.id).length : 0;
+	// Deleting a parent deletes its sub-tasks too: ask with a second click.
+	const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 	const properties = [...database.properties]
 		.filter((property) => property.type !== PropertyType.TITLE)
 		.sort((a, b) => Number(a.position) - Number(b.position));
@@ -75,6 +94,18 @@ export function RowDetailSheet({
 						<div className='flex h-12 items-center gap-1.5 border-b px-6 pr-12 text-sm text-muted-foreground sm:px-8'>
 							<Table2 className='size-4 shrink-0' />
 							<span className='truncate'>{database.name}</span>
+							{parentRow && (
+								<>
+									<ChevronRight className='size-3.5 shrink-0' />
+									<button
+										type='button'
+										onClick={() => onOpenRow?.(parentRow.id)}
+										className='truncate rounded-sm px-1 hover:bg-muted hover:text-foreground'
+									>
+										{parentTitle}
+									</button>
+								</>
+							)}
 						</div>
 
 						<div className='flex flex-1 flex-col px-6 pb-6 pt-8 sm:px-8'>
@@ -125,6 +156,14 @@ export function RowDetailSheet({
 								)}
 							</section>
 
+							<RowSubtasks
+								database={database}
+								row={row}
+								allRows={allRows}
+								readOnly={readOnly}
+								onOpenRow={onOpenRow}
+							/>
+
 							{/* Drawer chỉ đọc còn dùng cho site public (người xem chưa đăng nhập): chỉ hiện comment khi sửa được hoặc mở qua link share */}
 							{(!readOnly || shareToken) && (
 								<RowComments
@@ -140,16 +179,22 @@ export function RowDetailSheet({
 									<button
 										type='button'
 										disabled={deleteRowMutation.isPending}
-										onClick={() =>
+										onClick={() => {
+											if (subtaskCount > 0 && confirmDeleteId !== row.id) {
+												setConfirmDeleteId(row.id);
+												return;
+											}
 											deleteRowMutation.mutate(row.id, {
 												onSuccess: onClose,
 												onError: () => toast.error("Couldn't delete row"),
-											})
-										}
+											});
+										}}
 										className='flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm text-muted-foreground hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:opacity-50'
 									>
 										<Trash2 className='size-4' />
-										Delete row
+										{confirmDeleteId === row.id
+											? `Delete with ${subtaskCount} sub-task${subtaskCount > 1 ? "s" : ""}?`
+											: "Delete row"}
 									</button>
 								</div>
 							)}

@@ -115,6 +115,7 @@ export function DatabaseViewRenderer({
 							viewId={view.id}
 							viewDetail={viewDetail}
 							rows={groupRows}
+							allRows={allRows}
 							mode={readOnly ? "readonly" : "editable"}
 							onOpenRow={onOpenRow}
 						/>
@@ -148,6 +149,7 @@ export function DatabaseViewRenderer({
 						database={database}
 						viewDetail={viewDetail}
 						rows={groupRows}
+						allRows={allRows}
 						onOpenRow={onOpenRow}
 						readOnly={readOnly}
 					/>
@@ -171,6 +173,8 @@ export function DatabaseViewRenderer({
 			<RowDetailSheet
 				database={database}
 				row={allRows.find((row) => row.id === openRow?.id)}
+				allRows={allRows}
+				onOpenRow={onOpenRow}
 				autoFocusTitle={openRow?.isNew}
 				scrollToComments={openRow?.showComments}
 				readOnly={readOnly}

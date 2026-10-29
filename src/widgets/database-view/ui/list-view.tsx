@@ -3,6 +3,8 @@
 import { FileText, PanelRightOpen, Plus } from "lucide-react";
 import { useState } from "react";
 
+import { cn } from "@/shared/lib/utils";
+
 import type {
 	Database,
 	DatabaseRow,
@@ -14,16 +16,20 @@ import {
 	getTitleProperty,
 	getVisibleProperties,
 } from "../lib/view-properties";
+import { flattenRowTree, getSubtaskProgress } from "../lib/row-tree";
 import { useQuickAddRow } from "../model/use-quick-add-row";
 import type { OpenRowHandler } from "./database-view-renderer";
 import { RowActionsMenu } from "./row-actions-menu";
 import { RowPropertySummary } from "./row-property-summary";
 import { RenameRowButton, RowTitle } from "./row-title";
+import { SubtaskProgress, SubtaskToggle } from "./subtask-toggle";
 
 interface ListViewProps {
 	database: Database;
 	viewDetail: DatabaseViewDetail;
 	rows: DatabaseRow[];
+	/** Every row of the database, to place sub-tasks and parents the filters left out. */
+	allRows?: DatabaseRow[];
 	onOpenRow: OpenRowHandler;
 	readOnly?: boolean;
 }
@@ -32,6 +38,7 @@ export function ListView({
 	database,
 	viewDetail,
 	rows,
+	allRows = rows,
 	onOpenRow,
 	readOnly = false,
 }: ListViewProps) {
@@ -40,12 +47,27 @@ export function ListView({
 	const { addRow, isPending } = useQuickAddRow(database);
 	// Row whose name is being edited inline (pencil button or a just-added row).
 	const [editingRowId, setEditingRowId] = useState<string | null>(null);
+	const [collapsedIds, setCollapsedIds] = useState<ReadonlySet<string>>(new Set());
+	const toggleCollapsed = (rowId: string) =>
+		setCollapsedIds((current) => {
+			const next = new Set(current);
+			if (!next.delete(rowId)) next.add(rowId);
+			return next;
+		});
 
 	return (
 		<div className='w-full min-w-0'>
 			<ul className='border-t'>
-				{rows.map((row) => {
+				{flattenRowTree(rows, allRows, collapsedIds).map((item) => {
+					const { row } = item;
 					const values = getRowValueMap(row);
+					const toggle = (
+						<SubtaskToggle
+							item={item}
+							collapsed={collapsedIds.has(row.id)}
+							onToggle={() => toggleCollapsed(row.id)}
+						/>
+					);
 					const editing = row.id === editingRowId;
 					const summary = (
 						<RowPropertySummary
@@ -61,10 +83,14 @@ export function ListView({
 					return (
 						<li
 							key={row.id}
-							className='group/row flex min-h-10 items-center gap-2 border-b px-1 transition-colors hover:bg-muted/40'
+							className={cn(
+								"group/row flex min-h-10 items-center gap-2 border-b px-1 transition-colors hover:bg-muted/40",
+								item.dimmed && "opacity-50",
+							)}
 						>
 							{editing ? (
 								<div className='flex min-w-0 flex-1 items-center gap-2 px-1'>
+									{toggle}
 									<FileText className='size-4 shrink-0 text-muted-foreground' />
 									<RowTitle
 										database={database}
@@ -89,6 +115,7 @@ export function ListView({
 									}}
 									className='flex min-w-0 flex-1 cursor-pointer items-center gap-2 self-stretch rounded-sm px-1 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring/50'
 								>
+									{toggle}
 									<FileText className='size-4 shrink-0 text-muted-foreground' />
 									<RowTitle
 										database={database}
@@ -101,6 +128,9 @@ export function ListView({
 									{titleProperty && !readOnly && (
 										<RenameRowButton onClick={() => setEditingRowId(row.id)} />
 									)}
+									<SubtaskProgress
+										progress={getSubtaskProgress(database, allRows, row.id)}
+									/>
 									<span className='ml-auto hidden min-w-0 max-w-[65%] sm:block'>
 										{summary}
 									</span>
@@ -110,7 +140,11 @@ export function ListView({
 
 							{!readOnly && (
 								<div className='w-8 shrink-0'>
-									<RowActionsMenu databaseId={database.id} rowId={row.id} />
+									<RowActionsMenu
+										databaseId={database.id}
+										rowId={row.id}
+										onOpenRow={onOpenRow}
+									/>
 								</div>
 							)}
 						</li>

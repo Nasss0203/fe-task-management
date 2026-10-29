@@ -95,6 +95,8 @@ export interface DatabaseRow {
 	id: string;
 	databaseId: string;
 	position?: number;
+	/** Set on a sub-task; null or missing for a top-level row. */
+	parentRowId?: string | null;
 	values: DatabaseRowValue[];
 }
 
