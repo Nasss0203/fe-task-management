@@ -134,6 +134,17 @@ export function useDatabaseRows(databaseId?: string, enabled = true) {
 	});
 }
 
+/** One task by id (the full-page task view only knows the row from its URL). */
+export function useDatabaseRow(rowId?: string) {
+	return useQuery({
+		queryKey: ["database-rows", rowId ?? ""] as const,
+
+		queryFn: ({ signal }) => databaseApi.getRow(rowId!, signal),
+
+		enabled: Boolean(rowId),
+	});
+}
+
 export function useSharedDatabaseRows(
 	databaseId?: string,
 	shareToken?: string,

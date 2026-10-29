@@ -147,6 +147,16 @@ export const databaseApi = {
 		return response.data.data;
 	},
 
+	/** One task; its `databaseId` tells which database to load. */
+	getRow: async (rowId: string, signal?: AbortSignal): Promise<DatabaseRow> => {
+		const response = await instance.get<ApiResponse<DatabaseRow>>(
+			`/database-rows/${rowId}`,
+			{ signal },
+		);
+
+		return response.data.data;
+	},
+
 	deleteRow: async (rowId: string): Promise<void> => {
 		await instance.delete(`/database-rows/${rowId}`);
 	},

@@ -1,16 +1,10 @@
 "use client";
 
-import { ChevronRight, Table2, Trash2 } from "lucide-react";
+import { ChevronRight, Maximize2, Table2 } from "lucide-react";
+import Link from "next/link";
 import { useState, type CSSProperties } from "react";
-import { toast } from "sonner";
 
-import { useDeleteDatabaseRow } from "@/entities/database/model/database.mutations";
-import {
-	PropertyType,
-	type Database,
-	type DatabaseRow,
-} from "@/entities/database/model/database.types";
-import { PropertyIcon } from "@/entities/database/ui/database-visuals";
+import type { Database, DatabaseRow } from "@/entities/database/model/database.types";
 import {
 	Sheet,
 	SheetContent,
@@ -18,21 +12,16 @@ import {
 	SheetTitle,
 } from "@/shared/ui/sheet";
 
-import { RowComments } from "@/widgets/page-comments/ui/row-comments";
-
 import {
 	clampRowSheetWidth,
 	readRowSheetWidth,
 	ROW_SHEET_DEFAULT_WIDTH,
 	saveRowSheetWidth,
 } from "../lib/row-sheet-width";
-import { getChildRows } from "../lib/row-tree";
 import { getRowValueMap, getTitleProperty } from "../lib/view-properties";
 import { useDatabaseShareToken } from "../model/share-token-context";
-import { DatabaseCell } from "./database-cell";
 import type { OpenRowHandler } from "./database-view-renderer";
-import { RowContent } from "./row-content";
-import { RowSubtasks } from "./row-subtasks";
+import { RowDetailBody } from "./row-detail-body";
 import { SheetResizeHandle } from "./sheet-resize-handle";
 
 interface RowDetailSheetProps {
@@ -51,6 +40,11 @@ interface RowDetailSheetProps {
 	onClose: () => void;
 }
 
+/** The URL of a task opened full page. */
+export function rowPageHref(pageId: string, rowId: string) {
+	return `/page/${pageId}/row/${rowId}`;
+}
+
 /** Notion-style side peek: every property of one row, editable in place. */
 export function RowDetailSheet({
 	database,
@@ -62,31 +56,20 @@ export function RowDetailSheet({
 	readOnly = false,
 	onClose,
 }: RowDetailSheetProps) {
-	const mode = readOnly ? "readonly" : "editable";
-	const deleteRowMutation = useDeleteDatabaseRow(database.id);
 	const shareToken = useDatabaseShareToken();
 	const titleProperty = getTitleProperty(database);
-	const values = row ? getRowValueMap(row) : new Map<string, unknown>();
-	const title =
-		(titleProperty && (values.get(titleProperty.id) as string)) || "Untitled";
-	const parentRow = allRows.find((item) => item.id === row?.parentRowId);
-	const parentTitle =
-		(parentRow &&
+	const rowTitle = (target?: DatabaseRow) =>
+		(target &&
 			titleProperty &&
-			(getRowValueMap(parentRow).get(titleProperty.id) as string)) ||
+			(getRowValueMap(target).get(titleProperty.id) as string)) ||
 		"Untitled";
-	const subtaskCount = row ? getChildRows(allRows, row.id).length : 0;
-	// Deleting a parent deletes its sub-tasks too: ask with a second click.
-	const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+	const parentRow = allRows.find((item) => item.id === row?.parentRowId);
 	// Read once: the sheet only renders in the browser, after it opens.
 	const [width, setWidth] = useState(() =>
 		typeof window === "undefined"
 			? ROW_SHEET_DEFAULT_WIDTH
 			: clampRowSheetWidth(readRowSheetWidth(), window.innerWidth),
 	);
-	const properties = [...database.properties]
-		.filter((property) => property.type !== PropertyType.TITLE)
-		.sort((a, b) => Number(a.position) - Number(b.position));
 
 	return (
 		<Sheet open={Boolean(row)} onOpenChange={(open) => !open && onClose()}>
@@ -100,7 +83,7 @@ export function RowDetailSheet({
 				className='w-full gap-0 sm:w-(--row-sheet-width) sm:max-w-[90vw]'
 				style={{ "--row-sheet-width": `${width}px` } as CSSProperties}
 			>
-				<SheetTitle className='sr-only'>{title}</SheetTitle>
+				<SheetTitle className='sr-only'>{rowTitle(row)}</SheetTitle>
 				<SheetDescription className='sr-only'>
 					Row details in {database.name}
 				</SheetDescription>
@@ -117,7 +100,8 @@ export function RowDetailSheet({
 				{row && (
 					// Scrolls inside, so the resize handle and close button stay put.
 					<div className='flex h-full min-h-0 flex-col overflow-y-auto'>
-						<div className='flex h-12 items-center gap-1.5 border-b px-6 pr-12 text-sm text-muted-foreground sm:px-8'>
+						{/* shrink-0: inside the scrolling column a long task would squash it */}
+						<div className='flex h-12 shrink-0 items-center gap-1.5 border-b px-6 pr-12 text-sm text-muted-foreground sm:px-8'>
 							<Table2 className='size-4 shrink-0' />
 							<span className='truncate'>{database.name}</span>
 							{parentRow && (
@@ -128,109 +112,34 @@ export function RowDetailSheet({
 										onClick={() => onOpenRow?.(parentRow.id)}
 										className='truncate rounded-sm px-1 hover:bg-muted hover:text-foreground'
 									>
-										{parentTitle}
+										{rowTitle(parentRow)}
 									</button>
 								</>
+							)}
+							{/* Full page needs a signed-in workspace member, so not on share links or public sites. */}
+							{!readOnly && !shareToken && (
+								<Link
+									href={rowPageHref(database.pageId, row.id)}
+									aria-label='Open as page'
+									title='Open as page'
+									className='ml-auto flex size-7 shrink-0 items-center justify-center rounded-md hover:bg-muted hover:text-foreground'
+								>
+									<Maximize2 className='size-4' />
+								</Link>
 							)}
 						</div>
 
 						<div className='flex flex-1 flex-col px-6 pb-6 pt-8 sm:px-8'>
-							{titleProperty && (
-								<div className='[&_input]:h-auto [&_input]:px-0 [&_input]:py-1 [&_input]:text-2xl [&_input]:font-bold [&_input]:leading-tight sm:[&_input]:text-[1.75rem]'>
-									<DatabaseCell
-										databaseId={database.id}
-										pageId={database.pageId}
-										rowId={row.id}
-										property={titleProperty}
-										value={values.get(titleProperty.id)}
-										autoFocus={autoFocusTitle}
-										mode={mode}
-									/>
-								</div>
-							)}
-
-							<section
-								aria-label='Properties'
-								className='-mx-2 mt-6'
-							>
-								{properties.map((property) => (
-									<div
-										key={property.id}
-										className='flex min-h-10 items-center gap-3 rounded-md px-2 text-sm'
-									>
-										<span className='flex w-36 shrink-0 items-center gap-2 text-muted-foreground'>
-											<PropertyIcon type={property.type} className='size-4' />
-											<span className='truncate'>{property.name}</span>
-										</span>
-										{/* In the peek, empty-value hints stay visible and numbers align left. */}
-										<div className='min-w-0 flex-1 rounded-md px-1 transition-colors hover:bg-muted/70 [&_.opacity-0]:opacity-100 [&_input]:text-left [&_span.text-muted-foreground]:text-muted-foreground/60'>
-											<DatabaseCell
-												databaseId={database.id}
-												pageId={database.pageId}
-												rowId={row.id}
-												property={property}
-												value={values.get(property.id)}
-												mode={mode}
-											/>
-										</div>
-									</div>
-								))}
-								{properties.length === 0 && (
-									<p className='px-2 py-3 text-sm text-muted-foreground'>
-										No other properties yet
-									</p>
-								)}
-							</section>
-
-							<RowSubtasks
+							<RowDetailBody
 								database={database}
 								row={row}
 								allRows={allRows}
 								readOnly={readOnly}
+								autoFocusTitle={autoFocusTitle}
+								scrollToComments={scrollToComments}
 								onOpenRow={onOpenRow}
+								onDeleted={onClose}
 							/>
-
-							<RowContent
-								pageId={database.pageId}
-								rowId={row.id}
-								readOnly={readOnly}
-								shareToken={shareToken}
-							/>
-
-							{/* Drawer chỉ đọc còn dùng cho site public (người xem chưa đăng nhập): chỉ hiện comment khi sửa được hoặc mở qua link share */}
-							{(!readOnly || shareToken) && (
-								<RowComments
-									pageId={database.pageId}
-									rowId={row.id}
-									scrollIntoView={scrollToComments}
-									shareToken={shareToken}
-								/>
-							)}
-
-							{!readOnly && (
-								<div className='mt-auto flex justify-end pt-8'>
-									<button
-										type='button'
-										disabled={deleteRowMutation.isPending}
-										onClick={() => {
-											if (subtaskCount > 0 && confirmDeleteId !== row.id) {
-												setConfirmDeleteId(row.id);
-												return;
-											}
-											deleteRowMutation.mutate(row.id, {
-												onSuccess: onClose,
-												onError: () => toast.error("Couldn't delete row"),
-											});
-										}}
-										className='flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm text-muted-foreground hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:opacity-50'
-									>
-										<Trash2 className='size-4' />
-										{confirmDeleteId === row.id
-											? `Delete with ${subtaskCount} sub-task${subtaskCount > 1 ? "s" : ""}?`
-											: "Delete row"}
-									</button>
-								</div>
-							)}
 						</div>
 					</div>
 				)}
