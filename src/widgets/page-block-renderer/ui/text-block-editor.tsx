@@ -7,6 +7,7 @@ import {
 	useCreatePageBlock,
 	useCreatePageBlockColumns,
 	useDeletePageBlock,
+	useWrapInSection,
 	useTransformToDatabaseBlock,
 	useUpdatePageBlock,
 } from "@/entities/page-block/model/page-block.mutations";
@@ -50,6 +51,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 	const deleteBlock = useDeletePageBlock(shareToken);
 	const createBlock = useCreatePageBlock(shareToken);
 	const createColumns = useCreatePageBlockColumns(shareToken);
+	const wrapInSection = useWrapInSection(shareToken);
 
 	const [value, setValue] = useState(() => getText(block));
 
@@ -138,6 +140,26 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 		columnCount,
 	}: PageBlockCommand) => {
 		if (slashIndex === null) {
+			return;
+		}
+
+		if (type === PageBlockType.SECTION) {
+			setCommandOpen(false);
+			setSlashIndex(null);
+			const text = value.slice(0, slashIndex) + value.slice(slashIndex + 1);
+			setValue(text);
+			if (text !== getText(block)) {
+				await updateBlock.mutateAsync({
+					blockId: block.id,
+					pageId: block.page_id,
+					content: { text },
+				});
+			}
+			await wrapInSection.mutateAsync({
+				blockId: block.id,
+				pageId: block.page_id,
+				parentBlockId: block.parent_block_id,
+			});
 			return;
 		}
 

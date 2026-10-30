@@ -18,6 +18,7 @@ import {
 	useDeletePageBlock,
 	useDuplicatePageBlock,
 	useUpdatePageBlock,
+	useWrapInSection,
 } from "@/entities/page-block/model/page-block.mutations";
 
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
@@ -35,10 +36,10 @@ import {
 
 import { useState } from "react";
 
-import { useIsInColumn } from "./column-scope";
+import { useIsInColumn, useIsInSection } from "./column-scope";
 import {
 	type CommandItemData,
-	LAYOUT_BLOCKS,
+	layoutBlocksFor,
 	TURN_INTO_BLOCKS,
 } from "./page-block-command-menu";
 import { usePageBlockEditor } from "./page-block-editor-context";
@@ -88,9 +89,12 @@ export function PageBlockActionMenu({
 	const createColumns = useCreatePageBlockColumns(shareToken);
 
 	// Columns don't nest: "Turn into 2 columns" only outside a column.
-	const turnIntoOptions = useIsInColumn()
-		? TURN_INTO_BLOCKS
-		: [...TURN_INTO_BLOCKS, ...LAYOUT_BLOCKS];
+	const turnIntoOptions = [
+		...TURN_INTO_BLOCKS,
+		...layoutBlocksFor(useIsInColumn(), useIsInSection()),
+	];
+
+	const wrapInSection = useWrapInSection(shareToken);
 
 	const handleCopyLink = async () => {
 		const url =
@@ -139,6 +143,16 @@ export function PageBlockActionMenu({
 
 		if (isCurrentOption(option)) {
 			onClose?.();
+			return;
+		}
+
+		if (option.type === PageBlockType.SECTION) {
+			onClose?.();
+			await wrapInSection.mutateAsync({
+				blockId: block.id,
+				pageId: block.page_id,
+				parentBlockId: block.parent_block_id,
+			});
 			return;
 		}
 

@@ -25,9 +25,13 @@ import {
 	ReadOnlyMermaidBlock,
 	TableOfContentsBlock,
 	EmptyValue,
+	CALLOUT_TONES,
+	getCalloutTone,
 } from "@/entities/page-block/ui/read-only-block-content";
 import { Separator } from "@/shared/ui/separator";
 import { columnRatio } from "@/widgets/page-block-renderer/lib/column-widths";
+import { getSectionForm } from "@/widgets/page-block-renderer/lib/form-config";
+import { FormFill, useFormDatabase } from "@/widgets/page-block-renderer/ui/form-fill";
 import type { PublicDatabase } from "@/entities/public-site/model/public-site.types";
 import {
 	ReadOnlyDatabaseTable,
@@ -52,6 +56,96 @@ interface ReadOnlyPageBlockRendererProps {
 	block: ReadOnlyPageBlockNode;
 	shareToken?: string;
 	disableDatabaseView?: boolean;
+}
+
+function ReadOnlySectionBlock({
+	block,
+	shareToken,
+	disableDatabaseView,
+}: ReadOnlyPageBlockRendererProps) {
+	const [isOpen, setIsOpen] = useState(block.is_open);
+	const form = getSectionForm(block.data_config);
+	const formDatabase = useFormDatabase(form, shareToken);
+	const renderChild = (child: ReadOnlyPageBlockNode) => (
+		<ReadOnlyPageBlockRenderer
+			block={child}
+			shareToken={shareToken}
+			disableDatabaseView={disableDatabaseView}
+		/>
+	);
+	const title = getString(getContent(block), "title");
+	const description = getString(getContent(block), "description");
+
+	return (
+		<section
+			aria-label={title || "Untitled section"}
+			className={`w-full rounded-lg border border-border/60 px-3 py-2 ${CALLOUT_TONES[getCalloutTone(block.style_config)].className}`}
+		>
+			<button
+				type='button'
+				aria-expanded={isOpen}
+				aria-controls={`section-children-${block.id}`}
+				onClick={() => setIsOpen((current) => !current)}
+				className='flex min-h-7 w-full items-center gap-1 rounded-sm text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+			>
+				<span className='flex size-7 shrink-0 items-center justify-center text-muted-foreground'>
+					{isOpen ? (
+						<ChevronDown className='size-4' />
+					) : (
+						<ChevronRight className='size-4' />
+					)}
+				</span>
+				<span className='min-w-0 flex-1 text-base font-semibold leading-7'>
+					{title || <EmptyValue>Untitled section</EmptyValue>}
+				</span>
+				{!isOpen && block.children.length > 0 && (
+					<span className='shrink-0 text-xs text-muted-foreground'>
+						{block.children.length}{" "}
+						{block.children.length === 1 ? "block" : "blocks"}
+					</span>
+				)}
+			</button>
+
+			{isOpen && (
+				<div id={`section-children-${block.id}`}>
+					{description && (
+						<p className='ml-8 text-sm leading-6 text-muted-foreground'>
+							{description}
+						</p>
+					)}
+					{form && formDatabase ? (
+						<div className='ml-8 mt-2'>
+							<FormFill
+								section={block}
+								form={form}
+								database={formDatabase}
+								shareToken={shareToken}
+								renderBlock={(child) =>
+									renderChild(child as ReadOnlyPageBlockNode)
+								}
+							/>
+						</div>
+					) : (
+					<div className='ml-8 mt-1'>
+						{block.children.map((child) => (
+							<div
+								key={child.id}
+								id={`block-${child.id}`}
+								className='rounded-md transition-colors duration-500'
+							>
+								<ReadOnlyPageBlockRenderer
+									block={child}
+									shareToken={shareToken}
+									disableDatabaseView={disableDatabaseView}
+								/>
+							</div>
+						))}
+					</div>
+					)}
+				</div>
+			)}
+		</section>
+	);
 }
 
 /** Columns side by side (stacked on a phone), with no borders or handles. */
@@ -171,6 +265,14 @@ export function ReadOnlyPageBlockRenderer({
 			return <TableOfContentsBlock headings={block.toc_headings ?? []} />;
 		case PageBlockType.MERMAID:
 			return <ReadOnlyMermaidBlock block={block} />;
+		case PageBlockType.SECTION:
+			return (
+				<ReadOnlySectionBlock
+					block={block}
+					shareToken={shareToken}
+					disableDatabaseView={disableDatabaseView}
+				/>
+			);
 		case PageBlockType.COLUMN_LIST:
 			return (
 				<ReadOnlyColumnList

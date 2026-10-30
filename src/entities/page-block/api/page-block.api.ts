@@ -109,6 +109,20 @@ export const pageBlockApi = {
 		return response.data.data;
 	},
 
+	submitForm: async (
+		sectionBlockId: string,
+		answers: Record<string, unknown>,
+		shareToken?: string,
+	): Promise<{ row_id: string; success_message: string | null }> => {
+		const response = await instance.post<
+			ApiResponse<{ row_id: string; success_message: string | null }>
+		>(`/forms/${sectionBlockId}/responses`, { answers }, {
+			headers: getShareHeaders(shareToken),
+		});
+
+		return response.data.data;
+	},
+
 	/** Sets blocks side by side in a new column row, where the first one was. */
 	createColumns: async (
 		input: { page_id: string; block_ids: string[] },

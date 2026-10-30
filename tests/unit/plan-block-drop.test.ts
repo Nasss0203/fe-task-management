@@ -157,6 +157,33 @@ describe("planBlockDrop: a lone block within its own column row (Notion)", () =>
 	});
 });
 
+describe("planBlockDrop: sections", () => {
+	const sections = [
+		node("s1", null, [node("in1", "s1")], PageBlockType.SECTION),
+		node("s2", null, [], PageBlockType.SECTION),
+		node("plain"),
+	];
+
+	it("moves a block into a section by dropping on a block inside it", () => {
+		expect(planBlockDrop(sections, "plain", "in1", "after")).toEqual({
+			type: "move",
+			blockId: "plain",
+			parentId: "s1",
+			index: 1,
+		});
+	});
+
+	it("never puts a section inside another section", () => {
+		expect(planBlockDrop(sections, "s2", "in1", "before")).toBeNull();
+		expect(planBlockDrop(sections, "s2", "s1", "before")).toEqual({
+			type: "move",
+			blockId: "s2",
+			parentId: null,
+			index: 0,
+		});
+	});
+});
+
 describe("dropPositionAt", () => {
 	const rect = { left: 0, top: 0, width: 100, height: 20 };
 

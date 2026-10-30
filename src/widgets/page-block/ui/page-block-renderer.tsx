@@ -23,6 +23,8 @@ import { QuoteBlockEditor } from "@/widgets/page-block-renderer/ui/quote-block-e
 import { SimpleTableBlockEditor } from "@/widgets/page-block-renderer/ui/simple-table-block-editor";
 import { TextBlockEditor } from "@/widgets/page-block-renderer/ui/text-block-editor";
 import { TodoBlockEditor } from "@/widgets/page-block-renderer/ui/todo-block-editor";
+import { FormFieldBlockEditor } from "@/widgets/page-block-renderer/ui/form-field-block-editor";
+import { SectionBlockEditor } from "@/widgets/page-block-renderer/ui/section-block-editor";
 import { ToggleBlockEditor } from "@/widgets/page-block-renderer/ui/toggle-block-editor";
 import { VideoBlockEditor } from "@/widgets/page-block-renderer/ui/video-block-editor";
 
@@ -56,6 +58,10 @@ export function PageBlockRenderer({ block, shareToken }: PageBlockRendererProps)
 			return <MermaidBlockEditor block={block} shareToken={shareToken} />;
 		case PageBlockType.TOGGLE:
 			return <ToggleBlockEditor block={block} shareToken={shareToken} />;
+		case PageBlockType.SECTION:
+			return <SectionBlockEditor block={block} shareToken={shareToken} />;
+		case PageBlockType.FORM_FIELD:
+			return <FormFieldBlockEditor block={block} shareToken={shareToken} />;
 
 		case PageBlockType.QUOTE:
 			return <QuoteBlockEditor block={block} shareToken={shareToken} />;

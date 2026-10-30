@@ -14,6 +14,8 @@ import {
 	PageBlockType,
 } from "@/entities/page-block/model/page-block.types";
 import { usePageBlockRowId } from "./page-block-row-scope";
+import { databaseKeys } from "@/entities/database/model/database.queries";
+
 import { pageBlockKeys } from "./page-block.queries";
 
 /** The list a block lives in: a task's content when `rowId` is set, else the page's. */
@@ -333,6 +335,69 @@ export function useCreatePageBlockColumns(shareToken?: string) {
 		},
 
 		// Refresh even after a failure: empty blocks may already exist.
+		onSettled: async (_, __, variables) => {
+			await queryClient.invalidateQueries({
+				queryKey: blockListKey(variables.pageId, shareToken, rowId),
+				exact: true,
+			});
+		},
+		onError: () => notifyBlockWriteError(shareToken),
+	});
+}
+
+interface SubmitPageFormInput {
+	sectionBlockId: string;
+	databaseId: string;
+	answers: Record<string, unknown>;
+}
+
+export function useSubmitPageForm(shareToken?: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({ sectionBlockId, answers }: SubmitPageFormInput) =>
+			pageBlockApi.submitForm(sectionBlockId, answers, shareToken),
+
+		onSuccess: async (_, variables) => {
+			await queryClient.invalidateQueries({
+				queryKey: databaseKeys.rows(variables.databaseId),
+			});
+		},
+	});
+}
+
+interface WrapInSectionInput {
+	blockId: string;
+	pageId: string;
+	parentBlockId: string | null;
+}
+
+export function useWrapInSection(shareToken?: string) {
+	const queryClient = useQueryClient();
+	const rowId = usePageBlockRowId();
+
+	return useMutation({
+		mutationKey: [...pageBlockKeys.all, "wrap-section", shareToken ?? null],
+		mutationFn: async ({ blockId, pageId, parentBlockId }: WrapInSectionInput) => {
+			const section = await pageBlockApi.create(
+				{
+					page_id: pageId,
+					row_id: rowId,
+					parent_block_id: parentBlockId,
+					after_block_id: blockId,
+					type: PageBlockType.SECTION,
+					content: { title: "", description: "" },
+				},
+				shareToken,
+			);
+			await pageBlockApi.move(
+				blockId,
+				{ target_parent_block_id: section.id, target_order_index: 0 },
+				shareToken,
+			);
+			return section.id;
+		},
+
 		onSettled: async (_, __, variables) => {
 			await queryClient.invalidateQueries({
 				queryKey: blockListKey(variables.pageId, shareToken, rowId),

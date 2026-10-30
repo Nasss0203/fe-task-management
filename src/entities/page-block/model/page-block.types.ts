@@ -27,6 +27,8 @@ export enum PageBlockType {
 	COLUMN_LIST = "COLUMN_LIST",
 	/** One column; `style_config.width_ratio` is its share of the row. */
 	COLUMN = "COLUMN",
+	SECTION = "SECTION",
+	FORM_FIELD = "FORM_FIELD",
 }
 
 export type PageBlockJson = Record<string, unknown> | null;

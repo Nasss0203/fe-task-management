@@ -10,3 +10,11 @@ export const InColumnProvider = InColumnContext.Provider;
 export function useIsInColumn(): boolean {
 	return useContext(InColumnContext);
 }
+
+const InSectionContext = createContext(false);
+
+export const InSectionProvider = InSectionContext.Provider;
+
+export function useIsInSection(): boolean {
+	return useContext(InSectionContext);
+}

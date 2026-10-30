@@ -93,21 +93,22 @@ export function PageBlockEditorRow({ block, shareToken }: PageBlockEditorRowProp
 			return;
 		}
 
-		createBlockMutation.mutate({
-			pageId: block.page_id,
-
-			parentBlockId: block.parent_block_id,
-
-			afterBlockId: block.id,
-
-			type,
-
-			content: {},
-
-			styleConfig: styleConfig ?? {},
-
-			dataConfig: {},
-		});
+		createBlockMutation.mutate(
+			{
+				pageId: block.page_id,
+				parentBlockId: block.parent_block_id,
+				afterBlockId: block.id,
+				type,
+				content: {},
+				styleConfig: styleConfig ?? {},
+				dataConfig: {},
+			},
+			{
+				onSuccess: (created) => {
+					if (type === PageBlockType.SECTION) requestFocus(created.id);
+				},
+			},
+		);
 	};
 
 	// A column row has no handles of its own: each block inside its columns has them.

@@ -73,6 +73,13 @@ export function planBlockDrop(
 	const siblings = parent ? parent.children : roots;
 
 	if (position === "before" || position === "after") {
+		if (
+			dragged.type === PageBlockType.SECTION &&
+			parent?.type === PageBlockType.SECTION
+		) {
+			return null;
+		}
+
 		const others = siblings.filter((block) => block.id !== draggedId);
 		const at = others.findIndex((block) => block.id === targetId);
 		const index = position === "before" ? at : at + 1;

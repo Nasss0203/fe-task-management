@@ -7,6 +7,7 @@ import {
 	CheckSquare,
 	Columns2,
 	Columns3,
+	LayoutPanelTop,
 	ChevronRight,
 	Code2,
 	FileIcon,
@@ -29,7 +30,7 @@ import {
 
 import { DatabaseViewType } from "@/entities/database/model/database.types";
 import { usePageBlockRowId } from "@/entities/page-block/model/page-block-row-scope";
-import { useIsInColumn } from "./column-scope";
+import { useIsInColumn, useIsInSection } from "./column-scope";
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
 
 import {
@@ -295,6 +296,24 @@ export const TURN_INTO_BLOCKS = [...BASIC_BLOCKS, ...ADVANCED_BLOCKS].filter(
 );
 
 /** Columns don't nest, so callers hide these inside a column (`useIsInColumn`). */
+const SECTION_BLOCK: CommandItemData = {
+	id: "section",
+	label: "Section",
+	description: "A colored group with a title.",
+	type: PageBlockType.SECTION,
+	icon: LayoutPanelTop,
+};
+
+export function layoutBlocksFor(
+	inColumn: boolean,
+	inSection: boolean,
+): CommandItemData[] {
+	return [
+		...(inSection ? [] : [SECTION_BLOCK]),
+		...(inColumn ? [] : LAYOUT_BLOCKS),
+	];
+}
+
 export const LAYOUT_BLOCKS: CommandItemData[] = [
 	{
 		id: "columns-2",
@@ -463,7 +482,7 @@ export function PageBlockCommandMenu({
 }: PageBlockCommandMenuProps) {
 	// No database inside a task's content (the API refuses it too).
 	const inTask = usePageBlockRowId() !== null;
-	const inColumn = useIsInColumn();
+	const layoutBlocks = layoutBlocksFor(useIsInColumn(), useIsInSection());
 	return (
 		<Command
 			className='
@@ -535,13 +554,13 @@ export function PageBlockCommandMenu({
 
 				<CommandSeparator />
 
-				{!inColumn && (
+				{layoutBlocks.length > 0 && (
 					<>
 						<CommandGroup
 							heading='Layout'
 							className='[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground'
 						>
-							{LAYOUT_BLOCKS.map((command) => (
+							{layoutBlocks.map((command) => (
 								<BlockCommandItem
 									key={command.id}
 									command={command}
