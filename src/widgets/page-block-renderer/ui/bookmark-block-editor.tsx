@@ -156,8 +156,10 @@ export function BookmarkBlockEditor({ block, shareToken }: BookmarkBlockEditorPr
 
 	if (!content.url) {
 		return (
-			<div className='flex w-full items-center gap-2 rounded-md border border-border bg-muted/20 p-2'>
-				<BookmarkIcon className='size-4 shrink-0 text-muted-foreground' />
+			<div className='flex w-full items-center gap-3 rounded-md bg-muted/50 px-3 py-2.5 transition-colors hover:bg-muted/80'>
+				<div className='flex shrink-0 items-center text-muted-foreground'>
+					<BookmarkIcon className='size-4' />
+				</div>
 
 				<input
 					type='text'
@@ -183,7 +185,7 @@ export function BookmarkBlockEditor({ block, shareToken }: BookmarkBlockEditorPr
 						updateBlock.isPending
 					}
 					onClick={() => void handleSaveUrl()}
-					className='inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-xs font-medium hover:bg-muted disabled:pointer-events-none disabled:opacity-50'
+					className='inline-flex h-8 items-center gap-1.5 rounded-md bg-background/40 px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
 				>
 					{resolveMetadata.isPending && (
 						<Loader2Icon className='size-3.5 animate-spin' />

@@ -5,6 +5,8 @@ import {
 	CalendarDays,
 	AppWindow,
 	CheckSquare,
+	Columns2,
+	Columns3,
 	ChevronRight,
 	Code2,
 	FileIcon,
@@ -27,6 +29,7 @@ import {
 
 import { DatabaseViewType } from "@/entities/database/model/database.types";
 import { usePageBlockRowId } from "@/entities/page-block/model/page-block-row-scope";
+import { useIsInColumn } from "./column-scope";
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
 
 import {
@@ -47,6 +50,9 @@ export interface PageBlockCommand {
 
 	/** Kiểu view đầu tiên khi tạo database (mặc định Table). */
 	viewType?: DatabaseViewType;
+
+	/** Set for "2 columns" / "3 columns": the number of columns to create. */
+	columnCount?: number;
 }
 
 interface PageBlockCommandMenuProps {
@@ -68,6 +74,8 @@ export interface CommandItemData {
 	styleConfig?: Record<string, unknown>;
 
 	viewType?: DatabaseViewType;
+
+	columnCount?: number;
 
 	icon: React.ComponentType<{
 		className?: string;
@@ -286,6 +294,26 @@ export const TURN_INTO_BLOCKS = [...BASIC_BLOCKS, ...ADVANCED_BLOCKS].filter(
 	(command) => command.type !== PageBlockType.TABLE_SIMPLE,
 );
 
+/** Columns don't nest, so callers hide these inside a column (`useIsInColumn`). */
+export const LAYOUT_BLOCKS: CommandItemData[] = [
+	{
+		id: "columns-2",
+		label: "2 columns",
+		description: "Two blocks side by side.",
+		type: PageBlockType.COLUMN_LIST,
+		columnCount: 2,
+		icon: Columns2,
+	},
+	{
+		id: "columns-3",
+		label: "3 columns",
+		description: "Three blocks side by side.",
+		type: PageBlockType.COLUMN_LIST,
+		columnCount: 3,
+		icon: Columns3,
+	},
+];
+
 const DATABASE_BLOCKS: CommandItemData[] = [
 	{
 		id: "database-table",
@@ -378,6 +406,8 @@ function BlockCommandItem({
 					styleConfig: command.styleConfig,
 
 					viewType: command.viewType,
+
+					columnCount: command.columnCount,
 				})
 			}
 			className='
@@ -433,6 +463,7 @@ export function PageBlockCommandMenu({
 }: PageBlockCommandMenuProps) {
 	// No database inside a task's content (the API refuses it too).
 	const inTask = usePageBlockRowId() !== null;
+	const inColumn = useIsInColumn();
 	return (
 		<Command
 			className='
@@ -503,6 +534,24 @@ export function PageBlockCommandMenu({
 				</CommandGroup>
 
 				<CommandSeparator />
+
+				{!inColumn && (
+					<>
+						<CommandGroup
+							heading='Layout'
+							className='[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground'
+						>
+							{LAYOUT_BLOCKS.map((command) => (
+								<BlockCommandItem
+									key={command.id}
+									command={command}
+									onSelect={onSelect}
+								/>
+							))}
+						</CommandGroup>
+						<CommandSeparator />
+					</>
+				)}
 
 				{allowDatabase && !inTask && (
 					<>

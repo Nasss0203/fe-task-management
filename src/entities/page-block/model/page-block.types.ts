@@ -23,6 +23,10 @@ export enum PageBlockType {
 	MERMAID = "MERMAID",
 	BUTTON = "BUTTON",
 	TOGGLE = "TOGGLE",
+	/** A row of 2–5 columns; its children are COLUMN blocks only. */
+	COLUMN_LIST = "COLUMN_LIST",
+	/** One column; `style_config.width_ratio` is its share of the row. */
+	COLUMN = "COLUMN",
 }
 
 export type PageBlockJson = Record<string, unknown> | null;

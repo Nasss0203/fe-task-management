@@ -2,11 +2,14 @@ import { FileText, LockKeyhole } from "lucide-react";
 import { useState } from "react";
 
 import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-tree";
+import { PageBlockType } from "@/entities/page-block/model/page-block.types";
 
 import { ReadOnlyPageBlockRenderer } from "@/widgets/page-block/ui/read-only-page-block-renderer";
 import { BlockCommentsButton } from "@/widgets/page-comments/ui/block-comments-button";
 
 import { useScrollToBlockHash } from "../model/use-scroll-to-block-hash";
+import { AddBlockBelow } from "./add-block-below";
+import { BlockDragProvider } from "./block-drag-provider";
 import { EmptyPageBlockRow } from "./empty-page-block-row";
 import { PageBlockEditorProvider } from "./page-block-editor-context";
 import { PageBlockEditorRow } from "./page-block-editor-row";
@@ -31,10 +34,14 @@ interface PageBlockListProps {
  * để Backspace ở child nhảy về đúng block phía trên.
  */
 function getVisibleBlockIds(blocks: PageBlockNode[]): string[] {
-	return blocks.flatMap((block) => [
-		block.id,
-		...(block.is_open ? getVisibleBlockIds(block.children) : []),
-	]);
+	return blocks.flatMap((block) => {
+		const children = block.is_open ? getVisibleBlockIds(block.children) : [];
+		// Column rows and columns hold no text: Backspace skips to their blocks.
+		return block.type === PageBlockType.COLUMN_LIST ||
+			block.type === PageBlockType.COLUMN
+			? children
+			: [block.id, ...children];
+	});
 }
 
 interface ReadOnlyBlockRowProps {
@@ -126,19 +133,27 @@ export function PageBlockList({
 			key={`${pageId}:${shareToken ?? ""}`}
 			orderedBlockIds={orderedBlockIds}
 		>
-			<div className='w-full min-w-0 max-w-full space-y-2'>
-				{blocks.map((block) => (
-					<PageBlockEditorRow
-						key={block.id}
-						block={block}
-						shareToken={shareToken}
-					/>
-				))}
+			<BlockDragProvider pageId={pageId} blocks={blocks} shareToken={shareToken}>
+				<div className='w-full min-w-0 max-w-full space-y-2'>
+					{blocks.map((block) => (
+						<PageBlockEditorRow
+							key={block.id}
+							block={block}
+							shareToken={shareToken}
+						/>
+					))}
 
-				{blocks.length === 0 && (
-					<EmptyPageBlockRow pageId={pageId} shareToken={shareToken} />
-				)}
-			</div>
+					{blocks.length === 0 ? (
+						<EmptyPageBlockRow pageId={pageId} shareToken={shareToken} />
+					) : (
+						<AddBlockBelow
+							pageId={pageId}
+							blocks={blocks}
+							shareToken={shareToken}
+						/>
+					)}
+				</div>
+			</BlockDragProvider>
 		</PageBlockEditorProvider>
 	);
 }

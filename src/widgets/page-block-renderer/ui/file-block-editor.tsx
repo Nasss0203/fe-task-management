@@ -187,7 +187,7 @@ export function FileBlockEditor({ block, shareToken }: FileBlockEditorProps) {
 
 	if (!content.attachmentId) {
 		return (
-			<div className='w-full rounded-md border border-border bg-muted/20 p-3'>
+			<div className='w-full rounded-md bg-muted/50 px-3 py-2.5 transition-colors hover:bg-muted/80'>
 				<input
 					ref={fileInputRef}
 					type='file'
@@ -196,36 +196,38 @@ export function FileBlockEditor({ block, shareToken }: FileBlockEditorProps) {
 					onChange={handleUpload}
 				/>
 
-				<div className='flex items-center gap-3'>
-					<div className='flex size-9 shrink-0 items-center justify-center rounded-md bg-muted'>
-						<FileIcon className='size-4 text-muted-foreground' />
+				<div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
+					<div className='flex min-w-0 flex-1 items-center gap-3'>
+						<div className='flex shrink-0 items-center text-muted-foreground'>
+							<FileIcon className='size-5' />
+						</div>
+
+						<div className='min-w-0'>
+							<div className='text-sm text-muted-foreground'>Add a file</div>
+						</div>
 					</div>
 
-					<div className='min-w-0 flex-1'>
-						<div className='text-sm font-medium'>Add a file</div>
+					<div className='shrink-0'>
+						<button
+							type='button'
+							disabled={
+								!page?.workspace_id ||
+								Boolean(shareToken) ||
+								uploadAttachment.isPending
+							}
+							onClick={() => fileInputRef.current?.click()}
+							className='inline-flex h-8 items-center gap-1.5 rounded-md bg-background/40 px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
+						>
+							{uploadAttachment.isPending ? (
+								<Loader2Icon className='size-3.5 animate-spin' />
+							) : (
+								<UploadIcon className='size-3.5' />
+							)}
 
-						<div className='mt-2'>
-							<button
-								type='button'
-								disabled={
-									!page?.workspace_id ||
-									Boolean(shareToken) ||
-									uploadAttachment.isPending
-								}
-								onClick={() => fileInputRef.current?.click()}
-								className='inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-xs font-medium hover:bg-muted disabled:pointer-events-none disabled:opacity-50'
-							>
-								{uploadAttachment.isPending ? (
-									<Loader2Icon className='size-3.5 animate-spin' />
-								) : (
-									<UploadIcon className='size-3.5' />
-								)}
-
-								{uploadAttachment.isPending
-									? "Uploading..."
-									: "Upload"}
-							</button>
-						</div>
+							{uploadAttachment.isPending
+								? "Uploading..."
+								: "Upload"}
+						</button>
 					</div>
 				</div>
 

@@ -124,7 +124,7 @@ export function ImageBlockEditor({ block, shareToken }: ImageBlockEditorProps) {
 
 	if (!content.url) {
 		return (
-			<div className='w-full rounded-md border border-border bg-muted/20 p-3'>
+			<div className='w-full rounded-md bg-muted/50 px-3 py-2.5 transition-colors hover:bg-muted/80'>
 				<input
 					ref={fileInputRef}
 					type='file'
@@ -135,8 +135,10 @@ export function ImageBlockEditor({ block, shareToken }: ImageBlockEditorProps) {
 				/>
 
 				{showEmbedInput ? (
-					<div className='flex items-center gap-2'>
-						<LinkIcon className='size-4 shrink-0 text-muted-foreground' />
+					<div className='flex items-center gap-3'>
+						<div className='flex shrink-0 items-center text-muted-foreground'>
+							<LinkIcon className='size-4' />
+						</div>
 
 						<input
 							key='image-url-input'
@@ -163,52 +165,55 @@ export function ImageBlockEditor({ block, shareToken }: ImageBlockEditorProps) {
 						<button
 							type='button'
 							onClick={handleEmbed}
-							className='rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-muted'
+							disabled={!urlInput.trim()}
+							className='inline-flex h-8 items-center rounded-md bg-background/40 px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
 						>
 							Embed
 						</button>
 					</div>
 				) : (
-					<div className='flex items-center gap-3'>
-						<div className='flex size-9 shrink-0 items-center justify-center rounded-md bg-muted'>
-							<ImageIcon className='size-4 text-muted-foreground' />
+					<div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
+						<div className='flex min-w-0 flex-1 items-center gap-3'>
+							<div className='flex shrink-0 items-center text-muted-foreground'>
+								<ImageIcon className='size-5' />
+							</div>
+
+							<div className='min-w-0'>
+								<div className='text-sm text-muted-foreground'>
+									Add an image
+								</div>
+							</div>
 						</div>
 
-						<div className='min-w-0 flex-1'>
-							<div className='text-sm font-medium'>
-								Add an image
-							</div>
+						<div className='flex shrink-0 items-center gap-2'>
+							<button
+								type='button'
+								disabled={
+									!page?.workspace_id ||
+									Boolean(shareToken) ||
+									uploadAttachment.isPending
+								}
+								onClick={() =>
+									fileInputRef.current?.click()
+								}
+								className='inline-flex h-8 items-center gap-1.5 rounded-md bg-background/40 px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
+							>
+								<UploadIcon className='size-3.5' />
 
-							<div className='mt-2 flex items-center gap-2'>
-								<button
-									type='button'
-									disabled={
-										!page?.workspace_id ||
-										Boolean(shareToken) ||
-										uploadAttachment.isPending
-									}
-									onClick={() =>
-										fileInputRef.current?.click()
-									}
-									className='inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-xs font-medium hover:bg-muted disabled:pointer-events-none disabled:opacity-50'
-								>
-									<UploadIcon className='size-3.5' />
+								{uploadAttachment.isPending
+									? "Uploading..."
+									: "Upload"}
+							</button>
 
-									{uploadAttachment.isPending
-										? "Uploading..."
-										: "Upload"}
-								</button>
-
-								<button
-									type='button'
-									disabled={uploadAttachment.isPending}
-									onClick={() => setShowEmbedInput(true)}
-									className='inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-xs font-medium hover:bg-muted disabled:pointer-events-none disabled:opacity-50'
-								>
-									<LinkIcon className='size-3.5' />
-									Embed link
-								</button>
-							</div>
+							<button
+								type='button'
+								disabled={uploadAttachment.isPending}
+								onClick={() => setShowEmbedInput(true)}
+								className='inline-flex h-8 items-center gap-1.5 rounded-md bg-background/40 px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
+							>
+								<LinkIcon className='size-3.5' />
+								Embed link
+							</button>
 						</div>
 					</div>
 				)}

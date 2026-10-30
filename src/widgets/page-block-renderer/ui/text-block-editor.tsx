@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-tree";
 import {
 	useCreatePageBlock,
+	useCreatePageBlockColumns,
 	useDeletePageBlock,
 	useTransformToDatabaseBlock,
 	useUpdatePageBlock,
@@ -48,6 +49,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 	const transformToDatabaseBlock = useTransformToDatabaseBlock();
 	const deleteBlock = useDeletePageBlock(shareToken);
 	const createBlock = useCreatePageBlock(shareToken);
+	const createColumns = useCreatePageBlockColumns(shareToken);
 
 	const [value, setValue] = useState(() => getText(block));
 
@@ -133,8 +135,31 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 		type,
 		styleConfig,
 		viewType,
+		columnCount,
 	}: PageBlockCommand) => {
 		if (slashIndex === null) {
+			return;
+		}
+
+		if (columnCount) {
+			setCommandOpen(false);
+			setSlashIndex(null);
+			// This block (without the "/") becomes the first column.
+			const text = value.slice(0, slashIndex) + value.slice(slashIndex + 1);
+			setValue(text);
+			if (text !== getText(block)) {
+				await updateBlock.mutateAsync({
+					blockId: block.id,
+					pageId: block.page_id,
+					content: { text },
+				});
+			}
+			await createColumns.mutateAsync({
+				pageId: block.page_id,
+				parentBlockId: block.parent_block_id,
+				blockId: block.id,
+				count: columnCount,
+			});
 			return;
 		}
 
@@ -331,7 +356,6 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 		        leading-7
 		        outline-none
 		        placeholder:text-transparent
-		        hover:placeholder:text-muted-foreground/40
 		        focus:placeholder:text-muted-foreground/50
 		        focus-visible:ring-0
 		      `,

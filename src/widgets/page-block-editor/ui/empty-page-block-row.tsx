@@ -6,6 +6,7 @@ import { useState } from "react";
 import {
 	useCreateDatabaseBlock,
 	useCreatePageBlock,
+	useCreatePageBlockColumns,
 } from "@/entities/page-block/model/page-block.mutations";
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
 
@@ -15,6 +16,7 @@ import {
 	PageBlockCommand,
 	PageBlockCommandMenu,
 } from "./page-block-command-menu";
+import { usePageBlockEditor } from "./page-block-editor-context";
 
 interface EmptyPageBlockRowProps {
 	pageId: string;
@@ -26,11 +28,31 @@ export function EmptyPageBlockRow({ pageId, shareToken }: EmptyPageBlockRowProps
 
 	const createBlockMutation = useCreatePageBlock(shareToken);
 	const createDatabaseBlockMutation = useCreateDatabaseBlock();
+	const createColumnsMutation = useCreatePageBlockColumns(shareToken);
+	const { requestFocus } = usePageBlockEditor();
 
 	const isPending =
 		createBlockMutation.isPending || createDatabaseBlockMutation.isPending;
 
-	const handleSelect = ({ type, styleConfig, viewType }: PageBlockCommand) => {
+	const handleSelect = ({
+		type,
+		styleConfig,
+		viewType,
+		columnCount,
+	}: PageBlockCommand) => {
+		if (columnCount) {
+			createColumnsMutation.mutate(
+				{ pageId, parentBlockId: null, count: columnCount },
+				{
+					onSuccess: (firstBlockId) => {
+						setOpen(false);
+						requestFocus(firstBlockId);
+					},
+				},
+			);
+			return;
+		}
+
 		// Database cần tạo database + view trước rồi mới tạo block (giống các dòng khác)
 		if (type === PageBlockType.DATABASE_VIEW) {
 			if (shareToken) return;

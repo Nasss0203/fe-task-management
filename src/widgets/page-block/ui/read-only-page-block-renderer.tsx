@@ -27,6 +27,7 @@ import {
 	EmptyValue,
 } from "@/entities/page-block/ui/read-only-block-content";
 import { Separator } from "@/shared/ui/separator";
+import { columnRatio } from "@/widgets/page-block-renderer/lib/column-widths";
 import type { PublicDatabase } from "@/entities/public-site/model/public-site.types";
 import {
 	ReadOnlyDatabaseTable,
@@ -51,6 +52,41 @@ interface ReadOnlyPageBlockRendererProps {
 	block: ReadOnlyPageBlockNode;
 	shareToken?: string;
 	disableDatabaseView?: boolean;
+}
+
+/** Columns side by side (stacked on a phone), with no borders or handles. */
+function ReadOnlyColumnList({
+	block,
+	shareToken,
+	disableDatabaseView,
+}: ReadOnlyPageBlockRendererProps) {
+	const columns = block.children;
+
+	return (
+		<div className='flex w-full flex-col gap-x-8 md:flex-row'>
+			{columns.map((column) => (
+				<div
+					key={column.id}
+					className='min-w-0'
+					style={{ flex: `${columnRatio(column, columns.length)} 1 0%` }}
+				>
+					{column.children.map((child) => (
+						<div
+							key={child.id}
+							id={`block-${child.id}`}
+							className='rounded-md transition-colors duration-500'
+						>
+							<ReadOnlyPageBlockRenderer
+								block={child}
+								shareToken={shareToken}
+								disableDatabaseView={disableDatabaseView}
+							/>
+						</div>
+					))}
+				</div>
+			))}
+		</div>
+	);
 }
 
 function ReadOnlyToggleBlock({
@@ -135,6 +171,14 @@ export function ReadOnlyPageBlockRenderer({
 			return <TableOfContentsBlock headings={block.toc_headings ?? []} />;
 		case PageBlockType.MERMAID:
 			return <ReadOnlyMermaidBlock block={block} />;
+		case PageBlockType.COLUMN_LIST:
+			return (
+				<ReadOnlyColumnList
+					block={block}
+					shareToken={shareToken}
+					disableDatabaseView={disableDatabaseView}
+				/>
+			);
 		case PageBlockType.TOGGLE:
 			return (
 				<ReadOnlyToggleBlock

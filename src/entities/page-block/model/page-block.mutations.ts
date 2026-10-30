@@ -17,7 +17,7 @@ import { usePageBlockRowId } from "./page-block-row-scope";
 import { pageBlockKeys } from "./page-block.queries";
 
 /** The list a block lives in: a task's content when `rowId` is set, else the page's. */
-function blockListKey(pageId: string, shareToken?: string, rowId?: string | null) {
+export function blockListKey(pageId: string, shareToken?: string, rowId?: string | null) {
 	if (rowId) {
 		return shareToken
 			? pageBlockKeys.sharedByRow(rowId, shareToken)
@@ -274,6 +274,72 @@ export function useTransformToDatabaseBlock() {
 		},
 
 		onError: () => notifyBlockWriteError(),
+	});
+}
+
+interface CreatePageBlockColumnsInput {
+	pageId: string;
+	parentBlockId: string | null;
+	/** How many columns the row gets (2–5). */
+	count: number;
+	/** An existing block that becomes the first column ("Turn into", "/" in a text). */
+	blockId?: string;
+	/** Otherwise the row goes right after this block (null = top of the page). */
+	afterBlockId?: string | null;
+}
+
+/**
+ * "2 columns" / "3 columns": adds an empty text block for every column that
+ * has no block yet, then puts them side by side in one request.
+ */
+export function useCreatePageBlockColumns(shareToken?: string) {
+	const queryClient = useQueryClient();
+	const rowId = usePageBlockRowId();
+
+	return useMutation({
+		mutationKey: [...pageBlockKeys.all, "columns", shareToken ?? null],
+		mutationFn: async ({
+			pageId,
+			parentBlockId,
+			count,
+			blockId,
+			afterBlockId = null,
+		}: CreatePageBlockColumnsInput) => {
+			const blockIds = blockId ? [blockId] : [];
+			let after = blockId ?? afterBlockId;
+
+			while (blockIds.length < count) {
+				const created = await pageBlockApi.create(
+					{
+						page_id: pageId,
+						row_id: rowId,
+						parent_block_id: parentBlockId,
+						after_block_id: after,
+						type: PageBlockType.TEXT,
+						content: { text: "" },
+					},
+					shareToken,
+				);
+				blockIds.push(created.id);
+				after = created.id;
+			}
+
+			await pageBlockApi.createColumns(
+				{ page_id: pageId, block_ids: blockIds },
+				shareToken,
+			);
+			// The first column's block, to put the cursor there.
+			return blockIds[0];
+		},
+
+		// Refresh even after a failure: empty blocks may already exist.
+		onSettled: async (_, __, variables) => {
+			await queryClient.invalidateQueries({
+				queryKey: blockListKey(variables.pageId, shareToken, rowId),
+				exact: true,
+			});
+		},
+		onError: () => notifyBlockWriteError(shareToken),
 	});
 }
 

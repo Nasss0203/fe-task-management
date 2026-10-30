@@ -49,9 +49,11 @@ export function EmbedBlockEditor({ block, shareToken }: EmbedBlockEditorProps) {
 
 	if (!embed || editing) {
 		return (
-			<div className='w-full rounded-md border border-border bg-muted/20 p-3'>
-				<div className='flex items-center gap-2'>
-					<LinkIcon className='size-4 shrink-0 text-muted-foreground' />
+			<div className='w-full rounded-md bg-muted/50 px-3 py-2.5 transition-colors hover:bg-muted/80'>
+				<div className='flex items-center gap-3'>
+					<div className='flex shrink-0 items-center text-muted-foreground'>
+						<LinkIcon className='size-4' />
+					</div>
 
 					<input
 						type='url'
@@ -75,7 +77,8 @@ export function EmbedBlockEditor({ block, shareToken }: EmbedBlockEditorProps) {
 					<button
 						type='button'
 						onClick={handleSave}
-						className='rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-muted'
+						disabled={!urlInput.trim()}
+						className='inline-flex h-8 items-center rounded-md bg-background/40 px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
 					>
 						Embed
 					</button>

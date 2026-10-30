@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
 import { EmptyPageBlockRow } from "@/widgets/page-block-editor/ui/empty-page-block-row";
+import { PageBlockEditorProvider } from "@/widgets/page-block-editor/ui/page-block-editor-context";
 import { renderWithClient } from "../utils/test-utils";
 
 const http = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() }));
@@ -28,7 +29,11 @@ beforeEach(() => {
 describe("EmptyPageBlockRow", () => {
 	it("creates a database table as the first block of an empty page", async () => {
 		const user = userEvent.setup();
-		renderWithClient(<EmptyPageBlockRow pageId='page-1' />);
+		renderWithClient(
+			<PageBlockEditorProvider orderedBlockIds={[]}>
+				<EmptyPageBlockRow pageId='page-1' />
+			</PageBlockEditorProvider>,
+		);
 
 		await user.click(screen.getByRole("button", { name: /Press/ }));
 		await user.click(await screen.findByText("Table view"));
@@ -50,7 +55,11 @@ describe("EmptyPageBlockRow", () => {
 
 	it("creates a board when Board view is picked", async () => {
 		const user = userEvent.setup();
-		renderWithClient(<EmptyPageBlockRow pageId='page-1' />);
+		renderWithClient(
+			<PageBlockEditorProvider orderedBlockIds={[]}>
+				<EmptyPageBlockRow pageId='page-1' />
+			</PageBlockEditorProvider>,
+		);
 
 		await user.click(screen.getByRole("button", { name: /Press/ }));
 		await user.click(await screen.findByText("Board view"));

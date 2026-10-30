@@ -14,6 +14,7 @@ import {
 import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-tree";
 
 import {
+	useCreatePageBlockColumns,
 	useDeletePageBlock,
 	useDuplicatePageBlock,
 	useUpdatePageBlock,
@@ -34,8 +35,10 @@ import {
 
 import { useState } from "react";
 
+import { useIsInColumn } from "./column-scope";
 import {
 	type CommandItemData,
+	LAYOUT_BLOCKS,
 	TURN_INTO_BLOCKS,
 } from "./page-block-command-menu";
 import { usePageBlockEditor } from "./page-block-editor-context";
@@ -81,6 +84,13 @@ export function PageBlockActionMenu({
 	const updateBlock = useUpdatePageBlock(shareToken);
 
 	const deleteBlock = useDeletePageBlock(shareToken);
+
+	const createColumns = useCreatePageBlockColumns(shareToken);
+
+	// Columns don't nest: "Turn into 2 columns" only outside a column.
+	const turnIntoOptions = useIsInColumn()
+		? TURN_INTO_BLOCKS
+		: [...TURN_INTO_BLOCKS, ...LAYOUT_BLOCKS];
 
 	const handleCopyLink = async () => {
 		const url =
@@ -129,6 +139,18 @@ export function PageBlockActionMenu({
 
 		if (isCurrentOption(option)) {
 			onClose?.();
+			return;
+		}
+
+		// This block becomes the first column; the others start empty.
+		if (option.columnCount) {
+			onClose?.();
+			await createColumns.mutateAsync({
+				pageId: block.page_id,
+				parentBlockId: block.parent_block_id,
+				blockId: block.id,
+				count: option.columnCount,
+			});
 			return;
 		}
 
@@ -222,7 +244,7 @@ export function PageBlockActionMenu({
 					<CommandEmpty>No results.</CommandEmpty>
 
 					<CommandGroup>
-						{TURN_INTO_BLOCKS.map((option) => {
+						{turnIntoOptions.map((option) => {
 							const Icon = option.icon;
 
 							return (

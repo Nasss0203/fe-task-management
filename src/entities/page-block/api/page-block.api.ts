@@ -94,6 +94,35 @@ export const pageBlockApi = {
 		return response.data.data;
 	},
 
+	/** Moves a block under `target_parent_block_id` (null = root) at `target_order_index`. */
+	move: async (
+		blockId: string,
+		input: { target_parent_block_id: string | null; target_order_index: number },
+		shareToken?: string,
+	): Promise<PageBlock> => {
+		const response = await instance.patch<ApiResponse<PageBlock>>(
+			`${PAGE_BLOCK_API}/${blockId}/move`,
+			input,
+			{ headers: getShareHeaders(shareToken) },
+		);
+
+		return response.data.data;
+	},
+
+	/** Sets blocks side by side in a new column row, where the first one was. */
+	createColumns: async (
+		input: { page_id: string; block_ids: string[] },
+		shareToken?: string,
+	): Promise<PageBlock> => {
+		const response = await instance.post<ApiResponse<PageBlock>>(
+			"/pageBlock/columns",
+			input,
+			{ headers: getShareHeaders(shareToken) },
+		);
+
+		return response.data.data;
+	},
+
 	duplicate: async (blockId: string, shareToken?: string): Promise<PageBlock> => {
 		const response = await instance.post<ApiResponse<PageBlock>>(
 			`/pageBlock/${blockId}/duplicate`,
