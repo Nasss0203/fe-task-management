@@ -65,7 +65,11 @@ function ReadOnlySectionBlock({
 }: ReadOnlyPageBlockRendererProps) {
 	const [isOpen, setIsOpen] = useState(block.is_open);
 	const form = getSectionForm(block.data_config);
-	const formDatabase = useFormDatabase(form, shareToken);
+	const { data: formDatabase, isError: formUnavailable } = useFormDatabase(
+		block,
+		form,
+		shareToken,
+	);
 	const renderChild = (child: ReadOnlyPageBlockNode) => (
 		<ReadOnlyPageBlockRenderer
 			block={child}
@@ -75,6 +79,33 @@ function ReadOnlySectionBlock({
 	);
 	const title = getString(getContent(block), "title");
 	const description = getString(getContent(block), "description");
+
+	if (form && formDatabase) {
+		return (
+			<section
+				aria-label={title || "Form"}
+				className={`w-full rounded-xl border border-border/60 px-4 py-8 sm:px-8 ${CALLOUT_TONES[getCalloutTone(block.style_config)].className}`}
+			>
+				<div className='mx-auto mb-6 max-w-xl'>
+					{title && <h2 className='text-xl font-semibold'>{title}</h2>}
+					{description && (
+						<p className='mt-1 text-sm leading-6 text-muted-foreground'>
+							{description}
+						</p>
+					)}
+				</div>
+				<div data-read-only-allowed>
+					<FormFill
+						section={block}
+						form={form}
+						database={formDatabase}
+						shareToken={shareToken}
+						renderBlock={(child) => renderChild(child as ReadOnlyPageBlockNode)}
+					/>
+				</div>
+			</section>
+		);
+	}
 
 	return (
 		<section
@@ -113,19 +144,11 @@ function ReadOnlySectionBlock({
 							{description}
 						</p>
 					)}
-					{form && formDatabase ? (
-						<div className='ml-8 mt-2'>
-							<FormFill
-								section={block}
-								form={form}
-								database={formDatabase}
-								shareToken={shareToken}
-								renderBlock={(child) =>
-									renderChild(child as ReadOnlyPageBlockNode)
-								}
-							/>
-						</div>
-					) : (
+					{form && formUnavailable && (
+						<p className='ml-8 mt-1 text-sm text-destructive'>
+							This form is not available right now.
+						</p>
+					)}
 					<div className='ml-8 mt-1'>
 						{block.children.map((child) => (
 							<div
@@ -141,7 +164,6 @@ function ReadOnlySectionBlock({
 							</div>
 						))}
 					</div>
-					)}
 				</div>
 			)}
 		</section>
@@ -265,6 +287,9 @@ export function ReadOnlyPageBlockRenderer({
 			return <TableOfContentsBlock headings={block.toc_headings ?? []} />;
 		case PageBlockType.MERMAID:
 			return <ReadOnlyMermaidBlock block={block} />;
+		// Questions only exist inside FormFill: without the form there is nothing to show.
+		case PageBlockType.FORM_FIELD:
+			return null;
 		case PageBlockType.SECTION:
 			return (
 				<ReadOnlySectionBlock

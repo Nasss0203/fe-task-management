@@ -33,6 +33,7 @@ export const databaseApi = {
 		pageId: string,
 		input: {
 			name: string;
+			title_only?: boolean;
 		},
 	): Promise<Database> => {
 		const response = await instance.post<ApiResponse<Database>>(

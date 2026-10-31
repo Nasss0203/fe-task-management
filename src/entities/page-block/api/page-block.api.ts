@@ -1,6 +1,8 @@
 import type { ApiResponse } from "@/shared/api";
 import instance from "@/shared/api/api-client";
 
+import type { FormDatabase } from "@/entities/database/model/database.types";
+
 import type {
 	BookmarkMetadata,
 	PageBlock,
@@ -104,6 +106,19 @@ export const pageBlockApi = {
 			`${PAGE_BLOCK_API}/${blockId}/move`,
 			input,
 			{ headers: getShareHeaders(shareToken) },
+		);
+
+		return response.data.data;
+	},
+
+	getFormDatabase: async (
+		sectionBlockId: string,
+		signal?: AbortSignal,
+		shareToken?: string,
+	): Promise<FormDatabase> => {
+		const response = await instance.get<ApiResponse<FormDatabase>>(
+			`/forms/${sectionBlockId}`,
+			{ signal, headers: getShareHeaders(shareToken) },
 		);
 
 		return response.data.data;

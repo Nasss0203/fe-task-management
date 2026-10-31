@@ -3,6 +3,7 @@
 import { ChevronRight, Palette, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+import { useDatabase } from "@/entities/database/model/database.queries";
 import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-tree";
 import {
 	useCreatePageBlock,
@@ -20,9 +21,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 import { InSectionProvider } from "@/widgets/page-block-editor/ui/column-scope";
 import { usePageBlockEditor } from "@/widgets/page-block-editor/ui/page-block-editor-context";
 import { PageBlockEditorRow } from "@/widgets/page-block-editor/ui/page-block-editor-row";
+import { ReadOnlyPageBlockRenderer } from "@/widgets/page-block/ui/read-only-page-block-renderer";
 
 import { getSectionForm } from "../lib/form-config";
-import { FormDatabaseProvider } from "./form-field-block-editor";
+import {
+	FormDatabaseProvider,
+	FormQuestionsProvider,
+} from "./form-field-block-editor";
 import {
 	AddQuestionButton,
 	FillFormButton,
@@ -65,7 +70,15 @@ export function SectionBlockEditor({
 	const { focusBlockId, requestFocus, clearFocus } = usePageBlockEditor();
 	const tone = getCalloutTone(block.style_config);
 	const form = getSectionForm(block.data_config);
-	const formDatabase = useFormDatabase(form, shareToken);
+	const { data: formDatabase, isError: formUnavailable } = useFormDatabase(
+		block,
+		form,
+		shareToken,
+	);
+	const { isError: cannotManageForm } = useDatabase(
+		form?.database_id,
+		Boolean(form),
+	);
 	const hasQuestions = block.children.some(
 		(child) => child.type === PageBlockType.FORM_FIELD,
 	);
@@ -144,6 +157,18 @@ export function SectionBlockEditor({
 
 	const isEnter = (event: React.KeyboardEvent<HTMLInputElement>) =>
 		event.key === "Enter" && !event.nativeEvent.isComposing;
+
+	// Editing this page doesn't reach the form's database: fill the form, don't configure it.
+	if (cannotManageForm) {
+		return (
+			<ReadOnlyPageBlockRenderer
+				block={
+					block as Parameters<typeof ReadOnlyPageBlockRenderer>[0]["block"]
+				}
+				shareToken={shareToken}
+			/>
+		);
+	}
 
 	return (
 		<section
@@ -262,6 +287,7 @@ export function SectionBlockEditor({
 
 					<InSectionProvider value>
 						<FormDatabaseProvider value={formDatabase ?? null}>
+							<FormQuestionsProvider value={block.children}>
 							{block.children.length > 0 ? (
 								<div className='mt-1 space-y-1'>
 									{block.children.map((child) => (
@@ -282,11 +308,16 @@ export function SectionBlockEditor({
 									Add a block
 								</button>
 							)}
+							{form && formUnavailable && (
+								<p className='mt-1 ml-15 text-sm text-destructive'>
+									This form&apos;s database is no longer available.
+								</p>
+							)}
 							{form && formDatabase && (
 								<div className='mt-1 ml-14 flex flex-wrap items-center gap-1'>
 									<AddQuestionButton
 										block={block}
-										database={formDatabase}
+										databaseId={form.database_id}
 										shareToken={shareToken}
 									/>
 									{hasQuestions && (
@@ -300,6 +331,7 @@ export function SectionBlockEditor({
 									)}
 								</div>
 							)}
+							</FormQuestionsProvider>
 						</FormDatabaseProvider>
 					</InSectionProvider>
 				</>

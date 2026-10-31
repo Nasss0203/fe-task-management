@@ -49,6 +49,12 @@ export interface Database {
 	properties: DatabaseProperty[];
 }
 
+/** What a form exposes to the people filling it: only its questions' columns. */
+export interface FormDatabase {
+	id: string;
+	properties: Omit<DatabaseProperty, "isDefault" | "isHideable">[];
+}
+
 export interface DatabaseView {
 	id: string;
 	databaseId: string;

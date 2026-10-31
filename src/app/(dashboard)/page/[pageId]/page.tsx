@@ -16,6 +16,7 @@ import {
 } from "@/entities/page/ui/page-surface";
 import { PageUnavailable } from "@/entities/page/ui/page-unavailable";
 
+import { EditablePageTitle } from "@/features/page/ui/editable-page-title";
 import { PageEditAccessBoundary } from "@/features/page-access/ui/page-edit-access-boundary";
 import { RequestEditAccessDialog } from "@/features/page-edit-access/ui/request-edit-access-dialog";
 
@@ -67,7 +68,20 @@ export default function PageDetail() {
 
 			{/* Hover tiêu đề thì hiện "Add comment", giống Notion */}
 			<div className='group/page-title'>
-				<PageHeader icon={page.icon} title={page.title} />
+				<PageHeader
+					icon={page.icon}
+					title={page.title}
+					titleEditor={
+						page.canEdit ? (
+							<EditablePageTitle
+								key={page.title}
+								pageId={page.id}
+								workspaceId={page.workspace_id}
+								title={page.title}
+							/>
+						) : undefined
+					}
+				/>
 
 				<PageDiscussion pageId={page.id} />
 			</div>

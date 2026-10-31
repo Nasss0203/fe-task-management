@@ -7,6 +7,7 @@ import {
 	useCreatePageBlock,
 	useCreatePageBlockColumns,
 	useDeletePageBlock,
+	useCreateForm,
 	useWrapInSection,
 	useTransformToDatabaseBlock,
 	useUpdatePageBlock,
@@ -52,6 +53,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 	const createBlock = useCreatePageBlock(shareToken);
 	const createColumns = useCreatePageBlockColumns(shareToken);
 	const wrapInSection = useWrapInSection(shareToken);
+	const createForm = useCreateForm();
 
 	const [value, setValue] = useState(() => getText(block));
 
@@ -138,8 +140,30 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 		styleConfig,
 		viewType,
 		columnCount,
+		isForm,
 	}: PageBlockCommand) => {
 		if (slashIndex === null) {
+			return;
+		}
+
+		if (isForm) {
+			setCommandOpen(false);
+			setSlashIndex(null);
+			const text = value.slice(0, slashIndex) + value.slice(slashIndex + 1);
+			setValue(text);
+			if (text !== getText(block)) {
+				await updateBlock.mutateAsync({
+					blockId: block.id,
+					pageId: block.page_id,
+					content: { text },
+				});
+			}
+			const { section } = await createForm.mutateAsync({
+				pageId: block.page_id,
+				parentBlockId: block.parent_block_id,
+				afterBlockId: block.id,
+			});
+			requestFocus(section.id);
 			return;
 		}
 

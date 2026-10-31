@@ -78,7 +78,7 @@ describe("FormFill", () => {
 		expect(screen.getByText("Tell us")).toBeInTheDocument();
 		await user.type(screen.getByLabelText(/Name/), "Lan");
 		await user.type(screen.getByLabelText("Email"), "lan@example.com");
-		await user.selectOptions(screen.getByLabelText("Team"), "fe");
+		await user.click(screen.getByRole("radio", { name: "Frontend" }));
 		await user.click(screen.getByRole("button", { name: "Join" }));
 
 		await waitFor(() =>
@@ -91,6 +91,71 @@ describe("FormFill", () => {
 		expect(await screen.findByText("Welcome!")).toBeInTheDocument();
 	});
 
+	it("marks unanswered required questions without sending", async () => {
+		const user = userEvent.setup();
+		renderForm();
+
+		await user.click(screen.getByRole("button", { name: "Join" }));
+
+		const name = screen.getByLabelText(/Name/);
+		expect(screen.getByRole("alert")).toHaveTextContent("This question is required.");
+		expect(name).toHaveAttribute("aria-invalid", "true");
+		expect(name).toHaveFocus();
+		expect(http.post).not.toHaveBeenCalled();
+
+		await user.type(name, "L");
+		expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+	});
+
+	it("shows a follow-up checkbox as a row of the question it depends on", async () => {
+		const user = userEvent.setup();
+		const withCheckbox = {
+			...database,
+			properties: [
+				...database.properties,
+				{ id: "react", name: "ReactJS", type: PropertyType.CHECKBOX, options: [], position: "3", isDefault: false, isHideable: true },
+			],
+		} as Database;
+		renderWithClient(
+			<FormFill
+				section={{
+					...section,
+					children: [
+						field("q-team", "team"),
+						{
+							...field("q-react", "react"),
+							data_config: {
+								property_id: "react",
+								show_when: { property_id: "team", option_id: "fe" },
+							},
+						},
+					],
+				}}
+				form={{ database_id: "db-1" }}
+				database={withCheckbox}
+				renderBlock={() => null}
+			/>,
+		);
+
+		expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+		await user.click(screen.getByRole("radio", { name: "Frontend" }));
+
+		expect(screen.getByRole("checkbox", { name: "ReactJS" })).toBeInTheDocument();
+		expect(screen.queryByText("Yes")).not.toBeInTheDocument();
+	});
+
+	it("clears a single choice on a second click", async () => {
+		http.post.mockResolvedValue({ data: { data: { row_id: "row-1", success_message: null } } });
+		const user = userEvent.setup();
+		renderForm();
+
+		const option = screen.getByRole("radio", { name: "Frontend" });
+		await user.click(option);
+		expect(option).toBeChecked();
+		await user.click(option);
+		expect(option).not.toBeChecked();
+	});
+
 	it("shows the server's reason when the answer is refused", async () => {
 		http.post.mockRejectedValue(
 			Object.assign(new Error("Bad"), {
@@ -101,6 +166,7 @@ describe("FormFill", () => {
 		const user = userEvent.setup();
 		renderForm();
 
+		await user.type(screen.getByLabelText(/Name/), "Lan");
 		await user.click(screen.getByRole("button", { name: "Join" }));
 
 		expect(await screen.findByRole("alert")).toHaveTextContent('"Name" is required');

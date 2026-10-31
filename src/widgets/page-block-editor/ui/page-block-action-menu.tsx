@@ -353,14 +353,16 @@ export function PageBlockActionMenu({
 						Copy link to block
 					</CommandItem>
 
-					<CommandItem
-						onSelect={() => void handleDuplicate()}
-						className='h-10 cursor-pointer gap-2.5'
-					>
-						<Copy className='size-4' />
-						Duplicate
-						<CommandShortcut>Ctrl+D</CommandShortcut>
-					</CommandItem>
+					{block.type !== PageBlockType.FORM_FIELD && (
+						<CommandItem
+							onSelect={() => void handleDuplicate()}
+							className='h-10 cursor-pointer gap-2.5'
+						>
+							<Copy className='size-4' />
+							Duplicate
+							<CommandShortcut>Ctrl+D</CommandShortcut>
+						</CommandItem>
+					)}
 
 					{onComment && (
 						<CommandItem

@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import {
 	useCreateDatabaseBlock,
+	useCreateForm,
 	useCreatePageBlock,
 	useCreatePageBlockColumns,
 } from "@/entities/page-block/model/page-block.mutations";
@@ -28,18 +29,35 @@ export function EmptyPageBlockRow({ pageId, shareToken }: EmptyPageBlockRowProps
 
 	const createBlockMutation = useCreatePageBlock(shareToken);
 	const createDatabaseBlockMutation = useCreateDatabaseBlock();
+	const createFormMutation = useCreateForm();
 	const createColumnsMutation = useCreatePageBlockColumns(shareToken);
 	const { requestFocus } = usePageBlockEditor();
 
 	const isPending =
-		createBlockMutation.isPending || createDatabaseBlockMutation.isPending;
+		createBlockMutation.isPending ||
+		createDatabaseBlockMutation.isPending ||
+		createFormMutation.isPending;
 
 	const handleSelect = ({
 		type,
 		styleConfig,
 		viewType,
 		columnCount,
+		isForm,
 	}: PageBlockCommand) => {
+		if (isForm) {
+			createFormMutation.mutate(
+				{ pageId, parentBlockId: null },
+				{
+					onSuccess: ({ section }) => {
+						setOpen(false);
+						requestFocus(section.id);
+					},
+				},
+			);
+			return;
+		}
+
 		if (columnCount) {
 			createColumnsMutation.mutate(
 				{ pageId, parentBlockId: null, count: columnCount },

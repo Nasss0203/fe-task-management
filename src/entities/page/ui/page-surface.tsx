@@ -21,10 +21,12 @@ export function PageCover({
 export function PageHeader({
 	icon,
 	title,
+	titleEditor,
 	className,
 }: {
 	icon?: string | null;
 	title?: string | null;
+	titleEditor?: ReactNode;
 	className?: string;
 }) {
 	return (
@@ -35,7 +37,9 @@ export function PageHeader({
 			)}
 		>
 			<div className='mb-3 text-5xl'>{icon || "📄"}</div>
-			<h1 className='text-4xl font-bold'>{title || "Untitled"}</h1>
+			<h1 className='min-w-0 flex-1 text-4xl font-bold'>
+				{titleEditor ?? (title || "Untitled")}
+			</h1>
 		</div>
 	);
 }

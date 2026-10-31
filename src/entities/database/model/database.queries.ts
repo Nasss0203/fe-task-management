@@ -1,4 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
+
+import { pageBlockApi } from "@/entities/page-block/api/page-block.api";
 
 import { databaseApi } from "../api/database.api";
 
@@ -42,6 +45,10 @@ export function useDatabase(databaseId?: string, enabled = true) {
 		queryFn: ({ signal }) => databaseApi.getById(databaseId!, signal),
 
 		enabled: Boolean(databaseId) && enabled,
+
+		retry: (failureCount, error) =>
+			!(isAxiosError(error) && error.response?.status === 403) &&
+			failureCount < 3,
 	});
 }
 
@@ -57,6 +64,29 @@ export function useSharedDatabase(
 			databaseApi.getById(databaseId!, signal, shareToken!),
 
 		enabled: Boolean(databaseId) && Boolean(shareToken) && enabled,
+	});
+}
+
+/** Under `detail` so it refreshes whenever the database does. */
+export function useFormDatabaseQuery(
+	databaseId: string | undefined,
+	sectionBlockId: string,
+	questions: string,
+	shareToken?: string,
+) {
+	return useQuery({
+		queryKey: [
+			...databaseKeys.detail(databaseId ?? ""),
+			"form",
+			sectionBlockId,
+			questions,
+			shareToken ?? null,
+		],
+
+		queryFn: ({ signal }) =>
+			pageBlockApi.getFormDatabase(sectionBlockId, signal, shareToken),
+
+		enabled: Boolean(databaseId),
 	});
 }
 

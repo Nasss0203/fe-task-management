@@ -3,11 +3,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { DatabaseViewType } from "@/entities/database/model/database.types";
+import {
+	DatabaseViewType,
+	PropertyType,
+} from "@/entities/database/model/database.types";
 
 import { databaseApi } from "@/entities/database/api/database.api";
 import { pageBlockApi } from "@/entities/page-block/api/page-block.api";
-import { isDatabaseListQuery } from "@/entities/page/model/page.queries";
+import { pageApi } from "@/entities/page/api/page.api";
+import { isDatabaseListQuery, pageKeys } from "@/entities/page/model/page.queries";
 import {
 	PageBlockJson,
 	PageBlockStyleConfig,
@@ -53,54 +57,58 @@ interface CreateDatabaseBlockInput {
 	name?: string;
 	viewType?: DatabaseViewType;
 }
+async function createDatabaseWithBlock(
+	{
+		pageId,
+		parentBlockId,
+		afterBlockId,
+		name = "Untitled",
+		viewType = DatabaseViewType.TABLE,
+	}: CreateDatabaseBlockInput,
+	titleOnly = false,
+) {
+	const database = await databaseApi.createDatabase(pageId, {
+		name,
+		title_only: titleOnly,
+	});
+
+	const view = await databaseApi.createView(database.id, {
+		name: FIRST_VIEW_NAMES[viewType],
+		type: viewType,
+	});
+
+	const block = await pageBlockApi.create({
+		page_id: pageId,
+
+		parent_block_id: parentBlockId ?? null,
+
+		after_block_id: afterBlockId ?? null,
+
+		type: PageBlockType.DATABASE_VIEW,
+
+		content: {},
+		style_config: {},
+		data_config: {},
+	});
+
+	const attachedBlock = await pageBlockApi.attachDatabaseView(block.id, {
+		database_id: database.id,
+		view_id: view.id,
+	});
+
+	return {
+		database,
+		view,
+		block: attachedBlock,
+	};
+}
+
 export function useCreateDatabaseBlock() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: async ({
-			pageId,
-			parentBlockId,
-			afterBlockId,
-			name = "Untitled",
-			viewType = DatabaseViewType.TABLE,
-		}: CreateDatabaseBlockInput) => {
-			const database = await databaseApi.createDatabase(pageId, {
-				name,
-			});
-
-			const view = await databaseApi.createView(database.id, {
-				name: FIRST_VIEW_NAMES[viewType],
-				type: viewType,
-			});
-
-			const block = await pageBlockApi.create({
-				page_id: pageId,
-
-				parent_block_id: parentBlockId ?? null,
-
-				after_block_id: afterBlockId ?? null,
-
-				type: PageBlockType.DATABASE_VIEW,
-
-				content: {},
-				style_config: {},
-				data_config: {},
-			});
-
-			const attachedBlock = await pageBlockApi.attachDatabaseView(
-				block.id,
-				{
-					database_id: database.id,
-					view_id: view.id,
-				},
-			);
-
-			return {
-				database,
-				view,
-				block: attachedBlock,
-			};
-		},
+		mutationFn: (input: CreateDatabaseBlockInput) =>
+			createDatabaseWithBlock(input),
 
 		onSuccess: async (_, variables) => {
 			await Promise.all([
@@ -363,6 +371,82 @@ export function useSubmitPageForm(shareToken?: string) {
 				queryKey: databaseKeys.rows(variables.databaseId),
 			});
 		},
+	});
+}
+
+interface CreateFormInput {
+	pageId: string;
+	parentBlockId: string | null;
+	afterBlockId?: string | null;
+}
+
+/**
+ * Answers go to a sibling page: pages inherit shares from their parent,
+ * so a child page would open the answers to everyone the form is shared with.
+ */
+export function useCreateForm() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({ pageId, parentBlockId, afterBlockId }: CreateFormInput) => {
+			const page = await pageApi.getById(pageId);
+			const responsesPage = await pageApi.create({
+				workspace_id: page.workspace_id,
+				teamspace_id: page.teamspace_id,
+				parent_page_id: page.parent_page_id,
+				title: "Form responses",
+			});
+			const { database } = await createDatabaseWithBlock(
+				{ pageId: responsesPage.id, name: "Form responses" },
+				true,
+			);
+			const respondent = await databaseApi.addProperty(database.id, {
+				name: "Submitted by",
+				type: PropertyType.PERSON,
+			});
+			const title = database.properties.find(
+				(property) => property.type === PropertyType.TITLE,
+			);
+
+			const section = await pageBlockApi.create({
+				page_id: pageId,
+				parent_block_id: parentBlockId,
+				after_block_id: afterBlockId ?? null,
+				type: PageBlockType.SECTION,
+				content: { title: "", description: "" },
+				data_config: {
+					form: {
+						database_id: database.id,
+						respondent_property_id: respondent.id,
+					},
+				},
+			});
+
+			if (title) {
+				await pageBlockApi.create({
+					page_id: pageId,
+					parent_block_id: section.id,
+					type: PageBlockType.FORM_FIELD,
+					content: { label: title.name },
+					data_config: { property_id: title.id, required: true },
+				});
+			}
+
+			return { section, workspaceId: page.workspace_id };
+		},
+
+		onSuccess: async ({ workspaceId }, { pageId }) => {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: blockListKey(pageId),
+					exact: true,
+				}),
+				queryClient.invalidateQueries({
+					queryKey: pageKeys.byWorkspace(workspaceId),
+				}),
+			]);
+		},
+		onError: () => notifyBlockWriteError(),
 	});
 }
 

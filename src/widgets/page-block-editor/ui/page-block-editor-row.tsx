@@ -12,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 
 import {
 	useCreateDatabaseBlock,
+	useCreateForm,
 	useCreatePageBlock,
 	useCreatePageBlockColumns,
 } from "@/entities/page-block/model/page-block.mutations";
@@ -48,6 +49,7 @@ export function PageBlockEditorRow({ block, shareToken }: PageBlockEditorRowProp
 
 	const createBlockMutation = useCreatePageBlock(shareToken);
 	const createDatabaseBlockMutation = useCreateDatabaseBlock();
+	const createFormMutation = useCreateForm();
 	const createColumnsMutation = useCreatePageBlockColumns(shareToken);
 	const { requestFocus } = usePageBlockEditor();
 
@@ -56,7 +58,21 @@ export function PageBlockEditorRow({ block, shareToken }: PageBlockEditorRowProp
 		styleConfig,
 		viewType,
 		columnCount,
+		isForm,
 	}: PageBlockCommand) => {
+		if (isForm) {
+			setOpen(false);
+			createFormMutation.mutate(
+				{
+					pageId: block.page_id,
+					parentBlockId: block.parent_block_id,
+					afterBlockId: block.id,
+				},
+				{ onSuccess: ({ section }) => requestFocus(section.id) },
+			);
+			return;
+		}
+
 		if (columnCount) {
 			setOpen(false);
 			createColumnsMutation.mutate(

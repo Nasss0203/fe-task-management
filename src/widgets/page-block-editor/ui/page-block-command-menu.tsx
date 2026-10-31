@@ -5,6 +5,7 @@ import {
 	CalendarDays,
 	AppWindow,
 	CheckSquare,
+	ClipboardList,
 	Columns2,
 	Columns3,
 	LayoutPanelTop,
@@ -54,6 +55,9 @@ export interface PageBlockCommand {
 
 	/** Set for "2 columns" / "3 columns": the number of columns to create. */
 	columnCount?: number;
+
+	/** Set for "Form": a Section linked to a new database of answers. */
+	isForm?: boolean;
 }
 
 interface PageBlockCommandMenuProps {
@@ -77,6 +81,8 @@ export interface CommandItemData {
 	viewType?: DatabaseViewType;
 
 	columnCount?: number;
+
+	isForm?: boolean;
 
 	icon: React.ComponentType<{
 		className?: string;
@@ -103,7 +109,7 @@ const BASIC_BLOCKS: CommandItemData[] = [
 
 		label: "Heading 1",
 
-		description: "Big section heading.",
+		description: "Big heading.",
 
 		type: PageBlockType.HEADER,
 
@@ -121,7 +127,7 @@ const BASIC_BLOCKS: CommandItemData[] = [
 
 		label: "Heading 2",
 
-		description: "Medium section heading.",
+		description: "Medium heading.",
 
 		type: PageBlockType.HEADER,
 
@@ -139,7 +145,7 @@ const BASIC_BLOCKS: CommandItemData[] = [
 
 		label: "Heading 3",
 
-		description: "Small section heading.",
+		description: "Small heading.",
 
 		type: PageBlockType.HEADER,
 
@@ -304,6 +310,15 @@ const SECTION_BLOCK: CommandItemData = {
 	icon: LayoutPanelTop,
 };
 
+const FORM_BLOCK: CommandItemData = {
+	id: "form",
+	label: "Form",
+	description: "Collect answers into a new table.",
+	type: PageBlockType.SECTION,
+	isForm: true,
+	icon: ClipboardList,
+};
+
 export function layoutBlocksFor(
 	inColumn: boolean,
 	inSection: boolean,
@@ -427,6 +442,8 @@ function BlockCommandItem({
 					viewType: command.viewType,
 
 					columnCount: command.columnCount,
+
+					isForm: command.isForm,
 				})
 			}
 			className='
@@ -482,7 +499,11 @@ export function PageBlockCommandMenu({
 }: PageBlockCommandMenuProps) {
 	// No database inside a task's content (the API refuses it too).
 	const inTask = usePageBlockRowId() !== null;
-	const layoutBlocks = layoutBlocksFor(useIsInColumn(), useIsInSection());
+	const inSection = useIsInSection();
+	const layoutBlocks = [
+		...(allowDatabase && !inTask && !inSection ? [FORM_BLOCK] : []),
+		...layoutBlocksFor(useIsInColumn(), inSection),
+	];
 	return (
 		<Command
 			className='
