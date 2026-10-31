@@ -1,6 +1,7 @@
 "use client";
 
 import { FileText, Sparkles } from "lucide-react";
+import Link from "next/link";
 import { useRef } from "react";
 import { Button } from "@/shared/ui/button";
 import type { AiGeneration, AiPageResolutionCandidate } from "@/entities/ai-assistant/model/ai-assistant.types";
@@ -155,6 +156,10 @@ export function AiMessageItem({
 									<p className='truncate text-sm font-medium text-foreground'>
 										{page.title || "Untitled"}
 									</p>
+									{/* M7: why this Page was offered, from the block that matched. */}
+									{page.excerpt && (
+										<p className='line-clamp-2 text-xs text-muted-foreground'>“{page.excerpt}”</p>
+									)}
 									<CandidateLocation page={page} />
 								</div>
 
@@ -183,13 +188,29 @@ export function AiMessageItem({
 				)}
 
 				{isModificationPlan && generation && (
-					<AiModificationPlanPreview
-						generation={generation}
-						disabled={disabled}
-						previewOnly={message.previewOnly}
-						onConfirm={onConfirmAiModificationPlan}
-						onDiscard={onDiscardGeneration}
-					/>
+					<>
+						{/* M8: what the draft was based on; each title opens its Page. */}
+						{message.sources?.length ? (
+							<p className='text-xs text-muted-foreground'>
+								Dựa trên:{" "}
+								{message.sources.map((source, index) => (
+									<span key={source.pageId}>
+										{index > 0 && ", "}
+										<Link href={`/page/${source.pageId}`} className='font-medium underline-offset-2 hover:text-foreground hover:underline'>
+											{source.title || "Untitled"}
+										</Link>
+									</span>
+								))}
+							</p>
+						) : null}
+						<AiModificationPlanPreview
+							generation={generation}
+							disabled={disabled}
+							previewOnly={message.previewOnly}
+							onConfirm={onConfirmAiModificationPlan}
+							onDiscard={onDiscardGeneration}
+						/>
+					</>
 				)}
 			</div>
 		</div>

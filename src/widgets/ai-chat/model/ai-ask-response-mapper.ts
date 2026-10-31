@@ -1,6 +1,6 @@
 import type {
 	AiAskResponse, AiCapability, AiGeneration, AiModificationPlan, AiModificationPlanPreview,
-	AiPageResolutionCandidate, AskAiRequest, PageCompositionPreview,
+	AiPageResolutionCandidate, AiPlanSource, AskAiRequest, PageCompositionPreview,
 } from "@/entities/ai-assistant/model/ai-assistant.types";
 import { isAiCapability, isAiModificationPlan, isNonemptyString, isRecord } from "./ai-capability";
 
@@ -25,7 +25,9 @@ interface MappedBase {
 export type MappedAiAskResponse = MappedBase & (
 	| { kind: "generation"; hasGeneration: true; generation: AiGeneration; preview: PageCompositionPreview | null }
 	| { kind: "plan" | "needs-context"; hasGeneration: true; plan: AiModificationPlan;
-		preview: AiModificationPlanPreview; afterHydration: { canConfirm: boolean; canDiscard: true } }
+		preview: AiModificationPlanPreview; afterHydration: { canConfirm: boolean; canDiscard: true };
+		/** M8: what the draft was based on, shown above its preview. */
+		sources?: AiPlanSource[] }
 	| { kind: "page-selection"; hasGeneration: false; preview: null; candidates: AiPageResolutionCandidate[];
 		requestContext: AskAiRequest | null }
 	| { kind: "feedback"; hasGeneration: false; preview: null; channel: "business" | "planning"; reason: string | null }
@@ -59,7 +61,7 @@ function validPageActivity(value: unknown): boolean {
 
 function validPageIntent(value: unknown): boolean {
 	return isRecord(value) && ["MODIFY_PAGE", "OTHER", "UNCLEAR"].includes(String(value.intent)) &&
-		["TITLE", "CURRENT_PAGE", "UNRESOLVED", "ACTIVITY", "DESCRIPTION"].includes(String(value.referenceType)) &&
+		["TITLE", "CURRENT_PAGE", "UNRESOLVED", "ACTIVITY", "DESCRIPTION", "CONTENT"].includes(String(value.referenceType)) &&
 		(value.pageReference === null || typeof value.pageReference === "string") &&
 		(value.instruction === null || typeof value.instruction === "string") && typeof value.needsClarification === "boolean" &&
 		(value.referenceType === "ACTIVITY"
@@ -69,11 +71,24 @@ function validPageIntent(value: unknown): boolean {
 		(value.referenceType === "DESCRIPTION"
 			? value.intent === "MODIFY_PAGE" && value.pageReference === null && value.needsClarification === false &&
 				isNonemptyString(value.description)
-			: value.description === undefined);
+			: value.description === undefined) &&
+		(value.referenceType === "CONTENT"
+			? value.intent === "MODIFY_PAGE" && value.pageReference === null && value.needsClarification === false &&
+				isNonemptyString(value.topic)
+			: value.topic === undefined) &&
+		// M8: any edit may name its source, in the user's words.
+		(value.basedOn === undefined || (value.intent === "MODIFY_PAGE" && isNonemptyString(value.basedOn)));
+}
+
+/** M8: the Pages a draft was based on, at most eight, never the edited Page. */
+function validSources(value: unknown, pageId: unknown): value is AiPlanSource[] | undefined {
+	return value === undefined || (Array.isArray(value) && value.length > 0 && value.length <= 8 &&
+		value.every((source) => isRecord(source) && isNonemptyString(source.pageId) && source.pageId !== pageId &&
+			typeof source.title === "string"));
 }
 
 /** M1b / M2 / M3 / M6: Pages the user must pick from; a draft only follows that choice. */
-const PICKED_PAGE_METHODS = ["TITLE_IN_SENTENCE", "ACTIVITY", "FUZZY_TITLE", "SEMANTIC"];
+const PICKED_PAGE_METHODS = ["TITLE_IN_SENTENCE", "ACTIVITY", "FUZZY_TITLE", "SEMANTIC", "CONTENT"];
 
 /**
  * M6: a described Page is only ever found by SEMANTIC, unless the sentence
@@ -82,9 +97,18 @@ const PICKED_PAGE_METHODS = ["TITLE_IN_SENTENCE", "ACTIVITY", "FUZZY_TITLE", "SE
  */
 function semanticMismatch(method: unknown, intent: unknown): boolean {
 	const described = isRecord(intent) && intent.referenceType === "DESCRIPTION";
+	// M7: words inside a Page are only ever looked up as CONTENT, and the other way round.
+	const content = isRecord(intent) && intent.referenceType === "CONTENT";
+	if ((method === "CONTENT") !== content) return true;
 	return method === "SEMANTIC"
 		? !(described || (isRecord(intent) && intent.referenceType === "TITLE" && isNonemptyString(intent.pageReference)))
 		: described;
+}
+
+/** M7: an excerpt only explains a SEMANTIC or CONTENT choice, and stays short. */
+function validExcerpt(page: unknown, method: unknown): boolean {
+	if (!isRecord(page) || page.excerpt === undefined) return true;
+	return (method === "SEMANTIC" || method === "CONTENT") && isNonemptyString(page.excerpt) && page.excerpt.length <= 200;
 }
 
 /** M3: close titles answer a name the user typed (an explicit TITLE intent). */
@@ -235,10 +259,12 @@ export function mapAiAskResponse(response: AiAskResponse, requestContext?: AskAi
 			(requestContext?.currentPageId && requestContext.currentPageId !== plan.pageId) ||
 			(requestContext?.selectedPageId && requestContext.selectedPageId !== plan.pageId) ||
 			(data.status === "PLAN_GENERATED" ? plan.status !== "PLAN_READY" : plan.status !== "NEED_MORE_CONTEXT") ||
-			!validPlanPreview(data.preview, plan)) return invalid("INVALID_PLAN_PREVIEW");
+			!validPlanPreview(data.preview, plan) ||
+			!validSources(planning.sources, plan.pageId)) return invalid("INVALID_PLAN_PREVIEW");
 		return { ...base, kind: plan.status === "PLAN_READY" ? "plan" : "needs-context", hasGeneration: true,
 			capability: "GENERATE_PAGE_MODIFICATION_PLAN", capabilityValidated: true,
 			plan, preview: data.preview, needsGenerationRead: true,
+			...(planning.sources ? { sources: planning.sources } : {}),
 			afterHydration: { canConfirm: plan.status === "PLAN_READY", canDiscard: true } };
 	}
 	if (data.generationId !== undefined || data.conversationId !== undefined || data.generation !== undefined ||
@@ -252,13 +278,14 @@ export function mapAiAskResponse(response: AiAskResponse, requestContext?: AskAi
 			((planning.resolutionMethod === "ACTIVITY") !== (isRecord(planning.intent) && planning.intent.referenceType === "ACTIVITY")) ||
 			fuzzyTitleMismatch(planning.resolutionMethod, planning.intent) ||
 			semanticMismatch(planning.resolutionMethod, planning.intent) ||
+			!planning.candidates.every((page) => validExcerpt(page, planning.resolutionMethod)) ||
 			!planning.candidates.every((page) => isPage(page) && (!requestContext || page.workspaceId === requestContext.workspaceId))) return invalid("INVALID_CANDIDATES");
 		return { ...base, kind: "page-selection", hasGeneration: false, preview: null,
 			capability: "GENERATE_PAGE_MODIFICATION_PLAN", capabilityValidated: true,
 			candidates: planning.candidates, requestContext: requestContext ? { ...requestContext } : null };
 	}
 	if (!["NEEDS_CLARIFICATION", "PAGE_NOT_FOUND", "UNSUPPORTED_OPERATION", "NOT_A_PAGE_MODIFICATION"].includes(base.status) ||
-		(data.status === "NEEDS_CLARIFICATION" && !["UNCLEAR_INTENT", "UNRESOLVED_PAGE", "MISSING_CURRENT_PAGE", "MISSING_CHECKLIST_ITEMS"].includes(String(planning.reason))) ||
+		(data.status === "NEEDS_CLARIFICATION" && !["UNCLEAR_INTENT", "UNRESOLVED_PAGE", "MISSING_CURRENT_PAGE", "MISSING_CHECKLIST_ITEMS", "MISSING_SOURCE"].includes(String(planning.reason))) ||
 		(data.status === "UNSUPPORTED_OPERATION" && planning.reason !== "INSERT_ONLY")) return invalid("INVALID_PLANNING_FEEDBACK");
 	return { ...base, kind: "feedback", hasGeneration: false, preview: null,
 		capability: "GENERATE_PAGE_MODIFICATION_PLAN", capabilityValidated: true, channel: "planning",

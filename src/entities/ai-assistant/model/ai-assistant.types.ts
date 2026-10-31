@@ -194,6 +194,8 @@ export interface AiPageResolutionCandidate {
   title: string;
   parentPageId: string | null;
   teamspaceId: string | null;
+  /** M7: words of the block that matched, only for SEMANTIC and CONTENT choices. */
+  excerpt?: string;
 }
 
 /** M2: the Page was named by the user's own edits ("trang tôi sửa hôm qua"). */
@@ -205,7 +207,7 @@ export interface AiPageActivity {
 
 export interface AiPageIntent {
   intent: "MODIFY_PAGE" | "OTHER" | "UNCLEAR";
-  referenceType: "TITLE" | "CURRENT_PAGE" | "UNRESOLVED" | "ACTIVITY" | "DESCRIPTION";
+  referenceType: "TITLE" | "CURRENT_PAGE" | "UNRESOLVED" | "ACTIVITY" | "DESCRIPTION" | "CONTENT";
   pageReference: string | null;
   instruction: string | null;
   needsClarification: boolean;
@@ -215,6 +217,16 @@ export interface AiPageIntent {
   scope?: { parentTitle: string | null; teamspaceName: string | null };
   /** M6: only with referenceType DESCRIPTION, what the Page is for in the user's words. */
   description?: string;
+  /** M7: only with referenceType CONTENT, words inside the Page in the user's words. */
+  topic?: string;
+  /** M8: on an edit, the source the user named ("dựa trên …"). */
+  basedOn?: string;
+}
+
+/** M8: a Page a draft was based on; the server lists them, never the model. */
+export interface AiPlanSource {
+  pageId: string;
+  title: string;
 }
 
 export interface GeneratePagePlanFromInstructionRequest {
@@ -229,11 +241,11 @@ export interface GeneratePagePlanFromInstructionRequest {
 /**
  * M1b: TITLE_IN_SENTENCE is a real Page found in the sentence; M2: ACTIVITY is a
  * Page the user edited; M3: FUZZY_TITLE is a title close to a misspelled name;
- * M6: SEMANTIC is a Page close to a description. All four are planned only
- * after the user picked the Page.
+ * M6: SEMANTIC is a Page close to a description; M7: CONTENT is a Page whose
+ * text holds the words. All five are planned only after the user picked the Page.
  */
 export type AiPageResolutionMethod =
-  | "CURRENT_CONTEXT" | "EXACT_TITLE" | "TITLE_IN_SENTENCE" | "ACTIVITY" | "FUZZY_TITLE" | "SEMANTIC";
+  | "CURRENT_CONTEXT" | "EXACT_TITLE" | "TITLE_IN_SENTENCE" | "ACTIVITY" | "FUZZY_TITLE" | "SEMANTIC" | "CONTENT";
 
 export type GeneratePagePlanFromInstructionResponse =
   | {
@@ -245,7 +257,7 @@ export type GeneratePagePlanFromInstructionResponse =
   | {
       status: "NEEDS_CLARIFICATION";
       // MISSING_CHECKLIST_ITEMS (gp02): "thêm checklist" with neither items nor a topic.
-      reason: "UNCLEAR_INTENT" | "UNRESOLVED_PAGE" | "MISSING_CURRENT_PAGE" | "MISSING_CHECKLIST_ITEMS";
+      reason: "UNCLEAR_INTENT" | "UNRESOLVED_PAGE" | "MISSING_CURRENT_PAGE" | "MISSING_CHECKLIST_ITEMS" | "MISSING_SOURCE";
       intent: AiPageIntent;
     }
   | { status: "PAGE_NOT_FOUND"; intent: AiPageIntent }
@@ -255,15 +267,16 @@ export type GeneratePagePlanFromInstructionResponse =
       candidates: AiPageResolutionCandidate[];
       /**
        * Found in the sentence (M1b), among the user's own edits (M2), close to a
-       * misspelled name (M3), or close to a description (M6).
+       * misspelled name (M3), close to a description (M6), or holding the words (M7).
        */
-      resolutionMethod?: "TITLE_IN_SENTENCE" | "ACTIVITY" | "FUZZY_TITLE" | "SEMANTIC";
+      resolutionMethod?: "TITLE_IN_SENTENCE" | "ACTIVITY" | "FUZZY_TITLE" | "SEMANTIC" | "CONTENT";
     }
   | {
       status: "PLAN_GENERATED";
       intent: AiPageIntent;
       page: AiPageResolutionCandidate;
       resolutionMethod: AiPageResolutionMethod;
+      sources?: AiPlanSource[];
       plan: Extract<GenerateAiModificationPlanResponse, { status: "PLAN_READY" }>;
     }
   | {

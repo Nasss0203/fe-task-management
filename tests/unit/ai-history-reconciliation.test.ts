@@ -43,6 +43,16 @@ describe("history reconciliation", () => {
 		expect(result.filter((message) => message.role === "assistant")).toHaveLength(1);
 	});
 
+	it("keeps a draft's sources (M8) when the server's record replaces it", () => {
+		const incoming = map([serverMessage("server-user", "USER", { requestId: "request-1", generationId }),
+			serverMessage("server-assistant", "ASSISTANT", { requestId: "request-1", generationId })], [foundationGeneration]);
+		const sources = [{ pageId: "bug-tracker", title: "Bug tracker" }];
+		const result = reconcile([localMessage("local-user", "user"), { ...overlay(), sources }], incoming);
+		const assistant = result.find((message) => message.role === "assistant");
+		expect(assistant?.sources).toEqual(sources);
+		expect(reconcile(result, incoming).find((message) => message.role === "assistant")?.sources).toEqual(sources);
+	});
+
 	it("keeps all server records when request correlation is not unique", () => {
 		const incoming = map([serverMessage("server-user-1", "USER", { requestId: "request-1" }),
 			serverMessage("server-user-2", "USER", { requestId: "request-1" })], []);

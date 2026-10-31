@@ -45,6 +45,8 @@ export function reconcileAiHistory(
 			...message, id: old.id,
 			origin: { ...message.origin, localId: old.origin?.localId },
 			generation: preferGeneration(old.generation, message.generation),
+			// M8: the server's history holds no sources; keep the ones this chat saw.
+			...(old.sources && !message.sources ? { sources: old.sources } : {}),
 		} : message);
 	}
 	const records = [...saved.values()].sort((a, b) => a.createdAt.localeCompare(b.createdAt) ||
@@ -63,6 +65,7 @@ export function reconcileAiHistory(
 		const hydrated: AiChatMessage = {
 			...counterpart, id: local.id,
 			generation,
+			...(local.sources ? { sources: local.sources } : {}),
 			origin: { ...counterpart.origin!, source: "persisted", serverMessageId: counterpart.origin!.source === "persisted"
 				? counterpart.origin!.serverMessageId : counterpart.id,
 				localId: local.origin?.localId ?? local.id, turnId: local.origin?.turnId,
