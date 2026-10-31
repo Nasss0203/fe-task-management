@@ -36,7 +36,7 @@ describe("Phase 5.3 action confirmation dialog", () => {
     // Target shows the Page title, not its ID, and still links to the Page.
     expect(screen.getByRole("link", { name: "Release Plan" }).getAttribute("href")).toBe("/page/page-1");
     expect(screen.queryByText("page-1")).toBeNull();
-    expect(screen.getByText(/1 operations/)).toBeTruthy();
+    expect(screen.getByText("1 operation · 1 block")).toBeTruthy();
     expect(onConfirm).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Confirm apply" }));
     expect(onConfirm).toHaveBeenCalledTimes(1);

@@ -2,6 +2,7 @@ import type {
 	AiCapability,
 	AiGeneration,
 	AiPageResolutionCandidate,
+	AiPlanSource,
 	AskAiRequest,
 	AiModificationPlan,
 	AiModificationPlanPreview,
@@ -51,8 +52,11 @@ export interface AiChatMessage {
 		plan: AiModificationPlan;
 		preview: AiModificationPlanPreview;
 		turnId: string;
+		sources?: AiPlanSource[];
 	};
 	generation?: AiGeneration;
+	/** M8: the Pages a draft was based on (from the Ask response, not the model). */
+	sources?: AiPlanSource[];
 	/** Page candidates returned by NestJS. Selection is reauthorized there. */
 	pageSelection?: {
 		instruction: string;

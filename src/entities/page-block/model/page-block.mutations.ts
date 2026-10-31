@@ -1,24 +1,33 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { type QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { DatabaseViewType } from "@/entities/database/model/database.types";
 
 import { databaseApi } from "@/entities/database/api/database.api";
 import { pageBlockApi } from "@/entities/page-block/api/page-block.api";
-import { isDatabaseListQuery } from "@/entities/page/model/page.queries";
 import {
 	PageBlockJson,
 	PageBlockStyleConfig,
 	PageBlockType,
 } from "@/entities/page-block/model/page-block.types";
+import { isDatabaseListQuery, pageKeys } from "@/entities/page/model/page.queries";
+import type { Page } from "@/entities/page/model/page.types";
 import { pageBlockKeys } from "./page-block.queries";
 
 function blockListKey(pageId: string, shareToken?: string) {
 	return shareToken
 		? pageBlockKeys.sharedByPage(pageId, shareToken)
 		: pageBlockKeys.byPage(pageId);
+}
+
+/** The server marks the Page edited on every block write; mirror it without refetching the Page. */
+function markPageEdited(queryClient: QueryClient, pageId: string, shareToken?: string) {
+	const updatedAt = new Date().toISOString();
+	for (const key of [pageKeys.detail(pageId), ...(shareToken ? [pageKeys.sharedDetail(pageId, shareToken)] : [])]) {
+		queryClient.setQueryData<Page>(key, (page) => (page ? { ...page, updatedAt } : page));
+	}
 }
 
 function notifyBlockWriteError(shareToken?: string) {
@@ -84,6 +93,7 @@ export function useCreateDatabaseBlock() {
 		},
 
 		onSuccess: async (_, variables) => {
+			markPageEdited(queryClient, variables.pageId);
 			await Promise.all([
 				queryClient.invalidateQueries({
 					queryKey: pageBlockKeys.byPage(variables.pageId),
@@ -136,6 +146,7 @@ export function useCreatePageBlock(shareToken?: string) {
 			),
 
 		onSuccess: async (_, variables) => {
+			markPageEdited(queryClient, variables.pageId, shareToken);
 			await queryClient.invalidateQueries({
 				queryKey: blockListKey(variables.pageId, shareToken),
 				exact: true,
@@ -185,6 +196,7 @@ export function useUpdatePageBlock(shareToken?: string) {
 			),
 
 		onSuccess: async (_, variables) => {
+			markPageEdited(queryClient, variables.pageId, shareToken);
 			await queryClient.invalidateQueries({
 				queryKey: blockListKey(variables.pageId, shareToken),
 				exact: true,
@@ -242,6 +254,7 @@ export function useTransformToDatabaseBlock() {
 		},
 
 		onSuccess: (_, variables) => {
+			markPageEdited(queryClient, variables.pageId);
 			queryClient.invalidateQueries({
 				queryKey: pageBlockKeys.byPage(variables.pageId),
 			});
@@ -269,6 +282,7 @@ export function useDeletePageBlock(shareToken?: string) {
 			pageBlockApi.delete(blockId, shareToken),
 
 		onSuccess: async (_, variables) => {
+			markPageEdited(queryClient, variables.pageId, shareToken);
 			await Promise.all([
 				queryClient.invalidateQueries({
 					queryKey: blockListKey(variables.pageId, shareToken),

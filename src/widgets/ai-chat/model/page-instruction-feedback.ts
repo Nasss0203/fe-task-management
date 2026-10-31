@@ -9,6 +9,8 @@ export function getPageInstructionFeedback(
 		case "NOT_A_PAGE_MODIFICATION":
 			return "This request does not modify an existing page. Choose Create page or a Writing action instead.";
 		case "NEEDS_CLARIFICATION":
+			if (result.reason === "MISSING_CHECKLIST_ITEMS")
+				return "Which items should the checklist have? Send the full request with the items, for example: “Thêm checklist gồm in tài liệu, đặt phòng vào trang Kế hoạch Q4”.";
 			return result.reason === "MISSING_CURRENT_PAGE"
 				? "Which page do you want to edit? Include its name, for example: “Thêm checklist vào page Release 2.0”."
 				: result.reason === "UNRESOLVED_PAGE"

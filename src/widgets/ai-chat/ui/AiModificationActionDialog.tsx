@@ -8,6 +8,7 @@ import { getAiAccessIdentity } from "@/entities/ai-assistant/model/ai-assistant.
 import { usePage } from "@/entities/page/model/page.queries";
 import { assertModificationDraftTarget } from "../model/ai-modification-action";
 import { getAiChatErrorMessage } from "../model/ai-chat-error";
+import { formatPlanCounts } from "../model/ai-plan-counts";
 import { Button } from "@/shared/ui/button";
 import {
   AlertDialog, AlertDialogContent, AlertDialogDescription,
@@ -31,7 +32,7 @@ export function AiModificationActionDialog({ action, workspaceId, currentPageId,
   onAccessError?: (error: unknown, generationId: string) => void;
 }) {
   const accessId = getAiAccessIdentity(shareToken);
-  const [state, setState] = useState<{ id: string; accessId?: string; workspaceId: string | null; pageId?: string; kind: Action["kind"]; target: string; summary: string; operations: number; blocks: number; rows: number } | null>(null);
+  const [state, setState] = useState<{ id: string; accessId?: string; workspaceId: string | null; pageId?: string; kind: Action["kind"]; target: string; summary: string; counts: string; deletes: number; nestedDeletes: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -52,9 +53,9 @@ export function AiModificationActionDialog({ action, workspaceId, currentPageId,
           id: generation.id,
           accessId, workspaceId, pageId: currentPageId, kind: action.kind, target: action.pageId,
           summary: plan.summary,
-          operations: operations.length,
-          blocks: operations.reduce((sum, operation) => sum + (operation.type === "INSERT_BLOCKS" ? operation.blocks.length : 0), 0),
-          rows: operations.reduce((sum, operation) => sum + (operation.type === "CREATE_DATABASE_ROWS" ? operation.rows.length : 0), 0),
+          counts: formatPlanCounts(operations),
+          deletes: operations.filter((operation) => operation.type === "DELETE_BLOCK").length,
+          nestedDeletes: operations.reduce((sum, operation) => sum + (operation.type === "DELETE_BLOCK" ? operation.childCount : 0), 0),
         });
       } catch (cause) {
         if (!cancelled) onAccessError?.(cause, action.generationId);
@@ -88,7 +89,12 @@ export function AiModificationActionDialog({ action, workspaceId, currentPageId,
           {error && <p role="alert" className="text-destructive">{error}</p>}
           {visibleState && <>
             <p className="whitespace-pre-wrap">{visibleState.summary}</p>
-            <p className="text-muted-foreground">{visibleState.operations} operations · {visibleState.blocks} blocks · {visibleState.rows} rows</p>
+            <p className="text-muted-foreground">{visibleState.counts}</p>
+            {visibleState.deletes > 0 && <p role="alert" className="text-destructive">
+              {visibleState.deletes} {visibleState.deletes === 1 ? "block" : "blocks"}
+              {visibleState.nestedDeletes > 0 && ` (and ${visibleState.nestedDeletes} nested ${visibleState.nestedDeletes === 1 ? "block" : "blocks"})`}
+              {" will be removed. You can undo this for 24 hours."}
+            </p>}
           </>}
           {pending && <p role="status">Processing request...</p>}
         </div>}

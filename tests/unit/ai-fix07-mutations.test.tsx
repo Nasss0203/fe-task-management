@@ -40,7 +40,8 @@ describe("FIX07 mutation variables", () => {
       await result.current.modification.mutateAsync({ generationId, pageId, shareToken: token });
       await result.current.discard.mutateAsync({ generationId, shareToken: token });
     });
-    expect(ask).toHaveBeenCalledExactlyOnceWith(instruction, token);
+    // M2: Ask also carries the browser's time zone.
+    expect(ask).toHaveBeenCalledExactlyOnceWith({ ...instruction, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }, token);
     expect(create).toHaveBeenCalledExactlyOnceWith({ workspaceId, scope: "PAGE", pageId }, token);
     expect(submit).toHaveBeenCalledExactlyOnceWith(conversationId, message, token);
     expect(plan).toHaveBeenCalledExactlyOnceWith(pageId, { instruction: "Add QA", requestId }, token);

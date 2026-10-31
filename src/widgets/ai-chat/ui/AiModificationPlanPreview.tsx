@@ -1,10 +1,11 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import Link from "next/link";
 
 import {
 	AlertCircle,
+	ArrowRight,
 	ArrowUpRight,
 	Check,
 	ChevronDown,
@@ -12,9 +13,12 @@ import {
 	Database as DatabaseIcon,
 	ListChecks,
 	Loader2,
+	Pencil,
 	Plus,
 	Trash2,
+	Undo2,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import type {
 	AiGeneration,
@@ -23,12 +27,15 @@ import type {
 	AiModificationPlan,
 } from "@/entities/ai-assistant/model/ai-assistant.types";
 
+import { useUndoAiModificationPlan } from "@/entities/ai-assistant/model/ai-assistant.mutations";
 import { useDatabase } from "@/entities/database/model/database.queries";
 import { usePageBlocks } from "@/entities/page-block/model/page-block.queries";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 
 import { AiDraftStatusBadge, type AiDraftStatus } from "./AiDraftStatusBadge";
+import { getAiChatErrorMessage } from "../model/ai-chat-error";
+import { formatPlanCounts, pluralize } from "../model/ai-plan-counts";
 import { useAiChatStore } from "../model/use-ai-chat-store";
 
 interface AiModificationPlanPreviewProps {
@@ -75,10 +82,6 @@ function getModificationPlan(
 	}
 
 	return output as AiModificationPlan;
-}
-
-function pluralize(count: number, singular: string, plural: string): string {
-	return `${count} ${count === 1 ? singular : plural}`;
 }
 
 function renderFieldValue(value: unknown): ReactNode {
@@ -277,17 +280,7 @@ export function BlockContentPreview({ block }: { block: AiModificationBlockInput
 
 			return (
 				<div className='flex items-start gap-2 text-sm'>
-					<span
-						aria-hidden='true'
-						className={cn(
-							"mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-[4px] border",
-							checked
-								? "border-primary bg-primary text-primary-foreground"
-								: "border-muted-foreground/50",
-						)}
-					>
-						{checked && <Check className='size-3' />}
-					</span>
+					<TodoCheckbox checked={checked} />
 
 					<span className='sr-only'>
 						{checked ? "Checked:" : "Not checked:"}
@@ -330,6 +323,22 @@ export function BlockContentPreview({ block }: { block: AiModificationBlockInput
 				<p className='text-sm leading-relaxed text-foreground'>{body}</p>
 			);
 	}
+}
+
+function TodoCheckbox({ checked }: { checked: boolean }) {
+	return (
+		<span
+			aria-hidden='true'
+			className={cn(
+				"mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-[4px] border",
+				checked
+					? "border-primary bg-primary text-primary-foreground"
+					: "border-muted-foreground/50",
+			)}
+		>
+			{checked && <Check className='size-3' />}
+		</span>
+	);
 }
 
 function OperationSection({
@@ -512,6 +521,262 @@ function CreateDatabaseRowsPreview({
 	);
 }
 
+type BlockDeleteOperation = Extract<
+	AiModificationOperation,
+	{ type: "DELETE_BLOCK" }
+>;
+
+const LISTED_NESTED_BLOCKS = 5;
+// The server refuses an undo after this (kế hoạch xoá block, D5).
+const UNDO_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+/** The texts of the blocks nested in a deleted block, read from the page. */
+function NestedBlocks({
+	pageId,
+	operation,
+}: {
+	pageId: string;
+	operation: BlockDeleteOperation;
+}) {
+	const { data: blocks } = usePageBlocks(pageId);
+	const nested: string[] = [];
+	const pending = [operation.blockId];
+	while (pending.length > 0) {
+		const parentId = pending.shift();
+		for (const block of blocks ?? []) {
+			if (block.parent_block_id === parentId) {
+				nested.push(textOf(block.content)?.trim() || "Untitled block");
+				pending.push(block.id);
+			}
+		}
+	}
+
+	return (
+		<div className='mt-1 text-xs text-muted-foreground'>
+			<p>+ {pluralize(operation.childCount, "nested block", "nested blocks")}</p>
+			{nested.length > 0 && (
+				<ul className='mt-0.5 list-inside list-disc'>
+					{nested.slice(0, LISTED_NESTED_BLOCKS).map((text, index) => (
+						<li key={index} className='truncate'>
+							{text}
+						</li>
+					))}
+					{nested.length > LISTED_NESTED_BLOCKS && (
+						<li>and {nested.length - LISTED_NESTED_BLOCKS} more</li>
+					)}
+				</ul>
+			)}
+		</div>
+	);
+}
+
+/** DELETE_BLOCK: the block and everything nested in it are removed. */
+function BlockDeletePreview({
+	pageId,
+	operations,
+	defaultOpen,
+}: {
+	pageId: string;
+	operations: BlockDeleteOperation[];
+	defaultOpen: boolean;
+}) {
+	return (
+		<OperationSection
+			icon={<Trash2 className='size-3.5 text-destructive' />}
+			title={`Delete ${pluralize(operations.length, "block", "blocks")}`}
+			subtitle='Removed from the page; can be undone for 24 hours'
+			defaultOpen={defaultOpen}
+		>
+			<ul className='divide-y divide-border/40'>
+				{operations.map((operation) => (
+					<li
+						key={operation.blockId}
+						className='flex items-start gap-2.5 px-3 py-2.5'
+					>
+						<span
+							aria-hidden='true'
+							className='mt-0.5 w-3 shrink-0 text-center font-mono text-xs font-semibold text-destructive'
+						>
+							−
+						</span>
+
+						<div className='min-w-0 flex-1 text-sm leading-relaxed'>
+							<del className='block whitespace-pre-wrap break-words text-muted-foreground'>
+								{operation.text}
+							</del>
+							{operation.childCount > 0 && (
+								<NestedBlocks pageId={pageId} operation={operation} />
+							)}
+						</div>
+
+						<span className='mt-0.5 shrink-0 text-[10px] font-medium uppercase tracking-wide text-destructive/80'>
+							Delete
+						</span>
+					</li>
+				))}
+			</ul>
+		</OperationSection>
+	);
+}
+
+/** Restores what an applied AI delete removed (kế hoạch xoá block, D5). */
+function UndoDeleteFooter({
+	generationId,
+	pageId,
+	appliedAt,
+}: {
+	generationId: string;
+	pageId: string;
+	appliedAt: string;
+}) {
+	const undo = useUndoAiModificationPlan();
+	// Read the clock once; the server enforces the window anyway.
+	const [openedAt] = useState(() => Date.now());
+	if (!(openedAt - Date.parse(appliedAt) < UNDO_WINDOW_MS)) return null;
+
+	return (
+		<div className='flex flex-wrap items-center justify-between gap-2 border-t border-border/50 bg-muted/30 px-4 py-2.5'>
+			<p className='text-xs text-muted-foreground'>
+				Deleted blocks can be restored for 24 hours.
+			</p>
+			<Button
+				type='button'
+				size='sm'
+				variant='outline'
+				disabled={undo.isPending || undo.isSuccess}
+				onClick={() =>
+					undo.mutate(
+						{ generationId, pageId },
+						{
+							onSuccess: ({ restoredBlockIds }) =>
+								restoredBlockIds.length > 0
+									? toast.success(
+										`Restored ${pluralize(restoredBlockIds.length, "block", "blocks")}.`,
+									)
+									: toast.info("Nothing to restore: these blocks are already back."),
+							onError: (error) =>
+								toast.error(getAiChatErrorMessage(error, "Unable to undo these changes.")),
+						},
+					)
+				}
+			>
+				{undo.isPending ? (
+					<Loader2 className='size-4 animate-spin' />
+				) : (
+					<Undo2 className='size-4' />
+				)}
+				{undo.isSuccess ? "Undone" : "Undo"}
+			</Button>
+		</div>
+	);
+}
+
+type BlockTextOperation = Extract<
+	AiModificationOperation,
+	{ type: "SET_BLOCK_TEXT" }
+>;
+
+/** SET_BLOCK_TEXT: only the text of an existing block changes. */
+function BlockTextPreview({
+	operations,
+	defaultOpen,
+}: {
+	operations: BlockTextOperation[];
+	defaultOpen: boolean;
+}) {
+	return (
+		<OperationSection
+			icon={<Pencil className='size-3.5' />}
+			title={`Edit ${pluralize(operations.length, "block", "blocks")}`}
+			subtitle='Only the text changes'
+			defaultOpen={defaultOpen}
+		>
+			<ul className='divide-y divide-border/40'>
+				{operations.map((operation) => (
+					<li
+						key={operation.blockId}
+						className='flex items-start gap-2.5 px-3 py-2.5'
+					>
+						<div className='min-w-0 flex-1 space-y-1 text-sm leading-relaxed'>
+							<del className='block whitespace-pre-wrap break-words text-muted-foreground'>
+								{operation.oldText}
+							</del>
+							<ins className='block whitespace-pre-wrap break-words text-foreground no-underline'>
+								{operation.newText}
+							</ins>
+						</div>
+
+						<span className='mt-0.5 shrink-0 text-[10px] font-medium uppercase tracking-wide text-muted-foreground/80'>
+							Edit
+						</span>
+					</li>
+				))}
+			</ul>
+		</OperationSection>
+	);
+}
+
+type TodoTickOperation = Extract<
+	AiModificationOperation,
+	{ type: "SET_TODO_CHECKED" }
+>;
+
+/** SET_TODO_CHECKED: only the checkbox of an existing to-do changes. */
+function TodoTicksPreview({
+	operations,
+	defaultOpen,
+}: {
+	operations: TodoTickOperation[];
+	defaultOpen: boolean;
+}) {
+	return (
+		<OperationSection
+			icon={<ListChecks className='size-3.5' />}
+			title={`Update ${pluralize(operations.length, "to-do", "to-dos")}`}
+			subtitle='Only the checkbox changes'
+			defaultOpen={defaultOpen}
+		>
+			<ul className='divide-y divide-border/40'>
+				{operations.map((operation) => (
+					<li
+						key={operation.blockId}
+						className='flex items-start gap-2.5 px-3 py-2.5'
+					>
+						<span
+							role='img'
+							aria-label={
+								operation.checked
+									? "Not done → Done"
+									: "Done → Not done"
+							}
+							className='flex shrink-0 items-center gap-1 text-muted-foreground'
+						>
+							<TodoCheckbox checked={!operation.checked} />
+							<ArrowRight className='mt-0.5 size-3' />
+							<TodoCheckbox checked={operation.checked} />
+						</span>
+
+						<span
+							className={cn(
+								"min-w-0 flex-1 whitespace-pre-wrap break-words text-sm leading-relaxed",
+								operation.checked
+									? "text-muted-foreground line-through"
+									: "text-foreground",
+							)}
+						>
+							{operation.text}
+						</span>
+
+						<span className='mt-0.5 shrink-0 text-[10px] font-medium uppercase tracking-wide text-muted-foreground/80'>
+							{operation.checked ? "Check" : "Uncheck"}
+						</span>
+					</li>
+				))}
+			</ul>
+		</OperationSection>
+	);
+}
+
 function getDraftStatus(
 	generation: AiGeneration,
 	plan: AiModificationPlan,
@@ -557,29 +822,27 @@ export function AiModificationPlanPreview({
 	// Changes awaiting a decision stay expanded; settled drafts collapse.
 	const expandOperations = isCompleted;
 
-	const blockCount = plan.operations.reduce(
-		(total, operation) =>
-			operation.type === "INSERT_BLOCKS"
-				? total + operation.blocks.length
-				: total,
-		0,
+	const operations: AiModificationOperation[] = plan.operations;
+	const todoTicks = operations.filter(
+		(operation): operation is TodoTickOperation =>
+			operation.type === "SET_TODO_CHECKED",
 	);
 
-	const rowCount = plan.operations.reduce(
-		(total, operation) =>
-			operation.type === "CREATE_DATABASE_ROWS"
-				? total + operation.rows.length
-				: total,
-		0,
+	const textEdits = operations.filter(
+		(operation): operation is BlockTextOperation =>
+			operation.type === "SET_BLOCK_TEXT",
 	);
 
-	const counts = [
-		pluralize(plan.operations.length, "operation", "operations"),
-		blockCount > 0 && pluralize(blockCount, "block", "blocks"),
-		rowCount > 0 && pluralize(rowCount, "row", "rows"),
-	]
-		.filter(Boolean)
-		.join(" · ");
+	const blockDeletes = operations.filter(
+		(operation): operation is BlockDeleteOperation =>
+			operation.type === "DELETE_BLOCK",
+	);
+	const canUndo =
+		generation.status === "APPLIED" &&
+		blockDeletes.length > 0 &&
+		Boolean(generation.applied_at);
+
+	const counts = formatPlanCounts(operations);
 
 	return (
 		<div
@@ -647,6 +910,28 @@ export function AiModificationPlanPreview({
 						) : null,
 					)}
 
+					{blockDeletes.length > 0 && (
+						<BlockDeletePreview
+							pageId={plan.pageId}
+							operations={blockDeletes}
+							defaultOpen={expandOperations}
+						/>
+					)}
+
+					{textEdits.length > 0 && (
+						<BlockTextPreview
+							operations={textEdits}
+							defaultOpen={expandOperations}
+						/>
+					)}
+
+					{todoTicks.length > 0 && (
+						<TodoTicksPreview
+							operations={todoTicks}
+							defaultOpen={expandOperations}
+						/>
+					)}
+
 					{plan.operations.length === 0 && (
 						<p className='rounded-lg bg-muted/40 p-3 text-xs text-muted-foreground'>
 							No operations were proposed.
@@ -692,7 +977,7 @@ export function AiModificationPlanPreview({
 							? "The page changed after this draft was created. Send your request again to get a new draft."
 							: plan.status === "PLAN_READY"
 								? "Nothing changes until you apply."
-								: "Send a complete request with the additional details, or discard this draft."}
+								: "Or discard this draft."}
 					</p>
 
 					<div className='flex items-center gap-2'>
@@ -721,6 +1006,14 @@ export function AiModificationPlanPreview({
 						)}
 					</div>
 				</div>
+			)}
+
+			{canUndo && !previewOnly && (
+				<UndoDeleteFooter
+					generationId={generation.id}
+					pageId={plan.pageId}
+					appliedAt={generation.applied_at ?? ""}
+				/>
 			)}
 
 			{isCompleted && previewOnly && (

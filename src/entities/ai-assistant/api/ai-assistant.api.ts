@@ -18,6 +18,7 @@ import type {
 	GeneratePagePlanFromInstructionRequest,
 	GeneratePagePlanFromInstructionResponse,
 	SubmitAiMessageRequest,
+	UndoAiModificationPlanResponse,
 } from "../model/ai-assistant.types";
 
 // Backend AI contracts accept this credential only as a query parameter.
@@ -191,6 +192,19 @@ export async function confirmAiModificationPlan(
 	return response.data.data;
 }
 
+/** Restores what an applied AI delete removed, within 24 hours (kế hoạch xoá block). */
+export async function undoAiModificationPlan(
+	generationId: string,
+	shareToken?: string,
+): Promise<UndoAiModificationPlanResponse> {
+	const response = await apiClient.post<AiApiResponse<UndoAiModificationPlanResponse>>(
+		`/ai-assistant/generations/${generationId}/undo`,
+		...(shareToken ? [undefined, shareQuery(shareToken)] as const : [] as const),
+	);
+
+	return response.data.data;
+}
+
 export async function discardAiGeneration(
 	generationId: string,
 	shareToken?: string,
@@ -204,8 +218,9 @@ export async function discardAiGeneration(
 }
 
 // Initial budget for intent classification followed by generation/planning.
+// Above the backend's AI_SERVICE_TIMEOUT_MS (270 s): a new page can take minutes.
 // A timeout does not mean the server stopped; requestId is not an idempotency key.
-const AI_ASK_TIMEOUT = 180_000;
+const AI_ASK_TIMEOUT = 300_000;
 
 export async function askAi(input: AskAiRequest, shareToken?: string): Promise<AiAskResponse> {
   const response = await apiClient.post<AiApiResponse<AiAskResponse>>(

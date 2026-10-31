@@ -24,6 +24,15 @@ describe("pure Unified Ask response mapping", () => {
 		expect(input).toEqual(askResponses[name]);
 	});
 
+	it("maps a request for checklist items (gp02) to feedback, never an unknown reason", () => {
+		const withReason = (reason: string) => ({ ...askResponses.pageClarification,
+			planning: { ...askResponses.pageClarification.planning, reason } }) as AiAskResponse;
+		expect(mapAiAskResponse(withReason("MISSING_CHECKLIST_ITEMS")))
+			.toMatchObject({ kind: "feedback", reason: "MISSING_CHECKLIST_ITEMS", hasGeneration: false });
+		expect(mapAiAskResponse(withReason("MISSING_SOMETHING_ELSE")))
+			.toMatchObject({ kind: "invalid", reason: "INVALID_PLANNING_FEEDBACK" });
+	});
+
 	it("preserves null capability without a fake Writing action", () => {
 		const mapped = mapAiAskResponse(askResponses.clarification);
 		expect(mapped).toMatchObject({ capability: null, hasGeneration: false, canConfirm: false, canDiscard: false,
@@ -159,7 +168,8 @@ describe("M1b: real Page names found in the sentence", () => {
 		{ ...sentenceResponses.ambiguous, planning: { ...sentenceResponses.ambiguous.planning, resolutionMethod: "FUZZY_TITLE" } },
 		{ ...sentenceResponses.ambiguous, planning: { ...sentenceResponses.ambiguous.planning,
 			candidates: Array.from({ length: 6 }, (_, index) => ({ ...candidate, pageId: `page-${index}` })) } },
-		{ ...askResponses.plan, planning: { ...askResponses.plan.planning, resolutionMethod: "FUZZY_TITLE" } },
+		// M6: SEMANTIC answers a description or a typed name, never an unresolved Page.
+		{ ...sentenceResponses.plan, planning: { ...sentenceResponses.plan.planning, resolutionMethod: "SEMANTIC" } },
 		// Any other method still never plans an intent that needed clarification.
 		{ ...sentenceResponses.plan, planning: { ...sentenceResponses.plan.planning, resolutionMethod: "EXACT_TITLE" } },
 	])("rejects unexpected sentence payload %#", (payload) => {

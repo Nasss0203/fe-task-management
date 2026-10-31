@@ -79,7 +79,8 @@ export function createUnifiedAskOrchestrator(deps: Dependencies) {
 				requestId: operation.token.requestId, binding: operationBinding(operation.token) }, ...extra,
 		}, replaceId);
 	};
-	const planPreview = async (operation: AiChatOperation, turnId: string, mapped: Pick<PlanResult, "generationId" | "conversationId" | "plan" | "preview">,
+	const planPreview = async (operation: AiChatOperation, turnId: string,
+		mapped: Pick<PlanResult, "generationId" | "conversationId" | "plan" | "preview" | "sources">,
 		request: AskAiRequest, replaceId?: string) => {
 		if (!mapped.generationId || !mapped.conversationId) return false;
 		store().setPendingStage(operation.token.chatScope, operation.token.requestId!, "loading-preview");
@@ -90,6 +91,7 @@ export function createUnifiedAskOrchestrator(deps: Dependencies) {
 			return put(operation, turnId, mapped.plan.status === "PLAN_READY" ? "Review the proposed changes before applying. No changes have been applied."
 				: "More context is needed. Submit a complete instruction with the additional details.", "other", {
 				capability: "GENERATE_PAGE_MODIFICATION_PLAN", generation,
+				...(mapped.sources ? { sources: mapped.sources } : {}),
 				origin: { source: "generation-overlay", localId: replaceId ?? crypto.randomUUID(), turnId,
 					conversationId: mapped.conversationId, generationId: mapped.generationId, requestId: request.requestId ?? undefined },
 			}, replaceId);
@@ -97,7 +99,8 @@ export function createUnifiedAskOrchestrator(deps: Dependencies) {
 			if (deny(error, operation, mapped.conversationId, mapped.generationId)) return false;
 			return put(operation, turnId, "The draft was created, but its preview could not be loaded or verified. Retry loading the preview; do not resend the request.", "error", {
 				previewRecovery: { request, binding: operationBinding(operation.token), generationId: mapped.generationId,
-					conversationId: mapped.conversationId, plan: mapped.plan, preview: mapped.preview, turnId },
+					conversationId: mapped.conversationId, plan: mapped.plan, preview: mapped.preview, turnId,
+					...(mapped.sources ? { sources: mapped.sources } : {}) },
 			}, replaceId);
 		}
 	};
