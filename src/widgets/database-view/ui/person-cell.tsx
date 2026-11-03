@@ -14,6 +14,7 @@ import {
 	AvatarGroupCount,
 	AvatarImage,
 } from "@/shared/ui/avatar";
+import { cn } from "@/shared/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 
 import { useDatabaseShareToken } from "../model/share-token-context";
@@ -42,9 +43,15 @@ interface PersonCellProps {
 	onChange: (value: string[] | null) => void;
 }
 
-function PersonAvatar({ person }: { person: DisplayPerson }) {
+export function PersonAvatar({
+	person,
+	className,
+}: {
+	person: DisplayPerson;
+	className?: string;
+}) {
 	return (
-		<Avatar size='sm' className='size-5'>
+		<Avatar size='sm' className={cn("size-5", className)}>
 			{person.avatar_url && <AvatarImage src={person.avatar_url} />}
 			<AvatarFallback className='text-[10px]'>
 				{person.full_name.charAt(0).toUpperCase()}
