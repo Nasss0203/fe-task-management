@@ -1,4 +1,4 @@
-import { Check, CreditCard, RotateCw, Sparkles } from "lucide-react";
+import { Check, RotateCw } from "lucide-react";
 
 import {
 	useBillingPlans,
@@ -24,7 +24,7 @@ import {
 } from "./settings-layout";
 
 const STATUS_STYLES: Record<WorkspaceSubscriptionStatus, { label: string; className: string }> = {
-	ACTIVE: { label: "Active", className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
+	ACTIVE: { label: "Active", className: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400" },
 	PENDING: { label: "Pending", className: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
 	PAST_DUE: { label: "Past due", className: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
 	CANCELED: { label: "Canceled", className: "bg-muted text-muted-foreground" },
@@ -101,24 +101,24 @@ const BillingSection = ({ workspaceId }: BillingSectionProps) => {
 		<div>
 			{header}
 
-			<section className='mb-8 overflow-hidden rounded-xl border'>
-				<div className='flex flex-wrap items-start justify-between gap-4 bg-gradient-to-br from-primary/10 via-transparent to-transparent p-6'>
+			<section className='mb-5 overflow-hidden rounded-xl border p-5'>
+				<div className='flex flex-wrap items-start justify-between gap-4'>
 					<div className='min-w-0'>
-						<p className='text-xs font-medium uppercase tracking-wide text-muted-foreground'>
+						<p className='text-[12.5px] leading-[19px] text-muted-foreground'>
 							Current plan
 						</p>
 						<div className='mt-1 flex items-center gap-2'>
-							<h3 className='text-2xl font-semibold'>{subscription.plan.name}</h3>
+							<h3 className='text-lg font-semibold leading-[27px]'>{subscription.plan.name}</h3>
 							<span
 								className={cn(
-									"rounded-full px-2 py-0.5 text-xs font-medium",
+									"rounded-full px-2 py-0.5 text-[11.5px] font-medium leading-[17px]",
 									status.className,
 								)}
 							>
 								{status.label}
 							</span>
 						</div>
-						<p className='mt-1 text-sm text-muted-foreground'>
+						<p className='mt-1 text-[13.5px] leading-5 text-muted-foreground'>
 							{isFree
 								? "Free forever. Upgrade any time for more members and storage."
 								: currentPrice
@@ -129,13 +129,12 @@ const BillingSection = ({ workspaceId }: BillingSectionProps) => {
 						</p>
 					</div>
 					<Button onClick={openPlans}>
-						<Sparkles className='size-4' />
 						{isFree ? "Upgrade plan" : "Change plan"}
 					</Button>
 				</div>
 
-				<div className='border-t px-6 py-4'>
-					<p className='mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground'>
+				<div className='pt-3.5'>
+					<p className='mb-3 text-[12.5px] font-medium leading-[19px] text-muted-foreground'>
 						Included in your plan
 					</p>
 					{plansQuery.isPending ? (
@@ -145,13 +144,10 @@ const BillingSection = ({ workspaceId }: BillingSectionProps) => {
 							))}
 						</div>
 					) : currentPlan && currentPlan.features.length > 0 ? (
-						<ul className='grid gap-2 text-sm sm:grid-cols-2'>
+						<ul className='grid gap-2 text-[13px] leading-5 sm:grid-cols-2'>
 							{currentPlan.features.map((feature) => (
-								<li key={feature.id} className='flex gap-2'>
-									<Check
-										aria-hidden
-										className='mt-0.5 size-4 shrink-0 text-emerald-500'
-									/>
+								<li key={feature.id} className='flex items-center gap-2'>
+									<Check aria-hidden className='size-3.5 shrink-0 text-emerald-600 dark:text-emerald-400' />
 									{formatFeature(feature)}
 								</li>
 							))}
@@ -164,7 +160,7 @@ const BillingSection = ({ workspaceId }: BillingSectionProps) => {
 
 			<SettingsGroup title='Subscription'>
 				<SettingsRow label='Billing period'>
-					<span className='text-sm text-muted-foreground'>
+					<span className='text-[13.5px] text-muted-foreground'>
 						{isFree
 							? "—"
 							: `${formatSettingsDate(subscription.currentPeriodStart)} – ${formatSettingsDate(subscription.currentPeriodEnd)}`}
@@ -173,13 +169,12 @@ const BillingSection = ({ workspaceId }: BillingSectionProps) => {
 				<SettingsRow
 					label={subscription.cancelAtPeriodEnd ? "Ends on" : "Renews on"}
 				>
-					<span className='text-sm text-muted-foreground'>
+					<span className='text-[13.5px] text-muted-foreground'>
 						{isFree ? "—" : formatSettingsDate(subscription.currentPeriodEnd)}
 					</span>
 				</SettingsRow>
 				<SettingsRow label='Payment method'>
-					<span className='flex items-center gap-1.5 text-sm text-muted-foreground'>
-						<CreditCard className='size-4' />
+					<span className='text-[13.5px] text-muted-foreground'>
 						{subscription.provider === "STRIPE"
 							? "Card (Stripe)"
 							: subscription.provider === "SEPAY"
@@ -195,7 +190,7 @@ const BillingSection = ({ workspaceId }: BillingSectionProps) => {
 };
 
 const ORDER_STATUS_STYLES: Record<PaymentOrderStatus, { label: string; className: string }> = {
-	PAID: { label: "Paid", className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
+	PAID: { label: "Paid", className: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400" },
 	PENDING: { label: "Pending", className: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
 	FAILED: { label: "Failed", className: "bg-destructive/10 text-destructive" },
 	EXPIRED: { label: "Expired", className: "bg-muted text-muted-foreground" },
@@ -226,42 +221,42 @@ function PaymentHistory({ workspaceId }: { workspaceId: string }) {
 					No payments yet. Payments appear here after you upgrade.
 				</p>
 			) : (
-				<div className='overflow-x-auto py-2'>
-					<table className='w-full text-sm'>
+				<div className='overflow-x-auto'>
+					<table className='w-full text-[13px] leading-5 [&_tbody_tr:last-child]:border-b-0'>
 						<thead>
-							<tr className='text-left text-xs text-muted-foreground'>
-								<th className='py-2 pr-4 font-medium'>Date</th>
-								<th className='py-2 pr-4 font-medium'>Plan</th>
-								<th className='py-2 pr-4 font-medium'>Method</th>
-								<th className='py-2 pr-4 text-right font-medium'>Amount</th>
-								<th className='py-2 font-medium'>Status</th>
+							<tr className='h-11 text-left text-xs text-muted-foreground'>
+								<th className='w-[140px] pr-4 font-medium'>Date</th>
+								<th className='pr-4 font-medium'>Plan</th>
+								<th className='w-[130px] pr-4 font-medium'>Method</th>
+								<th className='w-[130px] pr-4 font-medium'>Amount</th>
+								<th className='w-[90px] text-right font-medium'>Status</th>
 							</tr>
 						</thead>
-						<tbody className='divide-y'>
+						<tbody>
 							{ordersQuery.data.map((order) => {
 								const status = ORDER_STATUS_STYLES[order.status];
 								return (
-									<tr key={order.id}>
-										<td className='py-2.5 pr-4 whitespace-nowrap'>
+									<tr key={order.id} className='h-11 border-b'>
+										<td className='pr-4 whitespace-nowrap text-muted-foreground'>
 											{formatSettingsDate(order.paidAt ?? order.createdAt)}
 										</td>
-										<td className='py-2.5 pr-4'>
+										<td className='pr-4'>
 											{order.planName}
-											<span className='text-muted-foreground'>
+											<span>
 												{" "}
 												· {order.billingInterval === "YEARLY" ? "Yearly" : "Monthly"}
 											</span>
 										</td>
-										<td className='py-2.5 pr-4 text-muted-foreground'>
+										<td className='pr-4 text-muted-foreground'>
 											{order.provider === "STRIPE" ? "Card" : "Bank transfer"}
 										</td>
-										<td className='py-2.5 pr-4 text-right tabular-nums whitespace-nowrap'>
+										<td className='pr-4 font-medium tabular-nums whitespace-nowrap'>
 											{order.amount.toLocaleString("vi-VN")} {order.currency}
 										</td>
-										<td className='py-2.5'>
+										<td className='text-right'>
 											<span
 												className={cn(
-													"rounded-full px-2 py-0.5 text-xs font-medium",
+													"rounded-full px-2 py-0.5 text-[11.5px] font-medium leading-[17px]",
 													status.className,
 												)}
 											>

@@ -43,7 +43,7 @@ export function PeopleList({
 	}
 
 	return (
-		<div className='divide-y'>
+		<div>
 			{people.map((person) => (
 				<PersonRow
 					key={person.id}

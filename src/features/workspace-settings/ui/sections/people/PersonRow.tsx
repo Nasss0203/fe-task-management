@@ -12,7 +12,8 @@ import {
 	DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
 import { Button } from "@/shared/ui/button";
-import { getInitials, getRoleLabel } from "./people.utils";
+import { cn } from "@/shared/lib/utils";
+import { getAvatarTone, getInitials, getRoleLabel } from "./people.utils";
 
 interface PersonRowProps {
 	person: WorkspacePerson;
@@ -47,19 +48,26 @@ export function PersonRow({
 		(person.membership_type === "GUEST" && canRemoveTarget);
 
 	return (
-		<div className='flex items-center justify-between gap-4 py-4'>
+		<div className='flex min-h-14 items-center justify-between gap-3 border-b py-2'>
 			<div className='flex min-w-0 items-center gap-3'>
-				<Avatar className='size-9'>
+				<Avatar className='size-8'>
 					{person.avatar_url ? (
 						<AvatarImage src={person.avatar_url} alt={displayName} />
 					) : null}
-					<AvatarFallback className='text-xs font-medium'>
+					<AvatarFallback
+						className={cn(
+							"text-xs font-semibold text-white",
+							person.membership_type === "GUEST"
+								? "bg-muted-foreground"
+								: getAvatarTone(person.user_id),
+						)}
+					>
 						{getInitials(displayName)}
 					</AvatarFallback>
 				</Avatar>
 				<div className='min-w-0'>
-					<p className='truncate text-sm font-medium'>{displayName}</p>
-					<p className='truncate text-xs text-muted-foreground'>{person.email}</p>
+					<p className='truncate text-[13.5px] font-medium leading-5'>{displayName}{isSelf && <span className='ml-1.5 text-[12.5px] font-normal text-faint'>(You)</span>}</p>
+					<p className='truncate text-[12.5px] leading-[19px] text-muted-foreground'>{person.email}</p>
 					{roleError ? (
 						<p role='alert' className='mt-1 text-xs text-destructive'>
 							{roleError}
@@ -72,18 +80,19 @@ export function PersonRow({
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button
-							variant='outline'
+							variant='ghost'
 							size='sm'
+							className='h-7 gap-1 px-2 text-[13px] font-normal text-muted-foreground hover:text-foreground data-[state=open]:bg-accent'
 							disabled={isRoleUpdating}
 							aria-label={`Role for ${displayName}`}
 						>
 							{person.membership_type === "GUEST"
 								? "Guest"
 								: getRoleLabel(person.role_name)}
-							<ChevronDown className='size-4 opacity-50' />
+							<ChevronDown className='size-3' />
 						</Button>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent align='end'>
+					<DropdownMenuContent align='end' className='w-60'>
 						{person.membership_type === "MEMBER"
 							? (["OWNER", "MEMBER"] as const).map((role) => (
 							<DropdownMenuItem
@@ -96,7 +105,7 @@ export function PersonRow({
 								}}
 							>
 								<span className='flex-1'>{getRoleLabel(role)}</span>
-								{person.role_name === role ? <Check className='size-4' /> : null}
+								{person.role_name === role ? <Check className='size-3.5' /> : null}
 							</DropdownMenuItem>
 							))
 							: null}
@@ -129,7 +138,7 @@ export function PersonRow({
 					</DropdownMenuContent>
 				</DropdownMenu>
 			) : (
-				<span className='shrink-0 text-sm text-muted-foreground'>
+				<span className='shrink-0 px-2 text-[13px] text-muted-foreground'>
 					{person.membership_type === "GUEST"
 						? "Guest"
 						: getRoleLabel(person.role_name)}

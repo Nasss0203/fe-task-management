@@ -1,12 +1,38 @@
 "use client";
 
-import { Globe2, Lock } from "lucide-react";
+import { Lock, Users, type LucideIcon } from "lucide-react";
 import { useState } from "react";
 
 import type { TeamspaceVisibility } from "@/entities/teamspace/model/teamspace.types";
 
+import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
-import { EntityEditorDialog } from "@/shared/ui/entity-editor-dialog/entity-editor-dialog";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "@/shared/ui/dialog";
+
+const VISIBILITY_OPTIONS: Array<{
+	value: TeamspaceVisibility;
+	label: string;
+	description: string;
+	icon: LucideIcon;
+}> = [
+	{
+		value: "OPEN",
+		label: "Open",
+		description: "Workspace members can discover this teamspace.",
+		icon: Users,
+	},
+	{
+		value: "PRIVATE",
+		label: "Private",
+		description: "Only Teamspace members can access this teamspace.",
+		icon: Lock,
+	},
+];
 
 interface CreateTeamspaceDialogProps {
 	open: boolean;
@@ -68,160 +94,113 @@ export function CreateTeamspaceDialog({
 	};
 
 	return (
-		<EntityEditorDialog
-			open={open}
-			onOpenChange={handleOpenChange}
-			title='Create teamspace'
-			breadcrumbLabel='New teamspace'
-			icon={<span className='text-sm'>{icon}</span>}
-		>
-			{/* Title */}
-			<div className='flex items-start gap-3'>
-				<button
-					type='button'
-					className='
-                        mt-1 flex size-10
-                        shrink-0 items-center
-                        justify-center rounded-lg
-                        bg-muted text-xl
-                        transition-colors
-                        hover:bg-muted/80
-                    '
-				>
-					{icon}
-				</button>
+		<Dialog open={open} onOpenChange={handleOpenChange}>
+			<DialogContent
+				aria-describedby={undefined}
+				className='gap-0 overflow-hidden rounded-[12px] p-0 shadow-[0_24px_56px_-12px_rgba(0,0,0,0.28)] sm:max-w-[480px]'
+			>
+				<DialogHeader className='px-6 pb-2 pr-12 pt-5'>
+					<DialogTitle className='text-base leading-6'>
+						Create teamspace
+					</DialogTitle>
+				</DialogHeader>
 
-				<input
-					autoFocus
-					value={name}
-					onChange={(event) => setName(event.target.value)}
-					onKeyDown={(event) => {
-						if (event.key === "Enter" && !isLoading) {
-							handleCreate();
-						}
-					}}
-					placeholder='New teamspace'
-					className='
-                        block w-full
-                        border-0
-                        bg-transparent
-                        p-0
-                        text-[40px]
-                        font-bold
-                        leading-[1.15]
-                        tracking-[-0.02em]
-                        outline-none
-                        placeholder:text-muted-foreground/25
-                    '
-				/>
-			</div>
+				<div className='flex flex-col gap-4 px-6 pb-5 pt-3'>
+					<div className='flex items-center gap-3'>
+						<button
+							type='button'
+							className='flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-xl transition-colors hover:bg-sidebar-accent'
+						>
+							{icon}
+						</button>
 
-			{/* Description */}
-			<textarea
-				value={description}
-				onChange={(event) => setDescription(event.target.value)}
-				placeholder='Add a description...'
-				rows={3}
-				className='
-                    mt-5
-                    w-full
-                    resize-none
-                    border-0
-                    bg-transparent
-                    text-sm
-                    leading-6
-                    outline-none
-                    placeholder:text-muted-foreground/50
-                '
-			/>
+						<input
+							autoFocus
+							value={name}
+							onChange={(event) => setName(event.target.value)}
+							onKeyDown={(event) => {
+								if (event.key === "Enter" && !isLoading) {
+									handleCreate();
+								}
+							}}
+							placeholder='New teamspace'
+							className='block w-full border-0 bg-transparent p-0 text-lg font-semibold leading-[27px] outline-none placeholder:text-muted-foreground/40'
+						/>
+					</div>
 
-			{/* Visibility */}
-			<div className='mt-10'>
-				<div className='mb-3 text-sm font-medium'>Visibility</div>
+					<textarea
+						value={description}
+						onChange={(event) => setDescription(event.target.value)}
+						placeholder='Add a description...'
+						rows={2}
+						className='w-full resize-none border-0 bg-transparent p-0 text-[13.5px] leading-5 outline-none placeholder:text-faint'
+					/>
 
-				<div className='space-y-2'>
-					<button
-						type='button'
-						onClick={() => setVisibility("OPEN")}
-						className={`
-                            flex w-full
-                            items-start gap-3
-                            rounded-lg
-                            border p-3
-                            text-left
-                            transition-colors
-                            hover:bg-muted/50
+					<div className='flex flex-col gap-2'>
+						<div className='text-[13px] font-medium leading-5'>Visibility</div>
 
-                            ${
-								visibility === "OPEN"
-									? "border-foreground/20 bg-muted"
-									: "border-border"
-							}
-                        `}
-					>
-						<Globe2 className='mt-0.5 size-4 shrink-0' />
+						{VISIBILITY_OPTIONS.map((option) => {
+							const Icon = option.icon;
 
-						<div className='min-w-0'>
-							<div className='text-sm font-medium'>Open</div>
+							const selected = visibility === option.value;
 
-							<div className='mt-1 text-xs leading-5 text-muted-foreground'>
-								Workspace members can discover this teamspace.
-							</div>
-						</div>
-					</button>
+							return (
+								<button
+									key={option.value}
+									type='button'
+									onClick={() => setVisibility(option.value)}
+									className={cn(
+										"flex w-full items-start gap-3 rounded-lg p-3 text-left transition-colors",
+										selected
+											? "border-[1.5px] border-ring bg-accent-soft"
+											: "border border-border hover:bg-muted/50",
+									)}
+								>
+									<span
+										aria-hidden='true'
+										className={cn(
+											"mt-0.5 size-4 shrink-0 rounded-full",
+											selected
+												? "border-[5px] border-ring"
+												: "border-[1.5px] border-muted-foreground/40",
+										)}
+									/>
 
-					<button
-						type='button'
-						onClick={() => setVisibility("PRIVATE")}
-						className={`
-                            flex w-full
-                            items-start gap-3
-                            rounded-lg
-                            border p-3
-                            text-left
-                            transition-colors
-                            hover:bg-muted/50
+									<div className='min-w-0 flex-1'>
+										<div className='flex items-center gap-1.5 text-[13.5px] font-medium leading-5'>
+											<Icon className='size-3.5 shrink-0' />
+											{option.label}
+										</div>
 
-                            ${
-								visibility === "PRIVATE"
-									? "border-foreground/20 bg-muted"
-									: "border-border"
-							}
-                        `}
-					>
-						<Lock className='mt-0.5 size-4 shrink-0' />
-
-						<div className='min-w-0'>
-							<div className='text-sm font-medium'>Private</div>
-
-							<div className='mt-1 text-xs leading-5 text-muted-foreground'>
-								Only Teamspace members can access this
-								teamspace.
-							</div>
-						</div>
-					</button>
+										<div className='mt-0.5 text-[12.5px] leading-[19px] text-muted-foreground'>
+											{option.description}
+										</div>
+									</div>
+								</button>
+							);
+						})}
+					</div>
 				</div>
-			</div>
 
-			{/* Actions */}
-			<div className='mt-10 flex justify-end gap-2'>
-				<Button
-					type='button'
-					variant='outline'
-					disabled={isLoading}
-					onClick={() => handleOpenChange(false)}
-				>
-					Cancel
-				</Button>
+				<div className='flex justify-end gap-2 border-t px-6 py-3'>
+					<Button
+						type='button'
+						variant='outline'
+						disabled={isLoading}
+						onClick={() => handleOpenChange(false)}
+					>
+						Cancel
+					</Button>
 
-				<Button
-					type='button'
-					disabled={!name.trim() || isLoading}
-					onClick={handleCreate}
-				>
-					{isLoading ? "Creating..." : "Create teamspace"}
-				</Button>
-			</div>
-		</EntityEditorDialog>
+					<Button
+						type='button'
+						disabled={!name.trim() || isLoading}
+						onClick={handleCreate}
+					>
+						{isLoading ? "Creating..." : "Create teamspace"}
+					</Button>
+				</div>
+			</DialogContent>
+		</Dialog>
 	);
 }

@@ -57,7 +57,8 @@ const STATUS_PRESENTATION: Record<
 > = {
 	ACTIVE: {
 		label: "Active",
-		className: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+		className:
+			"bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400",
 	},
 	EXPIRED: { label: "Expired", className: "bg-muted text-muted-foreground" },
 	EXHAUSTED: { label: "Used up", className: "bg-muted text-muted-foreground" },
@@ -161,7 +162,7 @@ export function TeamspaceInviteLinksTab({
 		<div className='flex flex-col gap-6'>
 			<section className='flex flex-col gap-3 rounded-lg border p-4'>
 				<div>
-					<h3 className='text-sm font-medium'>Create an invite link</h3>
+					<h3 className='text-[13px] font-medium'>Create an invite link</h3>
 
 					<p className='mt-0.5 text-xs text-muted-foreground'>
 						Anyone in this workspace with the link can join the
@@ -172,7 +173,7 @@ export function TeamspaceInviteLinksTab({
 				<div className='flex flex-col gap-2 sm:flex-row'>
 					<Select value={expiryDays} onValueChange={setExpiryDays}>
 						<SelectTrigger
-							className='h-9 sm:w-36'
+							className='gap-1.5 text-[13px] data-[size=default]:h-9 sm:w-auto sm:min-w-36 [&_svg]:size-3.5'
 							aria-label='Link expires after'
 						>
 							<SelectValue />
@@ -188,7 +189,10 @@ export function TeamspaceInviteLinksTab({
 					</Select>
 
 					<Select value={maxUses} onValueChange={setMaxUses}>
-						<SelectTrigger className='h-9 sm:w-32' aria-label='Maximum uses'>
+						<SelectTrigger
+							className='gap-1.5 text-[13px] data-[size=default]:h-9 sm:w-32 [&_svg]:size-3.5'
+							aria-label='Maximum uses'
+						>
 							<SelectValue />
 						</SelectTrigger>
 
@@ -202,32 +206,32 @@ export function TeamspaceInviteLinksTab({
 					</Select>
 
 					<Button
-						className='h-9 sm:ml-auto'
+						className='h-9 px-3.5 sm:ml-auto'
 						disabled={createMutation.isPending}
 						onClick={handleCreate}
 					>
-						<Link2 className='size-4' />
+						<Link2 className='size-3.5' />
 						{createMutation.isPending ? "Creating..." : "Create link"}
 					</Button>
 				</div>
 
 				{createdLink && (
-					<div className='flex flex-col gap-2 rounded-md bg-muted/60 p-3'>
+					<div className='flex flex-col gap-2 rounded-md bg-muted p-3'>
 						<div className='flex gap-2'>
 							<Input
 								readOnly
 								value={getShareUrl(createdLink)}
 								aria-label='New invite link'
-								className='h-9 bg-background font-mono text-xs'
+								className='h-9 bg-background px-2.5 text-xs text-muted-foreground md:text-xs'
 								onFocus={(event) => event.currentTarget.select()}
 							/>
 
 							<Button
 								variant='outline'
-								className='h-9 shrink-0'
+								className='h-9 shrink-0 bg-background'
 								onClick={() => handleCopy(getShareUrl(createdLink))}
 							>
-								<Copy className='size-4' />
+								<Copy className='size-3.5' />
 								Copy
 							</Button>
 						</div>
@@ -254,12 +258,12 @@ export function TeamspaceInviteLinksTab({
 						No invite links yet.
 					</p>
 				) : (
-					<ul className='divide-y'>
+					<ul>
 						{links.map((link) => {
 							const status = STATUS_PRESENTATION[link.status];
 
 							return (
-								<li key={link.id} className='flex items-center gap-3 py-2.5'>
+								<li key={link.id} className='flex items-center gap-3 border-b py-2.5'>
 									<span
 										className={cn(
 											"shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium",
@@ -286,8 +290,7 @@ export function TeamspaceInviteLinksTab({
 									{link.status === "ACTIVE" && (
 										<Button
 											variant='ghost'
-											size='sm'
-											className='h-8 shrink-0 text-xs text-destructive hover:text-destructive'
+											className='shrink-0 px-2.5 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive'
 											onClick={() => setLinkToRevoke(link)}
 										>
 											Revoke

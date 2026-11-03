@@ -99,22 +99,22 @@ export function CreateWorkspaceDialog({
 			open={open}
 			onOpenChange={(value) => !isSubmitting && onOpenChange(value)}
 		>
-			<DialogContent className='gap-0 overflow-hidden p-0 sm:max-w-[960px]'>
-				<div className='grid md:h-[600px] md:grid-cols-[320px_1fr]'>
+			<DialogContent className='gap-0 overflow-hidden rounded-xl border bg-background p-0 shadow-[0_24px_56px_-12px_rgba(0,0,0,0.28)] sm:max-w-[960px]'>
+				<div className='grid md:h-[600px] md:grid-cols-[340px_1fr]'>
 					<form
 						onSubmit={handleCreate}
-						className='flex min-h-0 flex-col border-border/60 md:border-r'
+						className='flex min-h-0 flex-col border-border md:border-r'
 					>
-						<div className='space-y-1 px-5 pt-5 pb-4'>
-							<DialogTitle className='text-base font-semibold'>
+						<div className='space-y-1 px-6 pb-2 pt-5'>
+							<DialogTitle className='text-base font-semibold leading-6'>
 								Create a new workspace
 							</DialogTitle>
-							<DialogDescription className='text-xs'>
+							<DialogDescription className='text-[13px] leading-5 text-muted-foreground'>
 								Pick a starting point. You can change everything later.
 							</DialogDescription>
 						</div>
 
-						<div className='min-h-0 flex-1 space-y-4 overflow-y-auto px-5 pb-4'>
+						<div className='min-h-0 flex-1 space-y-4 overflow-y-auto px-6 pb-4 pt-3'>
 							{errorMessage && (
 								<div
 									role='alert'
@@ -124,10 +124,10 @@ export function CreateWorkspaceDialog({
 								</div>
 							)}
 
-							<div className='space-y-2'>
-								<Label htmlFor='workspace-name' className='text-xs font-medium'>
-									Workspace name
-									<span className='font-normal text-muted-foreground'>
+							<div className='space-y-1.5'>
+								<Label htmlFor='workspace-name' className='text-[13px] font-medium leading-5 text-foreground'>
+									Workspace name{" "}
+									<span className='text-xs font-normal text-faint'>
 										(optional)
 									</span>
 								</Label>
@@ -138,11 +138,12 @@ export function CreateWorkspaceDialog({
 									value={name}
 									disabled={isSubmitting}
 									onChange={(event) => setName(event.target.value)}
+									className='h-9 md:text-[13.5px]'
 								/>
 							</div>
 
 							<div className='space-y-2'>
-								<Label className='text-xs font-medium'>Start with</Label>
+								<Label className='text-[13px] font-medium leading-5 text-foreground'>Start with</Label>
 								<StarterList
 									starters={starters.data}
 									isPending={starters.isPending}
@@ -155,11 +156,10 @@ export function CreateWorkspaceDialog({
 							</div>
 						</div>
 
-						<div className='flex justify-end gap-2 border-t border-border/60 bg-muted/10 px-5 py-3.5'>
+						<div className='flex justify-end gap-2 border-t px-6 py-3'>
 							<Button
 								type='button'
 								variant='outline'
-								size='sm'
 								disabled={isSubmitting}
 								onClick={() => onOpenChange(false)}
 							>
@@ -167,7 +167,6 @@ export function CreateWorkspaceDialog({
 							</Button>
 							<Button
 								type='submit'
-								size='sm'
 								disabled={isSubmitting || !selectedStarter}
 							>
 								{isSubmitting ? (
@@ -255,22 +254,24 @@ function StarterList({
 						disabled={disabled}
 						onClick={() => onSelect(starter.key)}
 						className={cn(
-							"flex w-full items-start gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-muted/50 disabled:opacity-60",
-							selected && "border-primary bg-primary/5 hover:bg-primary/5",
+							"flex w-full items-start gap-3 rounded-lg p-2.5 text-left transition-colors disabled:opacity-60",
+							selected
+								? "border-[1.5px] border-ring bg-accent-soft"
+								: "border border-border hover:bg-muted/40",
 						)}
 					>
-						<span className='flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-base'>
+						<span className='flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted text-base'>
 							{starter.icon}
 						</span>
 						<span className='min-w-0 flex-1'>
-							<span className='block truncate text-sm font-medium'>
+							<span className='block truncate text-[13.5px] font-medium leading-5 text-foreground'>
 								{starter.title}
 							</span>
-							<span className='line-clamp-2 text-xs text-muted-foreground'>
+							<span className='line-clamp-2 text-[12.5px] leading-[19px] text-muted-foreground'>
 								{starter.description}
 							</span>
 						</span>
-						{selected && <Check className='size-4 shrink-0 text-primary' />}
+						{selected && <Check className='mt-0.5 size-4 shrink-0 text-ring' />}
 					</button>
 				);
 			})}

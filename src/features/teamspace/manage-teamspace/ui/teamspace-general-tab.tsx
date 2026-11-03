@@ -108,22 +108,22 @@ export function TeamspaceGeneralTab({
 	};
 
 	return (
-		<div className='flex flex-col gap-6'>
+		<div className='flex flex-col gap-4'>
 			<form
-				className='flex flex-col gap-6'
+				className='flex flex-col gap-4'
 				onSubmit={(event) => {
 					event.preventDefault();
 					handleSave();
 				}}
 			>
-				<section className='flex items-start gap-4'>
+				<section className='flex flex-col gap-4'>
 					<Popover open={iconPickerOpen} onOpenChange={setIconPickerOpen}>
 						<PopoverTrigger asChild disabled={!canManage}>
 							<button
 								type='button'
 								aria-label='Change icon'
 								className={cn(
-									"flex size-16 shrink-0 items-center justify-center rounded-xl border bg-muted/50 text-3xl transition-colors",
+									"flex size-11 shrink-0 items-center justify-center rounded-[10px] border border-input text-xl transition-colors",
 									"enabled:hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
 									"disabled:cursor-default",
 								)}
@@ -178,10 +178,10 @@ export function TeamspaceGeneralTab({
 						</PopoverContent>
 					</Popover>
 
-					<div className='flex min-w-0 flex-1 flex-col gap-1.5'>
+					<div className='flex min-w-0 flex-col gap-1.5'>
 						<Label
 							htmlFor='teamspace-name'
-							className='text-xs text-muted-foreground'
+							className='text-[13px] font-medium leading-5'
 						>
 							Teamspace name
 						</Label>
@@ -192,7 +192,7 @@ export function TeamspaceGeneralTab({
 							maxLength={150}
 							disabled={!canManage}
 							aria-invalid={nameInvalid}
-							className='h-10 text-base font-medium md:text-base'
+							className='h-9 px-2.5 md:text-[13.5px]'
 						/>
 						{nameInvalid && (
 							<p className='text-xs text-destructive'>
@@ -206,7 +206,7 @@ export function TeamspaceGeneralTab({
 					<div className='flex items-baseline justify-between'>
 						<Label
 							htmlFor='teamspace-description'
-							className='text-xs text-muted-foreground'
+							className='text-[13px] font-medium leading-5'
 						>
 							Description
 						</Label>
@@ -219,11 +219,11 @@ export function TeamspaceGeneralTab({
 						value={description}
 						onChange={(event) => setDescription(event.target.value)}
 						maxLength={DESCRIPTION_MAX_LENGTH}
-						rows={4}
+						rows={2}
 						disabled={!canManage}
 						placeholder='What is this teamspace for? Who should join?'
 						className={cn(
-							"w-full resize-none rounded-md border border-input bg-transparent px-3 py-2 text-sm leading-6 shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground dark:bg-input/30",
+							"w-full resize-none rounded-md border border-input bg-transparent px-2.5 py-2.5 text-[13.5px] leading-5 outline-none transition-[color,box-shadow] placeholder:text-faint dark:bg-input/30",
 							"focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
 							"disabled:cursor-not-allowed disabled:opacity-50",
 						)}
@@ -233,25 +233,25 @@ export function TeamspaceGeneralTab({
 				{canManage ? (
 					<div
 						className={cn(
-							"flex items-center justify-between gap-3 border-t pt-4 transition-opacity",
+							"flex items-center justify-between gap-2 rounded-lg border bg-muted/40 px-3 py-2.5 transition-opacity",
 							!isDirty && "pointer-events-none opacity-0",
 						)}
 						aria-hidden={!isDirty}
 					>
-						<span className='text-xs text-muted-foreground'>
+						<span className='text-[13px] text-muted-foreground'>
 							You have unsaved changes
 						</span>
 						<div className='flex gap-2'>
 							<Button
 								type='button'
 								variant='ghost'
-								size='sm'
+								className='text-foreground'
 								onClick={handleDiscard}
 								disabled={updateMutation.isPending}
 							>
 								Discard
 							</Button>
-							<Button type='submit' size='sm' disabled={!canSave}>
+							<Button type='submit' disabled={!canSave}>
 								{updateMutation.isPending ? "Saving..." : "Save changes"}
 							</Button>
 						</div>
@@ -265,10 +265,10 @@ export function TeamspaceGeneralTab({
 			</form>
 
 			{canManage && (
-				<section className='flex items-center justify-between gap-4 rounded-lg border border-destructive/30 px-4 py-3'>
+				<section className='flex items-center justify-between gap-3 rounded-lg border p-3.5'>
 					<div className='min-w-0'>
-						<p className='text-sm font-medium'>Archive teamspace</p>
-						<p className='text-xs text-muted-foreground'>
+						<p className='text-[13.5px] font-medium leading-5'>Archive teamspace</p>
+						<p className='mt-0.5 text-xs leading-[18px] text-muted-foreground'>
 							Hides it and its pages from everyone. Owners can restore it
 							from Browse teamspaces.
 						</p>
@@ -276,8 +276,7 @@ export function TeamspaceGeneralTab({
 					<Button
 						type='button'
 						variant='outline'
-						size='sm'
-						className='shrink-0 text-destructive hover:text-destructive'
+						className='shrink-0'
 						onClick={() => setConfirmArchiveOpen(true)}
 					>
 						<Archive className='size-3.5' />

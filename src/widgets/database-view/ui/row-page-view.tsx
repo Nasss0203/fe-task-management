@@ -71,10 +71,10 @@ export function RowPageView({ pageId, rowId }: RowPageViewProps) {
 	const openRow = (id: string) => router.push(rowPageHref(pageId, id));
 
 	return (
-		<div className='mx-auto flex min-h-[70vh] w-full min-w-0 max-w-5xl flex-col px-12 pb-16 pt-10 md:px-16 lg:px-24'>
+		<div className='mx-auto flex min-h-[70vh] w-full min-w-0 max-w-[1200px] flex-col px-6 pb-16 pt-8 md:px-12 lg:px-24'>
 			<nav
 				aria-label='Breadcrumb'
-				className='-ml-1 mb-4 flex min-w-0 flex-wrap items-center gap-1 text-sm text-muted-foreground'
+				className='-ml-1 mb-5 flex min-w-0 flex-wrap items-center gap-1.5 text-[13px] text-muted-foreground'
 			>
 				<Link
 					href={`/page/${pageId}`}

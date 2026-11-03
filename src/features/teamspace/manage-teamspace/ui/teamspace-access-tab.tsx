@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Globe2, Lock, type LucideIcon } from "lucide-react";
+import { Lock, Users, type LucideIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { useUpdateTeamspaceJoinSettings } from "@/entities/teamspace/model/teamspace.mutations";
@@ -22,7 +22,7 @@ const OPTIONS: Array<{
 		label: "Open",
 		description:
 			"Anyone in the workspace can find this teamspace and join it.",
-		icon: Globe2,
+		icon: Users,
 	},
 	{
 		value: "PRIVATE",
@@ -61,8 +61,16 @@ export function TeamspaceAccessTab({
 	};
 
 	return (
-		<div className='flex flex-col gap-3'>
-			<div role='radiogroup' aria-label='Who can join' className='space-y-2'>
+		<div className='flex flex-col gap-4'>
+			<p id='teamspace-access-label' className='text-[13px] font-medium leading-5'>
+				Who can join
+			</p>
+
+			<div
+				role='radiogroup'
+				aria-labelledby='teamspace-access-label'
+				className='flex flex-col gap-4'
+			>
 				{OPTIONS.map((option) => {
 					const Icon = option.icon;
 
@@ -77,23 +85,33 @@ export function TeamspaceAccessTab({
 							disabled={!canManage || updateMutation.isPending}
 							onClick={() => handleSelect(option.value)}
 							className={cn(
-								"flex w-full items-start gap-3 rounded-lg border p-3 text-left transition-colors",
-								"enabled:hover:bg-muted/50 disabled:cursor-default",
-								selected ? "border-foreground/20 bg-muted" : "border-border",
+								"flex w-full items-start gap-3 rounded-lg p-3.5 text-left transition-colors disabled:cursor-default",
+								selected
+									? "border-[1.5px] border-ring bg-accent-soft"
+									: "border border-border enabled:hover:bg-muted/50",
 								!canManage && !selected && "opacity-60",
 							)}
 						>
-							<Icon className='mt-0.5 size-4 shrink-0' />
+							<span
+								aria-hidden='true'
+								className={cn(
+									"mt-0.5 size-4 shrink-0 rounded-full",
+									selected
+										? "border-[5px] border-ring"
+										: "border-[1.5px] border-muted-foreground/40",
+								)}
+							/>
 
 							<div className='min-w-0 flex-1'>
-								<div className='text-sm font-medium'>{option.label}</div>
+								<div className='flex items-center gap-1.5 text-[13.5px] font-medium leading-5'>
+									<Icon className='size-3.5 shrink-0' />
+									{option.label}
+								</div>
 
-								<div className='mt-1 text-xs leading-5 text-muted-foreground'>
+								<div className='mt-0.5 text-[12.5px] leading-[19px] text-muted-foreground'>
 									{option.description}
 								</div>
 							</div>
-
-							{selected && <Check className='mt-0.5 size-4 shrink-0' />}
 						</button>
 					);
 				})}

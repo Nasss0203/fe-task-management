@@ -1,4 +1,4 @@
-import { Camera, LogOut, Mail, Trash2 } from "lucide-react";
+import { Camera, KeyRound, LogOut, Mail, Upload } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState, type FormEvent } from "react";
 import { toast } from "sonner";
@@ -89,7 +89,7 @@ const ProfileSection = () => {
 				description='Your personal account information.'
 			/>
 
-			<div className='mb-8 flex flex-wrap items-center gap-5 rounded-xl border bg-muted/20 p-5'>
+			<div className='mb-6 flex flex-wrap items-center gap-4'>
 				<button
 					type='button'
 					onClick={() => fileInputRef.current?.click()}
@@ -101,7 +101,7 @@ const ProfileSection = () => {
 						{user.avatarUrl ? (
 							<AvatarImage src={user.avatarUrl} alt={displayName} />
 						) : null}
-						<AvatarFallback className='text-xl font-medium'>
+						<AvatarFallback className='bg-brand-indigo text-[22px] font-semibold text-white'>
 							{getInitials(displayName)}
 						</AvatarFallback>
 					</Avatar>
@@ -120,28 +120,21 @@ const ProfileSection = () => {
 					}}
 				/>
 
-				<div className='min-w-0 flex-1'>
-					<p className='truncate text-lg font-semibold'>{displayName}</p>
-					<p className='flex items-center gap-1.5 truncate text-sm text-muted-foreground'>
-						<Mail className='size-3.5 shrink-0' />
-						{user.email}
-					</p>
-				</div>
-
 				<div className='flex gap-2'>
 					<Button
 						variant='outline'
-						size='sm'
 						disabled={avatarBusy}
 						onClick={() => fileInputRef.current?.click()}
+						className='gap-1.5'
 					>
+						<Upload className='size-3.5' />
 						{uploadAvatar.isPending ? "Uploading..." : "Change photo"}
 					</Button>
 					{user.avatarUrl && (
 						<Button
 							variant='ghost'
-							size='sm'
 							disabled={avatarBusy}
+							className='text-foreground'
 							aria-label='Remove photo'
 							onClick={() =>
 								removeAvatar.mutate(undefined, {
@@ -152,7 +145,7 @@ const ProfileSection = () => {
 								})
 							}
 						>
-							<Trash2 className='size-4' />
+							Remove
 						</Button>
 					)}
 				</div>
@@ -175,17 +168,17 @@ const ProfileSection = () => {
 						disabled={updateUsername.isPending}
 						aria-label='Display name'
 						aria-invalid={username.trim().length < 2}
-						className='w-64'
+						className='h-[34px] w-full sm:w-[260px]'
 					/>
 				</SettingsRow>
 				<SettingsRow
 					label='Email'
 					description='Used to sign in and receive notifications.'
 				>
-					<Input value={user.email} disabled className='w-64' readOnly />
+					<span className='break-all text-[13.5px] leading-5 text-muted-foreground'>{user.email}</span>
 				</SettingsRow>
 				<SettingsRow label='Member since'>
-					<span className='text-sm text-muted-foreground'>
+					<span className='text-[13.5px] text-muted-foreground'>
 						{formatSettingsDate(user.createdAt)}
 					</span>
 				</SettingsRow>
@@ -197,8 +190,11 @@ const ProfileSection = () => {
 					label='Forgot your password?'
 					description='We will email you a link to set a new password.'
 				>
-					<Button variant='outline' size='sm' asChild>
-						<Link href='/forgot-password'>Reset via email</Link>
+					<Button variant='outline' asChild>
+						<Link href='/forgot-password'>
+							<Mail className='size-3.5' />
+							Reset via email
+						</Link>
 					</Button>
 				</SettingsRow>
 				<SettingsRow
@@ -207,11 +203,10 @@ const ProfileSection = () => {
 				>
 					<Button
 						variant='outline'
-						size='sm'
 						disabled={logout.isPending}
 						onClick={() => logout.mutate()}
 					>
-						<LogOut className='size-4' />
+						<LogOut className='size-3.5' />
 						{logout.isPending ? "Logging out..." : "Log out"}
 					</Button>
 				</SettingsRow>
@@ -275,7 +270,8 @@ function ChangePasswordRow({ hasPassword }: { hasPassword: boolean }) {
 						: "You sign in with Google. Set a password to also sign in with email."
 				}
 			>
-				<Button variant='outline' size='sm' onClick={() => setOpen(true)}>
+				<Button variant='outline' onClick={() => setOpen(true)}>
+					<KeyRound className='size-3.5' />
 					{hasPassword ? "Change password" : "Set password"}
 				</Button>
 			</SettingsRow>
@@ -284,7 +280,7 @@ function ChangePasswordRow({ hasPassword }: { hasPassword: boolean }) {
 
 	return (
 		<form onSubmit={submit} className='space-y-3 py-4'>
-			<div className='text-sm font-medium'>
+			<div className='text-[13.5px] font-medium leading-5'>
 				{hasPassword ? "Change password" : "Set password"}
 			</div>
 			<div className='grid max-w-md gap-3'>
@@ -318,13 +314,12 @@ function ChangePasswordRow({ hasPassword }: { hasPassword: boolean }) {
 				</p>
 			)}
 			<div className='flex gap-2'>
-				<Button type='submit' size='sm' disabled={changePassword.isPending}>
+				<Button type='submit' disabled={changePassword.isPending}>
 					{changePassword.isPending ? "Saving..." : "Save password"}
 				</Button>
 				<Button
 					type='button'
 					variant='ghost'
-					size='sm'
 					disabled={changePassword.isPending}
 					onClick={reset}
 				>

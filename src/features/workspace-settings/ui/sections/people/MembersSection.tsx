@@ -1,7 +1,7 @@
 "use client";
 
-import { Search, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Search, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -263,36 +263,36 @@ const MembersSection = ({
 	};
 
 	return (
-		<div className='mx-auto w-full max-w-4xl px-6 py-8 sm:px-8'>
+		<div className='mx-auto w-full max-w-[860px] px-5 py-8 sm:px-8 lg:px-[70px]'>
 			<div className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
 				<div className='min-w-0'>
-					<h2 className='text-xl font-semibold tracking-tight'>People</h2>
-					<p className='mt-1 text-sm text-muted-foreground'>Manage people in your workspace and their roles.</p>
+					<h2 className='text-xl font-semibold leading-[30px]'>People</h2>
+					<p className='mt-1 text-[13.5px] leading-5 text-muted-foreground'>Manage people in your workspace and their roles.</p>
 				</div>
 				{canInviteMembers ? (
 					<Button type='button' className='self-start' onClick={() => setInviteDialogOpen(true)}>
-						<UserPlus className='size-4' />
+						<UserPlus className='size-3.5' />
 						Add members
 					</Button>
 				) : null}
 			</div>
-			<div className='relative mt-6 max-w-md'>
-				<Search className='pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground' />
-				<Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder='Search people' aria-label='Search workspace people' className='pl-9' />
+			<div className='relative mt-5 max-w-[420px]'>
+				<span className='pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2'><Search className='size-3.5 text-muted-foreground' /></span>
+				<Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder='Search people' aria-label='Search workspace people' className='h-9 pl-8 md:text-[13.5px]' />
 			</div>
-			<Tabs defaultValue='members' className='mt-6 gap-0'>
+			<Tabs defaultValue='members' className='mt-5 gap-0'>
 				<TabsList variant='line' className='h-10 w-full justify-start rounded-none border-b p-0'>
-					<TabsTrigger value='members' className='flex-none px-3'>Members ({members.length})</TabsTrigger>
-					<TabsTrigger value='guests' className='flex-none px-3'>Guests ({guests.length})</TabsTrigger>
-					<TabsTrigger value='pending' className='flex-none px-3'>Pending ({pendingInvites.length})</TabsTrigger>
+					<TabsTrigger value='members' className='flex-none rounded-none px-3 text-[13.5px] font-medium text-muted-foreground data-[state=active]:text-foreground group-data-[orientation=horizontal]/tabs:after:bottom-0'>Members ({members.length})</TabsTrigger>
+					<TabsTrigger value='guests' className='flex-none rounded-none px-3 text-[13.5px] font-medium text-muted-foreground data-[state=active]:text-foreground group-data-[orientation=horizontal]/tabs:after:bottom-0'>Guests ({guests.length})</TabsTrigger>
+					<TabsTrigger value='pending' className='flex-none rounded-none px-3 text-[13.5px] font-medium text-muted-foreground data-[state=active]:text-foreground group-data-[orientation=horizontal]/tabs:after:bottom-0'>Pending ({pendingInvites.length})</TabsTrigger>
 				</TabsList>
-				<TabsContent value='members' className='pt-2'>
+				<TabsContent value='members' className='pt-5'>
 					<PeopleList people={visibleMembers} currentUserId={currentUserId} isLoading={isPeopleLoading} isError={isPeopleError} emptyMessage='No members found.' canUpdateRole={canUpdateMemberRole} canRemoveMember={canRemoveMember} pendingRoleUpdates={pendingRoleUpdates} roleErrors={roleErrors} onRoleChange={handleRoleChange} onRequestLeave={(person) => { setLeaveError(undefined); setPersonLeaving(person); }} onRequestRemove={(person) => { setRemoveError(undefined); setPersonToRemove(person); }} />
 				</TabsContent>
-				<TabsContent value='guests' className='pt-2'>
+				<TabsContent value='guests' className='pt-5'>
 					<PeopleList people={visibleGuests} currentUserId={currentUserId} isLoading={isPeopleLoading} isError={isPeopleError} emptyMessage='No guests yet.' canRemoveMember={canRemoveMember} onRequestRemove={(person) => { setRemoveError(undefined); setPersonToRemove(person); }} />
 				</TabsContent>
-				<TabsContent value='pending' className='pt-2'>
+				<TabsContent value='pending' className='pt-5'>
 					<PendingInvitesList invites={visiblePendingInvites} isLoading={isPendingLoading} isError={isPendingError} pendingActions={pendingActions} actionErrors={actionErrors} onResend={(inviteId) => void runPendingInviteAction(inviteId, "resend")} onRequestRevoke={setInviteToRevoke} />
 				</TabsContent>
 			</Tabs>
