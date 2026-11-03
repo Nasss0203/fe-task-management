@@ -2,7 +2,6 @@
 
 import axios from "axios";
 import {
-	ArrowLeft,
 	Calendar,
 	Check,
 	ChevronLeft,
@@ -50,22 +49,19 @@ export function PublicTemplateDetailPage({
 	const isNotFound = axios.isAxiosError(error) && error.response?.status === 404;
 	if (isError && !isNotFound) {
 		return (
-			<div className='mx-auto max-w-xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 text-center'>
+			<div className='mx-auto w-full max-w-[600px] px-4 py-16 sm:px-6 lg:px-8'>
 				<div
 					role='alert'
-					className='rounded-2xl border border-destructive/20 bg-destructive/5 p-8 sm:p-10 text-center shadow-xs space-y-4'
+					className='flex flex-col items-center gap-2 rounded-[14px] border bg-card px-6 py-10 text-center'
 				>
-					<div className='mx-auto flex size-12 items-center justify-center rounded-full bg-destructive/10 text-destructive'>
-						<LayoutTemplate className='size-6' />
-					</div>
-					<h1 className='text-xl font-bold tracking-tight text-foreground'>
+					<h1 className='text-base font-semibold leading-6 text-foreground'>
 						Unable to load template
 					</h1>
-					<p className='text-sm text-destructive'>
+					<p className='text-[13px] leading-5 text-destructive'>
 						Unable to load template details.
 					</p>
-					<div className='pt-2'>
-						<Button variant='outline' onClick={() => refetch()} className='rounded-xl'>
+					<div>
+						<Button variant='outline' onClick={() => refetch()} className='rounded-[7px]'>
 							Try again
 						</Button>
 					</div>
@@ -76,21 +72,17 @@ export function PublicTemplateDetailPage({
 
 	if (!template || isNotFound) {
 		return (
-			<div className='mx-auto max-w-xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 text-center'>
-				<div className='rounded-2xl border border-border/80 bg-card/60 p-8 sm:p-10 text-center shadow-xs space-y-4'>
-					<div className='mx-auto flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground'>
-						<LayoutTemplate className='size-6' />
-					</div>
-					<h1 className='text-2xl font-bold tracking-tight text-foreground'>
+			<div className='mx-auto w-full max-w-[600px] px-4 py-16 sm:px-6 lg:px-8'>
+				<div className='flex flex-col items-center gap-2 rounded-[14px] border bg-card px-6 py-10 text-center'>
+					<h1 className='text-base font-semibold leading-6 text-foreground'>
 						Template not found
 					</h1>
-					<p className='text-sm text-muted-foreground max-w-sm mx-auto'>
+					<p className='text-[13px] leading-5 text-muted-foreground'>
 						The template you are looking for does not exist or has been removed.
 					</p>
-					<div className='mt-6'>
-						<Button asChild variant='outline' className='rounded-xl'>
+					<div>
+						<Button asChild variant='outline' className='rounded-[7px]'>
 							<Link href={basePath}>
-								<ArrowLeft className='mr-2 size-4' />
 								Back to templates
 							</Link>
 						</Button>

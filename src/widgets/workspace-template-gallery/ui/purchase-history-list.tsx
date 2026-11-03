@@ -1,7 +1,7 @@
 "use client";
 
 import { format } from "date-fns";
-import { FileText, Receipt, RotateCw } from "lucide-react";
+import { Receipt, RotateCw } from "lucide-react";
 import Link from "next/link";
 
 import {
@@ -31,7 +31,7 @@ export function PurchaseHistoryList({ userId }: { userId: string }) {
 		return (
 			<div aria-label='Loading purchase history' className='flex flex-col gap-2'>
 				{Array.from({ length: 3 }, (_, index) => (
-					<Skeleton key={index} className='h-16 w-full rounded-xl' />
+					<Skeleton key={index} className='h-[52px] w-full rounded-xl' />
 				))}
 			</div>
 		);
@@ -53,12 +53,12 @@ export function PurchaseHistoryList({ userId }: { userId: string }) {
 
 	if (purchases.length === 0) {
 		return (
-			<div className='flex flex-col items-center gap-3 rounded-2xl border border-dashed px-6 py-16 text-center'>
-				<span className='flex size-11 items-center justify-center rounded-xl bg-muted'>
+			<div className='flex flex-col items-center gap-2 rounded-xl border bg-card px-6 py-10 text-center'>
+				<span className='flex size-10 items-center justify-center rounded-lg bg-muted'>
 					<Receipt className='size-5 text-muted-foreground' />
 				</span>
-				<p className='text-sm font-medium'>No purchases yet</p>
-				<p className='max-w-sm text-sm text-muted-foreground'>
+				<p className='text-[13.5px] font-medium leading-5'>No purchases yet</p>
+				<p className='max-w-sm text-[13px] leading-5 text-muted-foreground'>
 					Paid templates you buy show up here with their order status.
 				</p>
 			</div>
@@ -67,70 +67,78 @@ export function PurchaseHistoryList({ userId }: { userId: string }) {
 
 	return (
 		<div className='flex flex-col gap-4'>
-			<ul className='flex flex-col divide-y rounded-xl border'>
-				{purchases.map((purchase) => (
-					<li
-						key={purchase.id}
-						className='flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:gap-4'
-					>
-						<div className='flex min-w-0 flex-1 items-center gap-3'>
-							<span className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-lg'>
-								{purchase.templateIcon ?? (
-									<FileText className='size-4 text-muted-foreground' />
-								)}
-							</span>
-							<div className='min-w-0'>
-								{purchase.templateName ? (
-									<Link
-										href={`/dashboard/templates/${purchase.templateId}`}
-										className='block truncate text-sm font-medium hover:underline'
-									>
-										{purchase.templateName}
-									</Link>
-								) : (
-									<span className='block truncate text-sm font-medium text-muted-foreground'>
-										Unavailable template
+			<div className='overflow-hidden rounded-xl border bg-card'>
+				<ul className='flex flex-col divide-y'>
+					{purchases.map((purchase) => (
+						<li
+							key={purchase.id}
+							className='flex flex-col gap-1 px-4 py-2 sm:min-h-[52px] sm:flex-row sm:items-center sm:gap-3'
+						>
+							<div className='flex min-w-0 flex-1 items-center gap-3'>
+								{purchase.templateIcon && (
+									<span className='shrink-0 text-base leading-none' aria-hidden='true'>
+										{purchase.templateIcon}
 									</span>
 								)}
-								<p className='truncate text-xs text-muted-foreground'>
-									{purchase.versionNumber !== null &&
-										`v${purchase.versionNumber} · `}
-									<time dateTime={purchase.createdAt}>
-										{formatDate(purchase.createdAt)}
-									</time>
-									{` · ${purchase.orderCode}`}
-								</p>
+								<div className='min-w-0'>
+									{purchase.templateName ? (
+										<Link
+											href={`/dashboard/templates/${purchase.templateId}`}
+											className='block truncate text-[13.5px] font-medium leading-5 hover:underline'
+										>
+											{purchase.templateName}
+										</Link>
+									) : (
+										<span className='block truncate text-[13.5px] font-medium leading-5 text-faint'>
+											Unavailable template
+										</span>
+									)}
+									<p className='truncate text-xs leading-[18px] text-faint'>
+										{purchase.versionNumber !== null &&
+											`v${purchase.versionNumber} · `}
+										<time dateTime={purchase.createdAt}>
+											{formatDate(purchase.createdAt)}
+										</time>
+										{` · ${purchase.orderCode}`}
+									</p>
+								</div>
 							</div>
-						</div>
-						<div className='flex items-center justify-between gap-3 sm:justify-end'>
-							<span className='text-sm font-medium tabular-nums'>
-								{purchase.currency === "VND"
-									? formatVnd(purchase.amount)
-									: `${purchase.amount} ${purchase.currency}`}
-							</span>
-							<Badge variant={purchase.status === "PAID" ? "default" : "secondary"}>
-								{STATUS_LABELS[purchase.status] ?? purchase.status}
-							</Badge>
-						</div>
-					</li>
-				))}
-			</ul>
+							<div className='flex items-center justify-between gap-3 sm:justify-end'>
+								<span className='text-[13.5px] font-medium tabular-nums'>
+									{purchase.currency === "VND"
+										? formatVnd(purchase.amount)
+										: `${purchase.amount} ${purchase.currency}`}
+								</span>
+								<Badge
+									variant={purchase.status === "PAID" ? "default" : "secondary"}
+									className='rounded-[10px] px-2 py-0.5 text-[11.5px] font-medium leading-[17px]'
+								>
+									{STATUS_LABELS[purchase.status] ?? purchase.status}
+								</Badge>
+							</div>
+						</li>
+					))}
+				</ul>
+
+				{query.hasNextPage && (
+					<div className='flex h-[52px] items-center justify-center border-t'>
+						<Button
+							variant='outline'
+							size='sm'
+							className='h-[30px] rounded-md px-3 text-[13px]'
+							disabled={query.isFetchingNextPage}
+							onClick={() => query.fetchNextPage()}
+						>
+							{query.isFetchingNextPage ? "Loading..." : "Load more"}
+						</Button>
+					</div>
+				)}
+			</div>
 
 			{query.isError && (
 				<p role='alert' className='text-center text-sm text-destructive'>
 					Unable to load more purchases.
 				</p>
-			)}
-			{query.hasNextPage && (
-				<Button
-					variant='outline'
-					size='sm'
-					className='self-center'
-					disabled={query.isFetchingNextPage}
-					onClick={() => query.fetchNextPage()}
-				>
-					{query.isFetchingNextPage ? "Loading..." : "Load more"}
-				</Button>
 			)}
 		</div>
 	);

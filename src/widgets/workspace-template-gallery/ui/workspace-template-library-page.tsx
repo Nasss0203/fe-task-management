@@ -1,6 +1,6 @@
 "use client";
 
-import { Library, RotateCw } from "lucide-react";
+import { Layers, RotateCw } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useMemo, useState } from "react";
@@ -194,17 +194,17 @@ function LibraryTemplateGrid({ tab, userId }: { tab: LibraryTab; userId: string 
 
 	if (templates.length === 0 && tab.empty) {
 		return (
-			<div className='flex flex-col items-center gap-3 rounded-xl border border-dashed px-6 py-16 text-center'>
-				<span className='flex size-11 items-center justify-center rounded-xl bg-muted'>
-					<Library className='size-5 text-muted-foreground' />
+			<div className='flex flex-col items-center gap-2 rounded-xl border bg-card px-6 py-10 text-center'>
+				<span className='flex size-10 items-center justify-center rounded-lg bg-muted'>
+					<Layers className='size-5 text-muted-foreground' />
 				</span>
-				<div className='flex flex-col gap-1'>
-					<p className='text-[13.5px] font-medium'>{tab.empty.title}</p>
-					<p className='max-w-sm text-[13px] text-muted-foreground'>
+				<div className='flex flex-col gap-2'>
+					<p className='text-[13.5px] font-medium leading-5'>{tab.empty.title}</p>
+					<p className='max-w-sm text-[13px] leading-5 text-muted-foreground'>
 						{tab.empty.text}
 					</p>
 				</div>
-				<Button asChild size='sm' variant='outline'>
+				<Button asChild size='sm' variant='outline' className='h-[30px] rounded-md px-3 text-[13px]'>
 					<Link href={tab.empty.href}>{tab.empty.cta}</Link>
 				</Button>
 			</div>

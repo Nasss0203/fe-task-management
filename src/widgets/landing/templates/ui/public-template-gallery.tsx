@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, X } from "lucide-react";
+import { Layers, Search, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useDeferredValue, useState } from "react";
 
@@ -221,11 +221,12 @@ function PublicTemplateGalleryContent({ detailHref }: PublicTemplateGalleryProps
 						))}
 
 						{templates.length === 0 && (
-							<div className='col-span-full rounded-[14px] border border-dashed p-8 py-16 text-center text-muted-foreground'>
-								<p className='text-[13.5px] font-medium text-foreground'>
+							<div className='col-span-full flex flex-col items-center gap-1.5 rounded-[14px] border bg-card px-6 py-10 text-center'>
+								<Layers className='size-[22px] text-muted-foreground' aria-hidden />
+								<p className='text-sm font-semibold leading-[21px] text-foreground'>
 									No templates found
 								</p>
-								<p className='mt-1 text-[13px] text-muted-foreground'>
+								<p className='text-[13px] leading-5 text-muted-foreground'>
 									{isFiltered
 										? "Try another search keyword, category, price or tag."
 										: "Templates appear here once creators publish them."}
