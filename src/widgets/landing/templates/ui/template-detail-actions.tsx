@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Eye, Loader2 } from "lucide-react";
+import { Eye, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -24,10 +24,8 @@ import { UseTemplateDialog } from "@/features/template-use";
 
 import { getTemplatePriceLabel } from "./template-card";
 
-const primaryClass =
-	"h-11 sm:h-12 w-full rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 shadow-sm transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
-const secondaryClass =
-	"h-11 sm:h-12 w-full rounded-xl font-medium border-border/80 hover:bg-muted/60 transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
+const primaryClass = "h-10 w-full rounded-lg text-sm font-medium";
+const secondaryClass = "h-10 w-full rounded-lg text-sm font-medium";
 
 interface TemplateDetailActionsProps {
 	template: PublicTemplateListItem;
@@ -48,7 +46,7 @@ export function TemplateDetailActions({
 	const isPaid = template.offer_type === "PAID";
 
 	return (
-		<div className='flex flex-col gap-3 pt-2 border-t border-border/60'>
+		<div className='flex flex-col gap-2'>
 			{!user ? (
 				<Button asChild size='lg' className={primaryClass}>
 					<Link
@@ -59,7 +57,6 @@ export function TemplateDetailActions({
 						}
 					>
 						{isPaid ? "Sign in to buy" : "Use template"}
-						<ArrowRight className='ml-2 size-4.5' />
 					</Link>
 				</Button>
 			) : isPaid ? (
@@ -71,7 +68,7 @@ export function TemplateDetailActions({
 			{previewHref && (
 				<Button asChild variant='outline' size='lg' className={secondaryClass}>
 					<Link href={previewHref}>
-						<Eye className='mr-2 size-4.5 text-muted-foreground' aria-hidden />
+						<Eye className='size-[15px]' aria-hidden />
 						{isPaid ? "Try the demo" : "Preview"}
 					</Link>
 				</Button>
@@ -87,7 +84,6 @@ function FreeTemplateActions({ template }: { template: PublicTemplateListItem })
 		<>
 			<Button size='lg' onClick={() => setOpen(true)} className={primaryClass}>
 				Use template
-				<ArrowRight className='ml-2 size-4.5' />
 			</Button>
 			{template.version && (
 				<UseTemplateDialog
@@ -115,7 +111,7 @@ function PaidTemplateActions({
 	if (usable.isPending) {
 		return (
 			<Button size='lg' disabled className={primaryClass}>
-				<Loader2 className='mr-2 size-4 animate-spin' />
+				<Loader2 className='size-4 animate-spin' />
 				Checking access…
 			</Button>
 		);
@@ -173,7 +169,10 @@ function UseVersionActions({
 		<>
 			{versions.length > 1 && (
 				<Select value={selected.id} onValueChange={setSelectedId}>
-					<SelectTrigger aria-label='Version to use' className='h-10 w-full'>
+					<SelectTrigger
+						aria-label='Version to use'
+						className='w-full rounded-lg bg-background text-[13px] data-[size=default]:h-10'
+					>
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent position='popper'>
@@ -193,7 +192,6 @@ function UseVersionActions({
 				className={buttonClassName}
 			>
 				{label}
-				<ArrowRight className='ml-2 size-4.5' />
 			</Button>
 			<UseTemplateDialog
 				template={template}

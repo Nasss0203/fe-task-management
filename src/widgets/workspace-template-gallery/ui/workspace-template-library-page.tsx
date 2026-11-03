@@ -107,13 +107,13 @@ function LibraryContent() {
 	};
 
 	return (
-		<div className='mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 sm:px-6 lg:px-8'>
+		<div className='mx-auto flex w-full max-w-[1120px] flex-col gap-6 px-4 sm:px-6 lg:px-8'>
 			<WorkspaceTemplatesHeader description='Templates you purchased, claimed or created. Use them again in any workspace.' />
 
 			<div
 				role='tablist'
 				aria-label='Library sections'
-				className='-mt-4 flex gap-1 overflow-x-auto'
+				className='-mb-1 flex w-fit max-w-full gap-0.5 overflow-x-auto rounded-lg bg-muted p-0.5'
 			>
 				{LIBRARY_TABS.map((item) => (
 					<button
@@ -123,10 +123,10 @@ function LibraryContent() {
 						aria-selected={item.id === tab.id}
 						onClick={() => selectTab(item.id)}
 						className={cn(
-							"shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors",
+							"h-7 shrink-0 rounded-md px-3 text-[12.5px] leading-[19px] transition-colors",
 							item.id === tab.id
-								? "bg-foreground text-background"
-								: "bg-muted text-muted-foreground hover:text-foreground",
+								? "bg-background font-semibold text-foreground"
+								: "text-muted-foreground hover:text-foreground",
 						)}
 					>
 						{item.label}
@@ -194,13 +194,13 @@ function LibraryTemplateGrid({ tab, userId }: { tab: LibraryTab; userId: string 
 
 	if (templates.length === 0 && tab.empty) {
 		return (
-			<div className='flex flex-col items-center gap-3 rounded-2xl border border-dashed px-6 py-16 text-center'>
+			<div className='flex flex-col items-center gap-3 rounded-xl border border-dashed px-6 py-16 text-center'>
 				<span className='flex size-11 items-center justify-center rounded-xl bg-muted'>
 					<Library className='size-5 text-muted-foreground' />
 				</span>
 				<div className='flex flex-col gap-1'>
-					<p className='text-sm font-medium'>{tab.empty.title}</p>
-					<p className='max-w-sm text-sm text-muted-foreground'>
+					<p className='text-[13.5px] font-medium'>{tab.empty.title}</p>
+					<p className='max-w-sm text-[13px] text-muted-foreground'>
 						{tab.empty.text}
 					</p>
 				</div>
@@ -277,7 +277,7 @@ function LibrarySkeleton() {
 			className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'
 		>
 			{Array.from({ length: 3 }, (_, index) => (
-				<Skeleton key={index} className='h-72 w-full rounded-2xl' />
+				<Skeleton key={index} className='h-72 w-full rounded-xl' />
 			))}
 		</div>
 	);
