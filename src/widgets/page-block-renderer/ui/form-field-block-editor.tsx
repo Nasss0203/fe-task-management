@@ -320,7 +320,7 @@ export function FormFieldBlockEditor({
 	}
 
 	return (
-		<div className='group/question w-full rounded-lg border border-border/60 bg-background/40 px-3 py-2.5 transition-colors hover:border-border focus-within:border-primary/60'>
+		<div className='group/question w-full rounded-lg border border-border bg-background px-3.5 py-3 transition-colors focus-within:border-ring'>
 			<div className='flex items-center gap-2'>
 				<span title={`Saved to ${property.name}`} className='shrink-0'>
 					<PropertyIcon
@@ -359,14 +359,14 @@ export function FormFieldBlockEditor({
 							dataConfig: { ...block.data_config, required: !field.required },
 						})
 					}
-					className='flex shrink-0 items-center gap-1.5 rounded-md px-1 py-0.5 text-xs text-muted-foreground transition-colors hover:text-foreground'
+					className='flex shrink-0 items-center gap-2 rounded-md px-1 py-0.5 text-[12.5px] text-muted-foreground transition-colors hover:text-foreground'
 				>
 					Required
 					<span
 						aria-hidden='true'
 						className={cn(
 							"flex h-4 w-7 items-center rounded-full p-0.5 transition-colors",
-							field.required ? "justify-end bg-primary" : "bg-muted-foreground/30",
+							field.required ? "justify-end bg-ring" : "bg-muted-foreground/30",
 						)}
 					>
 						<span className='size-3 rounded-full bg-background' />

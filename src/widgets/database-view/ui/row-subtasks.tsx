@@ -54,8 +54,8 @@ export function RowSubtasks({
 	};
 
 	return (
-		<section aria-label='Sub-tasks' className='mt-8 border-t pt-5'>
-			<h3 className='mb-2 flex items-center gap-2 text-sm font-medium text-muted-foreground'>
+		<section aria-label='Sub-tasks' className='mt-6 border-t border-border pt-4'>
+			<h3 className='mb-2 flex items-center gap-2 text-[13.5px] font-semibold text-foreground'>
 				Sub-tasks
 				<SubtaskProgress
 					progress={getSubtaskProgress(database, allRows, row.id)}
@@ -77,7 +77,7 @@ export function RowSubtasks({
 					return (
 						<li
 							key={subtask.id}
-							className='flex min-h-9 items-center gap-2 rounded-md px-2 hover:bg-muted/60'
+							className='flex min-h-[30px] items-center gap-2 rounded-md px-2 hover:bg-accent'
 						>
 							{done && (
 								<div

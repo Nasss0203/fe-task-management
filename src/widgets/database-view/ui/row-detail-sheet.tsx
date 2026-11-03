@@ -101,7 +101,7 @@ export function RowDetailSheet({
 					// Scrolls inside, so the resize handle and close button stay put.
 					<div className='flex h-full min-h-0 flex-col overflow-y-auto'>
 						{/* shrink-0: inside the scrolling column a long task would squash it */}
-						<div className='flex h-12 shrink-0 items-center gap-1.5 border-b px-6 pr-12 text-sm text-muted-foreground sm:px-8'>
+						<div className='flex h-11 shrink-0 items-center gap-1.5 px-5 pr-12 text-[13px] text-muted-foreground'>
 							<Table2 className='size-4 shrink-0' />
 							<span className='truncate'>{database.name}</span>
 							{parentRow && (
@@ -122,14 +122,14 @@ export function RowDetailSheet({
 									href={rowPageHref(database.pageId, row.id)}
 									aria-label='Open as page'
 									title='Open as page'
-									className='ml-auto flex size-7 shrink-0 items-center justify-center rounded-md hover:bg-muted hover:text-foreground'
+									className='ml-auto flex size-7 shrink-0 items-center justify-center rounded-md hover:bg-accent hover:text-foreground'
 								>
-									<Maximize2 className='size-4' />
+									<Maximize2 className='size-3.5' />
 								</Link>
 							)}
 						</div>
 
-						<div className='flex flex-1 flex-col px-6 pb-6 pt-8 sm:px-8'>
+						<div className='flex flex-1 flex-col px-6 pb-6 pt-4 sm:px-7'>
 							<RowDetailBody
 								database={database}
 								row={row}

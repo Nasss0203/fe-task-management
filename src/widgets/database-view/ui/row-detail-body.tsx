@@ -76,7 +76,7 @@ export function RowDetailBody({
 						"[&_input]:h-auto [&_input]:px-0 [&_input]:py-1 [&_input]:font-bold [&_input]:leading-tight",
 						variant === "page"
 							? "[&_input]:text-4xl"
-							: "[&_input]:text-2xl sm:[&_input]:text-[1.75rem]",
+							: "[&_input]:text-[22px] [&_input]:tracking-[-0.01em]",
 					)}
 				>
 					<DatabaseCell
@@ -93,17 +93,17 @@ export function RowDetailBody({
 
 			<section
 				aria-label='Properties'
-				className={cn("-mx-2 mt-6", variant === "page" && "max-w-3xl")}
+				className={cn("-mx-2 mt-4", variant === "page" && "max-w-3xl")}
 			>
 				{properties.map((property) => (
 					<div
 						key={property.id}
-						className='flex min-h-10 items-center gap-3 rounded-md px-2 text-sm'
+						className='flex min-h-8 items-center gap-2 rounded-md px-2 text-[13.5px]'
 					>
-						<span className='flex w-36 shrink-0 items-center gap-2 text-muted-foreground'>
+						<span className='flex w-30 shrink-0 items-center gap-2 text-[13px] text-muted-foreground'>
 							<PropertyIcon
 								type={property.type}
-								className='size-4'
+								className='size-3.5'
 							/>
 							<span className='truncate'>{property.name}</span>
 						</span>
@@ -114,7 +114,7 @@ export function RowDetailBody({
 								// A checkbox is only its box: no row-wide hover band behind it.
 								property.type === PropertyType.CHECKBOX
 									? "shrink-0"
-									: "min-w-0 flex-1 transition-colors hover:bg-muted/70",
+									: "min-w-0 flex-1 transition-colors hover:bg-accent",
 							)}
 						>
 							<DatabaseCell

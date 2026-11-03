@@ -307,7 +307,7 @@ function BoardColumns({
 
 	return (
 		<div className='w-full min-w-0'>
-			<div className='mb-2 flex items-center gap-2 text-xs text-muted-foreground'>
+			<div className='mb-3 flex items-center gap-2 text-xs text-muted-foreground'>
 				<PropertyIcon type={groupProperty.type} className='size-3.5' />
 				<span>
 					Grouped by{" "}
@@ -324,7 +324,7 @@ function BoardColumns({
 				onDragEnd={handleDragEnd}
 				onDragCancel={() => setActiveRowId(null)}
 			>
-				<div className='flex items-start gap-2 overflow-x-auto pb-3'>
+				<div className='flex items-start gap-4 overflow-x-auto pb-3'>
 					{columns.map((column) => (
 						<BoardColumn
 							key={column.id}
@@ -380,7 +380,7 @@ function BoardColumns({
 
 				<DragOverlay>
 					{activeRow && (
-						<div className='w-[248px] rotate-1 cursor-grabbing rounded-lg border bg-card px-2 py-1.5 text-sm font-medium shadow-elevated'>
+						<div className='w-[272px] rotate-1 cursor-grabbing rounded-lg border border-border bg-card px-3 py-2.5 text-[13.5px] font-medium shadow-elevated'>
 							{(titleProperty &&
 								(getRowValueMap(activeRow).get(titleProperty.id) as string)) ||
 								"Untitled"}
@@ -428,22 +428,16 @@ function BoardColumn({
 		<section
 			ref={setNodeRef}
 			aria-label={`${name} column`}
-			style={
-				!noGroup && color
-					? { backgroundColor: `color-mix(in srgb, ${color} 11%, transparent)` }
-					: undefined
-			}
 			className={cn(
-				"group/column flex w-[260px] shrink-0 flex-col gap-1 rounded-lg p-1.5 transition-shadow",
-				(noGroup || !color) && "bg-muted/30",
-				isOver && "ring-2 ring-inset ring-primary/40",
+				"group/column flex w-[272px] shrink-0 flex-col gap-2 rounded-lg transition-colors",
+				isOver && "bg-muted/60",
 			)}
 		>
-			<header className='flex h-7 items-center gap-1.5 px-1'>
+			<header className='flex h-8 items-center gap-2'>
 				{readOnly && option ? (
 					<PropertyOptionBadge name={name} color={color} />
 				) : noGroup || !option ? (
-					<span className='truncate text-xs font-medium text-muted-foreground'>
+					<span className='truncate text-[13.5px] font-medium text-foreground'>
 						{name}
 					</span>
 				) : (
@@ -467,7 +461,7 @@ function BoardColumn({
 						</PopoverContent>
 					</Popover>
 				)}
-				<span className='text-xs tabular-nums text-muted-foreground'>
+				<span className='text-[13px] tabular-nums text-faint'>
 					{count}
 				</span>
 				{option && !readOnly && (
@@ -500,7 +494,7 @@ function BoardColumn({
 					type='button'
 					disabled={isPending}
 					onClick={onAdd}
-					className='flex h-7 items-center gap-1.5 rounded-md px-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground disabled:opacity-50'
+					className='flex h-7 items-center gap-1.5 rounded-md px-1.5 text-[13px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-50'
 				>
 					<Plus className='size-3.5' />
 					New
@@ -561,7 +555,7 @@ function BoardCard({
 				if (event.key === "Enter") onOpen();
 			}}
 			className={cn(
-				"group/row relative flex flex-col gap-1 rounded-lg border border-border/70 bg-card px-2 py-1.5 shadow-soft outline-none transition-colors hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring/50 dark:shadow-none",
+				"group/row relative flex flex-col gap-2 rounded-lg border border-border bg-card px-3 py-2.5 text-[13.5px] outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring/50",
 				readOnly ? "cursor-pointer" : "cursor-grab active:cursor-grabbing",
 				isDragging && "opacity-40",
 			)}
@@ -648,7 +642,7 @@ function NewGroupColumn({
 			<button
 				type='button'
 				onClick={() => setAdding(true)}
-				className='flex h-9 w-48 shrink-0 items-center gap-1.5 rounded-lg px-2 text-sm text-muted-foreground hover:bg-muted/60 hover:text-foreground'
+				className='flex h-8 w-48 shrink-0 items-center gap-1.5 rounded-md px-2 text-[13px] text-muted-foreground hover:bg-accent hover:text-foreground'
 			>
 				<Plus className='size-4' />
 				New group
@@ -657,7 +651,7 @@ function NewGroupColumn({
 	}
 
 	return (
-		<div className='w-56 shrink-0 rounded-lg bg-muted/40 p-2'>
+		<div className='w-56 shrink-0 rounded-lg border border-border p-2'>
 			<input
 				value={name}
 				onChange={(event) => setName(event.target.value)}

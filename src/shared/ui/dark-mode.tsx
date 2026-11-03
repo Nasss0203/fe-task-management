@@ -58,7 +58,7 @@ export const ThemeToggle = ({ className }: ThemeToggleProps) => {
 						)}
 					>
 						{isDark ? (
-							<Sun className='h-4 w-4 text-amber-400 transition-transform duration-200 hover:rotate-45' />
+							<Sun className='h-4 w-4 text-foreground/80 transition-transform duration-200 hover:rotate-45' />
 						) : (
 							<Moon className='h-4 w-4 text-foreground/80 transition-transform duration-200 hover:-rotate-12' />
 						)}

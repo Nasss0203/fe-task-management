@@ -24,19 +24,17 @@ export default function PublishPage() {
 		<div className='py-12 sm:py-20 space-y-24 sm:space-y-32'>
 			{/* Page Hero */}
 			<section className='mx-auto max-w-4xl px-4 sm:px-6 text-center space-y-6'>
-				<div className='inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3.5 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400'>
+				<div className='inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3.5 py-1 text-xs font-semibold text-muted-foreground'>
 					<Globe className='h-3.5 w-3.5' />
 					Instant Web Publishing
 				</div>
 
-				<h1 className='text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50 leading-[1.1]'>
+				<h1 className='text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.1]'>
 					Turn your pages into{" "}
-					<span className='bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 bg-clip-text text-transparent'>
 						beautiful websites
-					</span>
 				</h1>
 
-				<p className='text-base sm:text-xl text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto leading-relaxed'>
+				<p className='text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed'>
 					Publish your workspace pages and share them with anyone — no deployment, DNS configuration, or hosting setup required.
 				</p>
 
@@ -45,7 +43,7 @@ export default function PublishPage() {
 					<Link href='/sign-up'>
 						<Button
 							size='lg'
-							className='h-12 w-full sm:w-auto rounded-full bg-indigo-600 hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white px-8 text-sm font-semibold shadow-md shadow-indigo-600/20 dark:shadow-indigo-950/40'
+							className='h-10 w-full sm:w-auto rounded-lg bg-primary hover:bg-primary/85 text-primary-foreground px-[18px] text-sm font-medium'
 						>
 							Start publishing
 							<ArrowRight className='ml-2 h-4 w-4' />
@@ -55,7 +53,7 @@ export default function PublishPage() {
 						<Button
 							size='lg'
 							variant='outline'
-							className='h-12 w-full sm:w-auto rounded-full border-border bg-surface/80 px-8 text-sm font-medium text-foreground hover:bg-muted/70'
+							className='h-10 w-full sm:w-auto rounded-lg border-border bg-surface/80 px-[18px] text-sm font-medium text-foreground hover:bg-muted/70'
 						>
 							See how it works
 						</Button>
@@ -77,7 +75,7 @@ export default function PublishPage() {
 				<div className='grid grid-cols-1 md:grid-cols-3 gap-8 relative items-center'>
 					{/* Step 1 */}
 					<div className='rounded-2xl border border-border/80 bg-card p-6 shadow-xs flex flex-col items-center text-center space-y-3 relative'>
-						<div className='h-14 w-14 rounded-2xl bg-blue-500/10 text-blue-600 flex items-center justify-center ring-1 ring-blue-500/20'>
+						<div className='h-14 w-14 rounded-2xl bg-muted text-muted-foreground flex items-center justify-center ring-1 ring-border'>
 							<FileText className='h-6 w-6' />
 						</div>
 						<div className='text-[10px] font-bold tracking-wider uppercase text-muted-foreground'>
@@ -91,7 +89,7 @@ export default function PublishPage() {
 
 					{/* Step 2 */}
 					<div className='rounded-2xl border border-border/80 bg-card p-6 shadow-xs flex flex-col items-center text-center space-y-3 relative'>
-						<div className='h-14 w-14 rounded-2xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center ring-1 ring-indigo-500/20'>
+						<div className='h-14 w-14 rounded-2xl bg-muted text-muted-foreground flex items-center justify-center ring-1 ring-border'>
 							<UploadCloud className='h-6 w-6' />
 						</div>
 						<div className='text-[10px] font-bold tracking-wider uppercase text-muted-foreground'>
@@ -105,7 +103,7 @@ export default function PublishPage() {
 
 					{/* Step 3 */}
 					<div className='rounded-2xl border border-border/80 bg-card p-6 shadow-xs flex flex-col items-center text-center space-y-3 relative'>
-						<div className='h-14 w-14 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center ring-1 ring-emerald-500/20'>
+						<div className='h-14 w-14 rounded-2xl bg-muted text-muted-foreground flex items-center justify-center ring-1 ring-border'>
 							<Share2 className='h-6 w-6' />
 						</div>
 						<div className='text-[10px] font-bold tracking-wider uppercase text-muted-foreground'>
@@ -148,7 +146,7 @@ export default function PublishPage() {
 							</div>
 
 							<div className='flex items-center gap-2'>
-								<Badge className='text-[10px] bg-emerald-500/10 text-emerald-600 border-none font-medium'>
+								<Badge className='text-[10px] bg-muted text-muted-foreground border-none font-medium'>
 									Published
 								</Badge>
 							</div>
@@ -202,7 +200,7 @@ export default function PublishPage() {
 
 					<div className='grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2'>
 						<div className='flex items-start gap-3'>
-							<div className='h-7 w-7 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5'>
+							<div className='h-7 w-7 rounded-lg bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
 								<Check className='h-4 w-4' />
 							</div>
 							<div>
@@ -214,7 +212,7 @@ export default function PublishPage() {
 						</div>
 
 						<div className='flex items-start gap-3'>
-							<div className='h-7 w-7 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5'>
+							<div className='h-7 w-7 rounded-lg bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
 								<Check className='h-4 w-4' />
 							</div>
 							<div>
@@ -226,7 +224,7 @@ export default function PublishPage() {
 						</div>
 
 						<div className='flex items-start gap-3'>
-							<div className='h-7 w-7 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5'>
+							<div className='h-7 w-7 rounded-lg bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
 								<Check className='h-4 w-4' />
 							</div>
 							<div>
@@ -238,7 +236,7 @@ export default function PublishPage() {
 						</div>
 
 						<div className='flex items-start gap-3'>
-							<div className='h-7 w-7 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5'>
+							<div className='h-7 w-7 rounded-lg bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
 								<Check className='h-4 w-4' />
 							</div>
 							<div>

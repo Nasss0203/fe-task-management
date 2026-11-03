@@ -224,7 +224,7 @@ export function ProductPreview() {
 							<div className='rounded-xl border border-primary/20 bg-primary/5 p-4 text-xs text-primary flex gap-3 items-start'>
 								<Sparkles className='h-4 w-4 shrink-0 mt-0.5' />
 								<div>
-									<span className='font-semibold'>Live Sync Active:</span> Updates to blocks, tables, and nested pages are mirrored across all members in real time.
+									<span className='font-semibold'>Shared with team:</span> Members can comment on blocks, tables, and nested pages.
 								</div>
 							</div>
 

@@ -19,14 +19,14 @@ export const CORE_FEATURES: FeatureItem[] = [
 		id: "pages-notes",
 		title: "Pages & Notes",
 		description:
-			"Rich block documents with markdown, code snippets, nested pages, and real-time collaborative editing.",
+			"Rich block documents with markdown shortcuts, code snippets, nested pages, and comments.",
 		iconName: "file-text",
 		badge: "Core Editor",
 		capabilities: [
 			"Block-based editor with markdown formatting shortcuts",
 			"Infinite nested page hierarchy and knowledge trees",
 			"Syntax-highlighted code blocks, tables, and callouts",
-			"Live multiplayer typing and conflict-free sync",
+			"Comments and discussions on pages and blocks",
 		],
 	},
 	{
@@ -47,7 +47,7 @@ export const CORE_FEATURES: FeatureItem[] = [
 		id: "workspace-teamspaces",
 		title: "Workspace & Teamspaces",
 		description:
-			"Organize squads into dedicated teamspaces with centralized directories, feeds, and pinned resources.",
+			"Organize squads into teamspaces — open or private, with owners, members, and invite links.",
 		iconName: "users",
 		badge: "Team Hub",
 		capabilities: [
@@ -65,7 +65,7 @@ export const CORE_FEATURES: FeatureItem[] = [
 		iconName: "shield",
 		badge: "Access Control",
 		capabilities: [
-			"Role-based access: Owner, Admin, Member, Viewer",
+			"Workspace roles: owner, member and guest",
 			"Private personal drafts alongside shared spaces",
 			"Granular page permission inheritance rules",
 			"Workspace invitation tokens and access requests",

@@ -325,7 +325,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	);
 
 	return (
-		<Sidebar className='border-r-0' {...props}>
+		<Sidebar className='border-sidebar-border' {...props}>
 			<SidebarHeader>
 				{!isLoading &&
 					!isError &&

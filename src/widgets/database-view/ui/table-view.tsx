@@ -355,9 +355,9 @@ export function TableView({
 					type='button'
 					disabled={isAddingRow}
 					onClick={() => addRow()}
-					className='flex h-9 w-full items-center gap-1.5 rounded-sm px-2 text-sm text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground disabled:opacity-50'
+					className='flex h-9 w-full items-center gap-1.5 rounded-sm px-2 text-[13.5px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-50'
 				>
-					<Plus className='size-4' />
+					<Plus className='size-3.5' />
 
 					{isAddingRow ? "Adding..." : "New row"}
 				</button>

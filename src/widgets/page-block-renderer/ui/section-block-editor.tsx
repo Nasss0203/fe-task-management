@@ -174,7 +174,7 @@ export function SectionBlockEditor({
 		<section
 			aria-label={title || "Untitled section"}
 			className={cn(
-				"group/section w-full rounded-lg border border-border/60 py-2 pr-2 pl-1",
+				"group/section w-full rounded-xl border border-border py-2.5 pr-2.5 pl-1",
 				CALLOUT_TONES[tone].className,
 			)}
 		>
@@ -216,7 +216,7 @@ export function SectionBlockEditor({
 						}
 						void enterBody();
 					}}
-					className='min-h-7 min-w-0 border-0 bg-transparent p-0 pl-1 text-base font-semibold leading-7 outline-none placeholder:text-muted-foreground/50'
+					className='min-h-7 min-w-0 border-0 bg-transparent p-0 pl-1 text-base font-semibold leading-7 outline-none placeholder:text-faint'
 				/>
 
 				<div className='flex items-center gap-1'>
@@ -282,7 +282,7 @@ export function SectionBlockEditor({
 							event.preventDefault();
 							void enterBody();
 						}}
-						className='ml-15 block min-h-6 w-[calc(100%-3.75rem)] border-0 bg-transparent p-0 text-sm leading-6 text-muted-foreground outline-none placeholder:text-transparent focus:placeholder:text-muted-foreground/50 group-hover/section:placeholder:text-muted-foreground/50'
+						className='ml-15 block min-h-6 w-[calc(100%-3.75rem)] border-0 bg-transparent p-0 text-[13.5px] leading-6 text-muted-foreground outline-none placeholder:text-transparent focus:placeholder:text-faint group-hover/section:placeholder:text-faint'
 					/>
 
 					<InSectionProvider value>
@@ -302,7 +302,7 @@ export function SectionBlockEditor({
 								<button
 									type='button'
 									onClick={() => void addChild()}
-									className='mt-1 ml-15 flex items-center gap-1.5 rounded-md px-1 text-left text-sm leading-7 text-muted-foreground/60 transition-colors hover:bg-foreground/5 hover:text-muted-foreground'
+									className='mt-1 ml-15 flex items-center gap-1.5 rounded-md px-1 text-left text-[13px] leading-7 text-faint transition-colors hover:bg-foreground/5 hover:text-muted-foreground'
 								>
 									<Plus className='size-3.5' />
 									Add a block

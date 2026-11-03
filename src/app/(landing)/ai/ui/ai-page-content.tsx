@@ -30,19 +30,17 @@ export function AiPageContent() {
 		<div className='py-12 sm:py-20 space-y-24 sm:space-y-32'>
 			{/* Page Hero */}
 			<section className='mx-auto max-w-4xl px-4 sm:px-6 text-center space-y-6'>
-				<div className='inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-3.5 py-1 text-xs font-semibold text-amber-600 dark:text-amber-400'>
+				<div className='inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3.5 py-1 text-xs font-semibold text-muted-foreground'>
 					<Sparkles className='h-3.5 w-3.5' />
 					Taskmanly AI Assistant
 				</div>
 
-				<h1 className='text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50 leading-[1.1]'>
+				<h1 className='text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.1]'>
 					Get more done{" "}
-					<span className='bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 bg-clip-text text-transparent'>
 						with AI
-					</span>
 				</h1>
 
-				<p className='text-base sm:text-xl text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto leading-relaxed'>
+				<p className='text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed'>
 					Taskmanly AI understands workspace context and helps users create, plan and organize work without tedious administrative overhead.
 				</p>
 
@@ -51,7 +49,7 @@ export function AiPageContent() {
 					<Link href={user ? "/dashboard/ai" : "/sign-up"}>
 						<Button
 							size='lg'
-							className='h-12 w-full sm:w-auto rounded-full bg-indigo-600 hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white px-8 text-sm font-semibold shadow-md shadow-indigo-600/20 dark:shadow-indigo-950/40'
+							className='h-10 w-full sm:w-auto rounded-lg bg-primary hover:bg-primary/85 text-primary-foreground px-[18px] text-sm font-medium'
 						>
 							Try AI
 							<ArrowRight className='ml-2 h-4 w-4' />
@@ -62,7 +60,7 @@ export function AiPageContent() {
 						<Button
 							size='lg'
 							variant='outline'
-							className='h-12 w-full sm:w-auto rounded-full border-border/80 px-8 text-sm font-medium'
+							className='h-10 w-full sm:w-auto rounded-lg border-border/80 px-[18px] text-sm font-medium'
 						>
 							Explore capabilities
 						</Button>
@@ -72,13 +70,12 @@ export function AiPageContent() {
 
 			{/* Main Visual: AI Assistant Interface Mockup */}
 			<section className='mx-auto max-w-5xl px-4 sm:px-6 lg:px-8'>
-				<div className='rounded-2xl border border-border/80 bg-card p-5 sm:p-8 shadow-2xl relative overflow-hidden'>
-					<div className='pointer-events-none absolute -top-24 right-1/4 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl' />
+				<div className='rounded-2xl border border-border/80 bg-card p-5 sm:p-8 shadow-soft relative overflow-hidden'>
 
 					{/* Top Mockup Header Bar */}
 					<div className='flex items-center justify-between pb-5 border-b border-border/60 text-xs'>
 						<div className='flex items-center gap-2.5'>
-							<div className='h-8 w-8 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center ring-1 ring-amber-500/20'>
+							<div className='h-8 w-8 rounded-xl bg-muted text-muted-foreground flex items-center justify-center ring-1 ring-border'>
 								<Sparkles className='h-4 w-4' />
 							</div>
 							<div>
@@ -91,7 +88,7 @@ export function AiPageContent() {
 							</div>
 						</div>
 
-						<Badge variant='outline' className='text-[10px] text-emerald-600 bg-emerald-500/10 border-emerald-500/20'>
+						<Badge variant='outline' className='text-[10px] text-muted-foreground bg-muted border-border'>
 							Model Ready
 						</Badge>
 					</div>
@@ -131,7 +128,7 @@ export function AiPageContent() {
 
 						{/* Assistant Response Box */}
 						<div className='flex items-start gap-3'>
-							<div className='h-8 w-8 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0 ring-1 ring-amber-500/20'>
+							<div className='h-8 w-8 rounded-xl bg-muted text-muted-foreground flex items-center justify-center shrink-0 ring-1 ring-border'>
 								<Sparkles className='h-4 w-4' />
 							</div>
 							<div className='flex-1 rounded-2xl rounded-tl-none border border-border/80 bg-muted/20 p-5 space-y-4 shadow-xs'>
@@ -216,7 +213,7 @@ export function AiPageContent() {
 				<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
 					{/* Card 1: Generate content */}
 					<div className='rounded-2xl border border-border/80 bg-card p-6 shadow-xs space-y-3 hover:border-primary/40 transition-colors'>
-						<div className='h-10 w-10 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center'>
+						<div className='h-10 w-10 rounded-xl bg-muted text-muted-foreground flex items-center justify-center'>
 							<FileText className='h-5 w-5' />
 						</div>
 						<h3 className='text-lg font-bold text-foreground'>Generate Content</h3>
@@ -227,7 +224,7 @@ export function AiPageContent() {
 
 					{/* Card 2: Structure Knowledge */}
 					<div className='rounded-2xl border border-border/80 bg-card p-6 shadow-xs space-y-3 hover:border-primary/40 transition-colors'>
-						<div className='h-10 w-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center'>
+						<div className='h-10 w-10 rounded-xl bg-muted text-muted-foreground flex items-center justify-center'>
 							<Lightbulb className='h-5 w-5' />
 						</div>
 						<h3 className='text-lg font-bold text-foreground'>Structure Knowledge</h3>
@@ -238,7 +235,7 @@ export function AiPageContent() {
 
 					{/* Card 3: Generate Action Items */}
 					<div className='rounded-2xl border border-border/80 bg-card p-6 shadow-xs space-y-3 hover:border-primary/40 transition-colors'>
-						<div className='h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center'>
+						<div className='h-10 w-10 rounded-xl bg-muted text-muted-foreground flex items-center justify-center'>
 							<CheckCircle2 className='h-5 w-5' />
 						</div>
 						<h3 className='text-lg font-bold text-foreground'>Extract Action Items</h3>
@@ -249,7 +246,7 @@ export function AiPageContent() {
 
 					{/* Card 4: Summarize information */}
 					<div className='rounded-2xl border border-border/80 bg-card p-6 shadow-xs space-y-3 hover:border-primary/40 transition-colors'>
-						<div className='h-10 w-10 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center'>
+						<div className='h-10 w-10 rounded-xl bg-muted text-muted-foreground flex items-center justify-center'>
 							<AlignLeft className='h-5 w-5' />
 						</div>
 						<h3 className='text-lg font-bold text-foreground'>Summarize Information</h3>
@@ -260,7 +257,7 @@ export function AiPageContent() {
 
 					{/* Card 5: Answer questions */}
 					<div className='rounded-2xl border border-border/80 bg-card p-6 shadow-xs space-y-3 hover:border-primary/40 transition-colors'>
-						<div className='h-10 w-10 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center'>
+						<div className='h-10 w-10 rounded-xl bg-muted text-muted-foreground flex items-center justify-center'>
 							<HelpCircle className='h-5 w-5' />
 						</div>
 						<h3 className='text-lg font-bold text-foreground'>Answer Questions</h3>
@@ -281,7 +278,7 @@ export function AiPageContent() {
 							</p>
 						</div>
 						<Link href={user ? "/dashboard/ai" : "/sign-up"}>
-							<Button size='sm' className='rounded-lg text-xs font-semibold w-full mt-2'>
+							<Button size='sm' className='rounded-lg text-xs font-medium w-full mt-2'>
 								Try in Workspace
 							</Button>
 						</Link>

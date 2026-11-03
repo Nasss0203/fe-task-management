@@ -17,7 +17,7 @@ export function HomePublishShowcase() {
 			<div className='mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'>
 				{/* Header */}
 				<div className='mx-auto max-w-2xl text-center mb-16'>
-					<div className='inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 mb-4'>
+					<div className='inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground mb-4'>
 						<Globe className='h-3.5 w-3.5' />
 						Zero-Configuration Web Publishing
 					</div>
@@ -33,7 +33,7 @@ export function HomePublishShowcase() {
 				<div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 relative'>
 					{/* Step 1 */}
 					<div className='relative rounded-2xl border border-border/80 bg-card p-6 shadow-xs text-center flex flex-col items-center'>
-						<div className='h-12 w-12 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center font-bold text-sm mb-4 ring-1 ring-blue-500/20'>
+						<div className='h-12 w-12 rounded-xl bg-muted text-muted-foreground flex items-center justify-center font-bold text-sm mb-4 ring-1 ring-border'>
 							<FileText className='h-5 w-5' />
 						</div>
 						<div className='text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1'>
@@ -47,7 +47,7 @@ export function HomePublishShowcase() {
 
 					{/* Step 2 */}
 					<div className='relative rounded-2xl border border-border/80 bg-card p-6 shadow-xs text-center flex flex-col items-center'>
-						<div className='h-12 w-12 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center font-bold text-sm mb-4 ring-1 ring-indigo-500/20'>
+						<div className='h-12 w-12 rounded-xl bg-muted text-muted-foreground flex items-center justify-center font-bold text-sm mb-4 ring-1 ring-border'>
 							<UploadCloud className='h-5 w-5' />
 						</div>
 						<div className='text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1'>
@@ -61,7 +61,7 @@ export function HomePublishShowcase() {
 
 					{/* Step 3 */}
 					<div className='relative rounded-2xl border border-border/80 bg-card p-6 shadow-xs text-center flex flex-col items-center'>
-						<div className='h-12 w-12 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold text-sm mb-4 ring-1 ring-emerald-500/20'>
+						<div className='h-12 w-12 rounded-xl bg-muted text-muted-foreground flex items-center justify-center font-bold text-sm mb-4 ring-1 ring-border'>
 							<Share2 className='h-5 w-5' />
 						</div>
 						<div className='text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1'>
@@ -84,7 +84,7 @@ export function HomePublishShowcase() {
 							{/* Public Page Header */}
 							<div className='flex items-center justify-between pb-6 border-b border-border/60'>
 								<div className='flex items-center gap-2'>
-									<div className='h-8 w-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold text-xs ring-1 ring-emerald-500/20'>
+									<div className='h-8 w-8 rounded-lg bg-muted text-muted-foreground flex items-center justify-center font-bold text-xs ring-1 ring-border'>
 										A
 									</div>
 									<div>
@@ -94,7 +94,7 @@ export function HomePublishShowcase() {
 								</div>
 
 								<div className='flex items-center gap-2'>
-									<Badge variant='outline' className='text-[10px] text-emerald-600 border-emerald-500/30 bg-emerald-500/5'>
+									<Badge variant='outline' className='text-[10px] text-muted-foreground border-border bg-muted'>
 										Public Site
 									</Badge>
 									<span className='text-xs text-muted-foreground hidden sm:inline'>Read-only</span>
@@ -133,25 +133,25 @@ export function HomePublishShowcase() {
 				<div className='mt-12 flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-border/60 pt-8'>
 					<div className='flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground'>
 						<div className='flex items-center gap-1.5'>
-							<Check className='h-3.5 w-3.5 text-emerald-500' />
+							<Check className='h-3.5 w-3.5 text-muted-foreground' />
 							<span>Publish root page</span>
 						</div>
 						<div className='flex items-center gap-1.5'>
-							<Check className='h-3.5 w-3.5 text-emerald-500' />
+							<Check className='h-3.5 w-3.5 text-muted-foreground' />
 							<span>Include descendants</span>
 						</div>
 						<div className='flex items-center gap-1.5'>
-							<Check className='h-3.5 w-3.5 text-emerald-500' />
+							<Check className='h-3.5 w-3.5 text-muted-foreground' />
 							<span>Public subdomain / URL</span>
 						</div>
 						<div className='flex items-center gap-1.5'>
-							<Check className='h-3.5 w-3.5 text-emerald-500' />
+							<Check className='h-3.5 w-3.5 text-muted-foreground' />
 							<span>Instant republish updates</span>
 						</div>
 					</div>
 
 					<Link href='/publish'>
-						<Button variant='outline' className='rounded-full group'>
+						<Button variant='outline' className='rounded-lg group'>
 							Discover Web Publishing
 							<ArrowRight className='ml-2 h-4 w-4 transition-transform group-hover:translate-x-1' />
 						</Button>

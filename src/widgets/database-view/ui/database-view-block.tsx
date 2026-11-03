@@ -125,14 +125,14 @@ export function DatabaseViewBlock({
 		<DatabaseShareTokenContext.Provider value={shareToken}>
 		<div className='w-full min-w-0 max-w-full'>
 			{readOnly ? (
-				<h3 className='mb-1 truncate px-1 py-0.5 text-lg font-semibold'>
+				<h3 className='mb-2 truncate px-1 py-0.5 text-2xl font-bold tracking-[-0.02em]'>
 					{database.name || "Untitled database"}
 				</h3>
 			) : (
 				<DatabaseTitle databaseId={database.id} name={database.name} />
 			)}
-			<div className='mb-1 flex items-center justify-between gap-2'>
-				<div className='flex min-w-0 items-center gap-1 overflow-x-auto pb-1 [scrollbar-width:thin]'>
+			<div className='mb-3 flex items-center justify-between gap-2 border-b border-border pb-2'>
+				<div className='flex min-w-0 items-center gap-0.5 overflow-x-auto [scrollbar-width:thin]'>
 					{views.map((view) => (
 						<DatabaseViewTab
 							key={view.id}
@@ -154,7 +154,7 @@ export function DatabaseViewBlock({
 				</div>
 
 				{!readOnly && (
-				<div className='flex shrink-0 items-center gap-1'>
+				<div className='flex shrink-0 items-center gap-0.5'>
 					{activeViewDetail && (
 						<DatabaseViewFilterPopover
 							databaseId={database.id}

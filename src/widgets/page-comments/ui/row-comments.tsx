@@ -47,12 +47,12 @@ export function RowComments({
 		<section
 			ref={sectionRef}
 			aria-label='Comments'
-			className='mt-8 scroll-mt-4 border-t pt-5'
+			className='mt-6 scroll-mt-4 border-t border-border pt-4'
 		>
-			<h3 className='mb-3 text-sm font-medium text-muted-foreground'>
+			<h3 className='mb-3 text-[13.5px] font-semibold text-foreground'>
 				Comments
 				{comments.length > 0 && (
-					<span className='ml-1.5 text-xs font-normal'>{comments.length}</span>
+					<span className='ml-1.5 text-[12.5px] font-normal text-faint'>{comments.length}</span>
 				)}
 			</h3>
 

@@ -38,9 +38,9 @@ export function PageDiscussion({ pageId, shareToken }: PageDiscussionProps) {
 				<button
 					type='button'
 					onClick={() => setComposerOpen(true)}
-					className='-ml-1.5 flex items-center gap-1.5 rounded-md px-1.5 py-0.5 text-sm text-muted-foreground opacity-0 transition-opacity hover:bg-muted hover:text-foreground focus-visible:opacity-100 group-hover/page-title:opacity-100 [@media(hover:none)]:opacity-100'
+					className='-ml-1.5 flex items-center gap-1.5 rounded-md px-1.5 py-1 text-[13px] text-faint opacity-0 transition-opacity hover:bg-accent hover:text-foreground focus-visible:opacity-100 group-hover/page-title:opacity-100 [@media(hover:none)]:opacity-100'
 				>
-					<MessageSquare className='size-4' />
+					<MessageSquare className='size-3.5' />
 					Add comment
 				</button>
 			</div>

@@ -21,7 +21,7 @@ export function HomeTemplatesShowcase() {
 				{/* Header */}
 				<div className='flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16'>
 					<div className='max-w-xl space-y-3'>
-						<div className='inline-flex items-center gap-1.5 rounded-full border border-teal-500/20 bg-teal-500/5 px-3 py-1 text-xs font-semibold text-teal-600 dark:text-teal-400'>
+						<div className='inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground'>
 							<LayoutTemplate className='h-3.5 w-3.5' />
 							Curated Starter Frameworks
 						</div>
@@ -34,7 +34,7 @@ export function HomeTemplatesShowcase() {
 					</div>
 
 					<Link href='/templates'>
-						<Button variant='outline' className='rounded-full group'>
+						<Button variant='outline' className='rounded-lg group'>
 							Explore all templates
 							<ArrowRight className='ml-2 h-4 w-4 transition-transform group-hover:translate-x-1' />
 						</Button>
@@ -46,12 +46,12 @@ export function HomeTemplatesShowcase() {
 					{showcaseTemplates.map((template) => (
 						<div
 							key={template.id}
-							className='group flex flex-col h-full rounded-2xl border border-border/80 bg-card p-4 shadow-xs transition-all duration-300 hover:border-primary/50 hover:shadow-lg hover:-translate-y-1'
+							className='group flex flex-col h-full rounded-2xl border border-border/80 bg-card p-4 shadow-xs transition-all duration-300 hover:border-primary/50 hover:shadow-soft hover:-translate-y-1'
 						>
 							{/* Visual Preview Box */}
 							<div className='relative h-44 w-full rounded-xl overflow-hidden border border-border/50 bg-muted/30 mb-4 shrink-0'>
 								<TemplatePreview previewType={template.previewType} variant={template.variant} />
-								<div className='absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent pointer-events-none' />
+								<div className='absolute inset-0 pointer-events-none' />
 								<Badge className='absolute top-2.5 right-2.5 bg-background/90 text-foreground border border-border/60 text-[10px] backdrop-blur-md shadow-xs'>
 									{template.category}
 								</Badge>
@@ -92,7 +92,7 @@ export function HomeTemplatesShowcase() {
 									<Link href={ctaHref} className='flex-1'>
 										<Button
 											size='sm'
-											className='w-full rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90'
+											className='w-full rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90'
 										>
 											Use template
 										</Button>

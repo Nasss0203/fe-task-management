@@ -78,7 +78,7 @@ export default function ShareButton({ pageId }: ShareButtonProps) {
 			<PopoverTrigger asChild>
 				<button
 					type='button'
-					className='flex cursor-pointer items-center gap-1.5 rounded-md border border-transparent px-2 py-1.5 text-xs text-muted-foreground hover:border-border hover:bg-accent hover:text-accent-foreground'
+					className='flex h-7 cursor-pointer items-center gap-1.5 rounded-md px-2 text-[13px] font-medium text-secondary-foreground hover:bg-accent hover:text-accent-foreground'
 				>
 					<SquareArrowOutUpRight className='size-3.5' />
 					Share

@@ -330,7 +330,7 @@ describe("mentions in comments", () => {
 		await user.keyboard("{Enter}");
 		expect(input).toHaveValue("Hi @Lan ");
 		// Tô màu ngay trong ô nhập: lớp phủ có span cho "@Lan", chữ textarea trong suốt
-		expect(screen.getByText("@Lan", { selector: "span" })).toHaveClass("text-primary");
+		expect(screen.getByText("@Lan", { selector: "span" })).toHaveClass("text-ring");
 		expect(input).toHaveClass("text-transparent");
 
 		await user.type(input, "check this{Enter}");

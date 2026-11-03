@@ -44,11 +44,9 @@ export function PricingPageContent() {
 					Transparent Pricing
 				</div>
 
-				<h1 className='text-4xl sm:text-6xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50 leading-[1.1]'>
+				<h1 className='text-4xl sm:text-6xl font-bold tracking-tight text-foreground leading-[1.1]'>
 					Choose the plan that{" "}
-					<span className='bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 bg-clip-text text-transparent'>
 						fits your team
-					</span>
 				</h1>
 
 				<p className='text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed'>
@@ -79,7 +77,7 @@ export function PricingPageContent() {
 							}`}
 						>
 							<span>Yearly Billing</span>
-							<span className='rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-1.5 py-0.5 leading-none'>
+							<span className='rounded-full bg-muted text-muted-foreground text-[10px] font-bold px-1.5 py-0.5 leading-none'>
 								Save 20%
 							</span>
 						</button>
@@ -111,7 +109,7 @@ export function PricingPageContent() {
 								{/* Popular / Badge */}
 								{plan.badge && (
 									<div className='absolute -top-3.5 left-1/2 -translate-x-1/2'>
-										<Badge className='bg-primary text-primary-foreground font-semibold text-xs px-3 py-1 shadow-md'>
+										<Badge className='bg-primary text-primary-foreground font-semibold text-xs px-3 py-1 shadow-soft'>
 											{plan.badge}
 										</Badge>
 									</div>
@@ -169,7 +167,7 @@ export function PricingPageContent() {
 											}`}
 										>
 											{feature.included ? (
-												<div className='h-4 w-4 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5'>
+												<div className='h-4 w-4 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
 													<Check className='h-2.5 w-2.5' />
 												</div>
 											) : (
@@ -237,14 +235,14 @@ export function PricingPageContent() {
 								<tr>
 									<td className='py-3 px-3 font-medium'>Database Views (Board, Calendar, List)</td>
 									<td className='py-3 px-3 text-muted-foreground'><Minus className='h-3 w-3' /></td>
-									<td className='py-3 px-3 font-semibold text-emerald-600'><Check className='h-3.5 w-3.5' /></td>
-									<td className='py-3 px-3 font-semibold text-emerald-600'><Check className='h-3.5 w-3.5' /></td>
+									<td className='py-3 px-3 font-semibold text-muted-foreground'><Check className='h-3.5 w-3.5' /></td>
+									<td className='py-3 px-3 font-semibold text-muted-foreground'><Check className='h-3.5 w-3.5' /></td>
 								</tr>
 								<tr>
 									<td className='py-3 px-3 font-medium'>Public Page Web Publishing</td>
 									<td className='py-3 px-3 text-muted-foreground'><Minus className='h-3 w-3' /></td>
-									<td className='py-3 px-3 font-semibold text-emerald-600'><Check className='h-3.5 w-3.5' /></td>
-									<td className='py-3 px-3 font-semibold text-emerald-600'><Check className='h-3.5 w-3.5' /></td>
+									<td className='py-3 px-3 font-semibold text-muted-foreground'><Check className='h-3.5 w-3.5' /></td>
+									<td className='py-3 px-3 font-semibold text-muted-foreground'><Check className='h-3.5 w-3.5' /></td>
 								</tr>
 								<tr>
 									<td className='py-3 px-3 font-medium'>Taskmanly AI Assistant</td>
@@ -255,8 +253,8 @@ export function PricingPageContent() {
 								<tr>
 									<td className='py-3 px-3 font-medium'>Role-based Permissions (RBAC)</td>
 									<td className='py-3 px-3 text-muted-foreground'><Minus className='h-3 w-3' /></td>
-									<td className='py-3 px-3 font-semibold text-emerald-600'><Check className='h-3.5 w-3.5' /></td>
-									<td className='py-3 px-3 font-semibold text-emerald-600'><Check className='h-3.5 w-3.5' /></td>
+									<td className='py-3 px-3 font-semibold text-muted-foreground'><Check className='h-3.5 w-3.5' /></td>
+									<td className='py-3 px-3 font-semibold text-muted-foreground'><Check className='h-3.5 w-3.5' /></td>
 								</tr>
 							</tbody>
 						</table>

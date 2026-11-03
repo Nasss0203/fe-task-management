@@ -97,7 +97,7 @@ function CreatorHeader({ creator }: { creator: PublicCreatorProfile }) {
 
 	return (
 		<section aria-labelledby='creator-name' className='overflow-hidden rounded-2xl border border-border/80 bg-card/60'>
-			<div className='relative h-36 w-full bg-gradient-to-br from-primary/25 via-primary/10 to-muted sm:h-48'>
+			<div className='relative h-36 w-full sm:h-48'>
 				{creator.cover_url && (
 					/* eslint-disable-next-line @next/next/no-img-element */
 					<img

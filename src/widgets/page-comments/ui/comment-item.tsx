@@ -46,16 +46,16 @@ export function CommentItem({
 	return (
 		<div className='group/comment flex gap-2.5'>
 			<Avatar className='mt-0.5 size-6 shrink-0'>
-				<AvatarFallback className='bg-primary/15 text-[11px] font-medium text-primary'>
+				<AvatarFallback className='bg-ring text-[10px] font-semibold text-white'>
 					{name.charAt(0).toUpperCase()}
 				</AvatarFallback>
 			</Avatar>
 
 			<div className='min-w-0 flex-1'>
 				<div className='flex items-center gap-2'>
-					<span className='truncate text-sm font-medium'>{name}</span>
+					<span className='truncate text-[13px] font-medium'>{name}</span>
 
-					<span className='shrink-0 text-xs text-muted-foreground'>
+					<span className='shrink-0 text-xs text-faint'>
 						{formatRelativeTime(comment.created_at)}
 						{comment.edited_at && " · edited"}
 					</span>
@@ -133,12 +133,12 @@ export function CommentItem({
 						}}
 					/>
 				) : (
-					<p className='whitespace-pre-wrap break-words text-sm leading-6 text-foreground/90'>
+					<p className='whitespace-pre-wrap break-words text-[13.5px] leading-5 text-secondary-foreground'>
 						{splitMentions(comment.body).map((part, index) =>
 							part.type === "mention" ? (
 								<span
 									key={index}
-									className='rounded bg-primary/10 px-0.5 font-medium text-primary'
+									className='rounded-sm bg-accent-soft px-0.5 font-medium text-ring'
 								>
 									@{part.name}
 								</span>

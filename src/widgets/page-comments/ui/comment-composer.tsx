@@ -126,10 +126,15 @@ export function CommentComposer({
 	};
 
 	return (
-		<div className={cn("flex items-start gap-2.5", className)}>
+		<div
+			className={cn(
+				"flex items-start gap-2 rounded-lg border border-input bg-background py-1.5 pr-1.5 pl-2.5 transition-colors focus-within:border-ring focus-within:ring-[0.5px] focus-within:ring-ring",
+				className,
+			)}
+		>
 			{authorName && (
-				<Avatar className='mt-0.5 size-6 shrink-0'>
-					<AvatarFallback className='bg-primary/15 text-[11px] font-medium text-primary'>
+				<Avatar className='mt-0.5 size-5.5 shrink-0'>
+					<AvatarFallback className='bg-ring text-[9px] font-semibold text-white'>
 						{authorName.charAt(0).toUpperCase()}
 					</AvatarFallback>
 				</Avatar>
@@ -146,11 +151,11 @@ export function CommentComposer({
 						<div
 							ref={overlayRef}
 							aria-hidden='true'
-							className='pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words py-0.5 text-sm leading-6 text-foreground'
+							className='pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words py-0.5 text-[13.5px] leading-6 text-foreground'
 						>
 							{splitDisplayMentions(value, mentions).map((part, index) =>
 								part.mention ? (
-									<span key={index} className='rounded-sm bg-primary/15 text-primary'>
+									<span key={index} className='rounded-sm bg-accent-soft text-ring'>
 										{part.text}
 									</span>
 								) : (
@@ -226,7 +231,7 @@ export function CommentComposer({
 							}
 						}}
 						className={cn(
-							"relative block max-h-48 min-h-7 w-full resize-none overflow-y-auto break-words bg-transparent py-0.5 text-sm leading-6 outline-none placeholder:text-muted-foreground/60",
+							"relative block max-h-48 min-h-7 w-full resize-none overflow-y-auto break-words bg-transparent py-0.5 text-[13.5px] leading-6 outline-none placeholder:text-faint",
 							hasMentions && "text-transparent caret-foreground",
 						)}
 					/>
@@ -256,7 +261,7 @@ export function CommentComposer({
 								)}
 							>
 								<Avatar className='size-5 shrink-0'>
-									<AvatarFallback className='bg-primary/15 text-[10px] text-primary'>
+									<AvatarFallback className='bg-ring text-[9px] font-semibold text-white'>
 										{user.username.charAt(0).toUpperCase()}
 									</AvatarFallback>
 								</Avatar>
@@ -274,7 +279,7 @@ export function CommentComposer({
 					<button
 						type='button'
 						onClick={onCancel}
-						className='mb-0.5 shrink-0 rounded px-1.5 py-0.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground'
+						className='mb-0.5 shrink-0 rounded-md px-1.5 py-0.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground'
 					>
 						Cancel
 					</button>
@@ -285,7 +290,7 @@ export function CommentComposer({
 					aria-label={submitLabel}
 					disabled={!body || pending}
 					onClick={() => void submit()}
-					className='mb-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors disabled:bg-muted disabled:text-muted-foreground/60'
+					className='flex size-6.5 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground transition-colors disabled:bg-muted disabled:text-muted-foreground'
 				>
 					<ArrowUp className='size-3.5' />
 				</button>

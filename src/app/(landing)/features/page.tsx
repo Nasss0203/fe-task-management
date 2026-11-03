@@ -32,11 +32,9 @@ export default function FeaturesPage() {
 					Product Capabilities
 				</div>
 
-				<h1 className='text-4xl sm:text-6xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50 leading-[1.1]'>
+				<h1 className='text-4xl sm:text-6xl font-bold tracking-tight text-foreground leading-[1.1]'>
 					Powerful features for{" "}
-					<span className='bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 bg-clip-text text-transparent'>
 						modern teams
-					</span>
 				</h1>
 
 				<p className='text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed'>
@@ -69,10 +67,10 @@ export default function FeaturesPage() {
 				<div className='grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center'>
 					<div className='space-y-6'>
 						<div className='flex items-center gap-2'>
-							<div className='h-9 w-9 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center ring-1 ring-blue-500/20'>
+							<div className='h-9 w-9 rounded-xl bg-muted text-muted-foreground flex items-center justify-center ring-1 ring-border'>
 								<FileText className='h-5 w-5' />
 							</div>
-							<Badge variant='outline' className='text-xs font-semibold text-blue-600 border-blue-500/30'>
+							<Badge variant='outline' className='text-xs font-semibold text-muted-foreground border-border'>
 								Core Editor
 							</Badge>
 						</div>
@@ -90,10 +88,10 @@ export default function FeaturesPage() {
 								"Block-based editing with markdown shortcuts and rich formatting",
 								"Infinite nested page hierarchy for organized team knowledge",
 								"Code blocks with multi-language syntax highlighting",
-								"Real-time collaborative typing with conflict-free synchronization",
+								"Comments and discussions on pages and blocks",
 							].map((cap) => (
 								<div key={cap} className='flex items-start gap-2.5'>
-									<div className='h-5 w-5 rounded-full bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0 mt-0.5'>
+									<div className='h-5 w-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
 										<Check className='h-3 w-3' />
 									</div>
 									<span className='text-foreground font-medium'>{cap}</span>
@@ -103,7 +101,7 @@ export default function FeaturesPage() {
 
 						<div className='pt-2'>
 							<Link href='/sign-up'>
-								<Button className='rounded-full bg-primary text-primary-foreground font-semibold'>
+								<Button className='rounded-lg bg-primary text-primary-foreground font-medium'>
 									Start writing free
 								</Button>
 							</Link>
@@ -111,7 +109,7 @@ export default function FeaturesPage() {
 					</div>
 
 					{/* Mockup */}
-					<div className='rounded-2xl border border-border/80 bg-card p-6 shadow-xl'>
+					<div className='rounded-2xl border border-border/80 bg-card p-6 shadow-soft'>
 						<div className='flex items-center justify-between pb-4 border-b border-border/60 text-xs text-muted-foreground'>
 							<div className='flex items-center gap-2'>
 								<FileText className='h-4 w-4 text-primary' />
@@ -131,11 +129,11 @@ export default function FeaturesPage() {
 							</div>
 							<div className='space-y-1.5 pt-2'>
 								<div className='flex items-center gap-2 text-foreground font-medium'>
-									<CheckCircle2 className='h-4 w-4 text-emerald-500' />
+									<CheckCircle2 className='h-4 w-4 text-muted-foreground' />
 									<span>Validate HMAC SHA256 header signature hash</span>
 								</div>
 								<div className='flex items-center gap-2 text-foreground font-medium'>
-									<CheckCircle2 className='h-4 w-4 text-emerald-500' />
+									<CheckCircle2 className='h-4 w-4 text-muted-foreground' />
 									<span>Store incoming payload in idempotency audit log</span>
 								</div>
 							</div>
@@ -148,10 +146,10 @@ export default function FeaturesPage() {
 			<section id='database-views' className='mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 scroll-mt-24'>
 				<div className='grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center'>
 					{/* Mockup */}
-					<div className='order-2 lg:order-1 rounded-2xl border border-border/80 bg-card p-6 shadow-xl'>
+					<div className='order-2 lg:order-1 rounded-2xl border border-border/80 bg-card p-6 shadow-soft'>
 						<div className='flex items-center justify-between pb-3.5 border-b border-border/60 text-xs'>
 							<div className='flex items-center gap-2 font-semibold text-foreground'>
-								<Database className='h-4 w-4 text-purple-500' />
+								<Database className='h-4 w-4 text-muted-foreground' />
 								Workspace Database Views
 							</div>
 							<Badge variant='outline' className='text-[10px]'>4 Views</Badge>
@@ -170,21 +168,21 @@ export default function FeaturesPage() {
 								<tbody className='divide-y divide-border/40 text-foreground'>
 									<tr>
 										<td className='py-2 px-1 font-medium'>RBAC Permissions Matrix</td>
-										<td className='py-2 px-1'><Badge className='text-[9px] bg-emerald-500/10 text-emerald-600 border-none'>Done</Badge></td>
+										<td className='py-2 px-1'><Badge className='text-[9px] bg-muted text-muted-foreground border-none'>Done</Badge></td>
 										<td className='py-2 px-1 text-muted-foreground'>Alex</td>
-										<td className='py-2 px-1 text-amber-500 font-semibold'>High</td>
+										<td className='py-2 px-1 text-muted-foreground font-semibold'>High</td>
 									</tr>
 									<tr>
 										<td className='py-2 px-1 font-medium'>Subdomain Web Routing</td>
-										<td className='py-2 px-1'><Badge className='text-[9px] bg-blue-500/10 text-blue-600 border-none'>Active</Badge></td>
+										<td className='py-2 px-1'><Badge className='text-[9px] bg-muted text-muted-foreground border-none'>Active</Badge></td>
 										<td className='py-2 px-1 text-muted-foreground'>Nam</td>
-										<td className='py-2 px-1 text-emerald-600 font-semibold'>Normal</td>
+										<td className='py-2 px-1 text-muted-foreground font-semibold'>Normal</td>
 									</tr>
 									<tr>
 										<td className='py-2 px-1 font-medium'>Formula Fields & Aggregations</td>
-										<td className='py-2 px-1'><Badge className='text-[9px] bg-purple-500/10 text-purple-600 border-none'>Review</Badge></td>
+										<td className='py-2 px-1'><Badge className='text-[9px] bg-muted text-muted-foreground border-none'>Review</Badge></td>
 										<td className='py-2 px-1 text-muted-foreground'>Sara</td>
-										<td className='py-2 px-1 text-red-500 font-semibold'>Urgent</td>
+										<td className='py-2 px-1 text-muted-foreground font-semibold'>Urgent</td>
 									</tr>
 								</tbody>
 							</table>
@@ -194,10 +192,10 @@ export default function FeaturesPage() {
 					{/* Text */}
 					<div className='order-1 lg:order-2 space-y-6'>
 						<div className='flex items-center gap-2'>
-							<div className='h-9 w-9 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center ring-1 ring-purple-500/20'>
+							<div className='h-9 w-9 rounded-xl bg-muted text-muted-foreground flex items-center justify-center ring-1 ring-border'>
 								<Database className='h-5 w-5' />
 							</div>
-							<Badge variant='outline' className='text-xs font-semibold text-purple-600 border-purple-500/30'>
+							<Badge variant='outline' className='text-xs font-semibold text-muted-foreground border-border'>
 								Structured Data
 							</Badge>
 						</div>
@@ -218,7 +216,7 @@ export default function FeaturesPage() {
 								"Relational links between workspace pages and database items",
 							].map((cap) => (
 								<div key={cap} className='flex items-start gap-2.5'>
-									<div className='h-5 w-5 rounded-full bg-purple-500/10 text-purple-600 flex items-center justify-center shrink-0 mt-0.5'>
+									<div className='h-5 w-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
 										<Check className='h-3 w-3' />
 									</div>
 									<span className='text-foreground font-medium'>{cap}</span>
@@ -228,7 +226,7 @@ export default function FeaturesPage() {
 
 						<div className='pt-2'>
 							<Link href='/sign-up'>
-								<Button className='rounded-full bg-primary text-primary-foreground font-semibold'>
+								<Button className='rounded-lg bg-primary text-primary-foreground font-medium'>
 									Build a database
 								</Button>
 							</Link>
@@ -242,10 +240,10 @@ export default function FeaturesPage() {
 				<div className='grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center'>
 					<div className='space-y-6'>
 						<div className='flex items-center gap-2'>
-							<div className='h-9 w-9 rounded-xl bg-pink-500/10 text-pink-600 flex items-center justify-center ring-1 ring-pink-500/20'>
+							<div className='h-9 w-9 rounded-xl bg-muted text-muted-foreground flex items-center justify-center ring-1 ring-border'>
 								<Users className='h-5 w-5' />
 							</div>
-							<Badge variant='outline' className='text-xs font-semibold text-pink-600 border-pink-500/30'>
+							<Badge variant='outline' className='text-xs font-semibold text-muted-foreground border-border'>
 								Workspace & Access
 							</Badge>
 						</div>
@@ -261,12 +259,12 @@ export default function FeaturesPage() {
 						<div className='space-y-3 pt-2 text-sm'>
 							{[
 								"Squad Teamspaces for Engineering, Product, Marketing, and Ops",
-								"Granular role permissions: Workspace Owner, Admin, Member, Viewer",
+								"Workspace roles: owner, member and guest; page access from view to full access",
 								"Private personal drafts alongside shared organizational spaces",
 								"Instant workspace invite links and email invitations",
 							].map((cap) => (
 								<div key={cap} className='flex items-start gap-2.5'>
-									<div className='h-5 w-5 rounded-full bg-pink-500/10 text-pink-600 flex items-center justify-center shrink-0 mt-0.5'>
+									<div className='h-5 w-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
 										<Check className='h-3 w-3' />
 									</div>
 									<span className='text-foreground font-medium'>{cap}</span>
@@ -276,7 +274,7 @@ export default function FeaturesPage() {
 
 						<div className='pt-2'>
 							<Link href='/sign-up'>
-								<Button className='rounded-full bg-primary text-primary-foreground font-semibold'>
+								<Button className='rounded-lg bg-primary text-primary-foreground font-medium'>
 									Invite your team
 								</Button>
 							</Link>
@@ -284,10 +282,10 @@ export default function FeaturesPage() {
 					</div>
 
 					{/* Mockup */}
-					<div className='rounded-2xl border border-border/80 bg-card p-6 shadow-xl'>
+					<div className='rounded-2xl border border-border/80 bg-card p-6 shadow-soft'>
 						<div className='flex items-center justify-between pb-3.5 border-b border-border/60 text-xs'>
 							<span className='font-bold text-foreground'>Workspace Access Control</span>
-							<Badge variant='outline' className='text-[10px]'>Admin Console</Badge>
+							<Badge variant='outline' className='text-[10px]'>People</Badge>
 						</div>
 						<div className='mt-4 space-y-2.5 text-xs'>
 							<div className='flex items-center justify-between p-2.5 rounded-xl border border-border/60 bg-muted/20'>
@@ -299,10 +297,10 @@ export default function FeaturesPage() {
 							</div>
 							<div className='flex items-center justify-between p-2.5 rounded-xl border border-border/60 bg-muted/20'>
 								<div>
-									<div className='font-semibold text-foreground'>Admin</div>
-									<div className='text-[10px] text-muted-foreground'>Can manage Teamspaces and invite members</div>
+									<div className='font-semibold text-foreground'>Guest</div>
+									<div className='text-[10px] text-muted-foreground'>Can open only the pages shared with them</div>
 								</div>
-								<Badge variant='secondary' className='text-[10px]'>Admin</Badge>
+								<Badge variant='secondary' className='text-[10px]'>Guest</Badge>
 							</div>
 							<div className='flex items-center justify-between p-2.5 rounded-xl border border-border/60 bg-muted/20'>
 								<div>
@@ -320,7 +318,7 @@ export default function FeaturesPage() {
 			<section id='templates' className='mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 scroll-mt-24'>
 				<div className='grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center'>
 					{/* Mockup */}
-					<div className='order-2 lg:order-1 rounded-2xl border border-border/80 bg-card p-6 shadow-xl'>
+					<div className='order-2 lg:order-1 rounded-2xl border border-border/80 bg-card p-6 shadow-soft'>
 						<div className='h-48 w-full rounded-xl overflow-hidden border border-border/60 bg-muted/30 mb-3'>
 							<TemplatePreview variant='checklist' />
 						</div>
@@ -330,7 +328,7 @@ export default function FeaturesPage() {
 								<div className='text-[10px] text-muted-foreground'>Includes handbook, onboarding checklists, and team directory</div>
 							</div>
 							<Link href='/templates/tpl-company-wiki'>
-								<Button size='sm' className='h-8 text-xs font-semibold'>
+								<Button size='sm' className='h-8 text-xs font-medium'>
 									Preview
 								</Button>
 							</Link>
@@ -340,10 +338,10 @@ export default function FeaturesPage() {
 					{/* Text */}
 					<div className='order-1 lg:order-2 space-y-6'>
 						<div className='flex items-center gap-2'>
-							<div className='h-9 w-9 rounded-xl bg-teal-500/10 text-teal-600 flex items-center justify-center ring-1 ring-teal-500/20'>
+							<div className='h-9 w-9 rounded-xl bg-muted text-muted-foreground flex items-center justify-center ring-1 ring-border'>
 								<LayoutTemplate className='h-5 w-5' />
 							</div>
-							<Badge variant='outline' className='text-xs font-semibold text-teal-600 border-teal-500/30'>
+							<Badge variant='outline' className='text-xs font-semibold text-muted-foreground border-border'>
 								Starter Templates
 							</Badge>
 						</div>
@@ -358,13 +356,13 @@ export default function FeaturesPage() {
 
 						<div className='space-y-3 pt-2 text-sm'>
 							{[
-								"Curated templates across 6 categories for fast adoption",
+								"Curated templates across categories for fast adoption",
 								"Complete with sample data, tags, and pre-configured database views",
 								"One-click clone directly into your active workspace",
 								"Fully customizable after adding to your account",
 							].map((cap) => (
 								<div key={cap} className='flex items-start gap-2.5'>
-									<div className='h-5 w-5 rounded-full bg-teal-500/10 text-teal-600 flex items-center justify-center shrink-0 mt-0.5'>
+									<div className='h-5 w-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
 										<Check className='h-3 w-3' />
 									</div>
 									<span className='text-foreground font-medium'>{cap}</span>
@@ -374,7 +372,7 @@ export default function FeaturesPage() {
 
 						<div className='pt-2'>
 							<Link href='/templates'>
-								<Button className='rounded-full bg-primary text-primary-foreground font-semibold'>
+								<Button className='rounded-lg bg-primary text-primary-foreground font-medium'>
 									Browse template gallery
 								</Button>
 							</Link>
@@ -388,10 +386,10 @@ export default function FeaturesPage() {
 				<div className='grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center'>
 					<div className='space-y-6'>
 						<div className='flex items-center gap-2'>
-							<div className='h-9 w-9 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center ring-1 ring-emerald-500/20'>
+							<div className='h-9 w-9 rounded-xl bg-muted text-muted-foreground flex items-center justify-center ring-1 ring-border'>
 								<Globe className='h-5 w-5' />
 							</div>
-							<Badge variant='outline' className='text-xs font-semibold text-emerald-600 border-emerald-500/30'>
+							<Badge variant='outline' className='text-xs font-semibold text-muted-foreground border-border'>
 								Web Publishing
 							</Badge>
 						</div>
@@ -412,7 +410,7 @@ export default function FeaturesPage() {
 								"Instant live updates whenever you republish changes",
 							].map((cap) => (
 								<div key={cap} className='flex items-start gap-2.5'>
-									<div className='h-5 w-5 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5'>
+									<div className='h-5 w-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
 										<Check className='h-3 w-3' />
 									</div>
 									<span className='text-foreground font-medium'>{cap}</span>
@@ -422,7 +420,7 @@ export default function FeaturesPage() {
 
 						<div className='pt-2'>
 							<Link href='/publish'>
-								<Button className='rounded-full bg-primary text-primary-foreground font-semibold'>
+								<Button className='rounded-lg bg-primary text-primary-foreground font-medium'>
 									Learn more about publishing
 								</Button>
 							</Link>
@@ -430,10 +428,10 @@ export default function FeaturesPage() {
 					</div>
 
 					{/* Mockup */}
-					<div className='rounded-2xl border border-border/80 bg-card p-6 shadow-xl'>
+					<div className='rounded-2xl border border-border/80 bg-card p-6 shadow-soft'>
 						<div className='flex items-center justify-between pb-3.5 border-b border-border/60 text-xs'>
 							<span className='font-bold text-foreground'>Live Public Site Preview</span>
-							<Badge className='text-[10px] bg-emerald-500/10 text-emerald-600 border-none'>Online</Badge>
+							<Badge className='text-[10px] bg-muted text-muted-foreground border-none'>Online</Badge>
 						</div>
 						<div className='mt-4 space-y-3 text-xs'>
 							<div className='p-2.5 rounded-lg border border-border/60 bg-muted/20 font-mono text-[11px] text-primary flex items-center justify-between'>
@@ -453,13 +451,13 @@ export default function FeaturesPage() {
 			<section id='ai-assistant' className='mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 scroll-mt-24'>
 				<div className='grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center'>
 					{/* Mockup */}
-					<div className='order-2 lg:order-1 rounded-2xl border border-border/80 bg-card p-6 shadow-xl'>
+					<div className='order-2 lg:order-1 rounded-2xl border border-border/80 bg-card p-6 shadow-soft'>
 						<div className='flex items-center justify-between pb-3.5 border-b border-border/60 text-xs'>
 							<div className='flex items-center gap-2'>
-								<Sparkles className='h-4 w-4 text-amber-500' />
+								<Sparkles className='h-4 w-4 text-muted-foreground' />
 								<span className='font-bold text-foreground'>Taskmanly AI</span>
 							</div>
-							<Badge variant='outline' className='text-[10px] text-amber-600 border-amber-500/30'>Copilot</Badge>
+							<Badge variant='outline' className='text-[10px] text-muted-foreground border-border'>Copilot</Badge>
 						</div>
 						<div className='mt-4 space-y-3 text-xs'>
 							<div className='p-2.5 rounded-xl rounded-tr-none bg-primary text-primary-foreground text-[11px] ml-auto max-w-[85%] font-medium'>
@@ -468,15 +466,15 @@ export default function FeaturesPage() {
 							<div className='p-3 rounded-xl rounded-tl-none bg-muted/40 border border-border/60 text-[11px] space-y-1.5 max-w-[90%]'>
 								<div className='font-semibold text-foreground'>Generated 3 Action Items:</div>
 								<div className='flex items-center gap-2 text-muted-foreground'>
-									<div className='h-1.5 w-1.5 rounded-full bg-red-500' />
+									<div className='h-1.5 w-1.5 rounded-full bg-primary' />
 									<span>[P0] Define RBAC enum in Postgres schema</span>
 								</div>
 								<div className='flex items-center gap-2 text-muted-foreground'>
-									<div className='h-1.5 w-1.5 rounded-full bg-amber-500' />
+									<div className='h-1.5 w-1.5 rounded-full bg-primary' />
 									<span>[P1] Add permission check middleware on API</span>
 								</div>
 								<div className='flex items-center gap-2 text-muted-foreground'>
-									<div className='h-1.5 w-1.5 rounded-full bg-emerald-500' />
+									<div className='h-1.5 w-1.5 rounded-full bg-primary' />
 									<span>[P2] Build team member roles management UI</span>
 								</div>
 							</div>
@@ -486,10 +484,10 @@ export default function FeaturesPage() {
 					{/* Text */}
 					<div className='order-1 lg:order-2 space-y-6'>
 						<div className='flex items-center gap-2'>
-							<div className='h-9 w-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center ring-1 ring-amber-500/20'>
+							<div className='h-9 w-9 rounded-xl bg-muted text-muted-foreground flex items-center justify-center ring-1 ring-border'>
 								<Sparkles className='h-5 w-5' />
 							</div>
-							<Badge variant='outline' className='text-xs font-semibold text-amber-600 border-amber-500/30'>
+							<Badge variant='outline' className='text-xs font-semibold text-muted-foreground border-border'>
 								AI Copilot
 							</Badge>
 						</div>
@@ -510,7 +508,7 @@ export default function FeaturesPage() {
 								"Query your workspace documentation and team status naturally",
 							].map((cap) => (
 								<div key={cap} className='flex items-start gap-2.5'>
-									<div className='h-5 w-5 rounded-full bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0 mt-0.5'>
+									<div className='h-5 w-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
 										<Check className='h-3 w-3' />
 									</div>
 									<span className='text-foreground font-medium'>{cap}</span>
@@ -520,7 +518,7 @@ export default function FeaturesPage() {
 
 						<div className='pt-2'>
 							<Link href='/ai'>
-								<Button className='rounded-full bg-primary text-primary-foreground font-semibold'>
+								<Button className='rounded-lg bg-primary text-primary-foreground font-medium'>
 									Explore AI Capabilities
 								</Button>
 							</Link>

@@ -39,7 +39,7 @@ export function FeatureCard({ feature, href }: FeatureCardProps) {
 	};
 
 	const cardContent = (
-		<div className='group relative h-full flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-6 shadow-xs hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300'>
+		<div className='group relative h-full flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-6 shadow-xs hover:border-primary/40 hover:shadow-soft hover:-translate-y-0.5 transition-all duration-300'>
 			{/* Top Row: Icon Container Left + Badge Right */}
 			<div>
 				<div className='flex items-center justify-between'>

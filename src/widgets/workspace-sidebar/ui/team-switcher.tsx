@@ -108,12 +108,12 @@ export function TeamSwitcher({
 									icon={activeWorkspace.icon}
 								/>
 
-								<span className='truncate font-medium'>
+								<span className='truncate font-semibold'>
 									{activeWorkspace.name}
 								</span>
 							</div>
 
-							<ChevronDown className='size-4 opacity-50' />
+							<ChevronDown className='size-3.5 text-faint' />
 						</SidebarMenuButton>
 					</DropdownMenuTrigger>
 

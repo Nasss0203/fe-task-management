@@ -44,7 +44,7 @@ export function BlockCommentsButton({
 					data-read-only-allowed=''
 					aria-label={count > 0 ? `${count} comments` : "Comment on block"}
 					className={cn(
-						"ml-1 flex h-7 w-8 items-center justify-center gap-0.5 rounded-md text-xs text-muted-foreground hover:bg-muted hover:text-foreground",
+						"ml-1 flex h-7 w-8 items-center justify-center gap-0.5 rounded-md text-xs text-muted-foreground hover:bg-accent hover:text-foreground",
 						// Block chưa có comment: chỉ hiện khi hover; có rồi thì luôn hiện để biết đang có trao đổi
 						count === 0 && hoverOnlyClassName,
 					)}
@@ -60,9 +60,9 @@ export function BlockCommentsButton({
 				align='start'
 				sideOffset={8}
 				collisionPadding={12}
-				className='max-h-[min(28rem,70vh)] w-80 overflow-y-auto p-3'
+				className='max-h-[min(28rem,70vh)] w-96 overflow-y-auto rounded-[10px] p-3.5'
 			>
-				<p className='mb-2 text-xs font-medium text-muted-foreground'>
+				<p className='mb-3 text-[12.5px] font-medium text-muted-foreground'>
 					Comments
 				</p>
 

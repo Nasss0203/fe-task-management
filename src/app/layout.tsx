@@ -3,13 +3,12 @@ import { ThemeProvider } from "@/providers/theme-provider";
 import { Toaster } from "@/shared/ui/sonner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
-import { Roboto } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const roboto = Roboto({
-	variable: "--font-geist-sans", // Giữ nguyên tên biến để không ảnh hưởng tailwind config
+const inter = Inter({
+	variable: "--font-inter",
 	subsets: ["latin", "vietnamese"],
-	weight: ["300", "400", "500", "700"],
 	display: "swap",
 });
 
@@ -28,7 +27,7 @@ export default function RootLayout({
 		<html
 			lang='en'
 			suppressHydrationWarning
-			className={`${roboto.variable} `}
+			className={inter.variable}
 		>
 			<body className='font-sans antialiased'>
 				<ThemeProvider

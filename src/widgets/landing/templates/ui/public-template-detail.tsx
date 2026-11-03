@@ -190,7 +190,7 @@ function TemplateDetailContent({
 										className='h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-[1.01]'
 									/>
 								) : (
-									<div className='flex h-full w-full items-center justify-center bg-gradient-to-br from-muted/30 via-muted/10 to-background text-muted-foreground/40 transition-colors group-hover:text-muted-foreground/60'>
+									<div className='flex h-full w-full items-center justify-center text-muted-foreground/40 transition-colors group-hover:text-muted-foreground/60'>
 										{template.icon ? (
 											<span className='text-6xl select-none transition-transform duration-200 group-hover:scale-105'>
 												{template.icon}
@@ -215,7 +215,7 @@ function TemplateDetailContent({
 								className='h-full w-full object-cover object-top'
 							/>
 						) : (
-							<div className='flex h-full w-full items-center justify-center bg-gradient-to-br from-muted/30 via-muted/10 to-background text-muted-foreground/40'>
+							<div className='flex h-full w-full items-center justify-center text-muted-foreground/40'>
 								{template.icon ? (
 									<span className='text-6xl select-none'>{template.icon}</span>
 								) : (
@@ -335,15 +335,15 @@ function TemplateDetailContent({
 						{!isPaid && (
 						<div className='space-y-2.5 pt-4 border-t border-border/40 text-xs text-muted-foreground'>
 							<div className='flex items-center gap-2'>
-								<CheckCircle2 className='size-3.5 text-emerald-500 shrink-0' />
+								<CheckCircle2 className='size-3.5 text-muted-foreground shrink-0' />
 								<span>Claim once, use across workspaces</span>
 							</div>
 							<div className='flex items-center gap-2'>
-								<CheckCircle2 className='size-3.5 text-emerald-500 shrink-0' />
+								<CheckCircle2 className='size-3.5 text-muted-foreground shrink-0' />
 								<span>Full layout & database views cloning</span>
 							</div>
 							<div className='flex items-center gap-2'>
-								<CheckCircle2 className='size-3.5 text-emerald-500 shrink-0' />
+								<CheckCircle2 className='size-3.5 text-muted-foreground shrink-0' />
 								<span>Non-destructive workspace import</span>
 							</div>
 						</div>

@@ -15,7 +15,7 @@ const faqs = [
 	{
 		id: "item-2",
 		question: "Is Taskmanly suitable for remote and distributed squads?",
-		answer: "Yes. Taskmanly provides real-time collaborative editing, instant workspace invitations, granular role-based access control, and dedicated teamspaces for every department.",
+		answer: "Yes. Taskmanly provides comments, share links, instant workspace invitations, owner, member and guest roles, and dedicated teamspaces for every department.",
 	},
 	{
 		id: "item-3",
@@ -25,7 +25,7 @@ const faqs = [
 	{
 		id: "item-4",
 		question: "How secure is my data in Taskmanly?",
-		answer: "We utilize encryption in transit and at rest, strict workspace role isolation (Owner, Admin, Member, Viewer), and token-based authentication.",
+		answer: "We utilize encryption in transit and at rest, strict workspace role isolation (owner, member, guest), and token-based authentication.",
 	},
 	{
 		id: "item-5",
@@ -147,7 +147,7 @@ export default function TemplatesFaqSection() {
 				</div>
 
 				{/* Connected Workspace Callout */}
-				<div className='mt-20 rounded-3xl border border-border/80 bg-gradient-to-r from-primary/5 via-card to-secondary/20 p-8 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left shadow-xs'>
+				<div className='mt-20 rounded-3xl border border-border/80 p-8 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left shadow-xs'>
 					<div className='space-y-2 max-w-xl'>
 						<h3 className='text-2xl font-bold tracking-tight text-foreground'>
 							Ready to build your workspace?
@@ -163,7 +163,7 @@ export default function TemplatesFaqSection() {
 						<Link href='/sign-up'>
 							<Button
 								size='lg'
-								className='rounded-full bg-primary font-semibold text-primary-foreground shadow-xs px-6'
+								className='rounded-lg bg-primary font-medium text-primary-foreground px-6'
 							>
 								Get started free
 							</Button>
@@ -172,7 +172,7 @@ export default function TemplatesFaqSection() {
 							<Button
 								size='lg'
 								variant='outline'
-								className='rounded-full px-6'
+								className='rounded-lg px-6'
 							>
 								Explore features
 							</Button>

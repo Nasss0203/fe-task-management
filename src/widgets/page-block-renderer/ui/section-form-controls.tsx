@@ -305,13 +305,8 @@ export function AddQuestionButton({
 		<>
 			<Popover open={open} onOpenChange={setOpen}>
 				<PopoverTrigger asChild>
-					<Button
-						type='button'
-						variant='ghost'
-						size='sm'
-						className='text-muted-foreground'
-					>
-						<ListPlus className='size-4' />
+					<Button type='button' variant='outline' size='sm'>
+						<ListPlus />
 						Add question
 					</Button>
 				</PopoverTrigger>
@@ -349,14 +344,9 @@ export function AddQuestionButton({
 					))}
 				</PopoverContent>
 			</Popover>
-			<Button
-				asChild
-				variant='ghost'
-				size='sm'
-				className='text-muted-foreground'
-			>
+			<Button asChild variant='outline' size='sm'>
 				<Link href={`/page/${database.pageId}`}>
-					<ExternalLink className='size-4' />
+					<ExternalLink />
 					View responses
 				</Link>
 			</Button>
@@ -381,14 +371,8 @@ export function FillFormButton({
 
 	return (
 		<>
-			<Button
-				type='button'
-				variant='ghost'
-				size='sm'
-				className='text-muted-foreground'
-				onClick={() => setOpen(true)}
-			>
-				<Eye className='size-4' />
+			<Button type='button' size='sm' onClick={() => setOpen(true)}>
+				<Eye />
 				Fill out
 			</Button>
 			<Dialog open={open} onOpenChange={setOpen}>

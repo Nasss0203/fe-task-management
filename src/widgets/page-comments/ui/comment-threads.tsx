@@ -49,7 +49,7 @@ function ToggleButton({
 		<button
 			type='button'
 			onClick={onClick}
-			className='-ml-1 rounded px-1 py-0.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground'
+			className='-ml-1 rounded-md px-1 py-0.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground'
 		>
 			{children}
 		</button>
@@ -170,7 +170,7 @@ export function CommentThreads({
 						/>
 
 						{(replies.length > 0 || replyTo === root.id) && (
-							<div className='ml-3 space-y-2 border-l border-border/60 pl-4'>
+							<div className='space-y-2 pl-9'>
 								{hiddenReplyCount > 0 && (
 									<ToggleButton
 										onClick={() =>
