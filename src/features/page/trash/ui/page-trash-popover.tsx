@@ -1,12 +1,13 @@
 "use client";
 
 import {
+	ChevronDown,
 	Database,
 	FileText,
 	RotateCcw,
 	Search,
 	Trash2,
-	UserRound,
+	TriangleAlert,
 } from "lucide-react";
 import { type ReactNode, useMemo, useState } from "react";
 
@@ -26,6 +27,9 @@ import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 import { DeletePagePermanentlyDialog } from "./delete-page-permanently-dialog";
+
+const TRASH_FILTER_CLASS =
+	"rounded-full px-2 text-xs font-normal text-muted-foreground has-[>svg]:px-2";
 
 interface PageTrashPopoverProps {
 	workspaceId: string;
@@ -204,23 +208,23 @@ export function PageTrashPopover({
 					sideOffset={8}
 					collisionPadding={12}
 					className={[
-						"flex h-[420px] w-[420px]",
-						"max-h-[calc(100vh-24px)]",
+						"flex w-[420px]",
+						"max-h-[min(420px,calc(100vh-24px))]",
 						"max-w-[calc(100vw-24px)]",
-						"flex-col",
-						"overflow-hidden rounded-xl",
-						"border bg-popover p-0",
+						"flex-col gap-1.5",
+						"overflow-hidden rounded-[10px]",
+						"border bg-popover p-2.5",
 						"shadow-elevated",
 					].join(" ")}
 				>
 					{/* Header */}
-					<div className='shrink-0 p-3'>
+					<div className='flex shrink-0 flex-col gap-1.5'>
 						{/* Search */}
 						<div className='relative'>
 							<Search
 								className={[
 									"absolute left-2.5 top-1/2",
-									"size-4 -translate-y-1/2",
+									"size-3.5 -translate-y-1/2",
 									"text-muted-foreground",
 								].join(" ")}
 							/>
@@ -229,7 +233,7 @@ export function PageTrashPopover({
 								autoFocus
 								value={search}
 								placeholder='Search pages and databases in Trash'
-								className='h-9 pl-8'
+								className='h-8 pl-[30px] placeholder:text-faint'
 								onChange={(event) => {
 									setSearch(event.target.value);
 								}}
@@ -237,39 +241,41 @@ export function PageTrashPopover({
 						</div>
 
 						{/* Filters */}
-						<div className='mt-3 flex items-center gap-2'>
+						<div className='flex items-center gap-1.5'>
 							<Button
 								type='button'
-								variant='secondary'
-								size='sm'
-								className='h-7 rounded-full px-2.5 text-xs'
+								variant='outline'
+								size='xs'
+								className={TRASH_FILTER_CLASS}
 							>
-								<UserRound className='size-3.5' />
 								Last edited by
+								<ChevronDown className='size-3' />
 							</Button>
 
 							<Button
 								type='button'
-								variant='ghost'
-								size='sm'
-								className='h-7 px-2 text-xs text-muted-foreground'
+								variant='outline'
+								size='xs'
+								className={TRASH_FILTER_CLASS}
 							>
 								In
+								<ChevronDown className='size-3' />
 							</Button>
 
 							<Button
 								type='button'
-								variant='ghost'
-								size='sm'
-								className='h-7 px-2 text-xs text-muted-foreground'
+								variant='outline'
+								size='xs'
+								className={TRASH_FILTER_CLASS}
 							>
 								Teamspaces
+								<ChevronDown className='size-3' />
 							</Button>
 						</div>
 					</div>
 
 					{/* Trash List */}
-					<div className='min-h-0 flex-1 overflow-y-auto px-2 pb-2'>
+					<div className='min-h-0 flex-1 overflow-y-auto'>
 						{isLoading && (
 							<div className='px-3 py-8 text-center text-sm text-muted-foreground'>
 								Loading Trash...
@@ -288,13 +294,13 @@ export function PageTrashPopover({
 									key={`${item.kind}-${item.id}`}
 									className={[
 										"group/trash",
-										"flex items-center gap-2",
-										"rounded-md px-2 py-2",
-										"hover:bg-accent/60",
+										"flex h-11 items-center gap-2.5",
+										"rounded-md px-2.5",
+										"hover:bg-accent",
 									].join(" ")}
 								>
 									{/* Icon */}
-									<div className='flex size-7 shrink-0 items-center justify-center'>
+									<div className='flex size-4 shrink-0 items-center justify-center'>
 										{item.icon ? (
 											<span className='text-sm'>
 												{item.icon}
@@ -309,12 +315,12 @@ export function PageTrashPopover({
 									{/* Item info */}
 									<div className='min-w-0 flex-1'>
 										{/* Title */}
-										<div className='truncate text-sm font-medium'>
+										<div className='truncate text-[13.5px] font-medium leading-5'>
 											{item.title || "Untitled"}
 										</div>
 
 										{/* Parent / location */}
-										<div className='truncate text-xs text-muted-foreground'>
+										<div className='truncate text-xs leading-[17px] text-faint'>
 											{item.location}
 
 											{item.deletedAt
@@ -331,8 +337,8 @@ export function PageTrashPopover({
 										<Button
 											type='button'
 											variant='ghost'
-											size='icon'
-											className='size-7'
+											size='icon-sm'
+											className='text-muted-foreground'
 											disabled={isRestoring}
 											title='Restore'
 											onClick={() => {
@@ -346,8 +352,8 @@ export function PageTrashPopover({
 										<Button
 											type='button'
 											variant='ghost'
-											size='icon'
-											className='size-7 text-muted-foreground hover:text-destructive'
+											size='icon-sm'
+											className='text-muted-foreground hover:text-destructive'
 											disabled={isDeleting}
 											title='Delete permanently'
 											onClick={() => {
@@ -362,7 +368,8 @@ export function PageTrashPopover({
 					</div>
 
 					{/* Footer */}
-					<div className='shrink-0 border-t bg-muted/20 px-4 py-2.5 text-xs text-muted-foreground'>
+					<div className='flex shrink-0 items-center gap-1.5 border-t px-2.5 pb-0.5 pt-2 text-xs leading-[17px] text-faint'>
+						<TriangleAlert className='size-3.5 shrink-0' />
 						Pages and databases in Trash can be restored or
 						permanently deleted.
 					</div>

@@ -43,6 +43,7 @@ import {
 	SidebarContent,
 	SidebarHeader,
 	SidebarResizeHandle,
+	useSidebar,
 } from "@/widgets/workspace-sidebar/ui/sidebar";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { TeamSwitcher } from "@/widgets/workspace-sidebar/ui/team-switcher";
@@ -145,6 +146,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	);
 
 	const [view, setView] = useState<SidebarView>(SidebarView.WORKSPACE);
+
+	const { isMobile } = useSidebar();
+
+	const isInboxPanelOpen = view === SidebarView.INBOX && !isMobile;
 
 	const activePageId =
 		pathname.startsWith("/page/") || pathname.startsWith("/database/")
@@ -325,6 +330,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	);
 
 	return (
+		<>
 		<Sidebar className='border-sidebar-border' {...props}>
 			<SidebarHeader>
 				{!isLoading &&
@@ -372,7 +378,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			</SidebarHeader>
 
 			<SidebarContent>
-				{view === SidebarView.INBOX ? (
+				{view === SidebarView.INBOX && isMobile ? (
 					<InboxSidebar unreadCount={unreadCount} />
 				) : (
 					<>
@@ -457,6 +463,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			</SidebarContent>
 
 			<SidebarResizeHandle />
+
+			{isInboxPanelOpen && (
+				<div className='absolute left-full top-0 flex h-full w-[340px] flex-col border-r bg-background text-foreground'>
+					<InboxSidebar
+						unreadCount={unreadCount}
+						onClose={() => setView(SidebarView.WORKSPACE)}
+					/>
+				</div>
+			)}
 		</Sidebar>
+
+		{isInboxPanelOpen && (
+			<div aria-hidden='true' className='hidden w-[340px] shrink-0 md:block' />
+		)}
+		</>
 	);
 }

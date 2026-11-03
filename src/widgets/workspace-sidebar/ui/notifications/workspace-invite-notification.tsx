@@ -111,11 +111,11 @@ export function WorkspaceInviteNotification({
 		>
 			{/* PENDING */}
 			{canRespond && (
-				<div className='mt-2.5 flex items-center gap-2'>
+				<div className='mt-2 flex items-center gap-1.5'>
 					<Button
 						type='button'
 						size='sm'
-						className='h-8 flex-1'
+						className='px-2.5'
 						disabled={isActionPending}
 						onClick={handleAccept}
 					>
@@ -126,7 +126,7 @@ export function WorkspaceInviteNotification({
 						type='button'
 						size='sm'
 						variant='outline'
-						className='h-8 flex-1'
+						className='px-2.5'
 						disabled={isActionPending}
 						onClick={handleDecline}
 					>

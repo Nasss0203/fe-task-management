@@ -74,11 +74,11 @@ export function PageEditRequestNotification({
 			onRead={onRead}
 		>
 			{canReview && (
-				<div className='mt-2.5 flex items-center gap-2'>
+				<div className='mt-2 flex items-center gap-1.5'>
 					<Button
 						type='button'
 						size='sm'
-						className='h-8 flex-1'
+						className='px-2.5'
 						disabled={reviewMutation.isPending}
 						onClick={() => handleReview("approve")}
 					>
@@ -89,7 +89,7 @@ export function PageEditRequestNotification({
 						type='button'
 						size='sm'
 						variant='outline'
-						className='h-8 flex-1'
+						className='px-2.5'
 						disabled={reviewMutation.isPending}
 						onClick={() => handleReview("reject")}
 					>

@@ -8,6 +8,7 @@ import {
 	ListFilter,
 	Loader2,
 	type LucideIcon,
+	X,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -91,9 +92,10 @@ const FILTER_OPTIONS: FilterOption[] = [
 interface InboxSidebarProps {
 	/** Polled by AppSidebar; passed down so the count is fetched by one observer only. */
 	unreadCount: number;
+	onClose?: () => void;
 }
 
-export function InboxSidebar({ unreadCount }: InboxSidebarProps) {
+export function InboxSidebar({ unreadCount, onClose }: InboxSidebarProps) {
 	const [filter, setFilter] = useState<InboxFilter>("all");
 
 	const queryClient = useQueryClient();
@@ -182,52 +184,37 @@ export function InboxSidebar({ unreadCount }: InboxSidebarProps) {
 	};
 
 	return (
-		<div className='flex min-h-0 flex-1 flex-col'>
+		<div className='flex min-h-0 flex-1 flex-col bg-background'>
 			{/* Header */}
-			<div className='flex items-center justify-between gap-2 px-3 py-2'>
-				<div className='flex min-w-0 items-center gap-2'>
-					<span className='truncate text-sm font-semibold'>
-						{activeFilterLabel}
-					</span>
-
+			<div className='flex h-11 shrink-0 items-center gap-1.5 pl-4 pr-3'>
+				<span className='min-w-0 flex-1 truncate text-[13.5px] font-semibold text-foreground'>
+					Inbox
 					{unreadCount > 0 && (
-						<span className='rounded-full bg-primary px-1.5 text-[10px] font-semibold leading-4 tabular-nums text-primary-foreground'>
-							{unreadCount > 99 ? "99+" : unreadCount}
-							<span className='sr-only'> unread</span>
+						<span className='sr-only'>
+							{" "}
+							{unreadCount > 99 ? "99+" : unreadCount} unread
 						</span>
 					)}
-				</div>
+				</span>
 
-				<div className='flex items-center gap-0.5'>
-					<Button
-						variant='ghost'
-						size='icon'
-						className='size-7'
-						disabled={unreadCount === 0 || markAllReadMutation.isPending}
-						onClick={() => markAllReadMutation.mutate()}
-						aria-label='Mark all as read'
-						title='Mark all as read'
-					>
-						<CheckCheck className='size-4' />
-					</Button>
-
+				<div className='flex items-center gap-1.5'>
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button
 								variant='ghost'
-								size='icon'
+								size='icon-sm'
 								className={cn(
-									"size-7",
-									filter !== "all" && "text-primary",
+									"text-muted-foreground data-[state=open]:bg-accent",
+									filter !== "all" && "bg-accent text-foreground",
 								)}
 								aria-label='Filter notifications'
 								title='Filter notifications'
 							>
-								<ListFilter className='size-4' />
+								<ListFilter className='size-3.5' />
 							</Button>
 						</DropdownMenuTrigger>
 
-						<DropdownMenuContent align='end' className='w-48'>
+						<DropdownMenuContent align='end' className='w-50'>
 							<DropdownMenuLabel>
 								Filter notifications
 							</DropdownMenuLabel>
@@ -242,17 +229,48 @@ export function InboxSidebar({ unreadCount }: InboxSidebarProps) {
 									<span>{option.label}</span>
 
 									{filter === option.value && (
-										<Check className='ml-auto size-4' />
+										<Check className='ml-auto size-[15px]' />
 									)}
 								</DropdownMenuItem>
 							))}
 						</DropdownMenuContent>
 					</DropdownMenu>
+
+					<Button
+						variant='ghost'
+						size='icon-sm'
+						className='text-muted-foreground'
+						disabled={unreadCount === 0 || markAllReadMutation.isPending}
+						onClick={() => markAllReadMutation.mutate()}
+						aria-label='Mark all as read'
+						title='Mark all as read'
+					>
+						<CheckCheck className='size-3.5' />
+					</Button>
+
+					{onClose && (
+						<Button
+							variant='ghost'
+							size='icon-sm'
+							className='text-muted-foreground'
+							onClick={onClose}
+							aria-label='Close inbox'
+							title='Close inbox'
+						>
+							<X className='size-3.5' />
+						</Button>
+					)}
 				</div>
 			</div>
 
+			<div className='flex shrink-0 gap-4 border-b px-4'>
+				<span className='-mb-px border-b-2 border-foreground py-2 text-[13px] font-medium leading-[19px] text-foreground'>
+					{activeFilterLabel}
+				</span>
+			</div>
+
 			{/* Content */}
-			<div className='min-h-0 flex-1 overflow-y-auto pb-3'>
+			<div className='min-h-0 flex-1 overflow-y-auto'>
 				{isLoading ? (
 					<NotificationListSkeleton />
 				) : isError ? (
@@ -262,8 +280,7 @@ export function InboxSidebar({ unreadCount }: InboxSidebarProps) {
 						action={
 							<Button
 								variant='outline'
-								size='sm'
-								className='mt-3 h-7 text-xs'
+								className='h-[30px] bg-background text-[12.5px]'
 								onClick={() => refetch()}
 							>
 								Try again
@@ -288,11 +305,11 @@ export function InboxSidebar({ unreadCount }: InboxSidebarProps) {
 					<>
 						{groupedNotifications.map((group) => (
 							<section key={group.label} aria-label={group.label}>
-								<h3 className='sticky top-0 z-10 bg-sidebar px-3.5 pb-1.5 pt-3 text-xs font-medium text-muted-foreground'>
+								<h3 className='sticky top-0 z-10 border-b bg-background px-3.5 pb-1.5 pt-2.5 text-xs font-medium text-muted-foreground'>
 									{group.label}
 								</h3>
 
-								<div className='space-y-0.5 px-1.5'>
+								<div>
 									{group.notifications.map((notification) => (
 										<NotificationFeedItem
 											key={notification.id}
@@ -310,11 +327,11 @@ export function InboxSidebar({ unreadCount }: InboxSidebarProps) {
 						))}
 
 						{hasNextPage && (
-							<div className='px-1.5 pt-2'>
+							<div className='px-1.5 py-2'>
 								<Button
 									variant='ghost'
 									size='sm'
-									className='h-8 w-full text-xs text-muted-foreground'
+									className='px-2.5 text-[12.5px] font-normal text-muted-foreground'
 									disabled={isFetchingNextPage}
 									onClick={() => fetchNextPage()}
 								>
@@ -334,17 +351,17 @@ export function InboxSidebar({ unreadCount }: InboxSidebarProps) {
 
 function NotificationListSkeleton() {
 	return (
-		<div className='space-y-0.5 px-1.5 pt-3' aria-busy='true'>
+		<div aria-busy='true'>
 			<span className='sr-only'>Loading notifications</span>
 
 			{Array.from({ length: 5 }, (_, index) => (
 				<div
 					key={index}
-					className='flex items-start gap-3 rounded-lg px-2.5 py-2.5'
+					className='flex items-start gap-2.5 border-b px-3.5 py-3'
 				>
-					<Skeleton className='size-8 rounded-lg' />
+					<Skeleton className='size-[26px] rounded-full' />
 
-					<div className='flex-1 space-y-2 pt-0.5'>
+					<div className='flex-1 space-y-1.5'>
 						<Skeleton className='h-3.5 w-3/5' />
 						<Skeleton className='h-3 w-4/5' />
 					</div>
@@ -363,15 +380,15 @@ interface InboxStateProps {
 
 function InboxState({ icon: Icon, title, description, action }: InboxStateProps) {
 	return (
-		<div className='flex flex-col items-center px-6 py-12 text-center'>
-			<div className='mb-3 flex size-11 items-center justify-center rounded-full bg-muted text-muted-foreground'>
-				<Icon className='size-5' />
+		<div className='flex flex-col items-center gap-2 px-6 py-10 text-center'>
+			<div className='flex size-10 items-center justify-center rounded-full bg-sidebar-accent text-muted-foreground'>
+				<Icon className='size-[18px]' />
 			</div>
 
-			<p className='text-sm font-medium'>{title}</p>
+			<p className='text-[13.5px] font-medium'>{title}</p>
 
 			{description && (
-				<p className='mt-1 text-xs text-muted-foreground'>
+				<p className='text-[12.5px] text-muted-foreground'>
 					{description}
 				</p>
 			)}

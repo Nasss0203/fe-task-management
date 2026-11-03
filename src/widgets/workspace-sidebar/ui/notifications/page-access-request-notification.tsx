@@ -171,7 +171,7 @@ export function PageAccessRequestNotification({
 		>
 			{/* PENDING */}
 			{canReview && (
-				<div className='mt-2.5 space-y-2'>
+				<div className='mt-2 space-y-1.5'>
 					<Select
 						value={accessLevel}
 						disabled={isActionPending}
@@ -197,11 +197,11 @@ export function PageAccessRequestNotification({
 						</SelectContent>
 					</Select>
 
-					<div className='flex items-center gap-2'>
+					<div className='flex items-center gap-1.5'>
 						<Button
 							type='button'
 							size='sm'
-							className='h-8 flex-1'
+							className='px-2.5'
 							disabled={isActionPending}
 							onClick={handleApprove}
 						>
@@ -212,7 +212,7 @@ export function PageAccessRequestNotification({
 							type='button'
 							size='sm'
 							variant='outline'
-							className='h-8 flex-1'
+							className='px-2.5'
 							disabled={isActionPending}
 							onClick={handleReject}
 						>
