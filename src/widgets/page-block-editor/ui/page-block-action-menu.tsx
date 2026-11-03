@@ -242,14 +242,14 @@ export function PageBlockActionMenu({
                             justify-center
                             rounded-md
                             text-muted-foreground
-                            hover:bg-muted
+                            hover:bg-accent
                             hover:text-foreground
                         '
 					>
 						<ArrowLeft className='size-4' />
 					</button>
 
-					<span className='ml-1 text-sm font-medium'>Turn into</span>
+					<span className='ml-1 text-[13.5px] font-medium'>Turn into</span>
 				</div>
 
 				<CommandInput placeholder='Search blocks...' className='h-9' />
@@ -269,10 +269,11 @@ export function PageBlockActionMenu({
 										void handleTurnInto(option)
 									}
 									className='
-                                            h-10
+                                            h-9
                                             cursor-pointer
                                             gap-2.5
                                             px-2
+                                            text-[13.5px]
                                         '
 								>
 									<Icon className='size-4 text-muted-foreground' />
@@ -321,7 +322,7 @@ export function PageBlockActionMenu({
 						<CommandGroup heading='Code'>
 							<CommandItem
 								onSelect={() => void handleCopyCode()}
-								className='h-10 cursor-pointer gap-2.5'
+								className='h-9 cursor-pointer gap-2.5 text-[13.5px]'
 							>
 								<Code2 className='size-4' />
 								Copy code
@@ -336,7 +337,7 @@ export function PageBlockActionMenu({
 				<CommandGroup>
 					<CommandItem
 						onSelect={() => setMode("turn-into")}
-						className='h-10 cursor-pointer gap-2.5'
+						className='h-9 cursor-pointer gap-2.5 text-[13.5px]'
 					>
 						<RotateCcw className='size-4' />
 
@@ -347,7 +348,7 @@ export function PageBlockActionMenu({
 
 					<CommandItem
 						onSelect={() => void handleCopyLink()}
-						className='h-10 cursor-pointer gap-2.5'
+						className='h-9 cursor-pointer gap-2.5 text-[13.5px]'
 					>
 						<Link className='size-4' />
 						Copy link to block
@@ -356,7 +357,7 @@ export function PageBlockActionMenu({
 					{block.type !== PageBlockType.FORM_FIELD && (
 						<CommandItem
 							onSelect={() => void handleDuplicate()}
-							className='h-10 cursor-pointer gap-2.5'
+							className='h-9 cursor-pointer gap-2.5 text-[13.5px]'
 						>
 							<Copy className='size-4' />
 							Duplicate
@@ -370,7 +371,7 @@ export function PageBlockActionMenu({
 								onClose?.();
 								onComment();
 							}}
-							className='h-10 cursor-pointer gap-2.5'
+							className='h-9 cursor-pointer gap-2.5 text-[13.5px]'
 						>
 							<MessageSquare className='size-4' />
 							Comment

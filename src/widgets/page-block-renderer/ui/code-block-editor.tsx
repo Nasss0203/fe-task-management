@@ -40,6 +40,7 @@ const transparentEditorTheme = Prec.highest(
 		"&": { backgroundColor: "transparent" },
 		".cm-gutters": { backgroundColor: "transparent", border: "none" },
 		".cm-activeLine": { backgroundColor: "transparent" },
+		".cm-content": { padding: "2px 10px 14px" },
 	}),
 );
 
@@ -283,8 +284,7 @@ export function CodeBlockEditor({
                 w-full
                 overflow-hidden
                 rounded-lg
-                border
-                bg-muted/20
+                bg-muted/60
             '
 		>
 			{/* Toolbar */}
@@ -293,9 +293,8 @@ export function CodeBlockEditor({
                     flex
                     h-10
                     items-center
-                    justify-end
                     gap-1
-                    px-2
+                    px-3
                 '
 			>
 				{/* Language */}
@@ -307,12 +306,15 @@ export function CodeBlockEditor({
 							variant='ghost'
 							size='sm'
 							className='
-                                h-7
+                                h-6
                                 gap-1
-                                px-2
+                                rounded
+                                bg-muted
+                                px-1.5
                                 text-xs
-                                font-normal
-                                text-muted-foreground
+                                font-medium
+                                text-foreground
+                                hover:bg-sidebar-accent
                             '
 						>
 							{
@@ -321,13 +323,13 @@ export function CodeBlockEditor({
 								)?.label
 							}
 
-							<ChevronDown className='size-3' />
+							<ChevronDown className='size-3 text-muted-foreground' />
 						</Button>
 					</PopoverTrigger>
 
 					<PopoverContent
 						side='bottom'
-						align='end'
+						align='start'
 						className='w-48 p-1'
 					>
 						{LANGUAGE_OPTIONS.map((item) => (
@@ -348,14 +350,14 @@ export function CodeBlockEditor({
                                         px-2
                                         py-1.5
                                         text-left
-                                        text-sm
-                                        hover:bg-muted
+                                        text-[13px]
+                                        hover:bg-accent
                                     '
 							>
 								<span>{item.label}</span>
 
 								{language === item.value && (
-									<Check className='size-4' />
+									<Check className='size-3.5' />
 								)}
 							</button>
 						))}
@@ -371,7 +373,7 @@ export function CodeBlockEditor({
 					onClick={() => {
 						void handleCopy();
 					}}
-					className='size-7'
+					className='ml-auto size-7 text-muted-foreground hover:text-foreground'
 					title='Copy code'
 				>
 					{copied ? (
@@ -416,7 +418,7 @@ export function CodeBlockEditor({
 
     [&_.cm-scroller]:min-h-[40px]
     [&_.cm-scroller]:font-mono
-    [&_.cm-scroller]:text-sm
+    [&_.cm-scroller]:text-[13px]
 
     [&_.cm-content]:min-h-[40px]
     [&_.cm-content]:px-4

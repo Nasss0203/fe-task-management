@@ -30,7 +30,7 @@ import { MenuItem, MenuPageHeader, MenuSeparator } from "./menu-item";
 import { ToolbarCount, toolbarIconButtonClass } from "./toolbar-button";
 
 const FIELD_CLASS =
-	"h-7 min-w-0 rounded-md border border-input bg-transparent px-2 text-xs outline-none transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring/40 dark:bg-input/30";
+	"h-[30px] min-w-0 rounded-md border border-input bg-transparent px-2 text-[13px] outline-none transition-colors hover:bg-accent focus-visible:border-ring focus-visible:ring-[0.5px] focus-visible:ring-ring dark:bg-input/30";
 
 function FieldPicker({
 	label,
@@ -65,7 +65,7 @@ function FieldPicker({
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align='start' className='min-w-40'>
 				{options.length === 0 ? (
-					<div className='px-2 py-1.5 text-xs text-muted-foreground'>
+					<div className='px-2 py-1.5 text-[13px] text-muted-foreground'>
 						No options
 					</div>
 				) : (
@@ -73,7 +73,7 @@ function FieldPicker({
 						<DropdownMenuItem
 							key={option.value}
 							onSelect={() => onChange(option.value)}
-							className='text-xs'
+							className='text-[13px]'
 						>
 							<span className='flex-1 truncate'>{option.label}</span>
 							{option.value === value && <Check className='size-3.5' />}
@@ -148,12 +148,12 @@ export function DatabaseViewFilterPopover({
 			{activeFilters.length > 0 ? (
 				<MenuPageHeader title='Filter by' onBack={() => setPicking(false)} />
 			) : (
-				<div className='px-2 pb-1 pt-1 text-xs font-medium text-muted-foreground'>
+				<div className='px-2 pb-1 pt-1.5 text-xs font-medium text-muted-foreground'>
 					Filter by
 				</div>
 			)}
 			{candidates.length === 0 ? (
-				<p className='px-2 py-2 text-sm text-muted-foreground'>
+				<p className='px-2 py-2 text-[13px] text-muted-foreground'>
 					No properties can be filtered.
 				</p>
 			) : (
@@ -163,11 +163,11 @@ export function DatabaseViewFilterPopover({
 							key={property.id}
 							type='button'
 							onClick={() => addFilter(property)}
-							className='flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-sm hover:bg-muted'
+							className='flex h-[30px] w-full items-center gap-[9px] rounded-md px-2 text-left text-[13.5px] transition-colors hover:bg-accent'
 						>
 							<PropertyIcon
 								type={property.type}
-								className='size-3.5 text-muted-foreground'
+								className='size-[15px] shrink-0 text-muted-foreground'
 							/>
 							<span className='min-w-0 flex-1 truncate'>{property.name}</span>
 						</button>
@@ -179,7 +179,7 @@ export function DatabaseViewFilterPopover({
 
 	const list = (
 		<div>
-			<div className='px-2 pb-1 pt-1 text-xs font-medium text-muted-foreground'>
+			<div className='px-2 pb-1.5 pt-1.5 text-[12.5px] text-muted-foreground'>
 				Show rows where all conditions match
 			</div>
 			<div className='space-y-1'>
@@ -190,13 +190,13 @@ export function DatabaseViewFilterPopover({
 					return (
 						<div
 							key={`${filter.propertyId}-${index}`}
-							className='flex items-center gap-1.5 rounded-md px-2 py-1 text-sm hover:bg-muted/60'
+							className='flex items-center gap-1.5 rounded-md px-2 py-1 text-[13px] transition-colors hover:bg-accent/50'
 						>
 							<PropertyIcon
 								type={property.type}
 								className='size-3.5 shrink-0 text-muted-foreground'
 							/>
-							<span className='w-20 shrink-0 truncate text-xs' title={property.name}>
+							<span className='w-20 shrink-0 truncate text-[13px]' title={property.name}>
 								{property.name}
 							</span>
 							<FieldPicker
@@ -232,7 +232,7 @@ export function DatabaseViewFilterPopover({
 								type='button'
 								onClick={() => removeFilter(index)}
 								aria-label={`Remove filter on ${property.name}`}
-								className='ml-auto flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-background hover:text-foreground'
+								className='ml-auto flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground'
 							>
 								<X className='size-3.5' />
 							</button>
@@ -278,7 +278,7 @@ export function DatabaseViewFilterPopover({
 				</button>
 			</PopoverTrigger>
 
-			<PopoverContent align='end' className='w-[26rem] p-1'>
+			<PopoverContent align='end' className='w-[26rem] p-[5px]'>
 				{showPicker ? picker : list}
 			</PopoverContent>
 		</Popover>

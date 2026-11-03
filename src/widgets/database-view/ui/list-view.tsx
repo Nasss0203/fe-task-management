@@ -57,7 +57,7 @@ export function ListView({
 
 	return (
 		<div className='w-full min-w-0'>
-			<ul className='border-t'>
+			<ul>
 				{flattenRowTree(rows, allRows, collapsedIds).map((item) => {
 					const { row } = item;
 					const values = getRowValueMap(row);
@@ -84,7 +84,7 @@ export function ListView({
 						<li
 							key={row.id}
 							className={cn(
-								"group/row flex min-h-10 items-center gap-2 border-b px-1 transition-colors hover:bg-muted/40",
+								"group/row flex min-h-[38px] items-center gap-2 border-b border-border px-1 text-[13.5px] transition-colors hover:bg-accent/50",
 								item.dimmed && "opacity-50",
 							)}
 						>
@@ -152,7 +152,7 @@ export function ListView({
 				})}
 
 				{rows.length === 0 && (
-					<li className='border-b px-2 py-5 text-sm text-muted-foreground'>
+					<li className='border-b border-border px-2 py-5 text-[13.5px] text-faint'>
 						No rows yet
 					</li>
 				)}
@@ -166,9 +166,9 @@ export function ListView({
 						const rowId = await addRow();
 						if (rowId) setEditingRowId(rowId);
 					}}
-					className='flex h-9 w-full items-center gap-1.5 rounded-sm px-2 text-sm text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground disabled:opacity-50'
+					className='flex h-9 w-full items-center gap-1.5 rounded-md px-2 text-[13.5px] text-faint transition-colors hover:bg-accent hover:text-foreground disabled:opacity-50'
 				>
-					<Plus className='size-4' />
+					<Plus className='size-3.5' />
 					{isPending ? "Adding..." : "New row"}
 				</button>
 			)}

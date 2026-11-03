@@ -66,7 +66,7 @@ export function SheetResizeHandle({ width, onResize, onCommit }: SheetResizeHand
 				const delta = event.key === "ArrowLeft" ? 32 : -32;
 				onCommit(clampRowSheetWidth(width + delta, window.innerWidth));
 			}}
-			className='absolute inset-y-0 -left-[3px] z-20 hidden w-[6px] cursor-col-resize touch-none rounded-full outline-none transition-colors hover:bg-primary/60 focus-visible:bg-primary/60 active:bg-primary sm:block'
+			className='absolute inset-y-0 -left-[3px] z-20 hidden w-[6px] cursor-col-resize touch-none rounded-full outline-none transition-colors hover:bg-ring/60 focus-visible:bg-ring/60 active:bg-ring sm:block'
 		/>
 	);
 }

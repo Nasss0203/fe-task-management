@@ -274,7 +274,7 @@ export function ReadOnlySimpleTableBlock({ block }: BlockContentProps) {
 
 	if (rows.length === 0) {
 		return (
-			<div className='min-h-10 rounded-md border p-3 text-sm text-muted-foreground'>
+			<div className='min-h-10 rounded-md border border-border p-3 text-sm text-muted-foreground'>
 				Empty table
 			</div>
 		);
@@ -325,7 +325,7 @@ export function ReadOnlyImageBlock({ block }: BlockContentProps) {
 
 	if (!url) {
 		return (
-			<div className='flex min-h-14 items-center gap-3 rounded-md border bg-muted/20 p-3 text-sm text-muted-foreground'>
+			<div className='flex min-h-14 items-center gap-3 rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground'>
 				<ImageIcon className='size-4' />
 				No image
 			</div>
@@ -399,7 +399,7 @@ export function ReadOnlyVideoBlock({ block }: BlockContentProps) {
 					className='max-h-[520px] max-w-full rounded-md'
 				/>
 			) : (
-				<div className='flex min-h-14 items-center gap-3 rounded-md border bg-muted/20 p-3 text-sm text-muted-foreground'>
+				<div className='flex min-h-14 items-center gap-3 rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground'>
 					<VideoIcon className='size-4' />
 					{attachmentId ? fileName || "Attached video" : "No video"}
 				</div>
@@ -423,7 +423,7 @@ export function ReadOnlyBookmarkBlock({ block }: BlockContentProps) {
 
 	if (!url) {
 		return (
-			<div className='flex min-h-14 items-center gap-3 rounded-md border bg-muted/20 p-3 text-sm text-muted-foreground'>
+			<div className='flex min-h-14 items-center gap-3 rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground'>
 				<BookmarkIcon className='size-4' />
 				No bookmark
 			</div>
@@ -632,7 +632,7 @@ export function ReadOnlyEmbedBlock({ block }: BlockContentProps) {
 
 	if (!embed) {
 		return (
-			<div className='rounded-md border border-dashed p-3 text-sm text-muted-foreground'>
+			<div className='rounded-md border border-dashed border-input p-3 text-sm text-muted-foreground'>
 				This embed link is not supported.
 			</div>
 		);

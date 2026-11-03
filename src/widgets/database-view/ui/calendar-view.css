@@ -35,5 +35,6 @@
 }
 
 .db-calendar {
+	--fc-forma-primary: var(--destructive);
 	font-size: 0.8125rem;
 }

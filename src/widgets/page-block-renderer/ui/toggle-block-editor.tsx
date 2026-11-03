@@ -182,7 +182,7 @@ export function ToggleBlockEditor({ block, shareToken }: ToggleBlockEditorProps)
                         rounded-md
                         text-muted-foreground
                         transition-colors
-                        hover:bg-muted
+                        hover:bg-accent
                         hover:text-foreground
                     '
 				>
@@ -215,7 +215,7 @@ export function ToggleBlockEditor({ block, shareToken }: ToggleBlockEditorProps)
                         font-medium
                         leading-7
                         outline-none
-                        placeholder:text-muted-foreground/40
+                        placeholder:text-faint
                         focus-visible:ring-0
                     '
 				/>
@@ -247,11 +247,11 @@ export function ToggleBlockEditor({ block, shareToken }: ToggleBlockEditorProps)
                         rounded-md
                         px-1
                         text-left
-                        text-sm
+                        text-[13px]
                         leading-7
-                        text-muted-foreground/60
+                        text-faint
                         transition-colors
-                        hover:bg-muted/60
+                        hover:bg-accent
                         hover:text-muted-foreground
                     '
 				>

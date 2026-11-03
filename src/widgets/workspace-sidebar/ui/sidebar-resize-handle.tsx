@@ -74,9 +74,9 @@ export function SidebarResizeHandle({
 			className={cn(
 				"absolute top-0 right-0 z-30 h-full w-2 -mr-1 cursor-col-resize select-none",
 				"outline-none transition-colors",
-				"after:absolute after:inset-y-0 after:right-1 after:w-[2px] after:transition-colors",
-				"hover:after:bg-sidebar-border focus-visible:after:bg-ring",
-				isResizing && "after:bg-sidebar-border",
+				"after:absolute after:inset-y-0 after:right-1 after:w-[3px] after:rounded-full after:transition-colors",
+				"hover:after:bg-ring focus-visible:after:bg-ring",
+				isResizing && "after:bg-ring",
 				className,
 			)}
 			{...props}

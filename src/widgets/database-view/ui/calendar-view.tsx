@@ -318,14 +318,14 @@ function CalendarMonth({
 						type='button'
 						aria-label='Previous month'
 						onClick={() => api()?.prev()}
-						className='flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground'
+						className='flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground'
 					>
 						<ChevronLeft className='size-4' />
 					</button>
 					<button
 						type='button'
 						onClick={() => api()?.today()}
-						className='h-7 rounded-md px-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground'
+						className='h-7 rounded-md border border-input bg-background px-2.5 text-[13px] font-medium text-foreground shadow-xs hover:bg-accent'
 					>
 						Today
 					</button>
@@ -333,7 +333,7 @@ function CalendarMonth({
 						type='button'
 						aria-label='Next month'
 						onClick={() => api()?.next()}
-						className='flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground'
+						className='flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground'
 					>
 						<ChevronRight className='size-4' />
 					</button>
@@ -349,7 +349,7 @@ function CalendarMonth({
 								onChange={(event) =>
 									onDatePropertyChange(event.target.value)
 								}
-								className='rounded-sm bg-transparent py-0.5 font-medium text-foreground outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/40'
+								className='rounded-sm bg-transparent py-0.5 font-medium text-foreground outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring/40'
 							>
 								{candidates.map((property) => (
 									<option key={property.id} value={property.id}>
@@ -371,9 +371,9 @@ function CalendarMonth({
 
 			<div
 				ref={trayRef}
-				className='mb-2 flex min-h-9 flex-wrap items-center gap-1.5 rounded-md border border-dashed px-2 py-1.5'
+				className='mb-2 flex min-h-9 flex-wrap items-center gap-1.5 rounded-lg border border-dashed border-input px-2 py-1.5'
 			>
-				<span className='mr-1 text-xs text-muted-foreground'>
+				<span className='mr-1 text-xs text-faint'>
 					{undated.length
 						? `No date · ${undated.length}`
 						: readOnly
@@ -391,7 +391,7 @@ function CalendarMonth({
 							onOpenRow(row.id);
 						}}
 						className={cn(
-							"max-w-48 truncate rounded-sm border bg-card px-1.5 py-0.5 text-xs font-medium hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+							"max-w-48 truncate rounded-md border border-border bg-card px-1.5 py-0.5 text-xs font-medium hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
 							readOnly ? "cursor-pointer" : "cursor-grab",
 							titleOf(row) === "Untitled" && "text-muted-foreground",
 						)}
@@ -505,7 +505,7 @@ function CreateRowForm({
 					placeholder='Untitled'
 					aria-label='Name'
 					autoFocus
-					className='h-9 w-full bg-transparent text-base font-semibold outline-none placeholder:text-muted-foreground/60'
+					className='h-9 w-full bg-transparent text-base font-semibold outline-none placeholder:text-faint'
 				/>
 			</div>
 
@@ -522,7 +522,7 @@ function CreateRowForm({
 				<button
 					type='button'
 					onClick={onCancel}
-					className='h-8 rounded-md px-3 text-sm text-muted-foreground hover:bg-muted hover:text-foreground'
+					className='h-8 rounded-md px-3 text-sm text-muted-foreground hover:bg-accent hover:text-foreground'
 				>
 					Cancel
 				</button>

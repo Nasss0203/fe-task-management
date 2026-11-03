@@ -106,9 +106,9 @@ export function DatabaseViewPropertiesPopover({
 	const visibilityRow = (property: DatabaseProperty, visible: boolean) => (
 		<div
 			key={property.id}
-			className='flex h-8 items-center gap-2 rounded-md px-2 text-sm hover:bg-muted'
+			className='flex h-[30px] items-center gap-[9px] rounded-md px-2 text-[13.5px] transition-colors hover:bg-accent'
 		>
-			<PropertyIcon type={property.type} className='size-3.5 text-muted-foreground' />
+			<PropertyIcon type={property.type} className='size-[15px] shrink-0 text-muted-foreground' />
 			<span className='min-w-0 flex-1 truncate'>{property.name}</span>
 			{property.isHideable ? (
 				<button
@@ -117,14 +117,14 @@ export function DatabaseViewPropertiesPopover({
 					title={visible ? "Hide in view" : "Show in view"}
 					disabled={visibilityMutation.isPending}
 					onClick={() => setVisible(property.id, !visible)}
-					className='flex size-6 items-center justify-center rounded-sm text-muted-foreground hover:bg-background hover:text-foreground disabled:opacity-50'
+					className='flex size-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground disabled:opacity-50'
 				>
-					{visible ? <Eye className='size-4' /> : <EyeOff className='size-4' />}
+					{visible ? <Eye className='size-3.5' /> : <EyeOff className='size-3.5' />}
 				</button>
 			) : (
 				<span
 					title='Always shown'
-					className='flex size-6 items-center justify-center text-muted-foreground/60'
+					className='flex size-6 items-center justify-center text-faint'
 				>
 					<Lock className='size-3.5' />
 				</span>
@@ -161,14 +161,14 @@ export function DatabaseViewPropertiesPopover({
 							key={property.id}
 							type='button'
 							onClick={() => setPage({ propertyId: property.id })}
-							className='flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-sm hover:bg-muted'
+							className='flex h-[30px] w-full items-center gap-[9px] rounded-md px-2 text-left text-[13.5px] transition-colors hover:bg-accent'
 						>
 							<PropertyIcon
 								type={property.type}
-								className='size-3.5 text-muted-foreground'
+								className='size-[15px] shrink-0 text-muted-foreground'
 							/>
 							<span className='min-w-0 flex-1 truncate'>{property.name}</span>
-							<ChevronRight className='size-4 text-muted-foreground' />
+							<ChevronRight className='size-3.5 text-faint' />
 						</button>
 					))}
 				</div>
@@ -194,10 +194,10 @@ export function DatabaseViewPropertiesPopover({
 
 		return (
 			<div>
-				<div className='px-2 pb-1 pt-1 text-xs font-medium text-muted-foreground'>
+				<div className='flex h-8 items-center px-2 text-[13px] font-semibold'>
 					View settings
 				</div>
-				<div className='p-1'>
+				<div className='px-1 pb-1.5'>
 					<input
 						value={name}
 						onChange={(event) => setName(event.target.value)}
@@ -209,13 +209,13 @@ export function DatabaseViewPropertiesPopover({
 						maxLength={255}
 						aria-label='View name'
 						placeholder='View name'
-						className='h-8 w-full rounded-md border border-input bg-transparent px-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/40'
+						className='h-8 w-full rounded-md border border-input bg-transparent px-2.5 text-[13.5px] outline-none transition-colors placeholder:text-faint focus-visible:border-ring focus-visible:ring-[0.5px] focus-visible:ring-ring'
 					/>
 				</div>
-				<div className='flex h-8 items-center gap-2 px-2 text-sm'>
-					<LayoutGrid className='size-4 text-muted-foreground' />
+				<div className='flex h-[30px] items-center gap-[9px] px-2 text-[13.5px]'>
+					<LayoutGrid className='size-[15px] text-muted-foreground' />
 					<span className='flex-1'>Layout</span>
-					<span className='text-xs text-muted-foreground'>
+					<span className='text-xs text-faint'>
 						{LAYOUT_LABELS[view.type] ?? view.type}
 					</span>
 				</div>
@@ -259,7 +259,7 @@ export function DatabaseViewPropertiesPopover({
 				</button>
 			</PopoverTrigger>
 
-			<PopoverContent align='end' className='w-72 p-1'>
+			<PopoverContent align='end' className='w-72 p-[5px]'>
 				{content}
 			</PopoverContent>
 		</Popover>

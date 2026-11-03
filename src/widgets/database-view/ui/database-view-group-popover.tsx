@@ -69,12 +69,12 @@ export function DatabaseViewGroupPopover({
 			key={key}
 			type='button'
 			onClick={onClick}
-			className='flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-sm hover:bg-muted'
+			className='flex h-[30px] w-full items-center gap-[9px] rounded-md px-2 text-left text-[13.5px] transition-colors hover:bg-accent'
 		>
 			{icon ? (
-				<PropertyIcon type={icon} className='size-3.5 text-muted-foreground' />
+				<PropertyIcon type={icon} className='size-[15px] shrink-0 text-muted-foreground' />
 			) : (
-				<span className='size-3.5' />
+				<span className='size-[15px] shrink-0' />
 			)}
 			<span className='min-w-0 flex-1 truncate'>{label}</span>
 			{selected && <Check className='size-3.5 shrink-0' />}
@@ -94,12 +94,12 @@ export function DatabaseViewGroupPopover({
 				</button>
 			</PopoverTrigger>
 
-			<PopoverContent align='end' className='w-64 p-1'>
-				<div className='px-2 pb-1 pt-1 text-xs font-medium text-muted-foreground'>
+			<PopoverContent align='end' className='w-64 p-[5px]'>
+				<div className='px-2 pb-1 pt-1.5 text-xs font-medium text-muted-foreground'>
 					{isBoard ? "Board columns from" : "Group by"}
 				</div>
 				{candidates.length === 0 ? (
-					<p className='px-2 py-2 text-sm text-muted-foreground'>
+					<p className='px-2 py-2 text-[13px] text-muted-foreground'>
 						Add a Status, Select{isBoard ? "" : " or Checkbox"} property to group rows.
 					</p>
 				) : (

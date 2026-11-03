@@ -167,7 +167,7 @@ export function ColumnListBlockEditor({
 								}}
 								className='group/divider relative hidden w-2 shrink-0 cursor-col-resize touch-none outline-none md:block'
 							>
-								<div className='absolute inset-y-1 left-1/2 w-0.5 -translate-x-1/2 rounded-full bg-primary/50 opacity-0 transition-opacity group-hover/divider:opacity-100 group-focus-visible/divider:opacity-100 group-active/divider:opacity-100' />
+								<div className='absolute inset-y-1 left-1/2 w-0.5 -translate-x-1/2 rounded-full bg-ring opacity-0 transition-opacity group-hover/divider:opacity-100 group-focus-visible/divider:opacity-100 group-active/divider:opacity-100' />
 							</div>
 						)}
 						<div
@@ -224,7 +224,7 @@ function EmptyColumn({
 				});
 				requestFocus(created.id);
 			}}
-			className='ml-14 flex min-h-7 items-center gap-1.5 rounded-md px-1 text-sm text-muted-foreground/60 opacity-0 transition-opacity hover:bg-muted/60 hover:opacity-100 focus-visible:opacity-100'
+			className='ml-14 flex min-h-7 items-center gap-1.5 rounded-md px-1 text-[13px] text-faint opacity-0 transition-opacity hover:bg-accent hover:opacity-100 focus-visible:opacity-100'
 		>
 			<Plus className='size-3.5' />
 			Add a block

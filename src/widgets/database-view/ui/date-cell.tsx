@@ -79,7 +79,7 @@ export function DateCell({
 	const [rangeMode, setRangeMode] = useState(Boolean(end));
 
 	if (!interactive) {
-		return <span className='block truncate px-1'>{text}</span>;
+		return <span className='block truncate px-1.5 text-[13.5px]'>{text}</span>;
 	}
 
 	const emit = (nextStart?: Date, nextEnd?: Date) => {
@@ -96,8 +96,8 @@ export function DateCell({
 	const dateBox = (date: Date | undefined, label: string) => (
 		<div
 			className={cn(
-				"flex h-8 min-w-0 flex-1 items-center rounded-md border border-input bg-muted/30 px-2 text-sm",
-				!date && "text-muted-foreground",
+				"flex h-8 min-w-0 flex-1 items-center rounded-md border border-input bg-background px-2.5 text-[13px]",
+				!date && "text-faint",
 			)}
 			aria-label={label}
 		>
@@ -118,12 +118,12 @@ export function DateCell({
 					type='button'
 					aria-label={name}
 					disabled={disabled}
-					className='group/date flex h-8 w-full items-center rounded-sm px-1 text-left outline-none hover:bg-muted/60 focus-visible:bg-muted/60'
+					className='group/date flex h-8 w-full items-center rounded-sm px-1.5 text-left text-[13.5px] outline-none transition-colors hover:bg-accent/60 focus-visible:bg-accent/60 data-[state=open]:bg-background data-[state=open]:ring-2 data-[state=open]:ring-ring data-[state=open]:ring-inset'
 				>
 					{text ? (
 						<span className='truncate'>{text}</span>
 					) : (
-						<span className='text-muted-foreground opacity-0 group-hover/date:opacity-100 group-focus-visible/date:opacity-100'>
+						<span className='text-faint opacity-0 group-hover/date:opacity-100 group-focus-visible/date:opacity-100'>
 							Pick a date
 						</span>
 					)}
@@ -140,7 +140,7 @@ export function DateCell({
 					<button
 						type='button'
 						onClick={() => setMonth(startOfMonth(new Date()))}
-						className='absolute right-[3.75rem] top-0 z-10 h-8 rounded-md px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground'
+						className='absolute right-[3.75rem] top-0 z-10 h-8 rounded-md px-2 text-xs text-muted-foreground hover:bg-accent hover:text-foreground'
 					>
 						Today
 					</button>
@@ -171,8 +171,8 @@ export function DateCell({
 					)}
 				</div>
 
-				<div className='mt-2 border-t pt-1'>
-					<label className='flex h-8 items-center justify-between rounded-md px-2 text-sm hover:bg-muted'>
+				<div className='mt-2 border-t border-border pt-1'>
+					<label className='flex h-[30px] items-center justify-between rounded-md px-2 text-[13.5px] hover:bg-accent'>
 						End date
 						<Switch.Root
 							checked={rangeMode}
@@ -182,7 +182,7 @@ export function DateCell({
 								// Turning the range off keeps only the start day.
 								if (!checked) emit(start);
 							}}
-							className='relative h-5 w-9 shrink-0 rounded-full bg-muted-foreground/30 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/50 disabled:opacity-50 data-[state=checked]:bg-primary'
+							className='relative h-5 w-9 shrink-0 rounded-full bg-muted-foreground/30 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/50 disabled:opacity-50 data-[state=checked]:bg-ring'
 						>
 							<Switch.Thumb className='block size-4 translate-x-0.5 rounded-full bg-white shadow transition-transform data-[state=checked]:translate-x-[1.125rem]' />
 						</Switch.Root>
@@ -196,7 +196,7 @@ export function DateCell({
 								setRangeMode(false);
 								onChange(null);
 							}}
-							className='flex h-8 w-full items-center rounded-md px-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-50'
+							className='flex h-[30px] w-full items-center rounded-md px-2 text-[13.5px] text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-50'
 						>
 							Clear
 						</button>

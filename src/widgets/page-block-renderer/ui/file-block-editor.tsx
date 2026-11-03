@@ -187,7 +187,7 @@ export function FileBlockEditor({ block, shareToken }: FileBlockEditorProps) {
 
 	if (!content.attachmentId) {
 		return (
-			<div className='w-full rounded-md bg-muted/50 px-3 py-2.5 transition-colors hover:bg-muted/80'>
+			<div className='w-full rounded-lg border border-dashed border-input bg-muted/40 p-4'>
 				<input
 					ref={fileInputRef}
 					type='file'
@@ -196,14 +196,14 @@ export function FileBlockEditor({ block, shareToken }: FileBlockEditorProps) {
 					onChange={handleUpload}
 				/>
 
-				<div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
-					<div className='flex min-w-0 flex-1 items-center gap-3'>
+				<div className='flex flex-col gap-2.5'>
+					<div className='flex min-w-0 items-center gap-2'>
 						<div className='flex shrink-0 items-center text-muted-foreground'>
-							<FileIcon className='size-5' />
+							<FileIcon className='size-4' />
 						</div>
 
 						<div className='min-w-0'>
-							<div className='text-sm text-muted-foreground'>Add a file</div>
+							<div className='text-[13.5px] font-medium text-muted-foreground'>Add a file</div>
 						</div>
 					</div>
 
@@ -216,7 +216,7 @@ export function FileBlockEditor({ block, shareToken }: FileBlockEditorProps) {
 								uploadAttachment.isPending
 							}
 							onClick={() => fileInputRef.current?.click()}
-							className='inline-flex h-8 items-center gap-1.5 rounded-md bg-background/40 px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
+							className='inline-flex h-7.5 items-center gap-1.5 rounded-md border border-input bg-background px-2.5 text-[12.5px] font-medium text-foreground transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-50'
 						>
 							{uploadAttachment.isPending ? (
 								<Loader2Icon className='size-3.5 animate-spin' />
@@ -247,7 +247,7 @@ export function FileBlockEditor({ block, shareToken }: FileBlockEditorProps) {
 	}
 
 	return (
-		<div className='w-full overflow-hidden rounded-md border border-border'>
+		<div className='w-full overflow-hidden rounded-lg border border-border'>
 			<div className='flex items-center gap-3 p-3'>
 				{isPdf ? (
 					<button
@@ -283,7 +283,7 @@ export function FileBlockEditor({ block, shareToken }: FileBlockEditorProps) {
 				<button
 					type='button'
 					onClick={handleDownload}
-					className='inline-flex size-8 shrink-0 items-center justify-center rounded-md hover:bg-muted'
+					className='inline-flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground'
 					aria-label='Download file'
 				>
 					<DownloadIcon className='size-4' />

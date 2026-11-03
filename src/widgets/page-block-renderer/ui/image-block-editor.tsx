@@ -124,7 +124,7 @@ export function ImageBlockEditor({ block, shareToken }: ImageBlockEditorProps) {
 
 	if (!content.url) {
 		return (
-			<div className='w-full rounded-md bg-muted/50 px-3 py-2.5 transition-colors hover:bg-muted/80'>
+			<div className='w-full rounded-lg border border-dashed border-input bg-muted/40 p-4'>
 				<input
 					ref={fileInputRef}
 					type='file'
@@ -135,7 +135,7 @@ export function ImageBlockEditor({ block, shareToken }: ImageBlockEditorProps) {
 				/>
 
 				{showEmbedInput ? (
-					<div className='flex items-center gap-3'>
+					<div className='flex items-center gap-2'>
 						<div className='flex shrink-0 items-center text-muted-foreground'>
 							<LinkIcon className='size-4' />
 						</div>
@@ -159,27 +159,27 @@ export function ImageBlockEditor({ block, shareToken }: ImageBlockEditorProps) {
 									setUrlInput("");
 								}
 							}}
-							className='h-8 min-w-0 flex-1 border-0 bg-transparent text-sm outline-none placeholder:text-muted-foreground'
+							className='h-8 min-w-0 flex-1 rounded-md border border-input bg-background px-2.5 text-[13px] outline-none transition-colors placeholder:text-faint focus:border-ring focus:ring-[0.5px] focus:ring-ring'
 						/>
 
 						<button
 							type='button'
 							onClick={handleEmbed}
 							disabled={!urlInput.trim()}
-							className='inline-flex h-8 items-center rounded-md bg-background/40 px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
+							className='inline-flex h-7.5 items-center rounded-md bg-primary px-2.5 text-[12.5px] font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50'
 						>
 							Embed
 						</button>
 					</div>
 				) : (
-					<div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
-						<div className='flex min-w-0 flex-1 items-center gap-3'>
+					<div className='flex flex-col gap-2.5'>
+						<div className='flex min-w-0 items-center gap-2'>
 							<div className='flex shrink-0 items-center text-muted-foreground'>
-								<ImageIcon className='size-5' />
+								<ImageIcon className='size-4' />
 							</div>
 
 							<div className='min-w-0'>
-								<div className='text-sm text-muted-foreground'>
+								<div className='text-[13.5px] font-medium text-muted-foreground'>
 									Add an image
 								</div>
 							</div>
@@ -196,7 +196,7 @@ export function ImageBlockEditor({ block, shareToken }: ImageBlockEditorProps) {
 								onClick={() =>
 									fileInputRef.current?.click()
 								}
-								className='inline-flex h-8 items-center gap-1.5 rounded-md bg-background/40 px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
+								className='inline-flex h-7.5 items-center gap-1.5 rounded-md border border-input bg-background px-2.5 text-[12.5px] font-medium text-foreground transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-50'
 							>
 								<UploadIcon className='size-3.5' />
 
@@ -209,7 +209,7 @@ export function ImageBlockEditor({ block, shareToken }: ImageBlockEditorProps) {
 								type='button'
 								disabled={uploadAttachment.isPending}
 								onClick={() => setShowEmbedInput(true)}
-								className='inline-flex h-8 items-center gap-1.5 rounded-md bg-background/40 px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
+								className='inline-flex h-7.5 items-center gap-1.5 rounded-md border border-input bg-background px-2.5 text-[12.5px] font-medium text-foreground transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-50'
 							>
 								<LinkIcon className='size-3.5' />
 								Embed link
@@ -252,7 +252,7 @@ export function ImageBlockEditor({ block, shareToken }: ImageBlockEditorProps) {
 					}));
 				}}
 				onBlur={() => saveContent(content)}
-				className='mt-1 w-full border-0 bg-transparent px-1 text-center text-xs text-muted-foreground outline-none placeholder:text-muted-foreground/60'
+				className='mt-1.5 w-full border-0 bg-transparent px-0 text-[13px] text-muted-foreground outline-none placeholder:text-faint'
 			/>
 		</div>
 	);

@@ -33,10 +33,10 @@ export function MermaidBlockEditor({
 		<Tabs
 			value={tab}
 			onValueChange={(value) => setTab(value as MermaidTab)}
-			className='w-full gap-0 rounded-lg border bg-muted/20'
+			className='w-full gap-0 rounded-lg border border-border bg-muted/40'
 		>
-			<div className='flex items-center justify-between border-b px-3 py-1.5'>
-				<span className='text-xs font-medium text-muted-foreground'>
+			<div className='flex items-center justify-between px-3 pt-2.5 pb-1'>
+				<span className='text-[12.5px] font-semibold text-muted-foreground'>
 					Mermaid
 				</span>
 

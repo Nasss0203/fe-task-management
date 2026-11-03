@@ -156,9 +156,9 @@ export function BookmarkBlockEditor({ block, shareToken }: BookmarkBlockEditorPr
 
 	if (!content.url) {
 		return (
-			<div className='flex w-full items-center gap-3 rounded-md bg-muted/50 px-3 py-2.5 transition-colors hover:bg-muted/80'>
+			<div className='flex min-h-10 w-full items-center gap-2 rounded-lg border border-input bg-background py-1 pr-1 pl-3 transition-colors focus-within:border-ring'>
 				<div className='flex shrink-0 items-center text-muted-foreground'>
-					<BookmarkIcon className='size-4' />
+					<BookmarkIcon className='size-[15px]' />
 				</div>
 
 				<input
@@ -174,7 +174,7 @@ export function BookmarkBlockEditor({ block, shareToken }: BookmarkBlockEditorPr
 							void handleSaveUrl();
 						}
 					}}
-					className='h-8 min-w-0 flex-1 border-0 bg-transparent text-sm outline-none placeholder:text-muted-foreground disabled:opacity-50'
+					className='h-8 min-w-0 flex-1 border-0 bg-transparent text-[13.5px] outline-none placeholder:text-faint disabled:opacity-50'
 				/>
 
 				<button
@@ -185,7 +185,7 @@ export function BookmarkBlockEditor({ block, shareToken }: BookmarkBlockEditorPr
 						updateBlock.isPending
 					}
 					onClick={() => void handleSaveUrl()}
-					className='inline-flex h-8 items-center gap-1.5 rounded-md bg-background/40 px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
+					className='inline-flex h-7.5 items-center gap-1.5 rounded-md bg-primary px-2.5 text-[12.5px] font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50'
 				>
 					{resolveMetadata.isPending && (
 						<Loader2Icon className='size-3.5 animate-spin' />
@@ -202,7 +202,7 @@ export function BookmarkBlockEditor({ block, shareToken }: BookmarkBlockEditorPr
 			href={content.url}
 			target='_blank'
 			rel='noopener noreferrer'
-			className='group flex w-full max-w-3xl overflow-hidden rounded-md border border-border transition-colors hover:bg-muted/30'
+			className='group flex w-full max-w-3xl overflow-hidden rounded-lg border border-border transition-colors hover:bg-accent/50'
 		>
 			<div className='min-w-0 flex flex-1 flex-col justify-between p-3'>
 				<div className='min-w-0'>

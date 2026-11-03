@@ -48,6 +48,7 @@ export function DatabaseValueControl({
 				readOnly={!interactive}
 				disabled={disabled}
 				onChange={(e) => emit(e.target.checked)}
+				className='accent-ring'
 			/>
 		);
 	const multiple = type === "MULTI_SELECT";

@@ -145,7 +145,7 @@ function ReadOnlySectionBlock({
 						</p>
 					)}
 					{form && formUnavailable && (
-						<p className='ml-8 mt-1 text-sm text-destructive'>
+						<p className='ml-8 mt-1 text-[13.5px] text-destructive'>
 							This form is not available right now.
 						</p>
 					)}
@@ -342,7 +342,7 @@ export function ReadOnlyPageBlockRenderer({
 				}
 
 				return (
-					<div className='rounded-md border border-dashed p-3 text-sm text-muted-foreground'>
+					<div className='rounded-md border border-dashed border-input p-3 text-sm text-muted-foreground'>
 						This database is not available.
 					</div>
 				);

@@ -163,7 +163,7 @@ export function PublicPage({ publicSite }: PublicPageProps) {
 						aria-orientation='vertical'
 						aria-label='Resize page navigation'
 						data-testid='public-sidebar-resize-handle'
-						className='absolute top-0 right-0 z-30 h-full w-1.5 cursor-col-resize touch-none'
+						className='absolute top-0 right-0 z-30 h-full w-1.5 cursor-col-resize touch-none transition-colors hover:bg-ring/60 active:bg-ring'
 						onPointerDown={handleResizeStart}
 						onPointerMove={handleResizeMove}
 						onPointerUp={handleResizeEnd}

@@ -165,7 +165,7 @@ export function DatabaseCell({
 						readOnly={!interactive}
 						disabled={disabled}
 						className={[
-							"h-8 w-full min-w-0 truncate rounded-sm bg-transparent px-1 outline-none placeholder:text-muted-foreground/60 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none",
+							"h-8 w-full min-w-0 truncate rounded-sm bg-transparent px-1.5 text-[13.5px] outline-none transition-shadow placeholder:text-faint focus:bg-background focus:ring-2 focus:ring-ring focus:ring-inset read-only:focus:ring-0 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none",
 							isTitle ? "font-medium" : "",
 							isNumber ? "text-right tabular-nums" : "",
 							href ? "pr-7 text-foreground underline decoration-muted-foreground/40 underline-offset-2" : "",
@@ -178,9 +178,9 @@ export function DatabaseCell({
 							target='_blank'
 							rel='noopener noreferrer'
 							aria-label={`Open ${inputValue}`}
-							className='absolute right-1 flex size-6 items-center justify-center rounded-sm border bg-background text-muted-foreground opacity-0 shadow-sm hover:text-foreground group-hover/text:opacity-100 focus-visible:opacity-100'
+							className='absolute right-1.5 flex size-[22px] items-center justify-center rounded-[5px] bg-muted text-muted-foreground opacity-0 transition-colors hover:bg-sidebar-accent hover:text-foreground group-hover/text:opacity-100 focus-visible:opacity-100'
 						>
-							<ExternalLink className='size-3.5' />
+							<ExternalLink className='size-3' />
 						</a>
 					)}
 				</div>
@@ -195,7 +195,7 @@ export function DatabaseCell({
 				<div
 					className={
 						property.type === PropertyType.CHECKBOX
-							? "flex h-8 items-center px-1"
+							? "flex h-8 items-center px-1.5"
 							: undefined
 					}
 				>
@@ -237,7 +237,7 @@ export function DatabaseCell({
 
 		default:
 			return (
-				<span className='block truncate px-1 text-muted-foreground'>
+				<span className='block cursor-default truncate px-1.5 text-[13.5px] text-muted-foreground'>
 					{formatDatabaseValue(value)}
 				</span>
 			);
