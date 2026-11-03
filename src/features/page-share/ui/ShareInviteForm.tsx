@@ -122,7 +122,7 @@ export function ShareInviteForm({
 	return (
 		<form onSubmit={submitShare} className='space-y-2'>
 			<div className='flex gap-2'>
-				<div className='relative flex min-w-0 flex-1 items-center rounded-md border border-border bg-transparent pr-1 focus-within:border-primary'>
+				<div className='relative flex h-[34px] min-w-0 flex-1 items-center rounded-md border border-input bg-background pr-1 focus-within:border-ring'>
 					<Input
 						aria-label='Search people by name or email'
 						placeholder='Search people by name or email'
@@ -146,7 +146,7 @@ export function ShareInviteForm({
 								chooseCandidate(visibleCandidates[0]);
 							}
 						}}
-						className='h-8 flex-1 border-0 bg-transparent px-2 text-xs text-foreground shadow-none placeholder:text-muted-foreground focus-visible:border-0 focus-visible:ring-0 dark:bg-transparent'
+						className='h-8 flex-1 border-0 bg-transparent px-2.5 text-[13px] text-foreground shadow-none placeholder:text-faint focus-visible:border-0 focus-visible:ring-0 md:text-[13px] dark:bg-transparent'
 					/>
 
 					<Select
@@ -158,7 +158,7 @@ export function ShareInviteForm({
 						<SelectTrigger
 							size='sm'
 							aria-label='New share access level'
-							className='max-w-28 shrink-0 gap-1 border-0 bg-muted px-2 py-0 text-xs text-muted-foreground shadow-none data-[size=sm]:h-6 focus-visible:border-0 focus-visible:ring-1 focus-visible:ring-primary/40 dark:bg-muted'
+							className='max-w-28 shrink-0 gap-1 border-0 bg-transparent px-2 py-0 text-[12.5px] text-muted-foreground shadow-none hover:bg-accent data-[size=sm]:h-7 focus-visible:border-0 focus-visible:ring-1 focus-visible:ring-ring/40 dark:bg-transparent'
 						>
 							<SelectValue />
 						</SelectTrigger>
@@ -177,7 +177,7 @@ export function ShareInviteForm({
 					</Select>
 
 					{showCandidates && (
-						<div className='absolute inset-x-0 top-full z-50 mt-1 max-h-56 overflow-auto rounded-lg border border-border bg-popover p-1 shadow-elevated'>
+						<div className='absolute inset-x-0 top-full z-50 mt-1 max-h-56 overflow-auto rounded-[10px] border border-border bg-popover p-[5px] shadow-elevated'>
 							{!candidateQueryReady || isCandidatesFetching ? (
 								<p className='px-2 py-2 text-xs text-muted-foreground'>
 									Searching...
@@ -198,13 +198,13 @@ export function ShareInviteForm({
 										onClick={() =>
 											chooseCandidate(candidate)
 										}
-										className='flex w-full flex-col rounded px-2 py-1.5 text-left text-xs hover:bg-accent'
+										className='flex w-full flex-col rounded-[5px] px-2 py-1.5 text-left text-[13px] hover:bg-accent'
 									>
 										<span className='font-medium text-foreground'>
 											{getUserName(candidate)}
 										</span>
 
-										<span className='text-muted-foreground'>
+										<span className='text-xs text-muted-foreground'>
 											{candidate.email}
 										</span>
 									</button>
@@ -219,7 +219,7 @@ export function ShareInviteForm({
 					disabled={!selectedUser || sharePage.isPending}
 					// Chỉ bật khi đã chọn người trong gợi ý; lúc tắt phải trông khác hẳn để không tưởng là lỗi
 					title={selectedUser ? undefined : "Choose a person from the list first"}
-					className='h-9 bg-primary px-3.5 text-xs text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100'
+					className='h-[34px] rounded-md bg-primary px-3 text-[13px] font-medium text-primary-foreground shadow-none hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100'
 				>
 					{sharePage.isPending ? "Sharing..." : "Share"}
 				</Button>

@@ -75,8 +75,8 @@ function ResetPasswordContent() {
 		return (
 			<AuthCard
 				icon={
-					<div className='flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10 text-destructive'>
-						<XCircle className='h-5 w-5' />
+					<div className='flex size-12 items-center justify-center rounded-full bg-destructive/10 text-destructive'>
+						<XCircle className='size-[22px]' />
 					</div>
 				}
 				title='Liên kết không hợp lệ'
@@ -85,7 +85,7 @@ function ResetPasswordContent() {
 					<div className='flex justify-center w-full'>
 						<Link
 							href='/sign-in'
-							className='inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors'
+							className='inline-flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground'
 						>
 							<ArrowLeft className='h-3.5 w-3.5' />
 							Quay lại đăng nhập
@@ -106,8 +106,8 @@ function ResetPasswordContent() {
 		return (
 			<AuthCard
 				icon={
-					<div className='flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'>
-						<CheckCircle2 className='h-5 w-5' />
+					<div className='flex size-12 items-center justify-center rounded-full bg-success/10 text-success'>
+						<CheckCircle2 className='size-[22px]' />
 					</div>
 				}
 				title='Mật khẩu đã được cập nhật!'
@@ -130,7 +130,7 @@ function ResetPasswordContent() {
 				<div className='flex justify-center w-full'>
 					<Link
 						href='/sign-in'
-						className='inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors'
+						className='inline-flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground'
 					>
 						<ArrowLeft className='h-3.5 w-3.5' />
 						Quay lại đăng nhập
@@ -148,7 +148,7 @@ function ResetPasswordContent() {
 						control={form.control}
 						render={({ field, fieldState }) => (
 							<Field data-invalid={fieldState.invalid} className='gap-1.5'>
-								<FieldLabel htmlFor='reset-password-new' className='text-xs sm:text-sm font-medium text-foreground'>
+								<FieldLabel htmlFor='reset-password-new' className='text-[13px] font-medium text-foreground'>
 									Mật khẩu mới
 								</FieldLabel>
 								<PasswordInput
@@ -171,7 +171,7 @@ function ResetPasswordContent() {
 						control={form.control}
 						render={({ field, fieldState }) => (
 							<Field data-invalid={fieldState.invalid} className='gap-1.5'>
-								<FieldLabel htmlFor='reset-password-confirm' className='text-xs sm:text-sm font-medium text-foreground'>
+								<FieldLabel htmlFor='reset-password-confirm' className='text-[13px] font-medium text-foreground'>
 									Xác nhận mật khẩu
 								</FieldLabel>
 								<PasswordInput
@@ -219,7 +219,7 @@ export default function ResetPasswordPage() {
 		<Suspense
 			fallback={
 				<div className='flex min-h-[200px] w-full items-center justify-center'>
-					<div className='h-7 w-7 animate-spin rounded-full border-2 border-primary border-t-transparent' />
+					<div className='size-7 animate-spin rounded-full border-[3px] border-ring/20 border-t-ring' />
 				</div>
 			}
 		>

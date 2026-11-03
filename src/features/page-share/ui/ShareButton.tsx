@@ -89,13 +89,13 @@ export default function ShareButton({ pageId }: ShareButtonProps) {
 				align='end'
 				side='bottom'
 				sideOffset={8}
-				className='w-[calc(100vw-2rem)] overflow-visible rounded-xl border-border bg-popover p-0 text-foreground shadow-elevated sm:w-[500px]'
+				className='w-[calc(100vw-2rem)] overflow-visible rounded-[12px] border-border bg-popover p-0 text-foreground shadow-[0_8px_24px_-6px_rgba(0,0,0,0.14)] sm:w-[440px]'
 			>
 				<Tabs defaultValue='share' className='gap-0'>
 					<SharePopoverHeader showPublish={canPublish} />
 
 					<TabsContent value='share'>
-						<div className='space-y-4 px-4 py-4'>
+						<div className='space-y-3.5 p-4'>
 							{/* Direct Share */}
 							<ShareInviteForm
 								pageId={pageId}

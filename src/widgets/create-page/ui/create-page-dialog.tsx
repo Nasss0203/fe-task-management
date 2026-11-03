@@ -327,7 +327,7 @@ function CreatePageSession({
 			title='Create page'
 			location={
 				<>
-					<span className='shrink-0 text-sm text-muted-foreground'>
+					<span className='shrink-0 text-[12.5px] text-muted-foreground'>
 						Add to
 					</span>
 
@@ -336,20 +336,20 @@ function CreatePageSession({
 							<button
 								type='button'
 								aria-label={`Add to ${selectedLabel}`}
-								className='flex min-w-0 items-center gap-1.5 rounded-md px-1.5 py-1 text-sm font-medium transition-colors hover:bg-muted'
+								className='flex h-7 min-w-0 items-center gap-[5px] rounded-md bg-muted px-2 text-[12.5px] font-medium transition-colors hover:bg-sidebar-accent'
 							>
 								<span className='flex shrink-0 items-center text-muted-foreground'>
 									{selectedIcon}
 								</span>
 								<span className='truncate'>{selectedLabel}</span>
-								<ChevronDown className='size-3.5 shrink-0 text-muted-foreground' />
+								<ChevronDown className='size-3 shrink-0 text-muted-foreground' />
 							</button>
 						</DropdownMenuTrigger>
 
 						<DropdownMenuContent align='start' className='w-64'>
 							{defaultLocation.parentPage && (
 								<>
-									<DropdownMenuLabel className='text-xs font-normal text-muted-foreground'>
+									<DropdownMenuLabel className='px-2 pt-1.5 pb-0.5 text-xs font-medium text-muted-foreground'>
 										Inside page
 									</DropdownMenuLabel>
 									<LocationItem
@@ -372,7 +372,7 @@ function CreatePageSession({
 							{teamspaces.length > 0 && (
 								<>
 									<DropdownMenuSeparator />
-									<DropdownMenuLabel className='text-xs font-normal text-muted-foreground'>
+									<DropdownMenuLabel className='px-2 pt-1.5 pb-0.5 text-xs font-medium text-muted-foreground'>
 										Teamspaces
 									</DropdownMenuLabel>
 									{teamspaces.map((teamspace) => {
@@ -402,9 +402,9 @@ function CreatePageSession({
 					type='button'
 					aria-label='Open as full page'
 					onClick={handleOpenFullPage}
-					className='flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
+					className='flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
 				>
-					<Maximize2 className='size-4' />
+					<Maximize2 className='size-[15px]' />
 				</button>
 			}
 		>
@@ -427,7 +427,7 @@ function CreatePageSession({
                     leading-[1.15]
                     tracking-[-0.02em]
                     outline-none
-                    placeholder:text-muted-foreground/25
+                    placeholder:text-faint/50
                 '
 			/>
 
@@ -455,11 +455,11 @@ function CreatePageSession({
 
 			{isPresetPristine && presets.length > 0 && (
 				<section aria-label='Start with' className='mt-10'>
-					<p className='mb-2 px-2 text-xs font-medium text-muted-foreground'>
+					<p className='mb-2 text-xs font-medium text-muted-foreground'>
 						Start with
 					</p>
 
-					<div className='max-h-[280px] space-y-0.5 overflow-y-auto'>
+					<div className='max-h-[280px] w-60 space-y-0.5 overflow-y-auto'>
 						{presets.map((preset) => {
 							const selected = preset.key === "empty";
 							const isApplying =
@@ -474,7 +474,7 @@ function CreatePageSession({
 									disabled={applyPreset.isPending}
 									onClick={() => handleSelectPreset(preset.key)}
 									className={cn(
-										"flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-wait",
+										"flex h-8 w-full items-center gap-2.5 rounded-md px-2 text-left text-[13.5px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-wait",
 										selected && "bg-muted text-foreground",
 									)}
 								>

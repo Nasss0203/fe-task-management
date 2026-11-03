@@ -46,8 +46,8 @@ export default function ForgotPasswordPage() {
 	return (
 		<AuthCard
 			icon={
-				<div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary'>
-					<Mail className='h-5 w-5' />
+				<div className='flex size-12 items-center justify-center rounded-full bg-accent-soft text-ring'>
+					<Mail className='size-[22px]' />
 				</div>
 			}
 			title='Quên mật khẩu'
@@ -56,7 +56,7 @@ export default function ForgotPasswordPage() {
 				<div className='flex justify-center w-full'>
 					<Link
 						href='/sign-in'
-						className='inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors'
+						className='inline-flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground'
 					>
 						<ArrowLeft className='h-3.5 w-3.5' />
 						Quay lại đăng nhập
@@ -66,16 +66,16 @@ export default function ForgotPasswordPage() {
 		>
 			{isSubmitted ? (
 				<div className='flex flex-col gap-4 py-1'>
-					<div className='rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4'>
+					<div className='rounded-xl border border-border bg-muted/40 p-4'>
 						<div className='flex items-start gap-3'>
-							<div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'>
-								<CheckCircle2 className='h-5 w-5' />
+							<div className='flex size-9 shrink-0 items-center justify-center rounded-full bg-success/10 text-success'>
+								<CheckCircle2 className='size-[18px]' />
 							</div>
 							<div>
-								<h2 className='text-sm font-semibold text-foreground'>
+								<h2 className='text-[15px] font-semibold text-foreground'>
 									Yêu cầu đã được ghi nhận
 								</h2>
-								<p className='mt-1 text-xs sm:text-sm text-muted-foreground leading-relaxed'>
+								<p className='mt-1 text-[13px] leading-5 text-muted-foreground'>
 									Nếu email tồn tại, bạn sẽ nhận được liên kết đặt lại mật khẩu trong vài phút.
 								</p>
 							</div>
@@ -86,7 +86,7 @@ export default function ForgotPasswordPage() {
 						<Button
 							type='button'
 							variant='outline'
-							className='h-11 rounded-xl border border-border/80 text-sm font-medium hover:bg-muted/60 transition-colors'
+							className='h-11 rounded-xl border border-input bg-background text-sm font-medium shadow-none transition-colors hover:bg-accent'
 							onClick={() => {
 								form.reset();
 								setIsSubmitted(false);
@@ -110,7 +110,7 @@ export default function ForgotPasswordPage() {
 							control={form.control}
 							render={({ field, fieldState }) => (
 								<Field data-invalid={fieldState.invalid} className='gap-1.5'>
-									<FieldLabel htmlFor='forgot-password-email' className='text-xs sm:text-sm font-medium text-foreground'>
+									<FieldLabel htmlFor='forgot-password-email' className='text-[13px] font-medium text-foreground'>
 										Email
 									</FieldLabel>
 									<Input

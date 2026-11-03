@@ -42,9 +42,9 @@ export function SharePopoverFooter({ pageId }: SharePopoverFooterProps) {
 	};
 
 	return (
-		<div className='flex min-h-14 flex-wrap items-center justify-between gap-2 border-t border-border px-4 py-2'>
-			<span className='flex items-center gap-1.5 px-2 text-xs text-muted-foreground'>
-				<Settings className='size-4' />
+		<div className='flex flex-wrap items-center justify-between gap-2 border-t border-border px-4 py-2.5'>
+			<span className='flex items-center gap-[5px] text-[12.5px] text-muted-foreground'>
+				<Settings className='size-[13px]' />
 				Advanced
 			</span>
 
@@ -53,16 +53,16 @@ export function SharePopoverFooter({ pageId }: SharePopoverFooterProps) {
 				variant='outline'
 				onClick={handleCopyLink}
 				disabled={isCopying}
-				className='h-9 gap-1.5 border-border bg-transparent px-3 text-xs text-foreground hover:bg-accent'
+				className='h-[30px] gap-1.5 border-input bg-background px-3 text-[12.5px] font-medium text-foreground shadow-none hover:bg-accent'
 			>
 				{copied ? (
 					<>
-						<Check className='size-4' />
+						<Check className='size-[13px]' />
 						Copied
 					</>
 				) : (
 					<>
-						<Link2 className='size-4' />
+						<Link2 className='size-[13px]' />
 						{isCopying ? "Copying..." : "Copy link"}
 					</>
 				)}

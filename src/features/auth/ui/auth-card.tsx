@@ -5,10 +5,10 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 export const authInputClassName =
-	"h-11 rounded-xl border border-border/80 bg-background/80 px-3.5 text-sm text-foreground placeholder:text-muted-foreground/60 shadow-2xs focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 transition-all";
+	"h-11 rounded-xl border border-input bg-background px-3.5 text-sm text-foreground placeholder:text-faint md:text-sm shadow-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20";
 
 export const authSubmitButtonClassName =
-	"h-11 w-full rounded-xl text-sm font-semibold bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 active:scale-[0.98] transition-all";
+	"h-11 w-full rounded-xl bg-primary text-sm font-semibold text-primary-foreground shadow-none transition-colors hover:bg-primary/90";
 
 export interface AuthCardProps {
 	title?: ReactNode;
@@ -42,21 +42,21 @@ export function AuthCard({
 	return (
 		<div
 			className={cn(
-				"relative flex w-full max-w-md flex-col rounded-2xl border border-border/80 bg-card/90 shadow-xl shadow-black/5 dark:shadow-black/20 backdrop-blur-xl overflow-hidden",
+				"relative flex w-full max-w-md flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[0_16px_20px_rgba(0,0,0,0.06)] dark:shadow-black/20",
 				className
 			)}
 		>
 			{/* Fixed / pinned Card Header */}
 			{(title || description || icon) && (
-				<div className='shrink-0 px-6 pt-6 pb-2 sm:px-8 sm:pt-7 sm:pb-3 flex flex-col gap-2'>
+				<div className='flex shrink-0 flex-col gap-2 px-6 pt-6 pb-2.5 sm:px-8 sm:pt-7'>
 					{icon && <div className='mb-1 flex'>{icon}</div>}
 					{title && (
-						<h1 className='text-xl font-bold tracking-tight text-foreground sm:text-2xl'>
+						<h1 className='text-xl font-bold leading-9 tracking-tight text-foreground sm:text-2xl'>
 							{title}
 						</h1>
 					)}
 					{description && (
-						<p className='text-xs sm:text-sm text-muted-foreground leading-relaxed'>
+						<p className='text-[13.5px] leading-5 text-muted-foreground'>
 							{description}
 						</p>
 					)}
@@ -64,21 +64,21 @@ export function AuthCard({
 			)}
 
 			{children && (
-				<div className='px-6 py-2 sm:px-8'>
+				<div className='px-6 pt-2 pb-4 sm:px-8'>
 					{children}
 				</div>
 			)}
 
 			{/* Fixed / pinned Card Footer */}
 			{hasFooter && (
-				<div className='shrink-0 px-6 pt-2 pb-6 sm:px-8 sm:pb-7 flex flex-col gap-3.5 border-t border-border/50 mt-1'>
+				<div className='flex shrink-0 flex-col gap-3.5 border-t border-border px-6 pt-3.5 pb-6 sm:px-8 sm:pb-7'>
 					{footer}
 
 					{googleLabel && (
 						<>
-							<div className='flex w-full items-center gap-3 pt-1'>
+							<div className='flex w-full items-center gap-2.5'>
 								<Separator className='flex-1' />
-								<span className='text-[11px] font-medium uppercase tracking-wider text-muted-foreground'>
+								<span className='text-[11px] font-medium uppercase tracking-[0.6px] text-muted-foreground'>
 									Hoặc tiếp tục với
 								</span>
 								<Separator className='flex-1' />
@@ -89,11 +89,11 @@ export function AuthCard({
 					)}
 
 					{alternateText && alternateHref && alternateLabel && (
-						<div className='flex items-center justify-center gap-1.5 text-xs text-muted-foreground pt-0.5'>
+						<div className='flex items-center justify-center gap-1.5 text-[12.5px] text-muted-foreground'>
 							<span>{alternateText}</span>
 							<Link
 								href={alternateHref}
-								className='font-semibold text-foreground transition-colors hover:text-primary hover:underline'
+								className='font-semibold text-foreground hover:underline'
 							>
 								{alternateLabel}
 							</Link>

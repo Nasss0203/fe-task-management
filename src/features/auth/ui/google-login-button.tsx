@@ -27,11 +27,11 @@ const GoogleLoginButton = ({
 			size={size}
 			onClick={handleLoginGoogle}
 			className={cn(
-				"flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-border/80 bg-background/80 text-sm font-medium text-foreground shadow-2xs transition-colors hover:bg-muted/60",
+				"flex h-11 w-full items-center justify-center gap-2.5 rounded-xl border border-input bg-background text-sm font-medium text-foreground shadow-none transition-colors hover:bg-accent",
 				className
 			)}
 		>
-			<FcGoogle className='h-4.5 w-4.5 shrink-0' />
+			<FcGoogle className='size-4 shrink-0' />
 			<span>{label}</span>
 		</Button>
 	);

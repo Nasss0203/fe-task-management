@@ -134,7 +134,7 @@ export function GeneralAccessSection({
 
 	return (
 		<section className='space-y-2'>
-			<h2 className='text-[11px] font-semibold text-muted-foreground'>
+			<h2 className='text-xs font-medium text-muted-foreground'>
 				General access
 			</h2>
 
@@ -149,7 +149,7 @@ export function GeneralAccessSection({
 			) : (
 				<>
 					<div className='flex min-w-0 items-center gap-2.5'>
-						<div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground'>
+						<div className='flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground'>
 							{icon}
 						</div>
 
@@ -162,7 +162,7 @@ export function GeneralAccessSection({
 								<SelectTrigger
 									size='sm'
 									aria-label='General access'
-									className='max-w-full min-w-0 border-0 bg-transparent px-1 text-xs text-foreground'
+									className='max-w-full min-w-0 border-input bg-background px-2.5 text-[13px] text-foreground shadow-none data-[size=sm]:h-[30px]'
 								>
 									<SelectValue />
 								</SelectTrigger>

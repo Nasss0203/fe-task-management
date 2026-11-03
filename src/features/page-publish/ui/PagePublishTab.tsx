@@ -185,17 +185,17 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 	};
 
 	return (
-		<div className='space-y-4 px-4 py-4 text-sm'>
+		<div className='space-y-3 p-4 text-sm'>
 			<div className='flex items-center justify-between gap-3'>
-				<h3 className='text-sm font-semibold text-foreground'>Publish</h3>
+				<h3 className='text-[13px] font-medium text-foreground'>Publish</h3>
 				<Button
 					type='button'
 					variant='ghost'
 					size='sm'
-					className='h-8 gap-1.5 px-2 text-muted-foreground hover:bg-accent hover:text-foreground'
+					className='h-7 gap-[5px] px-2 text-[12.5px] font-normal text-muted-foreground hover:bg-accent hover:text-foreground'
 					onClick={() => setSettingsOpen(true)}
 				>
-					<Settings className='size-4' />
+					<Settings className='size-[13px]' />
 					Settings
 				</Button>
 			</div>
@@ -205,7 +205,7 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 				{!isPublished && isRootPage ? (
 					<span className='text-xs font-medium text-muted-foreground'>Site address</span>
 				) : null}
-				<div className='flex min-w-0 items-center justify-between gap-2 rounded-md border border-border bg-muted/60 px-3 py-2 text-sm'>
+				<div className='flex h-[34px] min-w-0 items-center justify-between gap-2 rounded-md border border-input bg-muted/40 px-2.5 text-[12.5px]'>
 					<span
 						className='truncate text-foreground'
 						data-testid='public-url'
@@ -216,12 +216,12 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 					{domainUrl ? (
 						<button
 							type='button'
-							className='shrink-0 rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground'
+							className='shrink-0 rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground [&_svg]:size-[13px]'
 							aria-label='Copy link'
 							onClick={() => void handleCopy()}
 						>
 							{copied ? (
-								<span className='text-xs font-medium text-primary'>Copied</span>
+								<span className='text-xs font-medium text-foreground'>Copied</span>
 							) : (
 								<Link2 className='size-4' />
 							)}
@@ -232,7 +232,8 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 
 			{/* Status */}
 			{!isRootPage ? (
-				<p className='text-xs text-muted-foreground'>
+				<p className='flex items-center gap-1.5 text-[12.5px] text-muted-foreground'>
+					<span className={isPublished ? 'size-[7px] rounded-full bg-success' : 'size-[7px] rounded-full bg-faint'} />
 					{isPublished
 						? "This page is published on the site."
 						: "This page is not currently public."}
@@ -253,7 +254,7 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 				<div className='flex justify-end'>
 					<Button
 						type='button'
-						className='w-full bg-primary text-primary-foreground hover:bg-primary/90'
+						className='h-8 px-3 text-[13px] font-medium shadow-none'
 						disabled={
 							busy ||
 							(isRootPage
@@ -266,11 +267,11 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 					</Button>
 				</div>
 			) : (
-				<div className='flex items-center justify-between gap-2'>
+				<div className='flex items-center justify-end gap-2'>
 					<Button
 						type='button'
 						variant='outline'
-						className='border-border bg-transparent text-foreground hover:bg-accent'
+						className='h-8 border-input bg-background px-3 text-[13px] font-medium text-foreground shadow-none hover:bg-accent'
 						disabled={busy}
 						onClick={() => {
 							if (isRootPage) {
@@ -284,10 +285,10 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 					</Button>
 					<Button
 						type='button'
-						className='bg-primary text-primary-foreground hover:bg-primary/90'
+						className='h-8 px-3 text-[13px] font-medium shadow-none'
 						onClick={handleViewSite}
 					>
-						<ExternalLink className='mr-1.5 size-4' />
+						<ExternalLink className='size-[13px]' />
 						View site
 					</Button>
 				</div>
