@@ -46,7 +46,7 @@ export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 	const inlineMarks = useInlineMarks(
 		value,
 		setValue,
-		"text-base leading-7",
+		"text-base leading-[26px] text-secondary-foreground",
 	);
 
 	const updateBlock = useUpdatePageBlock(shareToken);
@@ -151,8 +151,8 @@ export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 	useBlockAutoFocus(block.id, textareaRef);
 
 	return (
-		<div className='flex min-h-7 w-full'>
-			<div className='mr-3 w-[3px] shrink-0 rounded-full bg-foreground' />
+		<div className='flex min-h-[26px] w-full'>
+			<div className='mr-3.5 w-[3px] shrink-0 rounded-full bg-foreground' />
 
 			<div className='relative min-w-0 flex-1'>
 				<textarea
@@ -170,7 +170,7 @@ export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 					className={cn(
 						`
 	          block
-	          min-h-7
+	          min-h-[26px]
 	          w-full
 	          resize-none
 	          overflow-hidden
@@ -178,7 +178,8 @@ export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 	          bg-transparent
 	          p-0
 	          text-base
-	          leading-7
+	          leading-[26px]
+	          text-secondary-foreground
 	          outline-none
 	          placeholder:text-muted-foreground/40
 	          focus-visible:ring-0

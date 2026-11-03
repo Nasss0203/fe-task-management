@@ -225,7 +225,7 @@ export function PageBlockActionMenu({
 				className='
                     w-[280px]
                     max-h-[var(--radix-popover-content-available-height)]
-                    rounded-xl
+                    rounded-[9px]
                     border
                     bg-popover
                     shadow-elevated
@@ -269,14 +269,14 @@ export function PageBlockActionMenu({
 										void handleTurnInto(option)
 									}
 									className='
-                                            h-9
+                                            h-[30px]
                                             cursor-pointer
-                                            gap-2.5
+                                            gap-[9px]
                                             px-2
                                             text-[13.5px]
                                         '
 								>
-									<Icon className='size-4 text-muted-foreground' />
+									<Icon className='size-[15px] text-muted-foreground' />
 
 									<span>{option.label}</span>
 
@@ -297,9 +297,9 @@ export function PageBlockActionMenu({
 	return (
 		<Command
 			className='
-                w-[300px]
+                w-64
                 max-h-[var(--radix-popover-content-available-height)]
-                rounded-xl
+                rounded-[9px]
                 border
                 bg-popover
                 shadow-elevated
@@ -322,9 +322,9 @@ export function PageBlockActionMenu({
 						<CommandGroup heading='Code'>
 							<CommandItem
 								onSelect={() => void handleCopyCode()}
-								className='h-9 cursor-pointer gap-2.5 text-[13.5px]'
+								className='h-[30px] cursor-pointer gap-[9px] text-[13.5px]'
 							>
-								<Code2 className='size-4' />
+								<Code2 className='size-[15px]' />
 								Copy code
 							</CommandItem>
 						</CommandGroup>
@@ -337,29 +337,29 @@ export function PageBlockActionMenu({
 				<CommandGroup>
 					<CommandItem
 						onSelect={() => setMode("turn-into")}
-						className='h-9 cursor-pointer gap-2.5 text-[13.5px]'
+						className='h-[30px] cursor-pointer gap-[9px] text-[13.5px]'
 					>
-						<RotateCcw className='size-4' />
+						<RotateCcw className='size-[15px]' />
 
 						<span>Turn into</span>
 
-						<ChevronRight className='ml-auto size-4 text-muted-foreground' />
+						<ChevronRight className='ml-auto size-3 text-muted-foreground' />
 					</CommandItem>
 
 					<CommandItem
 						onSelect={() => void handleCopyLink()}
-						className='h-9 cursor-pointer gap-2.5 text-[13.5px]'
+						className='h-[30px] cursor-pointer gap-[9px] text-[13.5px]'
 					>
-						<Link className='size-4' />
+						<Link className='size-[15px]' />
 						Copy link to block
 					</CommandItem>
 
 					{block.type !== PageBlockType.FORM_FIELD && (
 						<CommandItem
 							onSelect={() => void handleDuplicate()}
-							className='h-9 cursor-pointer gap-2.5 text-[13.5px]'
+							className='h-[30px] cursor-pointer gap-[9px] text-[13.5px]'
 						>
-							<Copy className='size-4' />
+							<Copy className='size-[15px]' />
 							Duplicate
 							<CommandShortcut>Ctrl+D</CommandShortcut>
 						</CommandItem>
@@ -371,9 +371,9 @@ export function PageBlockActionMenu({
 								onClose?.();
 								onComment();
 							}}
-							className='h-9 cursor-pointer gap-2.5 text-[13.5px]'
+							className='h-[30px] cursor-pointer gap-[9px] text-[13.5px]'
 						>
-							<MessageSquare className='size-4' />
+							<MessageSquare className='size-[15px]' />
 							Comment
 						</CommandItem>
 					)}
@@ -385,14 +385,15 @@ export function PageBlockActionMenu({
 					<CommandItem
 						onSelect={() => void handleDelete()}
 						className='
-                            h-10
+                            h-[30px]
                             cursor-pointer
-                            gap-2.5
+                            gap-[9px]
+                            text-[13.5px]
                             text-destructive
                             data-[selected=true]:text-destructive
                         '
 					>
-						<Trash2 className='size-4' />
+						<Trash2 className='size-[15px]' />
 						Delete
 						<CommandShortcut>Del</CommandShortcut>
 					</CommandItem>

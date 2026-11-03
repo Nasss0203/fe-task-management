@@ -26,11 +26,11 @@ import {
 	OPERATOR_LABELS,
 	VALUELESS_OPERATORS,
 } from "../lib/filter-rows";
-import { MenuItem, MenuPageHeader, MenuSeparator } from "./menu-item";
+import { MenuPageHeader } from "./menu-item";
 import { ToolbarCount, toolbarIconButtonClass } from "./toolbar-button";
 
 const FIELD_CLASS =
-	"h-[30px] min-w-0 rounded-md border border-input bg-transparent px-2 text-[13px] outline-none transition-colors hover:bg-accent focus-visible:border-ring focus-visible:ring-[0.5px] focus-visible:ring-ring dark:bg-input/30";
+	"h-[30px] min-w-0 rounded-md border border-input bg-transparent px-2 text-[13px] outline-none transition-colors hover:bg-accent focus-visible:border-ring focus-visible:ring-[0.5px] focus-visible:ring-ring";
 
 function FieldPicker({
 	label,
@@ -60,7 +60,7 @@ function FieldPicker({
 					)}
 				>
 					<span className='truncate'>{current?.label ?? "Select…"}</span>
-					<ChevronDown className='size-3 shrink-0 text-muted-foreground' />
+					<ChevronDown className='size-[11px] shrink-0 text-muted-foreground' />
 				</button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align='start' className='min-w-40'>
@@ -179,10 +179,10 @@ export function DatabaseViewFilterPopover({
 
 	const list = (
 		<div>
-			<div className='px-2 pb-1.5 pt-1.5 text-[12.5px] text-muted-foreground'>
+			<div className='text-[12.5px] leading-[18px] text-muted-foreground'>
 				Show rows where all conditions match
 			</div>
-			<div className='space-y-1'>
+			<div className='mt-2 space-y-2'>
 				{activeFilters.map((filter, index) => {
 					const property = propertyById.get(filter.propertyId)!;
 					const operators = FILTER_OPERATORS[property.type] ?? [];
@@ -190,11 +190,11 @@ export function DatabaseViewFilterPopover({
 					return (
 						<div
 							key={`${filter.propertyId}-${index}`}
-							className='flex items-center gap-1.5 rounded-md px-2 py-1 text-[13px] transition-colors hover:bg-accent/50'
+							className='flex items-center gap-1.5 text-[13px]'
 						>
 							<PropertyIcon
 								type={property.type}
-								className='size-3.5 shrink-0 text-muted-foreground'
+								className='size-[13px] shrink-0 text-muted-foreground'
 							/>
 							<span className='w-20 shrink-0 truncate text-[13px]' title={property.name}>
 								{property.name}
@@ -234,23 +234,31 @@ export function DatabaseViewFilterPopover({
 								aria-label={`Remove filter on ${property.name}`}
 								className='ml-auto flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground'
 							>
-								<X className='size-3.5' />
+								<X className='size-[13px]' />
 							</button>
 						</div>
 					);
 				})}
 			</div>
-			<MenuSeparator />
-			<MenuItem
-				icon={Plus}
-				disabled={activeFilters.length >= MAX_FILTERS}
-				onClick={() => setPicking(true)}
-			>
-				Add filter
-			</MenuItem>
-			<MenuItem icon={Trash2} destructive onClick={() => save([])}>
-				Delete filters
-			</MenuItem>
+			<div className='mt-2 flex items-center gap-3.5 text-[13px] leading-[19px]'>
+				<button
+					type='button'
+					disabled={activeFilters.length >= MAX_FILTERS}
+					onClick={() => setPicking(true)}
+					className='flex items-center gap-[5px] rounded-sm text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
+				>
+					<Plus className='size-[13px]' />
+					Add filter
+				</button>
+				<button
+					type='button'
+					onClick={() => save([])}
+					className='flex items-center gap-[5px] rounded-sm text-destructive transition-colors hover:text-destructive/80'
+				>
+					<Trash2 className='size-[13px]' />
+					Delete filters
+				</button>
+			</div>
 		</div>
 	);
 
@@ -278,7 +286,10 @@ export function DatabaseViewFilterPopover({
 				</button>
 			</PopoverTrigger>
 
-			<PopoverContent align='end' className='w-[26rem] p-[5px]'>
+			<PopoverContent
+				align='end'
+				className={showPicker ? "w-60 p-[5px]" : "w-[420px] p-2.5"}
+			>
 				{showPicker ? picker : list}
 			</PopoverContent>
 		</Popover>

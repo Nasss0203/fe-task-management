@@ -219,10 +219,10 @@ function ReadOnlyToggleBlock({
 				type='button'
 				aria-expanded={isOpen}
 				aria-controls={`toggle-children-${block.id}`}
-				className='flex min-h-7 w-full items-start rounded-sm text-left hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+				className='flex min-h-6 w-full items-start rounded-sm text-left hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 				onClick={() => setIsOpen((current) => !current)}
 			>
-				<span className='flex size-7 shrink-0 items-center justify-center text-muted-foreground'>
+				<span className='flex h-6 w-[22px] shrink-0 items-center text-muted-foreground'>
 					{isOpen ? (
 						<ChevronDown className='size-4' />
 					) : (
@@ -230,13 +230,13 @@ function ReadOnlyToggleBlock({
 					)}
 				</span>
 
-				<p className='min-h-7 whitespace-pre-wrap text-base leading-7'>
+				<p className='min-h-6 whitespace-pre-wrap text-[15px] font-medium leading-6'>
 					{text || <EmptyValue>Toggle</EmptyValue>}
 				</p>
 			</button>
 
 			{isOpen && block.children.length > 0 && (
-				<div id={`toggle-children-${block.id}`} className='ml-7 pl-2'>
+				<div id={`toggle-children-${block.id}`} className='pl-[22px]'>
 					{block.children.map((child) => (
 						<div
 							key={child.id}

@@ -45,7 +45,7 @@ export function FavoritePageMenuItem({ page }: FavoritePageMenuItemProps) {
 			}}
 		>
 			<Star
-				className={`mr-2 size-4 ${
+				className={`size-[15px] ${
 					isFavorite ? "fill-yellow-400 text-yellow-400" : ""
 				}`}
 			/>

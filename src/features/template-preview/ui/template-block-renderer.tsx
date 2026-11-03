@@ -108,22 +108,22 @@ export function TemplateBlockRenderer({
 			return (
 				<div className='w-full'>
 					<div
-						className='flex min-h-7 w-full items-start rounded-sm text-left'
+						className='flex min-h-6 w-full items-start rounded-sm text-left'
 						aria-expanded={open}
 					>
-						<span className='flex size-7 shrink-0 items-center justify-center text-muted-foreground'>
+						<span className='flex h-6 w-[22px] shrink-0 items-center text-muted-foreground'>
 							{open ? (
 								<ChevronDown className='size-4' />
 							) : (
 								<ChevronRight className='size-4' />
 							)}
 						</span>
-						<p className='min-h-7 whitespace-pre-wrap text-base leading-7'>
+						<p className='min-h-6 whitespace-pre-wrap text-[15px] font-medium leading-6'>
 							{text}
 						</p>
 					</div>
 					{open && (
-						<div className='ml-7 pl-2 space-y-2'>
+						<div className='pl-[22px] space-y-2'>
 							{block.children?.map((child) => (
 								<TemplateBlockRenderer
 									key={child.id}

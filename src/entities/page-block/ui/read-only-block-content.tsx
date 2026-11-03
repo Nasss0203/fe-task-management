@@ -138,7 +138,7 @@ export function ReadOnlyTextBlock({ block }: BlockContentProps) {
 	const text = getString(getContent(block), "text");
 
 	return (
-		<p className='min-h-7 whitespace-pre-wrap text-base leading-7'>
+		<p className='min-h-6 whitespace-pre-wrap text-[15px] leading-6 text-secondary-foreground dark:text-foreground'>
 			{text ? (
 				<ReadOnlyRichText text={text} />
 			) : (
@@ -158,7 +158,7 @@ export function ReadOnlyHeadingBlock({
 
 	if (level === 2 || level === "2") {
 		return (
-			<h2 id={anchorId} className='min-h-8 whitespace-pre-wrap text-2xl font-semibold leading-8'>
+			<h2 id={anchorId} className='min-h-8 whitespace-pre-wrap text-[23px] font-semibold leading-8'>
 				{text ? (
 					<ReadOnlyRichText text={text} />
 				) : (
@@ -170,7 +170,7 @@ export function ReadOnlyHeadingBlock({
 
 	if (level === 3 || level === "3") {
 		return (
-			<h3 id={anchorId} className='min-h-7 whitespace-pre-wrap text-xl font-semibold leading-7'>
+			<h3 id={anchorId} className='min-h-7 whitespace-pre-wrap text-[19px] font-semibold leading-7'>
 				{text ? (
 					<ReadOnlyRichText text={text} />
 				) : (
@@ -181,7 +181,7 @@ export function ReadOnlyHeadingBlock({
 	}
 
 	return (
-		<h1 id={anchorId} className='min-h-10 whitespace-pre-wrap text-3xl font-bold leading-10'>
+		<h1 id={anchorId} className='min-h-[38px] whitespace-pre-wrap text-[30px] font-bold leading-[38px]'>
 			{text ? (
 				<ReadOnlyRichText text={text} />
 			) : (
@@ -203,7 +203,7 @@ export function ReadOnlyTodoBlock({
 	const interactive = canInteract(mode) && Boolean(onCheckedChange);
 
 	return (
-		<div className='flex min-h-7 w-full items-start gap-2'>
+		<div className='flex min-h-6 w-full items-start gap-2.5'>
 			<NativeCheckbox
 				checked={checked}
 				readOnly={!interactive}
@@ -213,14 +213,14 @@ export function ReadOnlyTodoBlock({
 						: undefined
 				}
 				aria-label={text || "To-do"}
-				className={`mt-[6px] shrink-0 ${
+				className={`mt-1 shrink-0 ${
 					interactive ? "cursor-pointer" : ""
 				}`}
 			/>
 
 			<p
-				className={`whitespace-pre-wrap text-base leading-7 ${
-					checked ? "text-muted-foreground line-through" : ""
+				className={`whitespace-pre-wrap text-[15px] leading-6 ${
+					checked ? "text-faint line-through" : "text-secondary-foreground dark:text-foreground"
 				}`}
 			>
 				{text ? (
@@ -237,7 +237,7 @@ export function ReadOnlyQuoteBlock({ block }: BlockContentProps) {
 	const text = getString(getContent(block), "text");
 
 	return (
-		<blockquote className='min-h-7 border-l-4 border-foreground/70 pl-4 text-base italic leading-7'>
+		<blockquote className='min-h-[26px] border-l-[3px] border-foreground pl-3.5 text-base leading-[26px] text-secondary-foreground'>
 			{text ? (
 				<ReadOnlyRichText text={text} />
 			) : (
@@ -253,11 +253,11 @@ export function ReadOnlyCodeBlock({ block }: BlockContentProps) {
 	const language = getString(content, "language") || "plaintext";
 
 	return (
-		<div className='w-full overflow-hidden rounded-lg border bg-muted/20'>
-			<div className='flex h-9 items-center justify-end px-3 text-xs text-muted-foreground'>
+		<div className='w-full overflow-hidden rounded-lg border border-border bg-[#f6f6f5] dark:bg-[#232220]'>
+			<div className='flex items-center border-b border-border px-3 py-2 text-xs leading-4 text-muted-foreground'>
 				{language}
 			</div>
-			<pre className='min-h-10 overflow-x-auto whitespace-pre-wrap px-4 pb-3 font-mono text-sm'>
+			<pre className='min-h-10 overflow-x-auto whitespace-pre-wrap px-3.5 py-3 font-mono text-[13px] leading-[21px]'>
 				<code>{text}</code>
 			</pre>
 		</div>
@@ -281,14 +281,14 @@ export function ReadOnlySimpleTableBlock({ block }: BlockContentProps) {
 	}
 
 	return (
-		<div className='w-full overflow-x-auto'>
+		<div className='w-full overflow-x-auto rounded-lg border border-border'>
 			<table className='w-full border-collapse'>
 				<tbody>
 					{rows.map((row, rowIndex) => {
 						const cells = Array.isArray(row.cells) ? row.cells : [];
 
 						return (
-							<tr key={row.id ?? rowIndex}>
+							<tr key={row.id ?? rowIndex} className='[&:last-child>td]:border-b-0'>
 								{cells.map((cell, columnIndex) => {
 									const isHeader =
 										(hasHeaderRow && rowIndex === 0) ||
@@ -297,9 +297,9 @@ export function ReadOnlySimpleTableBlock({ block }: BlockContentProps) {
 									return (
 										<td
 											key={cell.id ?? columnIndex}
-											className={`h-9 min-w-[160px] border border-border px-2 text-sm ${
+											className={`${hasHeaderRow && rowIndex === 0 ? "h-[34px]" : "h-[38px]"} min-w-[160px] border-b border-r border-border px-3 text-[13.5px] leading-5 text-foreground last:border-r-0 ${
 												isHeader
-													? "bg-muted/40 font-semibold"
+													? "bg-[#fbfbfa] font-medium dark:bg-muted/40"
 													: ""
 											}`}
 										>
@@ -481,7 +481,7 @@ function InlineNodes({ nodes }: { nodes: InlineNode[] }) {
 						return (
 							<code
 								key={index}
-								className='rounded bg-muted px-1 py-0.5 font-mono text-[0.85em] text-red-500 dark:text-red-400'
+								className='rounded bg-muted px-1 py-0.5 font-mono text-[0.85em] text-destructive'
 							>
 								{node.text}
 							</code>
@@ -523,11 +523,11 @@ function InlineNodes({ nodes }: { nodes: InlineNode[] }) {
 }
 
 export const CALLOUT_TONES = {
-	default: { label: "Note", icon: "💡", className: "bg-muted/50" },
-	info: { label: "Info", icon: "ℹ️", className: "bg-blue-500/10" },
-	success: { label: "Success", icon: "✅", className: "bg-emerald-500/10" },
-	warning: { label: "Warning", icon: "⚠️", className: "bg-amber-500/10" },
-	danger: { label: "Danger", icon: "🚫", className: "bg-red-500/10" },
+	default: { label: "Note", icon: "💡", className: "bg-muted" },
+	info: { label: "Info", icon: "ℹ️", className: "bg-accent-soft" },
+	success: { label: "Success", icon: "✅", className: "bg-success/10" },
+	warning: { label: "Warning", icon: "⚠️", className: "bg-[#fbf3db] dark:bg-[#3a3220]" },
+	danger: { label: "Danger", icon: "🚫", className: "bg-[#fdecec] dark:bg-danger/15" },
 } as const;
 
 export type CalloutTone = keyof typeof CALLOUT_TONES;
@@ -553,7 +553,7 @@ export function ListMarker({ number }: { number?: number }) {
 	return (
 		<span
 			aria-hidden='true'
-			className='flex h-7 min-w-6 shrink-0 select-none items-center justify-center text-base leading-7'
+			className='flex h-6 min-w-6 shrink-0 select-none items-center justify-center text-[15px] leading-6'
 		>
 			{number ? `${number}.` : "•"}
 		</span>
@@ -567,10 +567,10 @@ export function ReadOnlyListBlock({
 	const text = getString(getContent(block), "text");
 
 	return (
-		<div className='flex min-h-7 w-full items-start gap-1'>
+		<div className='flex min-h-6 w-full items-start gap-1'>
 			<ListMarker number={number} />
 
-			<p className='min-w-0 flex-1 whitespace-pre-wrap text-base leading-7'>
+			<p className='min-w-0 flex-1 whitespace-pre-wrap text-[15px] leading-6 text-secondary-foreground dark:text-foreground'>
 				{text ? <ReadOnlyRichText text={text} /> : <EmptyValue>List</EmptyValue>}
 			</p>
 		</div>
@@ -582,12 +582,12 @@ export function ReadOnlyCalloutBlock({ block }: BlockContentProps) {
 	const tone = CALLOUT_TONES[getCalloutTone(block.style_config)];
 
 	return (
-		<div className={`flex w-full items-start gap-3 rounded-md px-4 py-3 ${tone.className}`}>
-			<span aria-hidden='true' className='text-lg leading-7'>
+		<div className={`flex w-full items-start gap-3 rounded-lg px-4 py-3.5 ${tone.className}`}>
+			<span aria-hidden='true' className='text-lg leading-6'>
 				{getCalloutIcon(block)}
 			</span>
 
-			<p className='min-w-0 flex-1 whitespace-pre-wrap text-base leading-7'>
+			<p className='min-w-0 flex-1 whitespace-pre-wrap text-[15px] leading-6 text-secondary-foreground dark:text-foreground'>
 				{text ? <ReadOnlyRichText text={text} /> : <EmptyValue>Callout</EmptyValue>}
 			</p>
 		</div>
@@ -662,7 +662,7 @@ export function TableOfContentsBlock({ headings }: { headings: TocHeading[] }) {
 
 	return (
 		<nav aria-label='Table of contents' className='w-full'>
-			<ul className='space-y-0.5'>
+			<ul className='space-y-1'>
 				{visible.map((heading) => (
 					<li
 						key={heading.id}
@@ -678,7 +678,7 @@ export function TableOfContentsBlock({ headings }: { headings: TocHeading[] }) {
 								event.preventDefault();
 								target.scrollIntoView({ behavior: "smooth", block: "start" });
 							}}
-							className='block truncate rounded-sm py-0.5 text-sm leading-6 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+							className='block truncate rounded-sm text-sm leading-[22px] text-muted-foreground underline hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 						>
 							{heading.text}
 						</a>

@@ -26,7 +26,7 @@ export function SaveAsTemplateMenuItem({
 					setDialogOpen(true);
 				}}
 			>
-				<LayoutTemplate className='mr-2 size-4' />
+				<LayoutTemplate className='size-[15px]' />
 				Save as template
 			</DropdownMenuItem>
 

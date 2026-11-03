@@ -63,7 +63,7 @@ export function useInlineMarks(
 		preview: showPreview ? (
 			<div
 				className={cn(
-					"min-h-7 cursor-text whitespace-pre-wrap break-words",
+					"min-h-6 cursor-text whitespace-pre-wrap break-words",
 					previewClassName,
 				)}
 				onMouseDown={(event) => {

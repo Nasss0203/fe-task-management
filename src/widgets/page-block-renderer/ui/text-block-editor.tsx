@@ -61,7 +61,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 	const inlineMarks = useInlineMarks(
 		value,
 		setValue,
-		"text-base leading-7",
+		"text-[15px] leading-6 text-secondary-foreground dark:text-foreground",
 	);
 	const [commandOpen, setCommandOpen] = useState(false);
 	const [slashIndex, setSlashIndex] = useState<number | null>(null);
@@ -391,15 +391,16 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 						className={cn(
 					`
 		        block
-		        min-h-7
+		        min-h-6
 		        w-full
 		        resize-none
 		        overflow-hidden
 		        border-0
 		        bg-transparent
 		        p-0
-		        text-base
-		        leading-7
+		        text-[15px]
+		        leading-6
+		        text-secondary-foreground dark:text-foreground
 		        outline-none
 		        placeholder:text-transparent
 		        focus:placeholder:text-muted-foreground/50

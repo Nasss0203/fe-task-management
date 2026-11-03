@@ -42,7 +42,7 @@ export function CalloutBlockEditor({
 	const inlineMarks = useInlineMarks(
 		value,
 		setValue,
-		"text-base leading-7",
+		"text-[15px] leading-6 text-secondary-foreground dark:text-foreground",
 	);
 
 	const updateBlock = useUpdatePageBlock(shareToken);
@@ -138,7 +138,7 @@ export function CalloutBlockEditor({
 					<button
 						type='button'
 						aria-label='Change callout style'
-						className='flex size-7 shrink-0 items-center justify-center rounded-md text-base hover:bg-foreground/10'
+						className='flex size-6 shrink-0 items-center justify-center rounded-md text-lg hover:bg-foreground/10'
 					>
 						{getCalloutIcon(block)}
 					</button>
@@ -181,7 +181,7 @@ export function CalloutBlockEditor({
 						handleBlur();
 					}}
 					className={cn(
-						`block min-h-7 w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-base leading-7 outline-none placeholder:text-muted-foreground/40 focus-visible:ring-0`,
+						`block min-h-6 w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-[15px] leading-6 text-secondary-foreground dark:text-foreground outline-none placeholder:text-muted-foreground/40 focus-visible:ring-0`,
 						inlineMarks.textareaClassName,
 					)}
 				/>

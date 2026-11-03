@@ -452,19 +452,20 @@ function BlockCommandItem({
                 gap-2.5
                 rounded-md
                 px-2
-                py-1.5
+                py-[5px]
             '
 		>
 			<div
 				className='
                     flex
-                    size-7
+                    size-[34px]
                     shrink-0
                     items-center
                     justify-center
                     rounded-md
                     border
-                    border-border/70
+                    border-border
+                    bg-background
                     text-muted-foreground
                 '
 			>
@@ -472,7 +473,7 @@ function BlockCommandItem({
 			</div>
 
 			<div className='min-w-0 flex-1'>
-				<div className='text-sm font-medium leading-5'>
+				<div className='text-[13.5px] font-medium leading-5'>
 					{command.label}
 				</div>
 
@@ -507,9 +508,9 @@ export function PageBlockCommandMenu({
 	return (
 		<Command
 			className='
-                w-[280px]
+                w-[316px]
                 max-h-[var(--radix-popover-content-available-height)]
-                rounded-xl
+                rounded-[10px]
                 border
                 bg-popover
                 shadow-elevated

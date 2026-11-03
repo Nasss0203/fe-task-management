@@ -132,7 +132,7 @@ export function DatabaseHeaderCell({
 		<th
 			{...props}
 			className={cn(
-				"h-[34px] min-w-[100px] border-b border-border px-2 text-left text-[12.5px] font-normal text-muted-foreground",
+				"h-[34px] min-w-[100px] border-b border-r border-border px-2 text-left last:border-r-0 text-[12.5px] font-normal text-muted-foreground",
 				className,
 			)}
 		/>
@@ -146,7 +146,7 @@ export function DatabaseValueCell({
 		<td
 			{...props}
 			className={cn(
-				"h-[38px] min-w-[100px] border-b border-border px-1 align-middle",
+				"h-[38px] min-w-[100px] border-b border-r border-border px-1 align-middle last:border-r-0",
 				className,
 			)}
 		/>

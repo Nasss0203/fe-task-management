@@ -265,11 +265,11 @@ export function SimpleTableBlockEditor({ block, shareToken }: SimpleTableBlockEd
 
 			<div className='flex items-start'>
 				{/* Table */}
-				<div className='min-w-0 flex-1 overflow-x-auto'>
+				<div className='min-w-0 flex-1 overflow-x-auto rounded-lg border border-border'>
 					<table className='w-full border-collapse'>
 						<tbody>
 							{table.rows.map((row, rowIndex) => (
-								<tr key={row.id}>
+								<tr key={row.id} className='[&:last-child>td]:border-b-0'>
 									{row.cells.map((cell, columnIndex) => {
 										const isHeaderRow =
 											table.hasHeaderRow &&
@@ -285,9 +285,9 @@ export function SimpleTableBlockEditor({ block, shareToken }: SimpleTableBlockEd
 										return (
 											<td
 												key={cell.id}
-												className={`group/cell relative min-w-[160px] border border-border p-0 ${
+												className={`group/cell relative min-w-[160px] border-b border-r border-border p-0 last:border-r-0 ${
 													isHeader
-														? "bg-muted/40"
+														? "bg-[#fbfbfa] dark:bg-muted/40"
 														: ""
 												}`}
 											>
@@ -301,9 +301,9 @@ export function SimpleTableBlockEditor({ block, shareToken }: SimpleTableBlockEd
 														)
 													}
 													onBlur={handleCellBlur}
-													className={`h-8 w-full border-0 bg-transparent px-2.5 pr-9 text-[13px] outline-none focus:ring-2 focus:ring-ring focus:ring-inset ${
+													className={`${isHeaderRow ? "h-[34px]" : "h-[38px]"} w-full border-0 bg-transparent px-3 pr-9 text-[13.5px] leading-5 text-foreground outline-none focus:ring-2 focus:ring-ring focus:ring-inset ${
 														isHeader
-															? "text-[12.5px] font-medium text-muted-foreground"
+															? "font-medium"
 															: ""
 													}`}
 												/>

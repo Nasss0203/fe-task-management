@@ -1,6 +1,5 @@
 "use client";
 
-import { Code2, Eye } from "lucide-react";
 import { useState } from "react";
 
 import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-tree";
@@ -33,26 +32,26 @@ export function MermaidBlockEditor({
 		<Tabs
 			value={tab}
 			onValueChange={(value) => setTab(value as MermaidTab)}
-			className='w-full gap-0 rounded-lg border border-border bg-muted/40'
+			className='w-full gap-0 rounded-lg border border-border'
 		>
-			<div className='flex items-center justify-between px-3 pt-2.5 pb-1'>
-				<span className='text-[12.5px] font-semibold text-muted-foreground'>
-					Mermaid
-				</span>
-
-				<TabsList className='h-7 p-0.5'>
-					<TabsTrigger value='preview' className='h-6 gap-1 px-2 text-xs'>
-						<Eye className='size-3.5' />
+			<div className='flex items-center border-b border-border px-3 py-2'>
+				<TabsList className='h-6 gap-1 bg-transparent p-0'>
+					<TabsTrigger
+						value='preview'
+						className='h-6 flex-none rounded-[5px] px-2 text-xs font-normal text-muted-foreground data-[state=active]:bg-sidebar-accent data-[state=active]:font-medium data-[state=active]:shadow-none'
+					>
 						Preview
 					</TabsTrigger>
-					<TabsTrigger value='code' className='h-6 gap-1 px-2 text-xs'>
-						<Code2 className='size-3.5' />
+					<TabsTrigger
+						value='code'
+						className='h-6 flex-none rounded-[5px] px-2 text-xs font-normal text-muted-foreground data-[state=active]:bg-sidebar-accent data-[state=active]:font-medium data-[state=active]:shadow-none'
+					>
 						Code
 					</TabsTrigger>
 				</TabsList>
 			</div>
 
-			<TabsContent value='preview' className='p-4'>
+			<TabsContent value='preview' className='p-5'>
 				{code.trim() ? (
 					<MermaidDiagram code={code} />
 				) : (

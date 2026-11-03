@@ -78,7 +78,7 @@ export function RenamePageMenu({ page, onRenamed }: RenamePageMenuProps) {
 	return (
 		<DropdownMenuSub open={open} onOpenChange={setOpen}>
 			<DropdownMenuSubTrigger>
-				<Pencil className='mr-2 size-4' />
+				<Pencil className='size-[15px]' />
 				Rename
 			</DropdownMenuSubTrigger>
 

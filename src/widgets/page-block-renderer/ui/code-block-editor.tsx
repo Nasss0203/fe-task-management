@@ -284,17 +284,22 @@ export function CodeBlockEditor({
                 w-full
                 overflow-hidden
                 rounded-lg
-                bg-muted/60
+                border
+                border-border
+                bg-[#f6f6f5]
+                dark:bg-[#232220]
             '
 		>
 			{/* Toolbar */}
 			<div
 				className='
                     flex
-                    h-10
                     items-center
                     gap-1
+                    border-b
+                    border-border
                     px-3
+                    py-2
                 '
 			>
 				{/* Language */}
@@ -306,15 +311,15 @@ export function CodeBlockEditor({
 							variant='ghost'
 							size='sm'
 							className='
-                                h-6
+                                h-4
                                 gap-1
                                 rounded
-                                bg-muted
-                                px-1.5
+                                px-0
                                 text-xs
-                                font-medium
-                                text-foreground
-                                hover:bg-sidebar-accent
+                                font-normal
+                                text-muted-foreground
+                                hover:bg-transparent
+                                hover:text-foreground
                             '
 						>
 							{
@@ -369,18 +374,19 @@ export function CodeBlockEditor({
 				<Button
 					type='button'
 					variant='ghost'
-					size='icon'
+					size='sm'
 					onClick={() => {
 						void handleCopy();
 					}}
-					className='ml-auto size-7 text-muted-foreground hover:text-foreground'
+					className='ml-auto h-4 gap-1 px-0 text-xs font-normal text-muted-foreground hover:bg-transparent hover:text-foreground'
 					title='Copy code'
 				>
 					{copied ? (
-						<Check className='size-4' />
+						<Check className='size-[13px]' />
 					) : (
-						<Copy className='size-4' />
+						<Copy className='size-[13px]' />
 					)}
+					Copy code
 				</Button>
 			</div>
 
@@ -419,9 +425,10 @@ export function CodeBlockEditor({
     [&_.cm-scroller]:min-h-[40px]
     [&_.cm-scroller]:font-mono
     [&_.cm-scroller]:text-[13px]
+    [&_.cm-scroller]:leading-[21px]
 
     [&_.cm-content]:min-h-[40px]
-    [&_.cm-content]:px-4
+    [&_.cm-content]:px-3.5
     [&_.cm-content]:py-3
     [&_.cm-content]:pr-40
 

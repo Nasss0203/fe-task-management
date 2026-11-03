@@ -426,36 +426,20 @@ function CalendarMonth({
 	return (
 		<TooltipProvider>
 			<div className='w-full min-w-0'>
-				<div className='mb-2 flex flex-wrap items-center justify-between gap-2'>
-					<div className='flex items-center gap-1'>
-						<h3 className='mr-2 min-w-32 text-base font-semibold'>{title}</h3>
-						<button
-							type='button'
-							aria-label='Previous month'
-							onClick={() => api()?.prev()}
-							className='flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground'
-						>
-							<ChevronLeft className='size-4' />
-						</button>
-						<button
-							type='button'
-							onClick={() => api()?.today()}
-							className='h-7 rounded-md border border-input bg-background px-2.5 text-[13px] font-medium text-foreground shadow-xs hover:bg-accent'
-						>
-							Today
-						</button>
-						<button
-							type='button'
-							aria-label='Next month'
-							onClick={() => api()?.next()}
-							className='flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground'
-						>
-							<ChevronRight className='size-4' />
-						</button>
-					</div>
+				<div className='mb-4 flex flex-wrap items-center gap-2'>
+					<h3 className='min-w-32 flex-1 text-base font-semibold leading-[23px]'>
+						{title}
+					</h3>
 
-					<div className='flex items-center gap-1 text-xs text-muted-foreground'>
-						<PropertyIcon type={PropertyType.DATE} className='size-3.5' />
+					<button
+						type='button'
+						onClick={() => api()?.today()}
+						className='h-7 rounded-md border border-input bg-background px-2.5 text-[13px] text-foreground hover:bg-accent'
+					>
+						Today
+					</button>
+
+					<div className='flex h-7 items-center gap-1 rounded-md border border-input px-2 text-[12.5px] text-muted-foreground'>
 						{candidates.length > 1 ? (
 							<label className='flex items-center gap-1'>
 								By
@@ -481,6 +465,25 @@ function CalendarMonth({
 								</span>
 							</span>
 						)}
+					</div>
+
+					<div className='flex items-center'>
+						<button
+							type='button'
+							aria-label='Previous month'
+							onClick={() => api()?.prev()}
+							className='flex size-6 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground'
+						>
+							<ChevronLeft className='size-4' />
+						</button>
+						<button
+							type='button'
+							aria-label='Next month'
+							onClick={() => api()?.next()}
+							className='flex size-6 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground'
+						>
+							<ChevronRight className='size-4' />
+						</button>
 					</div>
 				</div>
 

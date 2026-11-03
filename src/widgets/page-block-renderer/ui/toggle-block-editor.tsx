@@ -167,15 +167,16 @@ export function ToggleBlockEditor({ block, shareToken }: ToggleBlockEditorProps)
 	return (
 		<div className='w-full'>
 			{/* Toggle title */}
-			<div className='flex min-h-7 items-start gap-1'>
+			<div className='flex min-h-6 items-start gap-0.5'>
 				<button
 					type='button'
 					aria-label={block.is_open ? "Collapse toggle" : "Expand toggle"}
 					aria-expanded={block.is_open}
 					onClick={handleToggle}
 					className='
+                        mt-0.5
                         flex
-                        size-7
+                        size-5
                         shrink-0
                         items-center
                         justify-center
@@ -206,14 +207,14 @@ export function ToggleBlockEditor({ block, shareToken }: ToggleBlockEditorProps)
 					}}
 					onBlur={saveTitle}
 					className='
-                        min-h-7
+                        min-h-6
                         w-full
                         border-0
                         bg-transparent
                         p-0
-                        text-base
+                        text-[15px]
                         font-medium
-                        leading-7
+                        leading-6
                         outline-none
                         placeholder:text-faint
                         focus-visible:ring-0
@@ -223,7 +224,7 @@ export function ToggleBlockEditor({ block, shareToken }: ToggleBlockEditorProps)
 
 			{/* Children: dùng cùng row với block gốc để có "+", menu block và "/" */}
 			{block.is_open && block.children.length > 0 && (
-				<div className='-ml-7 mt-1 space-y-1'>
+				<div className='-ml-[34px] mt-1 space-y-1'>
 					{block.children.map((child) => (
 						<PageBlockEditorRow
 							key={child.id}
@@ -242,7 +243,7 @@ export function ToggleBlockEditor({ block, shareToken }: ToggleBlockEditorProps)
 					}}
 					className='
                         mt-1
-                        ml-8
+                        ml-[18px]
                         block
                         rounded-md
                         px-1

@@ -51,6 +51,7 @@ import {
 	getTitleProperty,
 	getUniqueName,
 	getVisibleProperties,
+	isEmptyValue,
 } from "../lib/view-properties";
 import { useQuickAddRow } from "../model/use-quick-add-row";
 import { DatabaseViewEmptyGuide } from "./database-view-empty-guide";
@@ -539,6 +540,21 @@ function BoardCard({
 	});
 	const values = getRowValueMap(row);
 	const title = titleProperty && (values.get(titleProperty.id) as string);
+	const personProperties = cardProperties.filter(
+		(property) =>
+			property.type === PropertyType.PERSON &&
+			!isEmptyValue(values.get(property.id)),
+	);
+	const metaProperties = cardProperties.filter(
+		(property) => property.type !== PropertyType.PERSON,
+	);
+	const summaryProps = {
+		databaseId: database.id,
+		pageId: database.pageId,
+		rowId: row.id,
+		values,
+		layout: "card" as const,
+	};
 
 	return (
 		<article
@@ -560,31 +576,35 @@ function BoardCard({
 				isDragging && "opacity-40",
 			)}
 		>
-			<div className={cn("flex min-w-0", !readOnly && "pr-14")}>
+			<div
+				className={cn(
+					"flex min-w-0 items-start gap-2",
+					!readOnly && personProperties.length === 0 && "pr-14",
+				)}
+			>
 				<RowTitle
 					database={database}
 					row={row}
 					titleProperty={titleProperty}
 					editing={editing}
 					onEditingChange={onEditingChange}
+					className='text-[13.5px]'
 				/>
+				{personProperties.length > 0 && (
+					<div className='ml-auto shrink-0 [&_[data-slot=avatar]+span]:sr-only [&_[data-slot=avatar]]:size-[18px]'>
+						<RowPropertySummary {...summaryProps} properties={personProperties} />
+					</div>
+				)}
 			</div>
 
 			<div>
-				<RowPropertySummary
-					databaseId={database.id}
-					pageId={database.pageId}
-					rowId={row.id}
-					properties={cardProperties}
-					values={values}
-					layout='stack'
-				/>
+				<RowPropertySummary {...summaryProps} properties={metaProperties} />
 			</div>
 
 			{/* Opening the menu must not start a drag (Mouse/Touch sensors). */}
 			{!readOnly && (
 			<div
-				className='absolute right-1 top-1 flex items-center gap-0.5 [&_button]:size-6'
+				className='absolute right-1 top-1 flex items-center gap-0.5 rounded-md group-hover/row:bg-accent [&_button]:size-6'
 				onMouseDown={(event) => event.stopPropagation()}
 				onTouchStart={(event) => event.stopPropagation()}
 				onClick={(event) => event.stopPropagation()}

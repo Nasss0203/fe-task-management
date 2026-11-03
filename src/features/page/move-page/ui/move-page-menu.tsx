@@ -125,7 +125,7 @@ export function MovePageMenu({
 			}}
 		>
 			<DropdownMenuSubTrigger>
-				<MoveRight className='mr-2 size-4' />
+				<MoveRight className='size-[15px]' />
 				Move to
 			</DropdownMenuSubTrigger>
 

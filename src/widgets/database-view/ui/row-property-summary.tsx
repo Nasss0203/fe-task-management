@@ -26,8 +26,8 @@ interface RowPropertySummaryProps {
 	rowId: string;
 	properties: DatabaseProperty[];
 	values: Map<string, unknown>;
-	/** "stack" for board cards, "inline" for list rows. */
-	layout: "stack" | "inline";
+	/** "card" for board cards, "inline" for list rows. */
+	layout: "card" | "inline";
 }
 
 /** Read-only, compact rendering of a row's non-empty property values. */
@@ -51,9 +51,9 @@ export function RowPropertySummary({
 		<div
 			className={cn(
 				"flex min-w-0 text-xs text-muted-foreground",
-				layout === "stack"
-					? "flex-col items-start gap-1"
-					: "flex-wrap items-center justify-end gap-x-3 gap-y-1",
+				layout === "card"
+					? "flex-wrap items-center gap-x-2 gap-y-1.5"
+					: "h-6 flex-wrap items-center justify-end gap-x-2.5 overflow-hidden whitespace-nowrap [&>*]:shrink-0 [&_.flex-wrap]:flex-nowrap",
 			)}
 		>
 			{filled.map((property) => {
@@ -87,7 +87,10 @@ export function RowPropertySummary({
 					<div
 						key={property.id}
 						title={property.name}
-						className='max-w-full min-w-0 text-foreground/80 [&_span.px-1]:px-0'
+						className={cn(
+						"max-w-full min-w-0 [&_span.px-1]:px-0",
+						property.type === PropertyType.DATE ? "text-faint" : "text-foreground/80",
+					)}
 					>
 						<DatabaseCell
 							databaseId={databaseId}

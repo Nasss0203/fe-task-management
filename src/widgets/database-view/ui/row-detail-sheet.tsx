@@ -75,6 +75,7 @@ export function RowDetailSheet({
 		<Sheet open={Boolean(row)} onOpenChange={(open) => !open && onClose()}>
 			<SheetContent
 				side='right'
+				overlayClassName='bg-transparent backdrop-blur-none'
 				// Only a just-created row grabs focus; otherwise the title would open selected.
 				onOpenAutoFocus={(event) => {
 					if (!autoFocusTitle) event.preventDefault();

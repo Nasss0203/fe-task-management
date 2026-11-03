@@ -272,7 +272,10 @@ export function TableView({
 									<DatabaseValueCell
 										key={property.id}
 										// Notion-style "selected cell" ring while editing.
-										className='relative focus-within:shadow-[inset_0_0_0_2px_var(--ring)]'
+										className={cn(
+											"relative focus-within:shadow-[inset_0_0_0_2px_var(--ring)]",
+											property.type === PropertyType.DATE && "text-muted-foreground",
+										)}
 									>
 										{onOpenRow &&
 											property.type === PropertyType.TITLE && (
