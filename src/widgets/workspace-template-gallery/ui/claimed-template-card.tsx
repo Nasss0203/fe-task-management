@@ -6,6 +6,8 @@ import { FileText, Lock } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
+import { getTemplateCoverTone } from "@/entities/template/model/template-cover-tone";
+import { cn } from "@/shared/lib/utils";
 import type { ClaimedTemplateCardModel } from "../model/claimed-template-card.model";
 import { TemplateCardShell } from "./template-card-shell";
 
@@ -48,7 +50,10 @@ export function ClaimedTemplateCard({
 			/>
 		) : (
 			<div
-				className='flex h-full w-full items-center justify-center p-6'
+				className={cn(
+					"flex h-full w-full items-center justify-center p-6",
+					getTemplateCoverTone(template.id),
+				)}
 				aria-hidden='true'
 			>
 				<div className='flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border bg-background text-[28px] text-foreground'>

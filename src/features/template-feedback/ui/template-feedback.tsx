@@ -97,10 +97,10 @@ export function TemplateFeedbackSummary({ templateId }: { templateId: string }) 
 		<div className='flex flex-wrap items-center justify-between gap-3'>
 			<a
 				href='#reviews'
-				className='inline-flex items-center gap-2 rounded-lg text-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+				className='inline-flex items-center gap-2 rounded-lg text-[12.5px] text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 			>
-				<Stars value={data.rating_average ?? 0} />
-				<span className='font-medium text-foreground'>
+				<Stars value={data.rating_average ?? 0} className='[&>svg]:size-[15px]' />
+				<span>
 					{formatRatingSummary(data.rating_average, data.rating_count)}
 				</span>
 			</a>

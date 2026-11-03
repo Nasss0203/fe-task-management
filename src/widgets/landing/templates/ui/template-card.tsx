@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { useTemplateVersionThumbnail } from "@/entities/template/model/template.queries";
 import type { PublicTemplateListItem } from "@/entities/template/model/template.types";
+import { getTemplateCoverTone } from "@/entities/template/model/template-cover-tone";
 import { formatVnd } from "@/shared/lib/currency";
 import { cn } from "@/shared/lib/utils";
 import { formatRatingSummary } from "@/features/template-feedback";
@@ -49,7 +50,12 @@ export default function TemplateCard({ item, href }: TemplateCardProps) {
 						}}
 					/>
 				) : (
-					<div className='flex h-full w-full items-center justify-center'>
+					<div
+						className={cn(
+							"flex h-full w-full items-center justify-center",
+							getTemplateCoverTone(item.id),
+						)}
+					>
 						<span className='flex size-[60px] items-center justify-center rounded-[14px] border bg-background text-foreground'>
 							{item.icon ? (
 								<span className='select-none text-[26px] leading-none'>{item.icon}</span>
