@@ -408,6 +408,9 @@ interface BoardColumnProps {
 	children: ReactNode;
 }
 
+const COLUMN_LABEL_CLASS =
+	"h-auto gap-2 border-0 px-0 text-[13.5px] font-medium text-foreground";
+
 function BoardColumn({
 	id,
 	name,
@@ -436,7 +439,11 @@ function BoardColumn({
 		>
 			<header className='flex h-8 items-center gap-2'>
 				{readOnly && option ? (
-					<PropertyOptionBadge name={name} color={color} />
+					<PropertyOptionBadge
+									name={name}
+									color={color}
+									className={COLUMN_LABEL_CLASS}
+								/>
 				) : noGroup || !option ? (
 					<span className='truncate text-[13.5px] font-medium text-foreground'>
 						{name}
@@ -449,7 +456,11 @@ function BoardColumn({
 								aria-label={`Edit ${name}`}
 								className='min-w-0 rounded-[4px] outline-none focus-visible:ring-2 focus-visible:ring-ring/50'
 							>
-								<PropertyOptionBadge name={name} color={color} />
+								<PropertyOptionBadge
+									name={name}
+									color={color}
+									className={COLUMN_LABEL_CLASS}
+								/>
 							</button>
 						</PopoverTrigger>
 						<PopoverContent align='start' className='w-48 p-1.5'>

@@ -90,6 +90,7 @@ export function RowPropertySummary({
 						className={cn(
 						"max-w-full min-w-0 [&_span.px-1]:px-0",
 						property.type === PropertyType.DATE ? "text-faint" : "text-foreground/80",
+						property.type === PropertyType.DATE && layout === "card" && "ml-auto",
 					)}
 					>
 						<DatabaseCell

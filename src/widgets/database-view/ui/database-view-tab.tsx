@@ -112,7 +112,7 @@ export function DatabaseViewTab({
 	return (
 		<div
 			className={[
-				"flex h-7 shrink-0 items-center whitespace-nowrap rounded-md transition-colors",
+				"group/view-tab flex h-7 shrink-0 items-center whitespace-nowrap rounded-md transition-colors",
 				active
 					? "bg-sidebar-accent text-foreground"
 					: "text-muted-foreground hover:bg-accent hover:text-foreground",
@@ -133,7 +133,7 @@ export function DatabaseViewTab({
 					<PopoverTrigger asChild>
 						<button
 							type='button'
-							className='mr-1 flex size-5 items-center justify-center rounded-sm hover:bg-background/60'
+							className='mr-1 flex size-5 items-center justify-center rounded-sm opacity-0 transition-opacity hover:bg-background/60 focus-visible:opacity-100 group-hover/view-tab:opacity-100 data-[state=open]:opacity-100 [@media(hover:none)]:opacity-100'
 						>
 							<MoreHorizontal className='size-4' />
 						</button>
