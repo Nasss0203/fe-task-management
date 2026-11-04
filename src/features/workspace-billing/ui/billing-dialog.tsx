@@ -226,13 +226,13 @@ function BillingPlans({
 								aria-label={plan.name}
 								className={cn(
 									"flex flex-col rounded-xl border bg-card p-5",
-									isCurrent && "border-primary/60 ring-1 ring-primary/30",
+									isCurrent && "border-foreground",
 								)}
 							>
 								<div className='flex items-center justify-between gap-2'>
 									<h3 className='text-lg font-semibold'>{plan.name}</h3>
 									{isCurrent && (
-										<span className='rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary'>
+										<span className='rounded-full border border-border bg-secondary px-2 py-0.5 text-xs font-medium text-foreground'>
 											Gói hiện tại
 										</span>
 									)}
@@ -272,7 +272,7 @@ function BillingPlans({
 													type='button'
 													disabled={loadingPriceId !== null}
 													onClick={() => void handleCheckout(price)}
-													className='flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors hover:border-primary/50 hover:bg-muted/60 disabled:cursor-not-allowed disabled:opacity-50'
+													className='flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors hover:border-foreground/30 hover:bg-secondary/60 disabled:cursor-not-allowed disabled:opacity-50'
 												>
 													{loadingPriceId === price.id ? (
 														<Loader2 className='size-4 shrink-0 animate-spin' />

@@ -16,18 +16,18 @@ export function BrowserMockup({
 }: BrowserMockupProps) {
 	return (
 		<div
-			className={`relative rounded-2xl border border-border/80 bg-card shadow-2xl backdrop-blur-xl overflow-hidden flex flex-col transition-all duration-300 ${className}`}
+			className={`relative rounded-xl border border-border bg-card shadow-soft overflow-hidden flex flex-col ${className}`}
 		>
 			{/* Top Browser Header Bar */}
-			<div className='flex h-11 items-center justify-between border-b border-border/60 bg-muted/40 px-4 select-none shrink-0'>
-				<div className='flex items-center gap-2 w-20'>
-					<div className='h-3 w-3 rounded-full bg-muted transition-opacity hover:opacity-100' />
-					<div className='h-3 w-3 rounded-full bg-muted transition-opacity hover:opacity-100' />
-					<div className='h-3 w-3 rounded-full bg-muted transition-opacity hover:opacity-100' />
+			<div className='flex h-10 items-center justify-between border-b border-border/60 bg-muted/40 px-4 select-none shrink-0'>
+				<div className='flex items-center gap-1.5 w-20'>
+					<div className='h-2.5 w-2.5 rounded-full bg-border' />
+					<div className='h-2.5 w-2.5 rounded-full bg-border' />
+					<div className='h-2.5 w-2.5 rounded-full bg-border' />
 				</div>
 
 				{/* URL bar */}
-				<div className='flex h-7 flex-1 max-w-sm sm:max-w-md items-center justify-center gap-2 rounded-lg border border-border/50 bg-background/80 px-3 text-xs text-muted-foreground shadow-xs'>
+				<div className='flex h-6.5 flex-1 max-w-sm sm:max-w-md items-center justify-center gap-2 rounded-md border border-border/60 bg-background px-3 text-xs text-muted-foreground'>
 					<Lock className='h-3 w-3 text-muted-foreground' />
 					<span className='font-mono text-[11px] truncate tracking-tight text-foreground/80'>
 						{url}

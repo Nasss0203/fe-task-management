@@ -210,7 +210,7 @@ export function CreatorAnalyticsPage() {
 						{pageCount > 1 && (
 							<nav
 								aria-label='Template analytics pagination'
-								className='flex items-center justify-center gap-3'
+								className='flex items-center justify-end gap-2'
 							>
 								<Button
 									variant='outline'
@@ -221,7 +221,7 @@ export function CreatorAnalyticsPage() {
 									<ChevronLeft className='size-3.5' />
 									Previous
 								</Button>
-								<span className='text-sm tabular-nums text-muted-foreground'>
+								<span className='px-1 text-xs tabular-nums text-muted-foreground'>
 									Page {currentPage + 1} of {pageCount}
 								</span>
 								<Button

@@ -73,7 +73,7 @@ const appearances = {
 		title: "Đang kiểm tra thanh toán",
 		description: "Vui lòng đợi trong khi hệ thống kiểm tra đơn hàng.",
 		icon: Loader2,
-		color: "bg-blue-500/10 text-blue-500",
+		color: "bg-secondary text-muted-foreground",
 	},
 	pending: {
 		title: "Đang xác nhận thanh toán",
@@ -101,7 +101,7 @@ const appearances = {
 		description:
 			"Đơn hàng này đã hết hạn. Vui lòng quay lại trang gói dịch vụ để tạo thanh toán mới.",
 		icon: Clock3,
-		color: "bg-orange-500/10 text-orange-500",
+		color: "bg-amber-500/10 text-amber-500",
 	},
 	canceled: {
 		title: "Đơn thanh toán đã hủy",
@@ -115,7 +115,7 @@ const appearances = {
 		description:
 			"Chưa lấy được trạng thái đơn hàng. Điều này không có nghĩa là thanh toán thất bại.",
 		icon: HelpCircle,
-		color: "bg-blue-500/10 text-blue-500",
+		color: "bg-secondary text-muted-foreground",
 	},
 } as const;
 
@@ -318,17 +318,17 @@ function PaymentResult({
 				<div aria-live='polite' className='text-center'>
 					<div
 						className={cn(
-							"mx-auto flex size-16 items-center justify-center rounded-full",
+							"mx-auto flex size-12 items-center justify-center rounded-xl border border-border/60",
 							appearance.color,
 						)}
 					>
 						<Icon
 							aria-hidden='true'
-							className={cn("size-8", view === "loading" && "animate-spin")}
+							className={cn("size-6", view === "loading" && "animate-spin")}
 						/>
 					</div>
-					<h2 className='mt-4 text-xl font-semibold'>{appearance.title}</h2>
-					<p className='mt-2 text-sm leading-6 text-muted-foreground'>
+					<h2 className='mt-4 text-lg font-semibold'>{appearance.title}</h2>
+					<p className='mt-1.5 text-sm leading-6 text-muted-foreground'>
 						{appearance.description}
 					</p>
 				</div>

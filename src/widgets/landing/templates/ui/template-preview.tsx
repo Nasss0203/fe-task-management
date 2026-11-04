@@ -17,7 +17,7 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 					<div className='flex items-center gap-1.5'>
 						<div className='h-2.5 w-12 rounded bg-muted-foreground/30' />
 						<span>/</span>
-						<div className='h-2.5 w-16 rounded bg-primary/40 font-semibold' />
+						<div className='h-2.5 w-16 rounded bg-foreground/35 font-semibold' />
 					</div>
 					<div className='h-2 w-8 rounded bg-muted-foreground/20' />
 				</div>
@@ -30,11 +30,11 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 					{/* Nested children links */}
 					<div className='grid grid-cols-2 gap-2 pt-1.5'>
 						<div className='flex items-center gap-1.5 p-1.5 rounded-lg border border-border/60 bg-muted/30'>
-							<div className='h-2 w-2 rounded-full bg-blue-500' />
+							<div className='h-2 w-2 rounded-full bg-foreground/50' />
 							<div className='h-2 w-16 rounded bg-foreground/20' />
 						</div>
 						<div className='flex items-center gap-1.5 p-1.5 rounded-lg border border-border/60 bg-muted/30'>
-							<div className='h-2 w-2 rounded-full bg-indigo-500' />
+							<div className='h-2 w-2 rounded-full bg-muted-foreground/50' />
 							<div className='h-2 w-14 rounded bg-foreground/20' />
 						</div>
 					</div>
@@ -55,7 +55,7 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 				<div className='flex items-center justify-between pb-2 border-b border-border/50'>
 					<div className='flex items-center gap-2'>
 						<div className='h-2.5 w-20 rounded bg-foreground/30' />
-						<span className='text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 font-semibold'>
+						<span className='text-[9px] px-1.5 py-0.5 rounded bg-secondary text-muted-foreground font-medium'>
 							Weekly Sync
 						</span>
 					</div>
@@ -64,11 +64,11 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 
 				<div className='space-y-2 py-1'>
 					<div className='flex items-center gap-2'>
-						<div className='h-3 w-3 rounded border border-primary/50 bg-primary/20 flex items-center justify-center' />
+						<div className='h-3 w-3 rounded border border-foreground/40 bg-foreground/15 flex items-center justify-center' />
 						<div className='h-2 w-3/4 rounded bg-foreground/25' />
 					</div>
 					<div className='flex items-center gap-2'>
-						<div className='h-3 w-3 rounded border border-primary/50 bg-primary/20 flex items-center justify-center' />
+						<div className='h-3 w-3 rounded border border-foreground/40 bg-foreground/15 flex items-center justify-center' />
 						<div className='h-2 w-2/3 rounded bg-foreground/25' />
 					</div>
 					<div className='flex items-center gap-2'>
@@ -79,7 +79,7 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 
 				<div className='p-2 rounded-lg bg-muted/40 border border-border/50 flex items-center justify-between'>
 					<div className='h-2 w-24 rounded bg-foreground/20' />
-					<div className='h-3 w-8 rounded bg-emerald-500/20' />
+					<div className='h-3 w-8 rounded bg-secondary' />
 				</div>
 			</div>
 		);
@@ -91,22 +91,22 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 			<div className='h-full w-full rounded-xl border border-border/80 bg-card p-4 flex flex-col justify-between select-none'>
 				<div className='flex items-center justify-between pb-2 border-b border-border/50'>
 					<div className='h-3 w-28 rounded bg-foreground/30 font-bold' />
-					<div className='h-2 w-12 rounded-full bg-primary/30' />
+					<div className='h-2 w-12 rounded-full bg-muted-foreground/30' />
 				</div>
 
 				<div className='grid grid-cols-3 gap-2 py-1.5'>
 					<div className='rounded-lg border border-border/60 bg-muted/30 p-2 space-y-1.5'>
-						<div className='h-2 w-2 rounded-full bg-blue-500' />
+						<div className='h-2 w-2 rounded-full bg-foreground/60' />
 						<div className='h-2 w-full rounded bg-foreground/20' />
 						<div className='h-1.5 w-2/3 rounded bg-muted-foreground/20' />
 					</div>
 					<div className='rounded-lg border border-border/60 bg-muted/30 p-2 space-y-1.5'>
-						<div className='h-2 w-2 rounded-full bg-purple-500' />
+						<div className='h-2 w-2 rounded-full bg-muted-foreground/60' />
 						<div className='h-2 w-full rounded bg-foreground/20' />
 						<div className='h-1.5 w-2/3 rounded bg-muted-foreground/20' />
 					</div>
 					<div className='rounded-lg border border-border/60 bg-muted/30 p-2 space-y-1.5'>
-						<div className='h-2 w-2 rounded-full bg-emerald-500' />
+						<div className='h-2 w-2 rounded-full bg-muted-foreground/40' />
 						<div className='h-2 w-full rounded bg-foreground/20' />
 						<div className='h-1.5 w-2/3 rounded bg-muted-foreground/20' />
 					</div>
@@ -114,7 +114,7 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 
 				<div className='flex items-center justify-between pt-1 border-t border-border/40 text-[9px] text-muted-foreground'>
 					<span>Search across 24 docs</span>
-					<div className='h-2 w-14 rounded bg-primary/20' />
+					<div className='h-2 w-14 rounded bg-muted-foreground/20' />
 				</div>
 			</div>
 		);
@@ -127,7 +127,7 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 				<div className='flex items-center justify-between pb-2 border-b border-border/50'>
 					<div className='h-2.5 w-24 rounded bg-foreground/30 font-semibold' />
 					<div className='flex items-center gap-1'>
-						<span className='h-2 w-6 rounded bg-primary/30' />
+						<span className='h-2 w-6 rounded bg-foreground/30' />
 						<span className='h-2 w-6 rounded bg-muted' />
 					</div>
 				</div>
@@ -135,25 +135,25 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 				<div className='grid grid-cols-4 gap-1.5 py-1 text-center text-[9px]'>
 					<div className='p-1.5 rounded-lg border border-border/50 bg-background space-y-1'>
 						<div className='text-muted-foreground text-[8px]'>Mon</div>
-						<div className='h-2 w-full rounded bg-blue-500/30' />
+						<div className='h-2 w-full rounded bg-foreground/25' />
 					</div>
 					<div className='p-1.5 rounded-lg border border-border/50 bg-background space-y-1'>
 						<div className='text-muted-foreground text-[8px]'>Tue</div>
-						<div className='h-2 w-full rounded bg-emerald-500/30' />
+						<div className='h-2 w-full rounded bg-muted-foreground/30' />
 					</div>
 					<div className='p-1.5 rounded-lg border border-border/50 bg-background space-y-1'>
 						<div className='text-muted-foreground text-[8px]'>Wed</div>
-						<div className='h-2 w-full rounded bg-purple-500/30' />
+						<div className='h-2 w-full rounded bg-foreground/20' />
 					</div>
 					<div className='p-1.5 rounded-lg border border-border/50 bg-background space-y-1'>
 						<div className='text-muted-foreground text-[8px]'>Thu</div>
-						<div className='h-2 w-full rounded bg-amber-500/30' />
+						<div className='h-2 w-full rounded bg-muted-foreground/25' />
 					</div>
 				</div>
 
 				<div className='flex items-center justify-between pt-1 border-t border-border/40 text-[9px] text-muted-foreground'>
 					<span>View: Editorial Calendar</span>
-					<span className='text-primary font-semibold'>4 Posts</span>
+					<span className='text-foreground font-semibold'>4 Posts</span>
 				</div>
 			</div>
 		);
@@ -165,7 +165,7 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 			<div className='h-full w-full rounded-xl border border-border/80 bg-card p-4 flex flex-col justify-between select-none'>
 				<div className='flex items-center justify-between pb-2 border-b border-border/50 text-[10px]'>
 					<div className='h-2.5 w-24 rounded bg-foreground/30 font-semibold' />
-					<span className='px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 text-[9px] font-semibold'>
+					<span className='px-1.5 py-0.5 rounded bg-secondary text-muted-foreground text-[9px] font-medium'>
 						Pipeline View
 					</span>
 				</div>
@@ -173,22 +173,22 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 				<div className='space-y-1.5 py-1 text-[9px]'>
 					<div className='flex items-center justify-between p-1.5 rounded-lg bg-background border border-border/60'>
 						<div className='flex items-center gap-1.5'>
-							<div className='h-4 w-4 rounded-full bg-blue-500/20 text-blue-600 flex items-center justify-center font-bold text-[8px]'>
+							<div className='h-4 w-4 rounded-full bg-secondary text-foreground flex items-center justify-center font-semibold text-[8px]'>
 								A
 							</div>
 							<div className='h-2 w-16 rounded bg-foreground/30' />
 						</div>
-						<span className='px-1 rounded bg-blue-500/10 text-blue-600 text-[8px]'>Qualified</span>
+						<span className='px-1 rounded bg-secondary text-muted-foreground text-[8px]'>Qualified</span>
 					</div>
 
 					<div className='flex items-center justify-between p-1.5 rounded-lg bg-background border border-border/60'>
 						<div className='flex items-center gap-1.5'>
-							<div className='h-4 w-4 rounded-full bg-purple-500/20 text-purple-600 flex items-center justify-center font-bold text-[8px]'>
+							<div className='h-4 w-4 rounded-full bg-secondary text-foreground flex items-center justify-center font-semibold text-[8px]'>
 								S
 							</div>
 							<div className='h-2 w-18 rounded bg-foreground/30' />
 						</div>
-						<span className='px-1 rounded bg-purple-500/10 text-purple-600 text-[8px]'>Proposal</span>
+						<span className='px-1 rounded bg-secondary text-muted-foreground text-[8px]'>Proposal</span>
 					</div>
 				</div>
 
@@ -210,8 +210,8 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 				</div>
 
 				<div className='space-y-2 py-1 text-[9px]'>
-					<div className='p-2 rounded-lg bg-primary/5 border border-primary/20 space-y-1'>
-						<div className='h-2 w-1/3 rounded bg-primary/40 font-semibold' />
+					<div className='p-2 rounded-lg bg-secondary/50 border border-border space-y-1'>
+						<div className='h-2 w-1/3 rounded bg-foreground/35 font-semibold' />
 						<div className='h-1.5 w-full rounded bg-foreground/20' />
 					</div>
 					<div className='grid grid-cols-2 gap-1.5'>
@@ -226,7 +226,7 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 
 				<div className='flex items-center justify-between pt-1 border-t border-border/40 text-[9px] text-muted-foreground'>
 					<span>Publicly publishable</span>
-					<span className='text-emerald-600 font-semibold'>Ready</span>
+					<span className='text-emerald-600 dark:text-emerald-400 font-semibold'>Ready</span>
 				</div>
 			</div>
 		);
@@ -243,7 +243,7 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 
 				<div className='grid grid-cols-2 gap-2 py-1 text-[9px]'>
 					<div className='space-y-1.5 p-2 rounded-lg bg-muted/30 border border-border/50'>
-						<div className='h-2 w-12 rounded bg-primary/40 font-semibold' />
+						<div className='h-2 w-12 rounded bg-foreground/35 font-semibold' />
 						<div className='h-1.5 w-full rounded bg-foreground/20' />
 						<div className='h-1.5 w-4/5 rounded bg-muted-foreground/20' />
 					</div>
@@ -268,7 +268,7 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 			<div className='h-full w-full rounded-xl border border-border/80 bg-card p-4 flex flex-col justify-between select-none'>
 				<div className='flex items-center justify-between pb-2 border-b border-border/50'>
 					<div className='h-2.5 w-24 rounded bg-foreground/30 font-semibold' />
-					<span className='text-[8px] font-bold text-primary'>Today</span>
+					<span className='text-[8px] font-bold text-foreground'>Today</span>
 				</div>
 
 				<div className='space-y-1.5 py-1 text-[9px]'>
@@ -277,14 +277,14 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 							<div className='h-2.5 w-2.5 rounded-full bg-emerald-500' />
 							<div className='h-2 w-24 rounded bg-foreground/25' />
 						</div>
-						<div className='h-2 w-8 rounded bg-emerald-500/20' />
+						<div className='h-2 w-8 rounded bg-secondary' />
 					</div>
 					<div className='flex items-center justify-between p-1.5 rounded-lg bg-background border border-border/60'>
 						<div className='flex items-center gap-1.5'>
-							<div className='h-2.5 w-2.5 rounded-full bg-amber-500' />
+							<div className='h-2.5 w-2.5 rounded-full bg-muted-foreground/60' />
 							<div className='h-2 w-20 rounded bg-foreground/25' />
 						</div>
-						<div className='h-2 w-8 rounded bg-amber-500/20' />
+						<div className='h-2 w-8 rounded bg-secondary' />
 					</div>
 				</div>
 
@@ -308,13 +308,13 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 				<div className='space-y-1.5 py-1 text-[9px]'>
 					<div className='flex items-center justify-between p-1.5 rounded-lg bg-background border border-border/60'>
 						<div className='h-2 w-28 rounded bg-foreground/30 font-medium' />
-						<span className='px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600 text-[8px] font-semibold'>
+						<span className='px-1.5 py-0.5 rounded bg-secondary text-muted-foreground text-[8px] font-medium'>
 							Reading
 						</span>
 					</div>
 					<div className='flex items-center justify-between p-1.5 rounded-lg bg-background border border-border/60'>
 						<div className='h-2 w-24 rounded bg-foreground/30 font-medium' />
-						<span className='px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 text-[8px] font-semibold'>
+						<span className='px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[8px] font-semibold'>
 							Done ★★★★★
 						</span>
 					</div>
@@ -338,7 +338,7 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 
 			<div className='grid grid-cols-2 gap-2 py-1 text-[9px]'>
 				<div className='flex items-center gap-2 p-1.5 rounded-lg bg-background border border-border/60'>
-					<div className='h-5 w-5 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center text-[8px]'>
+					<div className='h-5 w-5 rounded-full bg-secondary text-foreground font-semibold flex items-center justify-center text-[8px]'>
 						A
 					</div>
 					<div>
@@ -347,7 +347,7 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 					</div>
 				</div>
 				<div className='flex items-center gap-2 p-1.5 rounded-lg bg-background border border-border/60'>
-					<div className='h-5 w-5 rounded-full bg-emerald-500/20 text-emerald-600 font-bold flex items-center justify-center text-[8px]'>
+					<div className='h-5 w-5 rounded-full bg-secondary text-foreground font-semibold flex items-center justify-center text-[8px]'>
 						N
 					</div>
 					<div>

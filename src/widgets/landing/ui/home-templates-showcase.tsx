@@ -21,7 +21,7 @@ export function HomeTemplatesShowcase() {
 				{/* Header */}
 				<div className='flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16'>
 					<div className='max-w-xl space-y-3'>
-						<div className='inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground'>
+						<div className='inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium text-muted-foreground'>
 							<LayoutTemplate className='h-3.5 w-3.5' />
 							Curated Starter Frameworks
 						</div>
@@ -36,7 +36,7 @@ export function HomeTemplatesShowcase() {
 					<Link href='/templates'>
 						<Button variant='outline' className='rounded-lg group'>
 							Explore all templates
-							<ArrowRight className='ml-2 h-4 w-4 transition-transform group-hover:translate-x-1' />
+							<ArrowRight className='ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5' />
 						</Button>
 					</Link>
 				</div>
@@ -46,20 +46,20 @@ export function HomeTemplatesShowcase() {
 					{showcaseTemplates.map((template) => (
 						<div
 							key={template.id}
-							className='group flex flex-col h-full rounded-2xl border border-border/80 bg-card p-4 shadow-xs transition-all duration-300 hover:border-primary/50 hover:shadow-soft hover:-translate-y-1'
+							className='group flex flex-col h-full rounded-xl border border-border bg-card p-4 transition-colors hover:border-foreground/20'
 						>
 							{/* Visual Preview Box */}
-							<div className='relative h-44 w-full rounded-xl overflow-hidden border border-border/50 bg-muted/30 mb-4 shrink-0'>
+							<div className='relative h-44 w-full rounded-lg overflow-hidden border border-border/50 bg-muted/30 mb-4 shrink-0'>
 								<TemplatePreview previewType={template.previewType} variant={template.variant} />
 								<div className='absolute inset-0 pointer-events-none' />
-								<Badge className='absolute top-2.5 right-2.5 bg-background/90 text-foreground border border-border/60 text-[10px] backdrop-blur-md shadow-xs'>
+								<Badge className='absolute top-2.5 right-2.5 bg-background/90 text-foreground border border-border/60 text-[10px] shadow-xs'>
 									{template.category}
 								</Badge>
 							</div>
 
 							{/* Content */}
 							<div className='flex-1 flex flex-col'>
-								<h3 className='text-base font-semibold text-foreground group-hover:text-primary transition-colors tracking-tight line-clamp-1'>
+								<h3 className='text-base font-semibold text-foreground tracking-tight line-clamp-1'>
 									{template.name || template.title}
 								</h3>
 								<p className='mt-1.5 text-xs text-muted-foreground line-clamp-2 leading-relaxed flex-1'>

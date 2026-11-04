@@ -180,10 +180,10 @@ function ResultCard({
 			<div
 				role='status'
 				aria-live='polite'
-				className='flex w-full flex-col items-center gap-3 rounded-2xl border border-border/70 bg-card p-8 text-sm text-muted-foreground shadow-sm'
+				className='flex w-full flex-col items-center gap-3 rounded-xl border border-border bg-card p-8 text-sm text-muted-foreground'
 			>
 				<Icon
-					className={`size-10 ${toneClass[tone]} ${spin ? "animate-spin" : ""}`}
+					className={`size-8 ${toneClass[tone]} ${spin ? "animate-spin" : ""}`}
 					aria-hidden
 				/>
 				<h1 className='text-lg font-semibold text-foreground'>{title}</h1>

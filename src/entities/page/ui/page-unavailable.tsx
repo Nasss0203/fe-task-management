@@ -32,8 +32,8 @@ export function PageUnavailable({ reason }: PageUnavailableProps) {
 	return (
 		<div className='flex min-h-[60vh] w-full items-center justify-center px-6 py-16'>
 			<div className='flex w-full max-w-md flex-col items-center text-center'>
-				<div className='mb-5 flex size-14 items-center justify-center rounded-2xl border border-border/70 bg-muted/40 text-muted-foreground'>
-					<Icon className='size-6' />
+				<div className='mb-5 flex size-12 items-center justify-center rounded-xl border border-border bg-secondary/60 text-muted-foreground'>
+					<Icon className='size-5' />
 				</div>
 
 				<h1 className='text-xl font-semibold tracking-tight'>{title}</h1>

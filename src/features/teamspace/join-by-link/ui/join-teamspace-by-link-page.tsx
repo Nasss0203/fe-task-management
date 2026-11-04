@@ -47,7 +47,7 @@ export function JoinTeamspaceByLinkPage() {
 
 	return (
 		<JoinCard
-			icon={<Users className='size-5 text-teal-600 dark:text-teal-400' />}
+			icon={<Users className='size-5 text-foreground' />}
 			title='Join teamspace'
 			description="You've been invited to a teamspace with a link. Join to see its pages."
 			error={
@@ -82,7 +82,7 @@ interface JoinCardProps {
 function JoinCard({ icon, title, description, error, action }: JoinCardProps) {
 	return (
 		<div className='mx-auto flex w-full max-w-sm flex-col items-center gap-4 px-4 pt-12 text-center'>
-			<span className='flex size-12 items-center justify-center rounded-xl bg-muted'>
+			<span className='flex size-12 items-center justify-center rounded-xl border border-border bg-secondary/60'>
 				{icon}
 			</span>
 

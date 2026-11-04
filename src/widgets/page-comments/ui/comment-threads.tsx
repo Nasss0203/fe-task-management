@@ -68,6 +68,8 @@ interface CommentThreadsProps {
 	/** Có thì ô nhập có nút Cancel / Esc. */
 	onComposerCancel?: () => void;
 	onPosted?: () => void;
+	showComposer?: boolean;
+	showResolved?: boolean;
 }
 
 /** Danh sách thread (đã thu gọn) + ô nhập comment mới cho một target. */
@@ -79,10 +81,13 @@ export function CommentThreads({
 	autoFocusComposer = false,
 	onComposerCancel,
 	onPosted,
+	showComposer = true,
+	showResolved: controlledShowResolved,
 }: CommentThreadsProps) {
 	const [replyTo, setReplyTo] = useState<string | null>(null);
 	const [showAllThreads, setShowAllThreads] = useState(false);
-	const [showResolved, setShowResolved] = useState(false);
+	const [localShowResolved, setShowResolved] = useState(false);
+	const showResolved = controlledShowResolved ?? localShowResolved;
 	const [expandedThreads, setExpandedThreads] = useState<Set<string>>(
 		() => new Set(),
 	);
@@ -120,7 +125,7 @@ export function CommentThreads({
 
 	return (
 		<div className='max-w-3xl space-y-3'>
-			{resolvedThreads.length > 0 && (
+			{resolvedThreads.length > 0 && controlledShowResolved === undefined && (
 				<ToggleButton onClick={() => setShowResolved((current) => !current)}>
 					{showResolved
 						? "Hide resolved"
@@ -212,7 +217,7 @@ export function CommentThreads({
 				);
 			})}
 
-			{canComment && (
+			{canComment && showComposer && (
 				<CommentComposer
 					autoFocus={autoFocusComposer}
 					authorName={authorName}

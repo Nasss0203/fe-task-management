@@ -96,7 +96,7 @@ export default function TemplateCard({ item, href }: TemplateCardProps) {
 						))}
 
 						{item.tags && item.tags.length > 0 && (
-							<p className='line-clamp-1 text-faint'>
+							<p className='line-clamp-1 text-muted-foreground'>
 								{item.tags
 									.slice(0, 3)
 									.map((tag) => `#${tag}`)

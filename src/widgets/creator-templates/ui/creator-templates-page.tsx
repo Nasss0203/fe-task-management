@@ -111,7 +111,7 @@ export function CreatorTemplatesPage() {
 			{(page > 0 || hasNext) && (
 				<nav
 					aria-label='Templates pagination'
-					className='flex items-center justify-center gap-3'
+					className='flex items-center justify-end gap-2'
 				>
 					<Button
 						variant='outline'
@@ -122,7 +122,7 @@ export function CreatorTemplatesPage() {
 						<ChevronLeft className='size-3.5' />
 						Previous
 					</Button>
-					<span className='text-sm tabular-nums text-muted-foreground'>
+					<span className='px-1 text-xs tabular-nums text-muted-foreground'>
 						Page {page + 1}
 					</span>
 					<Button

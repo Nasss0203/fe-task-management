@@ -119,7 +119,7 @@ export function BrowseTeamspacesDialog({
 										key={teamspace.id}
 										className='flex items-center gap-3 py-3'
 									>
-										<span className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-teal-500/10 text-teal-600 dark:text-teal-400'>
+										<span className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary'>
 											<Globe2 className='size-4' />
 										</span>
 

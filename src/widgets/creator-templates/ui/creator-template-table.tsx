@@ -68,9 +68,9 @@ export function CreatorTemplateTable({
 	);
 
 	return (
-		<div className='overflow-hidden rounded-xl border bg-card'>
+		<div className='overflow-hidden rounded-[12px] border bg-card'>
 			{showHeader && (
-				<div className='hidden items-center border-b bg-muted/40 pr-2 text-xs font-medium text-muted-foreground md:flex'>
+				<div className='hidden items-center border-b bg-muted/30 pr-2 text-xs font-medium text-muted-foreground md:flex'>
 					<div className={cn(ROW_GRID, "flex-1 px-4 py-2")}>
 						<span>Name</span>
 						<span>Visibility</span>

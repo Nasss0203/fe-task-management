@@ -10,25 +10,25 @@ const Banner = () => {
 					Công việc & Ghi chú, cuối cùng cũng hợp nhất
 				</div>
 
-				<h1 className='max-w-2xl text-6xl font-bold leading-[1.05] tracking-tight sm:text-7xl lg:text-[4.5rem]'>
-					Nơi <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">công việc</span> của bạn thực sự diễn ra.
+				<h1 className='max-w-2xl text-5xl font-bold leading-[1.08] tracking-tight sm:text-6xl lg:text-7xl'>
+					Nơi <span className='text-primary'>công việc</span> của bạn thực sự diễn ra.
 				</h1>
 
 				<p className='mt-8 max-w-xl text-lg sm:text-xl leading-relaxed text-muted-foreground'>
 					Một không gian làm việc thống nhất nơi đội ngũ của bạn lập kế hoạch dự án, soạn thảo tài liệu và theo dõi tiến độ mà không cần chuyển đổi ứng dụng.
 				</p>
 
-				<div className='mt-10 flex flex-col gap-4 sm:flex-row w-full sm:w-auto'>
+				<div className='mt-10 flex w-full flex-col gap-3 sm:w-auto sm:flex-row'>
 					<Button
 						size='lg'
-						className='h-14 min-w-[180px] rounded-full bg-primary text-base font-semibold text-primary-foreground shadow-xl shadow-primary/20 transition-all hover:bg-primary/90 hover:-translate-y-0.5 active:scale-[0.98]'
+						className='h-12 min-w-[170px] rounded-xl bg-primary text-base font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90'
 					>
-						Bắt đầu ngay <Sparkles className="ml-2 h-4 w-4" />
+						Bắt đầu ngay <Sparkles className='ml-2 h-4 w-4' />
 					</Button>
 					<Button
 						size='lg'
 						variant='outline'
-						className='h-14 min-w-[180px] rounded-full border-border bg-background/50 text-base font-semibold text-foreground backdrop-blur-md transition-all hover:bg-muted active:scale-[0.98]'
+						className='h-12 min-w-[170px] rounded-xl border-border bg-background text-base font-medium text-foreground transition-colors hover:bg-muted'
 					>
 						Dùng thử miễn phí
 					</Button>
@@ -36,9 +36,7 @@ const Banner = () => {
 			</div>
 
 			<div className='relative hidden lg:block'>
-				<div className='absolute -inset-2 rounded-[2.5rem] bg-gradient-to-br from-primary/20 via-transparent to-blue-500/20 opacity-60 blur-3xl dark:opacity-30 transition-opacity'></div>
-				
-				<div className='relative aspect-square rounded-[2rem] border border-border/50 bg-card/60 shadow-2xl backdrop-blur-xl flex flex-col overflow-hidden'>
+				<div className='relative flex aspect-square flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-lg'>
 					<div className='flex items-center justify-between border-b border-border/40 px-6 py-4 bg-muted/20'>
 						<div className='flex gap-2'>
 							<div className='h-3 w-3 rounded-full bg-red-500/80 shadow-[0_0_10px_rgba(239,68,68,0.3)]' />

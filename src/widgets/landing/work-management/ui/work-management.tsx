@@ -60,7 +60,7 @@ const WorkManagement = () => {
 				</div>
 
 				<div className='relative'>
-					<div className='aspect-video rounded-3xl border border-border bg-card shadow-2xl backdrop-blur-sm overflow-hidden flex'>
+					<div className='flex aspect-video overflow-hidden rounded-2xl border border-border bg-card shadow-lg'>
                         {/* Sidebar */}
 						<div className='w-1/4 border-r border-border bg-muted/30 p-4 space-y-4'>
 							<div className='h-3 w-3/4 rounded-full bg-border' />
@@ -99,8 +99,6 @@ const WorkManagement = () => {
                             </div>
                         </div>
 					</div>
-					{/* Glow */}
-					<div className='absolute -inset-4 -z-10 bg-primary/5 blur-3xl rounded-3xl' />
 				</div>
 			</div>
 		</div>

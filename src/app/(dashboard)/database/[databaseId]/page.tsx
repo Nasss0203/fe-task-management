@@ -20,7 +20,11 @@ export default function DatabaseDetail() {
 
 	return (
 		<div className='w-full min-w-0'>
-			<PageHeader icon='🗃️' title={database?.name} />
+			<PageHeader
+				icon='🗃️'
+				title={database?.name}
+				className='max-w-none'
+			/>
 
 			{page && (
 				<div className='truncate px-12 text-sm text-muted-foreground md:px-16 lg:px-24'>
@@ -34,7 +38,7 @@ export default function DatabaseDetail() {
 				</div>
 			)}
 
-			<PageContent>
+			<PageContent className='max-w-none'>
 				<DatabaseViewBlock databaseId={params.databaseId} />
 			</PageContent>
 		</div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, ImageUp, Trash2 } from "lucide-react";
+import { ArrowRight, Check, ImageIcon, ImageUp, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState, type FormEvent } from "react";
 
@@ -44,19 +44,19 @@ export function CreatorProfilePage() {
 	const query = useMyCreatorProfile(user?.id);
 
 	return (
-		<div className='flex flex-col gap-8'>
-			<header className='flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between'>
+		<div className='flex flex-col gap-6'>
+			<header className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
 				<div className='flex min-w-0 flex-col gap-1'>
 					<h1 className='text-2xl font-semibold tracking-tight'>Profile</h1>
-					<p className='text-sm text-muted-foreground'>
+					<p className='text-[13.5px] text-muted-foreground'>
 						Your public creator page on the marketplace. Only what you fill in here is shown.
 					</p>
 				</div>
 				{query.data?.has_profile && (
 					<Button asChild variant='outline' size='sm'>
 						<Link href={`/creators/${query.data.handle}`} target='_blank'>
+							<ArrowRight className='size-3.5' />
 							View public profile
-							<ExternalLink className='ml-1.5 size-3.5' />
 						</Link>
 					</Button>
 				)}
@@ -101,38 +101,80 @@ function ImagesSection({
 	return (
 		<section
 			aria-labelledby='creator-images-title'
-			className='overflow-hidden rounded-xl border bg-card'
+			className='flex flex-col gap-4 rounded-[12px] border bg-card p-5'
 		>
-			<div className='relative h-32 bg-gradient-to-br from-primary/25 via-primary/10 to-muted sm:h-40'>
-				{profile.cover_url && (
-					/* eslint-disable-next-line @next/next/no-img-element */
-					<img src={profile.cover_url} alt='' className='h-full w-full object-cover' />
-				)}
+			<div className='flex flex-col gap-0.5'>
+				<h2 id='creator-images-title' className='text-[15px] font-semibold'>
+					Images
+				</h2>
+				<p className='text-[13px] text-muted-foreground'>
+					PNG, JPEG or WebP. Avatar up to 2 MB, cover up to 5 MB.
+				</p>
 			</div>
-			<div className='flex flex-col gap-5 p-5 sm:flex-row sm:items-start'>
-				<CreatorAvatar
-					src={profile.avatar_url}
-					className='-mt-14 size-24 shrink-0 rounded-2xl border-4 border-card'
-				/>
-				<div className='flex flex-1 flex-col gap-3'>
-					<h2 id='creator-images-title' className='text-sm font-semibold'>
-						Images
-					</h2>
-					{profile.has_profile ? (
-						<div className='flex flex-wrap gap-4'>
-							<ImageControl kind='avatar' profile={profile} userId={userId} />
-							<ImageControl kind='cover' profile={profile} userId={userId} />
+
+			<div className='grid gap-4 md:grid-cols-[260px_minmax(0,1fr)]'>
+				{/* Avatar Card */}
+				<div className='flex flex-col justify-between gap-3 rounded-[10px] border border-border/70 bg-muted/20 p-3.5'>
+					<div className='flex h-28 w-full items-center justify-center rounded-[8px] border border-border/50 bg-background/60 sm:h-32'>
+						<CreatorAvatar
+							src={profile.avatar_url}
+							name={profile.display_name || profile.handle}
+							className='size-20 shrink-0 rounded-full text-[24px] shadow-xs ring-2 ring-background sm:size-[84px]'
+						/>
+					</div>
+					<div className='flex flex-wrap items-center justify-between gap-2'>
+						<div className='flex flex-col'>
+							<span className='text-[13px] font-medium text-foreground'>
+								Avatar
+							</span>
+							<span className='text-[11.5px] text-muted-foreground'>
+								Square · max 2 MB
+							</span>
 						</div>
-					) : (
-						<p className='text-sm text-muted-foreground'>
-							Save your profile below first, then you can upload an avatar and a cover image.
-						</p>
-					)}
-					<p className='text-xs text-muted-foreground'>
-						PNG, JPEG or WebP. Avatar up to 2 MB, cover up to 5 MB.
-					</p>
+						{profile.has_profile && (
+							<ImageControl kind='avatar' profile={profile} userId={userId} />
+						)}
+					</div>
+				</div>
+
+				{/* Cover Image Card */}
+				<div className='flex flex-col justify-between gap-3 rounded-[10px] border border-border/70 bg-muted/20 p-3.5'>
+					<div className='relative flex h-28 w-full items-center justify-center overflow-hidden rounded-[8px] border border-border/50 bg-gradient-to-r from-[#c9d6f2]/50 to-[#eadff2]/50 text-muted-foreground sm:h-32 dark:from-slate-800/80 dark:to-indigo-950/60'>
+						{profile.cover_url ? (
+							/* eslint-disable-next-line @next/next/no-img-element */
+							<img
+								src={profile.cover_url}
+								alt=''
+								className='h-full w-full object-cover'
+							/>
+						) : (
+							<div className='flex flex-col items-center gap-1.5 text-muted-foreground/70'>
+								<ImageIcon className='size-6' />
+								<span className='text-xs'>No cover image</span>
+							</div>
+						)}
+					</div>
+					<div className='flex flex-wrap items-center justify-between gap-2'>
+						<div className='flex flex-col'>
+							<span className='text-[13px] font-medium text-foreground'>
+								Cover image
+							</span>
+							<span className='text-[11.5px] text-muted-foreground'>
+								Wide banner · max 5 MB
+							</span>
+						</div>
+						{profile.has_profile && (
+							<ImageControl kind='cover' profile={profile} userId={userId} />
+						)}
+					</div>
 				</div>
 			</div>
+
+			{!profile.has_profile && (
+				<p className='text-[13px] text-muted-foreground'>
+					Save your profile below first, then you can upload an avatar and a cover image.
+				</p>
+			)}
 		</section>
 	);
 }
@@ -254,12 +296,14 @@ function ProfileForm({
 	}
 
 	return (
-		<form onSubmit={handleSubmit} className='flex flex-col gap-6 rounded-xl border bg-card p-5 sm:p-6'>
-			<div className='grid gap-5 sm:grid-cols-2'>
-				<div className='flex flex-col gap-1.5 sm:col-span-2'>
-					<Label htmlFor='creator-handle'>Handle</Label>
-					<div className='flex items-center overflow-hidden rounded-md border focus-within:ring-2 focus-within:ring-ring/50'>
-						<span className='shrink-0 border-r bg-muted/50 px-3 py-2 text-sm text-muted-foreground'>
+		<form onSubmit={handleSubmit} className='flex flex-col gap-4 rounded-[12px] border bg-card p-5'>
+			<div className='flex flex-col gap-4'>
+				<div className='flex flex-col gap-1.5'>
+					<Label htmlFor='creator-handle' className='text-[13px] font-medium'>
+						Handle
+					</Label>
+					<div className='flex h-9 items-center overflow-hidden rounded-[8px] border focus-within:ring-2 focus-within:ring-ring/50'>
+						<span className='flex h-full shrink-0 items-center border-r bg-muted/60 px-2.5 text-[13px] text-muted-foreground'>
 							/creators/
 						</span>
 						<input
@@ -269,48 +313,56 @@ function ProfileForm({
 							maxLength={30}
 							aria-invalid={!handleIsValid}
 							aria-describedby='creator-handle-help'
-							className='min-w-0 flex-1 bg-transparent px-3 py-2 text-sm outline-none'
+							className='min-w-0 flex-1 bg-transparent px-2.5 py-1.5 text-[13.5px] outline-none'
 						/>
 					</div>
 					<p
 						id='creator-handle-help'
-						className={cn("text-xs", handleIsValid ? "text-muted-foreground" : "text-destructive")}
+						className={cn("text-[12px]", handleIsValid ? "text-muted-foreground" : "text-destructive")}
 					>
 						3–30 characters: lowercase letters, numbers and hyphens. Changing it changes your public link.
 					</p>
 				</div>
 
 				<div className='flex flex-col gap-1.5'>
-					<Label htmlFor='creator-display-name'>Display name</Label>
+					<Label htmlFor='creator-display-name' className='text-[13px] font-medium'>
+						Display name
+					</Label>
 					<Input
 						id='creator-display-name'
 						value={displayName}
 						onChange={(event) => setDisplayName(event.target.value)}
 						maxLength={60}
 						placeholder='Shown instead of your username'
+						className='rounded-[8px] text-[13.5px]'
 					/>
 				</div>
 
 				<div className='flex flex-col gap-1.5'>
-					<Label htmlFor='creator-headline'>Headline</Label>
+					<Label htmlFor='creator-headline' className='text-[13px] font-medium'>
+						Headline
+					</Label>
 					<Input
 						id='creator-headline'
 						value={headline}
 						onChange={(event) => setHeadline(event.target.value)}
 						maxLength={120}
 						placeholder='e.g. Notion-style templates for product teams'
+						className='rounded-[8px] text-[13.5px]'
 					/>
 				</div>
 
-				<div className='flex flex-col gap-1.5 sm:col-span-2'>
-					<Label htmlFor='creator-bio'>Bio</Label>
+				<div className='flex flex-col gap-1.5'>
+					<Label htmlFor='creator-bio' className='text-[13px] font-medium'>
+						Bio
+					</Label>
 					<textarea
 						id='creator-bio'
 						value={bio}
 						onChange={(event) => setBio(event.target.value)}
 						maxLength={MAX_BIO_LENGTH}
-						rows={5}
-						className='w-full resize-y rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/50'
+						rows={4}
+						className='w-full resize-y rounded-[8px] border bg-transparent px-3 py-2 text-[13.5px] shadow-xs outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/50'
 						placeholder='Tell buyers who you are and what you build.'
 					/>
 					<p className='text-right text-[11px] tabular-nums text-muted-foreground'>
@@ -319,12 +371,20 @@ function ProfileForm({
 				</div>
 			</div>
 
-			<fieldset className='flex flex-col gap-4'>
-				<legend className='mb-1 text-sm font-semibold'>Links</legend>
-				<div className='grid gap-4 sm:grid-cols-2'>
+			<fieldset className='flex flex-col gap-2 pt-1'>
+				<legend className='mb-1.5 text-[13px] font-medium'>Links</legend>
+				<div className='flex flex-col gap-2'>
 					{CREATOR_LINK_KEYS.map((key) => (
-						<div key={key} className='flex flex-col gap-1.5'>
-							<Label htmlFor={`creator-link-${key}`}>{LINK_FIELDS[key].label}</Label>
+						<div
+							key={key}
+							className='flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2.5'
+						>
+							<Label
+								htmlFor={`creator-link-${key}`}
+								className='w-[90px] shrink-0 text-[13px] font-normal text-muted-foreground'
+							>
+								{LINK_FIELDS[key].label}
+							</Label>
 							<Input
 								id={`creator-link-${key}`}
 								type='url'
@@ -335,6 +395,7 @@ function ProfileForm({
 								}
 								maxLength={255}
 								placeholder={LINK_FIELDS[key].placeholder}
+								className='flex-1 rounded-[8px] text-[13.5px]'
 							/>
 						</div>
 					))}
@@ -347,15 +408,23 @@ function ProfileForm({
 				</p>
 			)}
 
-			<div className='flex items-center gap-3'>
-				<Button type='submit' disabled={!handleIsValid || mutation.isPending}>
-					{mutation.isPending ? "Saving…" : profile.has_profile ? "Save changes" : "Create profile"}
-				</Button>
+			<div className='flex items-center justify-end gap-2.5 pt-1'>
 				{saved && !mutation.isPending && (
-					<span role='status' className='text-sm text-emerald-600 dark:text-emerald-400'>
+					<span
+						role='status'
+						className='inline-flex items-center gap-1 text-[12.5px] text-emerald-600 dark:text-emerald-400'
+					>
+						<Check className='size-3.5' />
 						Saved
 					</span>
 				)}
+				<Button
+					type='submit'
+					size='sm'
+					disabled={!handleIsValid || mutation.isPending}
+				>
+					{mutation.isPending ? "Saving…" : profile.has_profile ? "Save changes" : "Create profile"}
+				</Button>
 			</div>
 		</form>
 	);

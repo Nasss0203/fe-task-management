@@ -32,7 +32,7 @@ export function PageHeader({
 	return (
 		<div
 			className={cn(
-				"flex items-center gap-1 px-12 pt-10 md:px-16 lg:px-24",
+				"mx-auto flex max-w-[1440px] items-center gap-1 px-12 pt-10 md:px-16 lg:px-24",
 				className,
 			)}
 		>
@@ -54,7 +54,7 @@ export function PageContent({
 	return (
 		<div
 			className={cn(
-				"mt-14 w-full min-w-0 max-w-full px-12 md:px-16 lg:px-24",
+				"mx-auto mt-14 w-full min-w-0 max-w-[1440px] px-12 md:px-16 lg:px-24",
 				className,
 			)}
 		>
@@ -66,7 +66,7 @@ export function PageContent({
 export function PageSkeleton() {
 	return (
 		<div role='status' aria-label='Loading page' className='w-full min-w-0'>
-			<div className='flex items-center gap-3 px-12 pt-10 md:px-16 lg:px-24'>
+			<div className='mx-auto flex max-w-[1440px] items-center gap-3 px-12 pt-10 md:px-16 lg:px-24'>
 				<Skeleton className='size-12 rounded-lg' />
 				<Skeleton className='h-9 w-2/5 max-w-sm' />
 			</div>

@@ -170,10 +170,10 @@ export function ListingReleaseSection({
 					</div>
 
 					<div className='flex flex-col gap-2'>
-						<div className='flex items-center justify-between gap-2'>
+						<div className='flex items-center gap-1.5'>
 							<span
 								id='listing-categories-label'
-								className='text-sm leading-none font-medium'
+								className='text-[13px] leading-none font-medium'
 							>
 								Categories
 							</span>
@@ -219,13 +219,13 @@ export function ListingReleaseSection({
 											disabled={disabled}
 											onClick={() => toggleCategory(category.id)}
 											className={cn(
-												"inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none disabled:opacity-50",
+												"inline-flex h-7 items-center gap-1.5 rounded-full border px-2.5 text-[12.5px] transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none disabled:opacity-50",
 												selected
-													? "border-primary bg-primary/10 text-foreground"
+													? "border-[#5e6ad2] bg-[#eeeffc] font-medium text-[#5e6ad2] dark:border-indigo-400 dark:bg-indigo-500/15 dark:text-indigo-300"
 													: "text-muted-foreground hover:bg-muted",
 											)}
 										>
-											{selected && <Check className='size-3.5 text-primary' />}
+											{selected && <Check className='size-3 text-current' />}
 											{category.name}
 										</button>
 									);

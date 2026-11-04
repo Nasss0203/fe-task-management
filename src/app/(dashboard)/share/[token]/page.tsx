@@ -164,7 +164,7 @@ export default function SharedPageDetail() {
 				</div>
 			)}
 
-			<div className='flex items-center gap-1 px-12 pt-10 md:px-16 lg:px-24'>
+			<div className='mx-auto flex max-w-[1440px] items-center gap-1 px-12 pt-10 md:px-16 lg:px-24'>
 				<div className='mb-3 text-5xl'>{page.icon || "📄"}</div>
 				<h1 className='text-4xl font-bold'>
 					{page.title || "Untitled"}
@@ -179,7 +179,7 @@ export default function SharedPageDetail() {
 				/>
 			</div>
 
-			<div className='mt-14 w-full min-w-0 max-w-full px-12 md:px-16 lg:px-24'>
+			<div className='mx-auto mt-14 w-full min-w-0 max-w-[1440px] px-12 md:px-16 lg:px-24'>
 				{/* Link chỉ cho xem: bấm vào nội dung thì hỏi xin quyền sửa */}
 				<PageEditAccessBoundary
 					canEdit={canEditPage || !hasLinkAccess}

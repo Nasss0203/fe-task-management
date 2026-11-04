@@ -18,20 +18,20 @@ export function ListingSection({
 	return (
 		<section
 			aria-labelledby={`${id}-title`}
-			className='rounded-xl border bg-card'
+			className='flex flex-col gap-3.5 rounded-[12px] border bg-card p-5'
 		>
-			<div className='flex items-start justify-between gap-3 border-b px-5 py-4'>
+			<div className='flex items-start justify-between gap-3'>
 				<div className='flex flex-col gap-0.5'>
-					<h2 id={`${id}-title`} className='text-sm font-semibold'>
+					<h2 id={`${id}-title`} className='text-[15px] font-semibold'>
 						{title}
 					</h2>
 					{description && (
-						<p className='text-xs text-muted-foreground'>{description}</p>
+						<p className='text-[13px] text-muted-foreground'>{description}</p>
 					)}
 				</div>
 				{aside}
 			</div>
-			<div className='flex flex-col gap-5 p-5'>{children}</div>
+			<div className='flex flex-col gap-4'>{children}</div>
 		</section>
 	);
 }
@@ -44,7 +44,6 @@ export function OptionCard({
 	onChange,
 	title,
 	description,
-	icon,
 	disabled,
 }: {
 	name: string;
@@ -53,16 +52,16 @@ export function OptionCard({
 	onChange: (value: string) => void;
 	title: string;
 	description: string;
-	icon: ReactNode;
+	icon?: ReactNode;
 	disabled?: boolean;
 }) {
 	return (
 		<label
 			className={cn(
-				"flex cursor-pointer gap-3 rounded-lg border p-4 transition-colors has-focus-visible:ring-2 has-focus-visible:ring-ring",
+				"flex cursor-pointer items-start gap-2.5 rounded-[10px] border p-3.5 transition-colors has-focus-visible:ring-2 has-focus-visible:ring-ring",
 				checked
-					? "border-primary bg-primary/5"
-					: "hover:bg-muted/50",
+					? "border-[1.5px] border-[#5e6ad2] bg-[#eeeffc]/60 dark:border-indigo-400 dark:bg-indigo-500/10"
+					: "hover:bg-muted/40",
 				disabled && "cursor-not-allowed opacity-60",
 			)}
 		>
@@ -76,16 +75,17 @@ export function OptionCard({
 				className='sr-only'
 			/>
 			<span
+				aria-hidden
 				className={cn(
-					"flex size-8 shrink-0 items-center justify-center rounded-md",
-					checked ? "bg-primary text-primary-foreground" : "bg-muted",
+					"mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-background transition-colors",
+					checked
+						? "border-[5px] border-[#5e6ad2] dark:border-indigo-400"
+						: "border-[1.5px] border-muted-foreground/40",
 				)}
-			>
-				{icon}
-			</span>
+			/>
 			<span className='flex flex-col gap-0.5'>
-				<span className='text-sm font-medium'>{title}</span>
-				<span className='text-xs text-muted-foreground'>{description}</span>
+				<span className='text-[13.5px] font-semibold'>{title}</span>
+				<span className='text-[12.5px] text-muted-foreground'>{description}</span>
 			</span>
 		</label>
 	);

@@ -174,7 +174,7 @@ function TemplateDetailContent({
 			<div className='grid grid-cols-1 items-start gap-6 md:grid-cols-12'>
 				{/* Block 1: Preview Area (Left Column on Desktop, First on Mobile) */}
 				<div className='md:col-span-7 md:col-start-1 md:row-start-1 space-y-6'>
-					<div className='relative aspect-[16/10] w-full overflow-hidden rounded-[18px] border bg-gradient-to-r from-muted to-background'>
+					<div className='relative aspect-[16/10] w-full overflow-hidden rounded-[18px] border bg-muted/40'>
 						{previewHref ? (
 							<Link
 								href={previewHref}
@@ -186,11 +186,11 @@ function TemplateDetailContent({
 									<img
 										src={visualUrl}
 										alt={template.name}
-										className='h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-[1.01]'
+										className='h-full w-full object-cover object-top'
 									/>
 								) : (
 									<div className='flex h-full w-full items-center justify-center'>
-										<span className='flex size-20 items-center justify-center rounded-[18px] border bg-background text-foreground transition-transform duration-200 group-hover:scale-105'>
+										<span className='flex size-20 items-center justify-center rounded-[18px] border bg-background text-foreground'>
 											{template.icon ? (
 												<span className='select-none text-4xl leading-none'>{template.icon}</span>
 											) : (

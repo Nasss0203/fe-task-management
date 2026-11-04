@@ -73,18 +73,18 @@ export function CreatorOverviewPage() {
 				<ol className='grid divide-y md:grid-cols-3 md:divide-x md:divide-y-0'>
 					{GUIDE_STEPS.map((step, index) => (
 						<li key={step.title} className='flex gap-3 p-5'>
-							<span className='flex size-6 shrink-0 items-center justify-center rounded-full border text-xs font-medium tabular-nums text-muted-foreground'>
+							<span className='flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold tabular-nums text-foreground'>
 								{index + 1}
 							</span>
 							<div className='flex min-w-0 flex-col gap-1'>
-								<h3 className='text-sm font-medium'>{step.title}</h3>
-								<p className='text-sm leading-relaxed text-muted-foreground'>
+								<h3 className='text-sm font-semibold'>{step.title}</h3>
+								<p className='text-[13px] leading-relaxed text-muted-foreground'>
 									{step.description}
 								</p>
 								{step.action && (
 									<Link
 										href={step.action.href}
-										className='mt-1 inline-flex w-fit items-center gap-1 text-sm font-medium text-primary hover:underline'
+										className='mt-1 inline-flex w-fit items-center gap-1 text-[13px] text-muted-foreground transition-colors hover:text-foreground'
 									>
 										{step.action.label}
 										<ArrowRight className='size-3.5' />

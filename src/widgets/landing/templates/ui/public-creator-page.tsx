@@ -45,7 +45,7 @@ export function PublicCreatorPage({ handle }: { handle: string }) {
 	if (query.isPending) {
 		return (
 			<div className='mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6 sm:py-10 lg:px-8'>
-				<Skeleton className='h-48 w-full rounded-2xl' />
+				<Skeleton className='h-48 w-full rounded-xl' />
 				<Skeleton className='h-8 w-64 rounded-lg' />
 				<Skeleton className='h-4 w-96 max-w-full rounded' />
 			</div>
@@ -57,7 +57,7 @@ export function PublicCreatorPage({ handle }: { handle: string }) {
 			<div className='mx-auto max-w-xl px-4 py-16 text-center sm:px-6 sm:py-20'>
 				<div
 					role={isNotFound ? undefined : "alert"}
-					className='space-y-4 rounded-2xl border border-border/80 bg-card/60 p-8 sm:p-10'
+					className='space-y-4 rounded-xl border border-border bg-card p-8 sm:p-10'
 				>
 					<div className='mx-auto flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground'>
 						<UserRound className='size-6' />
@@ -96,8 +96,8 @@ function CreatorHeader({ creator }: { creator: PublicCreatorProfile }) {
 	const { stats } = creator;
 
 	return (
-		<section aria-labelledby='creator-name' className='overflow-hidden rounded-2xl border border-border/80 bg-card/60'>
-			<div className='relative h-36 w-full sm:h-48'>
+		<section aria-labelledby='creator-name'>
+			<div className='relative h-44 w-full overflow-hidden rounded-[16px] border border-border/50 bg-gradient-to-r from-[#c9d6f2] to-[#eadff2] sm:h-[200px] dark:from-slate-800 dark:to-indigo-950'>
 				{creator.cover_url && (
 					/* eslint-disable-next-line @next/next/no-img-element */
 					<img
@@ -108,92 +108,89 @@ function CreatorHeader({ creator }: { creator: PublicCreatorProfile }) {
 				)}
 			</div>
 
-			<div className='space-y-4 px-5 pb-6 sm:px-8'>
-				<div className='-mt-12 flex flex-col gap-4 sm:-mt-14 sm:flex-row sm:items-end'>
-					<CreatorAvatar
-						src={creator.avatar_url}
-						name={creator.display_name}
-						className='size-24 shrink-0 rounded-2xl border-4 border-background sm:size-28'
-					/>
-					<div className='min-w-0 space-y-1'>
+			<div className='relative z-10 -mt-12 px-4 sm:px-6'>
+				<CreatorAvatar
+					src={creator.avatar_url}
+					name={creator.display_name || creator.handle}
+					className='size-24 shrink-0 rounded-full border-4 border-background text-[30px] shadow-md ring-1 ring-border/40'
+				/>
+
+				<div className='mt-3 flex flex-col gap-1.5'>
+					<div className='flex flex-wrap items-baseline gap-2.5'>
 						<h1
 							id='creator-name'
-							className='break-words text-2xl font-bold tracking-tight text-foreground sm:text-3xl'
+							className='break-words text-2xl font-bold tracking-[-0.6px] text-foreground sm:text-[30px] sm:leading-[36px]'
 						>
 							{creator.display_name}
 						</h1>
-						<p className='text-sm text-muted-foreground'>@{creator.handle}</p>
+						<p className='text-[13px] text-muted-foreground'>@{creator.handle}</p>
 					</div>
+
+					{creator.headline && (
+						<p className='text-[15px] text-muted-foreground'>
+							{creator.headline}
+						</p>
+					)}
+
+					{creator.bio && (
+						<p className='max-w-[640px] whitespace-pre-line text-[14px] leading-[22px] text-foreground'>
+							{creator.bio}
+						</p>
+					)}
+
+					{links.length > 0 && (
+						<ul aria-label='Links' className='mt-1 flex flex-wrap items-center gap-3.5'>
+							{links.map((key) => (
+								<li key={key}>
+									<a
+										href={creator.links[key] ?? undefined}
+										target='_blank'
+										rel='noopener noreferrer nofollow ugc'
+										className='inline-flex items-center gap-1.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+									>
+										<ExternalLink className='size-3.5' aria-hidden />
+										{LINK_LABELS[key]}
+									</a>
+								</li>
+							))}
+						</ul>
+					)}
+
+					<dl className='mt-2 flex flex-wrap gap-x-9 gap-y-3 pt-3'>
+						<div className='flex flex-col gap-0.5'>
+							<dt className='text-[12px] text-muted-foreground'>Templates</dt>
+							<dd className='text-[15px] font-semibold text-foreground'>
+								{countFormatter.format(stats.template_count)}
+							</dd>
+						</div>
+						<div className='flex flex-col gap-0.5'>
+							<dt className='text-[12px] text-muted-foreground'>Average rating</dt>
+							<dd className='inline-flex items-center gap-1 text-[15px] font-semibold text-foreground'>
+								<Star
+									className={
+										stats.rating_count
+											? "size-3.5 fill-amber-400 text-amber-400"
+											: "size-3.5 text-muted-foreground"
+									}
+									aria-hidden
+								/>
+								{formatRatingSummary(stats.rating_average, stats.rating_count)}
+							</dd>
+						</div>
+						<div className='flex flex-col gap-0.5'>
+							<dt className='text-[12px] text-muted-foreground'>Likes</dt>
+							<dd className='text-[15px] font-semibold text-foreground'>
+								{countFormatter.format(stats.like_count)}
+							</dd>
+						</div>
+						<div className='flex flex-col gap-0.5'>
+							<dt className='text-[12px] text-muted-foreground'>Joined</dt>
+							<dd className='text-[15px] font-semibold text-foreground'>
+								{joinedFormatter.format(new Date(creator.joined_at))}
+							</dd>
+						</div>
+					</dl>
 				</div>
-
-				{creator.headline && (
-					<p className='text-base font-medium text-foreground'>
-						{creator.headline}
-					</p>
-				)}
-
-				{creator.bio && (
-					<p className='max-w-3xl whitespace-pre-line text-sm leading-relaxed text-muted-foreground'>
-						{creator.bio}
-					</p>
-				)}
-
-				{links.length > 0 && (
-					<ul aria-label='Links' className='flex flex-wrap gap-2'>
-						{links.map((key) => (
-							<li key={key}>
-								<a
-									href={creator.links[key] ?? undefined}
-									target='_blank'
-									rel='noopener noreferrer nofollow ugc'
-									className='inline-flex items-center gap-1.5 rounded-full border border-border/70 px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
-								>
-									{LINK_LABELS[key]}
-									<ExternalLink className='size-3' aria-hidden />
-								</a>
-							</li>
-						))}
-					</ul>
-				)}
-
-				<dl className='flex flex-wrap gap-x-6 gap-y-2 border-t border-border/50 pt-4 text-sm'>
-					<div className='flex items-center gap-1.5'>
-						<dt className='sr-only'>Templates</dt>
-						<dd className='font-semibold text-foreground'>
-							{countFormatter.format(stats.template_count)}
-						</dd>
-						<span className='text-muted-foreground'>
-							{stats.template_count === 1 ? "template" : "templates"}
-						</span>
-					</div>
-					<div className='flex items-center gap-1.5'>
-						<dt className='sr-only'>Average rating</dt>
-						<Star
-							className={
-								stats.rating_count
-									? "size-4 fill-amber-400 text-amber-400"
-									: "size-4 text-muted-foreground"
-							}
-							aria-hidden
-						/>
-						<dd className='text-foreground'>
-							{formatRatingSummary(stats.rating_average, stats.rating_count)}
-						</dd>
-					</div>
-					<div className='flex items-center gap-1.5'>
-						<dt className='sr-only'>Likes</dt>
-						<Heart className='size-4 text-muted-foreground' aria-hidden />
-						<dd className='text-foreground'>
-							{countFormatter.format(stats.like_count)}{" "}
-							{stats.like_count === 1 ? "like" : "likes"}
-						</dd>
-					</div>
-					<div className='flex items-center gap-1.5 text-muted-foreground'>
-						<dt className='sr-only'>Joined</dt>
-						<Calendar className='size-4' aria-hidden />
-						<dd>Joined {joinedFormatter.format(new Date(creator.joined_at))}</dd>
-					</div>
-				</dl>
 			</div>
 		</section>
 	);
@@ -236,7 +233,7 @@ function CreatorTemplates({ handle }: { handle: string }) {
 			{isLoading ? (
 				<div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
 					{[0, 1, 2].map((index) => (
-						<Skeleton key={index} className='h-72 rounded-2xl' />
+						<Skeleton key={index} className='h-72 rounded-xl' />
 					))}
 				</div>
 			) : isError ? (
@@ -247,7 +244,7 @@ function CreatorTemplates({ handle }: { handle: string }) {
 					</Button>
 				</div>
 			) : templates.length === 0 ? (
-				<p className='rounded-2xl border border-dashed border-border/80 bg-card/40 p-10 text-center text-sm text-muted-foreground'>
+				<p className='rounded-xl border border-dashed border-border bg-card/40 p-10 text-center text-sm text-muted-foreground'>
 					This creator has not published any templates yet.
 				</p>
 			) : (

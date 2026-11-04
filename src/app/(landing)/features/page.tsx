@@ -27,7 +27,7 @@ export default function FeaturesPage() {
 		<div className='py-12 sm:py-20 space-y-24 sm:space-y-36'>
 			{/* Page Hero */}
 			<section className='mx-auto max-w-4xl px-4 sm:px-6 text-center space-y-6'>
-				<div className='inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3.5 py-1 text-xs font-semibold text-primary'>
+				<div className='inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3.5 py-1 text-xs font-medium text-muted-foreground'>
 					<Sparkles className='h-3.5 w-3.5' />
 					Product Capabilities
 				</div>
@@ -112,7 +112,7 @@ export default function FeaturesPage() {
 					<div className='rounded-2xl border border-border/80 bg-card p-6 shadow-soft'>
 						<div className='flex items-center justify-between pb-4 border-b border-border/60 text-xs text-muted-foreground'>
 							<div className='flex items-center gap-2'>
-								<FileText className='h-4 w-4 text-primary' />
+								<FileText className='h-4 w-4 text-muted-foreground' />
 								<span className='font-semibold text-foreground'>Engineering Wiki / Architecture</span>
 							</div>
 							<span className='font-mono text-[11px]'>v2.4 updated</span>
@@ -167,7 +167,7 @@ export default function FeaturesPage() {
 								</thead>
 								<tbody className='divide-y divide-border/40 text-foreground'>
 									<tr>
-										<td className='py-2 px-1 font-medium'>RBAC Permissions Matrix</td>
+										<td className='py-2 px-1 font-medium'>Workspace &amp; Page Permissions</td>
 										<td className='py-2 px-1'><Badge className='text-[9px] bg-muted text-muted-foreground border-none'>Done</Badge></td>
 										<td className='py-2 px-1 text-muted-foreground'>Alex</td>
 										<td className='py-2 px-1 text-muted-foreground font-semibold'>High</td>
@@ -179,7 +179,7 @@ export default function FeaturesPage() {
 										<td className='py-2 px-1 text-muted-foreground font-semibold'>Normal</td>
 									</tr>
 									<tr>
-										<td className='py-2 px-1 font-medium'>Formula Fields & Aggregations</td>
+										<td className='py-2 px-1 font-medium'>Formula Fields &amp; Aggregations</td>
 										<td className='py-2 px-1'><Badge className='text-[9px] bg-muted text-muted-foreground border-none'>Review</Badge></td>
 										<td className='py-2 px-1 text-muted-foreground'>Sara</td>
 										<td className='py-2 px-1 text-muted-foreground font-semibold'>Urgent</td>
@@ -253,7 +253,7 @@ export default function FeaturesPage() {
 						</h2>
 
 						<p className='text-base text-muted-foreground leading-relaxed'>
-							Give departments their own Teamspaces while keeping sensitive documents secure with granular role-based access control (RBAC).
+							Give departments their own Teamspaces while keeping sensitive documents secure with owner, member and guest roles, and page access from view to full access.
 						</p>
 
 						<div className='space-y-3 pt-2 text-sm'>
@@ -434,7 +434,7 @@ export default function FeaturesPage() {
 							<Badge className='text-[10px] bg-muted text-muted-foreground border-none'>Online</Badge>
 						</div>
 						<div className='mt-4 space-y-3 text-xs'>
-							<div className='p-2.5 rounded-lg border border-border/60 bg-muted/20 font-mono text-[11px] text-primary flex items-center justify-between'>
+							<div className='p-2.5 rounded-lg border border-border/60 bg-muted/20 font-mono text-[11px] text-foreground flex items-center justify-between'>
 								<span>https://acme-docs.taskmanly.app</span>
 								<ExternalLink className='h-3 w-3 text-muted-foreground' />
 							</div>
@@ -461,20 +461,20 @@ export default function FeaturesPage() {
 						</div>
 						<div className='mt-4 space-y-3 text-xs'>
 							<div className='p-2.5 rounded-xl rounded-tr-none bg-primary text-primary-foreground text-[11px] ml-auto max-w-[85%] font-medium'>
-								Break down &apos;Implement team role-based permissions&apos; into implementation steps.
+								Break down &apos;Implement workspace &amp; page permissions&apos; into implementation steps.
 							</div>
 							<div className='p-3 rounded-xl rounded-tl-none bg-muted/40 border border-border/60 text-[11px] space-y-1.5 max-w-[90%]'>
 								<div className='font-semibold text-foreground'>Generated 3 Action Items:</div>
 								<div className='flex items-center gap-2 text-muted-foreground'>
-									<div className='h-1.5 w-1.5 rounded-full bg-primary' />
-									<span>[P0] Define RBAC enum in Postgres schema</span>
+									<div className='h-1.5 w-1.5 rounded-full bg-foreground' />
+									<span>[P0] Define workspace role enum in Postgres schema</span>
 								</div>
 								<div className='flex items-center gap-2 text-muted-foreground'>
-									<div className='h-1.5 w-1.5 rounded-full bg-primary' />
+									<div className='h-1.5 w-1.5 rounded-full bg-foreground' />
 									<span>[P1] Add permission check middleware on API</span>
 								</div>
 								<div className='flex items-center gap-2 text-muted-foreground'>
-									<div className='h-1.5 w-1.5 rounded-full bg-primary' />
+									<div className='h-1.5 w-1.5 rounded-full bg-foreground' />
 									<span>[P2] Build team member roles management UI</span>
 								</div>
 							</div>

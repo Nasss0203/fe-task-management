@@ -89,12 +89,12 @@ export function TemplateIcon({
 	return (
 		<span
 			className={cn(
-				"flex size-8 shrink-0 items-center justify-center rounded-md border bg-background text-base",
+				"flex size-7 shrink-0 items-center justify-center rounded-[6px] bg-muted/80 text-sm",
 				className,
 			)}
 		>
 			{template.icon || (
-				<LayoutTemplate className='size-[45%] text-muted-foreground' />
+				<LayoutTemplate className='size-[50%] text-muted-foreground' />
 			)}
 		</span>
 	);

@@ -49,9 +49,9 @@ export function ListingDemoSummary({
 
 	return (
 		<div className='flex flex-col gap-2'>
-			<div className='flex flex-col gap-4 rounded-xl border bg-muted/20 p-4 sm:flex-row sm:items-center sm:justify-between'>
+			<div className='flex flex-col gap-4 rounded-[12px] border bg-muted/20 p-4 sm:flex-row sm:items-center sm:justify-between'>
 				<div className='flex min-w-0 items-center gap-3'>
-					<span className='flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+					<span className='flex size-10 shrink-0 items-center justify-center rounded-[8px] bg-[#eeeffc] text-[#5e6ad2] dark:bg-indigo-500/15 dark:text-indigo-400'>
 						<ScanEye className='size-5' />
 					</span>
 					<div className='min-w-0'>

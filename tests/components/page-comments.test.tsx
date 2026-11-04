@@ -78,7 +78,9 @@ describe("PageDiscussion", () => {
 		renderWithClient(<PageDiscussion pageId='page-1' />);
 
 		expect(await screen.findByText("Body c-1")).toBeInTheDocument();
+		expect(screen.queryByLabelText(/Add a comment/)).not.toBeInTheDocument();
 
+		await user.click(screen.getByRole("button", { name: "Add comment" }));
 		await user.type(screen.getByLabelText(/Add a comment/), "New note");
 		await user.click(screen.getByRole("button", { name: "Comment" }));
 		await waitFor(() =>
@@ -280,7 +282,7 @@ describe("resolving threads", () => {
 		expect(await screen.findByText("Body open")).toBeInTheDocument();
 		expect(screen.queryByText("Body done")).not.toBeInTheDocument();
 
-		await user.click(screen.getByRole("button", { name: "Show 1 resolved" }));
+		await user.click(screen.getByRole("button", { name: "1 resolved" }));
 		expect(screen.getByText("Body done")).toBeInTheDocument();
 		expect(screen.getByRole("button", { name: "Reopen thread" })).toBeInTheDocument();
 
@@ -290,8 +292,23 @@ describe("resolving threads", () => {
 		);
 		expect(await screen.findByRole("button", { name: "Hide resolved" })).toBeInTheDocument();
 		await user.click(screen.getByRole("button", { name: "Hide resolved" }));
-		expect(await screen.findByRole("button", { name: "Show 2 resolved" })).toBeInTheDocument();
+		expect(await screen.findByRole("button", { name: "2 resolved" })).toBeInTheDocument();
 		expect(screen.queryByText("Body open")).not.toBeInTheDocument();
+	});
+
+	it("keeps a page with only resolved threads collapsed to the comment row", async () => {
+		comments = [comment("done", { resolved_at: new Date().toISOString() })];
+		const user = userEvent.setup();
+		renderWithClient(<PageDiscussion pageId='page-1' />);
+
+		expect(await screen.findByRole("button", { name: "1 resolved" })).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Add comment" })).toBeInTheDocument();
+		expect(screen.queryByLabelText(/Add a comment/)).not.toBeInTheDocument();
+		expect(screen.queryByText("Body done")).not.toBeInTheDocument();
+
+		await user.click(screen.getByRole("button", { name: "1 resolved" }));
+		expect(screen.getByText("Body done")).toBeInTheDocument();
+		expect(screen.queryByLabelText(/Add a comment/)).not.toBeInTheDocument();
 	});
 
 	it("does not let a viewer resolve", async () => {
@@ -321,7 +338,8 @@ describe("mentions in comments", () => {
 		const user = userEvent.setup();
 		renderWithClient(<PageDiscussion pageId='page-1' />);
 
-		const input = await screen.findByLabelText(/Add a comment/);
+		await user.click(await screen.findByRole("button", { name: "Add comment" }));
+		const input = screen.getByLabelText(/Add a comment/);
 		await user.type(input, "Hi @la");
 
 		const option = await screen.findByRole("option", { name: /Lan/ });
