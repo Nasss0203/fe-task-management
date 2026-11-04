@@ -1,5 +1,6 @@
 "use client";
 
+import { Check } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -56,7 +57,11 @@ function ChoiceAnswer({
 			<SelectTrigger
 				aria-label='Correct answer'
 				size='sm'
-				className={SMALL_SELECT}
+				className={cn(
+					SMALL_SELECT,
+					value !== null &&
+						"border-emerald-500/40 bg-emerald-500/10 font-medium text-emerald-700 dark:text-emerald-300",
+				)}
 			>
 				<SelectValue />
 			</SelectTrigger>
@@ -102,12 +107,18 @@ function MultiChoiceAnswer({
 							onSave(next.length > 0 ? next : null);
 						}}
 						className={cn(
-							"rounded-md border px-2 py-0.5 transition-colors",
+							"inline-flex items-center gap-1 rounded-md border px-2 py-0.5 transition-colors",
 							isSelected
-								? "border-ring bg-ring/10 text-foreground"
+								? "border-emerald-500/50 bg-emerald-500/12 font-medium text-emerald-700 dark:text-emerald-300"
 								: "border-border hover:bg-muted",
 						)}
 					>
+						{isSelected && (
+							<Check
+								aria-hidden='true'
+								className='size-3 text-emerald-600 dark:text-emerald-400'
+							/>
+						)}
 						{option.name}
 					</button>
 				);
@@ -136,7 +147,11 @@ function TypedAnswer({
 			placeholder='No answer'
 			aria-label='Correct answer'
 			title={isNumber ? undefined : "Not case sensitive"}
-			className='h-7 w-40 text-xs'
+			className={cn(
+				"h-7 w-40 text-xs",
+				value !== null &&
+					"border-emerald-500/40 bg-emerald-500/5 font-medium text-foreground",
+			)}
 			onBlur={(event) => {
 				const raw = event.target.value.trim();
 				if (raw === saved.trim()) return;
@@ -188,10 +203,10 @@ export function AnswerKeyEditor({
 				: TypedAnswer;
 
 	return (
-		<div className='mt-2 ml-6 flex flex-wrap items-center gap-2 text-xs text-muted-foreground'>
-			Answer
+		<div className='mt-2.5 ml-8 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 border-t border-border/60 pt-2.5 text-xs text-muted-foreground'>
+			<span className='font-medium'>Answer</span>
 			<AnswerInput property={property} value={value} onSave={(next) => save(next)} />
-			Points
+			<span className='ml-auto font-medium'>Points</span>
 			<Input
 				key={points}
 				type='number'

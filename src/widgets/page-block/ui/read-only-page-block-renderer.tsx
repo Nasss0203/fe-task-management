@@ -30,7 +30,10 @@ import {
 } from "@/entities/page-block/ui/read-only-block-content";
 import { Separator } from "@/shared/ui/separator";
 import { columnRatio } from "@/widgets/page-block-renderer/lib/column-widths";
-import { getSectionForm } from "@/widgets/page-block-renderer/lib/form-config";
+import {
+	getSectionForm,
+	getSectionQuiz,
+} from "@/widgets/page-block-renderer/lib/form-config";
 import { FormFill, useFormDatabase } from "@/widgets/page-block-renderer/ui/form-fill";
 import type { PublicDatabase } from "@/entities/public-site/model/public-site.types";
 import {
@@ -79,6 +82,7 @@ function ReadOnlySectionBlock({
 	);
 	const title = getString(getContent(block), "title");
 	const description = getString(getContent(block), "description");
+	const quiz = form ? getSectionQuiz(block.data_config) : null;
 
 	if (form && formDatabase) {
 		return (
@@ -87,7 +91,18 @@ function ReadOnlySectionBlock({
 				className={`w-full rounded-xl border border-border/60 px-4 py-8 sm:px-8 ${CALLOUT_TONES[getCalloutTone(block.style_config)].className}`}
 			>
 				<div className='mx-auto mb-6 max-w-xl'>
-					{title && <h2 className='text-xl font-semibold'>{title}</h2>}
+					<div className='flex flex-wrap items-center gap-2.5'>
+						{title && <h2 className='text-xl font-semibold'>{title}</h2>}
+						{quiz && (
+							<span className='inline-flex items-center gap-1.5 rounded-full bg-[#5e6ad2]/12 px-2.5 py-0.5 text-xs font-medium text-[#5e6ad2] dark:bg-indigo-500/15 dark:text-indigo-300'>
+								<span
+									aria-hidden='true'
+									className='size-1.5 rounded-full bg-[#5e6ad2] dark:bg-indigo-400'
+								/>
+								Quiz
+							</span>
+						)}
+					</div>
 					{description && (
 						<p className='mt-1 text-sm leading-6 text-muted-foreground'>
 							{description}

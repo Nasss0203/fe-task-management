@@ -55,7 +55,7 @@ function ReadOnlyBlockRow({ block, shareToken }: ReadOnlyBlockRowProps) {
 	return (
 		<div
 			id={`block-${block.id}`}
-			className='group -mx-2 grid min-h-8 w-[calc(100%+1rem)] grid-cols-[28px_28px_minmax(0,1fr)_36px] items-center rounded-md px-2 transition-colors duration-150 hover:bg-muted/40'
+			className={`group -mx-2 grid min-h-8 w-[calc(100%+1rem)] grid-cols-[28px_28px_minmax(0,1fr)_36px] items-center rounded-md px-2 transition-colors duration-150 ${block.type === PageBlockType.DATABASE_VIEW ? "" : "hover:bg-muted/40"}`}
 		>
 			<div className='size-7' aria-hidden='true' />
 

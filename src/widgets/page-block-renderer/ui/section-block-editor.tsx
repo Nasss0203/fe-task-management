@@ -84,9 +84,13 @@ export function SectionBlockEditor({
 	const hasQuestions = block.children.some(
 		(child) => child.type === PageBlockType.FORM_FIELD,
 	);
-	const showAnswerKeys =
-		Boolean(form && getSectionQuiz(block.data_config)) && !shareToken;
+	const quiz = form ? getSectionQuiz(block.data_config) : null;
+	const showAnswerKeys = Boolean(quiz) && !shareToken;
 	const answerKeys = useFormAnswerKeys(block.id, showAnswerKeys);
+	const totalPoints = (answerKeys.data ?? []).reduce(
+		(sum, key) => sum + (key.correct_value !== null ? key.points : 0),
+		0,
+	);
 	const quizState = showAnswerKeys
 		? {
 				sectionBlockId: block.id,
@@ -233,13 +237,30 @@ export function SectionBlockEditor({
 					className='min-h-7 min-w-0 border-0 bg-transparent p-0 pl-1 text-base font-semibold leading-7 outline-none placeholder:text-faint'
 				/>
 
-				<div className='flex items-center gap-1'>
+				<div className='flex items-center gap-1.5'>
 					{!block.is_open && block.children.length > 0 && (
 						<span className='shrink-0 text-xs text-muted-foreground'>
 							{block.children.length}{" "}
 							{block.children.length === 1 ? "block" : "blocks"}
 						</span>
 					)}
+
+					{quiz ? (
+						<span className='inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#5e6ad2]/12 px-2.5 py-0.5 text-xs font-medium text-[#5e6ad2] dark:bg-indigo-500/15 dark:text-indigo-300'>
+							<span
+								aria-hidden='true'
+								className='size-1.5 rounded-full bg-[#5e6ad2] dark:bg-indigo-400'
+							/>
+							Quiz
+							{totalPoints > 0
+								? ` · ${totalPoints} ${totalPoints === 1 ? "pt" : "pts"}`
+								: ""}
+						</span>
+					) : form ? (
+						<span className='inline-flex shrink-0 items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground'>
+							Form
+						</span>
+					) : null}
 
 					<SectionFormSettings
 						block={block}
@@ -304,7 +325,7 @@ export function SectionBlockEditor({
 							<FormQuestionsProvider value={block.children}>
 							<FormQuizProvider value={quizState}>
 							{block.children.length > 0 ? (
-								<div className='mt-1 space-y-1'>
+								<div className={cn("mt-1.5", form ? "space-y-2" : "space-y-1")}>
 									{block.children.map((child) => (
 										<PageBlockEditorRow
 											key={child.id}
@@ -329,7 +350,7 @@ export function SectionBlockEditor({
 								</p>
 							)}
 							{form && formDatabase && (
-								<div className='mt-1 ml-14 flex flex-wrap items-center gap-1'>
+								<div className='mt-2.5 ml-14 flex flex-wrap items-center gap-2 pt-0.5'>
 									<AddQuestionButton
 										block={block}
 										databaseId={form.database_id}

@@ -19,6 +19,7 @@ import {
 	formConditions,
 	getFieldLabel,
 	getFormField,
+	getSectionQuiz,
 	hiddenFormProperties,
 	isFormOptionVisible,
 	type SectionForm,
@@ -63,10 +64,10 @@ const FIELD_SURFACE =
 
 // One block with dividers, so a question's options read as a single list.
 const OPTION_GROUP =
-	"divide-y divide-input overflow-hidden rounded-lg border border-input bg-surface shadow-xs dark:bg-input/30";
+	"divide-y divide-input/80 overflow-hidden rounded-xl border border-input bg-surface shadow-2xs dark:bg-input/30";
 
 const OPTION_ROW =
-	"flex min-h-11 cursor-pointer items-center gap-3 px-3.5 py-2.5 text-sm transition-colors hover:bg-foreground/[0.04] has-[:checked]:bg-primary/10 has-[:checked]:font-medium has-[:focus-visible]:bg-foreground/[0.06]";
+	"flex min-h-11 cursor-pointer items-center gap-3 px-3.5 py-2.5 text-sm transition-colors hover:bg-foreground/[0.04] has-[:checked]:bg-[#5e6ad2]/10 has-[:checked]:font-medium has-[:focus-visible]:bg-foreground/[0.06]";
 
 const SUB_OPTION_ROW =
 	"flex min-h-8 cursor-pointer items-center gap-3 rounded-md px-2 py-1 text-sm transition-colors hover:bg-foreground/[0.05]";
@@ -106,7 +107,7 @@ function FormCheckbox(props: Omit<ComponentProps<"input">, "type">) {
 			<input
 				{...props}
 				type='checkbox'
-				className='peer size-4 cursor-pointer appearance-none rounded border border-muted-foreground/60 transition-colors checked:border-primary checked:bg-primary'
+				className='peer size-4 cursor-pointer appearance-none rounded border border-muted-foreground/60 transition-colors checked:border-[#5e6ad2] checked:bg-[#5e6ad2]'
 			/>
 			<Check
 				aria-hidden='true'
@@ -184,7 +185,7 @@ function FieldInput({
 									// A second click clears the choice, so an optional question can stay empty.
 									onClick={() => value === option.id && onChange(null)}
 									onChange={() => onChange(option.id)}
-									className='size-4 shrink-0 cursor-pointer appearance-none rounded-full border border-muted-foreground/60 transition-[border] checked:border-[5px] checked:border-primary'
+									className='size-4 shrink-0 cursor-pointer appearance-none rounded-full border border-muted-foreground/60 transition-[border] checked:border-[5px] checked:border-[#5e6ad2]'
 								/>
 								{option.name}
 							</label>
@@ -289,6 +290,7 @@ export function FormFill({
 	const [missing, setMissing] = useState<ReadonlySet<string>>(new Set());
 	const [sent, setSent] = useState<string | null>(null);
 	const submit = useSubmitPageForm(shareToken);
+	const quiz = getSectionQuiz(section.data_config);
 	const properties = new Map(
 		database.properties.map((item) => [item.id, item]),
 	);
@@ -324,12 +326,19 @@ export function FormFill({
 			<div className='mx-auto w-full max-w-xl space-y-3'>
 				<div
 					role='status'
-					className='flex items-center gap-3 rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-4 py-3'
+					className='flex items-start gap-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 shadow-2xs'
 				>
-					<CheckCircle2 className='size-5 shrink-0 text-emerald-500' />
-					<p className='min-w-0 text-sm font-medium'>
-						{sent || "Thanks, your answer was sent."}
-					</p>
+					<CheckCircle2 className='mt-0.5 size-5 shrink-0 text-emerald-500' />
+					<div className='min-w-0 flex-1 space-y-0.5'>
+						<p className='text-sm font-semibold'>
+							{sent || "Thanks, your answer was sent."}
+						</p>
+						{quiz && (
+							<p className='text-xs text-muted-foreground'>
+								Your quiz response has been recorded.
+							</p>
+						)}
+					</div>
 				</div>
 				<Button
 					type='button'
@@ -387,6 +396,8 @@ export function FormFill({
 		) : null;
 	};
 
+	let questionCounter = 0;
+
 	const renderQuestion = (child: FormFillBlock): ReactNode => {
 			const field =
 				child.type === PageBlockType.FORM_FIELD
@@ -406,6 +417,7 @@ export function FormFill({
 			const errorId = `${inputId}-error`;
 			const invalid = missing.has(property.id);
 			const followUp = isFollowUp(property.id);
+			const questionNumber = followUp ? null : ++questionCounter;
 			const labelText = (
 				<>
 					{getFieldLabel(child.content, property.name)}
@@ -421,23 +433,38 @@ export function FormFill({
 					key={child.id}
 					className={cn(!followUp && "space-y-2")}
 				>
-					{followUp && property.type === PropertyType.CHECKBOX ? null : GROUP_TYPES.has(
-							property.type,
-						) ? (
+					{followUp && property.type === PropertyType.CHECKBOX ? null : followUp ? (
 						<p
 							id={inputId}
 							tabIndex={-1}
-							className={cn(
-								"text-sm font-medium outline-none",
-								followUp && "sr-only",
-							)}
+							className='sr-only text-sm font-medium outline-none'
 						>
 							{labelText}
 						</p>
 					) : (
-						<label htmlFor={inputId} className='block text-sm font-medium'>
-							{labelText}
-						</label>
+						<div className='flex items-baseline gap-2'>
+							{questionNumber !== null && (
+								<span
+									aria-hidden='true'
+									className='inline-flex size-5 shrink-0 items-center justify-center rounded-md bg-muted text-[11px] font-semibold text-muted-foreground'
+								>
+									{questionNumber}
+								</span>
+							)}
+							{GROUP_TYPES.has(property.type) ? (
+								<p
+									id={inputId}
+									tabIndex={-1}
+									className='text-sm font-medium outline-none'
+								>
+									{labelText}
+								</p>
+							) : (
+								<label htmlFor={inputId} className='block text-sm font-medium'>
+									{labelText}
+								</label>
+							)}
+						</div>
 					)}
 					<FieldInput
 						id={inputId}
@@ -524,6 +551,15 @@ export function FormFill({
 				);
 			}}
 		>
+			{quiz && quiz.max_attempts !== null && (
+				<div className='flex items-center gap-2 rounded-lg border border-[#5e6ad2]/25 bg-[#5e6ad2]/8 px-3 py-2 text-xs font-medium text-[#5e6ad2] dark:border-indigo-500/25 dark:bg-indigo-500/10 dark:text-indigo-300'>
+					<span>
+						Quiz · Up to {quiz.max_attempts}{" "}
+						{quiz.max_attempts === 1 ? "attempt" : "attempts"} per person
+					</span>
+				</div>
+			)}
+
 			{section.children.map((child) => {
 				const field =
 					child.type === PageBlockType.FORM_FIELD

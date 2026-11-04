@@ -149,7 +149,7 @@ function QuizSettings({
 	};
 
 	return (
-		<div className='space-y-2 border-t border-border pt-3'>
+		<div className='space-y-2.5 border-t border-border/70 pt-3'>
 			<button
 				type='button'
 				role='switch'
@@ -163,7 +163,7 @@ function QuizSettings({
 					aria-hidden='true'
 					className={cn(
 						"flex h-4 w-7 items-center rounded-full p-0.5 transition-colors",
-						quiz ? "justify-end bg-ring" : "bg-muted-foreground/30",
+						quiz ? "justify-end bg-[#5e6ad2]" : "bg-muted-foreground/30",
 					)}
 				>
 					<span className='size-3 rounded-full bg-background' />
@@ -588,6 +588,7 @@ export function FillFormButton({
 	title: string;
 }) {
 	const [open, setOpen] = useState(false);
+	const quiz = getSectionQuiz(block.data_config);
 
 	return (
 		<>
@@ -598,9 +599,18 @@ export function FillFormButton({
 			<Dialog open={open} onOpenChange={setOpen}>
 				<DialogContent className='max-h-[85vh] overflow-y-auto sm:max-w-lg'>
 					<DialogHeader>
-						<DialogTitle>{title || "Untitled form"}</DialogTitle>
+						<div className='flex items-center gap-2'>
+							<DialogTitle>{title || "Untitled form"}</DialogTitle>
+							{quiz && (
+								<span className='inline-flex items-center gap-1 rounded-full bg-[#5e6ad2]/12 px-2 py-0.5 text-[11px] font-medium text-[#5e6ad2] dark:bg-indigo-500/15 dark:text-indigo-300'>
+									Quiz
+								</span>
+							)}
+						</div>
 						<DialogDescription>
-							Answers are saved as a new row.
+							{quiz
+								? "Complete the questions below and submit your response."
+								: "Answers are saved as a new row."}
 						</DialogDescription>
 					</DialogHeader>
 					<FormFill

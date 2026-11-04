@@ -233,7 +233,13 @@ export function PageBlockEditorRow({ block, shareToken }: PageBlockEditorRowProp
 			</Popover>
 
 			{/* Block content: a faint background on the row under the pointer, like the handles */}
-			<div className='relative min-w-0 rounded-md pl-1 transition-colors [[data-block-row]:hover:not(:has([data-block-row]:hover))>&]:bg-muted/40'>
+			<div
+				className={cn(
+					"relative min-w-0 rounded-md pl-1 transition-colors",
+					block.type !== PageBlockType.DATABASE_VIEW &&
+						"[[data-block-row]:hover:not(:has([data-block-row]:hover))>&]:bg-muted/40",
+				)}
+			>
 				<PageBlockRenderer block={block} shareToken={shareToken} />
 				{indicator && <DropIndicator position={indicator} />}
 			</div>

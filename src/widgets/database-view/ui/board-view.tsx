@@ -13,16 +13,17 @@ import {
 	useSensors,
 	type CollisionDetection,
 	type DragEndEvent,
+	type DragOverEvent,
 	type DragStartEvent,
 } from "@dnd-kit/core";
 import {
 	SortableContext,
 	useSortable,
-	verticalListSortingStrategy,
+	type SortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { KanbanSquare, MoreHorizontal, Plus } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { Fragment, useState, type CSSProperties, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import {
@@ -39,10 +40,7 @@ import {
 	type DatabaseViewDetail,
 	type PropertyOption,
 } from "@/entities/database/model/database.types";
-import {
-	PropertyIcon,
-	PropertyOptionBadge,
-} from "@/entities/database/ui/database-visuals";
+import { PropertyIcon } from "@/entities/database/ui/database-visuals";
 import { cn } from "@/shared/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 
@@ -62,6 +60,18 @@ import { RowPropertySummary } from "./row-property-summary";
 import { RenameRowButton, RowTitle } from "./row-title";
 
 const NO_GROUP_ID = "__no_group__";
+const DROP_AT_END = "__drop_at_end__";
+
+const noShiftStrategy: SortingStrategy = () => null;
+
+function DropLine() {
+	return (
+		<div
+			aria-hidden
+			className='-my-[5px] h-0.5 rounded-full bg-(--board-text)'
+		/>
+	);
+}
 
 // Cards stay compact: only people, dates and option badges; the full row is in the side peek.
 const CARD_PROPERTY_TYPES = new Set<PropertyType>([
@@ -189,13 +199,15 @@ function BoardColumns({
 	const titleProperty = getTitleProperty(database);
 	const cardProperties = getVisibleProperties(database, viewDetail).filter(
 		(property) =>
-			property.id !== groupProperty.id && CARD_PROPERTY_TYPES.has(property.type),
+			property.id !== groupProperty.id &&
+			CARD_PROPERTY_TYPES.has(property.type),
 	);
 	const setValueMutation = useSetDatabaseRowValue(database.id);
 	const moveRowMutation = useMoveDatabaseRow(database.id);
 	const manualOrder = (viewDetail.sorts?.length ?? 0) === 0;
 	const { addRow, isPending } = useQuickAddRow(database);
 	const [activeRowId, setActiveRowId] = useState<string | null>(null);
+	const [overId, setOverId] = useState<string | null>(null);
 	// Card whose name is being edited inline (pencil button or a just-added card).
 	const [editingRowId, setEditingRowId] = useState<string | null>(null);
 
@@ -247,18 +259,14 @@ function BoardColumns({
 
 	const activeRow = rows.find((row) => row.id === activeRowId);
 
-	const handleDragStart = (event: DragStartEvent) =>
-		setActiveRowId(String(event.active.id));
+	const resolveDrop = (rowId: string, overId: string | null) => {
+		const row = rows.find((item) => item.id === rowId);
+		if (!row || !overId) return null;
 
-	const handleDragEnd = ({ active, over }: DragEndEvent) => {
-		setActiveRowId(null);
-		const row = rows.find((item) => item.id === active.id);
-		if (!row || !over) return;
-
-		const overId = String(over.id);
 		const overRow = rows.find((item) => item.id === overId);
 		const targetColumn = overRow ? groupOf(overRow) : overId;
-		if (!overRow && !columns.some((column) => column.id === overId)) return;
+		if (!overRow && !columns.some((column) => column.id === overId))
+			return null;
 
 		const sourceColumn = groupOf(row);
 		const sameColumn = sourceColumn === targetColumn;
@@ -267,16 +275,40 @@ function BoardColumns({
 			(item) => item.id !== row.id && groupOf(item) === targetColumn,
 		);
 
-		let insertAt = targetRows.length;
+		let insertAt: number | null = targetRows.length;
 		if (overRow && overRow.id !== row.id) {
 			const overIndex = targetRows.findIndex((item) => item.id === overRow.id);
 			const movingDown =
 				sameColumn &&
-				sourceRows.indexOf(row) < sourceRows.findIndex((item) => item.id === overRow.id);
+				sourceRows.indexOf(row) <
+					sourceRows.findIndex((item) => item.id === overRow.id);
 			insertAt = movingDown ? overIndex + 1 : overIndex;
 		} else if (sameColumn) {
-			return;
+			insertAt = null;
 		}
+
+		return { row, targetColumn, sameColumn, sourceRows, targetRows, insertAt };
+	};
+
+	const dropTarget = activeRowId ? resolveDrop(activeRowId, overId) : null;
+
+	const handleDragStart = (event: DragStartEvent) =>
+		setActiveRowId(String(event.active.id));
+
+	const handleDragOver = ({ over }: DragOverEvent) =>
+		setOverId(over ? String(over.id) : null);
+
+	const handleDragCancel = () => {
+		setActiveRowId(null);
+		setOverId(null);
+	};
+
+	const handleDragEnd = ({ active, over }: DragEndEvent) => {
+		handleDragCancel();
+		const drop = resolveDrop(String(active.id), over ? String(over.id) : null);
+		if (!drop || drop.insertAt === null) return;
+		const { row, targetColumn, sameColumn, sourceRows, targetRows, insertAt } =
+			drop;
 
 		const previousRowId = targetRows[insertAt - 1]?.id ?? null;
 		const nextRowId = targetRows[insertAt]?.id ?? null;
@@ -322,64 +354,76 @@ function BoardColumns({
 				sensors={sensors}
 				collisionDetection={collisionDetection}
 				onDragStart={handleDragStart}
+				onDragOver={handleDragOver}
 				onDragEnd={handleDragEnd}
-				onDragCancel={() => setActiveRowId(null)}
+				onDragCancel={handleDragCancel}
 			>
 				<div className='flex items-start gap-4 overflow-x-auto pb-3'>
-					{columns.map((column) => (
-						<BoardColumn
-							key={column.id}
-							id={column.id}
-							name={column.name}
-							color={column.color}
-							databaseId={database.id}
-							property={groupProperty}
-							option={groupProperty.options.find((item) => item.id === column.id)}
-							count={column.rows.length}
-							isPending={isPending}
-							readOnly={readOnly}
-							onAdd={async () => {
-								const rowId = await addRow([
-									{
-										propertyId: groupProperty.id,
-										value: column.id === NO_GROUP_ID ? undefined : column.id,
-									},
-								]);
-								if (rowId) setEditingRowId(rowId);
-							}}
-						>
-							<SortableContext
-								items={column.rows.map((row) => row.id)}
-								strategy={verticalListSortingStrategy}
+					{columns.map((column) => {
+						const isDropTarget = dropTarget?.targetColumn === column.id;
+						const dropBeforeId =
+							isDropTarget && dropTarget.insertAt !== null
+								? (dropTarget.targetRows[dropTarget.insertAt]?.id ??
+									DROP_AT_END)
+								: null;
+						return (
+							<BoardColumn
+								key={column.id}
+								id={column.id}
+								name={column.name}
+								color={column.color}
+								isDropTarget={isDropTarget}
+								databaseId={database.id}
+								property={groupProperty}
+								option={groupProperty.options.find(
+									(item) => item.id === column.id,
+								)}
+								count={column.rows.length}
+								isPending={isPending}
+								readOnly={readOnly}
+								onAdd={async () => {
+									const rowId = await addRow([
+										{
+											propertyId: groupProperty.id,
+											value: column.id === NO_GROUP_ID ? undefined : column.id,
+										},
+									]);
+									if (rowId) setEditingRowId(rowId);
+								}}
 							>
-								{column.rows.map((row) => (
-									<BoardCard
-										key={row.id}
-										row={row}
-										database={database}
-										titleProperty={titleProperty}
-										cardProperties={cardProperties}
-										onOpen={() => onOpenRow(row.id)}
-										editing={row.id === editingRowId}
-										onEditingChange={(editing) =>
-											setEditingRowId(editing ? row.id : null)
-										}
-										readOnly={readOnly}
-									/>
-								))}
-							</SortableContext>
-						</BoardColumn>
-					))}
+								<SortableContext
+									items={column.rows.map((row) => row.id)}
+									strategy={noShiftStrategy}
+								>
+									{column.rows.map((row) => (
+										<Fragment key={row.id}>
+											{dropBeforeId === row.id && <DropLine />}
+											<BoardCard
+												row={row}
+												database={database}
+												titleProperty={titleProperty}
+												cardProperties={cardProperties}
+												onOpen={() => onOpenRow(row.id)}
+												editing={row.id === editingRowId}
+												onEditingChange={(editing) =>
+													setEditingRowId(editing ? row.id : null)
+												}
+												readOnly={readOnly}
+											/>
+										</Fragment>
+									))}
+									{dropBeforeId === DROP_AT_END && <DropLine />}
+								</SortableContext>
+							</BoardColumn>
+						);
+					})}
 
 					{!readOnly && (
-						<NewGroupColumn
-							databaseId={database.id}
-							property={groupProperty}
-						/>
+						<NewGroupColumn databaseId={database.id} property={groupProperty} />
 					)}
 				</div>
 
-				<DragOverlay>
+				<DragOverlay dropAnimation={null}>
 					{activeRow && (
 						<div className='w-[272px] rotate-1 cursor-grabbing rounded-lg border border-border bg-card px-3 py-2.5 text-[13.5px] font-medium shadow-elevated'>
 							{(titleProperty &&
@@ -397,6 +441,7 @@ interface BoardColumnProps {
 	id: string;
 	name: string;
 	color: string | null;
+	isDropTarget: boolean;
 	databaseId: string;
 	property: DatabaseProperty;
 	/** Missing for the "No …" column, which has no option to edit. */
@@ -408,13 +453,40 @@ interface BoardColumnProps {
 	children: ReactNode;
 }
 
-const COLUMN_LABEL_CLASS =
-	"h-auto gap-2 border-0 px-0 text-[13.5px] font-medium text-foreground";
+function getTintStyle(color: string | null) {
+	const tint = color ?? "var(--muted-foreground)";
+	const mix = (percent: number, base = "transparent") =>
+		`color-mix(in srgb, ${tint} ${percent}%, ${base})`;
+	return {
+		"--board-column": mix(7),
+		"--board-column-over": mix(14),
+		"--board-card": mix(9),
+		"--board-card-hover": mix(15),
+		"--board-label": mix(20),
+		"--board-text": mix(70, "var(--foreground)"),
+	} as CSSProperties;
+}
+
+function ColumnLabel({ name, noGroup }: { name: string; noGroup: boolean }) {
+	return (
+		<span
+			className={cn(
+				"block truncate text-[13.5px] font-medium",
+				noGroup
+					? "text-foreground"
+					: "rounded-[4px] bg-(--board-label) px-1.5 leading-[22px] text-(--board-text)",
+			)}
+		>
+			{name}
+		</span>
+	);
+}
 
 function BoardColumn({
 	id,
 	name,
 	color,
+	isDropTarget,
 	databaseId,
 	property,
 	option,
@@ -424,7 +496,7 @@ function BoardColumn({
 	onAdd,
 	children,
 }: BoardColumnProps) {
-	const { setNodeRef, isOver } = useDroppable({ id });
+	const { setNodeRef } = useDroppable({ id });
 	const noGroup = id === NO_GROUP_ID;
 	const [menuOpen, setMenuOpen] = useState(false);
 
@@ -432,22 +504,15 @@ function BoardColumn({
 		<section
 			ref={setNodeRef}
 			aria-label={`${name} column`}
+			style={getTintStyle(color)}
 			className={cn(
-				"group/column flex w-[272px] shrink-0 flex-col gap-2 rounded-lg transition-colors",
-				isOver && "bg-muted/60",
+				"group/column flex w-[272px] shrink-0 flex-col gap-2 rounded-xl bg-(--board-column) p-2 transition-colors",
+				isDropTarget && "bg-(--board-column-over) ring-2 ring-(--board-label)",
 			)}
 		>
-			<header className='flex h-8 items-center gap-2'>
-				{readOnly && option ? (
-					<PropertyOptionBadge
-									name={name}
-									color={color}
-									className={COLUMN_LABEL_CLASS}
-								/>
-				) : noGroup || !option ? (
-					<span className='truncate text-[13.5px] font-medium text-foreground'>
-						{name}
-					</span>
+			<header className='flex h-7 items-center gap-2 px-1'>
+				{readOnly || noGroup || !option ? (
+					<ColumnLabel name={name} noGroup={noGroup || !option} />
 				) : (
 					<Popover open={menuOpen} onOpenChange={setMenuOpen}>
 						<PopoverTrigger asChild>
@@ -456,11 +521,7 @@ function BoardColumn({
 								aria-label={`Edit ${name}`}
 								className='min-w-0 rounded-[4px] outline-none focus-visible:ring-2 focus-visible:ring-ring/50'
 							>
-								<PropertyOptionBadge
-									name={name}
-									color={color}
-									className={COLUMN_LABEL_CLASS}
-								/>
+								<ColumnLabel name={name} noGroup={false} />
 							</button>
 						</PopoverTrigger>
 						<PopoverContent align='start' className='w-48 p-1.5'>
@@ -473,7 +534,7 @@ function BoardColumn({
 						</PopoverContent>
 					</Popover>
 				)}
-				<span className='text-[13px] tabular-nums text-faint'>
+				<span className='text-[13px] tabular-nums text-(--board-text) opacity-70'>
 					{count}
 				</span>
 				{option && !readOnly && (
@@ -487,15 +548,15 @@ function BoardColumn({
 					</button>
 				)}
 				{!readOnly && (
-				<button
-					type='button'
-					aria-label={`Add to ${name}`}
-					disabled={isPending}
-					onClick={onAdd}
-					className='ml-auto flex size-6 items-center justify-center rounded-sm text-muted-foreground opacity-0 hover:bg-muted hover:text-foreground focus-visible:opacity-100 group-hover/column:opacity-100 disabled:opacity-50 [@media(hover:none)]:opacity-100'
-				>
-					<Plus className='size-3.5' />
-				</button>
+					<button
+						type='button'
+						aria-label={`Add to ${name}`}
+						disabled={isPending}
+						onClick={onAdd}
+						className='ml-auto flex size-6 items-center justify-center rounded-sm text-muted-foreground opacity-0 hover:bg-muted hover:text-foreground focus-visible:opacity-100 group-hover/column:opacity-100 disabled:opacity-50 [@media(hover:none)]:opacity-100'
+					>
+						<Plus className='size-3.5' />
+					</button>
 				)}
 			</header>
 
@@ -506,7 +567,7 @@ function BoardColumn({
 					type='button'
 					disabled={isPending}
 					onClick={onAdd}
-					className='flex h-7 items-center gap-1.5 rounded-md px-1.5 text-[13px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-50'
+					className='flex h-8 items-center gap-1.5 rounded-lg px-2 text-[13px] text-(--board-text) opacity-80 transition-colors hover:bg-(--board-card) hover:opacity-100 disabled:opacity-50'
 				>
 					<Plus className='size-3.5' />
 					New
@@ -582,7 +643,7 @@ function BoardCard({
 				if (event.key === "Enter") onOpen();
 			}}
 			className={cn(
-				"group/row relative flex flex-col gap-2 rounded-lg border border-border bg-card px-3 py-2.5 text-[13.5px] outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring/50",
+				"group/row relative flex flex-col gap-2 rounded-lg bg-(--board-card) px-3 py-2.5 text-[13.5px] outline-none transition-colors hover:bg-(--board-card-hover) focus-visible:ring-2 focus-visible:ring-ring/50",
 				readOnly ? "cursor-pointer" : "cursor-grab active:cursor-grabbing",
 				isDragging && "opacity-40",
 			)}
@@ -603,7 +664,10 @@ function BoardCard({
 				/>
 				{personProperties.length > 0 && (
 					<div className='ml-auto shrink-0 [&_[data-slot=avatar]+span]:sr-only [&_[data-slot=avatar]]:size-[18px]'>
-						<RowPropertySummary {...summaryProps} properties={personProperties} />
+						<RowPropertySummary
+							{...summaryProps}
+							properties={personProperties}
+						/>
 					</div>
 				)}
 			</div>
@@ -614,18 +678,18 @@ function BoardCard({
 
 			{/* Opening the menu must not start a drag (Mouse/Touch sensors). */}
 			{!readOnly && (
-			<div
-				className='absolute right-1 top-1 flex items-center gap-0.5 rounded-md group-hover/row:bg-accent [&_button]:size-6'
-				onMouseDown={(event) => event.stopPropagation()}
-				onTouchStart={(event) => event.stopPropagation()}
-				onClick={(event) => event.stopPropagation()}
-				onKeyDown={(event) => event.stopPropagation()}
-			>
-				{titleProperty && !editing && (
-					<RenameRowButton onClick={() => onEditingChange(true)} />
-				)}
-				<RowActionsMenu databaseId={database.id} rowId={row.id} />
-			</div>
+				<div
+					className='absolute right-1 top-1 flex items-center gap-0.5 rounded-md group-hover/row:bg-(--board-card-hover) [&_button]:size-6'
+					onMouseDown={(event) => event.stopPropagation()}
+					onTouchStart={(event) => event.stopPropagation()}
+					onClick={(event) => event.stopPropagation()}
+					onKeyDown={(event) => event.stopPropagation()}
+				>
+					{titleProperty && !editing && (
+						<RenameRowButton onClick={() => onEditingChange(true)} />
+					)}
+					<RowActionsMenu databaseId={database.id} rowId={row.id} />
+				</div>
 			)}
 		</article>
 	);

@@ -1,6 +1,6 @@
 "use client";
 
-import { Trash2 } from "lucide-react";
+import { Check, Trash2 } from "lucide-react";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -78,9 +78,11 @@ interface FormFieldBlockEditorProps {
 function QuestionOptions({
 	databaseId,
 	property,
+	correctValue,
 }: {
 	databaseId: string;
 	property: FormDatabase["properties"][number];
+	correctValue?: FormAnswerKey["correct_value"] | null;
 }) {
 	const [name, setName] = useState("");
 	const addOption = useAddPropertyOption(databaseId, property.id);
@@ -100,15 +102,37 @@ function QuestionOptions({
 	};
 
 	return (
-		<div className='mt-2 ml-6 flex flex-wrap items-center gap-1'>
-			{property.options.map((option) => (
-				<span key={option.id} className='rounded-sm bg-muted px-1.5 py-0.5 text-xs'>
-					{option.name}
-				</span>
-			))}
+		<div className='mt-2.5 ml-8 flex flex-wrap items-center gap-1.5'>
+			{property.options.map((option) => {
+				const isCorrect = Array.isArray(correctValue)
+					? correctValue.includes(option.id)
+					: correctValue !== null &&
+						correctValue !== undefined &&
+						correctValue === option.id;
+
+				return (
+					<span
+						key={option.id}
+						className={cn(
+							"inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs transition-colors",
+							isCorrect
+								? "border-emerald-500/40 bg-emerald-500/12 font-medium text-emerald-700 dark:text-emerald-300"
+								: "border-border/70 bg-muted/60 text-foreground/90",
+						)}
+					>
+						{isCorrect && (
+							<Check
+								aria-hidden='true'
+								className='size-3 text-emerald-600 dark:text-emerald-400'
+							/>
+						)}
+						{option.name}
+					</span>
+				);
+			})}
 			<input
 				value={name}
-				placeholder='Add an option'
+				placeholder='+ Add an option'
 				aria-label={`Add an option to ${property.name}`}
 				onChange={(event) => setName(event.target.value)}
 				onKeyDown={(event) => {
@@ -117,7 +141,7 @@ function QuestionOptions({
 					submit();
 				}}
 				onBlur={submit}
-				className='min-w-24 flex-1 border-0 bg-transparent p-0 text-xs outline-none placeholder:text-muted-foreground/60'
+				className='min-w-24 flex-1 border-0 bg-transparent p-0 pl-1 text-xs outline-none placeholder:text-muted-foreground/60'
 			/>
 		</div>
 	);
@@ -174,7 +198,7 @@ function OptionConditionsEditor({
 	if (sources.length === 0) return null;
 
 	return (
-		<div className='mt-2 ml-6 space-y-1.5 text-xs text-muted-foreground'>
+		<div className='mt-2.5 ml-8 space-y-1.5 text-xs text-muted-foreground'>
 			<div className='flex items-center gap-2'>
 				Options depend on
 				<Select
@@ -266,7 +290,7 @@ function ShowWhenSelect({
 	const current = `${condition?.property_id}:${condition?.option_id}`;
 
 	return (
-		<div className='mt-2 ml-6 flex items-center gap-2 text-xs text-muted-foreground'>
+		<div className='mt-2.5 ml-8 flex items-center gap-2 text-xs text-muted-foreground'>
 			Show
 			<Select
 				value={
@@ -333,14 +357,19 @@ export function FormFieldBlockEditor({
 		);
 	}
 
+	const answerKey = quizState?.keys.get(block.id);
+	const hasCorrectAnswer = Boolean(
+		answerKey && answerKey.correct_value !== null,
+	);
+
 	return (
-		<div className='group/question w-full rounded-lg border border-border bg-background px-3.5 py-3 transition-colors focus-within:border-ring'>
-			<div className='flex items-center gap-2'>
-				<span title={`Saved to ${property.name}`} className='shrink-0'>
-					<PropertyIcon
-						type={property.type}
-						className='size-4 text-muted-foreground'
-					/>
+		<div className='group/question w-full rounded-xl border border-border/80 bg-card/95 px-4 py-3 shadow-2xs transition-colors focus-within:border-[#5e6ad2]/60'>
+			<div className='flex items-center gap-2.5'>
+				<span
+					title={`Saved to ${property.name}`}
+					className='flex size-6 shrink-0 items-center justify-center rounded-md bg-muted/70 text-muted-foreground'
+				>
+					<PropertyIcon type={property.type} className='size-3.5' />
 				</span>
 				<input
 					ref={inputRef}
@@ -360,8 +389,13 @@ export function FormFieldBlockEditor({
 						}
 					}}
 					placeholder='Question'
-				className='min-w-0 flex-1 border-0 bg-transparent p-0 text-sm font-medium outline-none placeholder:text-muted-foreground/50'
+					className='min-w-0 flex-1 border-0 bg-transparent p-0 text-sm font-medium outline-none placeholder:text-muted-foreground/50'
 				/>
+				{hasCorrectAnswer && answerKey && (
+					<span className='shrink-0 rounded-full bg-emerald-500/12 px-2 py-0.5 text-[11.5px] font-semibold text-emerald-600 dark:text-emerald-400'>
+						+{answerKey.points} {answerKey.points === 1 ? "pt" : "pts"}
+					</span>
+				)}
 				<button
 					type='button'
 					role='switch'
@@ -380,7 +414,9 @@ export function FormFieldBlockEditor({
 						aria-hidden='true'
 						className={cn(
 							"flex h-4 w-7 items-center rounded-full p-0.5 transition-colors",
-							field.required ? "justify-end bg-ring" : "bg-muted-foreground/30",
+							field.required
+								? "justify-end bg-[#5e6ad2]"
+								: "bg-muted-foreground/30",
 						)}
 					>
 						<span className='size-3 rounded-full bg-background' />
@@ -431,7 +467,11 @@ export function FormFieldBlockEditor({
 			{database &&
 				(property.type === PropertyType.SELECT ||
 					property.type === PropertyType.MULTI_SELECT) && (
-					<QuestionOptions databaseId={database.id} property={property} />
+					<QuestionOptions
+						databaseId={database.id}
+						property={property}
+						correctValue={answerKey?.correct_value}
+					/>
 				)}
 			{database && property.type === PropertyType.MULTI_SELECT && (
 				<OptionConditionsEditor
@@ -467,7 +507,7 @@ export function FormFieldBlockEditor({
 				/>
 			)}
 			{quizState?.unavailable && (
-				<p className='mt-2 ml-6 text-xs text-muted-foreground'>
+				<p className='mt-2.5 ml-8 text-xs text-muted-foreground'>
 					You need edit access to the answers page to set the correct answer.
 				</p>
 			)}
@@ -479,7 +519,7 @@ export function FormFieldBlockEditor({
 						sectionBlockId={quizState.sectionBlockId}
 						fieldBlockId={block.id}
 						property={property}
-						answerKey={quizState.keys.get(block.id)}
+						answerKey={answerKey}
 					/>
 				)}
 		</div>
