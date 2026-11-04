@@ -4,6 +4,16 @@ import type {
 } from "@/entities/ai-assistant/model/ai-assistant.types";
 import type { AiChatMessage } from "./types";
 import { isAiCapability } from "./ai-capability";
+import { validSources } from "./ai-ask-response-mapper";
+
+/** M8: the source Pages saved with a draft, so a reopened draft still shows "Dựa trên". */
+function savedSources(generation: AiGeneration) {
+	const output = generation.output_data;
+	const pageId = output && typeof output === "object" && !Array.isArray(output) && "pageId" in output
+		? output.pageId : undefined;
+	return generation.capability === "GENERATE_PAGE_MODIFICATION_PLAN" && generation.sources !== undefined &&
+		validSources(generation.sources, pageId) ? generation.sources : undefined;
+}
 
 export function mapAiHistoryMessages(
 	messages: AiHistoryMessage[],
@@ -24,6 +34,7 @@ export function mapAiHistoryMessages(
 			const metadataCapability = message.metadata?.capability;
 			const wireCapability = candidate?.capability ?? metadataCapability;
 			const capability = isAiCapability(wireCapability) ? wireCapability : null;
+			const sources = generation && message.role === "ASSISTANT" ? savedSources(generation) : undefined;
 			return {
 				id: message.id,
 				role: message.role === "USER" ? "user" : "assistant",
@@ -38,6 +49,7 @@ export function mapAiHistoryMessages(
 					...(typeof linkedId === "string" ? { generationId: linkedId } : {}),
 				},
 					...(generation ? { generation } : {}),
+					...(sources ? { sources } : {}),
 					...(generation?.capability === "GENERATE_PAGE_MODIFICATION_PLAN" && options.previewOnly
 						? { previewOnly: true } : {}),
 				createdAt: message.created_at,

@@ -23,7 +23,7 @@ const readyDraft = {
 			blocks: [{ type: "HEADER", content: { text: "QA" } }],
 		}],
 	},
-} as AiGeneration;
+} as unknown as AiGeneration;
 
 describe("Outdated modification draft", () => {
 	it("shows Outdated and offers only Discard once the server rejected it as stale", () => {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { AiAskResponse } from "@/entities/ai-assistant/model/ai-assistant.types";
+import type { AiAskResponse, AiGeneration, AiHistoryMessage } from "@/entities/ai-assistant/model/ai-assistant.types";
+import { mapAiHistoryMessages } from "@/widgets/ai-chat/model/ai-history-mapper";
 import { mapAiAskResponse } from "@/widgets/ai-chat/model/ai-ask-response-mapper";
 import { askResponses, pageId, workspaceId } from "./ai-ask.fixtures";
 
@@ -43,5 +44,34 @@ describe("M8: a draft based on other Pages", () => {
 				needsClarification: false, basedOn: "trang Bug tracker" } })],
 	])("rejects %s", (_name, payload) => {
 		expect(mapAiAskResponse(payload, request).kind).toBe("invalid");
+	});
+});
+
+// M8: reopening a saved draft (history reload) still shows what it was based on.
+describe("M8: sources of a reopened draft", () => {
+	const generation = (changes: Record<string, unknown> = {}) => ({
+		id: "generation-1", capability: "GENERATE_PAGE_MODIFICATION_PLAN", status: "COMPLETED",
+		conversation_id: "conversation-1", output_data: { pageId }, sources, ...changes,
+	}) as unknown as AiGeneration;
+	const messages: AiHistoryMessage[] = [
+		{ id: "m-user", conversation_id: "conversation-1", role: "USER", content: "thêm checklist",
+			metadata: { generationId: "generation-1" }, created_at: "2026-10-31T10:00:00.000Z" },
+		{ id: "m-assistant", conversation_id: "conversation-1", role: "ASSISTANT", content: "Bản nháp",
+			metadata: { generationId: "generation-1" }, created_at: "2026-10-31T10:00:01.000Z" },
+	];
+
+	it("puts the saved sources on the draft's message only", () => {
+		const [user, assistant] = mapAiHistoryMessages(messages, [generation()]);
+		expect(assistant.sources).toEqual(sources);
+		expect(user).not.toHaveProperty("sources");
+	});
+
+	it.each([
+		["no saved sources", generation({ sources: undefined })],
+		["the edited Page as its own source", generation({ sources: [{ pageId, title: "QA" }] })],
+		["a source without an ID", generation({ sources: [{ title: "Bug tracker" }] })],
+		["another capability", generation({ capability: "GENERATE_PAGE_COMPOSITION" })],
+	])("shows nothing for %s", (_name, saved) => {
+		expect(mapAiHistoryMessages(messages, [saved])[1]).not.toHaveProperty("sources");
 	});
 });

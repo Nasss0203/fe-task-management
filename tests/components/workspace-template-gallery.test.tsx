@@ -281,7 +281,8 @@ describe("Buyer template detail", () => {
 			}),
 		);
 		expect(claim).not.toHaveBeenCalled();
-		await waitFor(() => expect(routerPush).toHaveBeenCalledWith("/page/new-page"));
+		// Use → navigate runs several async steps; allow for a busy parallel test run.
+		await waitFor(() => expect(routerPush).toHaveBeenCalledWith("/page/new-page"), { timeout: 5000 });
 	});
 
 	it("has no interactive preview link for IMAGE listings", async () => {

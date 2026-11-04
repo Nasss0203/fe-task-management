@@ -33,6 +33,7 @@ const mockPublicSite: PublicSitePage = {
 		updated_at: "2026-09-30",
 	},
 	blocks: [],
+	capabilities: { updates_enabled: false, authenticated: false, can_update: false },
 };
 
 function renderWithClient(ui: React.ReactElement) {

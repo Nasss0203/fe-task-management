@@ -39,6 +39,7 @@ const rootDirectPublished: PagePublication = {
 	publication_type: "DIRECT",
 	visibility_override: null,
 	include_descendants: true,
+	allow_updates: false,
 	published: true,
 	published_at: "2026-09-29T00:00:00Z",
 	unpublished_at: null,
@@ -54,6 +55,7 @@ const inheritedChildPublished: PagePublication = {
 	publication_type: "INHERITED",
 	visibility_override: null,
 	include_descendants: true,
+	allow_updates: false,
 	published: true,
 	published_at: "2026-09-29T00:00:00Z",
 	unpublished_at: null,
@@ -69,6 +71,7 @@ const historicalChildDirectUnpublished: PagePublication = {
 	publication_type: "DIRECT",
 	visibility_override: null,
 	include_descendants: false,
+	allow_updates: false,
 	published: false,
 	published_at: "2026-09-01T00:00:00Z",
 	unpublished_at: "2026-09-10T00:00:00Z",
@@ -109,7 +112,7 @@ describe("PagePublishTab", () => {
 		});
 		vi.spyOn(pagePublicationApi, "updatePublicationSettings").mockImplementation(
 			async (_pageId, _siteId, payload) => {
-				records = [{ ...rootDirectPublished, include_descendants: payload.include_descendants }];
+				records = [{ ...rootDirectPublished, ...payload }];
 				return records[0];
 			},
 		);
@@ -145,6 +148,13 @@ describe("PagePublishTab", () => {
 
 	afterEach(() => vi.restoreAllMocks());
 
+	// The subpages switch lives in the Publication settings dialog.
+	const openSubpagesSwitch = async () => {
+		await userEvent.click(await screen.findByRole("button", { name: "Settings" }));
+		return screen.findByRole("switch", { name: "Include subpages" });
+	};
+	const closeSettings = () => userEvent.keyboard("{Escape}");
+
 	it("renders Root private with site URL, subpages switch, and Publish button (sends only include_descendants)", async () => {
 		records = [];
 		mount("home");
@@ -152,9 +162,9 @@ describe("PagePublishTab", () => {
 		expect(await screen.findByText(/asss\.localhost:3000/)).toBeInTheDocument();
 		expect(screen.getByText("Site address")).toBeInTheDocument();
 
-		const checkbox = screen.getByRole("checkbox", { name: "Publish subpages" });
-		expect(checkbox).toBeInTheDocument();
-		expect(checkbox).toBeChecked();
+		const toggle = await openSubpagesSwitch();
+		expect(toggle).toBeChecked();
+		await closeSettings();
 
 		const publishBtn = screen.getByRole("button", { name: "Publish" });
 		expect(publishBtn).toBeInTheDocument();
@@ -185,8 +195,9 @@ describe("PagePublishTab", () => {
 		expect(screen.queryByText("Site address")).not.toBeInTheDocument();
 		expect(screen.queryByText(/DIRECT/i)).not.toBeInTheDocument();
 
-		const checkbox = screen.getByRole("checkbox", { name: "Publish subpages" });
-		expect(checkbox).toBeChecked();
+		const toggle = await openSubpagesSwitch();
+		expect(toggle).toBeChecked();
+		await closeSettings();
 
 		const unpublishBtn = screen.getByRole("button", { name: "Unpublish" });
 		const viewSiteBtn = screen.getByRole("button", { name: /View site/i });
@@ -215,10 +226,10 @@ describe("PagePublishTab", () => {
 		records = [rootDirectPublished];
 		mount("home");
 
-		const checkbox = await screen.findByRole("checkbox", { name: "Publish subpages" });
-		expect(checkbox).toBeChecked();
+		const toggle = await openSubpagesSwitch();
+		expect(toggle).toBeChecked();
 
-		await userEvent.click(checkbox);
+		await userEvent.click(toggle);
 
 		await waitFor(() => {
 			expect(pagePublicationApi.updatePublicationSettings).toHaveBeenCalledWith(
@@ -232,8 +243,9 @@ describe("PagePublishTab", () => {
 	it("keeps the saved root default when republishing", async () => {
 		records = [{ ...rootDirectPublished, published: false, include_descendants: false, unpublished_at: "2026-09-30T00:00:00Z" }];
 		mount("home");
-		const toggle = await screen.findByRole("checkbox", { name: "Publish subpages" });
+		const toggle = await openSubpagesSwitch();
 		expect(toggle).not.toBeChecked();
+		await closeSettings();
 		await userEvent.click(screen.getByRole("button", { name: "Publish" }));
 		await waitFor(() => expect(pagePublicationApi.republishPage).toHaveBeenCalledWith("home", "site-1"));
 		expect(pagePublicationApi.updatePublicationSettings).not.toHaveBeenCalled();
@@ -247,7 +259,7 @@ describe("PagePublishTab", () => {
 		expect(await screen.findByTestId("public-url")).toHaveTextContent("asss.localhost:3000");
 		expect(screen.getByTestId("public-url")).not.toHaveTextContent("/about");
 		expect(screen.getByText("This page is published on the site.")).toBeInTheDocument();
-		expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+		expect(screen.queryByRole("switch")).not.toBeInTheDocument();
 
 		const viewSiteBtn = screen.getByRole("button", { name: /View site/i });
 		const unpublishBtn = screen.getByRole("button", { name: "Unpublish" });
@@ -263,7 +275,7 @@ describe("PagePublishTab", () => {
 
 		// Child never owns site settings or a new site, and does not show Publish when already published
 		expect(screen.queryByRole("button", { name: /^Publish$/i })).not.toBeInTheDocument();
-		expect(screen.queryByRole("checkbox", { name: "Publish subpages" })).not.toBeInTheDocument();
+		expect(screen.queryByRole("switch", { name: "Include subpages" })).not.toBeInTheDocument();
 		expect(screen.queryByLabelText(/Site address/i)).not.toBeInTheDocument();
 		expect(screen.queryByText(/New site/i)).not.toBeInTheDocument();
 		expect(screen.queryByText(/Existing site/i)).not.toBeInTheDocument();
@@ -277,7 +289,7 @@ describe("PagePublishTab", () => {
 
 		expect(await screen.findByText("This page is not currently public.")).toBeInTheDocument();
 		expect(screen.getByTestId("public-url")).toHaveTextContent("asss.localhost:3000");
-		expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+		expect(screen.queryByRole("switch")).not.toBeInTheDocument();
 		expect(screen.queryByRole("button", { name: /View site/i })).not.toBeInTheDocument();
 
 		const publishBtn = screen.getByRole("button", { name: "Publish" });
@@ -295,7 +307,7 @@ describe("PagePublishTab", () => {
 		mount("about");
 
 		expect(await screen.findByText("This page is published on the site.")).toBeInTheDocument();
-		expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+		expect(screen.queryByRole("switch")).not.toBeInTheDocument();
 
 		const unpublishBtn = screen.getByRole("button", { name: "Unpublish" });
 		expect(unpublishBtn).toBeInTheDocument();
@@ -312,7 +324,7 @@ describe("PagePublishTab", () => {
 		mount("about");
 
 		expect(await screen.findByTestId("public-url")).toHaveTextContent("asss.localhost:3000");
-		expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+		expect(screen.queryByRole("switch")).not.toBeInTheDocument();
 		expect(screen.getByText("This page is published on the site.")).toBeInTheDocument();
 		expect(screen.getByRole("button", { name: "Unpublish" })).toBeInTheDocument();
 		expect(screen.getByRole("button", { name: /View site/i })).toBeInTheDocument();
@@ -329,7 +341,7 @@ describe("PagePublishTab", () => {
 		mount("about");
 
 		expect(await screen.findByText("This page is not currently public.")).toBeInTheDocument();
-		expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+		expect(screen.queryByRole("switch")).not.toBeInTheDocument();
 		expect(screen.getByRole("button", { name: "Publish" })).toBeEnabled();
 		expect(screen.getByTestId("public-url")).toHaveTextContent("asss.localhost:3000");
 

@@ -18,7 +18,7 @@ const valid = {
     status: "PLAN_READY", summary: "Add a QA heading",
     operations: [{ type: "INSERT_BLOCKS", blocks: [{ type: "TEXT", content: { text: "QA" } }] }],
   },
-} as AiGeneration;
+} as unknown as AiGeneration;
 
 describe("Phase 5.3 action confirmation dialog", () => {
   beforeEach(() => {

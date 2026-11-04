@@ -81,7 +81,7 @@ function validPageIntent(value: unknown): boolean {
 }
 
 /** M8: the Pages a draft was based on, at most eight, never the edited Page. */
-function validSources(value: unknown, pageId: unknown): value is AiPlanSource[] | undefined {
+export function validSources(value: unknown, pageId: unknown): value is AiPlanSource[] | undefined {
 	return value === undefined || (Array.isArray(value) && value.length > 0 && value.length <= 8 &&
 		value.every((source) => isRecord(source) && isNonemptyString(source.pageId) && source.pageId !== pageId &&
 			typeof source.title === "string"));

@@ -15,7 +15,7 @@ const valid = {
     summary: "Add QA",
     operations: [{ type: "INSERT_BLOCKS", blocks: [{ type: "TEXT", content: { text: "QA" } }] }],
   },
-} as AiGeneration;
+} as unknown as AiGeneration;
 
 describe("Phase 5.3 AI modification preflight", () => {
   it("accepts a ready generation in the current workspace", () => {

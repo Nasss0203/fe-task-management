@@ -162,10 +162,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 		? user?.lastActiveWorkspaceId
 		: workspaces[0]?.id;
 
-	const { data: workspaceSubscription } = useWorkspaceSubscription(
-		currentWorkspaceId ?? "",
-	);
-
 	/**
 	 * Workspace access.
 	 *
@@ -195,6 +191,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const isGuest = membershipType === "GUEST";
 
 	const isMember = membershipType === "MEMBER";
+
+	// Billing is Member data: a Guest (or unknown access) never requests it.
+	const { data: workspaceSubscription } = useWorkspaceSubscription(
+		currentWorkspaceId ?? "",
+		isMember,
+	);
 
 	/**
 	 * Không dựa vào role OWNER/MEMBER.

@@ -354,6 +354,9 @@ export interface AiGeneration {
 
   preview?: PageCompositionPreview | AiModificationPlanPreview | null;
 
+  /** M8: Pages a modification draft was based on, saved with the draft. */
+  sources?: AiPlanSource[];
+
   provider: string | null;
   model: string | null;
 

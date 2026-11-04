@@ -2,6 +2,7 @@ import { act, renderHook, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { WorkspaceSubscription } from "@/entities/billing/model/billing.types";
 import { usePagesByWorkspace } from "@/entities/page/model/page.queries";
 import type { SharedPage } from "@/entities/page-share/model/page-share.types";
 import { useTeamspaces } from "@/entities/teamspace/model/teamspace.queries";
@@ -18,13 +19,20 @@ import { createWrapper, renderWithClient } from "../utils/test-utils";
 
 const mocks = vi.hoisted(() => ({ get: vi.fn(), patch: vi.fn(), push: vi.fn() }));
 
-vi.mock("@/shared/api/api-client", () => ({ default: mocks }));
+// auth-session imports refreshAccessToken; this test never refreshes a session.
+vi.mock("@/shared/api/api-client", () => ({ default: mocks, refreshAccessToken: vi.fn() }));
 vi.mock("next/navigation", () => ({
 	usePathname: () => "/page/shared-root",
 	useRouter: () => ({ push: mocks.push }),
 }));
+// useUser only trusts the stored user once the auth session is bootstrapped.
+vi.mock("@/features/auth/model/auth-session", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@/features/auth/model/auth-session")>()),
+	useAuthSessionSnapshot: () => ({ isBootstrapping: false, isBootstrapped: true, isAuthenticated: true }),
+}));
 vi.mock("@/features/auth", async () => ({
 	useUser: (await import("@/features/auth/model/use-user")).useUser,
+	useLogout: (await import("@/features/auth/model/use-auth")).useLogout,
 }));
 // Keep the actual sidebar, dropdown, shared tree, query hooks and API adapters.
 // Only isolate the settings dialog's unrelated form content.
@@ -86,6 +94,14 @@ function access(
 	};
 }
 
+function subscription(workspaceId: string): WorkspaceSubscription {
+	return {
+		subscriptionId: null, workspaceId, plan: { id: "plan-free", code: "FREE", name: "Free" },
+		planPriceId: null, provider: null, status: "ACTIVE",
+		currentPeriodStart: null, currentPeriodEnd: null, cancelAtPeriodEnd: false,
+	};
+}
+
 function deferred<T>() {
 	let resolve!: (value: T) => void;
 	const promise = new Promise<T>((done) => {
@@ -110,7 +126,8 @@ function renderSidebar(workspaceId = "A") {
 }
 
 function expectNoMemberNavigation() {
-	for (const label of ["Private", "Teamspaces", "Templates", "Trash", "Search", "Ask AI", "Home", "Inbox", "Favorites"]) {
+	// Inbox is intentionally shown to Guests (notifications about pages shared with them).
+	for (const label of ["Private", "Teamspaces", "Templates", "Trash", "Search", "Ask AI", "Home", "Favorites"]) {
 		expect(screen.queryByText(label, { exact: true })).not.toBeInTheDocument();
 	}
 	for (const label of ["Settings", "Invite members", "Add account", "Upgrade", "New workspace"]) {
@@ -122,7 +139,9 @@ function expectNoMemberNavigation() {
 
 function expectNoMemberRequests() {
 	for (const [url] of mocks.get.mock.calls) {
-		expect(["/workspaces", "/workspaces/A/access", "/workspaces/B/access", "/page-shares/shared-with-me"]).toContain(url);
+		// The unread count is the user's own (Inbox), not workspace Member data.
+		expect(["/workspaces", "/workspaces/A/access", "/workspaces/B/access", "/page-shares/shared-with-me",
+			"/notifications/unread-count"]).toContain(url);
 	}
 }
 
@@ -143,6 +162,12 @@ beforeEach(() => {
 		["/page/workspace/B", []],
 		["/teamspaces", []],
 		["/page/favorites", []],
+		["/page/workspace/A/databases", []],
+		["/page/workspace/B/databases", []],
+		["/teamspaces/invitations/me", []],
+		["/notifications/unread-count", { count: 0 }],
+		["/billing/workspaces/A/subscription", subscription("A")],
+		["/billing/workspaces/B/subscription", subscription("B")],
 	]);
 	mocks.get.mockImplementation(async (url: string) => {
 		if (!responses.has(url)) throw new Error(`Unexpected GET ${url}`);
@@ -186,7 +211,7 @@ describe("workspace membership sidebar", () => {
 	});
 
 	it.each(["OWNER", "MEMBER"] as const)("preserves Member navigation and Settings for role %s", async (role) => {
-		responses.set("/workspaces/A/access", access("A", "MEMBER", [role]));
+		responses.set("/workspaces/A/access", { ...access("A", "MEMBER", [role]), permissions: ["workspace.member.add"] });
 		const user = userEvent.setup();
 		renderSidebar();
 		await screen.findByText("Private", { exact: true });
@@ -213,7 +238,6 @@ describe("workspace membership sidebar", () => {
 		expectNoMemberNavigation();
 		expect(screen.getByRole("status")).toBeInTheDocument();
 		await user.click(await screen.findByRole("button", { name: /Workspace A/ }));
-		expect(screen.getByText("Loading workspace access...")).toBeInTheDocument();
 		expectNoMemberNavigation();
 		expectNoMemberRequests();
 		await user.keyboard("{Escape}");

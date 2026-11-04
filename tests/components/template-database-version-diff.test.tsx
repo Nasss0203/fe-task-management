@@ -40,7 +40,9 @@ describe("Template Database Version Visibility Isolation", () => {
 
 		// Real database title and row count
 		expect(screen.getByText("Release Tasks")).toBeInTheDocument();
-		expect(screen.getByText(/Release Overview · 8 rows/)).toBeInTheDocument();
+		expect(screen.getByText("Release Overview")).toBeInTheDocument();
+		// Header row + 8 data rows (the "· N rows" label is no longer shown)
+		expect(screen.getAllByRole("row")).toHaveLength(9);
 	});
 
 	it("2. v2 Result: Priority column is hidden in v2 UI after being hidden in source view", () => {
@@ -62,7 +64,9 @@ describe("Template Database Version Visibility Isolation", () => {
 
 		// Rows still render correctly
 		expect(screen.getByText("Release Tasks")).toBeInTheDocument();
-		expect(screen.getByText(/Release Overview · 8 rows/)).toBeInTheDocument();
+		expect(screen.getByText("Release Overview")).toBeInTheDocument();
+		// Header row + 8 data rows (the "· N rows" label is no longer shown)
+		expect(screen.getAllByRole("row")).toHaveLength(9);
 	});
 
 	it("3. Re-check v1: Priority column remains visible in v1 UI (immutable snapshot)", () => {

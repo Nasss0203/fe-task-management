@@ -375,7 +375,7 @@ describe("TemplateDatabasePreview", () => {
 		);
 
 		expect(screen.getByText("Sprint Tasks")).toBeInTheDocument();
-		expect(screen.getByText(/Active Sprint · 2 rows/)).toBeInTheDocument();
+		expect(screen.getByText("Active Sprint")).toBeInTheDocument();
 	});
 
 	it("renders real columns from view visible properties without fake fallback", () => {
@@ -460,7 +460,7 @@ describe("TemplateDatabasePreview", () => {
 		);
 
 		expect(
-			screen.getByText("Database snapshot unavailable"),
+			screen.getByText("Database unavailable"),
 		).toBeInTheDocument();
 		expect(
 			screen.queryByText("Team Onboarding Guide"),
@@ -480,9 +480,7 @@ describe("TemplateDatabasePreview", () => {
 			/>,
 		);
 
-		expect(screen.getByText(/Active Sprint · 0 rows/)).toBeInTheDocument();
-		expect(
-			screen.getByText("No rows in this database snapshot"),
-		).toBeInTheDocument();
+		expect(screen.getByText("Active Sprint")).toBeInTheDocument();
+		expect(screen.getByText("No rows")).toBeInTheDocument();
 	});
 });

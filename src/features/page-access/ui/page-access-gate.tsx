@@ -64,13 +64,27 @@ export function PageAccessGate({
 				</p>
 
 				{requestSent && (
-					<div role='status' className='text-sm'>
-						<p className='font-medium'>Request sent</p>
+					<>
+						<div role='status' className='text-sm'>
+							<p className='font-medium'>Request sent</p>
 
-						<p className='text-muted-foreground'>
-							Waiting for approval
-						</p>
-					</div>
+							<p className='text-muted-foreground'>
+								Waiting for approval
+							</p>
+						</div>
+
+						{/* Once approved, open the page without reloading. */}
+						<Button
+							type='button'
+							variant='outline'
+							disabled={isCheckingAccess}
+							onClick={onCheckAccess}
+						>
+							{isCheckingAccess
+								? "Checking access..."
+								: "Check access"}
+						</Button>
+					</>
 				)}
 
 				{createRequest.isError && !alreadyPendingError && (

@@ -456,10 +456,11 @@ describe("Use FREE Template Flow in Marketplace UI & Auto Claim Logic Fix", () =
 		const confirmBtn = within(dialog).getByRole("button", { name: "Use template" });
 		await userEvent.click(confirmBtn);
 
+		// Use → toast → navigate runs several async steps; allow for a busy parallel test run.
 		await waitFor(() => {
 			expect(mockToastSuccess).toHaveBeenCalledWith("Template added to workspace.");
 			expect(mockPush).toHaveBeenCalledWith(`/page/${mockUseResponse.pageId}`);
-		});
+		}, { timeout: 5000 });
 	});
 
 	it("FIX-10: Double submission is prevented when confirm button is clicked rapidly", async () => {

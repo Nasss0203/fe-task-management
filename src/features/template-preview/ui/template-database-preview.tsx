@@ -114,6 +114,23 @@ function renderCellValue(value: unknown, property: TemplateDatabaseProperty) {
 				{value}
 			</a>
 		);
+	// Snapshots hold only user / file IDs: show them shortened, never as raw JSON.
+	if (type === "PERSON" || type === "FILE") {
+		const ids = (Array.isArray(value) ? value : [value]).map(String);
+		return (
+			<div className='flex flex-wrap items-center gap-1'>
+				{ids.map((id) => (
+					<span
+						key={id}
+						title={id}
+						className='rounded border border-border/50 bg-muted/40 px-1.5 font-mono text-[10px] text-muted-foreground'
+					>
+						{id.length > 8 ? `${id.slice(0, 8)}...` : id}
+					</span>
+				))}
+			</div>
+		);
+	}
 	return formatDatabaseValue(value);
 }
 

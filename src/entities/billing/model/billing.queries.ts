@@ -31,10 +31,10 @@ export function useBillingPlans() {
 	});
 }
 
-export function useWorkspaceSubscription(workspaceId: string) {
+export function useWorkspaceSubscription(workspaceId: string, enabled = true) {
 	return useQuery({
 		queryKey: billingKeys.workspaceSubscription(workspaceId),
 		queryFn: ({ signal }) => getWorkspaceSubscription(workspaceId, signal),
-		enabled: Boolean(workspaceId),
+		enabled: enabled && Boolean(workspaceId),
 	});
 }

@@ -57,7 +57,7 @@ const savedGeneration = {
 		type: "AI_MODIFICATION_PLAN", schemaVersion: 1, status: "PLAN_READY",
 		pageId: "page-1", summary: "Add QA", operations: [],
 	},
-} as AiGeneration;
+} as unknown as AiGeneration;
 const pageMessages: AiHistoryMessage[] = [{
 	id: "user-message", conversation_id: pageConversation.id, role: "USER",
 	content: "Thêm heading QA vào page QA draft", metadata: { generationId: savedGeneration.id },

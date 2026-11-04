@@ -370,6 +370,9 @@ describe("share route regressions", () => {
 		await screen.findByText("Waiting for approval");
 		expect(mocks.post).toHaveBeenCalledExactlyOnceWith(requestUrl, { token: mocks.token });
 		expect(screen.queryByRole("button", { name: "Accept" })).not.toBeInTheDocument();
+		// Once sent: no second request, but the user can check whether it was approved.
+		expect(screen.getByText("Request sent")).toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: "Request access" })).not.toBeInTheDocument();
 		normalAccess = { effectiveAccessLevel: "VIEWER" };
 		await userEvent.click(screen.getByRole("button", { name: "Check access" }));
 		await screen.findByRole("heading", { name: page.title });
@@ -379,9 +382,10 @@ describe("share route regressions", () => {
 		resolved.invitation = null;
 		pendingRequest = true;
 		renderShare();
-		await screen.findByText("Access request already pending");
-		expect(screen.getByText("Waiting for approval")).toBeInTheDocument();
-		expect(screen.getByRole("button", { name: "Request sent" })).toBeDisabled();
+		await screen.findByText("Waiting for approval");
+		expect(screen.getByText("Request sent")).toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: "Request access" })).not.toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Check access" })).toBeEnabled();
 		expect(mocks.post).not.toHaveBeenCalled();
 	});
 

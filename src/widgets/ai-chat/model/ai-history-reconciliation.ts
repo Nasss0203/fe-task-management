@@ -45,7 +45,7 @@ export function reconcileAiHistory(
 			...message, id: old.id,
 			origin: { ...message.origin, localId: old.origin?.localId },
 			generation: preferGeneration(old.generation, message.generation),
-			// M8: the server's history holds no sources; keep the ones this chat saw.
+			// M8: keep the sources this chat saw if a refreshed record arrives without them.
 			...(old.sources && !message.sources ? { sources: old.sources } : {}),
 		} : message);
 	}
