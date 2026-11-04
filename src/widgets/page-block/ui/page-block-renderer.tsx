@@ -1,6 +1,10 @@
 import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-tree";
 import { getDatabaseViewConfig } from "@/entities/page-block/lib/get-database-view-config";
-import { PageBlockType } from "@/entities/page-block/model/page-block.types";
+import { useUpdatePageBlock } from "@/entities/page-block/model/page-block.mutations";
+import {
+	PageBlockType,
+	type DatabaseViewBlockDataConfig,
+} from "@/entities/page-block/model/page-block.types";
 import { TableOfContentsBlock } from "@/entities/page-block/ui/read-only-block-content";
 import { Separator } from "@/shared/ui/separator";
 import { DatabaseViewBlock } from "@/widgets/database-view/ui/database-view-block";
@@ -19,6 +23,8 @@ import { QuoteBlockEditor } from "@/widgets/page-block-renderer/ui/quote-block-e
 import { SimpleTableBlockEditor } from "@/widgets/page-block-renderer/ui/simple-table-block-editor";
 import { TextBlockEditor } from "@/widgets/page-block-renderer/ui/text-block-editor";
 import { TodoBlockEditor } from "@/widgets/page-block-renderer/ui/todo-block-editor";
+import { FormFieldBlockEditor } from "@/widgets/page-block-renderer/ui/form-field-block-editor";
+import { SectionBlockEditor } from "@/widgets/page-block-renderer/ui/section-block-editor";
 import { ToggleBlockEditor } from "@/widgets/page-block-renderer/ui/toggle-block-editor";
 import { VideoBlockEditor } from "@/widgets/page-block-renderer/ui/video-block-editor";
 
@@ -52,6 +58,10 @@ export function PageBlockRenderer({ block, shareToken }: PageBlockRendererProps)
 			return <MermaidBlockEditor block={block} shareToken={shareToken} />;
 		case PageBlockType.TOGGLE:
 			return <ToggleBlockEditor block={block} shareToken={shareToken} />;
+		case PageBlockType.SECTION:
+			return <SectionBlockEditor block={block} shareToken={shareToken} />;
+		case PageBlockType.FORM_FIELD:
+			return <FormFieldBlockEditor block={block} shareToken={shareToken} />;
 
 		case PageBlockType.QUOTE:
 			return <QuoteBlockEditor block={block} shareToken={shareToken} />;
@@ -89,12 +99,7 @@ export function PageBlockRenderer({ block, shareToken }: PageBlockRendererProps)
 				);
 			}
 
-			return (
-				<DatabaseViewBlock
-					databaseId={config.database_id}
-					viewId={config.view_id}
-				/>
-			);
+			return <EditableDatabaseViewBlock block={block} config={config} />;
 		}
 
 		default:
@@ -104,4 +109,29 @@ export function PageBlockRenderer({ block, shareToken }: PageBlockRendererProps)
 				</div>
 			);
 	}
+}
+
+/** Tab view đang chọn được lưu vào block: lần sau ai mở cũng thấy view này trước. */
+function EditableDatabaseViewBlock({
+	block,
+	config,
+}: {
+	block: PageBlockNode;
+	config: DatabaseViewBlockDataConfig;
+}) {
+	const updateBlock = useUpdatePageBlock();
+
+	return (
+		<DatabaseViewBlock
+			databaseId={config.database_id}
+			viewId={config.view_id}
+			onActiveViewChange={(viewId) =>
+				updateBlock.mutate({
+					blockId: block.id,
+					pageId: block.page_id,
+					dataConfig: { ...config, view_id: viewId },
+				})
+			}
+		/>
+	);
 }

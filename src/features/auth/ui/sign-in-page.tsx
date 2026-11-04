@@ -108,7 +108,7 @@ export default function SignIn() {
 						control={form.control}
 						render={({ field, fieldState }) => (
 							<Field data-invalid={fieldState.invalid} className='gap-1.5'>
-								<FieldLabel htmlFor='sign-in-email' className='text-xs sm:text-sm font-medium text-foreground'>
+								<FieldLabel htmlFor='sign-in-email' className='text-[13px] font-medium text-foreground'>
 									Email hoặc tên đăng nhập
 								</FieldLabel>
 								<Input
@@ -132,12 +132,12 @@ export default function SignIn() {
 						render={({ field, fieldState }) => (
 							<Field data-invalid={fieldState.invalid} className='gap-1.5'>
 								<div className='flex items-center justify-between'>
-									<FieldLabel htmlFor='sign-in-password' className='text-xs sm:text-sm font-medium text-foreground'>
+									<FieldLabel htmlFor='sign-in-password' className='text-[13px] font-medium text-foreground'>
 										Mật khẩu
 									</FieldLabel>
 									<Link
 										href='/forgot-password'
-										className='text-xs font-semibold text-primary hover:text-primary/90 hover:underline'
+										className='text-[12.5px] text-muted-foreground transition-colors hover:text-foreground hover:underline'
 									>
 										Quên mật khẩu?
 									</Link>

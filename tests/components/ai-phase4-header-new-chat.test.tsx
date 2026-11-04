@@ -14,11 +14,16 @@ vi.mock("next/navigation", () => ({
 	useParams: () => ({}),
 	useRouter: () => ({ push }),
 }));
-vi.mock("@/entities/page/model/page.queries", () => ({ usePage: () => ({ data: undefined }) }));
+vi.mock("@/entities/page/model/page.queries", () => ({
+	usePage: () => ({ data: undefined }),
+	usePagesByWorkspace: () => ({ data: [] }),
+}));
+vi.mock("@/entities/teamspace/model/teamspace.queries", () => ({ useTeamspaces: () => ({ data: [] }) }));
 vi.mock("@/entities/template", () => ({ usePublicTemplate: () => ({ data: undefined }) }));
 vi.mock("@/entities/workspace/model/workspace.queries", () => ({
 	useWorkspaces: () => ({ data: [{ id: "workspace-a" }] }),
 	useWorkspace: () => ({ data: { name: "Test workspace" } }),
+	useWorkspaceAccess: () => ({ data: undefined }),
 }));
 vi.mock("@/features/auth", () => ({
 	useUser: () => ({ user: { id: "user-a", lastActiveWorkspaceId: "workspace-a" } }),

@@ -63,7 +63,7 @@ describe("public page new block types", () => {
 			/>,
 		);
 
-		expect(screen.getByText("Careful").closest("div")).toHaveClass("bg-amber-500/10");
+		expect(screen.getByText("Careful").closest("div")).toHaveClass("bg-[#fbf3db]");
 		const frames = container.querySelectorAll("iframe");
 		expect(frames).toHaveLength(1);
 		expect(frames[0]).toHaveAttribute("src", "https://platform.twitter.com/embed/Tweet.html?id=20");

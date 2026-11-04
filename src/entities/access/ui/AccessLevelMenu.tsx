@@ -101,11 +101,11 @@ export function AccessLevelMenu({
 				<button
 					type='button'
 					disabled={disabled}
-					className='flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50'
+					className='flex h-7 items-center gap-1 rounded-md px-2 text-[12.5px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50'
 				>
 					{triggerLabel ?? current?.label ?? "Access"}
 
-					<ChevronDown className='size-3.5' />
+					<ChevronDown className='size-3' />
 				</button>
 			</DropdownMenuTrigger>
 
@@ -143,7 +143,7 @@ export function AccessLevelMenu({
 							key={option.value}
 							disabled={disabled}
 							onClick={() => handleChange(option.value)}
-							className='flex cursor-pointer items-start justify-between px-0 py-1.5'
+							className='flex cursor-pointer items-start justify-between rounded-[4px] px-1.5 py-1.5'
 						>
 							<div className='min-w-0'>
 								<p className='text-xs font-medium'>

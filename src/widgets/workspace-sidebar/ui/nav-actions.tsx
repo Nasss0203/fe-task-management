@@ -23,7 +23,7 @@ export function NavActions() {
 		<div className='flex items-center gap-2 text-sm'>
 			<Popover>
 				<PopoverTrigger asChild>
-					<button className='flex items-center gap-1 text-xs px-2 py-1.5 hover:bg-neutral-900 rounded-md cursor-pointer'>
+					<button className='flex items-center gap-1 text-xs px-2 py-1.5 hover:bg-accent hover:text-accent-foreground rounded-md cursor-pointer'>
 						<SquareArrowOutUpRight size={12} />
 						Share
 					</button>

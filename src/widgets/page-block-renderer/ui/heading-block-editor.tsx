@@ -56,9 +56,9 @@ function getHeadingLevel(block: PageBlockNode): 1 | 2 | 3 {
 }
 
 const headingStyles: Record<1 | 2 | 3, string> = {
-	1: "text-3xl font-bold leading-10",
-	2: "text-2xl font-semibold leading-8",
-	3: "text-xl font-semibold leading-7",
+	1: "text-[30px] font-bold leading-[38px]",
+	2: "text-[23px] font-semibold leading-8",
+	3: "text-[19px] font-semibold leading-7",
 };
 
 export function HeadingBlockEditor({ block, shareToken }: HeadingBlockEditorProps) {

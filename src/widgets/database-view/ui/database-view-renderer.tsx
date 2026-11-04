@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState, type ReactNode } from "react";
 
 import {
 	DatabaseViewType,
@@ -17,6 +18,36 @@ import { ListView } from "./list-view";
 import { RowDetailSheet } from "./row-detail-sheet";
 import { TableView } from "./table-view";
 
+/**
+ * Link thông báo comment task là `/page/:id?row=<rowId>`: mở drawer của row đó.
+ * Theo dõi URL nên bấm thông báo khi đang ở sẵn page cũng mở (không cần reload).
+ */
+function RowLinkOpener({
+	rows,
+	onOpen,
+}: {
+	rows: DatabaseRow[];
+	onOpen: (rowId: string) => void;
+}) {
+	const rowId = useSearchParams().get("row");
+
+	useEffect(() => {
+		const url = new URL(window.location.href);
+
+		// Đọc lại URL thật: view khác cùng database có thể vừa xử lý link này
+		if (!rowId || url.searchParams.get("row") !== rowId) return;
+		if (!rows.some((row) => row.id === rowId)) return;
+
+		onOpen(rowId);
+
+		// Bỏ `?row` để đóng drawer không mở lại; bấm lại thông báo thì URL đổi và mở tiếp
+		url.searchParams.delete("row");
+		window.history.replaceState(window.history.state, "", url);
+	}, [rowId, rows, onOpen]);
+
+	return null;
+}
+
 /** Opens a row in the side peek; `isNew` focuses its title. */
 export type OpenRowHandler = (rowId: string, isNew?: boolean) => void;
 
@@ -25,6 +56,8 @@ interface DatabaseViewRendererProps {
 	view: DatabaseView;
 	viewDetail?: DatabaseViewDetail;
 	rows: DatabaseRow[];
+	/** Mọi row (kể cả bị filter) để link `?row` và drawer vẫn mở được; mặc định là `rows`. */
+	allRows?: DatabaseRow[];
 	readOnly?: boolean;
 }
 
@@ -33,11 +66,14 @@ export function DatabaseViewRenderer({
 	view,
 	viewDetail,
 	rows,
+	allRows = rows,
 	readOnly = false,
 }: DatabaseViewRendererProps) {
 	const [openRow, setOpenRow] = useState<{
 		id: string;
 		isNew: boolean;
+		/** Mở từ link thông báo comment: cuộn tới mục Comments. */
+		showComments?: boolean;
 	} | null>(null);
 	const onOpenRow: OpenRowHandler = (id, isNew = false) =>
 		setOpenRow({ id, isNew });
@@ -79,6 +115,7 @@ export function DatabaseViewRenderer({
 							viewId={view.id}
 							viewDetail={viewDetail}
 							rows={groupRows}
+							allRows={allRows}
 							mode={readOnly ? "readonly" : "editable"}
 							onOpenRow={onOpenRow}
 						/>
@@ -112,6 +149,7 @@ export function DatabaseViewRenderer({
 						database={database}
 						viewDetail={viewDetail}
 						rows={groupRows}
+						allRows={allRows}
 						onOpenRow={onOpenRow}
 						readOnly={readOnly}
 					/>
@@ -125,10 +163,20 @@ export function DatabaseViewRenderer({
 	return (
 		<>
 			{content}
+			{/* Suspense riêng: useSearchParams không làm cả trang phải render động */}
+			<Suspense fallback={null}>
+				<RowLinkOpener
+					rows={allRows}
+					onOpen={(id) => setOpenRow({ id, isNew: false, showComments: true })}
+				/>
+			</Suspense>
 			<RowDetailSheet
 				database={database}
-				row={rows.find((row) => row.id === openRow?.id)}
+				row={allRows.find((row) => row.id === openRow?.id)}
+				allRows={allRows}
+				onOpenRow={onOpenRow}
 				autoFocusTitle={openRow?.isNew}
+				scrollToComments={openRow?.showComments}
 				readOnly={readOnly}
 				onClose={() => setOpenRow(null)}
 			/>

@@ -19,15 +19,15 @@ export function WorkspaceTemplatesHeader({ description }: { description: string 
 		<header className='flex flex-col gap-4'>
 			<div className='flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between'>
 				<div className='flex flex-col gap-1'>
-					<h1 className='text-2xl font-semibold tracking-tight'>Templates</h1>
-					<p className='text-sm text-muted-foreground'>{description}</p>
+					<h1 className='text-2xl font-semibold leading-9'>Templates</h1>
+					<p className='text-[13.5px] leading-5 text-muted-foreground'>{description}</p>
 				</div>
 				<Link
 					href='/creator/templates'
-					className='inline-flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground'
+					className='inline-flex w-fit items-center gap-1 text-[13px] leading-5 text-muted-foreground hover:text-foreground'
 				>
 					Manage your own templates
-					<ArrowRight className='size-3.5' />
+					<ArrowRight className='size-[13px]' />
 				</Link>
 			</div>
 
@@ -40,7 +40,7 @@ export function WorkspaceTemplatesHeader({ description }: { description: string 
 							href={tab.href}
 							aria-current={active ? "page" : undefined}
 							className={cn(
-								"-mb-px border-b-2 px-3 py-2 text-sm font-medium transition-colors",
+								"-mb-px border-b-2 px-3 pb-[9px] pt-2 text-[13.5px] font-medium leading-5 transition-colors",
 								active
 									? "border-foreground text-foreground"
 									: "border-transparent text-muted-foreground hover:text-foreground",

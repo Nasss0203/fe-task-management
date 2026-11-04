@@ -5,7 +5,10 @@ import { useEffect, useRef, useState } from "react";
 import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-tree";
 import {
 	useCreatePageBlock,
+	useCreatePageBlockColumns,
 	useDeletePageBlock,
+	useCreateForm,
+	useWrapInSection,
 	useTransformToDatabaseBlock,
 	useUpdatePageBlock,
 } from "@/entities/page-block/model/page-block.mutations";
@@ -48,6 +51,9 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 	const transformToDatabaseBlock = useTransformToDatabaseBlock();
 	const deleteBlock = useDeletePageBlock(shareToken);
 	const createBlock = useCreatePageBlock(shareToken);
+	const createColumns = useCreatePageBlockColumns(shareToken);
+	const wrapInSection = useWrapInSection(shareToken);
+	const createForm = useCreateForm();
 
 	const [value, setValue] = useState(() => getText(block));
 
@@ -55,7 +61,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 	const inlineMarks = useInlineMarks(
 		value,
 		setValue,
-		"text-base leading-7",
+		"text-[15px] leading-6 text-secondary-foreground dark:text-foreground",
 	);
 	const [commandOpen, setCommandOpen] = useState(false);
 	const [slashIndex, setSlashIndex] = useState<number | null>(null);
@@ -132,8 +138,76 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 	const handleSlashSelect = async ({
 		type,
 		styleConfig,
+		viewType,
+		columnCount,
+		isForm,
+		isQuiz,
 	}: PageBlockCommand) => {
 		if (slashIndex === null) {
+			return;
+		}
+
+		if (isForm) {
+			setCommandOpen(false);
+			setSlashIndex(null);
+			const text = value.slice(0, slashIndex) + value.slice(slashIndex + 1);
+			setValue(text);
+			if (text !== getText(block)) {
+				await updateBlock.mutateAsync({
+					blockId: block.id,
+					pageId: block.page_id,
+					content: { text },
+				});
+			}
+			const { section } = await createForm.mutateAsync({
+				pageId: block.page_id,
+				parentBlockId: block.parent_block_id,
+				afterBlockId: block.id,
+				quiz: isQuiz,
+			});
+			requestFocus(section.id);
+			return;
+		}
+
+		if (type === PageBlockType.SECTION) {
+			setCommandOpen(false);
+			setSlashIndex(null);
+			const text = value.slice(0, slashIndex) + value.slice(slashIndex + 1);
+			setValue(text);
+			if (text !== getText(block)) {
+				await updateBlock.mutateAsync({
+					blockId: block.id,
+					pageId: block.page_id,
+					content: { text },
+				});
+			}
+			await wrapInSection.mutateAsync({
+				blockId: block.id,
+				pageId: block.page_id,
+				parentBlockId: block.parent_block_id,
+			});
+			return;
+		}
+
+		if (columnCount) {
+			setCommandOpen(false);
+			setSlashIndex(null);
+			// This block (without the "/") becomes the first column.
+			const text = value.slice(0, slashIndex) + value.slice(slashIndex + 1);
+			setValue(text);
+			if (text !== getText(block)) {
+				await updateBlock.mutateAsync({
+					blockId: block.id,
+					pageId: block.page_id,
+					content: { text },
+				});
+			}
+			await createColumns.mutateAsync({
+				pageId: block.page_id,
+				parentBlockId: block.parent_block_id,
+				blockId: block.id,
+				count: columnCount,
+			});
 			return;
 		}
 
@@ -151,6 +225,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 				blockId: block.id,
 				pageId: block.page_id,
 				name: "Untitled",
+				viewType,
 			});
 
 			return;
@@ -318,17 +393,19 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 						className={cn(
 					`
 		        block
-		        min-h-7
+		        min-h-6
 		        w-full
 		        resize-none
 		        overflow-hidden
 		        border-0
 		        bg-transparent
 		        p-0
-		        text-base
-		        leading-7
+		        text-[15px]
+		        leading-6
+		        text-secondary-foreground dark:text-foreground
 		        outline-none
-		        placeholder:text-muted-foreground/50
+		        placeholder:text-transparent
+		        focus:placeholder:text-muted-foreground/50
 		        focus-visible:ring-0
 		      `,
 					inlineMarks.textareaClassName,

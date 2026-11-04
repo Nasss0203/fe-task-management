@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Globe, Store } from "lucide-react";
+import { ChevronLeft, Crown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -42,14 +42,14 @@ export function CreatorSidebar() {
 							tooltip='Creator Studio'
 						>
 							<Link href='/creator' onClick={handleNavigate}>
-								<div className='flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground'>
-									<Store className='size-4' />
+								<div className='flex aspect-square size-[22px] shrink-0 items-center justify-center rounded-[6px] bg-[#5e6ad2] text-white'>
+									<Crown className='size-[13px]' />
 								</div>
 								<div className='grid min-w-0 flex-1 text-left leading-tight'>
-									<span className='truncate text-sm font-semibold'>
+									<span className='truncate text-[13.5px] font-semibold'>
 										Creator Studio
 									</span>
-									<span className='truncate text-xs text-muted-foreground'>
+									<span className='truncate text-[11.5px] text-muted-foreground'>
 										Templates & marketplace
 									</span>
 								</div>
@@ -112,17 +112,25 @@ export function CreatorSidebar() {
 			<SidebarFooter>
 				<SidebarMenu>
 					<SidebarMenuItem>
-						<SidebarMenuButton asChild tooltip='Public marketplace'>
+						<SidebarMenuButton
+							asChild
+							tooltip='Public marketplace'
+							className='text-[13.5px] text-muted-foreground hover:text-foreground'
+						>
 							<Link href='/templates' onClick={handleNavigate}>
-								<Globe />
+								<ChevronLeft className='text-muted-foreground' />
 								<span>Public marketplace</span>
 							</Link>
 						</SidebarMenuButton>
 					</SidebarMenuItem>
 					<SidebarMenuItem>
-						<SidebarMenuButton asChild tooltip='Back to workspace'>
+						<SidebarMenuButton
+							asChild
+							tooltip='Back to workspace'
+							className='text-[13.5px] text-muted-foreground hover:text-foreground'
+						>
 							<Link href='/dashboard'>
-								<ArrowLeft />
+								<ChevronLeft className='text-muted-foreground' />
 								<span>Back to workspace</span>
 							</Link>
 						</SidebarMenuButton>

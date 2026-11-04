@@ -86,7 +86,7 @@ export function PageActionsMenu({
 				className="w-64"
 			>
 				{/* Page */}
-				<DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+				<DropdownMenuLabel>
 					Page
 				</DropdownMenuLabel>
 
@@ -101,7 +101,7 @@ export function PageActionsMenu({
 						void handleCopyLink();
 					}}
 				>
-					<Link2 className="mr-2 size-4" />
+					<Link2 className="size-[15px]" />
 					Copy link
 				</DropdownMenuItem>
 
@@ -146,7 +146,7 @@ export function PageActionsMenu({
 					className="text-destructive focus:text-destructive"
 					onSelect={handleTrashAction}
 				>
-					<Trash2 className="mr-2 size-4" />
+					<Trash2 className="size-[15px]" />
 					Move to Trash
 				</DropdownMenuItem>
 
@@ -154,7 +154,7 @@ export function PageActionsMenu({
 
 				{/* New Tab */}
 				<DropdownMenuItem onSelect={handleOpenInNewTab}>
-					<ExternalLink className="mr-2 size-4" />
+					<ExternalLink className="size-[15px]" />
 					Open in new tab
 				</DropdownMenuItem>
 			</DropdownMenuContent>

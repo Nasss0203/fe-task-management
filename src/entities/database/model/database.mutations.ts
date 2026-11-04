@@ -18,7 +18,8 @@ export function useCreateDatabaseRow(databaseId: string) {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: () => databaseApi.createRow(databaseId),
+		mutationFn: (parentRowId: string | null = null) =>
+			databaseApi.createRow(databaseId, parentRowId),
 
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({
@@ -33,6 +34,26 @@ export function useDeleteDatabaseRow(databaseId: string) {
 
 	return useMutation({
 		mutationFn: (rowId: string) => databaseApi.deleteRow(rowId),
+
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: databaseKeys.rows(databaseId),
+			});
+		},
+	});
+}
+
+export function useChangeDatabaseRowParent(databaseId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({
+			rowId,
+			parentRowId,
+		}: {
+			rowId: string;
+			parentRowId: string | null;
+		}) => databaseApi.changeRowParent(rowId, parentRowId),
 
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({

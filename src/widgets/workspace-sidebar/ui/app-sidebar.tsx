@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { useWorkspaceSubscription } from "@/entities/billing/model/billing.queries";
 import {
@@ -24,10 +25,12 @@ import {
 	useWorkspaceAccess,
 	useWorkspaces,
 } from "@/entities/workspace/model/workspace.queries";
+import { getApiErrorMessage } from "@/shared/lib/api-error-message";
 
 import { useUser } from "@/features/auth";
 import { PageSearchDialog, usePageSearchDialog } from "@/features/page-search";
 
+import { Skeleton } from "@/shared/ui/skeleton";
 import { NavFavorites } from "@/widgets/workspace-sidebar/ui/nav-favorites";
 import {
 	NavMain,
@@ -41,8 +44,8 @@ import {
 	SidebarContent,
 	SidebarHeader,
 	SidebarResizeHandle,
+	useSidebar,
 } from "@/widgets/workspace-sidebar/ui/sidebar";
-import { Skeleton } from "@/shared/ui/skeleton";
 import { TeamSwitcher } from "@/widgets/workspace-sidebar/ui/team-switcher";
 
 import { useUnreadNotificationCount } from "@/entities/notification/model/notification.queries";
@@ -61,8 +64,7 @@ import { NavTeamspaces } from "./nav-teamspaces";
  * chỉ cần sửa constant này.
  */
 const WORKSPACE_MEMBER_ADD_PERMISSION = "workspace.member.add";
-const WORKSPACE_MEMBER_UPDATE_ROLE_PERMISSION =
-	"workspace.member.update_role";
+const WORKSPACE_MEMBER_UPDATE_ROLE_PERMISSION = "workspace.member.update_role";
 const WORKSPACE_MEMBER_REMOVE_PERMISSION = "workspace.member.remove";
 
 const data = {
@@ -144,6 +146,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 	const [view, setView] = useState<SidebarView>(SidebarView.WORKSPACE);
 
+	const { isMobile } = useSidebar();
+
+	const isInboxPanelOpen = view === SidebarView.INBOX && !isMobile;
+
 	const activePageId =
 		pathname.startsWith("/page/") || pathname.startsWith("/database/")
 			? pathname.split("/")[2]
@@ -192,7 +198,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 	const isMember = membershipType === "MEMBER";
 
-	// Billing is Member data: a Guest (or unknown access) never requests it.
 	const { data: workspaceSubscription } = useWorkspaceSubscription(
 		currentWorkspaceId ?? "",
 		isMember,
@@ -247,12 +252,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	/**
 	 * Switch workspace.
 	 */
-	const handleWorkspaceSelect = async (workspaceId: string) => {
+	const handleWorkspaceSelect = (workspaceId: string) => {
 		if (workspaceId === currentWorkspaceId) {
 			return;
 		}
 
-		await selectWorkspaceMutation.mutateAsync(workspaceId);
+		// Lỗi chỉ báo toast, không để lỗi chưa bắt làm vỡ trang
+		selectWorkspaceMutation.mutate(workspaceId, {
+			onError: (error) =>
+				toast.error(
+					getApiErrorMessage(error, "Could not open this workspace."),
+				),
+		});
 	};
 
 	/**
@@ -288,11 +299,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	};
 
 	const activeMainAction: NavMainAction =
-		view === SidebarView.INBOX
-			? "inbox"
-			: isAiRoute
-				? "ai"
-				: "home";
+		view === SidebarView.INBOX ? "inbox" : isAiRoute ? "ai" : "home";
 
 	/**
 	 * Inbox unread badge.
@@ -319,138 +326,171 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	);
 
 	return (
-		<Sidebar className='border-r-0' {...props}>
-			<SidebarHeader>
-				{!isLoading &&
-					!isError &&
-					currentWorkspaceId &&
-					workspaces.length > 0 && (
-						<TeamSwitcher
-							key={currentWorkspaceId}
-							workspaces={workspaces}
-							currentWorkspaceId={currentWorkspaceId}
-							subscription={workspaceSubscription}
-							membershipType={membershipType}
-							canInviteMembers={canInviteMembers}
-							canUpdateMemberRole={canUpdateMemberRole}
-							canRemoveMember={canRemoveMember}
-							user={{
-								id: user?.id ?? "",
-								email: user?.email ?? "",
-							}}
-							onWorkspaceSelect={handleWorkspaceSelect}
+		<>
+			<Sidebar className='border-sidebar-border' {...props}>
+				<SidebarHeader>
+					{!isLoading &&
+						!isError &&
+						currentWorkspaceId &&
+						workspaces.length > 0 && (
+							<TeamSwitcher
+								key={currentWorkspaceId}
+								workspaces={workspaces}
+								currentWorkspaceId={currentWorkspaceId}
+								subscription={workspaceSubscription}
+								membershipType={membershipType}
+								canInviteMembers={canInviteMembers}
+								canUpdateMemberRole={canUpdateMemberRole}
+								canRemoveMember={canRemoveMember}
+								user={{
+									id: user?.id ?? "",
+									email: user?.email ?? "",
+								}}
+								onWorkspaceSelect={handleWorkspaceSelect}
+							/>
+						)}
+
+					{isMember && (
+						<NavMain
+							items={navMainItems}
+							activeAction={activeMainAction}
+							onAction={handleMainAction}
 						/>
 					)}
 
-				{isMember && (
-					<NavMain
-						items={navMainItems}
-						activeAction={activeMainAction}
-						onAction={handleMainAction}
-					/>
-				)}
+					{isMember && currentWorkspaceId && (
+						<PageSearchDialog workspaceId={currentWorkspaceId} />
+					)}
 
-				{isMember && currentWorkspaceId && (
-					<PageSearchDialog workspaceId={currentWorkspaceId} />
-				)}
+					{isGuest && (
+						<NavMain
+							items={guestNavMainItems}
+							activeAction={
+								view === SidebarView.INBOX ? "inbox" : undefined
+							}
+							onAction={handleMainAction}
+						/>
+					)}
+				</SidebarHeader>
 
-				{isGuest && (
-					<NavMain
-						items={guestNavMainItems}
-						activeAction={
-							view === SidebarView.INBOX ? "inbox" : undefined
-						}
-						onAction={handleMainAction}
-					/>
-				)}
-			</SidebarHeader>
+				<SidebarContent>
+					{view === SidebarView.INBOX && isMobile ? (
+						<InboxSidebar unreadCount={unreadCount} />
+					) : (
+						<>
+							{isAccessLoading ? (
+								<div
+									role='status'
+									aria-label='Loading workspace'
+									className='space-y-5 px-4 py-3'
+								>
+									{[4, 3, 5].map((rows, group) => (
+										<div
+											key={group}
+											className='space-y-2.5'
+										>
+											<Skeleton className='h-3 w-16' />
+											{Array.from(
+												{ length: rows },
+												(_, row) => (
+													<div
+														key={row}
+														className='flex items-center gap-2'
+													>
+														<Skeleton className='size-4 rounded' />
+														<Skeleton
+															className={
+																row % 2
+																	? "h-3.5 w-2/3"
+																	: "h-3.5 w-4/5"
+															}
+														/>
+													</div>
+												),
+											)}
+										</div>
+									))}
+								</div>
+							) : !isGuest && !isMember ? (
+								<p
+									role='alert'
+									className='px-4 py-2 text-sm text-muted-foreground'
+								>
+									{!isError && !currentWorkspaceId
+										? "No workspace available."
+										: "Unable to load workspace access."}
+								</p>
+							) : null}
 
-			<SidebarContent>
-				{view === SidebarView.INBOX ? (
-					<InboxSidebar unreadCount={unreadCount} />
-				) : (
-					<>
-						{isAccessLoading ? (
-							<div
-								role='status'
-								aria-label='Loading workspace'
-								className='space-y-5 px-4 py-3'
-							>
-								{[4, 3, 5].map((rows, group) => (
-									<div key={group} className='space-y-2.5'>
-										<Skeleton className='h-3 w-16' />
-										{Array.from({ length: rows }, (_, row) => (
-											<div key={row} className='flex items-center gap-2'>
-												<Skeleton className='size-4 rounded' />
-												<Skeleton
-													className={row % 2 ? "h-3.5 w-2/3" : "h-3.5 w-4/5"}
-												/>
-											</div>
-										))}
-									</div>
-								))}
-							</div>
-						) : !isGuest && !isMember ? (
-							<p
-								role='alert'
-								className='px-4 py-2 text-sm text-muted-foreground'
-							>
-								{!isError && !currentWorkspaceId
-									? "No workspace available."
-									: "Unable to load workspace access."}
-							</p>
-						) : null}
-
-						{isMember && (
-							<NavFavorites
-								workspaceId={currentWorkspaceId ?? undefined}
-								activePageId={activePageId}
-								pages={pages}
-								teamspaces={teamspaces}
-							/>
-						)}
-
-						{(isGuest || isMember) && (
-							<NavSharedPages activePageId={activePageId} />
-						)}
-
-						{isMember && !isPagesLoading && !isPagesError && (
-							<NavPrivatePages
-								workspaceId={currentWorkspaceId as string}
-								pages={pages}
-								databases={databases}
-								teamspaces={teamspaces}
-								activePageId={activePageId}
-							/>
-						)}
-
-						{isMember &&
-							!isPagesLoading &&
-							!isPagesError &&
-							!isTeamspacesLoading &&
-							!isTeamspacesError &&
-							currentWorkspaceId && (
-								<NavTeamspaces
-									workspaceId={currentWorkspaceId}
+							{isMember && (
+								<NavFavorites
+									workspaceId={
+										currentWorkspaceId ?? undefined
+									}
+									activePageId={activePageId}
+									pages={pages}
 									teamspaces={teamspaces}
+								/>
+							)}
+
+							{(isGuest || isMember) && (
+								<NavSharedPages activePageId={activePageId} />
+							)}
+
+							{isMember && !isPagesLoading && !isPagesError && (
+								<NavPrivatePages
+									workspaceId={currentWorkspaceId as string}
 									pages={pages}
 									databases={databases}
+									teamspaces={teamspaces}
 									activePageId={activePageId}
 								/>
 							)}
 
-						{isMember && (
-							<NavSecondary
-								workspaceId={currentWorkspaceId as string}
-								items={data.navSecondary}
-								className='mt-auto'
-							/>
-						)}
-					</>
-				)}
-			</SidebarContent>
+							{isMember &&
+								!isPagesLoading &&
+								!isPagesError &&
+								!isTeamspacesLoading &&
+								!isTeamspacesError &&
+								currentWorkspaceId && (
+									<NavTeamspaces
+										workspaceId={currentWorkspaceId}
+										teamspaces={teamspaces}
+										pages={pages}
+										databases={databases}
+										activePageId={activePageId}
+									/>
+								)}
 
-			<SidebarResizeHandle />
-		</Sidebar>
+							{isMember && (
+								<NavSecondary
+									workspaceId={currentWorkspaceId as string}
+									items={data.navSecondary}
+									className='mt-auto'
+								/>
+							)}
+						</>
+					)}
+				</SidebarContent>
+
+				<SidebarResizeHandle />
+
+				{isInboxPanelOpen && (
+					<div className='absolute left-full top-0 flex h-full w-[340px] flex-col border-r bg-background text-foreground'>
+						<InboxSidebar
+							unreadCount={unreadCount}
+							onClose={() => setView(SidebarView.WORKSPACE)}
+						/>
+					</div>
+				)}
+			</Sidebar>
+
+			{isInboxPanelOpen && (
+				<div
+					aria-hidden='true'
+					className='hidden w-[340px] shrink-0 md:block'
+				/>
+			)}
+		</>
 	);
 }

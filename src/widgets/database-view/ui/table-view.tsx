@@ -36,11 +36,14 @@ import {
 	type DatabaseViewDetail,
 } from "@/entities/database/model/database.types";
 
+import { cn } from "@/shared/lib/utils";
 import { InteractionMode } from "@/shared/model/interaction-mode";
 import { AddPropertyPopover } from "./add-property-popover";
 import { ColumnResizeHandle } from "./column-resize-handle";
 import { RowActionsMenu } from "./row-actions-menu";
+import { SubtaskProgress, SubtaskToggle } from "./subtask-toggle";
 import { moveViewProperty } from "../lib/reorder-properties";
+import { flattenRowTree, getSubtaskProgress } from "../lib/row-tree";
 import { getRowValueMap, getVisibleProperties } from "../lib/view-properties";
 import { useQuickAddRow } from "../model/use-quick-add-row";
 import type { OpenRowHandler } from "./database-view-renderer";
@@ -60,6 +63,8 @@ interface TableViewProps {
 	viewId: string;
 	viewDetail: DatabaseViewDetail;
 	rows: DatabaseRow[];
+	/** Every row of the database, to place sub-tasks and parents the filters left out. */
+	allRows?: DatabaseRow[];
 
 	mode?: InteractionMode;
 	/** Opens the row side peek (editable mode only). */
@@ -73,6 +78,7 @@ export function TableView({
 	viewId,
 	viewDetail,
 	rows,
+	allRows = rows,
 	mode = "editable",
 	onOpenRow,
 	onDatabaseValueChange,
@@ -85,6 +91,14 @@ export function TableView({
 	);
 	// Widths being dragged or saved; shown until the view detail catches up.
 	const { addRow, focusRowId, isPending: isAddingRow } = useQuickAddRow(database);
+	const [collapsedIds, setCollapsedIds] = useState<ReadonlySet<string>>(new Set());
+	const toggleCollapsed = (rowId: string) =>
+		setCollapsedIds((current) => {
+			const next = new Set(current);
+			if (!next.delete(rowId)) next.add(rowId);
+			return next;
+		});
+	const treeRows = flattenRowTree(rows, allRows, collapsedIds);
 	const [draftWidths, setDraftWidths] = useState<
 		Record<string, number | null>
 	>({});
@@ -242,19 +256,26 @@ export function TableView({
 				</thead>
 
 				<tbody>
-					{rows.map((row) => {
+					{treeRows.map((item) => {
+						const { row } = item;
 						const valueMap = getRowValueMap(row);
 
 						return (
 							<tr
 								key={row.id}
-								className='group/row transition-colors hover:bg-muted/40'
+								className={cn(
+									"group/row transition-colors hover:bg-muted/40",
+									item.dimmed && "opacity-50",
+								)}
 							>
 								{visibleProperties.map((property) => (
 									<DatabaseValueCell
 										key={property.id}
 										// Notion-style "selected cell" ring while editing.
-										className='relative focus-within:shadow-[inset_0_0_0_2px_var(--ring)]'
+										className={cn(
+											"relative focus-within:shadow-[inset_0_0_0_2px_var(--ring)]",
+											property.type === PropertyType.DATE && "text-muted-foreground",
+										)}
 									>
 										{onOpenRow &&
 											property.type === PropertyType.TITLE && (
@@ -267,23 +288,42 @@ export function TableView({
 													Open
 												</button>
 											)}
-										<DatabaseCell
-											databaseId={database.id}
-											pageId={database.pageId}
-											rowId={row.id}
-											property={property}
-											value={valueMap.get(property.id)}
-											mode={mode}
-											autoFocus={
-												row.id === focusRowId &&
-												property.type === PropertyType.TITLE
-											}
-											onValueChange={
-												mode === "preview"
-													? onDatabaseValueChange
-													: undefined
-											}
-										/>
+										{(() => {
+											const cell = (
+												<DatabaseCell
+													databaseId={database.id}
+													pageId={database.pageId}
+													rowId={row.id}
+													property={property}
+													value={valueMap.get(property.id)}
+													mode={mode}
+													autoFocus={
+														row.id === focusRowId &&
+														property.type === PropertyType.TITLE
+													}
+													onValueChange={
+														mode === "preview"
+															? onDatabaseValueChange
+															: undefined
+													}
+												/>
+											);
+											if (property.type !== PropertyType.TITLE) return cell;
+											// The title cell carries the sub-task indent, ▸ toggle and "2/5".
+											return (
+												<div className='flex min-w-0 items-center gap-1'>
+													<SubtaskToggle
+														item={item}
+														collapsed={collapsedIds.has(row.id)}
+														onToggle={() => toggleCollapsed(row.id)}
+													/>
+													<div className='min-w-0 flex-1'>{cell}</div>
+													<SubtaskProgress
+														progress={getSubtaskProgress(database, allRows, row.id)}
+													/>
+												</div>
+											);
+										})()}
 									</DatabaseValueCell>
 								))}
 
@@ -292,6 +332,7 @@ export function TableView({
 										<RowActionsMenu
 											databaseId={database.id}
 											rowId={row.id}
+											onOpenRow={onOpenRow}
 										/>
 									</DatabaseValueCell>
 								)}
@@ -317,9 +358,9 @@ export function TableView({
 					type='button'
 					disabled={isAddingRow}
 					onClick={() => addRow()}
-					className='flex h-9 w-full items-center gap-1.5 rounded-sm px-2 text-sm text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground disabled:opacity-50'
+					className='flex h-9 w-full items-center gap-1.5 rounded-sm px-2 text-[13.5px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-50'
 				>
-					<Plus className='size-4' />
+					<Plus className='size-3.5' />
 
 					{isAddingRow ? "Adding..." : "New row"}
 				</button>

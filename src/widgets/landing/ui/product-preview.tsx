@@ -25,9 +25,9 @@ export function ProductPreview() {
 			{/* Mini Dashboard Sidebar */}
 			<div className='w-48 sm:w-60 border-r border-border/60 bg-muted/20 p-3 hidden md:flex flex-col gap-4 shrink-0'>
 				{/* Workspace Switcher */}
-				<div className='flex items-center justify-between p-2 rounded-xl bg-card border border-border/60 shadow-xs'>
+				<div className='flex items-center justify-between p-2 rounded-lg bg-card border border-border/60 shadow-xs'>
 					<div className='flex items-center gap-2 min-w-0'>
-						<div className='h-7 w-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-xs ring-1 ring-border/40'>
+						<div className='h-6 w-6 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-semibold text-xs'>
 							T
 						</div>
 						<div className='truncate'>
@@ -37,7 +37,7 @@ export function ProductPreview() {
 							<div className='text-[10px] text-muted-foreground'>Pro Plan</div>
 						</div>
 					</div>
-					<Badge variant='outline' className='text-[9px] px-1 py-0 h-4 border-primary/30 text-primary'>
+					<Badge variant='outline' className='text-[9px] px-1.5 py-0 h-4 border-border bg-secondary text-muted-foreground'>
 						Active
 					</Badge>
 				</div>
@@ -47,52 +47,52 @@ export function ProductPreview() {
 					<button
 						type='button'
 						onClick={() => setActiveView("doc")}
-						className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg transition-colors text-left ${
+						className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md transition-colors text-left ${
 							activeView === "doc"
-								? "bg-secondary text-foreground font-semibold"
+								? "bg-secondary text-foreground font-medium"
 								: "hover:bg-muted/60 hover:text-foreground"
 						}`}
 					>
-						<FileText className='h-3.5 w-3.5 text-blue-500' />
+						<FileText className='h-3.5 w-3.5 text-muted-foreground' />
 						<span>Document Page</span>
 					</button>
 
 					<button
 						type='button'
 						onClick={() => setActiveView("table")}
-						className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg transition-colors text-left ${
+						className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md transition-colors text-left ${
 							activeView === "table"
-								? "bg-secondary text-foreground font-semibold"
+								? "bg-secondary text-foreground font-medium"
 								: "hover:bg-muted/60 hover:text-foreground"
 						}`}
 					>
-						<Table className='h-3.5 w-3.5 text-purple-500' />
+						<Table className='h-3.5 w-3.5 text-muted-foreground' />
 						<span>Database Table</span>
 					</button>
 
 					<button
 						type='button'
 						onClick={() => setActiveView("board")}
-						className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg transition-colors text-left ${
+						className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md transition-colors text-left ${
 							activeView === "board"
-								? "bg-secondary text-foreground font-semibold"
+								? "bg-secondary text-foreground font-medium"
 								: "hover:bg-muted/60 hover:text-foreground"
 						}`}
 					>
-						<LayoutGrid className='h-3.5 w-3.5 text-indigo-500' />
+						<LayoutGrid className='h-3.5 w-3.5 text-muted-foreground' />
 						<span>Database Board</span>
 					</button>
 
 					<button
 						type='button'
 						onClick={() => setActiveView("ai")}
-						className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg transition-colors text-left ${
+						className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md transition-colors text-left ${
 							activeView === "ai"
-								? "bg-secondary text-foreground font-semibold"
+								? "bg-secondary text-foreground font-medium"
 								: "hover:bg-muted/60 hover:text-foreground"
 						}`}
 					>
-						<Sparkles className='h-3.5 w-3.5 text-amber-500' />
+						<Sparkles className='h-3.5 w-3.5 text-muted-foreground' />
 						<span>AI Assistant</span>
 					</button>
 				</div>
@@ -103,23 +103,23 @@ export function ProductPreview() {
 						Teamspaces
 					</div>
 					<div className='space-y-0.5 text-xs text-muted-foreground'>
-						<div className='flex items-center justify-between px-2.5 py-1 rounded-lg hover:bg-muted/40 text-foreground font-medium'>
+						<div className='flex items-center justify-between px-2.5 py-1 rounded-md bg-secondary/60 text-foreground font-medium'>
 							<span className='flex items-center gap-2 truncate'>
-								<span className='h-2 w-2 rounded-full bg-blue-500' />
+								<span className='h-1.5 w-1.5 rounded-full bg-foreground' />
 								Engineering
 							</span>
 							<span className='text-[10px] text-muted-foreground'>12 docs</span>
 						</div>
-						<div className='flex items-center justify-between px-2.5 py-1 rounded-lg hover:bg-muted/40'>
+						<div className='flex items-center justify-between px-2.5 py-1 rounded-md hover:bg-muted/40'>
 							<span className='flex items-center gap-2 truncate'>
-								<span className='h-2 w-2 rounded-full bg-purple-500' />
+								<span className='h-1.5 w-1.5 rounded-full bg-muted-foreground/60' />
 								Product Specs
 							</span>
 							<span className='text-[10px] text-muted-foreground'>8 docs</span>
 						</div>
-						<div className='flex items-center justify-between px-2.5 py-1 rounded-lg hover:bg-muted/40'>
+						<div className='flex items-center justify-between px-2.5 py-1 rounded-md hover:bg-muted/40'>
 							<span className='flex items-center gap-2 truncate'>
-								<span className='h-2 w-2 rounded-full bg-emerald-500' />
+								<span className='h-1.5 w-1.5 rounded-full bg-muted-foreground/60' />
 								Company Handbook
 							</span>
 							<span className='text-[10px] text-muted-foreground'>6 docs</span>
@@ -128,10 +128,10 @@ export function ProductPreview() {
 				</div>
 
 				{/* Workspace Sync Status */}
-				<div className='mt-auto p-2.5 rounded-xl border border-border/50 bg-background/60'>
+				<div className='mt-auto p-2.5 rounded-lg border border-border/60 bg-background/60'>
 					<div className='flex items-center justify-between text-[11px] font-medium text-foreground mb-1'>
-						<span className='flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400'>
-							<CheckCircle2 className='h-3 w-3' />
+						<span className='flex items-center gap-1.5 text-foreground'>
+							<span className='h-1.5 w-1.5 rounded-full bg-emerald-500' />
 							Workspace Synced
 						</span>
 						<span className='font-mono text-[10px] text-muted-foreground'>Live</span>
@@ -145,7 +145,7 @@ export function ProductPreview() {
 			{/* Main Workspace Viewport */}
 			<div className='flex-1 flex flex-col min-w-0 bg-background overflow-hidden'>
 				{/* Top Workspace Header Bar */}
-				<div className='h-12 border-b border-border/60 px-4 flex items-center justify-between shrink-0 bg-background/70 backdrop-blur-xs'>
+				<div className='h-12 border-b border-border/60 px-4 flex items-center justify-between shrink-0 bg-background'>
 					{/* Breadcrumbs */}
 					<div className='flex items-center gap-1.5 text-xs text-muted-foreground truncate'>
 						<span className='hover:text-foreground cursor-pointer'>Engineering</span>
@@ -163,7 +163,7 @@ export function ProductPreview() {
 						<button
 							type='button'
 							onClick={() => setActiveView("doc")}
-							className={`px-2.5 py-1 text-xs rounded-md font-medium transition-all ${
+							className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${
 								activeView === "doc"
 									? "bg-background text-foreground shadow-xs font-semibold"
 									: "text-muted-foreground hover:text-foreground"
@@ -174,7 +174,7 @@ export function ProductPreview() {
 						<button
 							type='button'
 							onClick={() => setActiveView("table")}
-							className={`px-2.5 py-1 text-xs rounded-md font-medium transition-all ${
+							className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${
 								activeView === "table"
 									? "bg-background text-foreground shadow-xs font-semibold"
 									: "text-muted-foreground hover:text-foreground"
@@ -185,7 +185,7 @@ export function ProductPreview() {
 						<button
 							type='button'
 							onClick={() => setActiveView("board")}
-							className={`px-2.5 py-1 text-xs rounded-md font-medium transition-all ${
+							className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${
 								activeView === "board"
 									? "bg-background text-foreground shadow-xs font-semibold"
 									: "text-muted-foreground hover:text-foreground"
@@ -196,13 +196,13 @@ export function ProductPreview() {
 						<button
 							type='button'
 							onClick={() => setActiveView("ai")}
-							className={`px-2.5 py-1 text-xs rounded-md font-medium transition-all flex items-center gap-1 ${
+							className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors flex items-center gap-1 ${
 								activeView === "ai"
 									? "bg-background text-foreground shadow-xs font-semibold"
 									: "text-muted-foreground hover:text-foreground"
 							}`}
 						>
-							<Sparkles className='h-3 w-3 text-amber-500' />
+							<Sparkles className='h-3 w-3 text-muted-foreground' />
 							AI
 						</button>
 					</div>
@@ -221,15 +221,15 @@ export function ProductPreview() {
 							</p>
 
 							{/* Callout box */}
-							<div className='rounded-xl border border-primary/20 bg-primary/5 p-4 text-xs text-primary flex gap-3 items-start'>
-								<Sparkles className='h-4 w-4 shrink-0 mt-0.5' />
+							<div className='rounded-lg border border-border bg-secondary/50 p-3.5 text-xs text-foreground flex gap-3 items-start'>
+								<Sparkles className='h-4 w-4 shrink-0 mt-0.5 text-muted-foreground' />
 								<div>
-									<span className='font-semibold'>Live Sync Active:</span> Updates to blocks, tables, and nested pages are mirrored across all members in real time.
+									<span className='font-semibold'>Shared with team:</span> Members can comment on blocks, tables, and nested pages.
 								</div>
 							</div>
 
 							{/* Code block */}
-							<div className='rounded-xl border border-border/70 bg-muted/40 p-3.5 font-mono text-[11px] text-foreground space-y-1'>
+							<div className='rounded-lg border border-border/70 bg-muted/40 p-3.5 font-mono text-[11px] text-foreground space-y-1'>
 								<div className='text-muted-foreground text-[10px] mb-1'>{"// Edge proxy hostname resolution"}</div>
 								<div><code>GET https://acme-docs.taskmanly.app/architecture</code></div>
 								<div className='text-emerald-600 dark:text-emerald-400'>&rarr; 200 OK (Edge Cache HIT, 18ms)</div>
@@ -246,7 +246,7 @@ export function ProductPreview() {
 											<Check className='h-3 w-3' />
 										</div>
 										<span className='line-through text-muted-foreground'>
-											Finalize RBAC role inheritance schema in database
+											Finalize workspace role &amp; page access schema in database
 										</span>
 									</div>
 									<div className='flex items-center gap-2.5 text-foreground'>
@@ -259,7 +259,7 @@ export function ProductPreview() {
 									</div>
 									<div className='flex items-center gap-2.5 text-foreground'>
 										<div className='h-4 w-4 rounded border border-border bg-card flex items-center justify-center text-[10px]' />
-										<span>Deploy AI contextual assistant for workspace Q&A</span>
+										<span>Deploy AI contextual assistant for workspace Q&amp;A</span>
 									</div>
 								</div>
 							</div>
@@ -284,12 +284,12 @@ export function ProductPreview() {
 								<tbody className='divide-y divide-border/50 text-foreground'>
 									<tr className='hover:bg-muted/20 transition-colors'>
 										<td className='py-3 px-3 font-medium flex items-center gap-2'>
-											<FileText className='h-3.5 w-3.5 text-blue-500' />
+											<FileText className='h-3.5 w-3.5 text-muted-foreground' />
 											Engineering Onboarding Guide
 										</td>
 										<td className='py-3 px-3 text-muted-foreground'>Handbook</td>
 										<td className='py-3 px-3'>
-											<Badge variant='secondary' className='text-[10px] bg-emerald-500/10 text-emerald-600 border-none'>
+											<Badge variant='secondary' className='text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-none'>
 												Published
 											</Badge>
 										</td>
@@ -298,12 +298,12 @@ export function ProductPreview() {
 									</tr>
 									<tr className='hover:bg-muted/20 transition-colors'>
 										<td className='py-3 px-3 font-medium flex items-center gap-2'>
-											<Database className='h-3.5 w-3.5 text-purple-500' />
+											<Database className='h-3.5 w-3.5 text-muted-foreground' />
 											API Authentication Specs
 										</td>
 										<td className='py-3 px-3 text-muted-foreground'>Specs</td>
 										<td className='py-3 px-3'>
-											<Badge variant='secondary' className='text-[10px] bg-blue-500/10 text-blue-600 border-none'>
+											<Badge variant='secondary' className='text-[10px] bg-secondary text-foreground border-none'>
 												In Review
 											</Badge>
 										</td>
@@ -312,12 +312,12 @@ export function ProductPreview() {
 									</tr>
 									<tr className='hover:bg-muted/20 transition-colors'>
 										<td className='py-3 px-3 font-medium flex items-center gap-2'>
-											<Globe className='h-3.5 w-3.5 text-emerald-500' />
+											<Globe className='h-3.5 w-3.5 text-muted-foreground' />
 											Public Subdomain Documentation
 										</td>
 										<td className='py-3 px-3 text-muted-foreground'>Publishing</td>
 										<td className='py-3 px-3'>
-											<Badge variant='secondary' className='text-[10px] bg-emerald-500/10 text-emerald-600 border-none'>
+											<Badge variant='secondary' className='text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-none'>
 												Published
 											</Badge>
 										</td>
@@ -326,12 +326,12 @@ export function ProductPreview() {
 									</tr>
 									<tr className='hover:bg-muted/20 transition-colors'>
 										<td className='py-3 px-3 font-medium flex items-center gap-2'>
-											<Shield className='h-3.5 w-3.5 text-pink-500' />
-											Team Access & Permission Policy
+											<Shield className='h-3.5 w-3.5 text-muted-foreground' />
+											Team Access &amp; Permission Policy
 										</td>
 										<td className='py-3 px-3 text-muted-foreground'>Security</td>
 										<td className='py-3 px-3'>
-											<Badge variant='secondary' className='text-[10px] bg-amber-500/10 text-amber-600 border-none'>
+											<Badge variant='secondary' className='text-[10px] bg-muted text-muted-foreground border-none'>
 												Draft
 											</Badge>
 										</td>
@@ -351,22 +351,22 @@ export function ProductPreview() {
 						<div className='w-64 shrink-0 flex flex-col gap-2.5'>
 							<div className='flex items-center justify-between px-1 text-xs font-semibold text-muted-foreground'>
 								<span className='flex items-center gap-1.5'>
-									<span className='h-2 w-2 rounded-full bg-amber-500' />
+									<span className='h-2 w-2 rounded-full bg-muted-foreground/50' />
 									Drafting
 								</span>
 								<span className='text-[11px] font-mono'>1</span>
 							</div>
 
 							<div className='p-3.5 rounded-xl border border-border/80 bg-card shadow-xs space-y-2'>
-								<Badge variant='outline' className='text-[10px] text-amber-600 bg-amber-500/10 border-amber-500/20'>
+								<Badge variant='outline' className='text-[10px] text-muted-foreground bg-secondary border-border'>
 									Security
 								</Badge>
 								<div className='text-xs font-semibold text-foreground leading-snug'>
-									Team Access & Role Policy
+									Team Access &amp; Role Policy
 								</div>
 								<div className='flex items-center justify-between pt-1 text-[11px] text-muted-foreground'>
 									<span>Updated today</span>
-									<div className='h-5 w-5 rounded-full bg-primary/20 text-primary text-[10px] font-bold flex items-center justify-center'>
+									<div className='h-5 w-5 rounded-full bg-secondary text-foreground text-[10px] font-semibold flex items-center justify-center border border-border'>
 										AV
 									</div>
 								</div>
@@ -377,14 +377,14 @@ export function ProductPreview() {
 						<div className='w-64 shrink-0 flex flex-col gap-2.5'>
 							<div className='flex items-center justify-between px-1 text-xs font-semibold text-muted-foreground'>
 								<span className='flex items-center gap-1.5'>
-									<span className='h-2 w-2 rounded-full bg-blue-500' />
+									<span className='h-2 w-2 rounded-full bg-foreground/70' />
 									In Review
 								</span>
 								<span className='text-[11px] font-mono'>1</span>
 							</div>
 
 							<div className='p-3.5 rounded-xl border border-border/80 bg-card shadow-xs space-y-2'>
-								<Badge variant='outline' className='text-[10px] text-blue-600 bg-blue-500/10 border-blue-500/20'>
+								<Badge variant='outline' className='text-[10px] text-muted-foreground bg-secondary border-border'>
 									Specifications
 								</Badge>
 								<div className='text-xs font-semibold text-foreground leading-snug'>
@@ -392,7 +392,7 @@ export function ProductPreview() {
 								</div>
 								<div className='flex items-center justify-between pt-1 text-[11px] text-muted-foreground'>
 									<span>2 reviewers</span>
-									<div className='h-5 w-5 rounded-full bg-blue-500/20 text-blue-600 text-[10px] font-bold flex items-center justify-center'>
+									<div className='h-5 w-5 rounded-full bg-secondary text-foreground text-[10px] font-semibold flex items-center justify-center border border-border'>
 										NN
 									</div>
 								</div>
@@ -410,7 +410,7 @@ export function ProductPreview() {
 							</div>
 
 							<div className='p-3.5 rounded-xl border border-border/80 bg-card shadow-xs space-y-2'>
-								<Badge variant='outline' className='text-[10px] text-emerald-600 bg-emerald-500/10 border-emerald-500/20'>
+								<Badge variant='outline' className='text-[10px] text-muted-foreground bg-secondary border-border'>
 									Handbook
 								</Badge>
 								<div className='text-xs font-semibold text-foreground leading-snug'>
@@ -423,7 +423,7 @@ export function ProductPreview() {
 							</div>
 
 							<div className='p-3.5 rounded-xl border border-border/80 bg-card shadow-xs space-y-2'>
-								<Badge variant='outline' className='text-[10px] text-emerald-600 bg-emerald-500/10 border-emerald-500/20'>
+								<Badge variant='outline' className='text-[10px] text-muted-foreground bg-secondary border-border'>
 									Publishing
 								</Badge>
 								<div className='text-xs font-semibold text-foreground leading-snug'>
@@ -444,17 +444,17 @@ export function ProductPreview() {
 						<div className='space-y-4'>
 							{/* User query bubble */}
 							<div className='flex items-start gap-2.5 justify-end'>
-								<div className='rounded-2xl rounded-tr-none bg-primary px-3.5 py-2.5 text-xs text-primary-foreground max-w-[85%] font-medium'>
+								<div className='rounded-xl rounded-tr-none bg-primary px-3.5 py-2.5 text-xs text-primary-foreground max-w-[85%] font-medium'>
 									Draft an architecture spec for public page publishing with subdomains.
 								</div>
 							</div>
 
 							{/* AI Response bubble */}
 							<div className='flex items-start gap-2.5'>
-								<div className='h-6 w-6 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0 ring-1 ring-amber-500/30'>
+								<div className='h-6 w-6 rounded-md bg-secondary text-foreground flex items-center justify-center shrink-0 border border-border'>
 									<Sparkles className='h-3.5 w-3.5' />
 								</div>
-								<div className='rounded-2xl rounded-tl-none border border-border/80 bg-muted/30 p-4 text-xs text-foreground space-y-2.5 max-w-[90%] shadow-xs'>
+								<div className='rounded-xl rounded-tl-none border border-border/80 bg-muted/30 p-4 text-xs text-foreground space-y-2.5 max-w-[90%] shadow-xs'>
 									<div className='font-bold text-foreground'>
 										Architecture Spec: Public Site Publishing Engine
 									</div>
@@ -463,23 +463,23 @@ export function ProductPreview() {
 									</p>
 									<ul className='space-y-1.5 text-[11px] text-foreground'>
 										<li className='flex items-center gap-2'>
-											<span className='h-1.5 w-1.5 rounded-full bg-blue-500' />
+											<span className='h-1.5 w-1.5 rounded-full bg-foreground' />
 											<strong>Overview:</strong> Edge proxy mapping hostnames to page records
 										</li>
 										<li className='flex items-center gap-2'>
-											<span className='h-1.5 w-1.5 rounded-full bg-purple-500' />
+											<span className='h-1.5 w-1.5 rounded-full bg-foreground' />
 											<strong>Security:</strong> Read-only filter guaranteeing isolation from drafts
 										</li>
 										<li className='flex items-center gap-2'>
-											<span className='h-1.5 w-1.5 rounded-full bg-emerald-500' />
+											<span className='h-1.5 w-1.5 rounded-full bg-foreground' />
 											<strong>Data Model:</strong> Page publication state and recursive child flag
 										</li>
 									</ul>
 									<div className='pt-2 flex items-center gap-2'>
-										<Button size='sm' className='h-7 text-[11px] rounded-lg bg-primary text-primary-foreground'>
+										<Button size='sm' className='h-7 text-[11px] rounded-md bg-primary text-primary-foreground'>
 											Insert into Document
 										</Button>
-										<Button size='sm' variant='outline' className='h-7 text-[11px] rounded-lg'>
+										<Button size='sm' variant='outline' className='h-7 text-[11px] rounded-md'>
 											Copy spec
 										</Button>
 									</div>
@@ -488,14 +488,14 @@ export function ProductPreview() {
 						</div>
 
 						{/* Prompt composer */}
-						<div className='mt-4 flex items-center gap-2 rounded-xl border border-border/80 bg-card p-1.5 px-3 shadow-xs'>
+						<div className='mt-4 flex items-center gap-2 rounded-lg border border-border/80 bg-card p-1.5 px-3 shadow-xs'>
 							<input
 								type='text'
 								placeholder='Ask Taskmanly AI to draft, summarize or structure...'
 								className='flex-1 bg-transparent text-xs text-foreground placeholder:text-muted-foreground outline-none'
 								readOnly
 							/>
-							<Button size='icon' className='h-7 w-7 rounded-lg bg-primary text-primary-foreground shrink-0'>
+							<Button size='icon' className='h-7 w-7 rounded-md bg-primary text-primary-foreground shrink-0'>
 								<Send className='h-3.5 w-3.5' />
 							</Button>
 						</div>

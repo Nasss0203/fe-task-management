@@ -14,7 +14,7 @@ export function CreatorLayout({ children }: { children: ReactNode }) {
 			<CreatorSidebar />
 			<SidebarInset className='min-w-0'>
 				<CreatorHeader />
-				<div className='mx-auto w-full max-w-7xl flex-1 px-4 py-8 md:px-10 md:py-10'>
+				<div className='mx-auto w-full max-w-[1104px] flex-1 px-4 py-8 md:px-10 md:py-10'>
 					{children}
 				</div>
 			</SidebarInset>

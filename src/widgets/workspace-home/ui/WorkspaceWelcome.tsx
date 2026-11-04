@@ -27,10 +27,10 @@ export function WorkspaceWelcome({
 
 	return (
 		<div className='space-y-1'>
-			<h1 className='text-2xl font-bold tracking-tight text-foreground sm:text-3xl'>
+			<h1 className='text-2xl font-bold tracking-tight text-foreground sm:text-[30px] sm:leading-[1.5]'>
 				{workspaceName || "Workspace"}
 			</h1>
-			<p className='text-sm text-muted-foreground sm:text-base'>
+			<p className='text-sm text-muted-foreground sm:text-[15px]'>
 				{greeting}, {userName}
 			</p>
 		</div>

@@ -80,21 +80,16 @@ export function PropertyOptionBadge({
 	return (
 		<span
 			className={cn(
-				"inline-flex max-w-full items-center truncate rounded-[4px] bg-muted px-1.5 py-0.5 text-xs leading-4 font-medium text-foreground",
+				"inline-flex h-[22px] max-w-full items-center gap-1.5 rounded-full border border-input px-2 text-xs leading-4 text-secondary-foreground",
 				className,
 			)}
-			// Tinted background + text in the option's hue (Notion-style), readable
-			// in both themes because the text mixes toward the foreground color.
-			style={
-				color
-					? {
-							backgroundColor: `color-mix(in srgb, ${color} 30%, transparent)`,
-							color: `color-mix(in srgb, ${color} 72%, var(--foreground))`,
-						}
-					: undefined
-			}
 		>
-			{name}
+			<span
+				aria-hidden
+				className='size-[7px] shrink-0 rounded-full bg-faint'
+				style={color ? { backgroundColor: color } : undefined}
+			/>
+			<span className='truncate'>{name}</span>
 		</span>
 	);
 }
@@ -119,7 +114,7 @@ export function DatabaseTableSurface({
 		>
 			<table
 				className={cn(
-					"min-w-max table-fixed border-collapse text-sm",
+					"min-w-max table-fixed border-collapse text-[13.5px]",
 					tableClassName,
 				)}
 				style={tableStyle}
@@ -137,7 +132,7 @@ export function DatabaseHeaderCell({
 		<th
 			{...props}
 			className={cn(
-				"h-9 min-w-[100px] border-y border-r border-border px-2 text-left text-[13px] font-normal text-muted-foreground last:border-r-0",
+				"h-[34px] min-w-[100px] border-b border-r border-border px-2 text-left last:border-r-0 text-[12.5px] font-normal text-muted-foreground",
 				className,
 			)}
 		/>
@@ -151,7 +146,7 @@ export function DatabaseValueCell({
 		<td
 			{...props}
 			className={cn(
-				"h-9 min-w-[100px] border-b border-r border-border px-1 align-middle last:border-r-0",
+				"h-[38px] min-w-[100px] border-b border-r border-border px-1 align-middle last:border-r-0",
 				className,
 			)}
 		/>

@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Check, Copy, Trash2 } from "lucide-react";
+import { Check, Copy } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -194,7 +194,7 @@ const WorkspaceSection = ({ workspaceId }: WorkspaceSectionProps) => {
 						disabled={!canUpdate || updateMutation.isPending}
 						aria-label='Workspace name'
 						aria-invalid={!trimmedName}
-						className='w-64'
+						className='h-[34px] w-full sm:w-[260px]'
 					/>
 				</SettingsRow>
 				<SettingsRow
@@ -206,7 +206,7 @@ const WorkspaceSection = ({ workspaceId }: WorkspaceSectionProps) => {
 							<button
 								type='button'
 								aria-label='Change workspace icon'
-								className='flex size-10 items-center justify-center rounded-lg border bg-muted/50 text-xl transition-colors enabled:hover:bg-muted disabled:cursor-default'
+								className='flex size-9 items-center justify-center rounded-lg bg-primary text-[15px] font-bold text-primary-foreground transition-colors enabled:hover:bg-primary/85 disabled:cursor-default'
 							>
 								{workspace.icon || DEFAULT_WORKSPACE_ICON}
 							</button>
@@ -250,27 +250,28 @@ const WorkspaceSection = ({ workspaceId }: WorkspaceSectionProps) => {
 
 			<SettingsGroup title='Details'>
 				<SettingsRow label='Workspace ID' description='Useful when contacting support.'>
-					<div className='flex items-center gap-2'>
-						<code className='max-w-56 truncate rounded-md bg-muted px-2 py-1 text-xs'>
+					<div className='flex items-center gap-1.5'>
+						<code className='max-w-56 truncate font-sans text-[13px] text-muted-foreground'>
 							{workspace.id}
 						</code>
 						<Button
 							variant='ghost'
 							size='icon-sm'
+							className='size-[26px] rounded-[5px] text-muted-foreground'
 							onClick={copyId}
 							aria-label='Copy workspace ID'
 						>
-							{copied ? <Check className='size-4' /> : <Copy className='size-4' />}
+							{copied ? <Check className='size-3.5' /> : <Copy className='size-3.5' />}
 						</Button>
 					</div>
 				</SettingsRow>
 				<SettingsRow label='Created'>
-					<span className='text-sm text-muted-foreground'>
+					<span className='text-[13.5px] text-muted-foreground'>
 						{formatSettingsDate(workspace.createdAt)}
 					</span>
 				</SettingsRow>
 				<SettingsRow label='Last updated'>
-					<span className='text-sm text-muted-foreground'>
+					<span className='text-[13.5px] text-muted-foreground'>
 						{formatSettingsDate(workspace.updatedAt)}
 					</span>
 				</SettingsRow>
@@ -284,13 +285,11 @@ const WorkspaceSection = ({ workspaceId }: WorkspaceSectionProps) => {
 					>
 						<Button
 							variant='destructive'
-							size='sm'
 							onClick={() => {
 								setConfirmText("");
 								setConfirmOpen(true);
 							}}
 						>
-							<Trash2 className='size-4' />
 							Move to trash
 						</Button>
 					</SettingsRow>

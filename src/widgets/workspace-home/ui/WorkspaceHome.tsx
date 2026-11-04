@@ -34,7 +34,7 @@ export function WorkspaceHome() {
 	const isLoading = isWorkspacesLoading || isWorkspaceLoading;
 
 	return (
-		<div className='mx-auto w-full max-w-5xl space-y-8 px-4 py-6 sm:px-6'>
+		<div className='mx-auto w-full max-w-5xl space-y-8 px-4 pt-6 pb-12 sm:px-6'>
 			{/* 1. Workspace Header */}
 			<WorkspaceWelcome
 				workspaceName={activeWorkspace?.name}

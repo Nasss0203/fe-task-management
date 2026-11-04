@@ -29,8 +29,8 @@ export function DatabasePropertyHeader({
 
 	if (mode !== "editable") {
 		return (
-			<div className='flex w-full items-center gap-2 text-left'>
-				<PropertyIcon type={property.type} />
+			<div className='flex w-full items-center gap-1.5 text-left'>
+				<PropertyIcon type={property.type} className='size-[13px]' />
 
 				<span className='min-w-0 flex-1 truncate'>{property.name}</span>
 			</div>
@@ -42,13 +42,13 @@ export function DatabasePropertyHeader({
 			<PopoverTrigger asChild>
 				<button
 					type='button'
-					className='group flex h-9 w-full items-center gap-1.5 px-2 text-left outline-none focus-visible:bg-muted/60'
+					className='group flex h-[34px] w-full items-center gap-1.5 px-2 text-left outline-none hover:text-foreground focus-visible:bg-muted/60'
 				>
-					<PropertyIcon type={property.type} />
+					<PropertyIcon type={property.type} className='size-[13px]' />
 
 					<span className='min-w-0 flex-1 truncate'>{property.name}</span>
 
-					<MoreHorizontal className='size-4 shrink-0 opacity-0 group-hover:opacity-100' />
+					<MoreHorizontal className='size-3.5 shrink-0 opacity-0 group-hover:opacity-100' />
 				</button>
 			</PopoverTrigger>
 

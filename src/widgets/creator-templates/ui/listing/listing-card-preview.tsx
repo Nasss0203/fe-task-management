@@ -38,8 +38,8 @@ export function ListingCardPreview({
 			<p className='text-xs font-medium text-muted-foreground'>
 				Marketplace card preview
 			</p>
-			<div className='overflow-hidden rounded-xl border bg-card'>
-				<div className='flex aspect-video items-center justify-center overflow-hidden border-b bg-muted/40'>
+			<div className='overflow-hidden rounded-[12px] border bg-card'>
+				<div className='flex aspect-video items-center justify-center overflow-hidden border-b bg-gradient-to-br from-[#e2e7f6] to-[#d9f3ef] dark:from-indigo-950/50 dark:to-teal-950/50'>
 					{thumbnail?.url ? (
 						// eslint-disable-next-line @next/next/no-img-element -- signed URL from the API
 						<img
@@ -48,7 +48,11 @@ export function ListingCardPreview({
 							className='size-full object-cover object-top'
 						/>
 					) : (
-						<LayoutTemplate className='size-8 text-muted-foreground/60' />
+						<span className='flex size-11 items-center justify-center rounded-[10px] border bg-background text-lg text-foreground shadow-2xs'>
+							{template.icon || (
+								<LayoutTemplate className='size-5 text-muted-foreground' />
+							)}
+						</span>
 					)}
 				</div>
 				<div className='flex flex-col gap-2 p-4'>
@@ -72,7 +76,7 @@ export function ListingCardPreview({
 							{categoryNames.map((categoryName) => (
 								<span
 									key={categoryName}
-									className='rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground'
+									className='rounded-md bg-muted px-2 py-0.5 text-[11px] text-muted-foreground'
 								>
 									{categoryName}
 								</span>

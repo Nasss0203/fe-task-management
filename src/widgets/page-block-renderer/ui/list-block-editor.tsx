@@ -34,7 +34,7 @@ export function ListBlockEditor({ block, shareToken }: ListBlockEditorProps) {
 	const inlineMarks = useInlineMarks(
 		value,
 		setValue,
-		"text-base leading-7",
+		"text-[15px] leading-6 text-secondary-foreground dark:text-foreground",
 	);
 
 	const updateBlock = useUpdatePageBlock(shareToken);
@@ -134,7 +134,7 @@ export function ListBlockEditor({ block, shareToken }: ListBlockEditorProps) {
 	useBlockAutoFocus(block.id, textareaRef);
 
 	return (
-		<div className='flex min-h-7 w-full items-start gap-1'>
+		<div className='flex min-h-6 w-full items-start gap-1'>
 			<ListMarker
 				number={isNumbered ? (block.list_number ?? 1) : undefined}
 			/>
@@ -159,7 +159,7 @@ export function ListBlockEditor({ block, shareToken }: ListBlockEditorProps) {
 						handleBlur();
 					}}
 					className={cn(
-						`block min-h-7 w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-base leading-7 outline-none placeholder:text-muted-foreground/40 focus-visible:ring-0`,
+						`block min-h-6 w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-[15px] leading-6 text-secondary-foreground dark:text-foreground outline-none placeholder:text-muted-foreground/40 focus-visible:ring-0`,
 						inlineMarks.textareaClassName,
 					)}
 				/>

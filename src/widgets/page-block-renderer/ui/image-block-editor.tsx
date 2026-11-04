@@ -124,7 +124,7 @@ export function ImageBlockEditor({ block, shareToken }: ImageBlockEditorProps) {
 
 	if (!content.url) {
 		return (
-			<div className='w-full rounded-md border border-border bg-muted/20 p-3'>
+			<div className='w-full rounded-lg border border-dashed border-input bg-muted/40 p-4'>
 				<input
 					ref={fileInputRef}
 					type='file'
@@ -136,7 +136,9 @@ export function ImageBlockEditor({ block, shareToken }: ImageBlockEditorProps) {
 
 				{showEmbedInput ? (
 					<div className='flex items-center gap-2'>
-						<LinkIcon className='size-4 shrink-0 text-muted-foreground' />
+						<div className='flex shrink-0 items-center text-muted-foreground'>
+							<LinkIcon className='size-4' />
+						</div>
 
 						<input
 							key='image-url-input'
@@ -157,58 +159,61 @@ export function ImageBlockEditor({ block, shareToken }: ImageBlockEditorProps) {
 									setUrlInput("");
 								}
 							}}
-							className='h-8 min-w-0 flex-1 border-0 bg-transparent text-sm outline-none placeholder:text-muted-foreground'
+							className='h-8 min-w-0 flex-1 rounded-md border border-input bg-background px-2.5 text-[13px] outline-none transition-colors placeholder:text-faint focus:border-ring focus:ring-[0.5px] focus:ring-ring'
 						/>
 
 						<button
 							type='button'
 							onClick={handleEmbed}
-							className='rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-muted'
+							disabled={!urlInput.trim()}
+							className='inline-flex h-7.5 items-center rounded-md bg-primary px-2.5 text-[12.5px] font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50'
 						>
 							Embed
 						</button>
 					</div>
 				) : (
-					<div className='flex items-center gap-3'>
-						<div className='flex size-9 shrink-0 items-center justify-center rounded-md bg-muted'>
-							<ImageIcon className='size-4 text-muted-foreground' />
+					<div className='flex flex-col gap-2.5'>
+						<div className='flex min-w-0 items-center gap-2'>
+							<div className='flex shrink-0 items-center text-muted-foreground'>
+								<ImageIcon className='size-4' />
+							</div>
+
+							<div className='min-w-0'>
+								<div className='text-[13.5px] font-medium text-muted-foreground'>
+									Add an image
+								</div>
+							</div>
 						</div>
 
-						<div className='min-w-0 flex-1'>
-							<div className='text-sm font-medium'>
-								Add an image
-							</div>
+						<div className='flex shrink-0 items-center gap-2'>
+							<button
+								type='button'
+								disabled={
+									!page?.workspace_id ||
+									Boolean(shareToken) ||
+									uploadAttachment.isPending
+								}
+								onClick={() =>
+									fileInputRef.current?.click()
+								}
+								className='inline-flex h-7.5 items-center gap-1.5 rounded-md border border-input bg-background px-2.5 text-[12.5px] font-medium text-foreground transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-50'
+							>
+								<UploadIcon className='size-3.5' />
 
-							<div className='mt-2 flex items-center gap-2'>
-								<button
-									type='button'
-									disabled={
-										!page?.workspace_id ||
-										Boolean(shareToken) ||
-										uploadAttachment.isPending
-									}
-									onClick={() =>
-										fileInputRef.current?.click()
-									}
-									className='inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-xs font-medium hover:bg-muted disabled:pointer-events-none disabled:opacity-50'
-								>
-									<UploadIcon className='size-3.5' />
+								{uploadAttachment.isPending
+									? "Uploading..."
+									: "Upload"}
+							</button>
 
-									{uploadAttachment.isPending
-										? "Uploading..."
-										: "Upload"}
-								</button>
-
-								<button
-									type='button'
-									disabled={uploadAttachment.isPending}
-									onClick={() => setShowEmbedInput(true)}
-									className='inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-xs font-medium hover:bg-muted disabled:pointer-events-none disabled:opacity-50'
-								>
-									<LinkIcon className='size-3.5' />
-									Embed link
-								</button>
-							</div>
+							<button
+								type='button'
+								disabled={uploadAttachment.isPending}
+								onClick={() => setShowEmbedInput(true)}
+								className='inline-flex h-7.5 items-center gap-1.5 rounded-md border border-input bg-background px-2.5 text-[12.5px] font-medium text-foreground transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-50'
+							>
+								<LinkIcon className='size-3.5' />
+								Embed link
+							</button>
 						</div>
 					</div>
 				)}
@@ -247,7 +252,7 @@ export function ImageBlockEditor({ block, shareToken }: ImageBlockEditorProps) {
 					}));
 				}}
 				onBlur={() => saveContent(content)}
-				className='mt-1 w-full border-0 bg-transparent px-1 text-center text-xs text-muted-foreground outline-none placeholder:text-muted-foreground/60'
+				className='mt-1.5 w-full border-0 bg-transparent px-0 text-[13px] text-muted-foreground outline-none placeholder:text-faint'
 			/>
 		</div>
 	);

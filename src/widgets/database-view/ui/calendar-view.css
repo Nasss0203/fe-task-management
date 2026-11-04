@@ -2,7 +2,7 @@
  * FullCalendar "forma" theme mapped onto the app's design tokens, so the
  * calendar follows light/dark mode with the rest of the UI (.dark on <html>).
  */
-.db-calendar {
+:root {
 	/* primary */
 	--fc-forma-primary: var(--primary);
 	--fc-forma-primary-over: color-mix(in srgb, var(--primary) 88%, var(--foreground));
@@ -10,10 +10,10 @@
 	--fc-forma-primary-foreground: var(--primary-foreground);
 
 	/* events: soft tinted chips, readable in both modes */
-	--fc-forma-event: color-mix(in srgb, var(--primary) 16%, var(--card));
+	--fc-forma-event: var(--card);
 	--fc-forma-event-contrast: var(--foreground);
 	--fc-forma-background-event: var(--primary);
-	--fc-forma-highlight: color-mix(in srgb, var(--primary) 14%, transparent);
+	--fc-forma-highlight: var(--accent-soft);
 
 	/* neutral backgrounds */
 	--fc-forma-background: var(--background);
@@ -32,6 +32,19 @@
 	--fc-forma-border: var(--border);
 	--fc-forma-muted-border: var(--border);
 	--fc-forma-strong-border: color-mix(in srgb, var(--foreground) 30%, transparent);
+}
 
+.db-calendar {
+	--fc-forma-primary: var(--destructive);
 	font-size: 0.8125rem;
+}
+
+.db-calendar .db-calendar-event {
+	border: 1px solid var(--input);
+	border-radius: 6px;
+	background-color: var(--card);
+}
+
+.db-calendar .db-calendar-event:hover {
+	background-color: var(--accent);
 }

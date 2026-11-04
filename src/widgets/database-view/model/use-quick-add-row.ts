@@ -35,14 +35,15 @@ export function useQuickAddRow(database: Database) {
 	const [focusRowId, setFocusRowId] = useState<string | null>(null);
 	const [isPending, setIsPending] = useState(false);
 
-	/** Resolves to the new row id, or null when creating failed. */
+	/** Resolves to the new row id, or null when creating failed. Pass `parentRowId` for a sub-task. */
 	const addRow = async (
 		initial: InitialRowValue[] = [],
+		parentRowId: string | null = null,
 	): Promise<string | null> => {
 		setIsPending(true);
 		let rowId: string | null = null;
 		try {
-			const row = await databaseApi.createRow(database.id);
+			const row = await databaseApi.createRow(database.id, parentRowId);
 			const overridden = new Set(initial.map((item) => item.propertyId));
 			const values = [
 				...getDefaultValues(database).filter(

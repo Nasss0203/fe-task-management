@@ -62,28 +62,29 @@ export function ListingTagsField({
 	return (
 		<div className='flex flex-col gap-2'>
 			<div className='flex items-center justify-between gap-2'>
-				<label
-					htmlFor='listing-tags-input'
-					className='text-sm leading-none font-medium'
-				>
-					Tags
-				</label>
-				{changed ? (
-					<span className='text-xs text-amber-600 dark:text-amber-400'>
-						Applied when you release
-					</span>
-				) : (
-					<span className='text-xs text-muted-foreground'>
-						{tags.length}/{MAX_LISTING_TAGS}
-					</span>
-				)}
+				<div className='flex items-center gap-1.5'>
+					<label
+						htmlFor='listing-tags-input'
+						className='text-[13px] leading-none font-medium'
+					>
+						Tags
+					</label>
+					{changed && (
+						<span className='text-xs text-amber-600 dark:text-amber-400'>
+							Applied when you release
+						</span>
+					)}
+				</div>
+				<span className='text-xs text-muted-foreground'>
+					{tags.length}/{MAX_LISTING_TAGS}
+				</span>
 			</div>
 			{tags.length > 0 && (
 				<ul aria-label='Listing tags' className='flex flex-wrap gap-1.5'>
 					{tags.map((tag) => (
 						<li
 							key={tag}
-							className='inline-flex h-7 items-center gap-1 rounded-full border pl-2.5 pr-1 text-xs'
+							className='inline-flex h-6 items-center gap-1 rounded-full bg-muted pl-2.5 pr-1 text-[12.5px] text-foreground'
 						>
 							#{tag}
 							<button
@@ -91,7 +92,7 @@ export function ListingTagsField({
 								disabled={disabled}
 								aria-label={`Remove tag ${tag}`}
 								onClick={() => onChange(tags.filter((value) => value !== tag))}
-								className='inline-flex size-5 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none disabled:opacity-50'
+								className='inline-flex size-4 items-center justify-center rounded-full text-muted-foreground hover:bg-background hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none disabled:opacity-50'
 							>
 								<X className='size-3' aria-hidden />
 							</button>

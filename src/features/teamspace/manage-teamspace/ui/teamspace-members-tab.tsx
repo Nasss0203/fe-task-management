@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronDown, UserMinus, UserPlus } from "lucide-react";
+import { Check, ChevronDown, Mail, Search, UserMinus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -168,7 +168,7 @@ export function TeamspaceMembersTab({
 	}
 
 	return (
-		<div className='flex flex-col gap-6'>
+		<div className='flex flex-col gap-5'>
 			{canManage && (
 				<InvitePicker
 					candidates={candidates}
@@ -178,11 +178,11 @@ export function TeamspaceMembersTab({
 			)}
 
 			<section className='flex flex-col gap-1'>
-				<h3 className='text-xs font-medium text-muted-foreground'>
+				<h3 className='text-[12.5px] font-medium leading-[19px] text-muted-foreground'>
 					Members · {members.length}
 				</h3>
 
-				<ul className='divide-y'>
+				<ul>
 					{members.map((member) => {
 						const person = peopleById.get(member.workspaceMemberId);
 
@@ -190,7 +190,7 @@ export function TeamspaceMembersTab({
 							Boolean(currentUserId) && person?.user_id === currentUserId;
 
 						return (
-							<li key={member.id} className='flex items-center gap-3 py-2.5'>
+							<li key={member.id} className='flex h-12 items-center gap-3'>
 								<PersonIdentity
 									person={person}
 									suffix={
@@ -206,14 +206,14 @@ export function TeamspaceMembersTab({
 									<DropdownMenu>
 										<DropdownMenuTrigger asChild>
 											<Button
-												variant='ghost'
+												variant='outline'
 												size='sm'
-												className='h-8 shrink-0 gap-1 text-xs'
+												className='shrink-0 gap-1 px-2 text-[12.5px] font-normal data-[state=open]:bg-accent'
 												disabled={roleMutation.isPending}
 												aria-label={`Role for ${getPersonName(person)}`}
 											>
 												{ROLE_LABEL[member.roleName]}
-												<ChevronDown className='size-3.5 opacity-60' />
+												<ChevronDown className='size-3 text-muted-foreground' />
 											</Button>
 										</DropdownMenuTrigger>
 
@@ -229,7 +229,7 @@ export function TeamspaceMembersTab({
 												>
 													<span className='flex-1'>{ROLE_LABEL[role]}</span>
 													{member.roleName === role && (
-														<Check className='size-4' />
+														<Check className='size-3.5' />
 													)}
 												</DropdownMenuItem>
 											))}
@@ -250,7 +250,7 @@ export function TeamspaceMembersTab({
 										</DropdownMenuContent>
 									</DropdownMenu>
 								) : (
-									<span className='shrink-0 text-xs text-muted-foreground'>
+									<span className='shrink-0 text-[12.5px] text-muted-foreground'>
 										{ROLE_LABEL[member.roleName]}
 									</span>
 								)}
@@ -262,26 +262,29 @@ export function TeamspaceMembersTab({
 
 			{canManage && pendingInvitations.length > 0 && (
 				<section className='flex flex-col gap-1'>
-					<h3 className='text-xs font-medium text-muted-foreground'>
+					<h3 className='text-[12.5px] font-medium leading-[19px] text-muted-foreground'>
 						Pending invitations · {pendingInvitations.length}
 					</h3>
 
-					<ul className='divide-y'>
+					<ul>
 						{pendingInvitations.map((invitation) => (
 							<li
 								key={invitation.id}
-								className='flex items-center gap-3 py-2.5'
+								className='flex h-11 items-center gap-3'
 							>
 								<PersonIdentity
 									person={peopleById.get(invitation.workspaceMemberId)}
+									avatar={
+										<span className='flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground'>
+											<Mail className='size-3.5' />
+										</span>
+									}
 									detail={`Expires ${dateFormatter.format(new Date(invitation.expiresAt))}`}
 								/>
 
 								<div className='flex shrink-0 gap-1'>
 									<Button
 										variant='ghost'
-										size='sm'
-										className='h-8 text-xs'
 										disabled={resendMutation.isPending}
 										onClick={() => handleResend(invitation)}
 									>
@@ -290,8 +293,7 @@ export function TeamspaceMembersTab({
 
 									<Button
 										variant='ghost'
-										size='sm'
-										className='h-8 text-xs text-destructive hover:text-destructive'
+										className='text-destructive hover:bg-destructive/10 hover:text-destructive'
 										onClick={() => setInvitationToRevoke(invitation)}
 									>
 										Revoke
@@ -346,15 +348,16 @@ function InvitePicker({ candidates, isInviting, onInvite }: InvitePickerProps) {
 			<PopoverTrigger asChild>
 				<Button
 					variant='outline'
-					className='w-full justify-start gap-2 font-normal text-muted-foreground'
+					className='h-9 w-full justify-start gap-2 px-2.5 text-[13.5px] font-normal text-faint data-[state=open]:border-ring'
 					disabled={candidates.length === 0 || isInviting}
 				>
-					<UserPlus className='size-4' />
+					<Search className='size-3.5' />
 					{isInviting
 						? "Sending invitation..."
 						: candidates.length === 0
 							? "Everyone in the workspace is already here"
 							: "Invite a workspace member..."}
+					<ChevronDown className='ml-auto size-[13px]' />
 				</Button>
 			</PopoverTrigger>
 
@@ -391,12 +394,12 @@ function InvitePicker({ candidates, isInviting, onInvite }: InvitePickerProps) {
 
 function RowsSkeleton() {
 	return (
-		<div className='flex flex-col gap-3 py-2' aria-busy='true'>
+		<div className='flex flex-col' aria-busy='true'>
 			<span className='sr-only'>Loading members</span>
 
 			{Array.from({ length: 3 }, (_, index) => (
-				<div key={index} className='flex items-center gap-3'>
-					<Skeleton className='size-8 rounded-full' />
+				<div key={index} className='flex h-12 items-center gap-2.5'>
+					<Skeleton className='size-7 rounded-full' />
 
 					<div className='flex-1 space-y-1.5'>
 						<Skeleton className='h-3.5 w-1/3' />

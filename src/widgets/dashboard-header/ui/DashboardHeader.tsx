@@ -19,9 +19,9 @@ function DashboardHeader({ pageId }: DashboardHeaderProps) {
 	const editedAt = formatRelativeTime(page?.updatedAt);
 
 	return (
-		<header className='flex items-center gap-2 text-sm'>
+		<header className='flex items-center gap-1.5 text-sm'>
 			{editedAt && (
-				<div className='hidden text-xs text-muted-foreground md:inline-block'>
+				<div className='mr-1 hidden text-[12.5px] text-faint md:inline-block'>
 					Edited {editedAt}
 				</div>
 			)}

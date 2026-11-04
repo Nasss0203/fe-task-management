@@ -78,14 +78,14 @@ export function RenamePageMenu({ page, onRenamed }: RenamePageMenuProps) {
 	return (
 		<DropdownMenuSub open={open} onOpenChange={setOpen}>
 			<DropdownMenuSubTrigger>
-				<Pencil className='mr-2 size-4' />
+				<Pencil className='size-[15px]' />
 				Rename
 			</DropdownMenuSubTrigger>
 
 			<DropdownMenuSubContent
 				sideOffset={4}
 				alignOffset={-4}
-				className='w-[280px] rounded-lg p-1.5 shadow-lg'
+				className='w-[280px] rounded-xl p-1.5 shadow-elevated'
 			>
 				<form
 					className={[

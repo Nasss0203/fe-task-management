@@ -347,7 +347,7 @@ function TeamspaceIcon({
 		<span
 			aria-hidden='true'
 			className={cn(
-				"flex shrink-0 items-center justify-center rounded-lg bg-teal-500/10",
+				"flex shrink-0 items-center justify-center rounded-md border border-border bg-secondary",
 				size === "md" ? "size-10 text-lg" : "size-8 text-base",
 			)}
 		>

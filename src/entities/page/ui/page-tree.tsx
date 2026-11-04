@@ -6,6 +6,37 @@ import { useState } from "react";
 
 import type { PageTreeBase, PageTreeNode } from "../lib/build-page-tree";
 
+// Nhánh nào người dùng đã mở / đóng; giữ qua lần tải lại như Notion
+const EXPANDED_STORAGE_KEY = "taskmanly:page-tree-expanded";
+
+function readExpanded(): Record<string, boolean> {
+	try {
+		return JSON.parse(localStorage.getItem(EXPANDED_STORAGE_KEY) ?? "{}");
+	} catch {
+		return {};
+	}
+}
+
+function saveExpanded(pageId: string, expanded: boolean) {
+	try {
+		localStorage.setItem(
+			EXPANDED_STORAGE_KEY,
+			JSON.stringify({ ...readExpanded(), [pageId]: expanded }),
+		);
+	} catch {
+		// Không lưu được (chế độ riêng tư...) thì chỉ nhớ trong phiên
+	}
+}
+
+function containsPage<T extends PageTreeBase>(
+	nodes: PageTreeNode<T>[],
+	pageId: string,
+): boolean {
+	return nodes.some(
+		(node) => node.id === pageId || containsPage(node.children, pageId),
+	);
+}
+
 interface PageTreeProps<T extends PageTreeBase> {
 	pages: PageTreeNode<T>[];
 
@@ -73,9 +104,25 @@ function PageTreeItem<T extends PageTreeBase>({
 	renderActions,
 	depth = 0,
 }: PageTreeItemProps<T>) {
-	const [expanded, setExpanded] = useState(true);
-
 	const hasChildren = page.children.length > 0;
+
+	const containsActive = Boolean(
+		activePageId && containsPage(page.children, activePageId),
+	);
+
+	// Mặc định đóng; nhánh chứa page đang mở thì tự mở
+	const [stored, setStored] = useState<boolean | undefined>(
+		() => readExpanded()[page.id],
+	);
+	const [lastActivePageId, setLastActivePageId] = useState(activePageId);
+
+	// Chuyển sang page nằm trong nhánh này thì mở ra, kể cả khi trước đó đã đóng
+	if (lastActivePageId !== activePageId) {
+		setLastActivePageId(activePageId);
+		if (containsActive) setStored(true);
+	}
+
+	const expanded = stored ?? containsActive;
 
 	const isActive = page.id === activePageId;
 
@@ -141,7 +188,8 @@ function PageTreeItem<T extends PageTreeBase>({
 							return;
 						}
 
-						setExpanded((current) => !current);
+						setStored(!expanded);
+						saveExpanded(page.id, !expanded);
 					}}
 				>
 					{/* Page Icon */}

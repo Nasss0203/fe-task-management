@@ -47,16 +47,16 @@ interface DatabaseViewTabProps {
 function ViewIcon({ type }: { type: DatabaseViewType }) {
 	switch (type) {
 		case DatabaseViewType.TABLE:
-			return <Table2 className='size-4' />;
+			return <Table2 className='size-3.5' />;
 
 		case DatabaseViewType.BOARD:
-			return <KanbanSquare className='size-4' />;
+			return <KanbanSquare className='size-3.5' />;
 
 		case DatabaseViewType.CALENDAR:
-			return <CalendarDays className='size-4' />;
+			return <CalendarDays className='size-3.5' />;
 
 		case DatabaseViewType.LIST:
-			return <List className='size-4' />;
+			return <List className='size-3.5' />;
 	}
 }
 
@@ -112,14 +112,16 @@ export function DatabaseViewTab({
 	return (
 		<div
 			className={[
-				"flex shrink-0 items-center whitespace-nowrap rounded-md",
-				active ? "bg-muted text-foreground" : "text-muted-foreground",
+				"group/view-tab flex h-7 shrink-0 items-center whitespace-nowrap rounded-md transition-colors",
+				active
+					? "bg-sidebar-accent text-foreground"
+					: "text-muted-foreground hover:bg-accent hover:text-foreground",
 			].join(" ")}
 		>
 			<button
 				type='button'
 				onClick={onSelect}
-				className='flex items-center gap-2 px-3 py-1.5 text-sm'
+				className='flex h-full items-center gap-1.5 px-2.5 text-[13px] font-medium'
 			>
 				<ViewIcon type={view.type} />
 
@@ -131,7 +133,7 @@ export function DatabaseViewTab({
 					<PopoverTrigger asChild>
 						<button
 							type='button'
-							className='mr-1 flex size-6 items-center justify-center rounded hover:bg-background'
+							className='mr-1 flex size-5 items-center justify-center rounded-sm opacity-0 transition-opacity hover:bg-background/60 focus-visible:opacity-100 group-hover/view-tab:opacity-100 data-[state=open]:opacity-100 [@media(hover:none)]:opacity-100'
 						>
 							<MoreHorizontal className='size-4' />
 						</button>

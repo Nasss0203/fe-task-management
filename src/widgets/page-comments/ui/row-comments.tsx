@@ -1,0 +1,67 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
+import { useComments } from "@/entities/comment/model/comment.queries";
+import type { CommentTarget } from "@/entities/comment/model/comment.types";
+
+import { CommentThreads, useCanComment } from "./comment-threads";
+
+interface RowCommentsProps {
+	/** Page chứa database; quyền comment theo page này. */
+	pageId: string;
+	rowId: string;
+	/** Cuộn tới mục này khi mở (link thông báo comment). */
+	scrollIntoView?: boolean;
+	/** Trang share link: chỉ đọc, đọc bằng token của link. */
+	shareToken?: string;
+}
+
+/** Comment của một task (row database) trong drawer chi tiết. */
+export function RowComments({
+	pageId,
+	rowId,
+	scrollIntoView = false,
+	shareToken,
+}: RowCommentsProps) {
+	const target: CommentTarget = { type: "DATABASE_ROW", id: rowId };
+	const sectionRef = useRef<HTMLElement>(null);
+
+	const canComment = useCanComment(pageId, !shareToken);
+	const { data: comments = [], isSuccess } = useComments(
+		target,
+		true,
+		shareToken,
+	);
+
+	// Đợi comment tải xong để cuộn đúng chỗ (danh sách làm mục này cao lên)
+	useEffect(() => {
+		if (scrollIntoView && isSuccess) {
+			sectionRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+		}
+	}, [scrollIntoView, isSuccess]);
+
+	if (!canComment && comments.length === 0) return null;
+
+	return (
+		<section
+			ref={sectionRef}
+			aria-label='Comments'
+			className='mt-6 scroll-mt-4 border-t border-border pt-4'
+		>
+			<h3 className='mb-3 text-[13.5px] font-semibold text-foreground'>
+				Comments
+				{comments.length > 0 && (
+					<span className='ml-1.5 text-[12.5px] font-normal text-faint'>{comments.length}</span>
+				)}
+			</h3>
+
+			<CommentThreads
+				target={target}
+				pageId={pageId}
+				canComment={canComment}
+				shareToken={shareToken}
+			/>
+		</section>
+	);
+}

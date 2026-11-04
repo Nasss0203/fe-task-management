@@ -4,10 +4,13 @@ import { Plus } from "lucide-react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 
 import { useAiHistoryConversations } from "@/entities/ai-assistant/model/ai-assistant.queries";
-import { usePage } from "@/entities/page/model/page.queries";
+import { buildPageBreadcrumbs } from "@/entities/page/lib/build-page-breadcrumbs";
+import { usePage, usePagesByWorkspace } from "@/entities/page/model/page.queries";
+import { useTeamspaces } from "@/entities/teamspace/model/teamspace.queries";
 import { usePublicTemplate } from "@/entities/template";
 import {
 	useWorkspace,
+	useWorkspaceAccess,
 	useWorkspaces,
 } from "@/entities/workspace/model/workspace.queries";
 import { useUser } from "@/features/auth";
@@ -76,6 +79,21 @@ export function HeaderWorkspaceContainer() {
 
 	const { data: workspace } = useWorkspace(currentWorkspaceId ?? "");
 
+	// Page cha / teamspace: dùng lại dữ liệu sidebar đã tải; Guest không tải được nên chỉ có tên page
+	const { data: workspaceAccess } = useWorkspaceAccess(currentWorkspaceId ?? "");
+	const isMember =
+		isPageRoute &&
+		workspaceAccess?.workspace_id === currentWorkspaceId &&
+		workspaceAccess?.membership_type === "MEMBER";
+	const { data: workspacePages = [] } = usePagesByWorkspace(
+		currentWorkspaceId ?? undefined,
+		isMember,
+	);
+	const { data: teamspaces = [] } = useTeamspaces(
+		currentWorkspaceId ?? "",
+		isMember,
+	);
+
 	// Same query keys as useAiChat, so the chat title comes from its cache.
 	const isAiChatRoute = isAiRoute && pathname !== "/dashboard/ai";
 	const chatFilters = (scope: "GLOBAL" | "PAGE") =>
@@ -96,7 +114,14 @@ export function HeaderWorkspaceContainer() {
 					? "Home"
 					: undefined;
 
-	const customBreadcrumbs = isTemplateDetailRoute
+	const customBreadcrumbs = isPageRoute && page
+		? buildPageBreadcrumbs(page, workspacePages, {
+				workspaceName: workspace?.name,
+				teamspaceName: teamspaces.find(
+					(teamspace) => teamspace.id === page.teamspace_id,
+				)?.name,
+			})
+		: isTemplateDetailRoute
 		? [
 				...(workspace?.name ? [{ label: workspace.name }] : []),
 				{

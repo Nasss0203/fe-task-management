@@ -1,15 +1,10 @@
 "use client";
 
-import { Table2, Trash2 } from "lucide-react";
-import { toast } from "sonner";
+import { ChevronRight, Maximize2, Table2 } from "lucide-react";
+import Link from "next/link";
+import { useState, type CSSProperties } from "react";
 
-import { useDeleteDatabaseRow } from "@/entities/database/model/database.mutations";
-import {
-	PropertyType,
-	type Database,
-	type DatabaseRow,
-} from "@/entities/database/model/database.types";
-import { PropertyIcon } from "@/entities/database/ui/database-visuals";
+import type { Database, DatabaseRow } from "@/entities/database/model/database.types";
 import {
 	Sheet,
 	SheetContent,
@@ -17,125 +12,135 @@ import {
 	SheetTitle,
 } from "@/shared/ui/sheet";
 
+import {
+	clampRowSheetWidth,
+	readRowSheetWidth,
+	ROW_SHEET_DEFAULT_WIDTH,
+	saveRowSheetWidth,
+} from "../lib/row-sheet-width";
 import { getRowValueMap, getTitleProperty } from "../lib/view-properties";
-import { DatabaseCell } from "./database-cell";
+import { useDatabaseShareToken } from "../model/share-token-context";
+import type { OpenRowHandler } from "./database-view-renderer";
+import { RowDetailBody } from "./row-detail-body";
+import { SheetResizeHandle } from "./sheet-resize-handle";
 
 interface RowDetailSheetProps {
 	database: Database;
 	/** Undefined closes the sheet (also when the row was deleted). */
 	row?: DatabaseRow;
+	/** Every row of the database: finds the parent task and the sub-tasks. */
+	allRows?: DatabaseRow[];
+	/** Opens another row in this peek (a sub-task or the parent task). */
+	onOpenRow?: OpenRowHandler;
 	/** Focus the title right away, e.g. for a row that was just created. */
 	autoFocusTitle?: boolean;
+	/** Cuộn tới mục Comments khi mở (từ link thông báo comment). */
+	scrollToComments?: boolean;
 	readOnly?: boolean;
 	onClose: () => void;
+}
+
+/** The URL of a task opened full page. */
+export function rowPageHref(pageId: string, rowId: string) {
+	return `/page/${pageId}/row/${rowId}`;
 }
 
 /** Notion-style side peek: every property of one row, editable in place. */
 export function RowDetailSheet({
 	database,
 	row,
+	allRows = [],
+	onOpenRow,
 	autoFocusTitle = false,
+	scrollToComments = false,
 	readOnly = false,
 	onClose,
 }: RowDetailSheetProps) {
-	const mode = readOnly ? "readonly" : "editable";
-	const deleteRowMutation = useDeleteDatabaseRow(database.id);
+	const shareToken = useDatabaseShareToken();
 	const titleProperty = getTitleProperty(database);
-	const values = row ? getRowValueMap(row) : new Map<string, unknown>();
-	const title =
-		(titleProperty && (values.get(titleProperty.id) as string)) || "Untitled";
-	const properties = [...database.properties]
-		.filter((property) => property.type !== PropertyType.TITLE)
-		.sort((a, b) => Number(a.position) - Number(b.position));
+	const rowTitle = (target?: DatabaseRow) =>
+		(target &&
+			titleProperty &&
+			(getRowValueMap(target).get(titleProperty.id) as string)) ||
+		"Untitled";
+	const parentRow = allRows.find((item) => item.id === row?.parentRowId);
+	// Read once: the sheet only renders in the browser, after it opens.
+	const [width, setWidth] = useState(() =>
+		typeof window === "undefined"
+			? ROW_SHEET_DEFAULT_WIDTH
+			: clampRowSheetWidth(readRowSheetWidth(), window.innerWidth),
+	);
 
 	return (
 		<Sheet open={Boolean(row)} onOpenChange={(open) => !open && onClose()}>
 			<SheetContent
 				side='right'
+				overlayClassName='bg-transparent backdrop-blur-none'
 				// Only a just-created row grabs focus; otherwise the title would open selected.
 				onOpenAutoFocus={(event) => {
 					if (!autoFocusTitle) event.preventDefault();
 				}}
-				className='w-full gap-0 overflow-y-auto sm:max-w-xl'
+				// Phone: full width. Wider screens: the width dragged from the left edge.
+				className='w-full gap-0 sm:w-(--row-sheet-width) sm:max-w-[90vw]'
+				style={{ "--row-sheet-width": `${width}px` } as CSSProperties}
 			>
-				<SheetTitle className='sr-only'>{title}</SheetTitle>
+				<SheetTitle className='sr-only'>{rowTitle(row)}</SheetTitle>
 				<SheetDescription className='sr-only'>
 					Row details in {database.name}
 				</SheetDescription>
 
+				<SheetResizeHandle
+					width={width}
+					onResize={setWidth}
+					onCommit={(next) => {
+						setWidth(next ?? ROW_SHEET_DEFAULT_WIDTH);
+						saveRowSheetWidth(next);
+					}}
+				/>
+
 				{row && (
-					<div className='flex min-h-full flex-col'>
-						<div className='flex h-12 items-center gap-1.5 border-b px-6 pr-12 text-sm text-muted-foreground sm:px-8'>
+					// Scrolls inside, so the resize handle and close button stay put.
+					<div className='flex h-full min-h-0 flex-col overflow-y-auto'>
+						{/* shrink-0: inside the scrolling column a long task would squash it */}
+						<div className='flex h-11 shrink-0 items-center gap-1.5 px-5 pr-12 text-[13px] text-muted-foreground'>
 							<Table2 className='size-4 shrink-0' />
 							<span className='truncate'>{database.name}</span>
-						</div>
-
-						<div className='flex flex-1 flex-col px-6 pb-6 pt-8 sm:px-8'>
-							{titleProperty && (
-								<div className='[&_input]:h-auto [&_input]:px-0 [&_input]:py-1 [&_input]:text-2xl [&_input]:font-bold [&_input]:leading-tight sm:[&_input]:text-[1.75rem]'>
-									<DatabaseCell
-										databaseId={database.id}
-										pageId={database.pageId}
-										rowId={row.id}
-										property={titleProperty}
-										value={values.get(titleProperty.id)}
-										autoFocus={autoFocusTitle}
-										mode={mode}
-									/>
-								</div>
-							)}
-
-							<section
-								aria-label='Properties'
-								className='-mx-2 mt-6'
-							>
-								{properties.map((property) => (
-									<div
-										key={property.id}
-										className='flex min-h-10 items-center gap-3 rounded-md px-2 text-sm'
-									>
-										<span className='flex w-36 shrink-0 items-center gap-2 text-muted-foreground'>
-											<PropertyIcon type={property.type} className='size-4' />
-											<span className='truncate'>{property.name}</span>
-										</span>
-										{/* In the peek, empty-value hints stay visible and numbers align left. */}
-										<div className='min-w-0 flex-1 rounded-md px-1 transition-colors hover:bg-muted/70 [&_.opacity-0]:opacity-100 [&_input]:text-left [&_span.text-muted-foreground]:text-muted-foreground/60'>
-											<DatabaseCell
-												databaseId={database.id}
-												pageId={database.pageId}
-												rowId={row.id}
-												property={property}
-												value={values.get(property.id)}
-												mode={mode}
-											/>
-										</div>
-									</div>
-								))}
-								{properties.length === 0 && (
-									<p className='px-2 py-3 text-sm text-muted-foreground'>
-										No other properties yet
-									</p>
-								)}
-							</section>
-
-							{!readOnly && (
-								<div className='mt-auto flex justify-end pt-8'>
+							{parentRow && (
+								<>
+									<ChevronRight className='size-3.5 shrink-0' />
 									<button
 										type='button'
-										disabled={deleteRowMutation.isPending}
-										onClick={() =>
-											deleteRowMutation.mutate(row.id, {
-												onSuccess: onClose,
-												onError: () => toast.error("Couldn't delete row"),
-											})
-										}
-										className='flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm text-muted-foreground hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive disabled:opacity-50'
+										onClick={() => onOpenRow?.(parentRow.id)}
+										className='truncate rounded-sm px-1 hover:bg-muted hover:text-foreground'
 									>
-										<Trash2 className='size-4' />
-										Delete row
+										{rowTitle(parentRow)}
 									</button>
-								</div>
+								</>
 							)}
+							{/* Full page needs a signed-in workspace member, so not on share links or public sites. */}
+							{!readOnly && !shareToken && (
+								<Link
+									href={rowPageHref(database.pageId, row.id)}
+									aria-label='Open as page'
+									title='Open as page'
+									className='ml-auto flex size-7 shrink-0 items-center justify-center rounded-md hover:bg-accent hover:text-foreground'
+								>
+									<Maximize2 className='size-3.5' />
+								</Link>
+							)}
+						</div>
+
+						<div className='flex flex-1 flex-col px-6 pb-6 pt-4 sm:px-7'>
+							<RowDetailBody
+								database={database}
+								row={row}
+								allRows={allRows}
+								readOnly={readOnly}
+								autoFocusTitle={autoFocusTitle}
+								scrollToComments={scrollToComments}
+								onOpenRow={onOpenRow}
+								onDeleted={onClose}
+							/>
 						</div>
 					</div>
 				)}

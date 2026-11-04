@@ -20,30 +20,30 @@ export function FeatureCard({ feature, href }: FeatureCardProps) {
 	const getIcon = () => {
 		switch (feature.iconName) {
 			case "file-text":
-				return <FileText className='h-5 w-5 text-primary' />;
+				return <FileText className='h-4 w-4 text-foreground' />;
 			case "database":
-				return <Database className='h-5 w-5 text-primary' />;
+				return <Database className='h-4 w-4 text-foreground' />;
 			case "users":
-				return <Users className='h-5 w-5 text-primary' />;
+				return <Users className='h-4 w-4 text-foreground' />;
 			case "shield":
-				return <Shield className='h-5 w-5 text-primary' />;
+				return <Shield className='h-4 w-4 text-foreground' />;
 			case "globe":
-				return <Globe className='h-5 w-5 text-primary' />;
+				return <Globe className='h-4 w-4 text-foreground' />;
 			case "layout-template":
-				return <LayoutTemplate className='h-5 w-5 text-primary' />;
+				return <LayoutTemplate className='h-4 w-4 text-foreground' />;
 			case "sparkles":
-				return <Sparkles className='h-5 w-5 text-primary' />;
+				return <Sparkles className='h-4 w-4 text-foreground' />;
 			default:
-				return <Sparkles className='h-5 w-5 text-primary' />;
+				return <Sparkles className='h-4 w-4 text-foreground' />;
 		}
 	};
 
 	const cardContent = (
-		<div className='group relative h-full flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-6 shadow-xs hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300'>
+		<div className='group relative h-full flex flex-col justify-between rounded-xl border border-border bg-card p-6 hover:border-foreground/20 transition-colors'>
 			{/* Top Row: Icon Container Left + Badge Right */}
 			<div>
 				<div className='flex items-center justify-between'>
-					<div className='h-11 w-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center ring-1 ring-primary/20 shrink-0 group-hover:scale-105 transition-transform duration-200'>
+					<div className='h-9 w-9 rounded-lg border border-border/80 bg-secondary/70 text-foreground flex items-center justify-center shrink-0'>
 						{getIcon()}
 					</div>
 
@@ -58,12 +58,12 @@ export function FeatureCard({ feature, href }: FeatureCardProps) {
 				</div>
 
 				{/* Title */}
-				<h3 className='text-lg font-bold tracking-tight text-foreground group-hover:text-primary transition-colors mt-5'>
+				<h3 className='text-base font-semibold tracking-tight text-foreground mt-4'>
 					{feature.title}
 				</h3>
 
 				{/* Description */}
-				<p className='mt-2 text-sm text-muted-foreground leading-relaxed'>
+				<p className='mt-1.5 text-sm text-muted-foreground leading-relaxed'>
 					{feature.description}
 				</p>
 			</div>

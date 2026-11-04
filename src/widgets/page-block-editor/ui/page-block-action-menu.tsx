@@ -6,6 +6,7 @@ import {
 	Code2,
 	Copy,
 	Link,
+	MessageSquare,
 	RotateCcw,
 	Trash2,
 } from "lucide-react";
@@ -13,9 +14,11 @@ import {
 import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-tree";
 
 import {
-	useCreatePageBlock,
+	useCreatePageBlockColumns,
 	useDeletePageBlock,
+	useDuplicatePageBlock,
 	useUpdatePageBlock,
+	useWrapInSection,
 } from "@/entities/page-block/model/page-block.mutations";
 
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
@@ -33,15 +36,20 @@ import {
 
 import { useState } from "react";
 
+import { useIsInColumn, useIsInSection } from "./column-scope";
 import {
 	type CommandItemData,
+	layoutBlocksFor,
 	TURN_INTO_BLOCKS,
 } from "./page-block-command-menu";
+import { usePageBlockEditor } from "./page-block-editor-context";
 
 interface PageBlockActionMenuProps {
 	block: PageBlockNode;
 	shareToken?: string;
 	onClose?: () => void;
+	/** Có thì hiện mục "Comment" để mở thread comment của block. */
+	onComment?: () => void;
 }
 
 type MenuMode = "actions" | "turn-into";
@@ -66,14 +74,27 @@ export function PageBlockActionMenu({
 	block,
 	shareToken,
 	onClose,
+	onComment,
 }: PageBlockActionMenuProps) {
 	const [mode, setMode] = useState<MenuMode>("actions");
 
-	const createBlock = useCreatePageBlock(shareToken);
+	const { requestFocus } = usePageBlockEditor();
+
+	const duplicateBlock = useDuplicatePageBlock(shareToken);
 
 	const updateBlock = useUpdatePageBlock(shareToken);
 
 	const deleteBlock = useDeletePageBlock(shareToken);
+
+	const createColumns = useCreatePageBlockColumns(shareToken);
+
+	// Columns don't nest: "Turn into 2 columns" only outside a column.
+	const turnIntoOptions = [
+		...TURN_INTO_BLOCKS,
+		...layoutBlocksFor(useIsInColumn(), useIsInSection()),
+	];
+
+	const wrapInSection = useWrapInSection(shareToken);
 
 	const handleCopyLink = async () => {
 		const url =
@@ -93,21 +114,12 @@ export function PageBlockActionMenu({
 	};
 
 	const handleDuplicate = async () => {
-		await createBlock.mutateAsync({
+		const copy = await duplicateBlock.mutateAsync({
+			blockId: block.id,
 			pageId: block.page_id,
-
-			parentBlockId: block.parent_block_id,
-
-			afterBlockId: block.id,
-
-			type: block.type,
-
-			content: block.content,
-
-			styleConfig: block.style_config,
-
-			dataConfig: block.data_config,
 		});
+
+		requestFocus(copy.id);
 
 		onClose?.();
 	};
@@ -131,6 +143,28 @@ export function PageBlockActionMenu({
 
 		if (isCurrentOption(option)) {
 			onClose?.();
+			return;
+		}
+
+		if (option.type === PageBlockType.SECTION) {
+			onClose?.();
+			await wrapInSection.mutateAsync({
+				blockId: block.id,
+				pageId: block.page_id,
+				parentBlockId: block.parent_block_id,
+			});
+			return;
+		}
+
+		// This block becomes the first column; the others start empty.
+		if (option.columnCount) {
+			onClose?.();
+			await createColumns.mutateAsync({
+				pageId: block.page_id,
+				parentBlockId: block.parent_block_id,
+				blockId: block.id,
+				count: option.columnCount,
+			});
 			return;
 		}
 
@@ -191,10 +225,10 @@ export function PageBlockActionMenu({
 				className='
                     w-[280px]
                     max-h-[var(--radix-popover-content-available-height)]
-                    rounded-xl
+                    rounded-[9px]
                     border
                     bg-popover
-                    shadow-xl
+                    shadow-elevated
                 '
 			>
 				<div className='flex h-9 items-center border-b px-2'>
@@ -208,14 +242,14 @@ export function PageBlockActionMenu({
                             justify-center
                             rounded-md
                             text-muted-foreground
-                            hover:bg-muted
+                            hover:bg-accent
                             hover:text-foreground
                         '
 					>
 						<ArrowLeft className='size-4' />
 					</button>
 
-					<span className='ml-1 text-sm font-medium'>Turn into</span>
+					<span className='ml-1 text-[13.5px] font-medium'>Turn into</span>
 				</div>
 
 				<CommandInput placeholder='Search blocks...' className='h-9' />
@@ -224,7 +258,7 @@ export function PageBlockActionMenu({
 					<CommandEmpty>No results.</CommandEmpty>
 
 					<CommandGroup>
-						{TURN_INTO_BLOCKS.map((option) => {
+						{turnIntoOptions.map((option) => {
 							const Icon = option.icon;
 
 							return (
@@ -235,13 +269,14 @@ export function PageBlockActionMenu({
 										void handleTurnInto(option)
 									}
 									className='
-                                            h-10
+                                            h-[30px]
                                             cursor-pointer
-                                            gap-2.5
+                                            gap-[9px]
                                             px-2
+                                            text-[13.5px]
                                         '
 								>
-									<Icon className='size-4 text-muted-foreground' />
+									<Icon className='size-[15px] text-muted-foreground' />
 
 									<span>{option.label}</span>
 
@@ -262,12 +297,12 @@ export function PageBlockActionMenu({
 	return (
 		<Command
 			className='
-                w-[300px]
+                w-64
                 max-h-[var(--radix-popover-content-available-height)]
-                rounded-xl
+                rounded-[9px]
                 border
                 bg-popover
-                shadow-xl
+                shadow-elevated
             '
 			onKeyDown={(event) => {
 				if (event.key === "Escape") {
@@ -287,9 +322,9 @@ export function PageBlockActionMenu({
 						<CommandGroup heading='Code'>
 							<CommandItem
 								onSelect={() => void handleCopyCode()}
-								className='h-10 cursor-pointer gap-2.5'
+								className='h-[30px] cursor-pointer gap-[9px] text-[13.5px]'
 							>
-								<Code2 className='size-4' />
+								<Code2 className='size-[15px]' />
 								Copy code
 							</CommandItem>
 						</CommandGroup>
@@ -302,31 +337,46 @@ export function PageBlockActionMenu({
 				<CommandGroup>
 					<CommandItem
 						onSelect={() => setMode("turn-into")}
-						className='h-10 cursor-pointer gap-2.5'
+						className='h-[30px] cursor-pointer gap-[9px] text-[13.5px]'
 					>
-						<RotateCcw className='size-4' />
+						<RotateCcw className='size-[15px]' />
 
 						<span>Turn into</span>
 
-						<ChevronRight className='ml-auto size-4 text-muted-foreground' />
+						<ChevronRight className='ml-auto size-3 text-muted-foreground' />
 					</CommandItem>
 
 					<CommandItem
 						onSelect={() => void handleCopyLink()}
-						className='h-10 cursor-pointer gap-2.5'
+						className='h-[30px] cursor-pointer gap-[9px] text-[13.5px]'
 					>
-						<Link className='size-4' />
+						<Link className='size-[15px]' />
 						Copy link to block
 					</CommandItem>
 
-					<CommandItem
-						onSelect={() => void handleDuplicate()}
-						className='h-10 cursor-pointer gap-2.5'
-					>
-						<Copy className='size-4' />
-						Duplicate
-						<CommandShortcut>Ctrl+D</CommandShortcut>
-					</CommandItem>
+					{block.type !== PageBlockType.FORM_FIELD && (
+						<CommandItem
+							onSelect={() => void handleDuplicate()}
+							className='h-[30px] cursor-pointer gap-[9px] text-[13.5px]'
+						>
+							<Copy className='size-[15px]' />
+							Duplicate
+							<CommandShortcut>Ctrl+D</CommandShortcut>
+						</CommandItem>
+					)}
+
+					{onComment && (
+						<CommandItem
+							onSelect={() => {
+								onClose?.();
+								onComment();
+							}}
+							className='h-[30px] cursor-pointer gap-[9px] text-[13.5px]'
+						>
+							<MessageSquare className='size-[15px]' />
+							Comment
+						</CommandItem>
+					)}
 				</CommandGroup>
 
 				<CommandSeparator />
@@ -335,14 +385,15 @@ export function PageBlockActionMenu({
 					<CommandItem
 						onSelect={() => void handleDelete()}
 						className='
-                            h-10
+                            h-[30px]
                             cursor-pointer
-                            gap-2.5
+                            gap-[9px]
+                            text-[13.5px]
                             text-destructive
                             data-[selected=true]:text-destructive
                         '
 					>
-						<Trash2 className='size-4' />
+						<Trash2 className='size-[15px]' />
 						Delete
 						<CommandShortcut>Del</CommandShortcut>
 					</CommandItem>

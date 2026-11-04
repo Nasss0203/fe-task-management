@@ -1,8 +1,12 @@
 import type { ApiResponse } from "@/shared/api";
 import instance from "@/shared/api/api-client";
 
+import type { FormDatabase } from "@/entities/database/model/database.types";
+
 import type {
 	BookmarkMetadata,
+	FormAnswerKey,
+	FormAnswerValue,
 	PageBlock,
 	PageBlockJson,
 	PageBlockStyleConfig,
@@ -39,6 +43,23 @@ export const pageBlockApi = {
 		return response.data.data;
 	},
 
+	/** A task's content (blocks of one database row). */
+	getByRow: async (
+		rowId: string,
+		signal?: AbortSignal,
+		shareToken?: string,
+	): Promise<PageBlock[]> => {
+		const response = await instance.get<ApiResponse<PageBlock[]>>(
+			`${PAGE_BLOCK_API}/row/${rowId}`,
+			{
+				signal,
+				headers: getShareHeaders(shareToken),
+			},
+		);
+
+		return response.data.data;
+	},
+
 	getById: async (
 		blockId: string,
 		signal?: AbortSignal,
@@ -58,6 +79,7 @@ export const pageBlockApi = {
 	create: async (
 		input: {
 			page_id: string;
+			row_id?: string | null;
 			parent_block_id?: string | null;
 			after_block_id?: string | null;
 			type: PageBlockType;
@@ -70,6 +92,97 @@ export const pageBlockApi = {
 		const response = await instance.post<ApiResponse<PageBlock>>(
 			"/pageBlock",
 			input,
+			{ headers: getShareHeaders(shareToken) },
+		);
+
+		return response.data.data;
+	},
+
+	/** Moves a block under `target_parent_block_id` (null = root) at `target_order_index`. */
+	move: async (
+		blockId: string,
+		input: { target_parent_block_id: string | null; target_order_index: number },
+		shareToken?: string,
+	): Promise<PageBlock> => {
+		const response = await instance.patch<ApiResponse<PageBlock>>(
+			`${PAGE_BLOCK_API}/${blockId}/move`,
+			input,
+			{ headers: getShareHeaders(shareToken) },
+		);
+
+		return response.data.data;
+	},
+
+	getFormDatabase: async (
+		sectionBlockId: string,
+		signal?: AbortSignal,
+		shareToken?: string,
+	): Promise<FormDatabase> => {
+		const response = await instance.get<ApiResponse<FormDatabase>>(
+			`/forms/${sectionBlockId}`,
+			{ signal, headers: getShareHeaders(shareToken) },
+		);
+
+		return response.data.data;
+	},
+
+	submitForm: async (
+		sectionBlockId: string,
+		answers: Record<string, unknown>,
+		shareToken?: string,
+	): Promise<{ row_id: string; success_message: string | null }> => {
+		const response = await instance.post<
+			ApiResponse<{ row_id: string; success_message: string | null }>
+		>(`/forms/${sectionBlockId}/responses`, { answers }, {
+			headers: getShareHeaders(shareToken),
+		});
+
+		return response.data.data;
+	},
+
+	getAnswerKeys: async (
+		sectionBlockId: string,
+		signal?: AbortSignal,
+	): Promise<FormAnswerKey[]> => {
+		const response = await instance.get<ApiResponse<FormAnswerKey[]>>(
+			`/forms/${sectionBlockId}/answer-keys`,
+			{ signal },
+		);
+
+		return response.data.data;
+	},
+
+	setAnswerKey: async (
+		sectionBlockId: string,
+		fieldBlockId: string,
+		input: { correct_value: FormAnswerValue | null; points: number },
+	): Promise<FormAnswerKey> => {
+		const response = await instance.put<ApiResponse<FormAnswerKey>>(
+			`/forms/${sectionBlockId}/answer-keys/${fieldBlockId}`,
+			input,
+		);
+
+		return response.data.data;
+	},
+
+	/** Sets blocks side by side in a new column row, where the first one was. */
+	createColumns: async (
+		input: { page_id: string; block_ids: string[] },
+		shareToken?: string,
+	): Promise<PageBlock> => {
+		const response = await instance.post<ApiResponse<PageBlock>>(
+			"/pageBlock/columns",
+			input,
+			{ headers: getShareHeaders(shareToken) },
+		);
+
+		return response.data.data;
+	},
+
+	duplicate: async (blockId: string, shareToken?: string): Promise<PageBlock> => {
+		const response = await instance.post<ApiResponse<PageBlock>>(
+			`/pageBlock/${blockId}/duplicate`,
+			{},
 			{ headers: getShareHeaders(shareToken) },
 		);
 

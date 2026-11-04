@@ -6,8 +6,13 @@ import { FileText, Lock } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
+import { getTemplateCoverTone } from "@/entities/template/model/template-cover-tone";
+import { cn } from "@/shared/lib/utils";
 import type { ClaimedTemplateCardModel } from "../model/claimed-template-card.model";
 import { TemplateCardShell } from "./template-card-shell";
+
+const TEMPLATE_BADGE_CLASS =
+	"rounded-[4px] border-input px-1.5 py-px text-[10px] font-semibold leading-[15px] text-muted-foreground";
 
 interface ClaimedTemplateCardProps {
 	template: ClaimedTemplateCardModel;
@@ -45,10 +50,13 @@ export function ClaimedTemplateCard({
 			/>
 		) : (
 			<div
-				className='flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/10 via-muted/40 to-background p-6'
+				className={cn(
+					"flex h-full w-full items-center justify-center p-6",
+					getTemplateCoverTone(template.id),
+				)}
 				aria-hidden='true'
 			>
-				<div className='flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border/60 bg-background/80 text-3xl text-primary shadow-xs'>
+				<div className='flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border bg-background text-[28px] text-foreground'>
 					{template.isRestricted ? (
 						<Lock className='size-7 text-muted-foreground' />
 					) : template.icon ? (
@@ -85,43 +93,39 @@ export function ClaimedTemplateCard({
 					previewVisual
 				)
 			}
-			badgeOverlay={
+			badges={
 				<>
-					<Badge
-						variant='secondary'
-						className='bg-background/90 text-foreground border border-border/60 text-[10px] backdrop-blur-md shadow-xs font-medium'
-					>
+					<Badge variant='outline' className={TEMPLATE_BADGE_CLASS}>
 						{template.sourceLabel}
 					</Badge>
 					{template.isFree && (
-						<Badge
-							variant='secondary'
-							className='bg-background/90 text-foreground border border-border/60 text-[10px] backdrop-blur-md shadow-xs font-medium'
-						>
+						<Badge variant='outline' className={TEMPLATE_BADGE_CLASS}>
 							FREE
 						</Badge>
 					)}
 				</>
 			}
 			meta={
-				<div className='w-full min-w-0 text-[10px] text-muted-foreground'>
-					<div className='flex min-h-5 flex-wrap items-center justify-between gap-x-2 gap-y-1'>
-						<span className='min-w-0 truncate'>
+				<div className='flex w-full min-w-0 flex-col gap-2 text-[11px] leading-[17px]'>
+					<div className='flex flex-wrap items-center justify-between gap-x-2 gap-y-1'>
+						<span className='min-w-0 truncate text-faint'>
 							{template.sourceLabel}{" "}
 							<time dateTime={template.claimed_at}>{date}</time>
 						</span>
 						{template.version && (
-							<span className='shrink-0 font-medium'>
+							<span className='shrink-0 font-medium text-muted-foreground'>
 								Latest v{template.version.version_number}
 							</span>
 						)}
 					</div>
-					<p
-						className='min-h-4 line-clamp-1'
-						title={template.statusMessage ?? undefined}
-					>
-						{template.statusMessage}
-					</p>
+					{template.statusMessage && (
+						<p
+							className='line-clamp-1 text-amber-700 dark:text-amber-500'
+							title={template.statusMessage}
+						>
+							{template.statusMessage}
+						</p>
+					)}
 				</div>
 			}
 			title={
@@ -140,7 +144,7 @@ export function ClaimedTemplateCard({
 			}
 			description={template.description || "No description provided."}
 			footer={
-				<div className='flex items-center justify-between gap-2'>
+				<div className='flex items-center gap-2'>
 					<Button
 						variant='outline'
 						size='sm'
@@ -149,7 +153,7 @@ export function ClaimedTemplateCard({
 							e.stopPropagation();
 							onDetails();
 						}}
-						className='min-w-0 flex-1 rounded-lg text-xs font-medium'
+						className='h-[30px] min-w-0 flex-1 rounded-md text-[13px]'
 					>
 						Details
 					</Button>
@@ -160,7 +164,7 @@ export function ClaimedTemplateCard({
 							e.stopPropagation();
 							onUse();
 						}}
-						className='min-w-0 flex-1 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90'
+						className='h-[30px] min-w-0 flex-1 rounded-md text-[13px]'
 					>
 						Use template
 					</Button>

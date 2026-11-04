@@ -22,6 +22,19 @@ export function getInitials(value: string) {
 	return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
 }
 
+const AVATAR_TONES = [
+	"bg-brand-indigo",
+	"bg-emerald-600",
+	"bg-pink-600",
+	"bg-amber-600",
+];
+
+export function getAvatarTone(seed: string) {
+	let hash = 0;
+	for (const char of seed) hash = (hash * 31 + char.charCodeAt(0)) | 0;
+	return AVATAR_TONES[Math.abs(hash) % AVATAR_TONES.length];
+}
+
 export function omitRecordKey<T>(record: Record<string, T>, key: string) {
 	const nextRecord = { ...record };
 	delete nextRecord[key];

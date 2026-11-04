@@ -74,12 +74,12 @@ export function DatabaseViewSortPopover({
 			{activeSorts.length > 0 ? (
 				<MenuPageHeader title='Sort by' onBack={() => setPicking(false)} />
 			) : (
-				<div className='px-2 pb-1 pt-1 text-xs font-medium text-muted-foreground'>
+				<div className='px-2 pb-1 pt-1.5 text-xs font-medium text-muted-foreground'>
 					Sort by
 				</div>
 			)}
 			{candidates.length === 0 ? (
-				<p className='px-2 py-2 text-sm text-muted-foreground'>
+				<p className='px-2 py-2 text-[13px] text-muted-foreground'>
 					No more properties to sort by.
 				</p>
 			) : (
@@ -89,11 +89,11 @@ export function DatabaseViewSortPopover({
 							key={property.id}
 							type='button'
 							onClick={() => addSort(property.id)}
-							className='flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-sm hover:bg-muted'
+							className='flex h-[30px] w-full items-center gap-[9px] rounded-md px-2 text-left text-[13.5px] transition-colors hover:bg-accent'
 						>
 							<PropertyIcon
 								type={property.type}
-								className='size-3.5 text-muted-foreground'
+								className='size-[15px] shrink-0 text-muted-foreground'
 							/>
 							<span className='min-w-0 flex-1 truncate'>{property.name}</span>
 						</button>
@@ -105,7 +105,7 @@ export function DatabaseViewSortPopover({
 
 	const list = (
 		<div>
-			<div className='px-2 pb-1 pt-1 text-xs font-medium text-muted-foreground'>
+			<div className='px-2 pb-1 pt-1.5 text-xs font-medium text-muted-foreground'>
 				Sorted by
 			</div>
 			<div className='space-y-0.5'>
@@ -116,7 +116,7 @@ export function DatabaseViewSortPopover({
 					return (
 						<div
 							key={sort.propertyId}
-							className='flex h-8 items-center gap-2 rounded-md px-2 text-sm hover:bg-muted/60'
+							className='flex h-9 items-center gap-2 rounded-md px-2 text-[13.5px] transition-colors hover:bg-accent/50'
 						>
 							<PropertyIcon
 								type={property.type}
@@ -127,7 +127,7 @@ export function DatabaseViewSortPopover({
 								type='button'
 								onClick={() => toggleDirection(sort.propertyId)}
 								aria-label={`Sort ${property.name} ${ascending ? "descending" : "ascending"}`}
-								className='flex h-6 items-center gap-1 rounded-md border px-1.5 text-xs text-muted-foreground hover:bg-background hover:text-foreground'
+								className='flex h-7 items-center gap-1 rounded-md border border-input px-2 text-[13px] text-foreground transition-colors hover:bg-accent'
 							>
 								{ascending ? (
 									<ArrowUp className='size-3' />
@@ -140,7 +140,7 @@ export function DatabaseViewSortPopover({
 								type='button'
 								onClick={() => removeSort(sort.propertyId)}
 								aria-label={`Remove sort by ${property.name}`}
-								className='flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-background hover:text-foreground'
+								className='flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground'
 							>
 								<X className='size-3.5' />
 							</button>
@@ -184,7 +184,7 @@ export function DatabaseViewSortPopover({
 				</button>
 			</PopoverTrigger>
 
-			<PopoverContent align='end' className='w-80 p-1'>
+			<PopoverContent align='end' className='w-80 p-[5px]'>
 				{showPicker ? picker : list}
 			</PopoverContent>
 		</Popover>

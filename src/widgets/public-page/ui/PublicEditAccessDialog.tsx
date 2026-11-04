@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { toast } from "sonner";
 
-import { useRequestEditAccessFromSite } from "@/entities/page-access-request/model/page-access-request.mutations";
+import { useRequestEditAccess } from "@/entities/page-access-request/model/page-access-request.mutations";
 import { useMyPageAccessRequest } from "@/entities/page-access-request/model/page-access-request.queries";
+import type { EditAccessSource } from "@/entities/page-access-request/model/page-access-request.types";
 import { getApiErrorMessage } from "@/shared/lib/api-error-message";
 import { Button } from "@/shared/ui/button";
 import {
@@ -18,8 +19,8 @@ import {
 
 interface PublicEditAccessDialogProps {
 	pageId: string;
-	subdomain: string;
-	path: string;
+	/** Site đã publish hoặc link share (trang /share/:token). */
+	source: EditAccessSource;
 	authenticated: boolean;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -27,14 +28,13 @@ interface PublicEditAccessDialogProps {
 
 export function PublicEditAccessDialog({
 	pageId,
-	subdomain,
-	path,
+	source,
 	authenticated,
 	open,
 	onOpenChange,
 }: PublicEditAccessDialogProps) {
 	const myRequestQuery = useMyPageAccessRequest(pageId, open && authenticated);
-	const requestMutation = useRequestEditAccessFromSite(pageId, subdomain, path);
+	const requestMutation = useRequestEditAccess(pageId, source);
 	const pending = Boolean(myRequestQuery.data);
 
 	const handleRequest = () => {

@@ -39,7 +39,7 @@ function SettingsSwitch({ checked, disabled, label, onCheckedChange }: SettingsS
 			aria-checked={checked}
 			aria-label={label}
 			disabled={disabled}
-			className='group relative h-5 w-9 shrink-0 rounded-full bg-muted transition-colors aria-checked:bg-[#2e8de6] disabled:cursor-not-allowed disabled:opacity-60'
+			className='group relative h-5 w-9 shrink-0 rounded-full bg-muted transition-colors aria-checked:bg-primary disabled:cursor-not-allowed disabled:opacity-60'
 			onClick={() => onCheckedChange(!checked)}
 		>
 			<span className='absolute left-0.5 top-0.5 size-4 rounded-full bg-white shadow-sm transition-transform group-aria-checked:translate-x-4' />
@@ -96,8 +96,8 @@ export function PublicationSettingsDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className='gap-0 border-[#3d3d3d] bg-[#252525] p-0 text-[#f1f1f1] sm:max-w-md'>
-				<DialogHeader className='border-b border-[#383838] px-5 py-4'>
+			<DialogContent className='gap-0 border-border bg-popover p-0 text-foreground sm:max-w-md'>
+				<DialogHeader className='border-b border-border px-5 py-4'>
 					<DialogTitle className='text-base'>Publication settings</DialogTitle>
 					<DialogDescription className='sr-only'>
 						Configure content and permission settings for this published site.
@@ -106,18 +106,18 @@ export function PublicationSettingsDialog({
 
 				<div className='space-y-6 px-5 py-5'>
 					<section className='space-y-3' aria-labelledby='publication-content-heading'>
-						<h3 id='publication-content-heading' className='text-xs font-medium uppercase tracking-wide text-[#888]'>
+						<h3 id='publication-content-heading' className='text-xs font-medium uppercase tracking-wide text-muted-foreground'>
 							Content
 						</h3>
 						<div className='flex items-start justify-between gap-6'>
 							<div className='space-y-1'>
 								<p className='text-sm font-medium'>Include subpages</p>
-								<p className='text-xs leading-5 text-[#999]'>
+								<p className='text-xs leading-5 text-muted-foreground'>
 									Publish descendant pages together with this site.
 								</p>
 							</div>
 							<div className='flex min-h-5 items-center gap-2'>
-								{updateIncludeDescendants.isPending ? <LoaderCircle className='size-4 animate-spin text-[#999]' aria-label='Saving Include subpages' /> : null}
+								{updateIncludeDescendants.isPending ? <LoaderCircle className='size-4 animate-spin text-muted-foreground' aria-label='Saving Include subpages' /> : null}
 								<SettingsSwitch
 									label='Include subpages'
 									checked={includeDescendants}
@@ -129,18 +129,18 @@ export function PublicationSettingsDialog({
 					</section>
 
 					<section className='space-y-3' aria-labelledby='publication-permissions-heading'>
-						<h3 id='publication-permissions-heading' className='text-xs font-medium uppercase tracking-wide text-[#888]'>
+						<h3 id='publication-permissions-heading' className='text-xs font-medium uppercase tracking-wide text-muted-foreground'>
 							Permissions
 						</h3>
 						<div className='flex items-start justify-between gap-6'>
 							<div className='space-y-1'>
 								<p className='text-sm font-medium'>Allow updates</p>
-								<p className='text-xs leading-5 text-[#999]'>
+								<p className='text-xs leading-5 text-muted-foreground'>
 									Allow signed-in users with permission to update content from this published site.
 								</p>
 							</div>
 							<div className='flex min-h-5 items-center gap-2'>
-								{updateAllowUpdates.isPending ? <LoaderCircle className='size-4 animate-spin text-[#999]' aria-label='Saving Allow updates' /> : null}
+								{updateAllowUpdates.isPending ? <LoaderCircle className='size-4 animate-spin text-muted-foreground' aria-label='Saving Allow updates' /> : null}
 								<SettingsSwitch
 									label='Allow updates'
 									checked={allowUpdates}
@@ -152,7 +152,7 @@ export function PublicationSettingsDialog({
 					</section>
 				</div>
 
-				<DialogFooter className='border-t border-[#383838] px-5 py-4'>
+				<DialogFooter className='border-t border-border px-5 py-4'>
 					<Button type='button' variant='outline' onClick={() => onOpenChange(false)}>
 						Done
 					</Button>

@@ -18,7 +18,7 @@ export function CreatorAvatar({
 	const showImage = Boolean(src) && failedSrc !== src;
 
 	return (
-		<div className={cn("overflow-hidden bg-muted", className)}>
+		<div className={cn("overflow-hidden bg-[#5e6ad2] text-white", className)}>
 			{showImage ? (
 				/* eslint-disable-next-line @next/next/no-img-element */
 				<img
@@ -31,9 +31,9 @@ export function CreatorAvatar({
 			) : (
 				<span
 					aria-hidden={!name}
-					className='flex h-full w-full items-center justify-center text-3xl font-semibold text-muted-foreground'
+					className='flex h-full w-full items-center justify-center font-bold text-white'
 				>
-					{name ? name.charAt(0).toUpperCase() : <UserRound className='size-8' />}
+					{name ? name.charAt(0).toUpperCase() : <UserRound className='size-7' />}
 				</span>
 			)}
 		</div>

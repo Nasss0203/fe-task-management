@@ -108,12 +108,12 @@ export function TeamSwitcher({
 									icon={activeWorkspace.icon}
 								/>
 
-								<span className='truncate font-medium'>
+								<span className='truncate font-semibold'>
 									{activeWorkspace.name}
 								</span>
 							</div>
 
-							<ChevronDown className='size-4 opacity-50' />
+							<ChevronDown className='size-3.5 text-faint' />
 						</SidebarMenuButton>
 					</DropdownMenuTrigger>
 
@@ -164,7 +164,7 @@ export function TeamSwitcher({
 								<div className='p-1'>
 									{canUpgrade && (
 										<DropdownMenuItem
-											className='cursor-pointer gap-2 p-2 text-blue-500 focus:text-blue-500'
+											className='cursor-pointer gap-2 p-2 text-primary focus:text-primary'
 											onSelect={() => {
 												pendingDialog.current = "billing";
 											}}
@@ -247,7 +247,7 @@ export function TeamSwitcher({
 
 							{isMember && (
 								<DropdownMenuItem
-									className='gap-2 p-2 text-blue-500 focus:text-blue-500'
+									className='gap-2 p-2 text-primary focus:text-primary'
 									onSelect={() => {
 										pendingDialog.current = "create";
 									}}

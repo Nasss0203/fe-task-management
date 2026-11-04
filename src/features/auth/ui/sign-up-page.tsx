@@ -90,7 +90,7 @@ export default function SignUp() {
 						control={form.control}
 						render={({ field, fieldState }) => (
 							<Field data-invalid={fieldState.invalid} className='gap-1.5'>
-								<FieldLabel htmlFor='sign-up-email' className='text-xs sm:text-sm font-medium text-foreground'>
+								<FieldLabel htmlFor='sign-up-email' className='text-[13px] font-medium text-foreground'>
 									Email
 								</FieldLabel>
 								<Input
@@ -114,7 +114,7 @@ export default function SignUp() {
 						control={form.control}
 						render={({ field, fieldState }) => (
 							<Field data-invalid={fieldState.invalid} className='gap-1.5'>
-								<FieldLabel htmlFor='sign-up-username' className='text-xs sm:text-sm font-medium text-foreground'>
+								<FieldLabel htmlFor='sign-up-username' className='text-[13px] font-medium text-foreground'>
 									Tên đăng nhập
 								</FieldLabel>
 								<Input
@@ -137,7 +137,7 @@ export default function SignUp() {
 						control={form.control}
 						render={({ field, fieldState }) => (
 							<Field data-invalid={fieldState.invalid} className='gap-1.5'>
-								<FieldLabel htmlFor='sign-up-password' className='text-xs sm:text-sm font-medium text-foreground'>
+								<FieldLabel htmlFor='sign-up-password' className='text-[13px] font-medium text-foreground'>
 									Mật khẩu
 								</FieldLabel>
 								<PasswordInput

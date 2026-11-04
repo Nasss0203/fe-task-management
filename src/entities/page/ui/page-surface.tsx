@@ -21,21 +21,25 @@ export function PageCover({
 export function PageHeader({
 	icon,
 	title,
+	titleEditor,
 	className,
 }: {
 	icon?: string | null;
 	title?: string | null;
+	titleEditor?: ReactNode;
 	className?: string;
 }) {
 	return (
 		<div
 			className={cn(
-				"flex items-center gap-1 px-12 pt-10 md:px-16 lg:px-24",
+				"mx-auto flex max-w-[1440px] items-center gap-1 px-12 pt-10 md:px-16 lg:px-24",
 				className,
 			)}
 		>
 			<div className='mb-3 text-5xl'>{icon || "📄"}</div>
-			<h1 className='text-4xl font-bold'>{title || "Untitled"}</h1>
+			<h1 className='min-w-0 flex-1 text-4xl font-bold'>
+				{titleEditor ?? (title || "Untitled")}
+			</h1>
 		</div>
 	);
 }
@@ -50,7 +54,7 @@ export function PageContent({
 	return (
 		<div
 			className={cn(
-				"mt-14 w-full min-w-0 max-w-full px-12 md:px-16 lg:px-24",
+				"mx-auto mt-14 w-full min-w-0 max-w-[1440px] px-12 md:px-16 lg:px-24",
 				className,
 			)}
 		>
@@ -62,7 +66,7 @@ export function PageContent({
 export function PageSkeleton() {
 	return (
 		<div role='status' aria-label='Loading page' className='w-full min-w-0'>
-			<div className='flex items-center gap-3 px-12 pt-10 md:px-16 lg:px-24'>
+			<div className='mx-auto flex max-w-[1440px] items-center gap-3 px-12 pt-10 md:px-16 lg:px-24'>
 				<Skeleton className='size-12 rounded-lg' />
 				<Skeleton className='h-9 w-2/5 max-w-sm' />
 			</div>

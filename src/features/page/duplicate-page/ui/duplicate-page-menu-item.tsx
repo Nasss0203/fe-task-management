@@ -44,7 +44,7 @@ export function DuplicatePageMenuItem({
 				void handleDuplicate();
 			}}
 		>
-			<Copy className='mr-2 size-4' />
+			<Copy className='size-[15px]' />
 
 			{duplicatePage.isPending ? "Duplicating..." : "Duplicate"}
 		</DropdownMenuItem>

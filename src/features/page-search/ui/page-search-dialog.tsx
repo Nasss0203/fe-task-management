@@ -37,7 +37,7 @@ function ResultIcon({ result }: { result: PageSearchResult }) {
 			{result.icon}
 		</span>
 	) : (
-		<FileText className='size-4 shrink-0 text-muted-foreground' />
+		<FileText className='size-[15px] shrink-0 text-muted-foreground' />
 	);
 }
 
@@ -82,7 +82,7 @@ export function PageSearchDialog({ workspaceId }: { workspaceId: string }) {
 		<Dialog open={open} onOpenChange={handleOpenChange}>
 			<DialogContent
 				showCloseButton={false}
-				className='top-[20%] translate-y-0 overflow-hidden p-0 sm:max-w-xl'
+				className='top-[20%] translate-y-0 gap-0 overflow-hidden rounded-[12px] border-border p-0 shadow-[0_24px_56px_-12px_rgba(0,0,0,0.28)] sm:max-w-[600px]'
 			>
 				<DialogTitle className='sr-only'>Search pages</DialogTitle>
 				<DialogDescription className='sr-only'>
@@ -94,13 +94,13 @@ export function PageSearchDialog({ workspaceId }: { workspaceId: string }) {
 							value={query}
 							onValueChange={setQuery}
 							placeholder='Search pages and content…'
-							className='h-12 pr-10'
+							className='h-12 pr-10 text-[15px] placeholder:text-faint'
 						/>
 						{(isFetching || isTyping) && (
 							<Loader2 className='absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin text-muted-foreground' />
 						)}
 					</div>
-					<CommandList className='max-h-[min(60vh,420px)]'>
+					<CommandList className='max-h-[min(60vh,420px)] p-1'>
 						{isError ? (
 							<div className='py-8 text-center text-sm text-muted-foreground'>
 								Search is unavailable right now.
@@ -122,11 +122,11 @@ export function PageSearchDialog({ workspaceId }: { workspaceId: string }) {
 										key={result.pageId}
 										value={result.pageId}
 										onSelect={() => openPage(result.pageId)}
-										className='items-start gap-3 py-2'
+										className='items-start gap-2.5 px-2.5 py-2 data-[selected=true]:bg-muted'
 									>
 										<ResultIcon result={result} />
 										<div className='min-w-0 flex-1'>
-											<div className='truncate text-sm font-medium'>
+											<div className='truncate text-[13.5px]'>
 												{result.title || "Untitled"}
 											</div>
 											{result.snippet && (
@@ -143,15 +143,15 @@ export function PageSearchDialog({ workspaceId }: { workspaceId: string }) {
 							</CommandGroup>
 						)}
 					</CommandList>
-					<div className='flex items-center justify-between border-t px-3 py-2 text-[11px] text-muted-foreground'>
+					<div className='flex items-center justify-between border-t border-border bg-muted/40 px-4 py-2 text-xs text-faint'>
 						<span>
-							<kbd className='rounded border px-1'>↑</kbd>{" "}
-							<kbd className='rounded border px-1'>↓</kbd> to navigate ·{" "}
-							<kbd className='rounded border px-1'>Enter</kbd> to open
+							<kbd className='rounded border border-border bg-background px-1'>↑</kbd>{" "}
+							<kbd className='rounded border border-border bg-background px-1'>↓</kbd> to navigate ·{" "}
+							<kbd className='rounded border border-border bg-background px-1'>Enter</kbd> to open
 						</span>
 						<span>
-							<kbd className='rounded border px-1'>Ctrl</kbd> +{" "}
-							<kbd className='rounded border px-1'>K</kbd>
+							<kbd className='rounded border border-border bg-background px-1'>Ctrl</kbd> +{" "}
+							<kbd className='rounded border border-border bg-background px-1'>K</kbd>
 						</span>
 					</div>
 				</Command>

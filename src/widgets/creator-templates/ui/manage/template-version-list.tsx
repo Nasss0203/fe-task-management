@@ -2,9 +2,9 @@
 
 import React from "react";
 import { format } from "date-fns";
-import { Check, Eye, GitBranch, Loader2, Plus, Sparkles } from "lucide-react";
+import { GitBranch, Loader2, Plus } from "lucide-react";
 import type { PageTemplate, TemplateVersion } from "@/entities/template";
-import { Badge } from "@/shared/ui/badge";
+import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 
 interface TemplateVersionListProps {
@@ -38,14 +38,13 @@ export function TemplateVersionList({
 	};
 
 	return (
-		<div className='w-full space-y-4'>
-			{/* Tab Header (Full Width) */}
-			<div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4'>
-				<div>
-					<h2 className='text-lg font-semibold tracking-tight text-foreground'>
+		<div className='w-full overflow-hidden rounded-[12px] border bg-card'>
+			<div className='flex flex-col justify-between gap-3 border-b px-4 py-3.5 sm:flex-row sm:items-center sm:gap-4'>
+				<div className='flex flex-col gap-0.5'>
+					<h2 className='text-[14px] font-semibold text-foreground'>
 						Versions
 					</h2>
-					<p className='text-xs text-muted-foreground mt-0.5'>
+					<p className='text-[12.5px] text-muted-foreground'>
 						Manage saved versions of this template.
 					</p>
 				</div>
@@ -54,7 +53,7 @@ export function TemplateVersionList({
 					size='sm'
 					onClick={onCreateVersion}
 					disabled={isCreatingVersion || template.status === "ARCHIVED"}
-					className='self-start sm:self-auto shrink-0 gap-1.5'
+					className='shrink-0 gap-1.5 self-start sm:self-auto'
 				>
 					{isCreatingVersion ? (
 						<>
@@ -70,21 +69,20 @@ export function TemplateVersionList({
 				</Button>
 			</div>
 
-			{/* Versions Table / Card List (Full Width) */}
 			{versions.length === 0 ? (
-				<div className='rounded-2xl border border-border/70 bg-card p-12 text-center text-muted-foreground'>
-					<div className='flex size-12 items-center justify-center rounded-full bg-muted/40 mx-auto mb-3 text-muted-foreground'>
+				<div className='p-12 text-center text-muted-foreground'>
+					<div className='mx-auto mb-3 flex size-10 items-center justify-center rounded-lg bg-muted text-muted-foreground'>
 						<GitBranch className='size-5' />
 					</div>
 					<p className='text-sm font-medium text-foreground'>
 						No versions available
 					</p>
-					<p className='text-xs text-muted-foreground mt-1'>
+					<p className='mt-1 text-xs text-muted-foreground'>
 						This template does not have any saved versions yet.
 					</p>
 				</div>
 			) : (
-				<div className='w-full rounded-2xl border border-border/80 bg-card divide-y divide-border/60 overflow-hidden shadow-xs'>
+				<div className='divide-y'>
 					{versions.map((version) => {
 						const isPreviewing = version.id === activeVersionId;
 						const createdDate = formatSafeDate(version.created_at);
@@ -95,84 +93,60 @@ export function TemplateVersionList({
 						return (
 							<div
 								key={version.id}
-								className={`p-4 md:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors ${
-									isPreviewing ? "bg-primary/5" : "hover:bg-muted/15"
-								}`}
+								className={cn(
+									"flex min-h-[56px] flex-wrap items-center gap-3 px-4 py-2.5 transition-colors",
+									isPreviewing
+										? "bg-[#eeeffc]/70 dark:bg-indigo-500/10"
+										: "hover:bg-muted/30",
+								)}
 							>
-								{/* Left: Version Metadata */}
-								<div className='space-y-1.5 min-w-0'>
-									<div className='flex items-center gap-2.5 flex-wrap'>
-										<span className='font-mono font-bold text-base text-foreground'>
-											v{version.version_number}
-										</span>
+								<span className='text-[13.5px] font-semibold text-foreground'>
+									v{version.version_number}
+								</span>
 
-										{isDraft && (
-											<Badge
-												variant='outline'
-												className='bg-amber-500/10 text-amber-500 border-amber-500/30 text-[10px] font-medium'
-											>
-												Draft
-											</Badge>
-										)}
+								{isDraft && (
+									<span className='rounded-[10px] bg-[#fbf3db] px-2 py-0.5 text-[11.5px] font-medium text-[#8a6500] dark:bg-amber-500/15 dark:text-amber-400'>
+										Draft
+									</span>
+								)}
 
-										{isPublished && (
-											<Badge
-												variant='secondary'
-												className='bg-emerald-500/10 text-emerald-500 border-emerald-500/30 text-[10px] font-medium'
-											>
-												Published
-											</Badge>
-										)}
+								{isPublished && (
+									<span className='rounded-[10px] bg-[#e9f6ec] px-2 py-0.5 text-[11.5px] font-medium text-[#2f9e44] dark:bg-emerald-500/15 dark:text-emerald-400'>
+										Published
+									</span>
+								)}
 
-										{isPreviewing && (
-											<Badge
-												variant='secondary'
-												className='bg-primary/20 text-primary border-transparent gap-1 text-[10px] font-medium'
-											>
-												<Check className='size-2.5' />
-												Previewing
-											</Badge>
-										)}
-									</div>
+								<span className='min-w-[140px] flex-1 text-[13px] text-muted-foreground'>
+									{publishedDate
+										? `Published ${publishedDate}`
+										: createdDate
+											? `Created ${createdDate}`
+											: "—"}
+								</span>
 
-									<div className='flex items-center gap-3 text-xs text-muted-foreground flex-wrap'>
-										{createdDate && <span>Created {createdDate}</span>}
-										{publishedDate ? (
-											<>
-												<span>•</span>
-												<span>Published {publishedDate}</span>
-											</>
-										) : (
-											<>
-												<span>•</span>
-												<span>Published —</span>
-											</>
-										)}
-									</div>
-								</div>
-
-								{/* Right: Actions */}
-								<div className='flex items-center gap-2 self-end sm:self-center shrink-0'>
+								<div className='ml-auto flex shrink-0 items-center gap-2'>
 									{isDraft && onPublishVersion && (
 										<Button
 											variant='outline'
 											size='sm'
 											onClick={() => onPublishVersion(version)}
-											className='h-8 text-xs gap-1.5 border-border/80 hover:bg-accent'
+											className='h-[30px] px-2.5 text-[13px]'
 										>
-											<Sparkles className='size-3 text-primary' />
 											Publish
 										</Button>
 									)}
 
-									{!isPreviewing && (
+									{isPreviewing ? (
+										<span className='px-1 text-[12.5px] font-medium text-[#5e6ad2] dark:text-indigo-400'>
+											Previewing
+										</span>
+									) : (
 										<Button
-											variant='secondary'
+											variant='ghost'
 											size='sm'
 											onClick={() => onPreviewVersion(version.id)}
-											className='h-8 text-xs font-medium gap-1.5'
+											className='h-[30px] px-2.5 text-[13px]'
 										>
-											<Eye className='size-3.5' />
 											Preview
 										</Button>
 									)}

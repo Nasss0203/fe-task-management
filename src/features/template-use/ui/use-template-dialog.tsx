@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ChevronsUpDown, FileText, Loader2 } from "lucide-react";
+import { Check, ChevronDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 
@@ -142,7 +142,7 @@ export function UseTemplateDialog({
 	return (
 		<Dialog open={open} onOpenChange={(val) => !isPending && onOpenChange(val)}>
 			<DialogContent
-				className='sm:max-w-[460px] p-0 overflow-hidden'
+				className='gap-3.5 rounded-xl px-6 py-5 sm:max-w-[442px]'
 				onPointerDownOutside={(e) => {
 					if (isPending) e.preventDefault();
 				}}
@@ -150,23 +150,16 @@ export function UseTemplateDialog({
 					if (isPending) e.preventDefault();
 				}}
 			>
-				<DialogHeader className='px-6 pt-6 pb-4 border-b border-border/60'>
-					<div className='flex items-center gap-2'>
-						<div className='flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary'>
-							<FileText className='size-4' />
-						</div>
-						<div>
-							<DialogTitle className='text-base font-semibold'>
-								Use template
-							</DialogTitle>
-							<DialogDescription className='text-xs text-muted-foreground mt-0.5'>
-								Create a new page from &ldquo;{template.name}&rdquo;
-							</DialogDescription>
-						</div>
-					</div>
+				<DialogHeader className='gap-3.5 text-left'>
+					<DialogTitle className='text-base font-semibold'>
+						Use template
+					</DialogTitle>
+					<DialogDescription className='text-[13px] text-muted-foreground'>
+						Create a new page from &ldquo;{template.name}&rdquo;
+					</DialogDescription>
 				</DialogHeader>
 
-				<div className='px-6 py-5 space-y-4'>
+				<div className='space-y-3.5'>
 					{errorMessage && (
 						<div
 							role='alert'
@@ -177,8 +170,8 @@ export function UseTemplateDialog({
 					)}
 
 					{versions.length > 1 && (
-						<div className='space-y-2'>
-							<Label className='text-xs font-medium text-foreground'>
+						<div className='space-y-1.5'>
+							<Label className='text-[13px] font-medium text-foreground'>
 								Version
 							</Label>
 							<Select
@@ -186,7 +179,10 @@ export function UseTemplateDialog({
 								onValueChange={setSelectedVersionId}
 								disabled={isPending}
 							>
-								<SelectTrigger aria-label='Version to use' className='h-9 w-full text-xs'>
+								<SelectTrigger
+									aria-label='Version to use'
+									className='w-full px-2.5 text-[13.5px] data-[size=default]:h-9'
+								>
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent position='popper'>
@@ -201,14 +197,14 @@ export function UseTemplateDialog({
 						</div>
 					)}
 
-					<div className='space-y-2'>
-						<Label className='text-xs font-medium text-foreground'>
+					<div className='space-y-1.5'>
+						<Label className='text-[13px] font-medium text-foreground'>
 							Destination Workspace
 						</Label>
 						{workspaces.length === 0 ? (
 							<div
 								role='status'
-								className='rounded-md border border-border/80 bg-muted/40 p-3 text-xs text-muted-foreground'
+								className='rounded-md bg-muted p-3 text-xs text-muted-foreground'
 							>
 								No workspaces available. Please create a workspace first.
 							</div>
@@ -219,12 +215,12 @@ export function UseTemplateDialog({
 										variant='outline'
 										role='combobox'
 										disabled={isPending}
-										className='w-full justify-between h-9 text-xs font-normal'
+										className='h-9 w-full justify-between px-2.5 text-[13.5px] font-normal'
 									>
 										<span className='truncate'>
 											{selectedWorkspace?.name || "Select workspace..."}
 										</span>
-										<ChevronsUpDown className='ml-2 size-3.5 shrink-0 opacity-50' />
+										<ChevronDown className='ml-2 size-4 shrink-0 text-muted-foreground' />
 									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align='start' className='w-[410px]'>
@@ -235,7 +231,7 @@ export function UseTemplateDialog({
 												setSelectedWorkspaceId(ws.id);
 												setErrorMessage(null);
 											}}
-											className='flex items-center justify-between text-xs cursor-pointer'
+											className='flex cursor-pointer items-center justify-between text-[13px]'
 										>
 											<span className='truncate'>{ws.name}</span>
 											{ws.id === selectedWorkspaceId && (
@@ -246,18 +242,19 @@ export function UseTemplateDialog({
 								</DropdownMenuContent>
 							</DropdownMenu>
 						)}
-						<p className='text-[11px] text-muted-foreground'>
+						<p className='pt-2 text-xs text-faint'>
 							The template content and database snapshot will be cloned into
 							this workspace.
 						</p>
 					</div>
 				</div>
 
-				<DialogFooter className='px-6 py-3.5 border-t border-border/60 bg-muted/10 gap-2 sm:gap-2'>
+				<DialogFooter className='gap-2 sm:gap-2'>
 					<Button
 						type='button'
 						variant='outline'
 						size='sm'
+						className='h-8 px-3 text-[13px]'
 						disabled={isPending}
 						onClick={() => onOpenChange(false)}
 					>
@@ -268,7 +265,7 @@ export function UseTemplateDialog({
 						size='sm'
 						disabled={isPending || !selectedWorkspaceId}
 						onClick={handleUseTemplate}
-						className='bg-primary text-primary-foreground hover:bg-primary/90'
+						className='h-8 px-3 text-[13px]'
 					>
 						{isPending ? (
 							<>

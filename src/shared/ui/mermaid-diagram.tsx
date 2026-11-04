@@ -47,6 +47,12 @@ export function MermaidDiagram({ code }: MermaidDiagramProps) {
 					clusterBkg: color("--muted"),
 					clusterBorder: color("--border"),
 					edgeLabelBackground: color("--background"),
+					...Object.fromEntries(
+						Array.from({ length: 12 }, (_, index) => [
+							[`cScale${index}`, color(index % 2 ? "--muted" : "--accent-soft")],
+							[`cScaleLabel${index}`, color("--foreground")],
+						]).flat(),
+					),
 				},
 			});
 

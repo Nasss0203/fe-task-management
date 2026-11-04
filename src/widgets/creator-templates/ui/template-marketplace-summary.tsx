@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import { format } from "date-fns";
-import { ArrowRight, ExternalLink, RotateCw, Store } from "lucide-react";
+import { ExternalLink, Plus, RotateCw } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -62,24 +62,17 @@ export function TemplateMarketplaceSummary({
 	const isArchived = template.status === "ARCHIVED";
 
 	return (
-		<section className='overflow-hidden rounded-xl border bg-card'>
-			<div className='flex flex-col gap-4 border-b p-5 sm:flex-row sm:items-start sm:justify-between'>
-				<div className='flex gap-3'>
-					<span className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted'>
-						<Store className='size-4' />
-					</span>
-					<div className='flex flex-col gap-1'>
-						<h2 className='text-sm font-semibold'>Marketplace listing</h2>
-						<span className='inline-flex items-center gap-1.5 text-sm text-muted-foreground'>
-							<span className={cn("size-1.5 rounded-full", presentation.dot)} />
-							{presentation.label}
-						</span>
-					</div>
-				</div>
+		<section className='flex flex-col gap-4 rounded-[12px] border bg-card p-4'>
+			<div className='flex flex-wrap items-center gap-2.5'>
+				<h2 className='text-[14px] font-semibold'>Marketplace listing</h2>
+				<span className='inline-flex items-center gap-1.5 text-[13px] text-muted-foreground'>
+					<span className={cn("size-[7px] rounded-full", presentation.dot)} />
+					{presentation.label}
+				</span>
 
-				<div className='flex flex-wrap gap-2'>
+				<div className='ml-auto flex flex-wrap items-center gap-2'>
 					{state === "LIVE" && (
-						<Button asChild variant='outline' size='sm'>
+						<Button asChild variant='ghost' size='sm'>
 							<Link href={`/templates/${template.id}`} target='_blank'>
 								<ExternalLink className='size-3.5' />
 								View public page
@@ -87,21 +80,30 @@ export function TemplateMarketplaceSummary({
 						</Button>
 					)}
 					{isArchived ? (
-						<Button size='sm' disabled>
+						<Button
+							variant={currentListing ? "outline" : "default"}
+							size='sm'
+							disabled
+						>
+							{!currentListing && <Plus className='size-3.5' />}
 							{currentListing ? "Edit listing" : "Set up listing"}
 						</Button>
 					) : (
-						<Button asChild size='sm'>
+						<Button
+							asChild
+							variant={currentListing ? "outline" : "default"}
+							size='sm'
+						>
 							<Link href={`/creator/templates/${template.id}/listing`}>
+								{!currentListing && <Plus className='size-3.5' />}
 								{currentListing ? "Edit listing" : "Set up listing"}
-								<ArrowRight className='size-3.5' />
 							</Link>
 						</Button>
 					)}
 				</div>
 			</div>
 
-			<dl className='grid gap-4 p-5 text-sm sm:grid-cols-4'>
+			<dl className='grid grid-cols-2 gap-4 text-sm sm:grid-cols-4'>
 				<Fact label='Marketplace version'>
 					{releasedVersion ? `v${releasedVersion.version_number}` : "—"}
 				</Fact>
@@ -128,7 +130,7 @@ export function TemplateMarketplaceSummary({
 				</Fact>
 			</dl>
 
-			<p className='border-t bg-muted/30 px-5 py-3 text-xs text-muted-foreground'>
+			<p className='text-[12.5px] text-muted-foreground/80'>
 				Publishing a version only locks a snapshot. Buyers get a version after
 				you release it to the marketplace.
 			</p>
@@ -138,9 +140,9 @@ export function TemplateMarketplaceSummary({
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
 	return (
-		<div className='flex flex-col gap-1'>
-			<dt className='text-xs text-muted-foreground'>{label}</dt>
-			<dd className='font-medium'>{children}</dd>
+		<div className='flex flex-col gap-0.5'>
+			<dt className='text-[12px] text-muted-foreground'>{label}</dt>
+			<dd className='text-[14px] font-medium'>{children}</dd>
 		</div>
 	);
 }

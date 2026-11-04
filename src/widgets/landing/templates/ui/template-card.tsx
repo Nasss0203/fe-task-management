@@ -1,11 +1,13 @@
 "use client";
 
-import { ArrowRight, Heart, LayoutTemplate, Star } from "lucide-react";
+import { Heart, LayoutTemplate, Star } from "lucide-react";
 import Link from "next/link";
 
 import { useTemplateVersionThumbnail } from "@/entities/template/model/template.queries";
 import type { PublicTemplateListItem } from "@/entities/template/model/template.types";
+import { getTemplateCoverTone } from "@/entities/template/model/template-cover-tone";
 import { formatVnd } from "@/shared/lib/currency";
+import { cn } from "@/shared/lib/utils";
 import { formatRatingSummary } from "@/features/template-feedback";
 
 type TemplateCardProps = {
@@ -35,11 +37,11 @@ export default function TemplateCard({ item, href }: TemplateCardProps) {
 	return (
 		<Link
 			href={href ?? `/templates/${item.id}`}
-			className='group flex h-full flex-col overflow-hidden rounded-xl border border-border/70 bg-card transition-all duration-200 hover:border-foreground/20 hover:shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+			className='group flex h-full flex-col overflow-hidden rounded-[14px] border bg-card transition-colors hover:border-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
 			aria-label={`View template ${item.name}`}
 		>
 			{/* Thumbnail container */}
-			<div className='relative aspect-[16/10] w-full shrink-0 overflow-hidden bg-muted/30 border-b border-border/50'>
+			<div className='relative aspect-[2/1] w-full shrink-0 overflow-hidden bg-muted'>
 				{visualUrl ? (
 					<div
 						className='h-full w-full bg-cover bg-center bg-no-repeat transition-transform duration-300 group-hover:scale-[1.02]'
@@ -48,89 +50,94 @@ export default function TemplateCard({ item, href }: TemplateCardProps) {
 						}}
 					/>
 				) : (
-					<div className='flex h-full w-full items-center justify-center bg-muted/20 text-muted-foreground/50'>
-						{item.icon ? (
-							<span className='text-3xl select-none'>{item.icon}</span>
-						) : (
-							<LayoutTemplate className='h-8 w-8' />
+					<div
+						className={cn(
+							"flex h-full w-full items-center justify-center",
+							getTemplateCoverTone(item.id),
 						)}
+					>
+						<span className='flex size-[60px] items-center justify-center rounded-[14px] border bg-background text-foreground'>
+							{item.icon ? (
+								<span className='select-none text-[26px] leading-none'>{item.icon}</span>
+							) : (
+								<LayoutTemplate className='size-[26px]' />
+							)}
+						</span>
 					</div>
 				)}
 			</div>
 
 			{/* Info container */}
-			<div className='flex flex-1 flex-col p-4 sm:p-5'>
+			<div className='flex flex-1 flex-col gap-2.5 p-4'>
 				<div className='flex items-start gap-2'>
 					{item.icon && (
-						<span className='text-lg leading-none mt-0.5 select-none shrink-0' aria-hidden='true'>
+						<span className='mt-0.5 shrink-0 select-none text-base leading-none' aria-hidden='true'>
 							{item.icon}
 						</span>
 					)}
-					<h3 className='line-clamp-1 text-base font-semibold tracking-tight text-foreground transition-colors group-hover:text-primary'>
+					<h3 className='line-clamp-1 text-[15px] font-semibold leading-[23px] text-foreground'>
 						{item.name}
 					</h3>
 				</div>
 
-				<p className='mt-2 line-clamp-2 flex-1 text-sm leading-relaxed text-muted-foreground'>
+				<p className='line-clamp-2 flex-1 text-[13px] leading-5 text-muted-foreground'>
 					{item.description || "Explore and use this template in your workspace."}
 				</p>
 
-				{item.categories && item.categories.length > 0 && (
-					<div className='mt-3 flex flex-wrap gap-1'>
-						{item.categories.slice(0, 2).map((category) => (
+				{item.categories?.length || item.tags?.length ? (
+					<div className='flex min-w-0 flex-wrap items-center gap-1.5 text-[11.5px] leading-[17px]'>
+						{item.categories?.slice(0, 2).map((category) => (
 							<span
 								key={category.id}
-								className='rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground'
+								className='rounded-md bg-muted px-2 py-0.5 text-muted-foreground'
 							>
 								{category.name}
 							</span>
 						))}
+
+						{item.tags && item.tags.length > 0 && (
+							<p className='line-clamp-1 text-muted-foreground'>
+								{item.tags
+									.slice(0, 3)
+									.map((tag) => `#${tag}`)
+									.join(" ")}
+							</p>
+						)}
 					</div>
-				)}
+				) : null}
 
-				{item.tags && item.tags.length > 0 && (
-					<p className='mt-2 line-clamp-1 text-[11px] text-muted-foreground'>
-						{item.tags
-							.slice(0, 3)
-							.map((tag) => `#${tag}`)
-							.join(" ")}
-					</p>
-				)}
-
-				<div className='mt-3 flex items-center gap-3 text-[11px] text-muted-foreground'>
+				<div className='flex items-center gap-3 border-t pt-1.5 text-[12.5px] leading-[19px] text-muted-foreground'>
 					<span className='inline-flex items-center gap-1'>
 						<Star
 							className={
 								item.rating_count
-									? "size-3.5 fill-amber-400 text-amber-400"
-									: "size-3.5"
+									? "size-[13px] fill-amber-400 text-amber-400"
+									: "size-[13px]"
 							}
 							aria-hidden
 						/>
 						{formatRatingSummary(item.rating_average, item.rating_count)}
 					</span>
 					<span className='inline-flex items-center gap-1'>
-						<Heart className='size-3.5' aria-hidden />
+						<Heart className='size-[13px]' aria-hidden />
 						{item.like_count ?? 0}
 						<span className='sr-only'>likes</span>
 					</span>
-				</div>
-
-				<div className='mt-4 flex items-center justify-between gap-2 border-t border-border/40 pt-3 text-xs font-medium'>
 					<span
-						className={
+						className={cn(
+							"ml-auto text-[13px] font-semibold leading-5",
 							item.offer_type === "PAID"
 								? "text-foreground"
-								: "text-emerald-600 dark:text-emerald-400"
-						}
+								: "text-emerald-600 dark:text-emerald-400",
+						)}
 					>
 						{getTemplatePriceLabel(item)}
 					</span>
-					<span className='inline-flex items-center gap-1.5 text-muted-foreground transition-colors group-hover:text-foreground'>
-						View template
-						<ArrowRight className='h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5' />
-					</span>
 				</div>
+
+				<span className='inline-flex h-8 items-center justify-center rounded-[7px] border border-input text-[13px] font-medium text-foreground transition-colors group-hover:bg-accent'>
+					View template
+				</span>
 			</div>
 		</Link>
 	);

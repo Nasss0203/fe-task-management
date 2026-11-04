@@ -25,7 +25,7 @@ export function SectionHeading({
 		>
 			{eyebrow && (
 				<div
-					className={`inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary backdrop-blur-xs ${
+					className={`inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium text-muted-foreground ${
 						isCenter ? "mx-auto" : ""
 					}`}
 				>

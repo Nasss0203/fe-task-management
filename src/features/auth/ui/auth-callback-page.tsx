@@ -15,21 +15,21 @@ function LoadingScreen({
 }) {
   return (
     <AuthCard className="text-center">
-      <div className="flex flex-col items-center justify-center gap-5 py-8">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-xs">
+      <div className="flex flex-col items-center justify-center gap-3 py-6">
+        <div className="flex size-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
           <LayoutGrid className="h-6 w-6" />
         </div>
         <div>
-          <div className="text-base font-bold tracking-tight text-foreground">
+          <div className="text-[15px] font-bold tracking-tight text-foreground">
             Taskmanly
           </div>
-          <div className="text-xs text-muted-foreground mt-0.5">
+          <div className="text-xs text-muted-foreground">
             The connected workspace
           </div>
         </div>
         <div className="flex flex-col items-center gap-2.5 pt-2">
-          <div className="h-7 w-7 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
-          <p className="text-xs sm:text-sm text-muted-foreground font-medium">
+          <div className="size-7 animate-spin rounded-full border-[3px] border-ring/20 border-t-ring" />
+          <p className="text-[13px] font-medium text-muted-foreground">
             {message}
           </p>
         </div>

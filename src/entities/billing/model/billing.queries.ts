@@ -35,6 +35,6 @@ export function useWorkspaceSubscription(workspaceId: string, enabled = true) {
 	return useQuery({
 		queryKey: billingKeys.workspaceSubscription(workspaceId),
 		queryFn: ({ signal }) => getWorkspaceSubscription(workspaceId, signal),
-		enabled: enabled && Boolean(workspaceId),
+		enabled: Boolean(workspaceId) && enabled,
 	});
 }

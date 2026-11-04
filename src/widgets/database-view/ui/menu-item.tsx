@@ -27,20 +27,27 @@ export function MenuItem({
 			type='button'
 			{...props}
 			className={cn(
-				"flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-sm outline-none hover:bg-muted focus-visible:bg-muted disabled:pointer-events-none disabled:opacity-50",
-				destructive && "hover:bg-destructive/10 hover:text-destructive",
+				"flex h-[30px] w-full items-center gap-[9px] rounded-md px-2 text-left text-[13.5px] outline-none transition-colors hover:bg-accent focus-visible:bg-accent disabled:pointer-events-none disabled:opacity-50",
+				destructive && "text-destructive hover:bg-destructive/10",
 				className,
 			)}
 		>
-			{Icon && <Icon className='size-4 shrink-0 text-muted-foreground' />}
+			{Icon && (
+				<Icon
+					className={cn(
+						"size-[15px] shrink-0",
+						destructive ? "text-destructive" : "text-muted-foreground",
+					)}
+				/>
+			)}
 			<span className='min-w-0 flex-1 truncate'>{children}</span>
 			{hint && (
-				<span className='max-w-[45%] truncate text-xs text-muted-foreground'>
+				<span className='max-w-[45%] truncate text-xs text-faint'>
 					{hint}
 				</span>
 			)}
 			{submenu && (
-				<ChevronRight className='size-4 shrink-0 text-muted-foreground' />
+				<ChevronRight className='size-3.5 shrink-0 text-faint' />
 			)}
 		</button>
 	);
@@ -57,16 +64,16 @@ export function MenuPageHeader({
 	action?: ReactNode;
 }) {
 	return (
-		<div className='mb-1 flex h-8 items-center gap-1'>
+		<div className='mb-1 flex h-8 items-center gap-1 pl-0.5'>
 			<button
 				type='button'
 				aria-label='Back'
 				onClick={onBack}
-				className='flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground'
+				className='flex size-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground'
 			>
-				<ChevronLeft className='size-4' />
+				<ChevronLeft className='size-3.5' />
 			</button>
-			<span className='flex-1 truncate text-sm font-medium'>{title}</span>
+			<span className='flex-1 truncate text-[13px] font-semibold'>{title}</span>
 			{action}
 		</div>
 	);
@@ -74,12 +81,12 @@ export function MenuPageHeader({
 
 export function MenuSectionLabel({ children }: { children: ReactNode }) {
 	return (
-		<div className='px-2 pb-1 pt-2 text-xs font-medium text-muted-foreground'>
+		<div className='px-2 pb-1 pt-1.5 text-xs font-medium text-muted-foreground'>
 			{children}
 		</div>
 	);
 }
 
 export function MenuSeparator() {
-	return <div className='-mx-1 my-1 border-t' />;
+	return <div className='-mx-1 my-1 border-t border-border' />;
 }

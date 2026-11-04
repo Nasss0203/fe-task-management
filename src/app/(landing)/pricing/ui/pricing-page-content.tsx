@@ -39,16 +39,14 @@ export function PricingPageContent() {
 		<div className='py-12 sm:py-20 space-y-24 sm:space-y-32'>
 			{/* Hero */}
 			<section className='mx-auto max-w-4xl px-4 sm:px-6 text-center space-y-6'>
-				<div className='inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3.5 py-1 text-xs font-semibold text-primary'>
+				<div className='inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3.5 py-1 text-xs font-medium text-muted-foreground'>
 					<Sparkles className='h-3.5 w-3.5' />
 					Transparent Pricing
 				</div>
 
-				<h1 className='text-4xl sm:text-6xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50 leading-[1.1]'>
+				<h1 className='text-4xl sm:text-6xl font-bold tracking-tight text-foreground leading-[1.1]'>
 					Choose the plan that{" "}
-					<span className='bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 bg-clip-text text-transparent'>
 						fits your team
-					</span>
 				</h1>
 
 				<p className='text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed'>
@@ -79,7 +77,7 @@ export function PricingPageContent() {
 							}`}
 						>
 							<span>Yearly Billing</span>
-							<span className='rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-1.5 py-0.5 leading-none'>
+							<span className='rounded-full bg-muted text-muted-foreground text-[10px] font-bold px-1.5 py-0.5 leading-none'>
 								Save 20%
 							</span>
 						</button>
@@ -89,7 +87,7 @@ export function PricingPageContent() {
 
 			{/* 3 Pricing Cards */}
 			<section className='mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'>
-				<div className='grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch'>
+				<div className='grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch'>
 					{plans.map((plan) => {
 						const isPro = plan.popular;
 						const price =
@@ -102,16 +100,16 @@ export function PricingPageContent() {
 						return (
 							<div
 								key={plan.id}
-								className={`relative flex flex-col rounded-3xl p-6 sm:p-8 transition-all duration-300 ${
+								className={`relative flex flex-col rounded-2xl p-6 sm:p-8 transition-colors ${
 									isPro
-										? "border-2 border-primary bg-card shadow-2xl scale-[1.02] z-10"
-										: "border border-border/80 bg-card/60 shadow-xs hover:border-primary/40 hover:shadow-md"
+										? "border border-foreground bg-card shadow-soft"
+										: "border border-border bg-card/70 hover:border-foreground/20"
 								}`}
 							>
 								{/* Popular / Badge */}
 								{plan.badge && (
-									<div className='absolute -top-3.5 left-1/2 -translate-x-1/2'>
-										<Badge className='bg-primary text-primary-foreground font-semibold text-xs px-3 py-1 shadow-md'>
+									<div className='absolute -top-3 left-6'>
+										<Badge className='bg-primary text-primary-foreground font-medium text-[11px] px-2.5 py-0.5 rounded-full'>
 											{plan.badge}
 										</Badge>
 									</div>
@@ -120,9 +118,6 @@ export function PricingPageContent() {
 								<div className='space-y-4'>
 									<div className='flex items-center justify-between'>
 										<h2 className='text-xl font-bold text-foreground'>{plan.name}</h2>
-										{isPro && (
-											<Sparkles className='h-4 w-4 text-primary animate-pulse' />
-										)}
 									</div>
 
 									<p className='text-xs text-muted-foreground leading-relaxed min-h-[36px]'>
@@ -130,7 +125,7 @@ export function PricingPageContent() {
 									</p>
 
 									<div className='pt-2 flex items-baseline gap-1'>
-										<span className='text-4xl font-extrabold tracking-tight text-foreground'>
+										<span className='text-4xl font-bold tracking-tight text-foreground'>
 											{price}
 										</span>
 										<span className='text-xs text-muted-foreground'>
@@ -143,10 +138,10 @@ export function PricingPageContent() {
 								<div className='my-6'>
 									<Link href={ctaHref} className='block w-full'>
 										<Button
-											className={`w-full h-11 rounded-xl font-semibold text-sm transition-all ${
+											className={`w-full h-10 rounded-lg font-medium text-sm transition-colors ${
 												isPro
-													? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
-													: "border border-border/80 bg-background hover:bg-muted text-foreground"
+													? "bg-primary text-primary-foreground hover:bg-primary/90"
+													: "border border-border bg-background hover:bg-secondary text-foreground"
 											}`}
 										>
 											{user ? "Go to Billing" : plan.cta}
@@ -169,7 +164,7 @@ export function PricingPageContent() {
 											}`}
 										>
 											{feature.included ? (
-												<div className='h-4 w-4 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5'>
+												<div className='h-4 w-4 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
 													<Check className='h-2.5 w-2.5' />
 												</div>
 											) : (
@@ -205,7 +200,7 @@ export function PricingPageContent() {
 								<tr className='border-b border-border/60 text-muted-foreground font-semibold'>
 									<th className='py-3 px-3 w-2/5'>Feature</th>
 									<th className='py-3 px-3 w-1/5'>Free</th>
-									<th className='py-3 px-3 w-1/5 text-primary'>Pro</th>
+									<th className='py-3 px-3 w-1/5 text-foreground'>Pro</th>
 									<th className='py-3 px-3 w-1/5'>Team</th>
 								</tr>
 							</thead>
@@ -213,50 +208,50 @@ export function PricingPageContent() {
 								<tr>
 									<td className='py-3 px-3 font-medium'>Team Members</td>
 									<td className='py-3 px-3'>5 users</td>
-									<td className='py-3 px-3 font-semibold text-primary'>25 users</td>
+									<td className='py-3 px-3 font-semibold text-foreground'>25 users</td>
 									<td className='py-3 px-3'>Unlimited</td>
 								</tr>
 								<tr>
 									<td className='py-3 px-3 font-medium'>Squad Teamspaces</td>
 									<td className='py-3 px-3'>1 space</td>
-									<td className='py-3 px-3 font-semibold text-primary'>5 spaces</td>
+									<td className='py-3 px-3 font-semibold text-foreground'>5 spaces</td>
 									<td className='py-3 px-3'>Unlimited</td>
 								</tr>
 								<tr>
 									<td className='py-3 px-3 font-medium'>Storage Quota</td>
 									<td className='py-3 px-3'>100 MB</td>
-									<td className='py-3 px-3 font-semibold text-primary'>10 GB</td>
+									<td className='py-3 px-3 font-semibold text-foreground'>10 GB</td>
 									<td className='py-3 px-3'>100 GB</td>
 								</tr>
 								<tr>
 									<td className='py-3 px-3 font-medium'>Database & Multi-views</td>
 									<td className='py-3 px-3'>Basic</td>
-									<td className='py-3 px-3 font-semibold text-primary'>Unlimited Views</td>
+									<td className='py-3 px-3 font-semibold text-foreground'>Unlimited Views</td>
 									<td className='py-3 px-3'>Unlimited + API</td>
 								</tr>
 								<tr>
 									<td className='py-3 px-3 font-medium'>Database Views (Board, Calendar, List)</td>
 									<td className='py-3 px-3 text-muted-foreground'><Minus className='h-3 w-3' /></td>
-									<td className='py-3 px-3 font-semibold text-emerald-600'><Check className='h-3.5 w-3.5' /></td>
-									<td className='py-3 px-3 font-semibold text-emerald-600'><Check className='h-3.5 w-3.5' /></td>
+									<td className='py-3 px-3 font-semibold text-foreground'><Check className='h-3.5 w-3.5' /></td>
+									<td className='py-3 px-3 font-semibold text-foreground'><Check className='h-3.5 w-3.5' /></td>
 								</tr>
 								<tr>
 									<td className='py-3 px-3 font-medium'>Public Page Web Publishing</td>
 									<td className='py-3 px-3 text-muted-foreground'><Minus className='h-3 w-3' /></td>
-									<td className='py-3 px-3 font-semibold text-emerald-600'><Check className='h-3.5 w-3.5' /></td>
-									<td className='py-3 px-3 font-semibold text-emerald-600'><Check className='h-3.5 w-3.5' /></td>
+									<td className='py-3 px-3 font-semibold text-foreground'><Check className='h-3.5 w-3.5' /></td>
+									<td className='py-3 px-3 font-semibold text-foreground'><Check className='h-3.5 w-3.5' /></td>
 								</tr>
 								<tr>
 									<td className='py-3 px-3 font-medium'>Taskmanly AI Assistant</td>
 									<td className='py-3 px-3 text-muted-foreground'><Minus className='h-3 w-3' /></td>
-									<td className='py-3 px-3 font-semibold text-primary'>Standard Quota</td>
-									<td className='py-3 px-3 font-semibold text-primary'>Unlimited</td>
+									<td className='py-3 px-3 font-semibold text-foreground'>Standard Quota</td>
+									<td className='py-3 px-3 font-semibold text-foreground'>Unlimited</td>
 								</tr>
 								<tr>
-									<td className='py-3 px-3 font-medium'>Role-based Permissions (RBAC)</td>
+									<td className='py-3 px-3 font-medium'>Workspace &amp; Page Permissions</td>
 									<td className='py-3 px-3 text-muted-foreground'><Minus className='h-3 w-3' /></td>
-									<td className='py-3 px-3 font-semibold text-emerald-600'><Check className='h-3.5 w-3.5' /></td>
-									<td className='py-3 px-3 font-semibold text-emerald-600'><Check className='h-3.5 w-3.5' /></td>
+									<td className='py-3 px-3 font-semibold text-foreground'><Check className='h-3.5 w-3.5' /></td>
+									<td className='py-3 px-3 font-semibold text-foreground'><Check className='h-3.5 w-3.5' /></td>
 								</tr>
 							</tbody>
 						</table>
@@ -279,11 +274,11 @@ export function PricingPageContent() {
 					{PRICING_FAQS.map((faq) => (
 						<div
 							key={faq.question}
-							className='rounded-2xl border border-border/80 bg-card p-6 shadow-xs space-y-2'
+							className='rounded-xl border border-border bg-card p-6 space-y-2'
 						>
 							<div className='flex items-start gap-2.5'>
-								<HelpCircle className='h-4 w-4 text-primary shrink-0 mt-0.5' />
-								<h4 className='text-sm font-bold text-foreground'>{faq.question}</h4>
+								<HelpCircle className='h-4 w-4 text-muted-foreground shrink-0 mt-0.5' />
+								<h4 className='text-sm font-semibold text-foreground'>{faq.question}</h4>
 							</div>
 							<p className='text-xs text-muted-foreground leading-relaxed pl-6'>
 								{faq.answer}

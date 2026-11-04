@@ -34,6 +34,8 @@ interface DatabaseViewBlockProps {
 	readOnly?: boolean;
 	/** Reads through a share link instead of workspace membership. */
 	shareToken?: string;
+	/** Called when the user picks or creates a view (the block saves it as its default). */
+	onActiveViewChange?: (viewId: string) => void;
 }
 
 export function DatabaseViewBlock({
@@ -41,6 +43,7 @@ export function DatabaseViewBlock({
 	viewId,
 	readOnly = false,
 	shareToken,
+	onActiveViewChange,
 }: DatabaseViewBlockProps) {
 	const shared = Boolean(shareToken);
 
@@ -70,6 +73,11 @@ export function DatabaseViewBlock({
 
 	const activeView =
 		views.find((view) => view.id === activeViewId) ?? views[0];
+
+	const selectView = (id: string) => {
+		setActiveViewId(id);
+		if (id !== activeView?.id) onActiveViewChange?.(id);
+	};
 
 	const viewDetailQuery = useDatabaseView(database?.id, activeView?.id, !shared);
 	const sharedViewDetailQuery = useSharedDatabaseView(
@@ -117,21 +125,21 @@ export function DatabaseViewBlock({
 		<DatabaseShareTokenContext.Provider value={shareToken}>
 		<div className='w-full min-w-0 max-w-full'>
 			{readOnly ? (
-				<h3 className='mb-1 truncate px-1 py-0.5 text-lg font-semibold'>
+				<h3 className='mb-2 truncate px-1 py-0.5 text-2xl font-bold tracking-[-0.02em]'>
 					{database.name || "Untitled database"}
 				</h3>
 			) : (
 				<DatabaseTitle databaseId={database.id} name={database.name} />
 			)}
-			<div className='mb-1 flex items-center justify-between gap-2'>
-				<div className='flex min-w-0 items-center gap-1 overflow-x-auto [scrollbar-width:none]'>
+			<div className='mb-3 flex items-center justify-between gap-2 border-b border-border pb-2'>
+				<div className='flex min-w-0 items-center gap-0.5 overflow-x-auto [scrollbar-width:thin]'>
 					{views.map((view) => (
 						<DatabaseViewTab
 							key={view.id}
 							databaseId={database.id}
 							view={view}
 							active={view.id === activeView.id}
-							onSelect={() => setActiveViewId(view.id)}
+							onSelect={() => selectView(view.id)}
 							readOnly={readOnly}
 						/>
 					))}
@@ -140,13 +148,13 @@ export function DatabaseViewBlock({
 						<AddDatabaseViewPopover
 							databaseId={database.id}
 							views={views}
-							onCreated={(view) => setActiveViewId(view.id)}
+							onCreated={(view) => selectView(view.id)}
 						/>
 					)}
 				</div>
 
 				{!readOnly && (
-				<div className='flex shrink-0 items-center gap-1'>
+				<div className='flex shrink-0 items-center gap-0.5'>
 					{activeViewDetail && (
 						<DatabaseViewFilterPopover
 							databaseId={database.id}
@@ -194,6 +202,7 @@ export function DatabaseViewBlock({
 				view={activeView}
 				viewDetail={activeViewDetail}
 				rows={visibleRows}
+				allRows={rows}
 				readOnly={readOnly}
 			/>
 		</div>

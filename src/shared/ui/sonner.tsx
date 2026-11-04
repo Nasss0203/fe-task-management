@@ -13,7 +13,7 @@ import { Toaster as Sonner, type ToasterProps } from "sonner";
 
 const toastClassNames = {
 	toast:
-		"w-[360px]! rounded-md! border! border-border! bg-card! px-4! py-3! text-card-foreground! shadow-[0_14px_34px_rgba(15,23,42,0.18)]! dark:border-white/10! dark:bg-[#111318]! dark:shadow-[0_16px_36px_rgba(0,0,0,0.45)]!",
+		"w-[360px]! rounded-xl! border! border-border! bg-popover! px-4! py-3! text-popover-foreground! shadow-elevated!",
 	title: "text-sm! font-semibold! text-foreground!",
 	description: "mt-1! text-[13px]! leading-5! text-muted-foreground!",
 	icon: "mt-0.5! size-4!",

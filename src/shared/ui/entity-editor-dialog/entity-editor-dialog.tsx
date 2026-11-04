@@ -55,7 +55,7 @@ export function EntityEditorDialog({
                     border
                     bg-background
                     p-0
-                    shadow-2xl
+                    shadow-elevated
                     sm:max-w-[1000px]
                 '
 			>

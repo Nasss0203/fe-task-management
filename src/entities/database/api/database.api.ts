@@ -33,6 +33,7 @@ export const databaseApi = {
 		pageId: string,
 		input: {
 			name: string;
+			title_only?: boolean;
 		},
 	): Promise<Database> => {
 		const response = await instance.post<ApiResponse<Database>>(
@@ -123,9 +124,35 @@ export const databaseApi = {
 		return response.data.data;
 	},
 
-	createRow: async (databaseId: string): Promise<DatabaseRow> => {
+	createRow: async (
+		databaseId: string,
+		parentRowId: string | null = null,
+	): Promise<DatabaseRow> => {
 		const response = await instance.post<ApiResponse<DatabaseRow>>(
 			`${DATABASE_API}/${databaseId}/rows`,
+			{ parentRowId },
+		);
+
+		return response.data.data;
+	},
+
+	/** `null` moves the row back to the top level. */
+	changeRowParent: async (
+		rowId: string,
+		parentRowId: string | null,
+	): Promise<{ id: string; parentRowId: string | null }> => {
+		const response = await instance.patch<
+			ApiResponse<{ id: string; parentRowId: string | null }>
+		>(`/database-rows/${rowId}/parent`, { parentRowId });
+
+		return response.data.data;
+	},
+
+	/** One task; its `databaseId` tells which database to load. */
+	getRow: async (rowId: string, signal?: AbortSignal): Promise<DatabaseRow> => {
+		const response = await instance.get<ApiResponse<DatabaseRow>>(
+			`/database-rows/${rowId}`,
+			{ signal },
 		);
 
 		return response.data.data;

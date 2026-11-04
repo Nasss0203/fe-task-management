@@ -3,7 +3,11 @@
 import type { ReactNode } from "react";
 
 import type { WorkspacePerson } from "@/entities/workspace-member/model/workspace-member.types";
-import { getInitials } from "@/features/workspace-settings/ui/sections/people/people.utils";
+import {
+	getAvatarTone,
+	getInitials,
+} from "@/features/workspace-settings/ui/sections/people/people.utils";
+import { cn } from "@/shared/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 
 import { getPersonName } from "../model/use-teamspace-management";
@@ -14,30 +18,44 @@ interface PersonIdentityProps {
 	suffix?: ReactNode;
 	/** Replaces the email line. */
 	detail?: ReactNode;
+	/** Replaces the avatar. */
+	avatar?: ReactNode;
 }
 
-export function PersonIdentity({ person, suffix, detail }: PersonIdentityProps) {
+export function PersonIdentity({
+	person,
+	suffix,
+	detail,
+	avatar,
+}: PersonIdentityProps) {
 	const name = getPersonName(person);
 
 	return (
-		<div className='flex min-w-0 flex-1 items-center gap-3'>
-			<Avatar className='size-8'>
-				{person?.avatar_url ? (
-					<AvatarImage src={person.avatar_url} alt={name} />
-				) : null}
+		<div className='flex min-w-0 flex-1 items-center gap-2.5'>
+			{avatar ?? (
+				<Avatar className='size-7'>
+					{person?.avatar_url ? (
+						<AvatarImage src={person.avatar_url} alt={name} />
+					) : null}
 
-				<AvatarFallback className='text-xs font-medium'>
-					{getInitials(name)}
-				</AvatarFallback>
-			</Avatar>
+					<AvatarFallback
+						className={cn(
+							"text-[11px] font-semibold text-white",
+							getAvatarTone(person?.user_id ?? name),
+						)}
+					>
+						{getInitials(name)}
+					</AvatarFallback>
+				</Avatar>
+			)}
 
 			<div className='min-w-0'>
-				<p className='truncate text-sm font-medium'>
+				<p className='truncate text-[13.5px] font-medium leading-5'>
 					{name}
 					{suffix}
 				</p>
 
-				<p className='truncate text-xs text-muted-foreground'>
+				<p className='truncate text-xs leading-[18px] text-muted-foreground'>
 					{detail ?? person?.email}
 				</p>
 			</div>

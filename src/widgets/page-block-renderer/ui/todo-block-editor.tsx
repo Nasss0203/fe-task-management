@@ -56,10 +56,13 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 	const [checked, setChecked] = useState(initial.checked);
 
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	const textTone = checked
+		? "text-faint line-through"
+		: "text-secondary-foreground dark:text-foreground";
 	const inlineMarks = useInlineMarks(
 		text,
 		setText,
-		"text-base leading-7",
+		cn("text-[15px] leading-6", textTone),
 	);
 
 	const updateBlock = useUpdatePageBlock(shareToken);
@@ -185,12 +188,12 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 	useBlockAutoFocus(block.id, textareaRef);
 
 	return (
-		<div className='flex min-h-7 w-full items-start gap-2'>
+		<div className='flex min-h-6 w-full items-start gap-2.5'>
 			<NativeCheckbox
 				checked={checked}
 				onChange={(event) => handleCheckedChange(event.target.checked)}
 				className='
-          mt-[6px]
+          mt-1
           size-4
           shrink-0
           cursor-pointer
@@ -213,19 +216,20 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 					className={cn(
 						`
 	          block
-	          min-h-7
+	          min-h-6
 	          w-full
 	          resize-none
 	          overflow-hidden
 	          border-0
 	          bg-transparent
 	          p-0
-	          text-base
-	          leading-7
+	          text-[15px]
+	          leading-6
 	          outline-none
 	          placeholder:text-muted-foreground/40
 	          focus-visible:ring-0
 	        `,
+						textTone,
 						inlineMarks.textareaClassName,
 					)}
 				/>

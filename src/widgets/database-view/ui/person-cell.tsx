@@ -14,6 +14,7 @@ import {
 	AvatarGroupCount,
 	AvatarImage,
 } from "@/shared/ui/avatar";
+import { cn } from "@/shared/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 
 import { useDatabaseShareToken } from "../model/share-token-context";
@@ -42,9 +43,15 @@ interface PersonCellProps {
 	onChange: (value: string[] | null) => void;
 }
 
-function PersonAvatar({ person }: { person: DisplayPerson }) {
+export function PersonAvatar({
+	person,
+	className,
+}: {
+	person: DisplayPerson;
+	className?: string;
+}) {
 	return (
-		<Avatar size='sm' className='size-5'>
+		<Avatar size='sm' className={cn("size-5", className)}>
 			{person.avatar_url && <AvatarImage src={person.avatar_url} />}
 			<AvatarFallback className='text-[10px]'>
 				{person.full_name.charAt(0).toUpperCase()}
@@ -133,7 +140,7 @@ export function PersonCell({
 	const chips = <SelectedPeople people={selected} />;
 
 	if (!interactive) {
-		return <span className='block px-1'>{chips}</span>;
+		return <span className='block px-1.5 text-[13.5px]'>{chips}</span>;
 	}
 
 	const normalizedQuery = normalize(query.trim());
@@ -159,20 +166,20 @@ export function PersonCell({
 					type='button'
 					aria-label={name}
 					disabled={disabled}
-					className='group/person flex min-h-8 w-full items-center rounded-sm px-1 text-left outline-none hover:bg-muted/60 focus-visible:bg-muted/60'
+					className='group/person flex min-h-8 w-full items-center rounded-sm px-1.5 text-left text-[13.5px] outline-none transition-colors hover:bg-accent/60 focus-visible:bg-accent/60 data-[state=open]:bg-background data-[state=open]:ring-2 data-[state=open]:ring-ring data-[state=open]:ring-inset'
 				>
 					{selected.length ? (
 						chips
 					) : (
-						<span className='text-muted-foreground opacity-0 group-hover/person:opacity-100 group-focus-visible/person:opacity-100'>
+						<span className='text-faint opacity-0 group-hover/person:opacity-100 group-focus-visible/person:opacity-100'>
 							Add people
 						</span>
 					)}
 				</button>
 			</PopoverTrigger>
 
-			<PopoverContent align='start' className='w-72 p-1'>
-				<div className='flex items-center gap-2 border-b px-2 pb-1.5 pt-1'>
+			<PopoverContent align='start' className='w-72 p-[5px]'>
+				<div className='flex items-center gap-2 border-b border-border px-2 pb-1.5 pt-1'>
 					<Search className='size-3.5 shrink-0 text-muted-foreground' />
 					<input
 						autoFocus
@@ -180,7 +187,7 @@ export function PersonCell({
 						onChange={(event) => setQuery(event.target.value)}
 						placeholder='Search people...'
 						aria-label='Search people'
-						className='h-7 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground'
+						className='h-7 w-full bg-transparent text-[13.5px] outline-none placeholder:text-faint'
 					/>
 				</div>
 
@@ -207,7 +214,7 @@ export function PersonCell({
 									disabled={disabled}
 									aria-pressed={active}
 									onClick={() => toggle(person.user_id)}
-									className='flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted disabled:opacity-50'
+									className='flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13.5px] transition-colors hover:bg-accent disabled:opacity-50'
 								>
 									<PersonAvatar person={person} />
 									<span className='min-w-0 flex-1'>
@@ -217,7 +224,7 @@ export function PersonCell({
 										</span>
 									</span>
 									{active && (
-										<Check className='ml-auto size-4 shrink-0' />
+										<Check className='ml-auto size-3.5 shrink-0' />
 									)}
 								</button>
 							);

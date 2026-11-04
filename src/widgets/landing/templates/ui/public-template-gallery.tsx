@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, X } from "lucide-react";
+import { Layers, Search, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useDeferredValue, useState } from "react";
 
@@ -94,77 +94,82 @@ function PublicTemplateGalleryContent({ detailHref }: PublicTemplateGalleryProps
 
 	return (
 		<div className='flex flex-col gap-6'>
-			<div className='flex flex-col gap-4'>
-				<div className='relative w-full max-w-md'>
-					<Search className='absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
-					<input
-						type='search'
-						aria-label='Search templates'
-						placeholder='Search templates...'
-						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
-						className='h-11 w-full rounded-xl border border-border/80 bg-background pl-10 pr-4 text-sm text-foreground shadow-xs transition-all placeholder:text-muted-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20'
-					/>
-				</div>
-
-				<div className='flex flex-wrap items-center gap-2'>
-					<div role='group' aria-label='Sort templates' className='flex gap-2'>
-						{SORT_OPTIONS.map((option) => (
-							<CategoryChip
-								key={option.value}
-								label={option.label}
-								selected={sort === option.value}
-								onClick={() => setSort(option.value)}
-							/>
-						))}
-					</div>
-					<span aria-hidden className='mx-1 h-5 w-px bg-border' />
-					<div role='group' aria-label='Filter by price' className='flex gap-2'>
-						{OFFER_FILTERS.map((filter) => (
-							<CategoryChip
-								key={filter.label}
-								label={filter.label}
-								selected={offerType === filter.value}
-								onClick={() => setOfferType(filter.value)}
-							/>
-						))}
-					</div>
-					{tag && (
-						<span className='inline-flex h-8 items-center gap-1 rounded-full border border-primary/40 bg-primary/10 pl-3 pr-1 text-sm text-primary'>
-							#{tag}
-							<button
-								type='button'
-								onClick={clearTag}
-								aria-label={`Remove tag filter ${tag}`}
-								className='inline-flex size-6 items-center justify-center rounded-full hover:bg-primary/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
-							>
-								<X className='size-3.5' aria-hidden />
-							</button>
-						</span>
-					)}
-				</div>
-
-				{categories.length > 0 && (
-					<div
-						role='group'
-						aria-label='Filter by category'
-						className='flex flex-wrap gap-2'
-					>
-						<CategoryChip
-							label='All'
-							selected={!category}
-							onClick={() => setCategory(undefined)}
+			<div className='flex flex-col gap-3'>
+				<div className='flex flex-wrap items-center gap-3'>
+					<div className='relative w-full sm:w-[360px]'>
+						<Search className='absolute left-3 top-1/2 size-[15px] -translate-y-1/2 text-muted-foreground' />
+						<input
+							type='search'
+							aria-label='Search templates'
+							placeholder='Search templates...'
+							value={searchQuery}
+							onChange={(e) => setSearchQuery(e.target.value)}
+							className='h-9 w-full rounded-lg border border-input bg-background pl-[33px] pr-3 text-[13.5px] text-foreground transition-colors placeholder:text-faint focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20'
 						/>
-						{categories.map((item) => (
+					</div>
+
+					<div className='flex flex-wrap items-center gap-1.5 sm:ml-auto'>
+						<div role='group' aria-label='Sort templates' className='flex gap-1.5'>
+							{SORT_OPTIONS.map((option) => (
+								<CategoryChip
+									key={option.value}
+									label={option.label}
+									selected={sort === option.value}
+									onClick={() => setSort(option.value)}
+								/>
+							))}
+						</div>
+						<span aria-hidden className='mx-1.5 h-5 w-px bg-border' />
+						<div role='group' aria-label='Filter by price' className='flex gap-1.5'>
+							{OFFER_FILTERS.map((filter) => (
+								<CategoryChip
+									key={filter.label}
+									label={filter.label}
+									selected={offerType === filter.value}
+									onClick={() => setOfferType(filter.value)}
+								/>
+							))}
+						</div>
+					</div>
+				</div>
+
+				{(categories.length > 0 || tag) && (
+					<div className='flex flex-wrap items-center gap-1.5'>
+						<div
+							role='group'
+							aria-label='Filter by category'
+							className='flex flex-wrap gap-1.5'
+						>
 							<CategoryChip
-								key={item.id}
-								label={item.name}
-								selected={category === item.slug}
-								onClick={() =>
-									setCategory(category === item.slug ? undefined : item.slug)
-								}
+								label='All'
+								selected={!category}
+								onClick={() => setCategory(undefined)}
 							/>
-						))}
+							{categories.map((item) => (
+								<CategoryChip
+									key={item.id}
+									label={item.name}
+									selected={category === item.slug}
+									onClick={() =>
+										setCategory(category === item.slug ? undefined : item.slug)
+									}
+								/>
+							))}
+						</div>
+
+						{tag && (
+							<span className='ml-auto inline-flex h-7 items-center gap-1 rounded-full bg-accent-soft pl-2.5 pr-1 text-[12.5px] font-medium text-brand-indigo'>
+								#{tag}
+								<button
+									type='button'
+									onClick={clearTag}
+									aria-label={`Remove tag filter ${tag}`}
+									className='inline-flex size-5 items-center justify-center rounded-full hover:bg-brand-indigo/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+								>
+									<X className='size-3' aria-hidden />
+								</button>
+							</span>
+						)}
 					</div>
 				)}
 			</div>
@@ -174,14 +179,14 @@ function PublicTemplateGalleryContent({ detailHref }: PublicTemplateGalleryProps
 					{Array.from({ length: 6 }).map((_, index) => (
 						<div
 							key={index}
-							className='flex flex-col overflow-hidden rounded-xl border border-border/70 bg-card p-0'
+							className='flex flex-col overflow-hidden rounded-[14px] border bg-card p-0'
 						>
-							<Skeleton className='aspect-[16/10] w-full rounded-none' />
-							<div className='space-y-3 p-4 sm:p-5'>
+							<Skeleton className='aspect-[2/1] w-full rounded-none' />
+							<div className='space-y-3 p-4'>
 								<Skeleton className='h-5 w-3/4 rounded' />
 								<Skeleton className='h-4 w-full rounded' />
 								<Skeleton className='h-4 w-2/3 rounded' />
-								<div className='border-t border-border/40 pt-3'>
+								<div className='border-t pt-3'>
 									<Skeleton className='h-3 w-1/4 rounded' />
 								</div>
 							</div>
@@ -216,11 +221,12 @@ function PublicTemplateGalleryContent({ detailHref }: PublicTemplateGalleryProps
 						))}
 
 						{templates.length === 0 && (
-							<div className='col-span-full rounded-2xl border border-dashed border-border/80 bg-card/40 p-8 py-16 text-center text-muted-foreground'>
-								<p className='text-sm font-medium text-foreground'>
+							<div className='col-span-full flex flex-col items-center gap-1.5 rounded-[14px] border bg-card px-6 py-10 text-center'>
+								<Layers className='size-[22px] text-muted-foreground' aria-hidden />
+								<p className='text-sm font-semibold leading-[21px] text-foreground'>
 									No templates found
 								</p>
-								<p className='mt-1 text-xs text-muted-foreground'>
+								<p className='text-[13px] leading-5 text-muted-foreground'>
 									{isFiltered
 										? "Try another search keyword, category, price or tag."
 										: "Templates appear here once creators publish them."}
@@ -230,10 +236,11 @@ function PublicTemplateGalleryContent({ detailHref }: PublicTemplateGalleryProps
 					</div>
 
 					{hasNextPage && (
-						<div className='mt-4 flex justify-center'>
+						<div className='flex justify-center'>
 							<Button
 								type='button'
 								variant='outline'
+								className='h-[34px] rounded-[7px] px-4'
 								disabled={isFetchingNextPage}
 								onClick={() => fetchNextPage()}
 							>
@@ -262,10 +269,10 @@ export function CategoryChip({
 			aria-pressed={selected}
 			onClick={onClick}
 			className={cn(
-				"h-8 rounded-full border px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+				"h-[30px] rounded-full border px-3 text-[12.5px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
 				selected
 					? "border-foreground bg-foreground text-background"
-					: "border-border/80 text-muted-foreground hover:bg-muted hover:text-foreground",
+					: "border-input text-muted-foreground hover:bg-accent hover:text-foreground",
 			)}
 		>
 			{label}

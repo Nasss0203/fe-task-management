@@ -198,13 +198,13 @@ function ListingEditor({
 					{template.name}
 				</Link>
 
-				<header className='flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between'>
-					<div className='flex flex-col gap-1'>
+				<header className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+					<div className='flex flex-wrap items-center gap-2.5'>
 						<h1 className='text-2xl font-semibold tracking-tight'>
 							Marketplace listing
 						</h1>
-						<span className='inline-flex items-center gap-1.5 text-sm text-muted-foreground'>
-							<span className={cn("size-1.5 rounded-full", statePresentation.dot)} />
+						<span className='inline-flex items-center gap-1.5 text-[13px] text-muted-foreground'>
+							<span className={cn("size-[7px] rounded-full", statePresentation.dot)} />
 							{statePresentation.label}
 						</span>
 					</div>

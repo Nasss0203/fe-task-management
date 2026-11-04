@@ -10,8 +10,13 @@ export interface PageAccessRequest {
 	createdAt: string;
 }
 
-export type CreatePageAccessRequestPayload =
+/** Nơi người dùng xin quyền sửa: link share hoặc site đã publish. */
+export type EditAccessSource =
 	| { token: string }
+	| { subdomain: string; path: string };
+
+export type CreatePageAccessRequestPayload =
+	| { token: string; intent?: "view" | "edit" }
 	| { subdomain: string; path: string };
 
 export interface ApprovePageAccessRequestPayload {

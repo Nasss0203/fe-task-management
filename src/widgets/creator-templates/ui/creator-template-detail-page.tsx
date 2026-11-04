@@ -207,7 +207,7 @@ export function CreatorTemplateDetailPage({ templateId }: { templateId: string }
 
 			<header className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
 				<div className='flex min-w-0 gap-4'>
-					<TemplateIcon template={template} className='size-12 rounded-lg text-2xl' />
+					<TemplateIcon template={template} className='size-12 rounded-[10px] text-2xl' />
 					<div className='flex min-w-0 flex-col gap-1.5'>
 						<h1 className='truncate text-2xl font-semibold tracking-tight'>
 							{template.name}
@@ -289,9 +289,9 @@ export function CreatorTemplateDetailPage({ templateId }: { templateId: string }
 					<TabsTrigger value='overview' className='flex-none'>
 						Overview
 					</TabsTrigger>
-					<TabsTrigger value='versions' className='flex-none'>
+					<TabsTrigger value='versions' className='flex-none gap-1.5'>
 						Versions
-						<span className='text-xs text-muted-foreground tabular-nums'>
+						<span className='rounded-[10px] bg-muted px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-muted-foreground'>
 							{versions.length}
 						</span>
 					</TabsTrigger>
@@ -364,9 +364,9 @@ export function CreatorTemplateDetailPage({ templateId }: { templateId: string }
 							)}
 						</div>
 
-						<aside className='rounded-xl border bg-card'>
-							<h2 className='border-b px-4 py-3 text-sm font-semibold'>Details</h2>
-							<dl className='flex flex-col gap-3 p-4 text-sm'>
+						<aside className='flex flex-col gap-3 rounded-[12px] border bg-card p-4'>
+							<h2 className='text-[14px] font-semibold'>Details</h2>
+							<dl className='flex flex-col gap-2.5 text-[13px]'>
 								<DetailRow label='Status'>
 									<TemplateStatusLabel status={displayStatus} />
 								</DetailRow>

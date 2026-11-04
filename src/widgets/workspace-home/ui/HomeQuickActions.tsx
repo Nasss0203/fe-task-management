@@ -17,16 +17,15 @@ export function HomeQuickActions({ workspaceId }: HomeQuickActionsProps) {
 
 	return (
 		<>
-			<div className='flex flex-wrap items-center gap-2.5 pt-1'>
+			<div className='flex flex-wrap items-center gap-2'>
 				<Button
 					type='button'
 					variant='outline'
 					size='sm'
 					onClick={() => setCreateDialogOpen(true)}
 					disabled={!workspaceId}
-					className='h-8 gap-1.5 rounded-lg border-border/60 bg-background text-xs font-medium text-foreground hover:bg-accent/50'
 				>
-					<Plus className='size-3.5' />
+					<Plus />
 					<span>New page</span>
 				</Button>
 
@@ -35,9 +34,8 @@ export function HomeQuickActions({ workspaceId }: HomeQuickActionsProps) {
 					variant='outline'
 					size='sm'
 					onClick={() => router.push("/dashboard/ai")}
-					className='h-8 gap-1.5 rounded-lg border-border/60 bg-background text-xs font-medium text-foreground hover:bg-accent/50'
 				>
-					<Sparkles className='size-3.5 text-primary' />
+					<Sparkles />
 					<span>Ask AI</span>
 				</Button>
 			</div>

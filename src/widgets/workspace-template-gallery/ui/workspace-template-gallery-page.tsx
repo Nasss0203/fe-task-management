@@ -10,7 +10,7 @@ import { WorkspaceTemplatesHeader } from "./workspace-templates-header";
  */
 export function WorkspaceTemplateGalleryPage() {
 	return (
-		<div className='mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 sm:px-6 lg:px-8'>
+		<div className='mx-auto flex w-full max-w-[1120px] flex-col gap-6 px-4 sm:px-6 lg:px-8'>
 			<WorkspaceTemplatesHeader description='Browse templates published on the Taskmanly marketplace and add them to your workspace.' />
 
 			<PublicTemplateGallery

@@ -9,17 +9,11 @@ export default function AuthLayout({
 	children: ReactNode;
 }>) {
 	return (
-		<div className='relative isolate flex min-h-dvh flex-col bg-background text-foreground selection:bg-primary/20'>
-			{/* Subtle ambient lighting mesh matching landing page */}
-			<div
-				aria-hidden='true'
-				className='pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(99,102,241,0.06),transparent_70%)] dark:bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(139,92,246,0.08),transparent_70%)]'
-			/>
-
+		<div className='relative isolate flex min-h-dvh flex-col bg-muted/30 text-foreground selection:bg-ring/20'>
 			{/* Brand Header */}
 			<header className='relative z-10 flex h-14 shrink-0 items-center justify-between px-4 sm:px-6 md:px-8'>
 				<Link href='/' className='flex items-center gap-2.5 shrink-0'>
-					<div className='flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-xs'>
+					<div className='flex size-8 items-center justify-center rounded-[10px] bg-primary text-primary-foreground'>
 						<LayoutGrid className='h-4.5 w-4.5' />
 					</div>
 					<div className='flex flex-col'>

@@ -23,11 +23,25 @@ export enum PageBlockType {
 	MERMAID = "MERMAID",
 	BUTTON = "BUTTON",
 	TOGGLE = "TOGGLE",
+	/** A row of 2–5 columns; its children are COLUMN blocks only. */
+	COLUMN_LIST = "COLUMN_LIST",
+	/** One column; `style_config.width_ratio` is its share of the row. */
+	COLUMN = "COLUMN",
+	SECTION = "SECTION",
+	FORM_FIELD = "FORM_FIELD",
 }
 
 export type PageBlockJson = Record<string, unknown> | null;
 
 export type PageBlockStyleConfig = Record<string, unknown> | null;
+
+export type FormAnswerValue = string | number | boolean | string[];
+
+export interface FormAnswerKey {
+	field_block_id: string;
+	correct_value: FormAnswerValue | null;
+	points: number;
+}
 
 export interface DatabaseViewBlockDataConfig {
 	database_id: string;
@@ -39,6 +53,8 @@ export interface PageBlock {
 
 	page_id: string;
 	parent_block_id: string | null;
+	/** Task (database row) whose content this block is; null for page content. */
+	row_id?: string | null;
 
 	type: PageBlockType;
 

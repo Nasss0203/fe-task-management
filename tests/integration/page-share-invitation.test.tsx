@@ -33,8 +33,9 @@ const mocks = vi.hoisted(() => ({
 	token: "signed-token",
 }));
 
-vi.mock("@/shared/api/api-client", () => ({ default: mocks }));
+vi.mock("@/shared/api/api-client", () => ({ default: mocks, refreshAccessToken: vi.fn() }));
 vi.mock("next/navigation", () => ({ useParams: () => ({ token: mocks.token }) }));
+vi.mock("@/widgets/page-comments/ui/page-discussion", () => ({ PageDiscussion: () => null }));
 vi.mock("@/widgets/page-block-editor/ui/page-block-list", () => ({
 	PageBlockList: ({ canEdit, shareToken }: { canEdit: boolean; shareToken?: string }) => (
 		<div data-testid='page-blocks' data-can-edit={String(canEdit)} data-share-token={shareToken} />
@@ -394,7 +395,8 @@ describe("share route regressions", () => {
 		const { queryClient } = renderShare();
 		await screen.findByRole("heading", { name: page.title });
 		expect(screen.queryByRole("button", { name: "Accept" })).not.toBeInTheDocument();
-		expect(mocks.get.mock.calls.map(([url]) => url)).not.toContain(accessUrl);
+		// Hỏi quyền thật để biết người mở link có sửa được sẵn không; không có thì theo quyền của link
+		expect(mocks.get.mock.calls.map(([url]) => url)).toContain(accessUrl);
 		expectNoRequestAccess();
 		for (const url of [`/page/${pageId}`, `/pageBlock/page/${pageId}`]) {
 			expect(mocks.get).toHaveBeenCalledWith(url, expect.objectContaining({ headers: { "X-Page-Share-Token": mocks.token } }));
@@ -404,6 +406,29 @@ describe("share route regressions", () => {
 		expect(queryClient.getQueryData(pageKeys.detail(pageId))).toBeUndefined();
 		expect(queryClient.getQueryData(pageKeys.sharedDetail(pageId, mocks.token))).toEqual(page);
 		expect(mocks.post).not.toHaveBeenCalled();
+	});
+
+	it("lets someone who can already edit the page edit it from a view-only link", async () => {
+		resolved.linkAccessLevel = "VIEWER";
+		normalAccess = { effectiveAccessLevel: "EDITOR" };
+		renderShare();
+		await screen.findByRole("heading", { name: page.title });
+		await waitFor(() => expect(screen.getByTestId("page-blocks")).toHaveAttribute("data-can-edit", "true"));
+	});
+
+	it("asks a view-only link visitor to request edit access when they click the page", async () => {
+		resolved.linkAccessLevel = "VIEWER";
+		const user = userEvent.setup();
+		renderShare();
+		await screen.findByRole("heading", { name: page.title });
+		await waitFor(() => expect(mocks.get.mock.calls.map(([url]) => url)).toContain(accessUrl));
+
+		await user.click(screen.getByTestId("page-blocks"));
+		await user.click(await screen.findByRole("button", { name: "Request edit access" }));
+
+		await waitFor(() =>
+			expect(mocks.post).toHaveBeenCalledWith(requestUrl, { token: mocks.token, intent: "edit" }),
+		);
 	});
 
 	it("prioritizes existing normal access over a pending invitation", async () => {

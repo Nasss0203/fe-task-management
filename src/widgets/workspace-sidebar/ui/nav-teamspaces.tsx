@@ -429,8 +429,8 @@ function TeamspaceItem({
 			{/* Teamspace row */}
 			<div
 				className={[
-					"group/teamspace flex h-8 items-center rounded-md",
-					"hover:bg-sidebar-accent/60",
+					"group/teamspace flex h-7 items-center rounded-md",
+					"hover:bg-sidebar-accent",
 				].join(" ")}
 			>
 				{/* Teamspace icon / Chevron */}
@@ -478,7 +478,7 @@ function TeamspaceItem({
 				{/* Teamspace name */}
 				<button
 					type='button'
-					className='min-w-0 flex-1 truncate text-left text-sm font-medium'
+					className='min-w-0 flex-1 truncate text-left text-[13.5px]'
 					onClick={() => {
 						if (hasPages) {
 							setExpanded((value) => !value);

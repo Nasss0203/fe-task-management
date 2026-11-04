@@ -81,33 +81,33 @@ export function PeopleWithAccess({
 		currentUser?.username?.trim() || currentUser?.email || "You";
 
 	return (
-		<section className='space-y-2.5'>
-			<h2 className='text-[11px] font-semibold text-[#aaa]'>
+		<section className='space-y-1.5'>
+			<h2 className='text-xs font-medium text-muted-foreground'>
 				People with access
 			</h2>
 
 			{/* Current user */}
 			{currentUser && (
-				<div className='flex items-center justify-between gap-3 rounded-lg px-1 py-1.5'>
+				<div className='flex min-h-11 items-center justify-between gap-2.5 rounded-lg'>
 					<div className='flex min-w-0 items-center gap-2.5'>
-						<Avatar className='size-9 shrink-0'>
+						<Avatar className='size-7 shrink-0'>
 							<AvatarImage
 								src={currentUser.avatarUrl ?? undefined}
 								alt={currentUserName}
 							/>
 
-							<AvatarFallback className='bg-[#1296d4] text-white'>
+							<AvatarFallback className='bg-primary text-[11px] font-semibold text-primary-foreground'>
 								{currentUserName.charAt(0).toUpperCase()}
 							</AvatarFallback>
 						</Avatar>
 
-						<div className='min-w-0 leading-4'>
-							<p className='truncate text-[13px] text-[#ededed]'>
+						<div className='min-w-0 leading-[18px]'>
+							<p className='truncate text-[13px] font-medium text-foreground'>
 								{currentUserName}{" "}
-								<span className='text-[#aaa]'>(You)</span>
+								<span className='text-muted-foreground'>(You)</span>
 							</p>
 
-							<p className='truncate text-[11px] text-[#9a9a9a]'>
+							<p className='truncate text-xs text-muted-foreground'>
 								{currentUser.email}
 							</p>
 						</div>
@@ -126,7 +126,7 @@ export function PeopleWithAccess({
 
 			{/* Direct shares */}
 			{isPending ? (
-				<p className='py-2 text-xs text-[#8f8f8f]'>
+				<p className='py-2 text-xs text-muted-foreground'>
 					Loading people with access...
 				</p>
 			) : isError ? (
@@ -135,22 +135,22 @@ export function PeopleWithAccess({
 				</p>
 			) : directShares.length === 0 ? (
 				!currentUser && (
-					<p className='py-2 text-xs text-[#8f8f8f]'>
+					<p className='py-2 text-xs text-muted-foreground'>
 						No one has been shared directly yet.
 					</p>
 				)
 			) : (
-				<div className='space-y-1'>
+				<div>
 					{directShares.map((share) => {
 						const name = getUserName(share.user);
 
 						return (
 							<div
 								key={share.id}
-								className='flex items-center justify-between gap-3 rounded-lg px-1 py-1.5'
+								className='flex min-h-11 items-center justify-between gap-2.5 rounded-lg'
 							>
 								<div className='flex min-w-0 items-center gap-2.5'>
-									<Avatar className='size-9 shrink-0'>
+									<Avatar className='size-7 shrink-0'>
 										<AvatarImage
 											src={
 												share.user.avatarUrl ??
@@ -159,18 +159,18 @@ export function PeopleWithAccess({
 											alt={name}
 										/>
 
-										<AvatarFallback className='bg-[#1296d4] text-white'>
+										<AvatarFallback className='bg-primary text-[11px] font-semibold text-primary-foreground'>
 											{name.charAt(0).toUpperCase() ||
 												"?"}
 										</AvatarFallback>
 									</Avatar>
 
-									<div className='min-w-0 leading-4'>
-										<p className='truncate text-[13px] text-[#ededed]'>
+									<div className='min-w-0 leading-[18px]'>
+										<p className='truncate text-[13px] font-medium text-foreground'>
 											{name}
 										</p>
 
-										<p className='truncate text-[11px] text-[#9a9a9a]'>
+										<p className='truncate text-xs text-muted-foreground'>
 											{share.user.email}
 										</p>
 									</div>
@@ -196,7 +196,7 @@ export function PeopleWithAccess({
 										}}
 									/>
 								) : (
-									<span className='shrink-0 text-xs text-[#aaa]'>
+									<span className='shrink-0 px-2 text-[12.5px] text-muted-foreground'>
 										{accessLabel[share.accessLevel]}
 									</span>
 								)}

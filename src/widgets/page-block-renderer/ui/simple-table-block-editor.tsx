@@ -235,7 +235,7 @@ export function SimpleTableBlockEditor({ block, shareToken }: SimpleTableBlockEd
 						<button
 							type='button'
 							onClick={handleToggleHeaderRow}
-							className='flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted'
+							className='flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13.5px] hover:bg-accent'
 						>
 							<div className='flex size-4 items-center justify-center'>
 								{table.hasHeaderRow && (
@@ -249,7 +249,7 @@ export function SimpleTableBlockEditor({ block, shareToken }: SimpleTableBlockEd
 						<button
 							type='button'
 							onClick={handleToggleHeaderColumn}
-							className='flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted'
+							className='flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13.5px] hover:bg-accent'
 						>
 							<div className='flex size-4 items-center justify-center'>
 								{table.hasHeaderColumn && (
@@ -265,11 +265,11 @@ export function SimpleTableBlockEditor({ block, shareToken }: SimpleTableBlockEd
 
 			<div className='flex items-start'>
 				{/* Table */}
-				<div className='min-w-0 flex-1 overflow-x-auto'>
+				<div className='min-w-0 flex-1 overflow-x-auto rounded-lg border border-border'>
 					<table className='w-full border-collapse'>
 						<tbody>
 							{table.rows.map((row, rowIndex) => (
-								<tr key={row.id}>
+								<tr key={row.id} className='[&:last-child>td]:border-b-0'>
 									{row.cells.map((cell, columnIndex) => {
 										const isHeaderRow =
 											table.hasHeaderRow &&
@@ -285,9 +285,9 @@ export function SimpleTableBlockEditor({ block, shareToken }: SimpleTableBlockEd
 										return (
 											<td
 												key={cell.id}
-												className={`group/cell relative min-w-[160px] border border-border p-0 ${
+												className={`group/cell relative min-w-[160px] border-b border-r border-border p-0 last:border-r-0 ${
 													isHeader
-														? "bg-muted/40"
+														? "bg-[#fbfbfa] dark:bg-muted/40"
 														: ""
 												}`}
 											>
@@ -301,9 +301,9 @@ export function SimpleTableBlockEditor({ block, shareToken }: SimpleTableBlockEd
 														)
 													}
 													onBlur={handleCellBlur}
-													className={`h-9 w-full border-0 bg-transparent px-2 pr-9 text-sm outline-none focus:bg-muted/30 ${
+													className={`${isHeaderRow ? "h-[34px]" : "h-[38px]"} w-full border-0 bg-transparent px-3 pr-9 text-[13.5px] leading-5 text-foreground outline-none focus:ring-2 focus:ring-ring focus:ring-inset ${
 														isHeader
-															? "font-semibold"
+															? "font-medium"
 															: ""
 													}`}
 												/>
@@ -340,7 +340,7 @@ export function SimpleTableBlockEditor({ block, shareToken }: SimpleTableBlockEd
 																		row.id,
 																	)
 																}
-																className='flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted disabled:pointer-events-none disabled:opacity-40'
+																className='flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13.5px] text-destructive hover:bg-accent disabled:pointer-events-none disabled:opacity-40'
 															>
 																<Trash2 className='size-4' />
 																<span>
@@ -359,7 +359,7 @@ export function SimpleTableBlockEditor({ block, shareToken }: SimpleTableBlockEd
 																		columnIndex,
 																	)
 																}
-																className='flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted disabled:pointer-events-none disabled:opacity-40'
+																className='flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13.5px] text-destructive hover:bg-accent disabled:pointer-events-none disabled:opacity-40'
 															>
 																<Trash2 className='size-4' />
 																<span>
@@ -384,7 +384,7 @@ export function SimpleTableBlockEditor({ block, shareToken }: SimpleTableBlockEd
 					type='button'
 					onClick={handleAddColumn}
 					title='Add column'
-					className='ml-1 flex size-9 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground'
+					className='ml-1 flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground'
 				>
 					<Plus className='size-4' />
 				</button>
@@ -394,7 +394,7 @@ export function SimpleTableBlockEditor({ block, shareToken }: SimpleTableBlockEd
 			<button
 				type='button'
 				onClick={handleAddRow}
-				className='mt-1 flex h-7 w-full items-center justify-center rounded-md px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground'
+				className='mt-1 flex h-7 w-full items-center justify-center rounded-md px-2 text-xs text-faint hover:bg-accent hover:text-foreground'
 			>
 				<div className='flex items-center gap-1'>
 					<Plus className='size-3.5' />

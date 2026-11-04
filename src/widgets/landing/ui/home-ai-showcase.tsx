@@ -49,13 +49,11 @@ export function HomeAiShowcase() {
 
 	return (
 		<section className='py-20 sm:py-28 relative overflow-hidden'>
-			{/* Subtle decorative glow */}
-			<div className='pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-bl from-purple-500/10 via-amber-500/10 to-transparent blur-3xl opacity-70 rounded-full' />
 
 			<div className='mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'>
 				{/* Section Header */}
 				<div className='mx-auto max-w-2xl text-center mb-14 sm:mb-16'>
-					<div className='inline-flex items-center gap-1.5 rounded-full border border-amber-500/20 bg-amber-500/5 px-3 py-1 text-xs font-semibold text-amber-600 dark:text-amber-400 mb-4'>
+					<div className='inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground mb-4'>
 						<Sparkles className='h-3.5 w-3.5' />
 						Workspace Intelligence
 					</div>
@@ -69,7 +67,7 @@ export function HomeAiShowcase() {
 
 				<div className='grid grid-cols-1 lg:grid-cols-12 gap-10 items-center'>
 					{/* Left: Interactive Chat UI Mockup (7 cols) */}
-					<div className='lg:col-span-7 rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-xl relative overflow-hidden'>
+					<div className='lg:col-span-7 rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-soft relative overflow-hidden'>
 						{/* Top chat header */}
 						<div className='flex items-center justify-between pb-4 border-b border-border/60 text-xs'>
 							<div className='flex items-center gap-2'>
@@ -81,7 +79,7 @@ export function HomeAiShowcase() {
 									<div className='text-[10px] text-muted-foreground'>Document & Knowledge Copilot</div>
 								</div>
 							</div>
-							<Badge variant='outline' className='text-[10px] text-amber-600 bg-amber-500/10 border-amber-500/20'>
+							<Badge variant='outline' className='text-[10px] text-muted-foreground bg-muted border-border'>
 								Live Context
 							</Badge>
 						</div>
@@ -97,7 +95,7 @@ export function HomeAiShowcase() {
 
 							{/* AI Response Card */}
 							<div className='flex items-start gap-3'>
-								<div className='h-7 w-7 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0 mt-0.5 ring-1 ring-amber-500/20'>
+								<div className='h-7 w-7 rounded-lg bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5 ring-1 ring-border'>
 									<Sparkles className='h-3.5 w-3.5' />
 								</div>
 								<div className='flex-1 rounded-2xl rounded-tl-none border border-border/80 bg-muted/30 p-4 space-y-3 shadow-xs'>
@@ -116,7 +114,7 @@ export function HomeAiShowcase() {
 											<span className='font-medium text-foreground'>
 												Define WebSocket connection lifecycle & heartbeat protocols
 											</span>
-											<Badge variant='outline' className='text-[9px] text-red-500 border-red-500/30'>
+											<Badge variant='outline' className='text-[9px] text-muted-foreground border-border'>
 												P0 High
 											</Badge>
 										</div>
@@ -124,7 +122,7 @@ export function HomeAiShowcase() {
 											<span className='font-medium text-foreground'>
 												Implement client-side conflict resolution with CRDT timestamps
 											</span>
-											<Badge variant='outline' className='text-[9px] text-red-500 border-red-500/30'>
+											<Badge variant='outline' className='text-[9px] text-muted-foreground border-border'>
 												P0 High
 											</Badge>
 										</div>
@@ -132,7 +130,7 @@ export function HomeAiShowcase() {
 											<span className='font-medium text-foreground'>
 												Add exponential backoff retry for network reconnects
 											</span>
-											<Badge variant='outline' className='text-[9px] text-amber-500 border-amber-500/30'>
+											<Badge variant='outline' className='text-[9px] text-muted-foreground border-border'>
 												P1 Med
 											</Badge>
 										</div>
@@ -140,7 +138,7 @@ export function HomeAiShowcase() {
 											<span className='font-medium text-foreground'>
 												Automated unit test suite for multi-client concurrent edits
 											</span>
-											<Badge variant='outline' className='text-[9px] text-emerald-500 border-emerald-500/30'>
+											<Badge variant='outline' className='text-[9px] text-muted-foreground border-border'>
 												P2 Low
 											</Badge>
 										</div>
@@ -220,7 +218,7 @@ export function HomeAiShowcase() {
 
 						<div className='pt-3'>
 							<Link href='/ai'>
-								<Button className='rounded-full bg-primary text-primary-foreground font-semibold group'>
+								<Button className='rounded-lg bg-primary text-primary-foreground font-medium group'>
 									Explore Taskmanly AI
 									<ArrowRight className='ml-2 h-4 w-4 transition-transform group-hover:translate-x-1' />
 								</Button>

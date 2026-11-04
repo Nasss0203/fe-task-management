@@ -49,9 +49,11 @@ export function EmbedBlockEditor({ block, shareToken }: EmbedBlockEditorProps) {
 
 	if (!embed || editing) {
 		return (
-			<div className='w-full rounded-md border border-border bg-muted/20 p-3'>
+			<div className='w-full rounded-lg border border-dashed border-input bg-muted/40 p-4'>
 				<div className='flex items-center gap-2'>
-					<LinkIcon className='size-4 shrink-0 text-muted-foreground' />
+					<div className='flex shrink-0 items-center text-muted-foreground'>
+						<LinkIcon className='size-4' />
+					</div>
 
 					<input
 						type='url'
@@ -59,7 +61,7 @@ export function EmbedBlockEditor({ block, shareToken }: EmbedBlockEditorProps) {
 						autoFocus={editing}
 						aria-label='Embed link'
 						aria-invalid={invalid}
-						placeholder='Paste a Figma, Google Maps, GitHub Gist or tweet link...'
+						placeholder='Paste a Figma, Maps, Gist, tweet, Vimeo, Loom or Spotify link...'
 						onChange={(event) => {
 							setUrlInput(event.target.value);
 							setInvalid(false);
@@ -69,13 +71,14 @@ export function EmbedBlockEditor({ block, shareToken }: EmbedBlockEditorProps) {
 
 							if (event.key === "Escape" && embed) setEditing(false);
 						}}
-						className='h-8 min-w-0 flex-1 border-0 bg-transparent text-sm outline-none placeholder:text-muted-foreground'
+						className='h-8 min-w-0 flex-1 rounded-md border border-input bg-background px-2.5 text-[13px] outline-none transition-colors placeholder:text-faint focus:border-ring focus:ring-[0.5px] focus:ring-ring'
 					/>
 
 					<button
 						type='button'
 						onClick={handleSave}
-						className='rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-muted'
+						disabled={!urlInput.trim()}
+						className='inline-flex h-7.5 items-center rounded-md bg-primary px-2.5 text-[12.5px] font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50'
 					>
 						Embed
 					</button>
@@ -83,7 +86,7 @@ export function EmbedBlockEditor({ block, shareToken }: EmbedBlockEditorProps) {
 
 				{(invalid || (url && !embed)) && (
 					<p role='alert' className='mt-2 text-xs text-destructive'>
-						Only Figma, Google Maps, GitHub Gist and X/Twitter links
+						Only Figma, Google Maps, GitHub Gist, X/Twitter, Vimeo, Loom and Spotify links
 						can be embedded.
 					</p>
 				)}
@@ -101,7 +104,7 @@ export function EmbedBlockEditor({ block, shareToken }: EmbedBlockEditorProps) {
 					setUrlInput(url);
 					setEditing(true);
 				}}
-				className='absolute right-2 top-2 rounded-md border bg-background/90 px-2 py-1 text-xs font-medium opacity-0 shadow-sm transition-opacity hover:bg-muted focus-visible:opacity-100 group-hover/embed:opacity-100'
+				className='absolute right-2 top-2 rounded-md border border-input bg-background/90 px-2 py-1 text-xs font-medium opacity-0 shadow-xs transition-opacity hover:bg-accent focus-visible:opacity-100 group-hover/embed:opacity-100'
 			>
 				Change link
 			</button>

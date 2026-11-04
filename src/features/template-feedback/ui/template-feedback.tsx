@@ -97,10 +97,10 @@ export function TemplateFeedbackSummary({ templateId }: { templateId: string }) 
 		<div className='flex flex-wrap items-center justify-between gap-3'>
 			<a
 				href='#reviews'
-				className='inline-flex items-center gap-2 rounded-lg text-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+				className='inline-flex items-center gap-2 rounded-lg text-[12.5px] text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 			>
-				<Stars value={data.rating_average ?? 0} />
-				<span className='font-medium text-foreground'>
+				<Stars value={data.rating_average ?? 0} className='[&>svg]:size-[15px]' />
+				<span>
 					{formatRatingSummary(data.rating_average, data.rating_count)}
 				</span>
 			</a>
@@ -146,12 +146,12 @@ export function TemplateReviewsSection({ templateId }: { templateId: string }) {
 		<section
 			id='reviews'
 			aria-labelledby='template-reviews-title'
-			className='scroll-mt-24 rounded-2xl border border-border/60 bg-card/30 p-6 sm:p-7 backdrop-blur-xs dark:bg-card/20 space-y-6'
+			className='scroll-mt-24 space-y-6 rounded-2xl border bg-sidebar/50 p-6 sm:p-7'
 		>
 			<div className='flex flex-wrap items-baseline justify-between gap-2'>
 				<h2
 					id='template-reviews-title'
-					className='text-lg font-semibold tracking-tight text-foreground'
+					className='text-lg font-semibold text-foreground'
 				>
 					Reviews
 				</h2>
@@ -241,7 +241,7 @@ function ReviewForm({
 
 	if (!viewer) {
 		return (
-			<p className='rounded-xl border border-dashed border-border/70 p-4 text-sm text-muted-foreground'>
+			<p className='rounded-xl border border-dashed border-input p-4 text-sm text-muted-foreground'>
 				<Link href={signInHref} className='font-medium text-primary hover:underline'>
 					Sign in
 				</Link>{" "}
@@ -252,7 +252,7 @@ function ReviewForm({
 
 	if (viewer.is_creator) {
 		return (
-			<p className='rounded-xl border border-dashed border-border/70 p-4 text-sm text-muted-foreground'>
+			<p className='rounded-xl border border-dashed border-input p-4 text-sm text-muted-foreground'>
 				You created this template, so you cannot rate it.
 			</p>
 		);
@@ -273,7 +273,7 @@ function ReviewForm({
 	return (
 		<form
 			onSubmit={handleSubmit}
-			className='space-y-3 rounded-xl border border-border/70 bg-background/40 p-4'
+			className='space-y-3 rounded-xl border border-input p-4'
 		>
 			<fieldset>
 				<legend className='mb-2 text-sm font-medium text-foreground'>
@@ -315,7 +315,7 @@ function ReviewForm({
 						onChange={(event) => setBody(event.target.value)}
 						rows={4}
 						placeholder='What did you like? What could be better?'
-						className='w-full resize-y rounded-xl border border-border/80 bg-background px-3 py-2 text-sm text-foreground shadow-xs placeholder:text-muted-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20'
+						className='w-full resize-y rounded-xl border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20'
 					/>
 					<p className='text-right text-[11px] text-muted-foreground tabular-nums'>
 						{body.length}/{MAX_BODY_LENGTH}
@@ -381,9 +381,9 @@ function ReviewList({
 
 	return (
 		<div className='space-y-4'>
-			<ul className='divide-y divide-border/60'>
+			<ul>
 				{items.map((review) => (
-					<li key={review.id} className='space-y-1.5 py-4 first:pt-0'>
+					<li key={review.id} className='space-y-1.5 border-b py-4'>
 						<div className='flex flex-wrap items-center gap-2 text-sm'>
 							<span className='font-medium text-foreground'>
 								{review.author?.username ?? "Deleted user"}
@@ -392,7 +392,7 @@ function ReviewList({
 								<Badge
 									variant='secondary'
 									title='This reviewer owns the template'
-									className='rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0 text-[11px] text-emerald-700 dark:text-emerald-400'
+									className='rounded-[10px] border border-emerald-200 bg-emerald-50 px-2 py-0 text-[11px] font-normal text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400'
 								>
 									Verified
 									<span className='sr-only'> owner of this template</span>
@@ -406,7 +406,7 @@ function ReviewList({
 							{review.version_number !== null && ` · v${review.version_number}`}
 						</p>
 						{review.body && (
-							<p className='whitespace-pre-line text-sm leading-relaxed text-foreground/90'>
+							<p className='whitespace-pre-line text-sm leading-relaxed text-foreground'>
 								{review.body}
 							</p>
 						)}

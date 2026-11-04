@@ -2,8 +2,8 @@ import { cn } from "@/shared/lib/utils";
 
 export function toolbarIconButtonClass(active = false) {
 	return cn(
-		"relative flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground data-[state=open]:bg-muted data-[state=open]:text-foreground",
-		active && "text-primary hover:text-primary data-[state=open]:text-primary",
+		"relative flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground data-[state=open]:bg-accent data-[state=open]:text-foreground [&_svg]:size-[15px]",
+		active && "text-foreground",
 	);
 }
 

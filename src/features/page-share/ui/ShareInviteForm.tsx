@@ -25,7 +25,7 @@ import {
 	SelectValue,
 } from "@/shared/ui/select";
 
-const selectStyle = "border-[#414141] bg-[#2b2b2b] text-white";
+const selectStyle = "border-border bg-popover text-popover-foreground";
 
 const getUserName = (user: PageShareCandidate) =>
 	user.displayName?.trim() || user.username?.trim() || user.email;
@@ -122,7 +122,7 @@ export function ShareInviteForm({
 	return (
 		<form onSubmit={submitShare} className='space-y-2'>
 			<div className='flex gap-2'>
-				<div className='relative flex min-w-0 flex-1 items-center rounded-md border border-[#414141] bg-transparent pr-1 focus-within:border-[#626262]'>
+				<div className='relative flex h-[34px] min-w-0 flex-1 items-center rounded-md border border-input bg-background pr-1 focus-within:border-ring'>
 					<Input
 						aria-label='Search people by name or email'
 						placeholder='Search people by name or email'
@@ -146,7 +146,7 @@ export function ShareInviteForm({
 								chooseCandidate(visibleCandidates[0]);
 							}
 						}}
-						className='h-8 flex-1 border-0 bg-transparent px-2 text-xs text-white shadow-none placeholder:text-[#777] focus-visible:border-0 focus-visible:ring-0 dark:bg-transparent'
+						className='h-8 flex-1 border-0 bg-transparent px-2.5 text-[13px] text-foreground shadow-none placeholder:text-faint focus-visible:border-0 focus-visible:ring-0 md:text-[13px] dark:bg-transparent'
 					/>
 
 					<Select
@@ -158,7 +158,7 @@ export function ShareInviteForm({
 						<SelectTrigger
 							size='sm'
 							aria-label='New share access level'
-							className='max-w-28 shrink-0 gap-1 border-0 bg-[#333] px-2 py-0 text-xs text-[#aaa] shadow-none data-[size=sm]:h-6 focus-visible:border-0 focus-visible:ring-1 focus-visible:ring-[#626262] dark:bg-[#333]'
+							className='max-w-28 shrink-0 gap-1 border-0 bg-transparent px-2 py-0 text-[12.5px] text-muted-foreground shadow-none hover:bg-accent data-[size=sm]:h-7 focus-visible:border-0 focus-visible:ring-1 focus-visible:ring-ring/40 dark:bg-transparent'
 						>
 							<SelectValue />
 						</SelectTrigger>
@@ -177,9 +177,9 @@ export function ShareInviteForm({
 					</Select>
 
 					{showCandidates && (
-						<div className='absolute inset-x-0 top-full z-50 mt-1 max-h-56 overflow-auto rounded-lg border border-[#414141] bg-[#2b2b2b] p-1 shadow-xl'>
+						<div className='absolute inset-x-0 top-full z-50 mt-1 max-h-56 overflow-auto rounded-[10px] border border-border bg-popover p-[5px] shadow-elevated'>
 							{!candidateQueryReady || isCandidatesFetching ? (
-								<p className='px-2 py-2 text-xs text-[#aaa]'>
+								<p className='px-2 py-2 text-xs text-muted-foreground'>
 									Searching...
 								</p>
 							) : isCandidatesError ? (
@@ -187,7 +187,7 @@ export function ShareInviteForm({
 									Unable to search people.
 								</p>
 							) : visibleCandidates.length === 0 ? (
-								<p className='px-2 py-2 text-xs text-[#aaa]'>
+								<p className='px-2 py-2 text-xs text-muted-foreground'>
 									No available people found.
 								</p>
 							) : (
@@ -198,13 +198,13 @@ export function ShareInviteForm({
 										onClick={() =>
 											chooseCandidate(candidate)
 										}
-										className='flex w-full flex-col rounded px-2 py-1.5 text-left text-xs hover:bg-white/10'
+										className='flex w-full flex-col rounded-[5px] px-2 py-1.5 text-left text-[13px] hover:bg-accent'
 									>
-										<span className='font-medium text-white'>
+										<span className='font-medium text-foreground'>
 											{getUserName(candidate)}
 										</span>
 
-										<span className='text-[#aaa]'>
+										<span className='text-xs text-muted-foreground'>
 											{candidate.email}
 										</span>
 									</button>
@@ -217,7 +217,9 @@ export function ShareInviteForm({
 				<Button
 					type='submit'
 					disabled={!selectedUser || sharePage.isPending}
-					className='h-9 bg-[#2f86df] px-3.5 text-xs text-white hover:bg-[#3b91e8]'
+					// Chỉ bật khi đã chọn người trong gợi ý; lúc tắt phải trông khác hẳn để không tưởng là lỗi
+					title={selectedUser ? undefined : "Choose a person from the list first"}
+					className='h-[34px] rounded-md bg-primary px-3 text-[13px] font-medium text-primary-foreground shadow-none hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100'
 				>
 					{sharePage.isPending ? "Sharing..." : "Share"}
 				</Button>

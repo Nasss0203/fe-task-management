@@ -1,23 +1,49 @@
 "use client";
 
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import { CornerLeftUp, MoreHorizontal, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { useDeleteDatabaseRow } from "@/entities/database/model/database.mutations";
+import {
+	useChangeDatabaseRowParent,
+	useCreateDatabaseRow,
+	useDeleteDatabaseRow,
+} from "@/entities/database/model/database.mutations";
+import { useDatabaseRows } from "@/entities/database/model/database.queries";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
+
+import { getChildRows } from "../lib/row-tree";
+import type { OpenRowHandler } from "./database-view-renderer";
+import { MenuItem } from "./menu-item";
 
 interface RowActionsMenuProps {
 	databaseId: string;
 	rowId: string;
+	/** Enables "Add sub-task", which opens the new sub-task in the side peek. */
+	onOpenRow?: OpenRowHandler;
 }
 
-export function RowActionsMenu({ databaseId, rowId }: RowActionsMenuProps) {
+export function RowActionsMenu({ databaseId, rowId, onOpenRow }: RowActionsMenuProps) {
 	const [open, setOpen] = useState(false);
+	const [confirmDelete, setConfirmDelete] = useState(false);
+	// Same query as the view, so this reads the cache instead of fetching again.
+	const { data: rows = [] } = useDatabaseRows(databaseId);
+	const createRowMutation = useCreateDatabaseRow(databaseId);
+	const changeParentMutation = useChangeDatabaseRowParent(databaseId);
 	const deleteRowMutation = useDeleteDatabaseRow(databaseId);
+	const row = rows.find((item) => item.id === rowId);
+	const subtaskCount = getChildRows(rows, rowId).length;
+
+	const close = () => {
+		setOpen(false);
+		setConfirmDelete(false);
+	};
 
 	return (
-		<Popover open={open} onOpenChange={setOpen}>
+		<Popover
+			open={open}
+			onOpenChange={(next) => (next ? setOpen(true) : close())}
+		>
 			<PopoverTrigger asChild>
 				<button
 					type='button'
@@ -28,20 +54,63 @@ export function RowActionsMenu({ databaseId, rowId }: RowActionsMenuProps) {
 				</button>
 			</PopoverTrigger>
 
-			<PopoverContent align='end' className='w-48 p-1'>
+			<PopoverContent align='end' className='w-56 p-1'>
+				{onOpenRow && (
+					<MenuItem
+						icon={Plus}
+						disabled={createRowMutation.isPending}
+						onClick={() =>
+							createRowMutation.mutate(rowId, {
+								onSuccess: (created) => {
+									close();
+									onOpenRow(created.id, true);
+								},
+								onError: () => toast.error("Couldn't add sub-task"),
+							})
+						}
+					>
+						Add sub-task
+					</MenuItem>
+				)}
+				{row?.parentRowId && (
+					<MenuItem
+						icon={CornerLeftUp}
+						disabled={changeParentMutation.isPending}
+						onClick={() =>
+							changeParentMutation.mutate(
+								{ rowId, parentRowId: null },
+								{
+									onSuccess: close,
+									onError: () => toast.error("Couldn't move row"),
+								},
+							)
+						}
+					>
+						Make top-level
+					</MenuItem>
+				)}
 				<button
 					type='button'
 					disabled={deleteRowMutation.isPending}
-					onClick={() =>
+					onClick={() => {
+						// Deleting a parent deletes its sub-tasks too: ask with a second click.
+						if (subtaskCount > 0 && !confirmDelete) {
+							setConfirmDelete(true);
+							return;
+						}
 						deleteRowMutation.mutate(rowId, {
-							onSuccess: () => setOpen(false),
+							onSuccess: close,
 							onError: () => toast.error("Couldn't delete row"),
-						})
-					}
-					className='flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50'
+						});
+					}}
+					className='flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50'
 				>
-					<Trash2 className='size-4' />
-					{deleteRowMutation.isPending ? "Deleting..." : "Delete row"}
+					<Trash2 className='size-4 shrink-0' />
+					{deleteRowMutation.isPending
+						? "Deleting..."
+						: confirmDelete
+							? `Delete with ${subtaskCount} sub-task${subtaskCount > 1 ? "s" : ""}?`
+							: "Delete row"}
 				</button>
 			</PopoverContent>
 		</Popover>

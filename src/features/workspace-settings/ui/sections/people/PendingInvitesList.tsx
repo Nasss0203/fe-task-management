@@ -17,5 +17,5 @@ export function PendingInvitesList({ invites, isLoading, isError, pendingActions
 	if (isError) return <p role='alert' className='py-8 text-sm text-destructive'>Unable to load pending invitations.</p>;
 	if (invites.length === 0) return <p className='py-8 text-sm text-muted-foreground'>No pending invitations.</p>;
 
-	return <div className='divide-y'>{invites.map((invite) => <PendingInviteRow key={invite.id} invite={invite} pendingAction={pendingActions[invite.id]} errorMessage={actionErrors[invite.id]} onResend={onResend} onRequestRevoke={onRequestRevoke} />)}</div>;
+	return <div>{invites.map((invite) => <PendingInviteRow key={invite.id} invite={invite} pendingAction={pendingActions[invite.id]} errorMessage={actionErrors[invite.id]} onResend={onResend} onRequestRevoke={onRequestRevoke} />)}</div>;
 }
