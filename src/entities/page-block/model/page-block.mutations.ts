@@ -13,6 +13,7 @@ import { pageBlockApi } from "@/entities/page-block/api/page-block.api";
 import { pageApi } from "@/entities/page/api/page.api";
 import { isDatabaseListQuery, pageKeys } from "@/entities/page/model/page.queries";
 import {
+	FormAnswerValue,
 	PageBlockJson,
 	PageBlockStyleConfig,
 	PageBlockType,
@@ -374,10 +375,41 @@ export function useSubmitPageForm(shareToken?: string) {
 	});
 }
 
+interface SetFormAnswerKeyInput {
+	sectionBlockId: string;
+	fieldBlockId: string;
+	correctValue: FormAnswerValue | null;
+	points: number;
+}
+
+export function useSetFormAnswerKey() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({
+			sectionBlockId,
+			fieldBlockId,
+			correctValue,
+			points,
+		}: SetFormAnswerKeyInput) =>
+			pageBlockApi.setAnswerKey(sectionBlockId, fieldBlockId, {
+				correct_value: correctValue,
+				points,
+			}),
+
+		onSuccess: async (_, variables) => {
+			await queryClient.invalidateQueries({
+				queryKey: pageBlockKeys.answerKeys(variables.sectionBlockId),
+			});
+		},
+	});
+}
+
 interface CreateFormInput {
 	pageId: string;
 	parentBlockId: string | null;
 	afterBlockId?: string | null;
+	quiz?: boolean;
 }
 
 /**
@@ -388,22 +420,34 @@ export function useCreateForm() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: async ({ pageId, parentBlockId, afterBlockId }: CreateFormInput) => {
+		mutationFn: async ({
+			pageId,
+			parentBlockId,
+			afterBlockId,
+			quiz,
+		}: CreateFormInput) => {
+			const responsesTitle = quiz ? "Quiz responses" : "Form responses";
 			const page = await pageApi.getById(pageId);
 			const responsesPage = await pageApi.create({
 				workspace_id: page.workspace_id,
 				teamspace_id: page.teamspace_id,
 				parent_page_id: page.parent_page_id,
-				title: "Form responses",
+				title: responsesTitle,
 			});
 			const { database } = await createDatabaseWithBlock(
-				{ pageId: responsesPage.id, name: "Form responses" },
+				{ pageId: responsesPage.id, name: responsesTitle },
 				true,
 			);
 			const respondent = await databaseApi.addProperty(database.id, {
 				name: "Submitted by",
 				type: PropertyType.PERSON,
 			});
+			const score = quiz
+				? await databaseApi.addProperty(database.id, {
+						name: "Score",
+						type: PropertyType.NUMBER,
+					})
+				: null;
 			const title = database.properties.find(
 				(property) => property.type === PropertyType.TITLE,
 			);
@@ -419,6 +463,13 @@ export function useCreateForm() {
 						database_id: database.id,
 						respondent_property_id: respondent.id,
 					},
+					...(score && {
+						quiz: {
+							show_result: "score",
+							max_attempts: null,
+							score_property_id: score.id,
+						},
+					}),
 				},
 			});
 

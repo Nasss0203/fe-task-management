@@ -13,6 +13,7 @@ import {
 	Code2,
 	FileIcon,
 	GitFork,
+	GraduationCap,
 	Lightbulb,
 	List,
 	ListTree,
@@ -58,6 +59,8 @@ export interface PageBlockCommand {
 
 	/** Set for "Form": a Section linked to a new database of answers. */
 	isForm?: boolean;
+
+	isQuiz?: boolean;
 }
 
 interface PageBlockCommandMenuProps {
@@ -83,6 +86,8 @@ export interface CommandItemData {
 	columnCount?: number;
 
 	isForm?: boolean;
+
+	isQuiz?: boolean;
 
 	icon: React.ComponentType<{
 		className?: string;
@@ -319,6 +324,16 @@ const FORM_BLOCK: CommandItemData = {
 	icon: ClipboardList,
 };
 
+const QUIZ_BLOCK: CommandItemData = {
+	id: "quiz",
+	label: "Quiz",
+	description: "A form that scores answers automatically.",
+	type: PageBlockType.SECTION,
+	isForm: true,
+	isQuiz: true,
+	icon: GraduationCap,
+};
+
 export function layoutBlocksFor(
 	inColumn: boolean,
 	inSection: boolean,
@@ -444,6 +459,8 @@ function BlockCommandItem({
 					columnCount: command.columnCount,
 
 					isForm: command.isForm,
+
+					isQuiz: command.isQuiz,
 				})
 			}
 			className='
@@ -502,7 +519,7 @@ export function PageBlockCommandMenu({
 	const inTask = usePageBlockRowId() !== null;
 	const inSection = useIsInSection();
 	const layoutBlocks = [
-		...(allowDatabase && !inTask && !inSection ? [FORM_BLOCK] : []),
+		...(allowDatabase && !inTask && !inSection ? [FORM_BLOCK, QUIZ_BLOCK] : []),
 		...layoutBlocksFor(useIsInColumn(), inSection),
 	];
 	return (

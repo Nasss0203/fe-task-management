@@ -59,6 +59,7 @@ export function PageBlockEditorRow({ block, shareToken }: PageBlockEditorRowProp
 		viewType,
 		columnCount,
 		isForm,
+		isQuiz,
 	}: PageBlockCommand) => {
 		if (isForm) {
 			setOpen(false);
@@ -67,6 +68,7 @@ export function PageBlockEditorRow({ block, shareToken }: PageBlockEditorRowProp
 					pageId: block.page_id,
 					parentBlockId: block.parent_block_id,
 					afterBlockId: block.id,
+					quiz: isQuiz,
 				},
 				{ onSuccess: ({ section }) => requestFocus(section.id) },
 			);

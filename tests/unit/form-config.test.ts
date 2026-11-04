@@ -3,9 +3,25 @@ import { describe, expect, it } from "vitest";
 import { PropertyType } from "@/entities/database/model/database.types";
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
 import {
+	getSectionQuiz,
 	hiddenFormProperties,
 	nextColumnName,
 } from "@/widgets/page-block-renderer/lib/form-config";
+
+describe("getSectionQuiz", () => {
+	it("is off without a score column", () => {
+		expect(getSectionQuiz({ quiz: { show_result: "score" } })).toBeNull();
+		expect(getSectionQuiz(null)).toBeNull();
+	});
+
+	it("falls back to showing the score and no attempt limit", () => {
+		expect(
+			getSectionQuiz({
+				quiz: { score_property_id: "score", show_result: "x", max_attempts: "2" },
+			}),
+		).toEqual({ show_result: "score", max_attempts: null, score_property_id: "score" });
+	});
+});
 
 describe("hiddenFormProperties", () => {
 	const question = (propertyId: string, showWhen?: [string, string]) => ({

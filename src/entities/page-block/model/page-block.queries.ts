@@ -20,7 +20,22 @@ export const pageBlockKeys = {
 
 	sharedDetail: (blockId: string, shareToken: string) =>
 		[...pageBlockKeys.all, "shared-detail", blockId, shareToken] as const,
+
+	answerKeys: (sectionBlockId: string) =>
+		[...pageBlockKeys.all, "answer-keys", sectionBlockId] as const,
 };
+
+export function useFormAnswerKeys(sectionBlockId: string, enabled: boolean) {
+	return useQuery({
+		queryKey: pageBlockKeys.answerKeys(sectionBlockId),
+
+		queryFn: ({ signal }) => pageBlockApi.getAnswerKeys(sectionBlockId, signal),
+
+		enabled,
+
+		retry: false,
+	});
+}
 
 export function usePageBlocks(pageId?: string, enabled = true) {
 	return useQuery({

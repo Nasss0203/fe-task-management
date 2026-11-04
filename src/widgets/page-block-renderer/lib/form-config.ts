@@ -48,6 +48,26 @@ export interface SectionForm {
 	success_message?: string;
 }
 
+export const QUIZ_PROPERTY_TYPES = new Set<PropertyType>([
+	PropertyType.TITLE,
+	PropertyType.TEXT,
+	PropertyType.NUMBER,
+	PropertyType.SELECT,
+	PropertyType.MULTI_SELECT,
+	PropertyType.STATUS,
+	PropertyType.CHECKBOX,
+]);
+
+export const QUIZ_SHOW_RESULTS = ["none", "score", "results"] as const;
+
+export type QuizShowResult = (typeof QUIZ_SHOW_RESULTS)[number];
+
+export interface SectionQuiz {
+	show_result: QuizShowResult;
+	max_attempts: number | null;
+	score_property_id: string;
+}
+
 export interface FormFieldCondition {
 	property_id: string;
 	option_id: string;
@@ -88,6 +108,20 @@ export function getSectionForm(dataConfig: unknown): SectionForm | null {
 			typeof form.success_message === "string"
 				? form.success_message
 				: undefined,
+	};
+}
+
+export function getSectionQuiz(dataConfig: unknown): SectionQuiz | null {
+	const quiz = asRecord(asRecord(dataConfig).quiz);
+	if (typeof quiz.score_property_id !== "string") return null;
+
+	return {
+		show_result: QUIZ_SHOW_RESULTS.includes(quiz.show_result as QuizShowResult)
+			? (quiz.show_result as QuizShowResult)
+			: "score",
+		max_attempts:
+			typeof quiz.max_attempts === "number" ? quiz.max_attempts : null,
+		score_property_id: quiz.score_property_id,
 	};
 }
 

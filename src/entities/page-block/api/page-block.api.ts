@@ -5,6 +5,8 @@ import type { FormDatabase } from "@/entities/database/model/database.types";
 
 import type {
 	BookmarkMetadata,
+	FormAnswerKey,
+	FormAnswerValue,
 	PageBlock,
 	PageBlockJson,
 	PageBlockStyleConfig,
@@ -134,6 +136,31 @@ export const pageBlockApi = {
 		>(`/forms/${sectionBlockId}/responses`, { answers }, {
 			headers: getShareHeaders(shareToken),
 		});
+
+		return response.data.data;
+	},
+
+	getAnswerKeys: async (
+		sectionBlockId: string,
+		signal?: AbortSignal,
+	): Promise<FormAnswerKey[]> => {
+		const response = await instance.get<ApiResponse<FormAnswerKey[]>>(
+			`/forms/${sectionBlockId}/answer-keys`,
+			{ signal },
+		);
+
+		return response.data.data;
+	},
+
+	setAnswerKey: async (
+		sectionBlockId: string,
+		fieldBlockId: string,
+		input: { correct_value: FormAnswerValue | null; points: number },
+	): Promise<FormAnswerKey> => {
+		const response = await instance.put<ApiResponse<FormAnswerKey>>(
+			`/forms/${sectionBlockId}/answer-keys/${fieldBlockId}`,
+			input,
+		);
 
 		return response.data.data;
 	},

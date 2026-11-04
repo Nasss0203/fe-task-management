@@ -15,6 +15,7 @@ import {
 } from "@/entities/database/model/database.types";
 import { PropertyIcon } from "@/entities/database/ui/database-visuals";
 import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-tree";
+import type { FormAnswerKey } from "@/entities/page-block/model/page-block.types";
 import {
 	useDeletePageBlock,
 	useUpdatePageBlock,
@@ -43,13 +44,25 @@ import { useBlockAutoFocus } from "@/widgets/page-block-editor/ui/page-block-edi
 import {
 	getFieldLabel,
 	getFormField,
+	QUIZ_PROPERTY_TYPES,
 	type FormFieldCondition,
 	type FormOptionConditions,
 } from "../lib/form-config";
+import { AnswerKeyEditor } from "./form-answer-key-editor";
 
 const FormDatabaseContext = createContext<FormDatabase | null>(null);
 
 export const FormDatabaseProvider = FormDatabaseContext.Provider;
+
+export interface FormQuizState {
+	sectionBlockId: string;
+	keys: Map<string, FormAnswerKey>;
+	unavailable: boolean;
+}
+
+const FormQuizContext = createContext<FormQuizState | null>(null);
+
+export const FormQuizProvider = FormQuizContext.Provider;
 
 const FormQuestionsContext = createContext<PageBlockNode[]>([]);
 
@@ -292,6 +305,7 @@ export function FormFieldBlockEditor({
 	shareToken,
 }: FormFieldBlockEditorProps) {
 	const database = useContext(FormDatabaseContext);
+	const quizState = useContext(FormQuizContext);
 	const field = getFormField(block.data_config);
 	const property = database?.properties.find(
 		(item) => item.id === field?.property_id,
@@ -452,6 +466,22 @@ export function FormFieldBlockEditor({
 					}
 				/>
 			)}
+			{quizState?.unavailable && (
+				<p className='mt-2 ml-6 text-xs text-muted-foreground'>
+					You need edit access to the answers page to set the correct answer.
+				</p>
+			)}
+			{quizState &&
+				!quizState.unavailable &&
+				!field.option_conditions &&
+				QUIZ_PROPERTY_TYPES.has(property.type) && (
+					<AnswerKeyEditor
+						sectionBlockId={quizState.sectionBlockId}
+						fieldBlockId={block.id}
+						property={property}
+						answerKey={quizState.keys.get(block.id)}
+					/>
+				)}
 		</div>
 	);
 }

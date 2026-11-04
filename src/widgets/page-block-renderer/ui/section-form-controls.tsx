@@ -7,9 +7,10 @@ import { toast } from "sonner";
 
 import { useAddDatabaseProperty } from "@/entities/database/model/database.mutations";
 import { useDatabase } from "@/entities/database/model/database.queries";
-import type {
-	DatabaseProperty,
-	FormDatabase,
+import {
+	PropertyType,
+	type DatabaseProperty,
+	type FormDatabase,
 } from "@/entities/database/model/database.types";
 import { PropertyIcon } from "@/entities/database/ui/database-visuals";
 import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-tree";
@@ -34,15 +35,27 @@ import {
 } from "@/shared/ui/dialog";
 import { Input } from "@/shared/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/shared/ui/select";
+import { cn } from "@/shared/lib/utils";
 
 import { ReadOnlyPageBlockRenderer } from "@/widgets/page-block/ui/read-only-page-block-renderer";
 
 import {
 	FORM_PROPERTY_TYPES,
 	getFormField,
+	getSectionQuiz,
 	NEW_QUESTION_TYPES,
 	nextColumnName,
+	QUIZ_SHOW_RESULTS,
+	type QuizShowResult,
 	type SectionForm,
+	type SectionQuiz,
 } from "../lib/form-config";
 import { FormFill } from "./form-fill";
 
@@ -85,6 +98,173 @@ function DatabaseOption({
 	);
 }
 
+const SHOW_RESULT_LABELS: Record<QuizShowResult, string> = {
+	none: "Nothing",
+	score: "Score",
+	results: "Score and answers",
+};
+
+function QuizSettings({
+	block,
+	databaseId,
+	shareToken,
+}: {
+	block: PageBlockNode;
+	databaseId: string;
+	shareToken?: string;
+}) {
+	const quiz = getSectionQuiz(block.data_config);
+	const updateBlock = useUpdatePageBlock(shareToken);
+	const addColumn = useAddDatabaseProperty(databaseId);
+	const { data: database } = useDatabase(databaseId);
+
+	const saveQuiz = (next: SectionQuiz | null) =>
+		updateBlock.mutate({
+			blockId: block.id,
+			pageId: block.page_id,
+			dataConfig: { ...block.data_config, quiz: next },
+		});
+
+	const turnOnQuiz = () => {
+		if (!database) return;
+
+		addColumn.mutate(
+			{
+				name: nextColumnName(
+					"Score",
+					database.properties.map((item) => item.name),
+				),
+				type: PropertyType.NUMBER,
+			},
+			{
+				onSuccess: (column) =>
+					saveQuiz({
+						show_result: "score",
+						max_attempts: null,
+						score_property_id: column.id,
+					}),
+				onError: () => toast.error("Couldn't add the Score column."),
+			},
+		);
+	};
+
+	return (
+		<div className='space-y-2 border-t border-border pt-3'>
+			<button
+				type='button'
+				role='switch'
+				aria-checked={Boolean(quiz)}
+				disabled={!database || addColumn.isPending}
+				onClick={() => (quiz ? saveQuiz(null) : turnOnQuiz())}
+				className='flex w-full items-center justify-between gap-2 text-sm font-medium disabled:opacity-50'
+			>
+				Quiz
+				<span
+					aria-hidden='true'
+					className={cn(
+						"flex h-4 w-7 items-center rounded-full p-0.5 transition-colors",
+						quiz ? "justify-end bg-ring" : "bg-muted-foreground/30",
+					)}
+				>
+					<span className='size-3 rounded-full bg-background' />
+				</span>
+			</button>
+
+			{quiz && (
+				<>
+					<label className='flex items-center justify-between gap-2 text-xs text-muted-foreground'>
+						After sending, show
+						<Select
+							value={quiz.show_result}
+							onValueChange={(value) =>
+								saveQuiz({ ...quiz, show_result: value as QuizShowResult })
+							}
+						>
+							<SelectTrigger
+								aria-label='After sending, show'
+								size='sm'
+								className='h-7 w-auto text-xs'
+							>
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								{QUIZ_SHOW_RESULTS.map((value) => (
+									<SelectItem key={value} value={value}>
+										{SHOW_RESULT_LABELS[value]}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</label>
+					<label className='flex items-center justify-between gap-2 text-xs text-muted-foreground'>
+						Attempts per person
+						<Input
+							key={quiz.max_attempts ?? "none"}
+							type='number'
+							min={1}
+							step={1}
+							defaultValue={quiz.max_attempts ?? ""}
+							placeholder='No limit'
+							aria-label='Attempts per person'
+							className='h-7 w-24 text-xs'
+							onBlur={(event) => {
+								const raw = event.target.value.trim();
+								const value = raw === "" ? null : Number(raw);
+
+								if (value === quiz.max_attempts) return;
+								if (value !== null && (!Number.isInteger(value) || value < 1)) {
+									event.target.value = String(quiz.max_attempts ?? "");
+									toast.error("Attempts must be a whole number from 1.");
+									return;
+								}
+								saveQuiz({ ...quiz, max_attempts: value });
+							}}
+						/>
+					</label>
+					<p className='text-xs text-muted-foreground'>
+						Scores go to a number column. Anyone who can open the answers page
+						sees everyone&apos;s score.
+					</p>
+				</>
+			)}
+		</div>
+	);
+}
+
+function CurrentDatabase({
+	databaseId,
+	hasQuiz,
+	onChange,
+}: {
+	databaseId: string;
+	hasQuiz: boolean;
+	onChange: () => void;
+}) {
+	const { data } = useDatabase(databaseId);
+
+	return (
+		<div className='space-y-1'>
+			<div className='flex items-center gap-2 rounded-md bg-muted px-2 py-1.5 text-sm'>
+				<ClipboardList className='size-4 shrink-0 text-muted-foreground' />
+				<span className='min-w-0 flex-1 truncate'>
+					{data?.name ?? "Database"}
+				</span>
+				<button
+					type='button'
+					onClick={onChange}
+					className='shrink-0 text-xs text-muted-foreground hover:text-foreground'
+				>
+					Change
+				</button>
+			</div>
+			<p className='text-xs text-muted-foreground'>
+				Answers become rows here. Anyone who can open its page can read them.
+				{hasQuiz && " Changing it turns off the quiz."}
+			</p>
+		</div>
+	);
+}
+
 export function SectionFormSettings({
 	block,
 	form,
@@ -98,6 +278,9 @@ export function SectionFormSettings({
 }) {
 	const [open, setOpen] = useState(false);
 	const [search, setSearch] = useState("");
+	const [pickingDatabase, setPickingDatabase] = useState(false);
+	const hasQuiz = Boolean(form && getSectionQuiz(block.data_config));
+	const showDatabaseList = !form || pickingDatabase;
 	const updateBlock = useUpdatePageBlock(shareToken);
 	const sharedBlocks = useSharedPageBlocks(
 		block.page_id,
@@ -127,25 +310,39 @@ export function SectionFormSettings({
 				Number(b.pageId === block.page_id) - Number(a.pageId === block.page_id),
 		);
 
-	const saveForm = (next: SectionForm | null) =>
+	const saveForm = (next: SectionForm | null, keepQuiz = true) =>
 		updateBlock.mutate({
 			blockId: block.id,
 			pageId: block.page_id,
-			dataConfig: { ...block.data_config, form: next },
+			dataConfig: {
+				...block.data_config,
+				form: next,
+				...(keepQuiz ? {} : { quiz: null }),
+			},
 		});
 
 	const pickDatabase = (databaseId: string) => {
+		setPickingDatabase(false);
 		if (form?.database_id === databaseId) return;
 
-		saveForm({
-			database_id: databaseId,
-			submit_label: form?.submit_label,
-			success_message: form?.success_message,
-		});
+		saveForm(
+			{
+				database_id: databaseId,
+				submit_label: form?.submit_label,
+				success_message: form?.success_message,
+			},
+			false,
+		);
 	};
 
 	return (
-		<Popover open={open} onOpenChange={setOpen}>
+		<Popover
+			open={open}
+			onOpenChange={(next) => {
+				setOpen(next);
+				if (!next) setPickingDatabase(false);
+			}}
+		>
 			<PopoverTrigger asChild>
 				<button
 					type='button'
@@ -158,14 +355,24 @@ export function SectionFormSettings({
 
 			<PopoverContent side='bottom' align='end' className='w-72 space-y-3 p-3'>
 				<div>
-					<p className='text-sm font-medium'>Form</p>
-					<p className='text-xs text-muted-foreground'>
-						Answers become rows of this database. Anyone who can open its page
-						can read them.
-					</p>
+					<p className='text-sm font-medium'>{hasQuiz ? "Quiz" : "Form"}</p>
+					{showDatabaseList && (
+						<p className='text-xs text-muted-foreground'>
+							Pick the database that keeps the answers. Anyone who can open
+							its page can read them.
+						</p>
+					)}
 				</div>
 
-				{shareToken ? (
+				{form && !pickingDatabase && (
+					<CurrentDatabase
+						databaseId={form.database_id}
+						hasQuiz={hasQuiz}
+						onChange={() => setPickingDatabase(true)}
+					/>
+				)}
+
+				{!showDatabaseList ? null : shareToken ? (
 					<div className='max-h-56 space-y-0.5 overflow-y-auto'>
 						{sharedDatabaseIds.map((databaseId) => (
 							<DatabaseOption
@@ -226,13 +433,20 @@ export function SectionFormSettings({
 								}
 							/>
 						</label>
+						{!shareToken && (
+							<QuizSettings
+								block={block}
+								databaseId={form.database_id}
+								shareToken={shareToken}
+							/>
+						)}
 						<Button
 							type='button'
 							variant='ghost'
 							size='sm'
 							disabled={hasQuestions}
 							title={hasQuestions ? "Remove the questions first" : undefined}
-							onClick={() => saveForm(null)}
+							onClick={() => saveForm(null, false)}
 						>
 							Turn off form
 						</Button>
@@ -297,8 +511,14 @@ export function AddQuestionButton({
 				: [];
 		}),
 	);
+	const scorePropertyId = getSectionQuiz(block.data_config)?.score_property_id;
 	const available = [...database.properties]
-		.filter((item) => FORM_PROPERTY_TYPES.has(item.type) && !used.has(item.id))
+		.filter(
+			(item) =>
+				FORM_PROPERTY_TYPES.has(item.type) &&
+				!used.has(item.id) &&
+				item.id !== scorePropertyId,
+		)
 		.sort((a, b) => Number(a.position) - Number(b.position));
 
 	return (

@@ -35,6 +35,14 @@ export type PageBlockJson = Record<string, unknown> | null;
 
 export type PageBlockStyleConfig = Record<string, unknown> | null;
 
+export type FormAnswerValue = string | number | boolean | string[];
+
+export interface FormAnswerKey {
+	field_block_id: string;
+	correct_value: FormAnswerValue | null;
+	points: number;
+}
+
 export interface DatabaseViewBlockDataConfig {
 	database_id: string;
 	view_id: string;

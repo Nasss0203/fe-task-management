@@ -44,10 +44,11 @@ export function EmptyPageBlockRow({ pageId, shareToken }: EmptyPageBlockRowProps
 		viewType,
 		columnCount,
 		isForm,
+		isQuiz,
 	}: PageBlockCommand) => {
 		if (isForm) {
 			createFormMutation.mutate(
-				{ pageId, parentBlockId: null },
+				{ pageId, parentBlockId: null, quiz: isQuiz },
 				{
 					onSuccess: ({ section }) => {
 						setOpen(false);

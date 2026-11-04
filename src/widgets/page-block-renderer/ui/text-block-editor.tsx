@@ -141,6 +141,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 		viewType,
 		columnCount,
 		isForm,
+		isQuiz,
 	}: PageBlockCommand) => {
 		if (slashIndex === null) {
 			return;
@@ -162,6 +163,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 				pageId: block.page_id,
 				parentBlockId: block.parent_block_id,
 				afterBlockId: block.id,
+				quiz: isQuiz,
 			});
 			requestFocus(section.id);
 			return;

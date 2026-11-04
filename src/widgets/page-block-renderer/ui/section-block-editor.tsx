@@ -9,6 +9,7 @@ import {
 	useCreatePageBlock,
 	useUpdatePageBlock,
 } from "@/entities/page-block/model/page-block.mutations";
+import { useFormAnswerKeys } from "@/entities/page-block/model/page-block.queries";
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
 import {
 	CALLOUT_TONES,
@@ -23,10 +24,11 @@ import { usePageBlockEditor } from "@/widgets/page-block-editor/ui/page-block-ed
 import { PageBlockEditorRow } from "@/widgets/page-block-editor/ui/page-block-editor-row";
 import { ReadOnlyPageBlockRenderer } from "@/widgets/page-block/ui/read-only-page-block-renderer";
 
-import { getSectionForm } from "../lib/form-config";
+import { getSectionForm, getSectionQuiz } from "../lib/form-config";
 import {
 	FormDatabaseProvider,
 	FormQuestionsProvider,
+	FormQuizProvider,
 } from "./form-field-block-editor";
 import {
 	AddQuestionButton,
@@ -82,6 +84,18 @@ export function SectionBlockEditor({
 	const hasQuestions = block.children.some(
 		(child) => child.type === PageBlockType.FORM_FIELD,
 	);
+	const showAnswerKeys =
+		Boolean(form && getSectionQuiz(block.data_config)) && !shareToken;
+	const answerKeys = useFormAnswerKeys(block.id, showAnswerKeys);
+	const quizState = showAnswerKeys
+		? {
+				sectionBlockId: block.id,
+				keys: new Map(
+					(answerKeys.data ?? []).map((key) => [key.field_block_id, key]),
+				),
+				unavailable: answerKeys.isError,
+			}
+		: null;
 
 	useEffect(() => {
 		setTitle(getSectionText(block, "title"));
@@ -288,6 +302,7 @@ export function SectionBlockEditor({
 					<InSectionProvider value>
 						<FormDatabaseProvider value={formDatabase ?? null}>
 							<FormQuestionsProvider value={block.children}>
+							<FormQuizProvider value={quizState}>
 							{block.children.length > 0 ? (
 								<div className='mt-1 space-y-1'>
 									{block.children.map((child) => (
@@ -331,6 +346,7 @@ export function SectionBlockEditor({
 									)}
 								</div>
 							)}
+							</FormQuizProvider>
 							</FormQuestionsProvider>
 						</FormDatabaseProvider>
 					</InSectionProvider>
