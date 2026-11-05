@@ -78,20 +78,20 @@ export function AiChatEmptyState({
 }: AiChatEmptyStateProps) {
 	return (
 		<div className='flex flex-1 flex-col items-center pt-8 pb-4 text-center sm:pt-14'>
-			<div className='mb-4 flex size-11 items-center justify-center rounded-xl border border-border/40 bg-muted/60 text-foreground/80'>
+			<div className='mb-4 flex size-11 items-center justify-center rounded-xl border border-border/80 bg-muted/70 text-foreground/80'>
 				<Sparkles className='size-5 text-foreground/75' />
 			</div>
 
-			<h2 className='text-2xl font-semibold tracking-tight text-foreground sm:text-3xl'>
+			<h2 className='text-[26px] font-semibold tracking-tight text-foreground'>
 				How can I help you today?
 			</h2>
 
-			<p className='mt-2 max-w-sm text-sm text-muted-foreground sm:text-base'>
+			<p className='mt-2 max-w-[384px] text-sm text-muted-foreground'>
 				Ask AI to improve your writing or create content for your
 				workspace.
 			</p>
 
-			<div className='mt-7 grid w-full max-w-md grid-cols-1 gap-2.5 sm:grid-cols-2'>
+			<div className='mt-7 grid w-full max-w-[450px] grid-cols-1 gap-2.5 sm:grid-cols-2'>
 				{QUICK_ACTIONS.map((action) => (
 					<Button
 						key={action.id}
@@ -99,7 +99,7 @@ export function AiChatEmptyState({
 						disabled={disabled}
 						variant='outline'
 						onClick={() => onSelectQuickAction(action)}
-						className='flex h-12 items-center justify-start gap-2.5 rounded-lg border border-border/60 bg-background px-3.5 text-left font-normal text-foreground/90 shadow-none transition-colors hover:border-border hover:bg-accent/50 hover:text-foreground'
+						className='flex h-12 items-center justify-start gap-2.5 rounded-[8px] border border-border bg-background px-3.5 text-left font-medium text-foreground shadow-none transition-colors hover:bg-accent/50'
 					>
 						{getQuickActionIcon(action.iconName)}
 

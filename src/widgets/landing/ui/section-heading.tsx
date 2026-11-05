@@ -25,10 +25,11 @@ export function SectionHeading({
 		>
 			{eyebrow && (
 				<div
-					className={`inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium text-muted-foreground ${
+					className={`inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground shadow-2xs ${
 						isCenter ? "mx-auto" : ""
 					}`}
 				>
+					<span className='h-1.5 w-1.5 rounded-full bg-[#5e6ad2]' />
 					{eyebrow}
 				</div>
 			)}

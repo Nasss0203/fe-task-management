@@ -48,9 +48,9 @@ export function AiChatComposer({ value, onChange, onSend, currentPageId, disable
   };
 
   return (
-    <div className="sticky bottom-0 z-10 w-full bg-background pt-2 pb-3">
+    <div className="w-full shrink-0 bg-background pt-2 pb-4">
       <form onSubmit={(event) => { event.preventDefault(); send(); }}
-        className="relative rounded-2xl border border-border/70 bg-card px-3.5 pt-3 pb-2.5 shadow-sm transition-colors focus-within:border-ring/60 focus-within:ring-1 focus-within:ring-ring/25">
+        className="relative rounded-[14px] border border-input bg-card pl-3.5 pr-2.5 pt-2.5 pb-2 shadow-[0_4px_7px_rgba(0,0,0,0.06)] transition-colors focus-within:border-ring/70 dark:shadow-none">
         <label htmlFor={inputId} className="sr-only">{placeholder}</label>
         <textarea ref={textareaRef} id={inputId} value={value}
           onChange={(event) => onChange(event.target.value)} onKeyDown={handleKeyDown}
@@ -58,15 +58,15 @@ export function AiChatComposer({ value, onChange, onSend, currentPageId, disable
           onCompositionEnd={() => { composingRef.current = false; }}
           placeholder={placeholder} rows={1} disabled={disabled} aria-label={placeholder}
           aria-invalid={Boolean(validationError)} aria-describedby={validationError ? errorId : undefined}
-          className="block min-h-[36px] max-h-40 w-full resize-none border-0 bg-transparent p-0 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/70 outline-none focus:ring-0" />
+          className="block min-h-[28px] max-h-40 w-full resize-none border-0 bg-transparent p-0 text-[14px] leading-[21px] text-foreground placeholder:text-faint outline-none focus:ring-0" />
         {validationError && <p id={errorId} role="alert" className="mt-2 text-xs text-destructive">{validationError}</p>}
-        <div className="mt-2 flex items-center justify-between gap-2">
-          <span className="text-[11px] text-muted-foreground/70">{value.length.toLocaleString()} / 4,000</span>
+        <div className="mt-1.5 flex items-center justify-between gap-2">
+          <span className="text-[11px] text-faint">{value.length.toLocaleString()} / 4,000</span>
           <div className="flex items-center gap-2">
-            <span className="hidden text-[11px] text-muted-foreground/70 sm:inline">Enter to send · Shift + Enter for new line</span>
+            <span className="hidden text-[11px] text-faint sm:inline">Enter to send · Shift + Enter for new line</span>
             <Button type="submit" size="icon-xs" disabled={!canSend} aria-label="Send message"
-              className="flex size-8 items-center justify-center rounded-full bg-foreground text-background shadow-none transition-opacity hover:bg-foreground/90 disabled:opacity-30 disabled:hover:bg-foreground">
-              <ArrowUp className="size-4" />
+              className="flex size-[30px] items-center justify-center rounded-full bg-foreground text-background shadow-none transition-colors hover:bg-foreground/90 disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100">
+              <ArrowUp className="size-[15px]" />
             </Button>
           </div>
         </div>

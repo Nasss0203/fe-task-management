@@ -116,7 +116,7 @@ export const HeaderLanding = () => {
 					}`}
 				>
 					<span>AI</span>
-					<span className='rounded-full bg-muted text-muted-foreground border border-border text-[10px] font-semibold px-1.5 py-0.5 leading-none'>
+					<span className='rounded-full bg-[#eeeffc] text-[#5e6ad2] border border-[#5e6ad2]/25 dark:bg-indigo-500/15 dark:text-indigo-300 dark:border-indigo-400/25 text-[10px] font-semibold px-1.5 py-0.5 leading-none'>
 						New
 					</span>
 				</Link>

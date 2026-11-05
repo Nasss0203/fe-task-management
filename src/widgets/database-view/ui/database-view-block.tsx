@@ -18,6 +18,7 @@ import { filterRows } from "../lib/filter-rows";
 import { sortRows } from "../lib/sort-rows";
 import { DatabaseShareTokenContext } from "../model/share-token-context";
 import { AddDatabaseViewPopover } from "./add-database-view-popover";
+import { DatabaseCalendarFeedPopover } from "./database-calendar-feed-popover";
 import { DatabaseTitle } from "./database-title";
 import { DatabaseViewFilterPopover } from "./database-view-filter-popover";
 import { DatabaseViewGroupPopover } from "./database-view-group-popover";
@@ -187,6 +188,12 @@ export function DatabaseViewBlock({
 							view={activeView}
 							properties={database.properties}
 							viewProperties={activeViewDetail.properties}
+						/>
+					)}
+					{activeView.type === DatabaseViewType.CALENDAR && (
+						<DatabaseCalendarFeedPopover
+							databaseId={database.id}
+							properties={database.properties}
 						/>
 					)}
 					{/* sau này */}

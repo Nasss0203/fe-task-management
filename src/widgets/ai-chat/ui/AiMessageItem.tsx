@@ -58,7 +58,7 @@ export function AiAssistantAvatar() {
 	return (
 		<div
 			aria-hidden='true'
-			className='flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary'
+			className='flex size-6 shrink-0 items-center justify-center rounded-[8px] bg-[#eeeffc] text-[#5e6ad2] dark:bg-indigo-500/15 dark:text-indigo-300'
 		>
 			<Sparkles className='size-3.5' />
 		</div>
@@ -88,8 +88,8 @@ export function AiMessageItem({
 	if (isUser) {
 		return (
 			<div className='flex w-full justify-end'>
-				<div className='max-w-[80%] rounded-2xl rounded-br-md bg-muted px-4 py-2.5 text-sm text-foreground'>
-					<p className='whitespace-pre-wrap break-words leading-relaxed'>
+				<div className='max-w-[80%] rounded-[14px] bg-muted px-3.5 py-2.5 text-[14px] text-foreground'>
+					<p className='whitespace-pre-wrap break-words leading-[21px]'>
 						{message.content}
 					</p>
 				</div>
@@ -123,27 +123,28 @@ export function AiMessageItem({
 		);
 
 	return (
-		<div className='flex w-full items-start gap-3'>
+		<div className='flex w-full items-start gap-2.5'>
 			<AiAssistantAvatar />
 
-			<div className='min-w-0 flex-1 space-y-3 pt-1'>
+			<div className='min-w-0 flex-1 space-y-3 pt-0.5'>
 				{showContent && (
-					<p className='whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground'>
+					<p className='whitespace-pre-wrap break-words text-[14px] leading-[21px] text-foreground'>
 						{message.content}
 					</p>
 				)}
 
-				{invalidGeneration && <p role="alert" className="text-sm text-muted-foreground">
+				{invalidGeneration && <p role="alert" className="rounded-[8px] bg-[#fdecec] px-3 py-2.5 text-[12.5px] leading-[18px] text-[#e5484d] dark:bg-red-500/15 dark:text-red-300">
 					This draft could not be verified. Refresh history before taking any action.
 				</p>}
 				{message.previewRecovery && (
 					<Button type="button" size="sm" variant="outline" disabled={disabled || !onRetryUnifiedAskPreview}
-						onClick={() => runOnce(() => onRetryUnifiedAskPreview?.(message.id))}>
+						onClick={() => runOnce(() => onRetryUnifiedAskPreview?.(message.id))}
+						className="h-7 rounded-[6px] text-xs text-muted-foreground hover:text-foreground">
 						Retry loading preview
 					</Button>
 				)}
 				{candidates && (
-					<ul className='overflow-hidden rounded-xl border border-border/60 bg-card'>
+					<ul className='overflow-hidden rounded-[12px] border border-border bg-card'>
 						{candidates.map((page) => (
 							<li
 								key={page.pageId}

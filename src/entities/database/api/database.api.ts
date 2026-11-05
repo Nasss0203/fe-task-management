@@ -2,6 +2,7 @@ import instance from "@/shared/api/api-client";
 
 import { ApiResponse } from "@/shared/api";
 import type {
+	CalendarFeed,
 	Database,
 	DatabasePerson,
 	DatabaseProperty,
@@ -408,4 +409,31 @@ export const databaseApi = {
 
 		return response.data.data;
 	},
+
+	getCalendarFeed: async (databaseId: string): Promise<CalendarFeed | null> => {
+		const response = await instance.get<ApiResponse<CalendarFeed | null>>(
+			`${DATABASE_API}/${databaseId}/calendar-feed`,
+		);
+
+		return response.data.data;
+	},
+
+	upsertCalendarFeed: async (
+		databaseId: string,
+		datePropertyId: string,
+	): Promise<CalendarFeed> => {
+		const response = await instance.put<ApiResponse<CalendarFeed>>(
+			`${DATABASE_API}/${databaseId}/calendar-feed`,
+			{ datePropertyId },
+		);
+
+		return response.data.data;
+	},
+
+	revokeCalendarFeed: async (databaseId: string): Promise<void> => {
+		await instance.delete(`${DATABASE_API}/${databaseId}/calendar-feed`);
+	},
 };
+
+export const calendarFeedUrl = (token: string) =>
+	`${process.env.NEXT_PUBLIC_API_URL}/calendar-feeds/${token}.ics`;

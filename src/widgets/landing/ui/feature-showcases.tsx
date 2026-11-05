@@ -19,8 +19,8 @@ export function FeatureShowcases() {
 				<div className='grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center'>
 					{/* Text Column */}
 					<div className='space-y-6'>
-						<div className='inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground'>
-							<FileText className='h-3.5 w-3.5' />
+						<div className='inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground shadow-2xs'>
+							<span className='h-1.5 w-1.5 rounded-full bg-[#5e6ad2]' />
 							Pages & Notes
 						</div>
 
@@ -34,25 +34,25 @@ export function FeatureShowcases() {
 
 						<div className='grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-sm'>
 							<div className='flex items-start gap-2.5'>
-								<div className='h-5 w-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
+								<div className='h-5 w-5 rounded-md border border-border bg-muted/50 text-[#5e6ad2] flex items-center justify-center shrink-0 mt-0.5'>
 									<Check className='h-3 w-3' />
 								</div>
 								<span className='text-foreground font-medium'>Create structured pages</span>
 							</div>
 							<div className='flex items-start gap-2.5'>
-								<div className='h-5 w-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
+								<div className='h-5 w-5 rounded-md border border-border bg-muted/50 text-[#5e6ad2] flex items-center justify-center shrink-0 mt-0.5'>
 									<Check className='h-3 w-3' />
 								</div>
 								<span className='text-foreground font-medium'>Nested content hierarchy</span>
 							</div>
 							<div className='flex items-start gap-2.5'>
-								<div className='h-5 w-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
+								<div className='h-5 w-5 rounded-md border border-border bg-muted/50 text-[#5e6ad2] flex items-center justify-center shrink-0 mt-0.5'>
 									<Check className='h-3 w-3' />
 								</div>
 								<span className='text-foreground font-medium'>Flexible blocks & code</span>
 							</div>
 							<div className='flex items-start gap-2.5'>
-								<div className='h-5 w-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
+								<div className='h-5 w-5 rounded-md border border-border bg-muted/50 text-[#5e6ad2] flex items-center justify-center shrink-0 mt-0.5'>
 									<Check className='h-3 w-3' />
 								</div>
 								<span className='text-foreground font-medium'>Organize knowledge base</span>
@@ -69,54 +69,59 @@ export function FeatureShowcases() {
 						</div>
 					</div>
 
-					{/* UI Preview Column */}
-					<div className='relative rounded-2xl border border-border/80 bg-card p-6 shadow-soft overflow-hidden'>
-						<div className='flex items-center justify-between pb-4 border-b border-border/60 text-xs text-muted-foreground'>
-							<div className='flex items-center gap-2'>
-								<FileText className='h-4 w-4 text-muted-foreground' />
-								<span className='font-semibold text-foreground'>Product Architecture RFC</span>
-							</div>
-							<Badge variant='outline' className='text-[10px]'>Live Editing</Badge>
-						</div>
-
-						<div className='mt-5 space-y-4 text-sm'>
-							<div className='h-6 w-3/4 rounded-md bg-foreground/15 font-bold text-foreground text-lg flex items-center px-1'>
-								System Architecture & State Flow
-							</div>
-
-							<p className='text-xs text-muted-foreground leading-relaxed'>
-								Our unified workspace synchronizes state between collaborative note blocks and structured relational tables without layout lag.
-							</p>
-
-							{/* Callout box */}
-							<div className='rounded-xl border border-primary/20 bg-primary/5 p-3.5 flex items-start gap-3 text-xs'>
-								<Sparkles className='h-4 w-4 text-primary shrink-0 mt-0.5' />
-								<div>
-									<span className='font-semibold text-foreground'>Key Decision:</span> Single source of truth across database properties, team notes, and markdown checklists.
+					{/* UI Preview Column (Double-bezel frame) */}
+					<div className='rounded-2xl border border-border/80 bg-muted/35 p-2 shadow-xs'>
+						<div className='relative rounded-xl border border-border/80 bg-card p-6 shadow-2xs overflow-hidden'>
+							<div className='flex items-center justify-between pb-4 border-b border-border/60 text-xs text-muted-foreground'>
+								<div className='flex items-center gap-2'>
+									<FileText className='h-4 w-4 text-muted-foreground' />
+									<span className='font-semibold text-foreground'>Product Architecture RFC</span>
 								</div>
+								<Badge variant='outline' className='text-[10px] border-border bg-muted/50 text-foreground gap-1.5'>
+									<span className='h-1.5 w-1.5 rounded-full bg-emerald-500' />
+									Live Editing
+								</Badge>
 							</div>
 
-							{/* Checklist items */}
-							<div className='space-y-2 pt-1'>
-								<div className='flex items-center gap-2.5 text-xs text-foreground'>
-									<div className='h-4 w-4 rounded bg-primary text-primary-foreground flex items-center justify-center'>
-										<Check className='h-3 w-3' />
+							<div className='mt-5 space-y-4 text-sm'>
+								<div className='font-bold text-foreground text-lg tracking-tight'>
+									System Architecture & State Flow
+								</div>
+
+								<p className='text-xs text-muted-foreground leading-relaxed'>
+									Our unified workspace synchronizes state between collaborative note blocks and structured relational tables without layout lag.
+								</p>
+
+								{/* Callout box */}
+								<div className='rounded-xl border border-border bg-muted/30 p-3.5 flex items-start gap-3 text-xs'>
+									<Sparkles className='h-4 w-4 text-[#5e6ad2] shrink-0 mt-0.5' />
+									<div>
+										<span className='font-semibold text-foreground'>Key Decision:</span> Single source of truth across database properties, team notes, and markdown checklists.
 									</div>
-									<span className='line-through text-muted-foreground'>
-										Define recursive schema for nested blocks
-									</span>
 								</div>
-								<div className='flex items-center gap-2.5 text-xs text-foreground'>
-									<div className='h-4 w-4 rounded bg-primary text-primary-foreground flex items-center justify-center'>
-										<Check className='h-3 w-3' />
+
+								{/* Checklist items */}
+								<div className='space-y-2 pt-1'>
+									<div className='flex items-center gap-2.5 text-xs text-foreground'>
+										<div className='h-4 w-4 rounded bg-[#5e6ad2] text-white flex items-center justify-center'>
+											<Check className='h-3 w-3' />
+										</div>
+										<span className='line-through text-muted-foreground'>
+											Define recursive schema for nested blocks
+										</span>
 									</div>
-									<span className='line-through text-muted-foreground'>
-										Implement AST parser for rich code snippets
-									</span>
-								</div>
-								<div className='flex items-center gap-2.5 text-xs text-foreground'>
-									<div className='h-4 w-4 rounded border border-border bg-card flex items-center justify-center' />
-									<span>Enable drag-and-drop block reordering</span>
+									<div className='flex items-center gap-2.5 text-xs text-foreground'>
+										<div className='h-4 w-4 rounded bg-[#5e6ad2] text-white flex items-center justify-center'>
+											<Check className='h-3 w-3' />
+										</div>
+										<span className='line-through text-muted-foreground'>
+											Implement AST parser for rich code snippets
+										</span>
+									</div>
+									<div className='flex items-center gap-2.5 text-xs text-foreground'>
+										<div className='h-4 w-4 rounded border border-border bg-card flex items-center justify-center' />
+										<span>Enable drag-and-drop block reordering</span>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -127,71 +132,73 @@ export function FeatureShowcases() {
 			{/* SHOWCASE 2: Database & Views (UI Left | Text Right) */}
 			<div id='showcase-database' className='mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'>
 				<div className='grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center'>
-					{/* UI Preview Column (Left) */}
-					<div className='order-2 lg:order-1 relative rounded-2xl border border-border/80 bg-card p-6 shadow-soft overflow-hidden'>
-						{/* Table Header controls */}
-						<div className='flex items-center justify-between pb-3.5 border-b border-border/60 text-xs'>
-							<div className='flex items-center gap-1 rounded-lg border border-border/60 p-0.5 bg-muted/40'>
-								<span className='px-2 py-0.5 rounded bg-background font-semibold text-foreground shadow-xs'>
-									All Records
-								</span>
-								<span className='px-2 py-0.5 rounded text-muted-foreground'>By Priority</span>
-								<span className='px-2 py-0.5 rounded text-muted-foreground'>Calendar</span>
+					{/* UI Preview Column (Left - Double-bezel frame) */}
+					<div className='order-2 lg:order-1 rounded-2xl border border-border/80 bg-muted/35 p-2 shadow-xs'>
+						<div className='relative rounded-xl border border-border/80 bg-card p-6 shadow-2xs overflow-hidden'>
+							{/* Table Header controls */}
+							<div className='flex items-center justify-between pb-3.5 border-b border-border/60 text-xs'>
+								<div className='flex items-center gap-1 rounded-lg border border-border/60 p-0.5 bg-muted/40'>
+									<span className='px-2 py-0.5 rounded bg-background font-semibold text-foreground shadow-xs'>
+										All Records
+									</span>
+									<span className='px-2 py-0.5 rounded text-muted-foreground'>By Priority</span>
+									<span className='px-2 py-0.5 rounded text-muted-foreground'>Calendar</span>
+								</div>
+								<span className='text-[11px] text-muted-foreground font-mono'>3 items</span>
 							</div>
-							<span className='text-[11px] text-muted-foreground font-mono'>3 items</span>
-						</div>
 
-						{/* Table rows */}
-						<div className='mt-4 overflow-x-auto'>
-							<table className='w-full text-xs text-left border-collapse'>
-								<thead>
-									<tr className='text-muted-foreground font-semibold border-b border-border/50'>
-										<th className='py-2 px-2'>Item Name</th>
-										<th className='py-2 px-2'>Status</th>
-										<th className='py-2 px-2'>Owner</th>
-										<th className='py-2 px-2'>Priority</th>
-									</tr>
-								</thead>
-								<tbody className='divide-y divide-border/40 text-foreground'>
-									<tr>
-										<td className='py-2.5 px-2 font-medium'>Q4 Marketing Landing Website</td>
-										<td className='py-2.5 px-2'>
-											<Badge variant='outline' className='text-[9px] bg-muted text-muted-foreground border-none'>
-												In Progress
-											</Badge>
-										</td>
-										<td className='py-2.5 px-2 text-muted-foreground'>Alex V.</td>
-										<td className='py-2.5 px-2 text-muted-foreground font-semibold'>High</td>
-									</tr>
-									<tr>
-										<td className='py-2.5 px-2 font-medium'>PostgreSQL Database Index Tuning</td>
-										<td className='py-2.5 px-2'>
-											<Badge variant='outline' className='text-[9px] bg-muted text-muted-foreground border-none'>
-												Completed
-											</Badge>
-										</td>
-										<td className='py-2.5 px-2 text-muted-foreground'>Nam N.</td>
-										<td className='py-2.5 px-2 text-muted-foreground font-semibold'>Normal</td>
-									</tr>
-									<tr>
-										<td className='py-2.5 px-2 font-medium'>Template Clone Transaction Model</td>
-										<td className='py-2.5 px-2'>
-											<Badge variant='outline' className='text-[9px] bg-muted text-muted-foreground border-none'>
-												Review
-											</Badge>
-										</td>
-										<td className='py-2.5 px-2 text-muted-foreground'>Sara K.</td>
-										<td className='py-2.5 px-2 text-muted-foreground font-semibold'>Urgent</td>
-									</tr>
-								</tbody>
-							</table>
+							{/* Table rows */}
+							<div className='mt-4 overflow-x-auto'>
+								<table className='w-full text-xs text-left border-collapse'>
+									<thead>
+										<tr className='text-muted-foreground font-semibold border-b border-border/50'>
+											<th className='py-2 px-2'>Item Name</th>
+											<th className='py-2 px-2'>Status</th>
+											<th className='py-2 px-2'>Owner</th>
+											<th className='py-2 px-2'>Priority</th>
+										</tr>
+									</thead>
+									<tbody className='divide-y divide-border/40 text-foreground'>
+										<tr>
+											<td className='py-2.5 px-2 font-medium'>Q4 Marketing Landing Website</td>
+											<td className='py-2.5 px-2'>
+												<Badge variant='outline' className='text-[9px] bg-[#eeeffc]/70 text-[#5e6ad2] dark:bg-indigo-500/15 dark:text-indigo-300 border-[#5e6ad2]/20'>
+													In Progress
+												</Badge>
+											</td>
+											<td className='py-2.5 px-2 text-muted-foreground'>Alex V.</td>
+											<td className='py-2.5 px-2 text-foreground font-medium'>High</td>
+										</tr>
+										<tr>
+											<td className='py-2.5 px-2 font-medium'>PostgreSQL Database Index Tuning</td>
+											<td className='py-2.5 px-2'>
+												<Badge variant='outline' className='text-[9px] bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20'>
+													Completed
+												</Badge>
+											</td>
+											<td className='py-2.5 px-2 text-muted-foreground'>Nam N.</td>
+											<td className='py-2.5 px-2 text-muted-foreground font-medium'>Normal</td>
+										</tr>
+										<tr>
+											<td className='py-2.5 px-2 font-medium'>Template Clone Transaction Model</td>
+											<td className='py-2.5 px-2'>
+												<Badge variant='outline' className='text-[9px] bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20'>
+													Review
+												</Badge>
+											</td>
+											<td className='py-2.5 px-2 text-muted-foreground'>Sara K.</td>
+											<td className='py-2.5 px-2 text-foreground font-medium'>Urgent</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
 						</div>
 					</div>
 
 					{/* Text Column (Right) */}
 					<div className='order-1 lg:order-2 space-y-6'>
-						<div className='inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground'>
-							<Database className='h-3.5 w-3.5' />
+						<div className='inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground shadow-2xs'>
+							<span className='h-1.5 w-1.5 rounded-full bg-[#5e6ad2]' />
 							Database & Views
 						</div>
 
@@ -205,25 +212,25 @@ export function FeatureShowcases() {
 
 						<div className='grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-sm'>
 							<div className='flex items-start gap-2.5'>
-								<div className='h-5 w-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
+								<div className='h-5 w-5 rounded-md border border-border bg-muted/50 text-[#5e6ad2] flex items-center justify-center shrink-0 mt-0.5'>
 									<Check className='h-3 w-3' />
 								</div>
 								<span className='text-foreground font-medium'>Custom property types</span>
 							</div>
 							<div className='flex items-start gap-2.5'>
-								<div className='h-5 w-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
+								<div className='h-5 w-5 rounded-md border border-border bg-muted/50 text-[#5e6ad2] flex items-center justify-center shrink-0 mt-0.5'>
 									<Check className='h-3 w-3' />
 								</div>
 								<span className='text-foreground font-medium'>Dynamic multi-row views</span>
 							</div>
 							<div className='flex items-start gap-2.5'>
-								<div className='h-5 w-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
+								<div className='h-5 w-5 rounded-md border border-border bg-muted/50 text-[#5e6ad2] flex items-center justify-center shrink-0 mt-0.5'>
 									<Check className='h-3 w-3' />
 								</div>
 								<span className='text-foreground font-medium'>Table, Board, List & Calendar</span>
 							</div>
 							<div className='flex items-start gap-2.5'>
-								<div className='h-5 w-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
+								<div className='h-5 w-5 rounded-md border border-border bg-muted/50 text-[#5e6ad2] flex items-center justify-center shrink-0 mt-0.5'>
 									<Check className='h-3 w-3' />
 								</div>
 								<span className='text-foreground font-medium'>Sorting & multi-level filters</span>
@@ -247,8 +254,8 @@ export function FeatureShowcases() {
 				<div className='grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center'>
 					{/* Text Column */}
 					<div className='space-y-6'>
-						<div className='inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground'>
-							<Users className='h-3.5 w-3.5' />
+						<div className='inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground shadow-2xs'>
+							<span className='h-1.5 w-1.5 rounded-full bg-[#5e6ad2]' />
 							Team Collaboration
 						</div>
 
@@ -262,25 +269,25 @@ export function FeatureShowcases() {
 
 						<div className='grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-sm'>
 							<div className='flex items-start gap-2.5'>
-								<div className='h-5 w-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
+								<div className='h-5 w-5 rounded-md border border-border bg-muted/50 text-[#5e6ad2] flex items-center justify-center shrink-0 mt-0.5'>
 									<Check className='h-3 w-3' />
 								</div>
 								<span className='text-foreground font-medium'>Squad Teamspaces</span>
 							</div>
 							<div className='flex items-start gap-2.5'>
-								<div className='h-5 w-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
+								<div className='h-5 w-5 rounded-md border border-border bg-muted/50 text-[#5e6ad2] flex items-center justify-center shrink-0 mt-0.5'>
 									<Check className='h-3 w-3' />
 								</div>
 								<span className='text-foreground font-medium'>Owner, member & guest roles</span>
 							</div>
 							<div className='flex items-start gap-2.5'>
-								<div className='h-5 w-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
+								<div className='h-5 w-5 rounded-md border border-border bg-muted/50 text-[#5e6ad2] flex items-center justify-center shrink-0 mt-0.5'>
 									<Check className='h-3 w-3' />
 								</div>
 								<span className='text-foreground font-medium'>Private & shared spaces</span>
 							</div>
 							<div className='flex items-start gap-2.5'>
-								<div className='h-5 w-5 rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
+								<div className='h-5 w-5 rounded-md border border-border bg-muted/50 text-[#5e6ad2] flex items-center justify-center shrink-0 mt-0.5'>
 									<Check className='h-3 w-3' />
 								</div>
 								<span className='text-foreground font-medium'>Share links & page invitations</span>
@@ -297,55 +304,63 @@ export function FeatureShowcases() {
 						</div>
 					</div>
 
-					{/* UI Preview Column */}
-					<div className='relative rounded-2xl border border-border/80 bg-card p-6 shadow-soft overflow-hidden'>
-						<div className='flex items-center justify-between pb-4 border-b border-border/60 text-xs'>
-							<div className='flex items-center gap-2 font-semibold text-foreground'>
-								<Shield className='h-4 w-4 text-muted-foreground' />
-								Workspace Members & Roles
-							</div>
-							<Badge variant='outline' className='text-[10px]'>People</Badge>
-						</div>
-
-						{/* Member list */}
-						<div className='mt-4 space-y-3'>
-							<div className='flex items-center justify-between p-2.5 rounded-xl border border-border/60 bg-muted/20 text-xs'>
-								<div className='flex items-center gap-2.5'>
-									<div className='h-8 w-8 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center text-xs'>
-										AD
-									</div>
-									<div>
-										<div className='font-semibold text-foreground'>Alex Doe</div>
-										<div className='text-[10px] text-muted-foreground'>alex@taskmanly.app</div>
-									</div>
+					{/* UI Preview Column (Double-bezel frame) */}
+					<div className='rounded-2xl border border-border/80 bg-muted/35 p-2 shadow-xs'>
+						<div className='relative rounded-xl border border-border/80 bg-card p-6 shadow-2xs overflow-hidden'>
+							<div className='flex items-center justify-between pb-4 border-b border-border/60 text-xs'>
+								<div className='flex items-center gap-2 font-semibold text-foreground'>
+									<Shield className='h-4 w-4 text-muted-foreground' />
+									Workspace Members & Roles
 								</div>
-								<Badge className='bg-primary text-primary-foreground text-[10px]'>Workspace Owner</Badge>
+								<Badge variant='outline' className='text-[10px] border-border bg-muted/50 text-muted-foreground'>
+									3 members
+								</Badge>
 							</div>
 
-							<div className='flex items-center justify-between p-2.5 rounded-xl border border-border/60 bg-muted/20 text-xs'>
-								<div className='flex items-center gap-2.5'>
-									<div className='h-8 w-8 rounded-full bg-muted text-muted-foreground font-bold flex items-center justify-center text-xs'>
-										SK
+							{/* Member list */}
+							<div className='mt-4 space-y-3'>
+								<div className='flex items-center justify-between p-2.5 rounded-xl border border-border/60 bg-muted/20 text-xs'>
+									<div className='flex items-center gap-2.5'>
+										<div className='h-8 w-8 rounded-full bg-[#eeeffc] text-[#5e6ad2] dark:bg-indigo-500/20 dark:text-indigo-300 font-bold flex items-center justify-center text-xs border border-[#5e6ad2]/25'>
+											AD
+										</div>
+										<div>
+											<div className='font-semibold text-foreground'>Alex Doe</div>
+											<div className='text-[10px] text-muted-foreground'>alex@taskmanly.app</div>
+										</div>
 									</div>
-									<div>
-										<div className='font-semibold text-foreground'>Sarah Kim</div>
-										<div className='text-[10px] text-muted-foreground'>sarah@taskmanly.app</div>
-									</div>
+									<Badge className='bg-[#5e6ad2] text-white text-[10px] hover:bg-[#5e6ad2]'>Workspace Owner</Badge>
 								</div>
-								<Badge variant='secondary' className='text-[10px]'>Member</Badge>
-							</div>
 
-							<div className='flex items-center justify-between p-2.5 rounded-xl border border-border/60 bg-muted/20 text-xs'>
-								<div className='flex items-center gap-2.5'>
-									<div className='h-8 w-8 rounded-full bg-muted text-muted-foreground font-bold flex items-center justify-center text-xs'>
-										NL
+								<div className='flex items-center justify-between p-2.5 rounded-xl border border-border/60 bg-muted/20 text-xs'>
+									<div className='flex items-center gap-2.5'>
+										<div className='h-8 w-8 rounded-full bg-secondary text-foreground font-bold flex items-center justify-center text-xs border border-border'>
+											SK
+										</div>
+										<div>
+											<div className='font-semibold text-foreground'>Sarah Kim</div>
+											<div className='text-[10px] text-muted-foreground'>sarah@taskmanly.app</div>
+										</div>
 									</div>
-									<div>
-										<div className='font-semibold text-foreground'>Nam Le</div>
-										<div className='text-[10px] text-muted-foreground'>nam@taskmanly.app</div>
-									</div>
+									<Badge variant='secondary' className='text-[10px]'>
+										Member
+									</Badge>
 								</div>
-								<Badge variant='outline' className='text-[10px]'>Guest</Badge>
+
+								<div className='flex items-center justify-between p-2.5 rounded-xl border border-border/60 bg-muted/20 text-xs'>
+									<div className='flex items-center gap-2.5'>
+										<div className='h-8 w-8 rounded-full bg-muted text-muted-foreground font-bold flex items-center justify-center text-xs border border-border'>
+											NL
+										</div>
+										<div>
+											<div className='font-semibold text-foreground'>Nam Le</div>
+											<div className='text-[10px] text-muted-foreground'>nam@taskmanly.app</div>
+										</div>
+									</div>
+									<Badge variant='outline' className='text-[10px]'>
+										Guest
+									</Badge>
+								</div>
 							</div>
 						</div>
 					</div>

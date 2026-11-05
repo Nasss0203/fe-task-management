@@ -113,6 +113,11 @@ export interface DatabasePerson {
 	avatar_url: string | null;
 }
 
+export interface CalendarFeed {
+	token: string;
+	datePropertyId: string;
+}
+
 export interface SetDatabaseRowValueResponse {
 	id: string;
 	rowId: string;

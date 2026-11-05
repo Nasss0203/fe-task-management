@@ -12,36 +12,35 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 	// 1. Team Wiki: Nested page hierarchy with breadcrumb and content blocks
 	if (type === "wiki" || type === "checklist") {
 		return (
-			<div className='h-full w-full rounded-xl border border-border/80 bg-card p-4 flex flex-col justify-between select-none'>
+			<div className='h-full w-full rounded-lg border border-border/80 bg-card p-3.5 flex flex-col justify-between select-none shadow-2xs'>
 				<div className='flex items-center justify-between pb-2 border-b border-border/50 text-[10px] text-muted-foreground'>
 					<div className='flex items-center gap-1.5'>
-						<div className='h-2.5 w-12 rounded bg-muted-foreground/30' />
-						<span>/</span>
-						<div className='h-2.5 w-16 rounded bg-foreground/35 font-semibold' />
+						<div className='h-2 w-2 rounded-xs bg-[#5e6ad2]' />
+						<div className='h-2 w-14 rounded bg-foreground/30 font-semibold' />
 					</div>
 					<div className='h-2 w-8 rounded bg-muted-foreground/20' />
 				</div>
 
 				<div className='space-y-2 py-2'>
-					<div className='h-3.5 w-3/4 rounded-md bg-foreground/20 font-bold' />
+					<div className='h-3 w-3/4 rounded bg-foreground/25 font-bold' />
 					<div className='h-2 w-full rounded bg-muted-foreground/20' />
 					<div className='h-2 w-5/6 rounded bg-muted-foreground/15' />
 
 					{/* Nested children links */}
 					<div className='grid grid-cols-2 gap-2 pt-1.5'>
-						<div className='flex items-center gap-1.5 p-1.5 rounded-lg border border-border/60 bg-muted/30'>
-							<div className='h-2 w-2 rounded-full bg-foreground/50' />
+						<div className='flex items-center gap-1.5 p-1.5 rounded-md border border-border/60 bg-muted/30'>
+							<div className='h-1.5 w-1.5 rounded-full bg-[#5e6ad2]' />
 							<div className='h-2 w-16 rounded bg-foreground/20' />
 						</div>
-						<div className='flex items-center gap-1.5 p-1.5 rounded-lg border border-border/60 bg-muted/30'>
-							<div className='h-2 w-2 rounded-full bg-muted-foreground/50' />
+						<div className='flex items-center gap-1.5 p-1.5 rounded-md border border-border/60 bg-muted/30'>
+							<div className='h-1.5 w-1.5 rounded-full bg-muted-foreground/50' />
 							<div className='h-2 w-14 rounded bg-foreground/20' />
 						</div>
 					</div>
 				</div>
 
 				<div className='flex items-center gap-2 pt-1 border-t border-border/40 text-[9px] text-muted-foreground'>
-					<div className='h-2 w-2 rounded-full bg-emerald-500' />
+					<div className='h-1.5 w-1.5 rounded-full bg-emerald-500' />
 					<span>Live Workspace Sync</span>
 				</div>
 			</div>
@@ -51,35 +50,35 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 	// 2. Meeting Notes: Agendas and actionable checklists
 	if (type === "notes" || type === "meeting") {
 		return (
-			<div className='h-full w-full rounded-xl border border-border/80 bg-card p-4 flex flex-col justify-between select-none'>
+			<div className='h-full w-full rounded-lg border border-border/80 bg-card p-3.5 flex flex-col justify-between select-none shadow-2xs'>
 				<div className='flex items-center justify-between pb-2 border-b border-border/50'>
 					<div className='flex items-center gap-2'>
-						<div className='h-2.5 w-20 rounded bg-foreground/30' />
-						<span className='text-[9px] px-1.5 py-0.5 rounded bg-secondary text-muted-foreground font-medium'>
+						<div className='h-2 w-20 rounded bg-foreground/30' />
+						<span className='text-[9px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-medium'>
 							Weekly Sync
 						</span>
 					</div>
-					<div className='h-2 w-10 rounded bg-muted-foreground/30' />
+					<div className='h-2 w-10 rounded bg-muted-foreground/25' />
 				</div>
 
 				<div className='space-y-2 py-1'>
 					<div className='flex items-center gap-2'>
-						<div className='h-3 w-3 rounded border border-foreground/40 bg-foreground/15 flex items-center justify-center' />
+						<div className='h-3 w-3 rounded-xs bg-[#5e6ad2] flex items-center justify-center' />
 						<div className='h-2 w-3/4 rounded bg-foreground/25' />
 					</div>
 					<div className='flex items-center gap-2'>
-						<div className='h-3 w-3 rounded border border-foreground/40 bg-foreground/15 flex items-center justify-center' />
+						<div className='h-3 w-3 rounded-xs bg-[#5e6ad2] flex items-center justify-center' />
 						<div className='h-2 w-2/3 rounded bg-foreground/25' />
 					</div>
 					<div className='flex items-center gap-2'>
-						<div className='h-3 w-3 rounded border border-border bg-background' />
+						<div className='h-3 w-3 rounded-xs border border-border bg-background' />
 						<div className='h-2 w-4/5 rounded bg-muted-foreground/30' />
 					</div>
 				</div>
 
-				<div className='p-2 rounded-lg bg-muted/40 border border-border/50 flex items-center justify-between'>
+				<div className='p-2 rounded-md bg-muted/40 border border-border/50 flex items-center justify-between'>
 					<div className='h-2 w-24 rounded bg-foreground/20' />
-					<div className='h-3 w-8 rounded bg-secondary' />
+					<div className='h-2.5 w-8 rounded bg-secondary' />
 				</div>
 			</div>
 		);
@@ -88,25 +87,25 @@ export default function TemplatePreview({ variant, previewType }: TemplatePrevie
 	// 3. Knowledge Base: Hub with categories and article cards
 	if (type === "knowledge" || type === "mindmap") {
 		return (
-			<div className='h-full w-full rounded-xl border border-border/80 bg-card p-4 flex flex-col justify-between select-none'>
+			<div className='h-full w-full rounded-lg border border-border/80 bg-card p-3.5 flex flex-col justify-between select-none shadow-2xs'>
 				<div className='flex items-center justify-between pb-2 border-b border-border/50'>
-					<div className='h-3 w-28 rounded bg-foreground/30 font-bold' />
-					<div className='h-2 w-12 rounded-full bg-muted-foreground/30' />
+					<div className='h-2.5 w-28 rounded bg-foreground/30 font-bold' />
+					<div className='h-2 w-12 rounded-full bg-muted-foreground/25' />
 				</div>
 
 				<div className='grid grid-cols-3 gap-2 py-1.5'>
-					<div className='rounded-lg border border-border/60 bg-muted/30 p-2 space-y-1.5'>
-						<div className='h-2 w-2 rounded-full bg-foreground/60' />
+					<div className='rounded-md border border-border/60 bg-muted/30 p-2 space-y-1.5'>
+						<div className='h-1.5 w-1.5 rounded-full bg-[#5e6ad2]' />
 						<div className='h-2 w-full rounded bg-foreground/20' />
 						<div className='h-1.5 w-2/3 rounded bg-muted-foreground/20' />
 					</div>
-					<div className='rounded-lg border border-border/60 bg-muted/30 p-2 space-y-1.5'>
-						<div className='h-2 w-2 rounded-full bg-muted-foreground/60' />
+					<div className='rounded-md border border-border/60 bg-muted/30 p-2 space-y-1.5'>
+						<div className='h-1.5 w-1.5 rounded-full bg-foreground/50' />
 						<div className='h-2 w-full rounded bg-foreground/20' />
 						<div className='h-1.5 w-2/3 rounded bg-muted-foreground/20' />
 					</div>
-					<div className='rounded-lg border border-border/60 bg-muted/30 p-2 space-y-1.5'>
-						<div className='h-2 w-2 rounded-full bg-muted-foreground/40' />
+					<div className='rounded-md border border-border/60 bg-muted/30 p-2 space-y-1.5'>
+						<div className='h-1.5 w-1.5 rounded-full bg-muted-foreground/50' />
 						<div className='h-2 w-full rounded bg-foreground/20' />
 						<div className='h-1.5 w-2/3 rounded bg-muted-foreground/20' />
 					</div>

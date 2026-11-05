@@ -3,7 +3,7 @@ import { LayoutGrid } from "lucide-react";
 
 export const Footer = () => {
 	return (
-		<footer className='border-t border-border/80 bg-card/60 backdrop-blur-sm mt-20 sm:mt-28'>
+		<footer className='border-t border-border/80 bg-card/60 backdrop-blur-sm mt-8 sm:mt-12'>
 			<div className='mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-14 sm:py-16'>
 				<div className='grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12'>
 					{/* Brand Column */}

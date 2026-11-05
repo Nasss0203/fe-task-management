@@ -21,8 +21,8 @@ export function HomeTemplatesShowcase() {
 				{/* Header */}
 				<div className='flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16'>
 					<div className='max-w-xl space-y-3'>
-						<div className='inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium text-muted-foreground'>
-							<LayoutTemplate className='h-3.5 w-3.5' />
+						<div className='inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground shadow-2xs'>
+							<span className='h-1.5 w-1.5 rounded-full bg-[#5e6ad2]' />
 							Curated Starter Frameworks
 						</div>
 						<h2 className='text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground'>
@@ -46,13 +46,13 @@ export function HomeTemplatesShowcase() {
 					{showcaseTemplates.map((template) => (
 						<div
 							key={template.id}
-							className='group flex flex-col h-full rounded-xl border border-border bg-card p-4 transition-colors hover:border-foreground/20'
+							className='group flex flex-col h-full rounded-2xl border border-border/80 bg-card p-4 transition-colors hover:border-foreground/20 shadow-2xs'
 						>
-							{/* Visual Preview Box */}
-							<div className='relative h-44 w-full rounded-lg overflow-hidden border border-border/50 bg-muted/30 mb-4 shrink-0'>
+							{/* Visual Preview Box (Recessed well) */}
+							<div className='relative h-44 w-full rounded-xl overflow-hidden border border-border/60 bg-muted/40 p-2.5 mb-4 shrink-0'>
 								<TemplatePreview previewType={template.previewType} variant={template.variant} />
 								<div className='absolute inset-0 pointer-events-none' />
-								<Badge className='absolute top-2.5 right-2.5 bg-background/90 text-foreground border border-border/60 text-[10px] shadow-xs'>
+								<Badge className='absolute top-4 right-4 bg-background/95 text-foreground border border-border/80 text-[10px] shadow-2xs'>
 									{template.category}
 								</Badge>
 							</div>

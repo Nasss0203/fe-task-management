@@ -46,8 +46,16 @@ const DRAFT_STATUS_LABEL: Record<AiGeneration["status"], string> = {
 	FAILED: "Failed",
 };
 
+const DRAFT_STATUS_STYLE: Record<AiGeneration["status"], string> = {
+	PROCESSING: "bg-[#eeeffc] text-[#5e6ad2] dark:bg-indigo-500/15 dark:text-indigo-300",
+	COMPLETED: "bg-[#eeeffc] text-[#5e6ad2] dark:bg-indigo-500/15 dark:text-indigo-300",
+	APPLIED: "bg-[#e9f6ec] text-[#2f9e44] dark:bg-emerald-500/15 dark:text-emerald-300",
+	DISCARDED: "bg-muted text-muted-foreground",
+	FAILED: "bg-[#fdecec] text-[#e5484d] dark:bg-red-500/15 dark:text-red-300",
+};
+
 const rowClassName =
-	"flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs text-foreground transition-colors hover:bg-accent/60 disabled:pointer-events-none disabled:opacity-50";
+	"flex w-full items-center gap-2 rounded-[6px] px-2 py-1.5 text-left text-[12.5px] text-foreground transition-colors hover:bg-accent/60 disabled:pointer-events-none disabled:opacity-50";
 
 /** A compact History button; the list opens in a popover instead of taking a row. */
 export function AiChatHistory({
@@ -72,7 +80,7 @@ export function AiChatHistory({
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
 				<Button type="button" variant="ghost" size="sm"
-					className="h-7 gap-1.5 px-2 text-xs font-medium text-muted-foreground hover:bg-accent/50 hover:text-foreground">
+					className="h-7 gap-1.5 rounded-[6px] px-2 text-[13px] font-normal text-muted-foreground hover:bg-accent/50 hover:text-foreground">
 					<Clock3 className="size-3.5" aria-hidden="true" />
 					History
 					{conversations.length > 0 && (
@@ -83,8 +91,8 @@ export function AiChatHistory({
 				</Button>
 			</PopoverTrigger>
 
-			<PopoverContent align="end" className="w-80 p-0">
-				<div className="flex items-center justify-between border-b border-border/60 px-3 py-2">
+			<PopoverContent align="end" className="w-80 rounded-[10px] border-border p-0">
+				<div className="flex items-center justify-between border-b border-border/60 px-3.5 py-2">
 					<p className="text-xs font-medium text-foreground">Chat history</p>
 					<Button type="button" variant="ghost" size="xs" disabled={disabled}
 						onClick={pick(onNewChat)}
@@ -93,7 +101,7 @@ export function AiChatHistory({
 					</Button>
 				</div>
 
-				<div className="max-h-96 space-y-0.5 overflow-y-auto p-1.5">
+				<div className="max-h-96 space-y-0.5 overflow-y-auto p-2">
 					{loading && (
 						<p className="flex items-center gap-2 px-2 py-1.5 text-xs text-muted-foreground">
 							<Loader2 className="size-3.5 animate-spin" /> Loading conversations...
@@ -106,6 +114,8 @@ export function AiChatHistory({
 
 					{conversations.map((conversation) => {
 						const selected = selectedConversationId === conversation.id;
+						const ConversationIcon =
+							conversation.scope === "PAGE" ? FileText : MessageSquare;
 
 						return (
 							<button
@@ -114,15 +124,15 @@ export function AiChatHistory({
 								disabled={disabled}
 								aria-current={selected ? "true" : undefined}
 								onClick={pick(() => onSelectConversation(conversation.id))}
-								className={cn(rowClassName, selected && "bg-accent font-medium")}
+								className={cn(rowClassName, selected && "bg-muted font-medium")}
 								title={conversation.title ?? "Untitled chat"}
 							>
-								<MessageSquare className="size-3.5 shrink-0 text-muted-foreground" />
+								<ConversationIcon className="size-3.5 shrink-0 text-muted-foreground" />
 								<span className="min-w-0 flex-1 truncate">{conversation.title || "Untitled chat"}</span>
 								{conversation.status === "ARCHIVED" && (
 									<span className="shrink-0 text-[10px] text-muted-foreground">Archived</span>
 								)}
-								<span className="shrink-0 rounded bg-muted px-1.5 py-px text-[10px] text-muted-foreground">
+								<span className="shrink-0 rounded-[10px] bg-muted px-2 py-0.5 text-[10.5px] font-medium text-muted-foreground">
 									{conversation.scope === "PAGE" ? "Page" : "Chat"}
 								</span>
 							</button>
@@ -137,13 +147,13 @@ export function AiChatHistory({
 						<button type="button"
 							disabled={disabled || loadingMoreConversations}
 							onClick={onLoadConversations}
-							className={cn(rowClassName, "justify-center text-muted-foreground")}>
+							className={cn(rowClassName, "text-xs text-muted-foreground")}>
 							{loadingMoreConversations ? "Loading..." : "Load more conversations"}
 						</button>
 					)}
 
 					{selectedConversationId && drafts.length > 0 && (
-						<div className="mt-1.5 border-t border-border/50 pt-1.5">
+						<div className="mt-1.5 border-t border-border/60 pt-1.5">
 							<p className="px-2 pb-1 text-[11px] font-medium text-muted-foreground">Drafts in this chat</p>
 							{drafts.map((generation) => {
 								const isPageDraft = generation.capability === "GENERATE_PAGE_COMPOSITION";
@@ -159,11 +169,8 @@ export function AiChatHistory({
 											{isPageDraft ? "Page draft" : "Page modification"}
 										</span>
 										<span className={cn(
-											"shrink-0 text-[10px]",
-											generation.status === "APPLIED" ? "text-success"
-												: generation.status === "FAILED" ? "text-destructive"
-													: generation.status === "COMPLETED" ? "text-primary"
-														: "text-muted-foreground",
+											"shrink-0 rounded-[10px] px-2 py-0.5 text-[11px] font-medium leading-[17px]",
+											DRAFT_STATUS_STYLE[generation.status],
 										)}>
 											{DRAFT_STATUS_LABEL[generation.status]}
 										</span>
@@ -174,7 +181,7 @@ export function AiChatHistory({
 								<button type="button"
 									disabled={disabled || loadingMoreGenerations}
 									onClick={onLoadGenerations}
-									className={cn(rowClassName, "justify-center text-muted-foreground")}>
+									className={cn(rowClassName, "text-xs text-muted-foreground")}>
 									{loadingMoreGenerations ? "Loading..." : "Load more drafts"}
 								</button>
 							)}

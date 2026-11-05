@@ -4,14 +4,13 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
-import { ChevronRight, Loader2, MessageSquare } from "lucide-react";
+import { ChevronRight, FileText, Loader2, MessageSquare, Sparkles } from "lucide-react";
 
 import { useAiChat } from "../model/use-ai-chat";
 import { EMPTY_AI_CHAT_THREAD, useAiChatStore } from "../model/use-ai-chat-store";
 
 import { AiChatComposer } from "./AiChatComposer";
 import { getQuickActionIcon, QUICK_ACTIONS } from "./AiChatEmptyState";
-import { AiAssistantAvatar } from "./AiMessageItem";
 
 export const AI_CHAT_THREAD_PATH = "/dashboard/ai/chat";
 
@@ -59,15 +58,18 @@ export function AiChatHome() {
 
 	return (
 		<div className='h-full overflow-y-auto'>
-			<div className='mx-auto w-full max-w-2xl px-4 pt-[12vh] pb-16 sm:px-6'>
-				<div className='mb-6 flex flex-col items-center text-center'>
-					<div className='mb-4 scale-125'>
-						<AiAssistantAvatar />
+			<div className='mx-auto w-full max-w-[640px] px-4 pt-20 pb-16 sm:px-0 sm:pt-24'>
+				<div className='mb-5 flex flex-col items-center text-center'>
+					<div
+						aria-hidden='true'
+						className='mb-4 flex size-[52px] items-center justify-center rounded-[14px] bg-[#eeeffc] text-[#5e6ad2] dark:bg-indigo-500/15 dark:text-indigo-300'
+					>
+						<Sparkles className='size-6' />
 					</div>
-					<h1 className='text-2xl font-semibold tracking-tight text-foreground sm:text-3xl'>
+					<h1 className='text-[28px] font-bold leading-[42px] tracking-tight text-foreground'>
 						How can I help you today?
 					</h1>
-					<p className='mt-2 text-sm text-muted-foreground'>
+					<p className='mt-1.5 text-[14px] leading-[21px] text-muted-foreground'>
 						Write, create a page, or update an existing page in your workspace.
 					</p>
 				</div>
@@ -75,11 +77,16 @@ export function AiChatHome() {
 				{isPending && (
 					<Link
 						href={AI_CHAT_THREAD_PATH}
-						className='mb-2 flex items-center justify-center gap-2 rounded-lg bg-muted/60 px-3 py-2 text-xs text-muted-foreground hover:text-foreground'
+						className='mb-3 flex items-center gap-2 rounded-[10px] bg-[#eeeffc] px-3.5 py-2.5 text-[13px] text-[#5e6ad2] transition-opacity hover:opacity-90 dark:bg-indigo-500/15 dark:text-indigo-300'
 					>
-						<Loader2 className='size-3.5 animate-spin' />
-						AI is still responding in your current chat. Open chat
-						<ChevronRight className='size-3.5' />
+						<Loader2 className='size-3.5 shrink-0 animate-spin' />
+						<span className='min-w-0 flex-1'>
+							AI is still responding in your current chat.
+						</span>
+						<span className='inline-flex shrink-0 items-center gap-0.5 font-semibold'>
+							Open chat
+							<ChevronRight className='size-3.5' />
+						</span>
 					</Link>
 				)}
 
@@ -90,14 +97,14 @@ export function AiChatHome() {
 					disabled={disabled}
 				/>
 
-				<div className='flex flex-wrap justify-center gap-2'>
+				<div className='mt-1.5 flex flex-wrap justify-center gap-2'>
 					{QUICK_ACTIONS.map((action) => (
 						<button
 							key={action.id}
 							type='button'
 							disabled={disabled}
 							onClick={() => selectQuickAction(chatScope, action)}
-							className='inline-flex h-8 items-center gap-1.5 rounded-full border border-border/60 px-3 text-xs font-medium text-foreground/90 transition-colors hover:bg-accent/50 disabled:opacity-50'
+							className='inline-flex h-[34px] items-center gap-[7px] rounded-full border border-input bg-background px-3 text-[13px] font-normal text-foreground transition-colors hover:bg-accent/60 disabled:opacity-50'
 						>
 							{getQuickActionIcon(action.iconName)}
 							{action.label}
@@ -105,18 +112,21 @@ export function AiChatHome() {
 					))}
 				</div>
 
-				<section className='mt-12' aria-labelledby='ai-recent-chats'>
-					<h2 id='ai-recent-chats' className='mb-2 px-1 text-sm font-medium text-foreground'>
+				<section className='mt-10' aria-labelledby='ai-recent-chats'>
+					<h2
+						id='ai-recent-chats'
+						className='mb-1.5 px-3 text-[12.5px] font-medium leading-[19px] text-muted-foreground'
+					>
 						Recent chats
 					</h2>
 
 					{loading ? (
-						<p className='flex items-center gap-2 px-1 py-3 text-xs text-muted-foreground'>
+						<p className='flex items-center gap-2 px-3 py-3 text-xs text-muted-foreground'>
 							<Loader2 className='size-3.5 animate-spin' /> Loading conversations...
 						</p>
 					) : null}
 					{error && (
-						<p role='alert' className='px-1 py-3 text-xs text-destructive'>
+						<p role='alert' className='px-3 py-3 text-xs text-destructive'>
 							Unable to load chat history.
 						</p>
 					)}
@@ -125,54 +135,71 @@ export function AiChatHome() {
 							No chats yet. Your conversations will appear here.
 						</p>
 					) : !loading && (!error || listDenied) && conversations.length > 0 ? (
-						<ul className='overflow-hidden rounded-xl border border-border/60 bg-card'>
-							{conversations.map((conversation) => (
-								<li key={conversation.id} className='border-b border-border/40 last:border-b-0'>
-									<button
-										type='button'
-										disabled={disabled}
-										onClick={() => openConversation(conversation.id)}
-										className='group flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-accent/40 disabled:opacity-50'
-									>
-										<MessageSquare className='size-4 shrink-0 text-muted-foreground' />
-										<span className='min-w-0 flex-1'>
-											<span className='block truncate text-sm text-foreground'>
+						<div className='max-h-[280px] overflow-y-auto pr-1 sm:max-h-[320px]'>
+							<ul className='space-y-0.5'>
+								{conversations.map((conversation) => (
+									<li key={conversation.id}>
+										<button
+											type='button'
+											disabled={disabled}
+											onClick={() => openConversation(conversation.id)}
+											className='group flex min-h-[44px] w-full items-center gap-2.5 rounded-[8px] px-3 py-2 text-left transition-colors hover:bg-accent/50 disabled:opacity-50'
+										>
+											{conversation.scope === "PAGE" ? (
+												<FileText className='size-[15px] shrink-0 text-muted-foreground' />
+											) : (
+												<MessageSquare className='size-[15px] shrink-0 text-muted-foreground' />
+											)}
+											<span className='min-w-0 flex-1 truncate text-[13.5px] font-normal leading-5 text-foreground'>
 												{conversation.title || "Untitled chat"}
 											</span>
-											<span className='mt-0.5 block text-[11px] text-muted-foreground'>
+											<span className='shrink-0 rounded-[10px] bg-muted px-2 py-0.5 text-[11.5px] font-medium leading-[17px] text-muted-foreground'>
 												{conversation.scope === "PAGE" ? "Page changes" : "Chat"}
-												{" · "}
-												{formatDistanceToNow(new Date(conversation.updated_at), { addSuffix: true })}
 											</span>
-										</span>
-										<ChevronRight className='size-4 shrink-0 text-muted-foreground/60 transition-transform group-hover:translate-x-0.5' />
-									</button>
-								</li>
-							))}
-						</ul>
+											<span className='shrink-0 text-[12px] leading-[18px] text-faint'>
+												{formatDistanceToNow(new Date(conversation.updated_at), {
+													addSuffix: true,
+												})}
+											</span>
+										</button>
+									</li>
+								))}
+							</ul>
+
+							{hasMore && (
+								<button
+									type='button'
+									disabled={loadingMore}
+									onClick={() => {
+										if (conversationsQuery.hasNextPage)
+											void conversationsQuery.fetchNextPage();
+										else void workspacePageConversationsQuery.fetchNextPage();
+									}}
+									className='mt-1 inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground disabled:opacity-50'
+								>
+									{loadingMore && <Loader2 className='size-3 animate-spin' />}
+									{loadingMore ? "Loading..." : "Load more chats"}
+								</button>
+							)}
+						</div>
 					) : null}
 
 					{listDenied && (
-						<button type="button" disabled={conversationsQuery.isFetching || workspacePageConversationsQuery.isFetching}
-							onClick={() => {
-								if (conversationsQuery.isAccessDenied) void conversationsQuery.refetch();
-								if (workspacePageConversationsQuery.isAccessDenied) void workspacePageConversationsQuery.refetch();
-							}}
-							className="mt-3 text-xs text-muted-foreground underline">Retry chat history</button>
-					)}
-
-					{hasMore && (
 						<button
 							type='button'
-							disabled={loadingMore}
+							disabled={
+								conversationsQuery.isFetching ||
+								workspacePageConversationsQuery.isFetching
+							}
 							onClick={() => {
-								if (conversationsQuery.hasNextPage) void conversationsQuery.fetchNextPage();
-								else void workspacePageConversationsQuery.fetchNextPage();
+								if (conversationsQuery.isAccessDenied)
+									void conversationsQuery.refetch();
+								if (workspacePageConversationsQuery.isAccessDenied)
+									void workspacePageConversationsQuery.refetch();
 							}}
-							className='mx-auto mt-3 flex items-center gap-1.5 rounded-full border border-border/60 px-3 py-1 text-xs text-muted-foreground hover:bg-accent/50 hover:text-foreground disabled:opacity-50'
+							className='mt-2 px-3 text-xs text-muted-foreground underline'
 						>
-							{loadingMore && <Loader2 className='size-3 animate-spin' />}
-							{loadingMore ? "Loading..." : "Load more chats"}
+							Retry chat history
 						</button>
 					)}
 				</section>

@@ -15,14 +15,34 @@ export type AiDraftStatus =
 	| "failed";
 
 const STATUS: Record<AiDraftStatus, { label: string; className: string }> = {
-	review: { label: "Awaiting review", className: "bg-primary/10 text-primary" },
+	review: {
+		label: "Awaiting review",
+		className:
+			"bg-[#eeeffc] text-[#5e6ad2] dark:bg-indigo-500/15 dark:text-indigo-300",
+	},
 	preview: { label: "Preview", className: "bg-muted text-muted-foreground" },
-	"needs-info": { label: "Needs more info", className: "bg-warning/10 text-warning" },
-	processing: { label: "Generating", className: "bg-muted text-muted-foreground" },
-	stale: { label: "Outdated", className: "bg-warning/10 text-warning" },
-	applied: { label: "Applied", className: "bg-success/10 text-success" },
+	"needs-info": {
+		label: "Needs more info",
+		className:
+			"bg-[#fbf3db] text-[#b07b00] dark:bg-amber-500/15 dark:text-amber-300",
+	},
+	processing: {
+		label: "Generating",
+		className:
+			"bg-[#eeeffc] text-[#5e6ad2] dark:bg-indigo-500/15 dark:text-indigo-300",
+	},
+	stale: { label: "Outdated", className: "bg-muted text-muted-foreground" },
+	applied: {
+		label: "Applied",
+		className:
+			"bg-[#e9f6ec] text-[#2f9e44] dark:bg-emerald-500/15 dark:text-emerald-300",
+	},
 	discarded: { label: "Discarded", className: "bg-muted text-muted-foreground" },
-	failed: { label: "Failed", className: "bg-destructive/10 text-destructive" },
+	failed: {
+		label: "Failed",
+		className:
+			"bg-[#fdecec] text-[#e5484d] dark:bg-red-500/15 dark:text-red-300",
+	},
 };
 
 export function AiDraftStatusBadge({ status }: { status: AiDraftStatus }) {
@@ -31,7 +51,7 @@ export function AiDraftStatusBadge({ status }: { status: AiDraftStatus }) {
 	return (
 		<span
 			className={cn(
-				"inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium",
+				"inline-flex shrink-0 items-center gap-1 rounded-[10px] px-2 py-0.5 text-[11.5px] font-medium leading-[17px]",
 				className,
 			)}
 		>

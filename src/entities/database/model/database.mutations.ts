@@ -7,6 +7,7 @@ import { databaseKeys } from "./database.queries";
 import {
 	DatabaseViewType,
 	PropertyType,
+	type CalendarFeed,
 	type Database,
 	type DatabaseRow,
 	type DatabaseViewDetail,
@@ -260,6 +261,37 @@ export function useRenameDatabase(databaseId: string) {
 				database ? { ...database, name } : database,
 			);
 			await queryClient.invalidateQueries({ queryKey: ["pages", "workspace"] });
+		},
+	});
+}
+
+export function useUpsertCalendarFeed(databaseId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (datePropertyId: string) =>
+			databaseApi.upsertCalendarFeed(databaseId, datePropertyId),
+
+		onSuccess: (feed) => {
+			queryClient.setQueryData<CalendarFeed | null>(
+				databaseKeys.calendarFeed(databaseId),
+				feed,
+			);
+		},
+	});
+}
+
+export function useRevokeCalendarFeed(databaseId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: () => databaseApi.revokeCalendarFeed(databaseId),
+
+		onSuccess: () => {
+			queryClient.setQueryData<CalendarFeed | null>(
+				databaseKeys.calendarFeed(databaseId),
+				null,
+			);
 		},
 	});
 }

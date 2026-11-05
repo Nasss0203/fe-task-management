@@ -169,12 +169,12 @@ export function AiPageCompositionPreview({
   return (
     <div
       className={cn(
-        "min-w-0 overflow-hidden rounded-xl border border-border/60 bg-card",
+        "min-w-0 overflow-hidden rounded-[12px] border border-border bg-card",
         generation.status === "DISCARDED" && "opacity-75",
       )}
     >
       <div className="flex items-start gap-3 p-4">
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-[8px] bg-[#eeeffc] text-[#5e6ad2] dark:bg-indigo-500/15 dark:text-indigo-300">
           <FileText className="size-4" />
         </div>
 
@@ -196,25 +196,26 @@ export function AiPageCompositionPreview({
       </div>
 
       {requireContentReview && (
-        <div className="space-y-2 px-4 pb-4">
-          <details className="rounded-lg border border-border/60 p-3"
+        <div className="space-y-2.5 px-4 pb-4">
+          <details className="rounded-[8px] border border-border p-3"
             onToggle={(event) => { if (event.currentTarget.open) setOpenedContent(reviewKey); }}>
-            <summary className="cursor-pointer text-xs font-medium">Review full generated content</summary>
-            <p className="mt-2 text-xs text-muted-foreground">Read-only page content, including all blocks, databases and row values. Check any details AI may have inferred.</p>
-            <div className="mt-3 max-h-80 overflow-auto rounded-md bg-background/40 p-3">
+            <summary className="cursor-pointer text-[12.5px] font-medium text-foreground">Review full generated content</summary>
+            <p className="mt-1.5 text-xs text-muted-foreground">Read-only page content, including all blocks, databases and row values. Check any details AI may have inferred.</p>
+            <div className="mt-3 max-h-80 overflow-auto rounded-[6px] bg-muted/30 p-3">
               <CompositionContent draft={generation.output_data as PageCompositionDraft} />
             </div>
           </details>
           {isCompleted && <label htmlFor={reviewId} className="flex items-start gap-2 text-xs text-muted-foreground">
             <input id={reviewId} type="checkbox" checked={approvedContent === reviewKey}
               disabled={disabled || openedContent !== reviewKey}
-              onChange={(event) => setApprovedContent(event.target.checked ? reviewKey : null)} />
+              onChange={(event) => setApprovedContent(event.target.checked ? reviewKey : null)}
+              className="mt-0.5 size-3.5 rounded-[3px] accent-[#5e6ad2]" />
             I have reviewed the generated content and want to create this page.
           </label>}
         </div>
       )}
       {isCompleted && (
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/50 bg-muted/30 px-4 py-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border bg-muted/25 px-4 py-2.5">
           <p className="text-xs text-muted-foreground">
             The page is created only after you confirm.
           </p>
@@ -223,12 +224,12 @@ export function AiPageCompositionPreview({
             <Button
               type="button"
               size="sm"
-              variant="ghost"
+              variant="outline"
               disabled={disabled}
               onClick={() => onDiscard(generation.id)}
-              className="text-muted-foreground hover:text-foreground"
+              className="h-[30px] rounded-[6px] border-input bg-background px-3 text-[13px] font-medium text-foreground shadow-none hover:bg-accent/50"
             >
-              <Trash2 className="size-4" />
+              <Trash2 className="size-3.5" />
               Discard
             </Button>
 
@@ -237,8 +238,9 @@ export function AiPageCompositionPreview({
               size="sm"
               disabled={disabled || !canConfirm}
               onClick={() => { if (canConfirm) onConfirm(generation.id); }}
+              className="h-[30px] rounded-[6px] px-3 text-[13px]"
             >
-              <Check className="size-4" />
+              <Check className="size-3.5" />
               Confirm
             </Button>
           </div>
