@@ -118,6 +118,25 @@ export interface CalendarFeed {
 	datePropertyId: string;
 }
 
+export type GoogleCalendarSyncError =
+	| "ACCESS_REVOKED"
+	| "ACCESS_LOST"
+	| "DATE_PROPERTY_MISSING"
+	| "CALENDAR_MISSING"
+	| "GOOGLE_ERROR";
+
+export interface GoogleCalendarSyncStatus {
+	connected: boolean;
+	googleEmail: string | null;
+	connectionError: GoogleCalendarSyncError | null;
+	sync: {
+		datePropertyId: string;
+		assignedToMeOnly: boolean;
+		lastSyncedAt: string | null;
+		lastError: GoogleCalendarSyncError | null;
+	} | null;
+}
+
 export interface SetDatabaseRowValueResponse {
 	id: string;
 	rowId: string;
