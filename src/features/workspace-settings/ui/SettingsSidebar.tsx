@@ -1,4 +1,4 @@
-import { Box, CreditCard, User, Users, type LucideIcon } from "lucide-react";
+import { Box, CreditCard, Plug, User, Users, type LucideIcon } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
 import {
@@ -11,6 +11,7 @@ const NAV_ITEMS: { value: SettingsSection; label: string; icon: LucideIcon }[] =
 	{ value: "workspace", label: "Workspace", icon: Box },
 	{ value: "members", label: "Members", icon: Users },
 	{ value: "billing", label: "Billing", icon: CreditCard },
+	{ value: "connections", label: "Connections", icon: Plug },
 ];
 
 const SettingsSidebar = () => {
