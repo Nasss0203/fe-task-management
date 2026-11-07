@@ -1,15 +1,21 @@
 "use client";
 
-import { History } from "lucide-react";
-import { useState } from "react";
+import Link from "next/link";
+import type { ReactNode } from "react";
 
 import {
 	getActivityActorName,
 	getActivityPresentation,
+	getActivityValueChange,
 	groupActivitiesByDay,
 } from "@/entities/activity/lib/activity-presentation";
 import { usePageActivities } from "@/entities/activity/model/activity.queries";
 import type { ActivityItem } from "@/entities/activity/model/activity.types";
+import {
+	formatDatabaseValue,
+	PropertyIcon,
+	PropertyOptionBadge,
+} from "@/entities/database/ui/database-visuals";
 import { formatRelativeTime } from "@/shared/lib/format-relative-time";
 import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
@@ -19,7 +25,6 @@ import {
 	SheetDescription,
 	SheetHeader,
 	SheetTitle,
-	SheetTrigger,
 } from "@/shared/ui/sheet";
 import { Skeleton } from "@/shared/ui/skeleton";
 
@@ -31,35 +36,37 @@ interface PageActivityButtonProps {
 export function PageActivityButton({
 	workspaceId,
 	pageId,
-}: PageActivityButtonProps) {
-	const [open, setOpen] = useState(false);
-
+	open,
+	onOpenChange: setOpen,
+}: PageActivityButtonProps & {
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+}) {
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
-			<SheetTrigger asChild>
-				<Button
-					variant='ghost'
-					size='icon'
-					className='h-7 w-7'
-					aria-label='Page activity'
-				>
-					<History className='size-4' />
-				</Button>
-			</SheetTrigger>
-
 			<SheetContent side='right' className='w-full gap-0 sm:max-w-sm'>
 				<SheetHeader className='border-b'>
 					<SheetTitle>Activity</SheetTitle>
 					<SheetDescription>Changes made on this page.</SheetDescription>
 				</SheetHeader>
 
-				{open && <PageActivityList workspaceId={workspaceId} pageId={pageId} />}
+				{open && (
+					<PageActivityList
+						workspaceId={workspaceId}
+						pageId={pageId}
+						onNavigate={() => setOpen(false)}
+					/>
+				)}
 			</SheetContent>
 		</Sheet>
 	);
 }
 
-function PageActivityList({ workspaceId, pageId }: PageActivityButtonProps) {
+function PageActivityList({
+	workspaceId,
+	pageId,
+	onNavigate,
+}: PageActivityButtonProps & { onNavigate: () => void }) {
 	const {
 		data,
 		isPending,
@@ -110,7 +117,12 @@ function PageActivityList({ workspaceId, pageId }: PageActivityButtonProps) {
 					</h3>
 					<ul className='space-y-2.5'>
 						{group.items.map((item) => (
-							<PageActivityRow key={item.id} activity={item} />
+							<PageActivityRow
+								key={item.id}
+								activity={item}
+								pageId={pageId}
+								onNavigate={onNavigate}
+							/>
 						))}
 					</ul>
 				</section>
@@ -131,12 +143,72 @@ function PageActivityList({ workspaceId, pageId }: PageActivityButtonProps) {
 	);
 }
 
-function PageActivityRow({ activity }: { activity: ActivityItem }) {
-	const name = getActivityActorName(activity.actor);
-	const { icon: Icon, text } = getActivityPresentation(activity);
+function rowLink(activity: ActivityItem, pageId: string): string | null {
+	const openable =
+		activity.entityType === "DATABASE_ROW" &&
+		activity.action !== "DATABASE_ROW_DELETED" &&
+		typeof activity.target?.rowTitle === "string";
+	return openable ? `/page/${pageId}?row=${activity.entityId}` : null;
+}
+
+function PageActivityValue({ activity }: { activity: ActivityItem }) {
+	const change = getActivityValueChange(activity);
+	if (!change) return null;
+
+	let value: ReactNode = null;
+	if (change.cleared) {
+		value = <span className='text-faint'>Cleared</span>;
+	} else if (change.options.length > 0) {
+		value = change.options.map((option) => (
+			<PropertyOptionBadge
+				key={option.id}
+				name={option.name}
+				color={option.color}
+			/>
+		));
+	} else if (change.people.length > 0) {
+		value = <span>{change.people.join(", ")}</span>;
+	} else if (typeof change.value === "boolean") {
+		value = <span>{change.value ? "Checked" : "Unchecked"}</span>;
+	} else if (change.value !== null && !Array.isArray(change.value)) {
+		value = (
+			<span className='truncate'>{formatDatabaseValue(change.value)}</span>
+		);
+	}
 
 	return (
-		<li className='flex items-start gap-2.5 text-sm'>
+		<div className='mt-1.5 space-y-1'>
+			<p className='flex items-center gap-1 text-xs text-muted-foreground'>
+				<PropertyIcon
+					type={change.propertyType ?? "TEXT"}
+					className='size-3.5'
+				/>
+				{change.propertyName}
+			</p>
+			{value && (
+				<div className='flex min-w-0 flex-wrap items-center gap-1 text-sm'>
+					{value}
+				</div>
+			)}
+		</div>
+	);
+}
+
+function PageActivityRow({
+	activity,
+	pageId,
+	onNavigate,
+}: {
+	activity: ActivityItem;
+	pageId: string;
+	onNavigate: () => void;
+}) {
+	const name = getActivityActorName(activity.actor);
+	const { icon: Icon, text, subject } = getActivityPresentation(activity);
+	const href = rowLink(activity, pageId);
+
+	const body = (
+		<>
 			<Avatar className='mt-0.5 size-6 shrink-0'>
 				<AvatarFallback className='bg-ring text-[10px] font-semibold text-white'>
 					{name.charAt(0).toUpperCase()}
@@ -146,12 +218,30 @@ function PageActivityRow({ activity }: { activity: ActivityItem }) {
 				<p className='leading-snug'>
 					<span className='font-medium'>{name}</span>{" "}
 					<span className='text-muted-foreground'>{text}</span>
+					{subject && <span className='font-medium'> {subject}</span>}
 				</p>
 				<p className='mt-0.5 flex items-center gap-1 text-xs text-faint'>
 					<Icon className='size-3' />
 					{formatRelativeTime(activity.createdAt)}
 				</p>
+				<PageActivityValue activity={activity} />
 			</div>
+		</>
+	);
+
+	return (
+		<li className='text-sm'>
+			{href ? (
+				<Link
+					href={href}
+					onClick={onNavigate}
+					className='-mx-2 flex items-start gap-2.5 rounded-md px-2 py-1 hover:bg-accent'
+				>
+					{body}
+				</Link>
+			) : (
+				<div className='flex items-start gap-2.5 py-1'>{body}</div>
+			)}
 		</li>
 	);
 }

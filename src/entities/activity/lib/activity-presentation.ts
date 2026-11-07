@@ -12,11 +12,60 @@ import {
 	Trash2,
 } from "lucide-react";
 
-import type { ActivityActor, ActivityItem } from "../model/activity.types";
+import type {
+	ActivityActor,
+	ActivityItem,
+	ActivityTarget,
+} from "../model/activity.types";
 
 export interface ActivityPresentation {
 	icon: typeof History;
 	text: string;
+	subject?: string;
+}
+
+export interface ActivityValueChange {
+	propertyName: string;
+	propertyType: string | null;
+	cleared: boolean;
+	value: unknown;
+	options: ActivityTarget["options"];
+	people: string[];
+}
+
+function rowSubject(activity: ActivityItem): string | undefined {
+	const target = activity.target;
+	if (!target) return undefined;
+	if (target.rowTitle === null) return "a deleted row";
+	return target.rowTitle.trim() || "Untitled";
+}
+
+function rowPresentation(
+	icon: typeof History,
+	verb: string,
+	activity: ActivityItem,
+): ActivityPresentation {
+	const subject = rowSubject(activity);
+	return subject
+		? { icon, text: verb, subject }
+		: { icon, text: `${verb} a row` };
+}
+
+export function getActivityValueChange(
+	activity: ActivityItem,
+): ActivityValueChange | null {
+	const target = activity.target;
+	if (activity.action !== "DATABASE_ROW_UPDATED" || !target?.propertyName)
+		return null;
+
+	return {
+		propertyName: target.propertyName,
+		propertyType: target.propertyType,
+		cleared: activity.metadata?.kind === "CLEARED",
+		value: activity.newValue ?? null,
+		options: target.options,
+		people: target.people.map((person) => person.username || "Unknown user"),
+	};
 }
 
 const OPTION_TEXT: Record<string, string> = {
@@ -64,7 +113,13 @@ export function getActivityPresentation(
 		case "DATABASE_RENAMED":
 			return { icon: Table2, text: "renamed a database" };
 		case "DATABASE_PROPERTY_ADDED":
-			return { icon: Columns3, text: "added a property" };
+			return activity.target?.propertyName
+				? {
+						icon: Columns3,
+						text: "added property",
+						subject: activity.target.propertyName,
+					}
+				: { icon: Columns3, text: "added a property" };
 		case "DATABASE_PROPERTY_UPDATED":
 			return {
 				icon: Columns3,
@@ -73,19 +128,15 @@ export function getActivityPresentation(
 		case "DATABASE_PROPERTY_DELETED":
 			return { icon: Columns3, text: "deleted a property" };
 		case "DATABASE_ROW_CREATED":
-			return { icon: ListPlus, text: "added a row" };
+			return rowPresentation(ListPlus, "added", activity);
 		case "DATABASE_ROW_UPDATED":
-			return { icon: PenLine, text: "edited a row" };
+			return rowPresentation(PenLine, "edited", activity);
 		case "DATABASE_ROW_DELETED":
 			return { icon: Trash2, text: "deleted a row" };
 		case "DATABASE_ROW_MOVED":
-			return {
-				icon: ArrowRightLeft,
-				text:
-					kind === "PARENT_CHANGED"
-						? "changed the parent of a row"
-						: "moved a row",
-			};
+			return kind === "PARENT_CHANGED"
+				? rowPresentation(ArrowRightLeft, "changed the parent of", activity)
+				: rowPresentation(ArrowRightLeft, "moved", activity);
 		default:
 			return { icon: History, text: "made a change" };
 	}

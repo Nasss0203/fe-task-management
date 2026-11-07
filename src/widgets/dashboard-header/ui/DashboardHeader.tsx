@@ -1,9 +1,11 @@
 import { MoreHorizontal } from "lucide-react";
+import { useState } from "react";
 
 import { usePage } from "@/entities/page/model/page.queries";
 import { FavoritePageButton } from "@/features/page/favorite-page/ui/favorite-page-button";
 import { PageActionsMenu } from "@/features/page/page-actions/ui/page-actions-menu";
 import { PageActivityButton } from "@/features/page-activity/ui/page-activity-button";
+import { PageEditedPopover } from "@/features/page-activity/ui/page-edited-popover";
 import ShareButton from "@/features/page-share/ui/ShareButton";
 import { formatRelativeTime } from "@/shared/lib/format-relative-time";
 import { Button } from "@/shared/ui/button";
@@ -14,6 +16,7 @@ interface DashboardHeaderProps {
 
 function DashboardHeader({ pageId }: DashboardHeaderProps) {
 	const { data: page } = usePage(pageId);
+	const [activityOpen, setActivityOpen] = useState(false);
 
 	if (!pageId) return null;
 
@@ -21,17 +24,25 @@ function DashboardHeader({ pageId }: DashboardHeaderProps) {
 
 	return (
 		<header className='flex items-center gap-1.5 text-sm'>
-			{editedAt && (
-				<div className='mr-1 hidden text-[12.5px] text-faint md:inline-block'>
-					Edited {editedAt}
-				</div>
+			{editedAt && page && (
+				<PageEditedPopover
+					workspaceId={page.workspace_id}
+					pageId={pageId}
+					editedAt={editedAt}
+					onOpenActivity={() => setActivityOpen(true)}
+				/>
 			)}
 
 			<ShareButton pageId={pageId} />
 
 			{page && (
 				<>
-					<PageActivityButton workspaceId={page.workspace_id} pageId={pageId} />
+					<PageActivityButton
+						workspaceId={page.workspace_id}
+						pageId={pageId}
+						open={activityOpen}
+						onOpenChange={setActivityOpen}
+					/>
 
 					<FavoritePageButton page={page} />
 

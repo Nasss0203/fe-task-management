@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
 	getActivityActorName,
 	getActivityPresentation,
+	getActivityValueChange,
 	groupActivitiesByDay,
 } from "@/entities/activity/lib/activity-presentation";
 import type { ActivityItem } from "@/entities/activity/model/activity.types";
@@ -101,5 +102,90 @@ describe("groupActivitiesByDay", () => {
 			"Oct 30, 2026",
 		]);
 		expect(groups[0].items.map((item) => item.id)).toEqual(["1", "2"]);
+	});
+});
+
+describe("row details", () => {
+	const target = {
+		rowTitle: "New skill",
+		propertyName: "Tags",
+		propertyType: "MULTI_SELECT",
+		options: [{ id: "opt-done", name: "done", color: "green" }],
+		people: [],
+	};
+	const rowEdit = (overrides: Partial<ActivityItem> = {}) =>
+		activity({
+			entityType: "DATABASE_ROW",
+			entityId: "row-1",
+			action: "DATABASE_ROW_UPDATED",
+			field: "prop-tags",
+			newValue: ["opt-done"],
+			target,
+			...overrides,
+		});
+
+	it("names the edited row", () => {
+		expect(getActivityPresentation(rowEdit())).toMatchObject({
+			text: "edited",
+			subject: "New skill",
+		});
+	});
+
+	it("says a deleted row once the row is gone, and Untitled for no title", () => {
+		expect(
+			getActivityPresentation(
+				rowEdit({ target: { ...target, rowTitle: null } }),
+			).subject,
+		).toBe("a deleted row");
+		expect(
+			getActivityPresentation(rowEdit({ target: { ...target, rowTitle: " " } }))
+				.subject,
+		).toBe("Untitled");
+	});
+
+	it("keeps 'deleted a row' for a delete", () => {
+		expect(
+			getActivityPresentation(
+				rowEdit({
+					action: "DATABASE_ROW_DELETED",
+					target: { ...target, rowTitle: null },
+				}),
+			).text,
+		).toBe("deleted a row");
+	});
+
+	it("gives the property and its new options", () => {
+		expect(getActivityValueChange(rowEdit())).toEqual({
+			propertyName: "Tags",
+			propertyType: "MULTI_SELECT",
+			cleared: false,
+			value: ["opt-done"],
+			options: target.options,
+			people: [],
+		});
+	});
+
+	it("marks a cleared value and names people", () => {
+		expect(
+			getActivityValueChange(
+				rowEdit({ newValue: null, metadata: { kind: "CLEARED" } }),
+			)?.cleared,
+		).toBe(true);
+		expect(
+			getActivityValueChange(
+				rowEdit({
+					target: {
+						...target,
+						propertyType: "PERSON",
+						options: [],
+						people: [{ id: "u-2", username: "nam" }],
+					},
+				}),
+			)?.people,
+		).toEqual(["nam"]);
+	});
+
+	it("has no value change for a block edit", () => {
+		expect(getActivityValueChange(activity())).toBeNull();
 	});
 });
