@@ -3,6 +3,7 @@ import { MoreHorizontal } from "lucide-react";
 import { usePage } from "@/entities/page/model/page.queries";
 import { FavoritePageButton } from "@/features/page/favorite-page/ui/favorite-page-button";
 import { PageActionsMenu } from "@/features/page/page-actions/ui/page-actions-menu";
+import { PageActivityButton } from "@/features/page-activity/ui/page-activity-button";
 import ShareButton from "@/features/page-share/ui/ShareButton";
 import { formatRelativeTime } from "@/shared/lib/format-relative-time";
 import { Button } from "@/shared/ui/button";
@@ -30,6 +31,8 @@ function DashboardHeader({ pageId }: DashboardHeaderProps) {
 
 			{page && (
 				<>
+					<PageActivityButton workspaceId={page.workspace_id} pageId={pageId} />
+
 					<FavoritePageButton page={page} />
 
 					<PageActionsMenu page={page}>
