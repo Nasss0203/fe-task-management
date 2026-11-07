@@ -111,7 +111,6 @@ export function createUnifiedAskOrchestrator(deps: Dependencies) {
 		if (mapped.kind === "feedback") return put(operation, turnId, mapped.feedback,
 			mapped.status === "NEEDS_CLARIFICATION" ? "clarification" : mapped.status.startsWith("UNSUPPORTED") ? "unsupported" : "other", {}, replaceId);
 		if (mapped.kind === "answer") {
-			// AI-Q1: the answer is shown even when its conversation cannot join this thread.
 			const conversationId = mapped.conversationId!;
 			let joined = false;
 			try {

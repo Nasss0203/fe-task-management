@@ -492,7 +492,6 @@ export type AiAskResponse = AiAskResponseBase & (
     } & AiAskConversationSwitch)
   | AiAskPlanningResponse
   | ({
-      /** AI-Q1: read-only answer about one Page; no draft. */
       status: "ANSWERED";
       capability: "PAGE_QUESTION";
       reason: string;

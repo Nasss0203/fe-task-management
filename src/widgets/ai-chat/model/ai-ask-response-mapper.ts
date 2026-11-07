@@ -31,7 +31,6 @@ export type MappedAiAskResponse = MappedBase & (
 	| { kind: "page-selection"; hasGeneration: false; preview: null; candidates: AiPageResolutionCandidate[];
 		requestContext: AskAiRequest | null }
 	| { kind: "feedback"; hasGeneration: false; preview: null; channel: "business" | "planning"; reason: string | null }
-	/** AI-Q1: a read-only answer kept in the asked Page's conversation; no draft actions. */
 	| { kind: "answer"; hasGeneration: false; preview: null; page: { pageId: string; title: string }; reason: string }
 	| { kind: "invalid"; hasGeneration: null; preview: null; reason: string }
 	| { kind: "unknown-capability"; hasGeneration: true; preview: null; reason: string }
@@ -295,7 +294,6 @@ export function mapAiAskResponse(response: AiAskResponse, requestContext?: AskAi
 		reason: typeof planning.reason === "string" ? planning.reason : null };
 }
 
-/** AI-Q1: an answer, or Pages to choose from; never a generation or a plan. */
 function mapPageQuestion(data: Record<string, unknown>, base: MappedBase, requestContext?: AskAiRequest): MappedAiAskResponse {
 	const invalid = (reason: string): MappedAiAskResponse => ({ ...base, kind: "invalid", hasGeneration: null, preview: null, reason });
 	if (data.intent !== "PAGE_QUESTION" || data.generationId !== undefined || data.generation !== undefined ||
