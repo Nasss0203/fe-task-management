@@ -443,7 +443,8 @@ export type AiAskIntent =
   | "MODIFY_PAGE"
   | "WRITING"
   | "OTHER"
-  | "UNCLEAR";
+  | "UNCLEAR"
+  | "PAGE_QUESTION";
 
 /** Wire capability is open-ended; consumers must validate before using legacy UI. */
 export type AiAskGeneration = Omit<AiGeneration, "capability"> & {
@@ -490,4 +491,19 @@ export type AiAskResponse = AiAskResponseBase & (
       generation: AiAskGeneration;
     } & AiAskConversationSwitch)
   | AiAskPlanningResponse
+  | ({
+      /** AI-Q1: read-only answer about one Page; no draft. */
+      status: "ANSWERED";
+      capability: "PAGE_QUESTION";
+      reason: string;
+      conversationId: string;
+      page: { pageId: string; title: string };
+      usedModel: boolean;
+    } & AiAskConversationSwitch)
+  | {
+      status: "AMBIGUOUS_PAGE";
+      capability: "PAGE_QUESTION";
+      candidates: AiPageResolutionCandidate[];
+      resolutionMethod?: "TITLE_IN_SENTENCE" | "FUZZY_TITLE";
+    }
 );

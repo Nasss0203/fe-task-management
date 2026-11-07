@@ -37,7 +37,10 @@ function checkNarrowing(response: AiAskResponse) {
         void response.reason;
       }
     }
-    if (response.status === "AMBIGUOUS_PAGE") expectTypeOf(response.planning.candidates).toBeArray();
+    if (response.status === "AMBIGUOUS_PAGE") {
+      if (response.capability === "PAGE_QUESTION") expectTypeOf(response.candidates).toBeArray();
+      else expectTypeOf(response.planning.candidates).toBeArray();
+    }
   }
 }
 void checkNarrowing;

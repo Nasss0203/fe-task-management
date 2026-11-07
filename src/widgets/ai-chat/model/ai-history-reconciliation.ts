@@ -19,7 +19,11 @@ function matches(local: AiChatMessage, saved: AiChatMessage): boolean {
 	const a = local.origin;
 	const b = saved.origin;
 	if (!a || !b || a.source === "persisted" || b.source !== "persisted" ||
-		a.source === "feedback" || !a.conversationId || a.conversationId !== b.conversationId || local.role !== saved.role) return false;
+		!a.conversationId || a.conversationId !== b.conversationId || local.role !== saved.role) return false;
+	// AI-Q1: only a page answer is saved as an assistant message without a draft;
+	// the local answer pairs with it by request. Other feedback is never saved.
+	if (a.source === "feedback") return local.role === "assistant" && !a.generationId && !b.generationId &&
+		Boolean(a.requestId && a.requestId === b.requestId);
 	if (local.role === "assistant") return Boolean(a.generationId && a.generationId === b.generationId);
 	return Boolean(a.requestId && a.requestId === b.requestId);
 }

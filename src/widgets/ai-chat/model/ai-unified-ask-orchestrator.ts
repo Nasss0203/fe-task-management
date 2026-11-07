@@ -110,6 +110,19 @@ export function createUnifiedAskOrchestrator(deps: Dependencies) {
 			"This AI response could not be verified. No draft actions are available. Check conversation history before sending again.", "error", {}, replaceId);
 		if (mapped.kind === "feedback") return put(operation, turnId, mapped.feedback,
 			mapped.status === "NEEDS_CLARIFICATION" ? "clarification" : mapped.status.startsWith("UNSUPPORTED") ? "unsupported" : "other", {}, replaceId);
+		if (mapped.kind === "answer") {
+			// AI-Q1: the answer is shown even when its conversation cannot join this thread.
+			const conversationId = mapped.conversationId!;
+			let joined = false;
+			try {
+				const verified = await verify(conversationId, operation);
+				joined = operation.isCurrent() && canReuseVerifiedAiConversation(verified, context(operation), "MODIFY_PAGE", mapped.page.pageId) &&
+					(mapped.conversationSwitched ? operation.switchConversation(conversationId, turnId) : operation.bindConversation(conversationId));
+			} catch { joined = false; }
+			const shown = put(operation, turnId, mapped.feedback, "other", {}, replaceId);
+			if (joined) refresh(conversationId, operation);
+			return shown;
+		}
 		if (mapped.kind === "page-selection") return put(operation, turnId, mapped.feedback, "page-selection", {
 			unifiedSelection: { request, binding: operationBinding(operation.token), selectedConversationId: operation.initialConversationId,
 				selectionRevision: operation.selectionRevision(), candidates: mapped.candidates, turnId },

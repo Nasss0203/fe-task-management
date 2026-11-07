@@ -31,6 +31,8 @@ export type MappedAiAskResponse = MappedBase & (
 	| { kind: "page-selection"; hasGeneration: false; preview: null; candidates: AiPageResolutionCandidate[];
 		requestContext: AskAiRequest | null }
 	| { kind: "feedback"; hasGeneration: false; preview: null; channel: "business" | "planning"; reason: string | null }
+	/** AI-Q1: a read-only answer kept in the asked Page's conversation; no draft actions. */
+	| { kind: "answer"; hasGeneration: false; preview: null; page: { pageId: string; title: string }; reason: string }
 	| { kind: "invalid"; hasGeneration: null; preview: null; reason: string }
 	| { kind: "unknown-capability"; hasGeneration: true; preview: null; reason: string }
 );
@@ -199,7 +201,7 @@ export function mapAiAskResponse(response: AiAskResponse, requestContext?: AskAi
 	};
 	const invalid = (reason: string): MappedAiAskResponse => ({ ...base, kind: "invalid", hasGeneration: null, preview: null, reason });
 	if (!base.requestId || typeof data.assistantMessage !== "string" ||
-		!["CREATE_PAGE", "MODIFY_PAGE", "WRITING", "OTHER", "UNCLEAR"].includes(String(data.intent)) ||
+		!["CREATE_PAGE", "MODIFY_PAGE", "WRITING", "OTHER", "UNCLEAR", "PAGE_QUESTION"].includes(String(data.intent)) ||
 		(requestContext?.requestId && requestContext.requestId !== base.requestId)) return invalid("INVALID_ENVELOPE");
 	// Another conversation is accepted only when the server says it opened one
 	// because the sent conversation did not fit (chat nhiều lượt).
@@ -230,6 +232,7 @@ export function mapAiAskResponse(response: AiAskResponse, requestContext?: AskAi
 			canConfirm: generation.status === "COMPLETED", canDiscard: generation.status === "COMPLETED" };
 	}
 
+	if (data.capability === "PAGE_QUESTION") return mapPageQuestion(data, base, requestContext);
 	const planning = data.planning;
 	if (data.capability === null) {
 		if (!["NEEDS_CLARIFICATION", "UNSUPPORTED_REQUEST", "UNSUPPORTED_OPERATION"].includes(base.status) ||
@@ -290,4 +293,29 @@ export function mapAiAskResponse(response: AiAskResponse, requestContext?: AskAi
 	return { ...base, kind: "feedback", hasGeneration: false, preview: null,
 		capability: "GENERATE_PAGE_MODIFICATION_PLAN", capabilityValidated: true, channel: "planning",
 		reason: typeof planning.reason === "string" ? planning.reason : null };
+}
+
+/** AI-Q1: an answer, or Pages to choose from; never a generation or a plan. */
+function mapPageQuestion(data: Record<string, unknown>, base: MappedBase, requestContext?: AskAiRequest): MappedAiAskResponse {
+	const invalid = (reason: string): MappedAiAskResponse => ({ ...base, kind: "invalid", hasGeneration: null, preview: null, reason });
+	if (data.intent !== "PAGE_QUESTION" || data.generationId !== undefined || data.generation !== undefined ||
+		data.preview !== undefined || data.planning !== undefined) return invalid("INVALID_PAGE_QUESTION");
+	if (data.status === "ANSWERED") {
+		const page = data.page;
+		if (!base.conversationId || !isRecord(page) || !isNonemptyString(page.pageId) || typeof page.title !== "string" ||
+			!isNonemptyString(data.reason) || typeof data.usedModel !== "boolean" || !base.feedback.trim() ||
+			(requestContext?.selectedPageId && requestContext.selectedPageId !== page.pageId)) return invalid("INVALID_PAGE_ANSWER");
+		return { ...base, kind: "answer", hasGeneration: false, preview: null,
+			page: { pageId: page.pageId, title: page.title }, reason: data.reason };
+	}
+	if (data.status === "AMBIGUOUS_PAGE") {
+		const candidates = data.candidates;
+		if (base.conversationId || !Array.isArray(candidates) || candidates.length === 0 || candidates.length > 5 ||
+			(data.resolutionMethod !== undefined && !["TITLE_IN_SENTENCE", "FUZZY_TITLE"].includes(String(data.resolutionMethod))) ||
+			!candidates.every((page) => isPage(page) && (!requestContext || page.workspaceId === requestContext.workspaceId)))
+			return invalid("INVALID_CANDIDATES");
+		return { ...base, kind: "page-selection", hasGeneration: false, preview: null,
+			candidates: candidates as AiPageResolutionCandidate[], requestContext: requestContext ? { ...requestContext } : null };
+	}
+	return invalid("INVALID_PAGE_QUESTION");
 }
