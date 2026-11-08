@@ -171,7 +171,26 @@ describe("DatabaseCalendarFeedPopover", () => {
 		).toBeInTheDocument();
 		expect(screen.queryByRole("button", { name: "Sync now" })).not.toBeInTheDocument();
 		fireEvent.click(screen.getByRole("button", { name: "Disconnect Google" }));
+		expect(disconnectGoogle).not.toHaveBeenCalled();
+		fireEvent.click(screen.getByRole("button", { name: "Disconnect" }));
 		expect(disconnectGoogle).toHaveBeenCalled();
+	});
+
+	it("warns that Google calendars will be deleted and cancels without disconnecting", () => {
+		google = connectedStatus();
+		open([property("Due", PropertyType.DATE, 0)]);
+
+		fireEvent.click(screen.getByRole("button", { name: "Disconnect Google" }));
+
+		expect(
+			screen.getByRole("alertdialog", { name: "Disconnect Google Calendar?" }),
+		).toHaveTextContent("Every Taskmanly calendar created in your Google Calendar will be deleted");
+		fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+		expect(
+			screen.queryByRole("alertdialog", { name: "Disconnect Google Calendar?" }),
+		).not.toBeInTheDocument();
+		expect(disconnectGoogle).not.toHaveBeenCalled();
 	});
 
 	it("reports the Google sign-in result and clears it from the address", () => {

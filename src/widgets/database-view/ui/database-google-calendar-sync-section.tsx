@@ -9,6 +9,7 @@ import {
 	Unlink,
 	UserRoundCheck,
 } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import {
@@ -24,6 +25,16 @@ import type {
 	GoogleCalendarSyncError,
 } from "@/entities/database/model/database.types";
 import { getApiErrorMessage } from "@/shared/lib/api-error-message";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/shared/ui/alert-dialog";
 
 import { MenuItem, MenuSectionLabel } from "./menu-item";
 
@@ -56,6 +67,7 @@ export function DatabaseGoogleCalendarSyncSection({
 	const upsertMutation = useUpsertGoogleCalendarSync(databaseId);
 	const deleteMutation = useDeleteGoogleCalendarSync(databaseId);
 	const runMutation = useRunGoogleCalendarSync(databaseId);
+	const [confirmDisconnectOpen, setConfirmDisconnectOpen] = useState(false);
 
 	const busy =
 		connectMutation.isPending ||
@@ -123,7 +135,10 @@ export function DatabaseGoogleCalendarSyncSection({
 
 	const disconnect = () =>
 		disconnectMutation.mutate(undefined, {
-			onSuccess: () => toast.success("Google Calendar disconnected"),
+			onSuccess: () => {
+				setConfirmDisconnectOpen(false);
+				toast.success("Google Calendar disconnected");
+			},
 			onError: (error) =>
 				toast.error(getApiErrorMessage(error, "Couldn't disconnect Google")),
 		});
@@ -239,11 +254,50 @@ export function DatabaseGoogleCalendarSyncSection({
 
 			{status?.connected && (
 				<div className='pt-0.5'>
-					<MenuItem icon={Unlink} destructive disabled={busy} onClick={disconnect}>
+					<MenuItem
+						icon={Unlink}
+						destructive
+						disabled={busy}
+						onClick={() => setConfirmDisconnectOpen(true)}
+					>
 						Disconnect Google
 					</MenuItem>
 				</div>
 			)}
+
+			<AlertDialog
+				open={confirmDisconnectOpen}
+				onOpenChange={(open) => {
+					if (!disconnectMutation.isPending) setConfirmDisconnectOpen(open);
+				}}
+			>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Disconnect Google Calendar?</AlertDialogTitle>
+						<AlertDialogDescription>
+							Every Taskmanly calendar created in your Google Calendar will be
+							deleted, for all databases you sync. Your rows in Taskmanly stay
+							as they are.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+
+					<AlertDialogFooter>
+						<AlertDialogCancel disabled={disconnectMutation.isPending}>
+							Cancel
+						</AlertDialogCancel>
+						<AlertDialogAction
+							variant='destructive'
+							disabled={disconnectMutation.isPending}
+							onClick={(event) => {
+								event.preventDefault();
+								disconnect();
+							}}
+						>
+							{disconnectMutation.isPending ? "Disconnecting..." : "Disconnect"}
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	);
 }
