@@ -29,6 +29,7 @@ import type {
 
 import { useUndoAiModificationPlan } from "@/entities/ai-assistant/model/ai-assistant.mutations";
 import { useDatabase } from "@/entities/database/model/database.queries";
+import { PropertyType } from "@/entities/database/model/database.types";
 import { usePageBlocks } from "@/entities/page-block/model/page-block.queries";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
@@ -123,13 +124,24 @@ function renderFieldValue(value: unknown): ReactNode {
  * - INSERT_BLOCKS: use original content keys.
  * - CREATE_DATABASE_ROWS: map propertyId to propertyName.
  */
+const OPTION_TYPES = new Set<PropertyType>([PropertyType.SELECT, PropertyType.MULTI_SELECT, PropertyType.STATUS]);
+
+function optionLabel(value: unknown, options: ReadonlyMap<string, string>): unknown {
+	const label = (id: string) => options.get(id) ?? `${id} (không còn trong bảng)`;
+	if (typeof value === "string") return label(value);
+	if (Array.isArray(value) && value.every((item) => typeof item === "string")) return value.map(label).join(", ");
+	return value;
+}
+
 function PlanDataFields({
 	values,
 	propertyNames,
+	optionNames,
 	emptyMessage = "No fields provided.",
 }: {
 	values: Record<string, unknown>;
 	propertyNames?: ReadonlyMap<string, string>;
+	optionNames?: ReadonlyMap<string, ReadonlyMap<string, string>>;
 	emptyMessage?: string;
 }) {
 	const entries = Object.entries(values);
@@ -146,6 +158,8 @@ function PlanDataFields({
 		<dl className='divide-y divide-border/40'>
 			{entries.map(([key, value]) => {
 				const displayName = propertyNames?.get(key) ?? key;
+				const options = optionNames?.get(key);
+				const shown = options ? optionLabel(value, options) : value;
 
 				return (
 					<div
@@ -160,7 +174,7 @@ function PlanDataFields({
 						</dt>
 
 						<dd className='min-w-0 text-xs leading-relaxed text-foreground'>
-							{renderFieldValue(value)}
+							{renderFieldValue(shown)}
 						</dd>
 					</div>
 				);
@@ -453,6 +467,14 @@ function CreateDatabaseRowsPreview({
 		database?.properties.map((property) => [property.id, property.name]) ??
 			[],
 	);
+	const optionNames = new Map<string, ReadonlyMap<string, string>>(
+		database?.properties
+			.filter((property) => OPTION_TYPES.has(property.type))
+			.map((property) => [
+				property.id,
+				new Map(property.options.map((option) => [option.id, option.name])),
+			]) ?? [],
+	);
 
 	return (
 		<OperationSection
@@ -511,6 +533,7 @@ function CreateDatabaseRowsPreview({
 							<PlanDataFields
 								values={row.values}
 								propertyNames={propertyNames}
+								optionNames={optionNames}
 								emptyMessage='This row has no property values.'
 							/>
 						</div>
