@@ -6,6 +6,7 @@ export type SettingsSection =
 	| "workspace"
 	| "members"
 	| "billing"
+	| "storage"
 	| "connections";
 
 interface SettingsDialogState {

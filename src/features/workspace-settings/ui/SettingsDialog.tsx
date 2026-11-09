@@ -16,6 +16,7 @@ import BillingSection from "./sections/BillingSection";
 import ConnectionsSection from "./sections/ConnectionsSection";
 import MembersSection from "./sections/MembersSection";
 import ProfileSection from "./sections/ProfileSection";
+import StorageSection from "./sections/StorageSection";
 import WorkspaceSection from "./sections/WorkspaceSection";
 
 const SLACK_PARAM = "slack";
@@ -89,6 +90,11 @@ const SettingsDialog = ({
 					{section === "billing" && (
 						<div className='mx-auto w-full max-w-[860px] px-5 py-8 sm:px-8 lg:px-[70px]'>
 							<BillingSection workspaceId={workspaceId} />
+						</div>
+					)}
+					{section === "storage" && (
+						<div className='mx-auto w-full max-w-[860px] px-5 py-8 sm:px-8 lg:px-[70px]'>
+							<StorageSection workspaceId={workspaceId} />
 						</div>
 					)}
 					{section === "connections" && (
