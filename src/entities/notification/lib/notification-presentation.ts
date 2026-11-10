@@ -129,6 +129,7 @@ export function getNotificationPresentation(
 			};
 
 		case "comment.mentioned":
+		case "page.mentioned":
 			return {
 				icon: AtSign,
 				title: notification.title,

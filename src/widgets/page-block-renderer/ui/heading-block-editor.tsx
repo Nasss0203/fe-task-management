@@ -13,6 +13,9 @@ import {
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
 
 import { usePageBlockEditor } from "@/widgets/page-block-editor/ui/page-block-editor-context";
+import { useBlockMentions } from "@/widgets/page-block-renderer/model/use-block-mentions";
+import { useInlineMarks } from "@/widgets/page-block-renderer/model/use-inline-marks";
+import { tokensToDisplay } from "@/entities/comment/lib/mention-text";
 
 interface HeadingBlockEditorProps {
 	block: PageBlockNode;
@@ -62,9 +65,30 @@ const headingStyles: Record<1 | 2 | 3, string> = {
 };
 
 export function HeadingBlockEditor({ block, shareToken }: HeadingBlockEditorProps) {
-	const [value, setValue] = useState(() => getText(block));
+	const [value, setValue] = useState(
+		() => tokensToDisplay(getText(block)).text,
+	);
+
+	const mentions = useBlockMentions({
+		pageId: block.page_id,
+		enabled: !shareToken,
+		storedText: getText(block),
+		value,
+		setValue,
+	});
 
 	const inputRef = useRef<HTMLInputElement>(null);
+
+	const level = getHeadingLevel(block);
+
+	const headingClass = headingStyles[level];
+
+	const inlineMarks = useInlineMarks(
+		value,
+		setValue,
+		headingClass,
+		mentions.toStored(value),
+	);
 
 	const updateBlock = useUpdatePageBlock(shareToken);
 
@@ -75,12 +99,8 @@ export function HeadingBlockEditor({ block, shareToken }: HeadingBlockEditorProp
 	const { focusBlockId, requestFocus, clearFocus, getPreviousBlockId } =
 		usePageBlockEditor();
 
-	const level = getHeadingLevel(block);
-
-	const headingClass = headingStyles[level];
-
 	useEffect(() => {
-		setValue(getText(block));
+		setValue(tokensToDisplay(getText(block)).text);
 	}, [block]);
 
 	useEffect(() => {
@@ -106,7 +126,7 @@ export function HeadingBlockEditor({ block, shareToken }: HeadingBlockEditorProp
 	const handleBlur = () => {
 		const oldValue = getText(block);
 
-		if (value === oldValue) {
+		if (mentions.toStored(value) === oldValue) {
 			return;
 		}
 
@@ -115,7 +135,7 @@ export function HeadingBlockEditor({ block, shareToken }: HeadingBlockEditorProp
 			pageId: block.page_id,
 
 			content: {
-				text: value,
+				text: mentions.toStored(value),
 			},
 		});
 	};
@@ -123,6 +143,8 @@ export function HeadingBlockEditor({ block, shareToken }: HeadingBlockEditorProp
 	const handleKeyDown = async (
 		event: React.KeyboardEvent<HTMLInputElement>,
 	) => {
+		if (mentions.handleKeyDown(event)) return;
+
 		if (event.key === "Backspace" && value.length === 0) {
 			event.preventDefault();
 
@@ -167,7 +189,7 @@ export function HeadingBlockEditor({ block, shareToken }: HeadingBlockEditorProp
 			pageId: block.page_id,
 
 			content: {
-				text: before,
+				text: mentions.toStored(before),
 			},
 		});
 
@@ -177,7 +199,7 @@ export function HeadingBlockEditor({ block, shareToken }: HeadingBlockEditorProp
 			afterBlockId: block.id,
 			type: PageBlockType.TEXT,
 			content: {
-				text: after,
+				text: mentions.toStored(after),
 			},
 			styleConfig: {},
 			dataConfig: {},
@@ -187,6 +209,7 @@ export function HeadingBlockEditor({ block, shareToken }: HeadingBlockEditorProp
 	};
 
 	return (
+		<div className='relative w-full'>
 		<input
 			ref={inputRef}
 			id={`block-${block.id}`}
@@ -195,9 +218,16 @@ export function HeadingBlockEditor({ block, shareToken }: HeadingBlockEditorProp
 			placeholder={`Heading ${level}`}
 			onChange={(event) => {
 				setValue(event.target.value);
+				mentions.track(event.target);
 			}}
 			onKeyDown={handleKeyDown}
-			onBlur={handleBlur}
+			{...mentions.comboboxProps}
+			onFocus={inlineMarks.onFocus}
+			onBlur={() => {
+				inlineMarks.onBlur();
+				mentions.close();
+				handleBlur();
+			}}
 			className={`
                 w-full
                 border-0
@@ -208,7 +238,11 @@ export function HeadingBlockEditor({ block, shareToken }: HeadingBlockEditorProp
                 focus-visible:ring-0
 
                 ${headingClass}
+                ${inlineMarks.textareaClassName ?? ""}
             `}
 		/>
+		{inlineMarks.preview}
+		{mentions.menu}
+		</div>
 	);
 }

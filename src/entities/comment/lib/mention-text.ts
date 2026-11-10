@@ -85,3 +85,13 @@ export function displayToTokens(text: string, mentions: MentionRef[]): string {
 		text,
 	);
 }
+
+/** `@abc` ngay trước con trỏ (đầu dòng hoặc sau khoảng trắng). */
+export function findMentionQuery(
+	text: string,
+	caret: number,
+): { start: number; search: string } | null {
+	const match = text.slice(0, caret).match(/(?:^|\s)@([^\s@]{0,30})$/);
+
+	return match ? { start: caret - match[1].length - 1, search: match[1] } : null;
+}

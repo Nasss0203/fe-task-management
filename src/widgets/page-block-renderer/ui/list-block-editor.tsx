@@ -19,6 +19,8 @@ import {
 } from "@/widgets/page-block-editor/ui/page-block-editor-context";
 import { cn } from "@/shared/lib/utils";
 import { useInlineMarks } from "@/widgets/page-block-renderer/model/use-inline-marks";
+import { useBlockMentions } from "@/widgets/page-block-renderer/model/use-block-mentions";
+import { tokensToDisplay } from "@/entities/comment/lib/mention-text";
 
 interface ListBlockEditorProps {
 	block: PageBlockNode;
@@ -26,15 +28,23 @@ interface ListBlockEditorProps {
 }
 
 export function ListBlockEditor({ block, shareToken }: ListBlockEditorProps) {
-	const [value, setValue] = useState(() =>
-		getString(getContent(block), "text"),
+	const [value, setValue] = useState(
+		() => tokensToDisplay(getString(getContent(block), "text")).text,
 	);
 
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	const mentions = useBlockMentions({
+		pageId: block.page_id,
+		enabled: !shareToken,
+		storedText: getString(getContent(block), "text"),
+		value: value,
+		setValue: setValue,
+	});
 	const inlineMarks = useInlineMarks(
 		value,
 		setValue,
 		"text-[15px] leading-6 text-secondary-foreground dark:text-foreground",
+		mentions.toStored(value),
 	);
 
 	const updateBlock = useUpdatePageBlock(shareToken);
@@ -53,7 +63,7 @@ export function ListBlockEditor({ block, shareToken }: ListBlockEditorProps) {
 	};
 
 	useEffect(() => {
-		setValue(getString(getContent(block), "text"));
+		setValue(tokensToDisplay(getString(getContent(block), "text")).text);
 	}, [block]);
 
 	useEffect(() => {
@@ -65,25 +75,27 @@ export function ListBlockEditor({ block, shareToken }: ListBlockEditorProps) {
 			blockId: block.id,
 			pageId: block.page_id,
 			type: PageBlockType.TEXT,
-			content: { text: value },
+			content: { text: mentions.toStored(value) },
 		});
 
 		requestFocus(block.id);
 	};
 
 	const handleBlur = () => {
-		if (value === getString(getContent(block), "text")) return;
+		if (mentions.toStored(value) === getString(getContent(block), "text"))
+			return;
 
 		updateBlock.mutate({
 			blockId: block.id,
 			pageId: block.page_id,
-			content: { text: value },
+			content: { text: mentions.toStored(value) },
 		});
 	};
 
 	const handleKeyDown = async (
 		event: React.KeyboardEvent<HTMLTextAreaElement>,
 	) => {
+		if (mentions.handleKeyDown(event)) return;
 		if (inlineMarks.handleKeyDown(event)) return;
 
 		const textarea = event.currentTarget;
@@ -115,7 +127,7 @@ export function ListBlockEditor({ block, shareToken }: ListBlockEditorProps) {
 		await updateBlock.mutateAsync({
 			blockId: block.id,
 			pageId: block.page_id,
-			content: { text: before },
+			content: { text: mentions.toStored(before) },
 		});
 
 		const newBlock = await createBlock.mutateAsync({
@@ -123,7 +135,7 @@ export function ListBlockEditor({ block, shareToken }: ListBlockEditorProps) {
 			parentBlockId: block.parent_block_id,
 			afterBlockId: block.id,
 			type: block.type,
-			content: { text: after },
+			content: { text: mentions.toStored(after) },
 			styleConfig: {},
 			dataConfig: {},
 		});
@@ -150,12 +162,15 @@ export function ListBlockEditor({ block, shareToken }: ListBlockEditorProps) {
 					}
 					onChange={(event) => {
 						setValue(event.target.value);
+						mentions.track(event.target);
 						resizeTextarea(event.target);
 					}}
 					onKeyDown={handleKeyDown}
+					{...mentions.comboboxProps}
 					onFocus={inlineMarks.onFocus}
 					onBlur={() => {
 						inlineMarks.onBlur();
+					mentions.close();
 						handleBlur();
 					}}
 					className={cn(
@@ -164,6 +179,7 @@ export function ListBlockEditor({ block, shareToken }: ListBlockEditorProps) {
 					)}
 				/>
 				{inlineMarks.preview}
+				{mentions.menu}
 			</div>
 		</div>
 	);

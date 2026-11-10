@@ -504,6 +504,15 @@ function InlineNodes({ nodes }: { nodes: InlineNode[] }) {
 								<InlineNodes nodes={node.children} />
 							</s>
 						);
+					case "mention":
+						return (
+							<span
+								key={index}
+								className='rounded-sm bg-accent-soft px-0.5 font-medium text-ring'
+							>
+								@{node.name}
+							</span>
+						);
 					case "link":
 						return (
 							<a

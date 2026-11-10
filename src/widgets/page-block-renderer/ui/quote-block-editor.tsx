@@ -17,6 +17,8 @@ import {
 } from "@/widgets/page-block-editor/ui/page-block-editor-context";
 import { cn } from "@/shared/lib/utils";
 import { useInlineMarks } from "@/widgets/page-block-renderer/model/use-inline-marks";
+import { useBlockMentions } from "@/widgets/page-block-renderer/model/use-block-mentions";
+import { tokensToDisplay } from "@/entities/comment/lib/mention-text";
 
 interface QuoteBlockEditorProps {
 	block: PageBlockNode;
@@ -40,13 +42,23 @@ function getText(block: PageBlockNode): string {
 }
 
 export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
-	const [value, setValue] = useState(() => getText(block));
+	const [value, setValue] = useState(
+		() => tokensToDisplay(getText(block)).text,
+	);
 
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	const mentions = useBlockMentions({
+		pageId: block.page_id,
+		enabled: !shareToken,
+		storedText: getText(block),
+		value: value,
+		setValue: setValue,
+	});
 	const inlineMarks = useInlineMarks(
 		value,
 		setValue,
 		"text-base leading-[26px] text-secondary-foreground",
+		mentions.toStored(value),
 	);
 
 	const updateBlock = useUpdatePageBlock(shareToken);
@@ -56,7 +68,7 @@ export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 	const { requestFocus } = usePageBlockEditor();
 
 	useEffect(() => {
-		setValue(getText(block));
+		setValue(tokensToDisplay(getText(block)).text);
 	}, [block]);
 
 	const resizeTextarea = (textarea?: HTMLTextAreaElement) => {
@@ -75,6 +87,7 @@ export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 
 	const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setValue(event.target.value);
+		mentions.track(event.target);
 
 		resizeTextarea(event.target);
 	};
@@ -82,7 +95,7 @@ export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 	const handleBlur = () => {
 		const oldValue = getText(block);
 
-		if (value === oldValue) {
+		if (mentions.toStored(value) === oldValue) {
 			return;
 		}
 
@@ -91,7 +104,7 @@ export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 			pageId: block.page_id,
 
 			content: {
-				text: value,
+				text: mentions.toStored(value),
 			},
 		});
 	};
@@ -99,6 +112,7 @@ export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 	const handleKeyDown = async (
 		event: React.KeyboardEvent<HTMLTextAreaElement>,
 	) => {
+		if (mentions.handleKeyDown(event)) return;
 		if (inlineMarks.handleKeyDown(event)) return;
 
 		if (event.key !== "Enter" || event.shiftKey) {
@@ -124,7 +138,7 @@ export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 			pageId: block.page_id,
 
 			content: {
-				text: before,
+				text: mentions.toStored(before),
 			},
 		});
 
@@ -138,7 +152,7 @@ export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 			type: PageBlockType.TEXT,
 
 			content: {
-				text: after,
+				text: mentions.toStored(after),
 			},
 
 			styleConfig: {},
@@ -162,9 +176,11 @@ export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 					placeholder='Quote'
 					onChange={handleChange}
 					onKeyDown={handleKeyDown}
+					{...mentions.comboboxProps}
 					onFocus={inlineMarks.onFocus}
 					onBlur={() => {
 						inlineMarks.onBlur();
+					mentions.close();
 						handleBlur();
 					}}
 					className={cn(
@@ -188,6 +204,7 @@ export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 					)}
 				/>
 				{inlineMarks.preview}
+				{mentions.menu}
 			</div>
 		</div>
 	);

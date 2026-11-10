@@ -27,6 +27,7 @@ export type NotificationType =
 	| "page.edit.approved"
 	| "page.edit.rejected"
 	| "comment.mentioned"
+	| "page.mentioned"
 	| "comment.replied";
 
 export interface Notification {
