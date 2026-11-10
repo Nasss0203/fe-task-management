@@ -54,6 +54,31 @@ export interface WorkspaceSubscription {
 	currentPeriodStart: string | null;
 	currentPeriodEnd: string | null;
 	cancelAtPeriodEnd: boolean;
+	accessEndsAt: string | null;
+}
+
+export interface WorkspaceEntitlementFeature {
+	code: string;
+	name: string;
+	valueType: "NUMBER" | "BOOLEAN";
+	limit: number | boolean;
+	usage: number | null;
+}
+
+export interface WorkspaceEntitlements {
+	workspaceId: string;
+	plan: {
+		id: string;
+		code: string;
+		name: string;
+	};
+	periodStart: string | null;
+	periodEnd: string | null;
+	usagePeriod: {
+		start: string;
+		end: string;
+	};
+	features: WorkspaceEntitlementFeature[];
 }
 
 export type PaymentOrderStatus =

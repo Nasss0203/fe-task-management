@@ -13,6 +13,7 @@ import {
 	useWorkspaceStorage,
 	useWorkspaceStorageFiles,
 } from "@/entities/attachment/model/storage.queries";
+import { useWorkspaceEntitlements } from "@/entities/billing/model/billing.queries";
 import { useDebounce } from "@/shared/hooks/use-debounce";
 import { cn } from "@/shared/lib/utils";
 import {
@@ -108,6 +109,7 @@ const StorageSection = ({ workspaceId }: StorageSectionProps) => {
 	);
 
 	const usageQuery = useWorkspaceStorage(workspaceId);
+	const entitlementsQuery = useWorkspaceEntitlements(workspaceId);
 	const filesQuery = useWorkspaceStorageFiles(workspaceId, params);
 	const bulkDelete = useBulkDeleteWorkspaceFiles(workspaceId);
 
@@ -118,6 +120,12 @@ const StorageSection = ({ workspaceId }: StorageSectionProps) => {
 
 	const usage = usageQuery.data;
 	const canManageAll = usage?.canManageAll ?? false;
+	const storageLimit = entitlementsQuery.data?.features.find(
+		(feature) => feature.code === "MAX_STORAGE_MB",
+	)?.limit;
+	const storageLimitBytes =
+		typeof storageLimit === "number" ? storageLimit * 1024 * 1024 : null;
+	const barTotalBytes = storageLimitBytes ?? usage?.workspace.bytes ?? 0;
 	const files = filesQuery.data?.data ?? [];
 	const meta = filesQuery.data?.meta;
 	const selectedFiles = files.filter((file) => selectedIds.has(file.id));
@@ -172,11 +180,23 @@ const StorageSection = ({ workspaceId }: StorageSectionProps) => {
 					<p className='text-[12.5px] leading-[19px] text-muted-foreground'>Workspace usage</p>
 					<p className='mt-1 text-lg font-semibold leading-[27px]'>
 						{formatBytes(usage.workspace.bytes)}
+						{storageLimitBytes !== null && (
+							<span className='text-[13px] font-normal text-muted-foreground'>
+								{" "}of {formatBytes(storageLimitBytes)}
+							</span>
+						)}
 						<span className='ml-2 text-[13px] font-normal text-muted-foreground'>
 							{usage.workspace.count} files
 						</span>
 					</p>
-					<div className='mt-3 flex h-2 overflow-hidden rounded-full bg-muted'>
+					<div
+						role={storageLimitBytes !== null ? "progressbar" : undefined}
+						aria-label={storageLimitBytes !== null ? "Storage used of plan limit" : undefined}
+						aria-valuemin={storageLimitBytes !== null ? 0 : undefined}
+						aria-valuemax={storageLimitBytes ?? undefined}
+						aria-valuenow={storageLimitBytes !== null ? usage.workspace.bytes : undefined}
+						className='mt-3 flex h-2 overflow-hidden rounded-full bg-muted'
+					>
 						{(Object.keys(TYPE_LABELS) as StorageFileType[]).map((key) => (
 							<div
 								key={key}
@@ -186,7 +206,7 @@ const StorageSection = ({ workspaceId }: StorageSectionProps) => {
 									key === "other" && "bg-zinc-400",
 								)}
 								style={{
-									width: `${usage.workspace.bytes ? (usage.byType[key].bytes / usage.workspace.bytes) * 100 : 0}%`,
+									width: `${barTotalBytes ? Math.min(100, (usage.byType[key].bytes / barTotalBytes) * 100) : 0}%`,
 								}}
 							/>
 						))}

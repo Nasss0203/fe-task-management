@@ -118,6 +118,7 @@ function subscription(workspaceId: string): WorkspaceSubscription {
 		currentPeriodStart: null,
 		currentPeriodEnd: null,
 		cancelAtPeriodEnd: false,
+		accessEndsAt: null,
 	};
 }
 

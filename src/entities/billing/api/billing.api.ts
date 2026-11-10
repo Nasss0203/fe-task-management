@@ -6,6 +6,7 @@ import type {
 	BillingPlansResponse,
 	CreateBillingCheckoutInput,
 	PaymentOrderHistoryItem,
+	WorkspaceEntitlements,
 	WorkspaceSubscription,
 } from "../model/billing.types";
 
@@ -36,6 +37,37 @@ export async function getWorkspaceSubscription(
 	const response = await apiClient.get<
 		BillingApiResponse<WorkspaceSubscription>
 	>(`/billing/workspaces/${workspaceId}/subscription`, { signal });
+
+	return response.data.data;
+}
+
+export async function getWorkspaceEntitlements(
+	workspaceId: string,
+	signal?: AbortSignal,
+): Promise<WorkspaceEntitlements> {
+	const response = await apiClient.get<
+		BillingApiResponse<WorkspaceEntitlements>
+	>(`/billing/workspaces/${workspaceId}/entitlements`, { signal });
+
+	return response.data.data;
+}
+
+export async function cancelWorkspaceSubscription(
+	workspaceId: string,
+): Promise<WorkspaceSubscription> {
+	const response = await apiClient.post<
+		BillingApiResponse<WorkspaceSubscription>
+	>(`/billing/workspaces/${workspaceId}/subscription/cancel`);
+
+	return response.data.data;
+}
+
+export async function resumeWorkspaceSubscription(
+	workspaceId: string,
+): Promise<WorkspaceSubscription> {
+	const response = await apiClient.post<
+		BillingApiResponse<WorkspaceSubscription>
+	>(`/billing/workspaces/${workspaceId}/subscription/resume`);
 
 	return response.data.data;
 }

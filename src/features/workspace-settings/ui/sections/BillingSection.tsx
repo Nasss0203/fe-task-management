@@ -1,17 +1,35 @@
-import { Check, RotateCw } from "lucide-react";
+import { Check, Minus, RotateCw } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 import {
+	useCancelSubscription,
+	useResumeSubscription,
+} from "@/entities/billing/model/billing.mutations";
+import {
 	useBillingPlans,
+	useWorkspaceEntitlements,
 	useWorkspacePaymentOrders,
 	useWorkspaceSubscription,
 } from "@/entities/billing/model/billing.queries";
 import type {
 	PaymentOrderStatus,
+	WorkspaceEntitlementFeature,
 	WorkspaceSubscriptionStatus,
 } from "@/entities/billing/model/billing.types";
 import { useWorkspaceAccess } from "@/entities/workspace/model/workspace.queries";
-import { formatFeature, useBillingDialog } from "@/features/workspace-billing";
+import { useBillingDialog } from "@/features/workspace-billing";
+import { getApiErrorMessage } from "@/shared/lib/api-error-message";
 import { cn } from "@/shared/lib/utils";
+import {
+	AlertDialog,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/shared/ui/alert-dialog";
 import { Button } from "@/shared/ui/button";
 import { Skeleton } from "@/shared/ui/skeleton";
 
@@ -31,6 +49,92 @@ const STATUS_STYLES: Record<WorkspaceSubscriptionStatus, { label: string; classN
 	EXPIRED: { label: "Expired", className: "bg-muted text-muted-foreground" },
 };
 
+const HIDDEN_FEATURE_CODES = new Set(["AI_REQUESTS_MONTHLY"]);
+
+const FEATURE_LABELS: Record<string, string> = {
+	MAX_MEMBERS: "Members",
+	MAX_TEAMSPACES: "Teamspaces",
+	MAX_STORAGE_MB: "Storage",
+	PUBLIC_PAGE: "Public pages",
+};
+
+function formatMegabytes(megabytes: number): string {
+	return megabytes >= 1024
+		? `${Number((megabytes / 1024).toFixed(1))} GB`
+		: `${Number(megabytes.toFixed(1))} MB`;
+}
+
+function usageLevel(usage: number, limit: number): "normal" | "warning" | "exceeded" {
+	const ratio = limit > 0 ? usage / limit : 1;
+	if (ratio >= 1) return "exceeded";
+	if (ratio >= 0.8) return "warning";
+	return "normal";
+}
+
+const LEVEL_BAR_CLASSES = {
+	normal: "bg-primary",
+	warning: "bg-amber-500",
+	exceeded: "bg-destructive",
+} as const;
+
+function UsageItem({ feature }: { feature: WorkspaceEntitlementFeature }) {
+	const label = FEATURE_LABELS[feature.code] ?? feature.name;
+
+	if (typeof feature.limit === "boolean") {
+		return (
+			<li className='flex items-center gap-2 text-[13px] leading-5'>
+				{feature.limit ? (
+					<Check aria-hidden className='size-3.5 shrink-0 text-emerald-600 dark:text-emerald-400' />
+				) : (
+					<Minus aria-hidden className='size-3.5 shrink-0 text-muted-foreground' />
+				)}
+				{label}: {feature.limit ? "Included" : "Not included"}
+			</li>
+		);
+	}
+
+	const usage = feature.usage ?? 0;
+	const isStorage = feature.code === "MAX_STORAGE_MB";
+	const format = (value: number) =>
+		isStorage ? formatMegabytes(value) : value.toLocaleString("en-US");
+	const level = usageLevel(usage, feature.limit);
+
+	return (
+		<li className='text-[13px] leading-5'>
+			<div className='flex items-center justify-between gap-3'>
+				<span>{label}</span>
+				<span
+					className={cn(
+						"tabular-nums text-muted-foreground",
+						level === "warning" && "text-amber-600 dark:text-amber-400",
+						level === "exceeded" && "text-destructive",
+					)}
+				>
+					{format(usage)} / {format(feature.limit)}
+				</span>
+			</div>
+			<div
+				role='progressbar'
+				aria-label={`${label} usage`}
+				aria-valuemin={0}
+				aria-valuemax={feature.limit}
+				aria-valuenow={usage}
+				data-level={level}
+				className='mt-1.5 h-1.5 overflow-hidden rounded-full bg-muted'
+			>
+				<div
+					className={cn("h-full rounded-full", LEVEL_BAR_CLASSES[level])}
+					style={{
+						width: `${feature.limit > 0 ? Math.min(100, (usage / feature.limit) * 100) : 100}%`,
+					}}
+				/>
+			</div>
+		</li>
+	);
+}
+
+type ConfirmAction = "cancel" | "resume";
+
 interface BillingSectionProps {
 	workspaceId: string;
 }
@@ -41,6 +145,13 @@ const BillingSection = ({ workspaceId }: BillingSectionProps) => {
 
 	const subscriptionQuery = useWorkspaceSubscription(workspaceId);
 	const plansQuery = useBillingPlans();
+	const entitlementsQuery = useWorkspaceEntitlements(workspaceId);
+	const { data: access } = useWorkspaceAccess(workspaceId);
+	const canManage = access?.permissions.includes("workspace.update") ?? false;
+	const cancelSubscription = useCancelSubscription(workspaceId);
+	const resumeSubscription = useResumeSubscription(workspaceId);
+	const [confirmAction, setConfirmAction] = useState<ConfirmAction | null>(null);
+	const [renderedAt] = useState(Date.now);
 	const subscription = subscriptionQuery.data;
 	const currentPlan = plansQuery.data?.items.find(
 		(plan) => plan.code === subscription?.plan.code,
@@ -96,6 +207,43 @@ const BillingSection = ({ workspaceId }: BillingSectionProps) => {
 	}
 
 	const status = STATUS_STYLES[subscription.status];
+	const periodEndInFuture =
+		subscription.currentPeriodEnd !== null &&
+		new Date(subscription.currentPeriodEnd).getTime() > renderedAt;
+	const isActivePaid = !isFree && subscription.status === "ACTIVE";
+	const canCancel = canManage && isActivePaid && !subscription.cancelAtPeriodEnd;
+	const canResume =
+		canManage && isActivePaid && subscription.cancelAtPeriodEnd && periodEndInFuture;
+	const showPastDue = canManage && subscription.status === "PAST_DUE";
+	const pendingMutation =
+		confirmAction === "resume" ? resumeSubscription : cancelSubscription;
+	const usageFeatures =
+		entitlementsQuery.data?.features.filter(
+			(feature) => !HIDDEN_FEATURE_CODES.has(feature.code),
+		) ?? [];
+
+	const confirm = () => {
+		if (!confirmAction) return;
+		pendingMutation.mutate(undefined, {
+			onSuccess: () => {
+				toast.success(
+					confirmAction === "cancel"
+						? "Your plan will end at the end of the billing period"
+						: "Your plan will renew as usual",
+				);
+				setConfirmAction(null);
+			},
+			onError: (error) =>
+				toast.error(
+					getApiErrorMessage(
+						error,
+						confirmAction === "cancel"
+							? "Couldn't cancel the plan"
+							: "Couldn't resume the plan",
+					),
+				),
+		});
+	};
 
 	return (
 		<div>
@@ -133,23 +281,54 @@ const BillingSection = ({ workspaceId }: BillingSectionProps) => {
 					</Button>
 				</div>
 
+				{showPastDue && (
+					<div
+						role='alert'
+						className='mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-amber-500/10 px-3.5 py-3 text-[13px] leading-5 text-amber-700 dark:text-amber-400'
+					>
+						<p>
+							Plan expired on {formatSettingsDate(subscription.currentPeriodEnd)}.
+							{subscription.accessEndsAt &&
+								` Workspace moves to Free on ${formatSettingsDate(subscription.accessEndsAt)}.`}
+						</p>
+						<Button size='sm' onClick={openPlans}>
+							Renew
+						</Button>
+					</div>
+				)}
+
+				{subscription.cancelAtPeriodEnd && subscription.status === "ACTIVE" && (
+					<div className='mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-muted px-3.5 py-3 text-[13px] leading-5'>
+						<p>
+							Plan ends on {formatSettingsDate(subscription.currentPeriodEnd)}. The
+							workspace moves to Free after that.
+						</p>
+						{canResume && (
+							<Button size='sm' variant='outline' onClick={() => setConfirmAction("resume")}>
+								Resume plan
+							</Button>
+						)}
+					</div>
+				)}
+
 				<div className='pt-3.5'>
 					<p className='mb-3 text-[12.5px] font-medium leading-[19px] text-muted-foreground'>
-						Included in your plan
+						Usage
 					</p>
-					{plansQuery.isPending ? (
-						<div className='grid gap-2 sm:grid-cols-2'>
+					{entitlementsQuery.isPending ? (
+						<div className='grid gap-3 sm:grid-cols-2'>
 							{Array.from({ length: 4 }, (_, index) => (
-								<Skeleton key={index} className='h-5 w-3/4' />
+								<Skeleton key={index} className='h-9 w-full' />
 							))}
 						</div>
-					) : currentPlan && currentPlan.features.length > 0 ? (
-						<ul className='grid gap-2 text-[13px] leading-5 sm:grid-cols-2'>
-							{currentPlan.features.map((feature) => (
-								<li key={feature.id} className='flex items-center gap-2'>
-									<Check aria-hidden className='size-3.5 shrink-0 text-emerald-600 dark:text-emerald-400' />
-									{formatFeature(feature)}
-								</li>
+					) : entitlementsQuery.isError ? (
+						<p role='alert' className='text-sm text-muted-foreground'>
+							Could not load the plan usage.
+						</p>
+					) : usageFeatures.length > 0 ? (
+						<ul className='grid gap-x-6 gap-y-3 sm:grid-cols-2'>
+							{usageFeatures.map((feature) => (
+								<UsageItem key={feature.code} feature={feature} />
 							))}
 						</ul>
 					) : (
@@ -182,9 +361,52 @@ const BillingSection = ({ workspaceId }: BillingSectionProps) => {
 								: "—"}
 					</span>
 				</SettingsRow>
+				{canCancel && (
+					<SettingsRow label='Cancel plan'>
+						<Button size='sm' variant='outline' onClick={() => setConfirmAction("cancel")}>
+							Cancel plan
+						</Button>
+					</SettingsRow>
+				)}
 			</SettingsGroup>
 
 			<PaymentHistory workspaceId={workspaceId} />
+
+			<AlertDialog
+				open={confirmAction !== null}
+				onOpenChange={(open) => {
+					if (!open && !pendingMutation.isPending) setConfirmAction(null);
+				}}
+			>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>
+							{confirmAction === "resume" ? "Resume your plan?" : "Cancel your plan?"}
+						</AlertDialogTitle>
+						<AlertDialogDescription>
+							{confirmAction === "resume"
+								? `${subscription.plan.name} stays active and renews on ${formatSettingsDate(subscription.currentPeriodEnd)}.`
+								: `You keep ${subscription.plan.name} until ${formatSettingsDate(subscription.currentPeriodEnd)}. After that the workspace moves to Free and its limits apply.`}
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel disabled={pendingMutation.isPending}>
+							{confirmAction === "resume" ? "Not now" : "Keep plan"}
+						</AlertDialogCancel>
+						<Button
+							variant={confirmAction === "resume" ? "default" : "destructive"}
+							disabled={pendingMutation.isPending}
+							onClick={confirm}
+						>
+							{pendingMutation.isPending
+								? "Saving..."
+								: confirmAction === "resume"
+									? "Resume plan"
+									: "Cancel plan"}
+						</Button>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	);
 };

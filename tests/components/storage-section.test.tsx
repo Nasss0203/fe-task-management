@@ -15,6 +15,8 @@ const api = vi.hoisted(() => ({
 	bulkDeleteWorkspaceFiles: vi.fn(),
 }));
 vi.mock("@/entities/attachment/api/attachment-api", () => ({ attachmentApi: api }));
+const billingApi = vi.hoisted(() => ({ getWorkspaceEntitlements: vi.fn() }));
+vi.mock("@/entities/billing/api/billing.api", () => billingApi);
 vi.mock("sonner", () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
 const usage = (canManageAll: boolean): WorkspaceStorage => ({
@@ -53,8 +55,17 @@ const files: StorageFile[] = [
 	},
 ];
 
-function renderSection(canManageAll: boolean) {
+function renderSection(canManageAll: boolean, storageLimitMb?: number) {
 	api.getWorkspaceStorage.mockResolvedValue(usage(canManageAll));
+	billingApi.getWorkspaceEntitlements.mockImplementation(() =>
+		storageLimitMb === undefined
+			? Promise.reject(new Error("unavailable"))
+			: Promise.resolve({
+					features: [
+						{ code: "MAX_STORAGE_MB", name: "Storage", valueType: "NUMBER", limit: storageLimitMb, usage: 3 },
+					],
+				}),
+	);
 	api.listWorkspaceFiles.mockResolvedValue({
 		data: files,
 		meta: { page: 1, pageSize: 20, total: 2, totalPages: 1 },
@@ -90,6 +101,16 @@ describe("StorageSection", () => {
 
 		expect(await screen.findByText(/You uploaded 1\.0 MB/)).toBeInTheDocument();
 		expect(screen.queryByRole("columnheader", { name: "Uploaded by" })).not.toBeInTheDocument();
+	});
+
+	it("shows the workspace usage against the plan storage limit", async () => {
+		renderSection(true, 10 * 1024);
+
+		expect(await screen.findByText(/of 10\.0 GB/)).toBeInTheDocument();
+		expect(screen.getByRole("progressbar", { name: "Storage used of plan limit" })).toHaveAttribute(
+			"aria-valuemax",
+			String(10 * 1024 * 1024 * 1024),
+		);
 	});
 
 	it("deletes the selected files after confirmation and warns about files in use", async () => {
