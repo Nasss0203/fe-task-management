@@ -340,7 +340,13 @@ const BillingSection = ({ workspaceId }: BillingSectionProps) => {
 					</span>
 				</SettingsRow>
 				<SettingsRow
-					label={subscription.cancelAtPeriodEnd ? "Ends on" : "Renews on"}
+					label={
+						subscription.status === "PAST_DUE"
+							? "Expired on"
+							: subscription.cancelAtPeriodEnd
+								? "Ends on"
+								: "Renews on"
+					}
 				>
 					<span className='text-[13.5px] text-muted-foreground'>
 						{isFree ? "—" : formatSettingsDate(subscription.currentPeriodEnd)}

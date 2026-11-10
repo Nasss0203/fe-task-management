@@ -39,6 +39,24 @@ const plans: BillingPlansResponse = {
 					valueType: "NUMBER",
 					value: 25,
 				},
+				{
+					id: "f2",
+					featureId: "f2",
+					code: "MAX_STORAGE_MB",
+					name: "Storage",
+					description: "",
+					valueType: "NUMBER",
+					value: 10240,
+				},
+				{
+					id: "f3",
+					featureId: "f3",
+					code: "AI_REQUESTS_MONTHLY",
+					name: "AI requests per month",
+					description: "",
+					valueType: "NUMBER",
+					value: 500,
+				},
 			],
 			prices: [
 				{ id: "plus-m-sepay", billingInterval: "MONTHLY", currency: "VND", amount: 99000, provider: "SEPAY" },
@@ -80,6 +98,42 @@ describe("BillingDialog", () => {
 		const free = await within(dialog).findByRole("region", { name: "Free" });
 		expect(within(free).getByText("Gói hiện tại")).toBeInTheDocument();
 		expect(within(dialog).getByText("Tối đa 25 thành viên")).toBeInTheDocument();
+	});
+
+	it("shows storage in GB and hides the AI request quota", async () => {
+		renderDialog();
+		act(() => useBillingDialog.getState().setOpen(true));
+
+		const plus = await screen.findByRole("region", { name: "Plus" });
+		expect(within(plus).getByText("10 GB lưu trữ")).toBeInTheDocument();
+		expect(within(plus).queryByText(/MB lưu trữ/)).not.toBeInTheDocument();
+		expect(within(plus).queryByText(/AI requests/)).not.toBeInTheDocument();
+	});
+
+	it("shows the price once and lists SePay before Stripe", async () => {
+		const plus = plans.items[1];
+		billingApi.getBillingPlans.mockResolvedValue({
+			items: [
+				{
+					...plus,
+					prices: [
+						{ id: "plus-m-stripe", billingInterval: "MONTHLY", currency: "VND", amount: 99000, provider: "STRIPE" },
+						{ id: "plus-m-sepay", billingInterval: "MONTHLY", currency: "VND", amount: 99000, provider: "SEPAY" },
+					],
+				},
+			],
+		});
+		renderDialog();
+		act(() => useBillingDialog.getState().setOpen(true));
+
+		const region = await screen.findByRole("region", { name: "Plus" });
+		const methods = await within(region).findAllByRole("button");
+		expect(methods.map((button) => button.textContent)).toEqual([
+			"Chuyển khoản QRSePay",
+			"Thẻ Visa/MastercardStripe test",
+		]);
+		expect(within(region).getAllByText(/99\.000/)).toHaveLength(1);
+		expect(within(region).getByText("/ tháng")).toBeInTheDocument();
 	});
 
 	it("checks out the chosen price for this workspace from inside the dialog", async () => {

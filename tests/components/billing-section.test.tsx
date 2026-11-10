@@ -143,6 +143,8 @@ describe("BillingSection", () => {
 		const alert = await screen.findByText(/Plan expired on 1 Feb 2099/);
 		expect(alert).toHaveTextContent("Workspace moves to Free on 4 Feb 2099.");
 		expect(screen.getByRole("button", { name: "Renew" })).toBeInTheDocument();
+		expect(screen.getByText("Expired on")).toBeInTheDocument();
+		expect(screen.queryByText("Renews on")).not.toBeInTheDocument();
 	});
 
 	it("hides plan actions and the expiry notice from members without workspace.update", async () => {
