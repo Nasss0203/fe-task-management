@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
 	Check,
@@ -8,30 +8,67 @@ import {
 	Minus,
 } from "lucide-react";
 import { useBillingPlans } from "@/entities/billing/model/billing.queries";
+import type {
+	BillingInterval,
+	BillingPlan,
+} from "@/entities/billing/model/billing.types";
 import { useUser } from "@/features/auth";
+import { formatMegabytes } from "@/features/workspace-billing";
 import { Button } from "@/shared/ui/button";
 import { CtaSection } from "@/widgets/landing/ui/cta-section";
 import {
 	MARKETING_PRICING_PLANS,
 	PRICING_FAQS,
-	type PricingPlan,
 } from "@/widgets/landing/data/marketing-data";
+
+const PLAN_FEATURE_ROWS = [
+	{ code: "MAX_MEMBERS", label: "Members" },
+	{ code: "MAX_TEAMSPACES", label: "Teamspaces" },
+	{ code: "MAX_STORAGE_MB", label: "File storage" },
+	{ code: "PUBLIC_PAGE", label: "Publish pages to the web" },
+] as const;
+
+function getFeatureValue(plan: BillingPlan, code: string) {
+	return plan.features.find((feature) => feature.code === code)?.value;
+}
+
+function describeFeature(code: string, value: number | boolean): string {
+	if (typeof value === "boolean") return "Publish pages to the web";
+	if (code === "MAX_MEMBERS") return `Up to ${value.toLocaleString("en-US")} members`;
+	if (code === "MAX_TEAMSPACES") return value === 1 ? "1 teamspace" : `${value.toLocaleString("en-US")} teamspaces`;
+	return `${formatMegabytes(value)} file storage`;
+}
+
+function formatLimit(code: string, value: number): string {
+	return code === "MAX_STORAGE_MB" ? formatMegabytes(value) : value.toLocaleString("en-US");
+}
+
+function getMonthlyAmount(plan: BillingPlan): number {
+	return plan.prices.find((price) => price.billingInterval === "MONTHLY")?.amount ?? 0;
+}
+
+function formatPlanPrice(plan: BillingPlan, interval: BillingInterval) {
+	const price = plan.prices.find((item) => item.billingInterval === interval);
+	const amount = new Intl.NumberFormat("vi-VN", {
+		style: "currency",
+		currency: price?.currency ?? "VND",
+		maximumFractionDigits: 0,
+	}).format(price?.amount ?? 0);
+	if (!price) return { amount, period: "forever" };
+	return { amount, period: interval === "MONTHLY" ? "/ month" : "/ year" };
+}
 
 export function PricingPageContent() {
 	const { user } = useUser();
-	const [billingInterval, setBillingInterval] = useState<"MONTHLY" | "YEARLY">("MONTHLY");
-
-	// Try querying real billing plans from backend (fallback to marketing plans)
+	const [billingInterval, setBillingInterval] = useState<BillingInterval>("MONTHLY");
 	const { data: billingPlansResponse } = useBillingPlans();
 
-	const plans = useMemo<PricingPlan[]>(() => {
-		// If real backend plans exist and have items, map them gracefully
-		if (billingPlansResponse?.items && billingPlansResponse.items.length > 0) {
-			return MARKETING_PRICING_PLANS;
-		}
-
-		return MARKETING_PRICING_PLANS;
-	}, [billingPlansResponse]);
+	const plans = billingPlansResponse?.items.length
+		? billingPlansResponse.items
+		: MARKETING_PRICING_PLANS;
+	const popularPlanId = plans
+		.filter((plan) => plan.prices.length > 0)
+		.sort((a, b) => getMonthlyAmount(a) - getMonthlyAmount(b))[0]?.id;
 
 	return (
 		<div className='relative overflow-hidden py-12 sm:py-20 space-y-24 sm:space-y-32'>
@@ -83,9 +120,6 @@ export function PricingPageContent() {
 							}`}
 						>
 							<span>Yearly Billing</span>
-							<span className='rounded border border-[#5e6ad2]/25 bg-[#eeeffc] text-[#434cb8] dark:bg-indigo-500/15 dark:text-indigo-300 text-[10px] font-bold px-1.5 py-0.5 leading-none'>
-								Save 20%
-							</span>
 						</button>
 					</div>
 				</div>
@@ -95,13 +129,15 @@ export function PricingPageContent() {
 			<section className='mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'>
 				<div className='grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch'>
 					{plans.map((plan) => {
-						const isPro = plan.popular;
-						const price =
-							billingInterval === "YEARLY"
-								? plan.priceYearly
-								: plan.priceMonthly;
+						const isPro = plan.id === popularPlanId;
+						const { amount, period } = formatPlanPrice(plan, billingInterval);
 
 						const ctaHref = user ? "/dashboard?upgrade=1" : "/sign-up";
+						const ctaLabel = user
+							? "Go to Billing"
+							: plan.prices.length > 0
+								? `Get started with ${plan.name}`
+								: "Get started free";
 
 						return (
 							<div
@@ -113,16 +149,15 @@ export function PricingPageContent() {
 								}`}
 							>
 								<div className='relative flex flex-1 flex-col rounded-xl border border-border/80 bg-card p-6 sm:p-7 shadow-2xs'>
-									{/* Popular / Badge */}
 									<div className='space-y-4'>
 										<div className='flex items-center justify-between gap-2'>
 											<h2 className='text-xl font-bold tracking-tight text-foreground'>
 												{plan.name}
 											</h2>
-											{plan.badge && (
+											{isPro && (
 												<span className='inline-flex items-center gap-1.5 rounded-full bg-[#5e6ad2] px-2.5 py-0.5 text-[10px] font-semibold text-white'>
 													<span className='h-1.5 w-1.5 rounded-full bg-white' />
-													{plan.badge}
+													Most popular
 												</span>
 											)}
 										</div>
@@ -133,10 +168,10 @@ export function PricingPageContent() {
 
 										<div className='pt-2 flex items-baseline gap-1'>
 											<span className='text-4xl font-bold tracking-tight text-foreground font-mono'>
-												{price}
+												{amount}
 											</span>
 											<span className='text-xs text-muted-foreground'>
-												{plan.code === "FREE" ? "" : `/ user / month`}
+												{period}
 											</span>
 										</div>
 									</div>
@@ -151,7 +186,7 @@ export function PricingPageContent() {
 														: "border border-border bg-background hover:bg-muted text-foreground"
 												}`}
 											>
-												{user ? "Go to Billing" : plan.cta}
+												{ctaLabel}
 											</Button>
 										</Link>
 									</div>
@@ -161,27 +196,32 @@ export function PricingPageContent() {
 										<div className='font-semibold text-muted-foreground text-[11px] uppercase tracking-wider'>
 											What&apos;s included:
 										</div>
-										{plan.features.map((feature) => (
-											<div
-												key={feature.name}
-												className={`flex items-start gap-2.5 ${
-													feature.included
-														? "text-foreground font-medium"
-														: "text-muted-foreground/60 line-through"
-												}`}
-											>
-												{feature.included ? (
-													<div className='h-4 w-4 rounded border border-border bg-muted/50 text-[#5e6ad2] flex items-center justify-center shrink-0 mt-0.5'>
-														<Check className='h-2.5 w-2.5' />
-													</div>
-												) : (
-													<div className='h-4 w-4 rounded border border-border/60 bg-muted/30 text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
-														<Minus className='h-2.5 w-2.5' />
-													</div>
-												)}
-												<span>{feature.name}</span>
-											</div>
-										))}
+										{PLAN_FEATURE_ROWS.map(({ code }) => {
+											const value = getFeatureValue(plan, code);
+											if (value === undefined) return null;
+											const included = value !== false;
+											return (
+												<div
+													key={code}
+													className={`flex items-start gap-2.5 ${
+														included
+															? "text-foreground font-medium"
+															: "text-muted-foreground/60 line-through"
+													}`}
+												>
+													{included ? (
+														<div className='h-4 w-4 rounded border border-border bg-muted/50 text-[#5e6ad2] flex items-center justify-center shrink-0 mt-0.5'>
+															<Check className='h-2.5 w-2.5' />
+														</div>
+													) : (
+														<div className='h-4 w-4 rounded border border-border/60 bg-muted/30 text-muted-foreground flex items-center justify-center shrink-0 mt-0.5'>
+															<Minus className='h-2.5 w-2.5' />
+														</div>
+													)}
+													<span>{describeFeature(code, value)}</span>
+												</div>
+											);
+										})}
 									</div>
 								</div>
 							</div>
@@ -208,60 +248,36 @@ export function PricingPageContent() {
 								<thead>
 									<tr className='border-b border-border/60 text-muted-foreground font-semibold'>
 										<th className='py-3 px-3 w-2/5'>Feature</th>
-										<th className='py-3 px-3 w-1/5'>Free</th>
-										<th className='py-3 px-3 w-1/5 text-[#5e6ad2] dark:text-indigo-400'>Pro</th>
-										<th className='py-3 px-3 w-1/5'>Team</th>
+										{plans.map((plan) => (
+											<th
+												key={plan.id}
+												className={`py-3 px-3 ${plan.id === popularPlanId ? "text-[#5e6ad2] dark:text-indigo-400" : ""}`}
+											>
+												{plan.name}
+											</th>
+										))}
 									</tr>
 								</thead>
 								<tbody className='divide-y divide-border/40 text-foreground'>
-									<tr>
-										<td className='py-3 px-3 font-medium'>Team Members</td>
-										<td className='py-3 px-3'>5 users</td>
-										<td className='py-3 px-3 font-semibold text-foreground'>25 users</td>
-										<td className='py-3 px-3'>Unlimited</td>
-									</tr>
-									<tr>
-										<td className='py-3 px-3 font-medium'>Squad Teamspaces</td>
-										<td className='py-3 px-3'>1 space</td>
-										<td className='py-3 px-3 font-semibold text-foreground'>5 spaces</td>
-										<td className='py-3 px-3'>Unlimited</td>
-									</tr>
-									<tr>
-										<td className='py-3 px-3 font-medium'>Storage Quota</td>
-										<td className='py-3 px-3'>100 MB</td>
-										<td className='py-3 px-3 font-semibold text-foreground'>10 GB</td>
-										<td className='py-3 px-3'>100 GB</td>
-									</tr>
-									<tr>
-										<td className='py-3 px-3 font-medium'>Database & Multi-views</td>
-										<td className='py-3 px-3'>Basic</td>
-										<td className='py-3 px-3 font-semibold text-foreground'>Unlimited Views</td>
-										<td className='py-3 px-3'>Unlimited + API</td>
-									</tr>
-									<tr>
-										<td className='py-3 px-3 font-medium'>Database Views (Board, Calendar, List)</td>
-										<td className='py-3 px-3 text-muted-foreground'><Minus className='h-3 w-3' /></td>
-										<td className='py-3 px-3 font-semibold text-[#5e6ad2]'><Check className='h-3.5 w-3.5' /></td>
-										<td className='py-3 px-3 font-semibold text-[#5e6ad2]'><Check className='h-3.5 w-3.5' /></td>
-									</tr>
-									<tr>
-										<td className='py-3 px-3 font-medium'>Public Page Web Publishing</td>
-										<td className='py-3 px-3 text-muted-foreground'><Minus className='h-3 w-3' /></td>
-										<td className='py-3 px-3 font-semibold text-[#5e6ad2]'><Check className='h-3.5 w-3.5' /></td>
-										<td className='py-3 px-3 font-semibold text-[#5e6ad2]'><Check className='h-3.5 w-3.5' /></td>
-									</tr>
-									<tr>
-										<td className='py-3 px-3 font-medium'>Taskmanly AI Assistant</td>
-										<td className='py-3 px-3 text-muted-foreground'><Minus className='h-3 w-3' /></td>
-										<td className='py-3 px-3 font-semibold text-foreground'>Standard Quota</td>
-										<td className='py-3 px-3 font-semibold text-foreground'>Unlimited</td>
-									</tr>
-									<tr>
-										<td className='py-3 px-3 font-medium'>Workspace &amp; Page Permissions</td>
-										<td className='py-3 px-3 text-muted-foreground'><Minus className='h-3 w-3' /></td>
-										<td className='py-3 px-3 font-semibold text-[#5e6ad2]'><Check className='h-3.5 w-3.5' /></td>
-										<td className='py-3 px-3 font-semibold text-[#5e6ad2]'><Check className='h-3.5 w-3.5' /></td>
-									</tr>
+									{PLAN_FEATURE_ROWS.map(({ code, label }) => (
+										<tr key={code}>
+											<td className='py-3 px-3 font-medium'>{label}</td>
+											{plans.map((plan) => {
+												const value = getFeatureValue(plan, code);
+												return (
+													<td key={plan.id} className='py-3 px-3'>
+														{typeof value === "number" ? (
+															formatLimit(code, value)
+														) : value ? (
+															<Check aria-label='Included' className='h-3.5 w-3.5 text-[#5e6ad2]' />
+														) : (
+															<Minus aria-label='Not included' className='h-3 w-3 text-muted-foreground' />
+														)}
+													</td>
+												);
+											})}
+										</tr>
+									))}
 								</tbody>
 							</table>
 						</div>
