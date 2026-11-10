@@ -45,6 +45,7 @@ import {
 	type TeamspaceSettingsTab,
 } from "@/features/teamspace/manage-teamspace/ui/teamspace-settings-dialog";
 
+import { usePlanLimitNotifier } from "@/features/workspace-billing";
 import { getApiErrorMessage } from "@/shared/lib/api-error-message";
 import { Button } from "@/shared/ui/button";
 import {
@@ -92,6 +93,7 @@ export function NavTeamspaces({
 	>(null);
 
 	const createTeamspaceMutation = useCreateTeamspace();
+	const notifyPlanLimit = usePlanLimitNotifier(workspaceId);
 
 	const [createTeamspaceDialogOpen, setCreateTeamspaceDialogOpen] =
 		useState(false);
@@ -174,6 +176,9 @@ export function NavTeamspaces({
 			{
 				onSuccess: () => {
 					setCreateTeamspaceDialogOpen(false);
+				},
+				onError: (error) => {
+					if (notifyPlanLimit(error)) setCreateTeamspaceDialogOpen(false);
 				},
 			},
 		);

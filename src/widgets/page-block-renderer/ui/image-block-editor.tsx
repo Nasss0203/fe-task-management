@@ -7,6 +7,7 @@ import { useUploadAttachment } from "@/entities/attachment/model/page.mutations"
 import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-tree";
 import { useUpdatePageBlock } from "@/entities/page-block/model/page-block.mutations";
 import { usePage } from "@/entities/page/model/page.queries";
+import { isPlanLimitError, usePlanLimitNotifier } from "@/features/workspace-billing";
 
 interface ImageBlockEditorProps {
 	block: PageBlockNode;
@@ -60,6 +61,7 @@ export function ImageBlockEditor({ block, shareToken }: ImageBlockEditorProps) {
 
 	const updateBlock = useUpdatePageBlock(shareToken);
 	const uploadAttachment = useUploadAttachment();
+	const notifyPlanLimit = usePlanLimitNotifier(page?.workspace_id);
 
 	useEffect(() => {
 		setContent(getImageContent(block));
@@ -100,6 +102,8 @@ export function ImageBlockEditor({ block, shareToken }: ImageBlockEditorProps) {
 				caption: "",
 				attachmentId: attachment.id,
 			});
+		} catch (error) {
+			notifyPlanLimit(error);
 		} finally {
 			event.target.value = "";
 		}
@@ -224,7 +228,7 @@ export function ImageBlockEditor({ block, shareToken }: ImageBlockEditorProps) {
 					</p>
 				)}
 
-				{uploadAttachment.isError && (
+				{uploadAttachment.isError && !isPlanLimitError(uploadAttachment.error) && (
 					<p className='mt-2 text-xs text-destructive'>
 						Upload image failed.
 					</p>

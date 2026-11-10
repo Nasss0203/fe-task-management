@@ -18,7 +18,7 @@ import type {
 	WorkspaceSubscriptionStatus,
 } from "@/entities/billing/model/billing.types";
 import { useWorkspaceAccess } from "@/entities/workspace/model/workspace.queries";
-import { useBillingDialog } from "@/features/workspace-billing";
+import { formatMegabytes, useBillingDialog } from "@/features/workspace-billing";
 import { getApiErrorMessage } from "@/shared/lib/api-error-message";
 import { cn } from "@/shared/lib/utils";
 import {
@@ -57,12 +57,6 @@ const FEATURE_LABELS: Record<string, string> = {
 	MAX_STORAGE_MB: "Storage",
 	PUBLIC_PAGE: "Public pages",
 };
-
-function formatMegabytes(megabytes: number): string {
-	return megabytes >= 1024
-		? `${Number((megabytes / 1024).toFixed(1))} GB`
-		: `${Number(megabytes.toFixed(1))} MB`;
-}
 
 function usageLevel(usage: number, limit: number): "normal" | "warning" | "exceeded" {
 	const ratio = limit > 0 ? usage / limit : 1;

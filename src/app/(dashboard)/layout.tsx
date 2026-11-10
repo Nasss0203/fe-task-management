@@ -1,4 +1,4 @@
-import { PaymentResultDialog } from "@/features/workspace-billing";
+import { PaymentResultDialog, PlanLimitDialog } from "@/features/workspace-billing";
 import { AppSidebar } from "@/widgets/workspace-sidebar";
 import { HeaderWorkspaceContainer } from "@/widgets/workspace-sidebar/ui/header-workspace-container";
 import {
@@ -27,6 +27,7 @@ const layout = ({
 			<Suspense fallback={null}>
 				<PaymentResultDialog />
 			</Suspense>
+			<PlanLimitDialog />
 		</SidebarProvider>
 	);
 };
