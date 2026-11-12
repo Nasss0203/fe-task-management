@@ -14,6 +14,7 @@ import {
 } from "@/entities/page-share/model/page-share.queries";
 
 import type { PageShareMember } from "@/entities/page-share/model/page-share.types";
+import { usePage } from "@/entities/page/model/page.queries";
 
 import { PagePublishTab } from "@/features/page-publish/ui/PagePublishTab";
 
@@ -62,6 +63,8 @@ export default function ShareButton({ pageId }: ShareButtonProps) {
 	const updateShareAccess = useUpdatePageShareAccess(pageId);
 
 	const updateSetting = useUpdatePageShareSetting(pageId);
+
+	const { data: page } = usePage(pageId, canReadShares);
 
 	/**
 	 * VIEWER / COMMENTER
@@ -123,6 +126,7 @@ export default function ShareButton({ pageId }: ShareButtonProps) {
 							{/* General Access */}
 							<GeneralAccessSection
 								setting={shareSetting}
+								workspaceViewOnly={Boolean(page?.teamspace_id)}
 								canManage={canManageShares}
 								isPending={isSettingPending}
 								isError={isSettingError}

@@ -27,6 +27,8 @@ type GeneralAccessChoice = "RESTRICTED" | "WORKSPACE" | "LINK";
 interface GeneralAccessSectionProps {
 	setting?: PageShareSetting;
 
+	workspaceViewOnly?: boolean;
+
 	canManage: boolean;
 
 	isPending: boolean;
@@ -70,6 +72,7 @@ const accessLabel: Record<PageShareAccessLevel, string> = {
 
 export function GeneralAccessSection({
 	setting,
+	workspaceViewOnly = false,
 	canManage,
 	isPending,
 	isError,
@@ -105,8 +108,9 @@ export function GeneralAccessSection({
 
 		if (nextValue === "WORKSPACE") {
 			onUpdate({
-				workspace_access_level:
-					setting?.workspaceAccessLevel ?? "VIEWER",
+				workspace_access_level: workspaceViewOnly
+					? "VIEWER"
+					: (setting?.workspaceAccessLevel ?? "VIEWER"),
 
 				link_access_level: null,
 			});
@@ -187,7 +191,9 @@ export function GeneralAccessSection({
 						{generalAccess === "WORKSPACE" &&
 							setting?.workspaceAccessLevel && (
 								<div className='ml-auto shrink-0 text-xs text-muted-foreground'>
-									{canManage ? (
+									{workspaceViewOnly ? (
+										<span>{accessLabel.VIEWER}</span>
+									) : canManage ? (
 										<AccessLevelMenu
 											currentLevel={
 												menuLevel[
