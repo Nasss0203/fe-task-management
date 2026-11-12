@@ -77,6 +77,14 @@ export interface PagePresetOption {
 	icon: string;
 }
 
+export interface PageMentionTitle {
+	pageId: string;
+	title: string;
+	icon: string | null;
+}
+
+export type PageMentionTitles = Record<string, PageMentionTitle | null>;
+
 export interface PageSearchResult {
 	pageId: string;
 	title: string;

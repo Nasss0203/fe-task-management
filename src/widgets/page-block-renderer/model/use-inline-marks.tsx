@@ -8,6 +8,7 @@ import {
 	toggleInlineMark,
 } from "@/entities/page-block/lib/toggle-inline-mark";
 import { ReadOnlyRichText } from "@/entities/page-block/ui/read-only-block-content";
+import type { PageMentionTitles } from "@/entities/page/model/page.types";
 import { cn } from "@/shared/lib/utils";
 
 /**
@@ -20,6 +21,7 @@ export function useInlineMarks(
 	setValue: (value: string) => void,
 	previewClassName?: string,
 	previewText: string = value,
+	pageTitles?: Partial<PageMentionTitles>,
 ) {
 	const [focused, setFocused] = useState(false);
 	const showPreview = !focused && hasInlineMarks(previewText);
@@ -75,7 +77,7 @@ export function useInlineMarks(
 					focusAtEnd(event.currentTarget);
 				}}
 			>
-				<ReadOnlyRichText text={previewText} />
+				<ReadOnlyRichText text={previewText} pageTitles={pageTitles} />
 			</div>
 		) : null,
 	};

@@ -75,6 +75,7 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 		setText,
 		cn("text-[15px] leading-6", textTone),
 		mentions.toStored(text),
+		mentions.pageTitles,
 	);
 
 	const updateBlock = useUpdatePageBlock(shareToken);

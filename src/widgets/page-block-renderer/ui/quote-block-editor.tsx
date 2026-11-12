@@ -59,6 +59,7 @@ export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 		setValue,
 		"text-base leading-[26px] text-secondary-foreground",
 		mentions.toStored(value),
+		mentions.pageTitles,
 	);
 
 	const updateBlock = useUpdatePageBlock(shareToken);

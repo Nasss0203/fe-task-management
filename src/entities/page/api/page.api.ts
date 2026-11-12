@@ -8,6 +8,7 @@ import type {
 	Page,
 	PagePreset,
 	PagePresetOption,
+	PageMentionTitles,
 	PageSearchResult,
 	UpdatePageInput,
 	WorkspaceDatabase,
@@ -55,6 +56,19 @@ export const pageApi = {
 		const response = await instance.get<ApiResponse<PageSearchResult[]>>(
 			`${PAGE_API}/workspace/${workspaceId}/search`,
 			{ params: { q: query }, signal },
+		);
+
+		return response.data.data;
+	},
+
+	mentionTitles: async (
+		workspaceId: string,
+		pageIds: string[],
+		signal?: AbortSignal,
+	): Promise<PageMentionTitles> => {
+		const response = await instance.get<ApiResponse<PageMentionTitles>>(
+			`${PAGE_API}/workspace/${workspaceId}/mention-titles`,
+			{ params: { ids: pageIds.join(",") }, signal },
 		);
 
 		return response.data.data;

@@ -53,6 +53,7 @@ export function CalloutBlockEditor({
 		setValue,
 		"text-[15px] leading-6 text-secondary-foreground dark:text-foreground",
 		mentions.toStored(value),
+		mentions.pageTitles,
 	);
 
 	const updateBlock = useUpdatePageBlock(shareToken);

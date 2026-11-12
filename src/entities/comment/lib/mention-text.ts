@@ -7,6 +7,37 @@ const MENTION_TOKEN = /@\[([^\]\n]{1,100})\]\(user:([0-9a-f-]{36})\)/gi;
 export interface MentionRef {
 	id: string;
 	name: string;
+	kind?: "user" | "page";
+}
+
+const PAGE_MENTION_TOKEN = /@\[([^\]\n]{1,100})\]\(page:([0-9a-f-]{36})\)/gi;
+
+export const pageMentionToken = (pageId: string) => `@[page](page:${pageId})`;
+
+export function findPageMentionIds(body: string): string[] {
+	return [
+		...new Set(
+			[...body.matchAll(PAGE_MENTION_TOKEN)].map((match) => match[2].toLowerCase()),
+		),
+	];
+}
+
+export function pageMentionsToDisplay(
+	body: string,
+	titles: Record<string, { title: string } | null | undefined>,
+): { text: string; mentions: MentionRef[] } {
+	const mentions: MentionRef[] = [];
+
+	const text = body.replace(PAGE_MENTION_TOKEN, (token, _label: string, id: string) => {
+		const page = titles[id.toLowerCase()];
+		if (!page) return token;
+
+		const name = page.title || "Untitled";
+		mentions.push({ id: id.toLowerCase(), name, kind: "page" });
+		return `@${name}`;
+	});
+
+	return { text, mentions };
 }
 
 export type MentionPart =
@@ -80,7 +111,9 @@ export function displayToTokens(text: string, mentions: MentionRef[]): string {
 		(result, mention) =>
 			result.replaceAll(
 				`@${mention.name}`,
-				`@[${mention.name}](user:${mention.id})`,
+				mention.kind === "page"
+					? pageMentionToken(mention.id)
+					: `@[${mention.name}](user:${mention.id})`,
 			),
 		text,
 	);

@@ -74,6 +74,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 		setValue,
 		"text-[15px] leading-6 text-secondary-foreground dark:text-foreground",
 		mentions.toStored(value),
+		mentions.pageTitles,
 	);
 	const [commandOpen, setCommandOpen] = useState(false);
 	const [slashIndex, setSlashIndex] = useState<number | null>(null);

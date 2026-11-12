@@ -4,11 +4,14 @@ import {
 	parseInlineMarks,
 } from "@/entities/page-block/lib/parse-inline-marks";
 import { resolveEmbed, type ResolvedEmbed } from "@/entities/page-block/lib/resolve-embed";
+import type { PageMentionTitles } from "@/entities/page/model/page.types";
 import { canInteract, InteractionMode } from "@/shared/model/interaction-mode";
 import { MermaidDiagram } from "@/shared/ui/mermaid-diagram";
 import { NativeCheckbox } from "@/shared/ui/native-checkbox";
 import { BookmarkIcon, FileIcon, ImageIcon, VideoIcon } from "lucide-react";
 import { Fragment } from "react";
+
+import { PageMentionChip } from "./page-mention-chip";
 
 interface BlockContentProps {
 	block: { content: unknown; style_config: Record<string, unknown> | null };
@@ -466,11 +469,23 @@ export function ReadOnlyBookmarkBlock({ block }: BlockContentProps) {
 	);
 }
 
-export function ReadOnlyRichText({ text }: { text: string }) {
-	return <InlineNodes nodes={parseInlineMarks(text)} />;
+export function ReadOnlyRichText({
+	text,
+	pageTitles,
+}: {
+	text: string;
+	pageTitles?: Partial<PageMentionTitles>;
+}) {
+	return <InlineNodes nodes={parseInlineMarks(text)} pageTitles={pageTitles} />;
 }
 
-function InlineNodes({ nodes }: { nodes: InlineNode[] }) {
+function InlineNodes({
+	nodes,
+	pageTitles,
+}: {
+	nodes: InlineNode[];
+	pageTitles?: Partial<PageMentionTitles>;
+}) {
 	return (
 		<Fragment>
 			{nodes.map((node, index) => {
@@ -489,19 +504,19 @@ function InlineNodes({ nodes }: { nodes: InlineNode[] }) {
 					case "bold":
 						return (
 							<strong key={index} className='font-semibold'>
-								<InlineNodes nodes={node.children} />
+								<InlineNodes nodes={node.children} pageTitles={pageTitles} />
 							</strong>
 						);
 					case "italic":
 						return (
 							<em key={index}>
-								<InlineNodes nodes={node.children} />
+								<InlineNodes nodes={node.children} pageTitles={pageTitles} />
 							</em>
 						);
 					case "strike":
 						return (
 							<s key={index}>
-								<InlineNodes nodes={node.children} />
+								<InlineNodes nodes={node.children} pageTitles={pageTitles} />
 							</s>
 						);
 					case "mention":
@@ -513,6 +528,14 @@ function InlineNodes({ nodes }: { nodes: InlineNode[] }) {
 								@{node.name}
 							</span>
 						);
+					case "page-mention":
+						return (
+							<PageMentionChip
+								key={index}
+								pageId={node.pageId}
+								pageTitles={pageTitles}
+							/>
+						);
 					case "link":
 						return (
 							<a
@@ -522,7 +545,7 @@ function InlineNodes({ nodes }: { nodes: InlineNode[] }) {
 								rel='noopener noreferrer'
 								className='text-primary underline decoration-primary/50 underline-offset-2 hover:decoration-primary'
 							>
-								<InlineNodes nodes={node.children} />
+								<InlineNodes nodes={node.children} pageTitles={pageTitles} />
 							</a>
 						);
 				}

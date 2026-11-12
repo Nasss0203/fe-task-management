@@ -88,6 +88,7 @@ export function HeadingBlockEditor({ block, shareToken }: HeadingBlockEditorProp
 		setValue,
 		headingClass,
 		mentions.toStored(value),
+		mentions.pageTitles,
 	);
 
 	const updateBlock = useUpdatePageBlock(shareToken);
