@@ -27,7 +27,9 @@ type GeneralAccessChoice = "RESTRICTED" | "WORKSPACE" | "LINK";
 interface GeneralAccessSectionProps {
 	setting?: PageShareSetting;
 
-	workspaceViewOnly?: boolean;
+	teamspacePage?: boolean;
+
+	privateTeamspace?: boolean;
 
 	canManage: boolean;
 
@@ -72,7 +74,8 @@ const accessLabel: Record<PageShareAccessLevel, string> = {
 
 export function GeneralAccessSection({
 	setting,
-	workspaceViewOnly = false,
+	teamspacePage = false,
+	privateTeamspace = false,
 	canManage,
 	isPending,
 	isError,
@@ -108,7 +111,7 @@ export function GeneralAccessSection({
 
 		if (nextValue === "WORKSPACE") {
 			onUpdate({
-				workspace_access_level: workspaceViewOnly
+				workspace_access_level: teamspacePage
 					? "VIEWER"
 					: (setting?.workspaceAccessLevel ?? "VIEWER"),
 
@@ -122,7 +125,9 @@ export function GeneralAccessSection({
 			onUpdate({
 				workspace_access_level: null,
 
-				link_access_level: setting?.linkAccessLevel ?? "VIEWER",
+				link_access_level: teamspacePage
+					? "VIEWER"
+					: (setting?.linkAccessLevel ?? "VIEWER"),
 			});
 		}
 	};
@@ -176,9 +181,12 @@ export function GeneralAccessSection({
 										Only people invited
 									</SelectItem>
 
-									<SelectItem value='WORKSPACE'>
-										Everyone in workspace
-									</SelectItem>
+									{(!privateTeamspace ||
+										generalAccess === "WORKSPACE") && (
+										<SelectItem value='WORKSPACE'>
+											Everyone in workspace
+										</SelectItem>
+									)}
 
 									<SelectItem value='LINK'>
 										Anyone with the link
@@ -191,7 +199,7 @@ export function GeneralAccessSection({
 						{generalAccess === "WORKSPACE" &&
 							setting?.workspaceAccessLevel && (
 								<div className='ml-auto shrink-0 text-xs text-muted-foreground'>
-									{workspaceViewOnly ? (
+									{teamspacePage ? (
 										<span>{accessLabel.VIEWER}</span>
 									) : canManage ? (
 										<AccessLevelMenu
@@ -230,7 +238,9 @@ export function GeneralAccessSection({
 						{generalAccess === "LINK" &&
 							setting?.linkAccessLevel && (
 								<div className='ml-auto shrink-0 text-xs text-muted-foreground'>
-									{canManage ? (
+									{teamspacePage ? (
+										<span>{accessLabel.VIEWER}</span>
+									) : canManage ? (
 										<AccessLevelMenu
 											currentLevel={
 												menuLevel[
@@ -265,6 +275,12 @@ export function GeneralAccessSection({
 								</div>
 							)}
 					</div>
+
+					{privateTeamspace && generalAccess === "WORKSPACE" && (
+						<p className='text-xs text-muted-foreground'>
+							Not in effect: this page is in a private teamspace.
+						</p>
+					)}
 
 					{isUpdateError && (
 						<p role='alert' className='text-xs text-red-400'>
