@@ -1,6 +1,6 @@
 "use client";
 
-import { Archive, Check, Globe2 } from "lucide-react";
+import { Archive, Check, Globe2, Lock } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -10,11 +10,13 @@ import {
 import {
 	useArchivedTeamspaces,
 	useDiscoverTeamspaces,
+	usePrivateTeamspaceSummaries,
 } from "@/entities/teamspace/model/teamspace.queries";
 import type {
 	DiscoverTeamspaceItem,
 	Teamspace,
 } from "@/entities/teamspace/model/teamspace.types";
+import { useWorkspaceAccess } from "@/entities/workspace/model/workspace.queries";
 import { getApiErrorMessage } from "@/shared/lib/api-error-message";
 import { Button } from "@/shared/ui/button";
 import {
@@ -48,6 +50,16 @@ export function BrowseTeamspacesDialog({
 	const archivedQuery = useArchivedTeamspaces(workspaceId, open);
 	const restoreMutation = useRestoreTeamspace();
 	const archived = archivedQuery.data ?? [];
+
+	const { data: access } = useWorkspaceAccess(workspaceId);
+	const isWorkspaceOwner =
+		access?.membership_type === "MEMBER" &&
+		access.roles.includes("OWNER");
+	const privateQuery = usePrivateTeamspaceSummaries(
+		workspaceId,
+		open && isWorkspaceOwner,
+	);
+	const privateTeamspaces = privateQuery.data ?? [];
 
 	const handleRestore = (teamspace: Teamspace) => {
 		restoreMutation.mutate(teamspace.id, {
@@ -154,6 +166,54 @@ export function BrowseTeamspacesDialog({
 								);
 							})}
 						</ul>
+					)}
+
+					{privateTeamspaces.length > 0 && (
+						<section className='mt-4 border-t pt-4'>
+							<h3 className='mb-1 text-xs font-medium text-muted-foreground'>
+								Private
+							</h3>
+
+							<p className='mb-1 text-xs text-muted-foreground'>
+								You are not a member. Ask an owner to invite you to see the
+								pages.
+							</p>
+
+							<ul className='divide-y'>
+								{privateTeamspaces.map((teamspace) => (
+									<li
+										key={teamspace.id}
+										className='flex items-center gap-3 py-3'
+									>
+										<span className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground'>
+											<Lock className='size-4' />
+										</span>
+
+										<div className='min-w-0 flex-1'>
+											<p className='truncate text-sm font-medium'>
+												{teamspace.icon && (
+													<span aria-hidden='true'>{teamspace.icon} </span>
+												)}
+												{teamspace.name}
+											</p>
+
+											<p className='truncate text-xs text-muted-foreground'>
+												{teamspace.ownerNames.length > 0
+													? `Owner: ${teamspace.ownerNames.join(", ")}`
+													: "No owner"}
+												{` · ${teamspace.memberCount} ${
+													teamspace.memberCount === 1 ? "member" : "members"
+												}`}
+											</p>
+										</div>
+
+										<span className='shrink-0 text-xs text-muted-foreground'>
+											Invite only
+										</span>
+									</li>
+								))}
+							</ul>
+						</section>
 					)}
 
 					{archived.length > 0 && (

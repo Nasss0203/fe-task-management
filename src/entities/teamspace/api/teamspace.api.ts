@@ -10,6 +10,7 @@ import type {
 	DiscoverTeamspacesResponse,
 	ListTeamspaceInvitationsResponse,
 	MyTeamspaceInvitation,
+	PrivateTeamspaceSummary,
 	Teamspace,
 	TeamspaceInvitation,
 	TeamspaceInviteLink,
@@ -231,6 +232,17 @@ export const teamspaceApi = {
 			params: { workspaceId, limit: 100 },
 			signal,
 		});
+
+		return response.data.data;
+	},
+
+	getPrivateSummaries: async (
+		workspaceId: string,
+		signal?: AbortSignal,
+	): Promise<PrivateTeamspaceSummary[]> => {
+		const response = await instance.get<
+			ApiResponse<PrivateTeamspaceSummary[]>
+		>(`${TEAMSPACE_API}/private`, { params: { workspaceId }, signal });
 
 		return response.data.data;
 	},

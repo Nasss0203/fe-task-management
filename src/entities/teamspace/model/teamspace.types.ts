@@ -151,6 +151,20 @@ export interface DiscoverTeamspaceItem {
 	isMember: boolean;
 }
 
+export interface PrivateTeamspaceSummary {
+	id: string;
+
+	name: string;
+
+	icon: string | null;
+
+	visibility: TeamspaceVisibility;
+
+	ownerNames: string[];
+
+	memberCount: number;
+}
+
 export interface DiscoverTeamspacesResponse {
 	items: DiscoverTeamspaceItem[];
 
