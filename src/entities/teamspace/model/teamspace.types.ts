@@ -15,6 +15,8 @@ export interface Teamspace {
 
 	visibility: TeamspaceVisibility;
 
+	myRole?: TeamspaceRole | null;
+
 	createdAt: string;
 
 	updatedAt: string;

@@ -15,7 +15,6 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { toast } from "sonner";
 
 import {
 	buildPageTree,
@@ -29,24 +28,20 @@ import {
 import type { Page, WorkspaceDatabase } from "@/entities/page/model/page.types";
 import { PageTree } from "@/entities/page/ui/page-tree";
 
-import {
-	useCreateTeamspace,
-	useLeaveTeamspace,
-} from "@/entities/teamspace/model/teamspace.mutations";
+import { useCreateTeamspace } from "@/entities/teamspace/model/teamspace.mutations";
 import { useMyTeamspaceInvitations } from "@/entities/teamspace/model/teamspace.queries";
 import type { Teamspace } from "@/entities/teamspace/model/teamspace.types";
 
 import { CreatePageDialog } from "@/widgets/create-page";
 import { BrowseTeamspacesDialog } from "@/features/teamspace/browse-teamspaces/ui/browse-teamspaces-dialog";
 import { CreateTeamspaceDialog } from "@/features/teamspace/create-teamspace/ui/create-teamspace-dialog";
-import { ConfirmActionDialog } from "@/features/teamspace/manage-teamspace/ui/confirm-action-dialog";
+import { LeaveTeamspaceDialog } from "@/features/teamspace/manage-teamspace/ui/leave-teamspace-dialog";
 import {
 	TeamspaceSettingsDialog,
 	type TeamspaceSettingsTab,
 } from "@/features/teamspace/manage-teamspace/ui/teamspace-settings-dialog";
 
 import { usePlanLimitNotifier } from "@/features/workspace-billing";
-import { getApiErrorMessage } from "@/shared/lib/api-error-message";
 import { Button } from "@/shared/ui/button";
 import {
 	DropdownMenu,
@@ -110,24 +105,9 @@ export function NavTeamspaces({
 		? teamspaces.find((teamspace) => teamspace.id === settingsTarget.teamspaceId)
 		: undefined;
 
-	const leaveTeamspaceMutation = useLeaveTeamspace();
-
 	const [teamspaceToLeave, setTeamspaceToLeave] = useState<Teamspace | null>(
 		null,
 	);
-
-	const handleLeaveTeamspace = () => {
-		if (!teamspaceToLeave) return;
-
-		leaveTeamspaceMutation.mutate(teamspaceToLeave.id, {
-			onSuccess: () => toast.success(`You left ${teamspaceToLeave.name}`),
-			onError: (error) =>
-				toast.error(
-					getApiErrorMessage(error, "Could not leave the teamspace."),
-				),
-			onSettled: () => setTeamspaceToLeave(null),
-		});
-	};
 
 	/**
 	 * Tạo Page root trong Teamspace.
@@ -328,16 +308,13 @@ export function NavTeamspaces({
 				onOpenChange={setBrowseDialogOpen}
 			/>
 
-			<ConfirmActionDialog
-				open={teamspaceToLeave !== null}
-				title='Leave teamspace?'
-				description={`You will lose access to the pages in ${teamspaceToLeave?.name ?? "this teamspace"} unless someone invites you again.`}
-				confirmLabel='Leave teamspace'
-				pendingLabel='Leaving...'
-				isPending={leaveTeamspaceMutation.isPending}
-				onOpenChange={(open) => !open && setTeamspaceToLeave(null)}
-				onConfirm={handleLeaveTeamspace}
-			/>
+			{teamspaceToLeave && (
+				<LeaveTeamspaceDialog
+					key={teamspaceToLeave.id}
+					teamspace={teamspaceToLeave}
+					onClose={() => setTeamspaceToLeave(null)}
+				/>
+			)}
 		</SidebarGroup>
 	);
 }
@@ -429,6 +406,10 @@ function TeamspaceItem({
 
 	const hasPages = pageTree.length > 0;
 
+	const isMember = Boolean(teamspace.myRole);
+
+	const isOwner = teamspace.myRole === "OWNER";
+
 	return (
 		<div>
 			{/* Teamspace row */}
@@ -493,62 +474,67 @@ function TeamspaceItem({
 					{teamspace.name}
 				</button>
 
-				{/* Actions */}
-				<div className='mr-1 hidden shrink-0 items-center gap-0.5 group-hover/teamspace:flex has-[[data-state=open]]:flex'>
-					{/* More */}
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<button
-								type='button'
-								aria-label={`${teamspace.name} options`}
-								className='flex size-6 items-center justify-center rounded-sm text-muted-foreground hover:bg-sidebar-accent-foreground/10 hover:text-sidebar-foreground'
-								onClick={(event) => event.stopPropagation()}
-							>
-								<MoreHorizontal size={13} />
-							</button>
-						</DropdownMenuTrigger>
+				{isMember && (
+					<div className='mr-1 hidden shrink-0 items-center gap-0.5 group-hover/teamspace:flex has-[[data-state=open]]:flex'>
+						{/* More */}
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<button
+									type='button'
+									aria-label={`${teamspace.name} options`}
+									className='flex size-6 items-center justify-center rounded-sm text-muted-foreground hover:bg-sidebar-accent-foreground/10 hover:text-sidebar-foreground'
+									onClick={(event) => event.stopPropagation()}
+								>
+									<MoreHorizontal size={13} />
+								</button>
+							</DropdownMenuTrigger>
 
-						<DropdownMenuContent align='start' className='w-52'>
-							<DropdownMenuItem onSelect={() => onOpenSettings("members")}>
-								<Users className='size-4' />
-								Members
-							</DropdownMenuItem>
+							<DropdownMenuContent align='start' className='w-52'>
+								<DropdownMenuItem onSelect={() => onOpenSettings("members")}>
+									<Users className='size-4' />
+									Members
+								</DropdownMenuItem>
 
-							<DropdownMenuItem onSelect={() => onOpenSettings("links")}>
-								<Link2 className='size-4' />
-								Invite links
-							</DropdownMenuItem>
+								{isOwner && (
+									<>
+										<DropdownMenuItem onSelect={() => onOpenSettings("links")}>
+											<Link2 className='size-4' />
+											Invite links
+										</DropdownMenuItem>
 
-							<DropdownMenuItem onSelect={() => onOpenSettings("access")}>
-								<Shield className='size-4' />
-								Access
-							</DropdownMenuItem>
+										<DropdownMenuItem onSelect={() => onOpenSettings("access")}>
+											<Shield className='size-4' />
+											Access
+										</DropdownMenuItem>
+									</>
+								)}
 
-							<DropdownMenuSeparator />
+								<DropdownMenuSeparator />
 
-							<DropdownMenuItem variant='destructive' onSelect={onLeave}>
-								<LogOut className='size-4' />
-								Leave teamspace
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+								<DropdownMenuItem variant='destructive' onSelect={onLeave}>
+									<LogOut className='size-4' />
+									Leave teamspace
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
 
-					{/* Create root Page */}
-					<button
-						type='button'
-						disabled={isCreatingPage}
-						className='flex size-6 items-center justify-center rounded-sm text-muted-foreground hover:bg-sidebar-accent-foreground/10 hover:text-sidebar-foreground disabled:pointer-events-none disabled:opacity-50'
-						onClick={(event) => {
-							event.stopPropagation();
+						{/* Create root Page */}
+						<button
+							type='button'
+							disabled={isCreatingPage}
+							className='flex size-6 items-center justify-center rounded-sm text-muted-foreground hover:bg-sidebar-accent-foreground/10 hover:text-sidebar-foreground disabled:pointer-events-none disabled:opacity-50'
+							onClick={(event) => {
+								event.stopPropagation();
 
-							onCreateRootPage();
+								onCreateRootPage();
 
-							setExpanded(true);
-						}}
-					>
-						<Plus size={13} />
-					</button>
-				</div>
+								setExpanded(true);
+							}}
+						>
+							<Plus size={13} />
+						</button>
+					</div>
+				)}
 			</div>
 
 			{/* Pages */}

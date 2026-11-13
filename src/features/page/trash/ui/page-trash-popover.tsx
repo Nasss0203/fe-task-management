@@ -8,8 +8,10 @@ import {
 	Search,
 	Trash2,
 	TriangleAlert,
+	Users,
 } from "lucide-react";
 import { type ReactNode, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import {
 	useDeleteDatabasePermanently,
@@ -22,7 +24,10 @@ import {
 	usePagesByWorkspace,
 	useTrashPages,
 } from "@/entities/page/model/page.queries";
+import { useRestoreTeamspace } from "@/entities/teamspace/model/teamspace.mutations";
+import { useArchivedTeamspaces } from "@/entities/teamspace/model/teamspace.queries";
 import { useWorkspaceAccess } from "@/entities/workspace/model/workspace.queries";
+import { getApiErrorMessage } from "@/shared/lib/api-error-message";
 
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
@@ -38,7 +43,7 @@ interface PageTrashPopoverProps {
 }
 
 interface TrashItem {
-	kind: "page" | "database";
+	kind: "page" | "database" | "teamspace";
 	id: string;
 	/** The page itself, or the page that holds the database. */
 	pageId: string;
@@ -55,8 +60,9 @@ export function PageTrashPopover({
 	const [open, setOpen] = useState(false);
 
 	const [search, setSearch] = useState("");
-	const [itemPendingDelete, setItemPendingDelete] =
-		useState<TrashItem | null>(null);
+	const [itemPendingDelete, setItemPendingDelete] = useState<
+		(TrashItem & { kind: "page" | "database" }) | null
+	>(null);
 
 	const { data: pages = [], isLoading: isPagesLoading } = useTrashPages(
 		open ? workspaceId : undefined,
@@ -70,11 +76,15 @@ export function PageTrashPopover({
 		open ? workspaceId : undefined,
 	);
 
+	const { data: archivedTeamspaces = [], isLoading: isTeamspacesLoading } =
+		useArchivedTeamspaces(workspaceId, open);
+
 	const { data: access } = useWorkspaceAccess(workspaceId);
 	const canDeletePermanently =
 		access?.permissions.includes("page.permanent_delete") ?? false;
 
-	const isLoading = isPagesLoading || isDatabasesLoading;
+	const isLoading =
+		isPagesLoading || isDatabasesLoading || isTeamspacesLoading;
 
 	const restoreMutation = useRestorePage();
 
@@ -83,6 +93,8 @@ export function PageTrashPopover({
 	const deleteMutation = useDeletePagePermanently();
 
 	const deleteDatabaseMutation = useDeleteDatabasePermanently();
+
+	const restoreTeamspaceMutation = useRestoreTeamspace();
 
 	const filteredItems = useMemo(() => {
 		const trashPageMap = new Map(pages.map((page) => [page.id, page]));
@@ -124,14 +136,26 @@ export function PageTrashPopover({
 			}),
 		);
 
+		const teamspaceItems = archivedTeamspaces.map(
+			(teamspace): TrashItem => ({
+				kind: "teamspace",
+				id: teamspace.id,
+				pageId: teamspace.id,
+				title: teamspace.name,
+				icon: teamspace.icon,
+				location: "Teamspace",
+				deletedAt: teamspace.updatedAt,
+			}),
+		);
+
 		const keyword = search.trim().toLowerCase();
 
-		return [...pageItems, ...databaseItems]
+		return [...pageItems, ...databaseItems, ...teamspaceItems]
 			.filter((item) =>
 				(item.title || "Untitled").toLowerCase().includes(keyword),
 			)
 			.sort((a, b) => (b.deletedAt ?? "").localeCompare(a.deletedAt ?? ""));
-	}, [pages, databases, workspacePages, search]);
+	}, [pages, databases, workspacePages, archivedTeamspaces, search]);
 
 	const formatDeletedAt = (value: string | null) => {
 		if (!value) {
@@ -146,6 +170,18 @@ export function PageTrashPopover({
 	};
 
 	const handleRestore = (item: TrashItem) => {
+		if (item.kind === "teamspace") {
+			restoreTeamspaceMutation.mutate(item.id, {
+				onSuccess: () => toast.success(`${item.title} restored`),
+				onError: (error) =>
+					toast.error(
+						getApiErrorMessage(error, "Could not restore the teamspace."),
+					),
+			});
+
+			return;
+		}
+
 		if (item.kind === "page") {
 			restoreMutation.mutate({
 				pageId: item.id,
@@ -197,7 +233,9 @@ export function PageTrashPopover({
 	};
 
 	const isRestoring =
-		restoreMutation.isPending || restoreDatabaseMutation.isPending;
+		restoreMutation.isPending ||
+		restoreDatabaseMutation.isPending ||
+		restoreTeamspaceMutation.isPending;
 
 	const isDeleting =
 		deleteMutation.isPending || deleteDatabaseMutation.isPending;
@@ -310,6 +348,8 @@ export function PageTrashPopover({
 											<span className='text-sm'>
 												{item.icon}
 											</span>
+										) : item.kind === "teamspace" ? (
+											<Users className='size-4 text-muted-foreground' />
 										) : item.kind === "database" ? (
 											<Database className='size-4 text-muted-foreground' />
 										) : (
@@ -354,7 +394,7 @@ export function PageTrashPopover({
 										</Button>
 
 										{/* Delete permanently */}
-										{canDeletePermanently && (
+										{canDeletePermanently && item.kind !== "teamspace" && (
 											<Button
 												type='button'
 												variant='ghost'
@@ -363,7 +403,11 @@ export function PageTrashPopover({
 												disabled={isDeleting}
 												title='Delete permanently'
 												onClick={() => {
-													setItemPendingDelete(item);
+													const { kind } = item;
+
+													if (kind !== "teamspace") {
+														setItemPendingDelete({ ...item, kind });
+													}
 												}}
 											>
 												<Trash2 className='size-3.5' />

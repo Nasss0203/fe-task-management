@@ -128,8 +128,14 @@ export const teamspaceApi = {
 		);
 	},
 
-	leave: async (teamspaceId: string): Promise<void> => {
-		await instance.post(`${TEAMSPACE_API}/${teamspaceId}/leave`);
+	leave: async (
+		teamspaceId: string,
+		newOwnerMemberId?: string,
+	): Promise<void> => {
+		await instance.post(
+			`${TEAMSPACE_API}/${teamspaceId}/leave`,
+			newOwnerMemberId ? { newOwnerMemberId } : undefined,
+		);
 	},
 
 	inviteMember: async (

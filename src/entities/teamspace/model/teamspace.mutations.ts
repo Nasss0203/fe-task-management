@@ -100,7 +100,13 @@ export function useLeaveTeamspace() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: (teamspaceId: string) => teamspaceApi.leave(teamspaceId),
+		mutationFn: ({
+			teamspaceId,
+			newOwnerMemberId,
+		}: {
+			teamspaceId: string;
+			newOwnerMemberId?: string;
+		}) => teamspaceApi.leave(teamspaceId, newOwnerMemberId),
 
 		onSettled: () => {
 			// Sidebar list, discover list and the teamspace's own queries.
