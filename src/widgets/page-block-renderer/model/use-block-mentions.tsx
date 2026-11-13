@@ -7,8 +7,11 @@ import {
 	displayToTokens,
 	findMentionQuery,
 	findPageMentionIds,
+	markDisplayMentions,
 	type MentionRef,
+	mentionOrdinalAt,
 	pageMentionsToDisplay,
+	storedMentionsInOrder,
 	tokensToDisplay,
 } from "@/entities/comment/lib/mention-text";
 import { useMentionCandidates } from "@/entities/comment/model/comment.queries";
@@ -48,6 +51,22 @@ type Suggestion =
 
 const GROUP_LIMIT = 5;
 
+interface PickedMention {
+	mention: MentionRef;
+	ordinal: number;
+}
+
+function withPicked(stored: MentionRef[], picked: PickedMention[]): MentionRef[] {
+	return picked.reduce((list, { mention, ordinal }) => {
+		const sameName = list.flatMap((item, index) =>
+			item.name === mention.name ? [index] : [],
+		);
+		const at = sameName[ordinal] ?? list.length;
+
+		return [...list.slice(0, at), mention, ...list.slice(at)];
+	}, stored);
+}
+
 export function useBlockMentions({
 	pageId,
 	enabled,
@@ -58,7 +77,11 @@ export function useBlockMentions({
 	const textareaRef = useRef<TextField | null>(null);
 	const [query, setQuery] = useState<MentionQuery | null>(null);
 	const [activeIndex, setActiveIndex] = useState(0);
-	const [picked, setPicked] = useState<MentionRef[]>([]);
+	const [picked, setPicked] = useState<{
+		storedText: string;
+		items: PickedMention[];
+	}>({ storedText, items: [] });
+	const unsavedPicks = picked.storedText === storedText ? picked.items : [];
 	const [pickedPages, setPickedPages] = useState<
 		Record<string, PageMentionTitle>
 	>({});
@@ -75,7 +98,10 @@ export function useBlockMentions({
 
 	const userDisplay = tokensToDisplay(storedText);
 	const pageDisplay = pageMentionsToDisplay(userDisplay.text, pageTitles ?? {});
-	const known = [...userDisplay.mentions, ...pageDisplay.mentions, ...picked];
+	const known = withPicked(
+		storedMentionsInOrder(storedText, pageTitles ?? {}),
+		unsavedPicks,
+	);
 
 	if (pageDisplay.text !== userDisplay.text && value === userDisplay.text) {
 		setValue(pageDisplay.text);
@@ -103,6 +129,31 @@ export function useBlockMentions({
 		: [];
 
 	const toStored = (display: string) => displayToTokens(display, known);
+
+	const marked = enabled ? markDisplayMentions(value, known) : [];
+	const hasMarked = marked.some((part) => part.mention);
+
+	const highlight = (className: string, visible: boolean) =>
+		visible && hasMarked ? (
+			<div
+				aria-hidden='true'
+				className={cn(
+					"pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words",
+					className,
+				)}
+			>
+				{marked.map((part, index) =>
+					part.mention ? (
+						<span key={index} className='rounded-sm bg-accent-soft text-ring'>
+							{part.text}
+						</span>
+					) : (
+						part.text
+					),
+				)}
+				{"​"}
+			</div>
+		) : null;
 
 	const close = () => setQuery(null);
 
@@ -144,7 +195,13 @@ export function useBlockMentions({
 				},
 			}));
 		}
-		setPicked((current) => [...current, mention]);
+		setPicked((current) => ({
+			storedText,
+			items: [
+				...(current.storedText === storedText ? current.items : []),
+				{ mention, ordinal: mentionOrdinalAt(value, query.start, mention.name) },
+			],
+		}));
 		setValue(next);
 		setQuery(null);
 
@@ -230,6 +287,8 @@ export function useBlockMentions({
 	return {
 		toStored,
 		pageTitles,
+		highlight,
+		fieldClassName: hasMarked ? "text-transparent caret-foreground" : undefined,
 		track,
 		close,
 		handleKeyDown,

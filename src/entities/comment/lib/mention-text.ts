@@ -12,6 +12,10 @@ export interface MentionRef {
 
 const PAGE_MENTION_TOKEN = /@\[([^\]\n]{1,100})\]\(page:([0-9a-f-]{36})\)/gi;
 
+const ANY_MENTION_TOKEN = /@\[([^\]\n]{1,100})\]\((user|page):([0-9a-f-]{36})\)/gi;
+
+const WORD_CHAR = /[\p{L}\p{N}_]/u;
+
 export const pageMentionToken = (pageId: string) => `@[page](page:${pageId})`;
 
 export function findPageMentionIds(body: string): string[] {
@@ -103,20 +107,126 @@ export function splitDisplayMentions(
 		.filter((part) => part.text !== "");
 }
 
-/** `@Tên` của những người đã chọn từ gợi ý → token; `@chữ` gõ tay giữ nguyên. */
-export function displayToTokens(text: string, mentions: MentionRef[]): string {
-	const byLength = byNameLength(mentions);
+export function storedMentionsInOrder(
+	body: string,
+	titles: Record<string, { title: string } | null | undefined>,
+): MentionRef[] {
+	return [...body.matchAll(ANY_MENTION_TOKEN)].flatMap(
+		([, name, kind, rawId]): MentionRef[] => {
+			const id = rawId.toLowerCase();
 
-	return byLength.reduce(
-		(result, mention) =>
-			result.replaceAll(
-				`@${mention.name}`,
-				mention.kind === "page"
-					? pageMentionToken(mention.id)
-					: `@[${mention.name}](user:${mention.id})`,
-			),
-		text,
+			if (kind === "user") return [{ id: rawId, name }];
+
+			const page = titles[id];
+			return page ? [{ id, name: page.title || "Untitled", kind: "page" }] : [];
+		},
 	);
+}
+
+export function mentionOrdinalAt(
+	text: string,
+	position: number,
+	name: string,
+): number {
+	let count = 0;
+
+	for (let at = text.indexOf("@"); at !== -1 && at < position; at = text.indexOf("@", at + 1)) {
+		if (matchesMentionAt(text, at, name)) count += 1;
+	}
+
+	return count;
+}
+
+function matchesMentionAt(text: string, at: number, name: string): boolean {
+	const startsWord = at === 0 || /\s/.test(text[at - 1]);
+	const end = at + 1 + name.length;
+
+	return (
+		startsWord &&
+		text.startsWith(name, at + 1) &&
+		!WORD_CHAR.test(text.charAt(end))
+	);
+}
+
+const sameTarget = (a: MentionRef, b: MentionRef) =>
+	a.id.toLowerCase() === b.id.toLowerCase() && (a.kind ?? "user") === (b.kind ?? "user");
+
+function toToken(mention: MentionRef): string {
+	return mention.kind === "page"
+		? pageMentionToken(mention.id)
+		: `@[${mention.name}](user:${mention.id})`;
+}
+
+interface DisplayMention {
+	start: number;
+	end: number;
+	mention: MentionRef;
+}
+
+function findDisplayMentions(text: string, mentions: MentionRef[]): DisplayMention[] {
+	const queues = new Map<string, MentionRef[]>();
+
+	for (const mention of mentions) {
+		queues.set(mention.name, [...(queues.get(mention.name) ?? []), mention]);
+	}
+
+	const names = [...queues.keys()].sort((a, b) => b.length - a.length);
+	const used = new Map<string, number>();
+	const found: DisplayMention[] = [];
+	let index = 0;
+
+	for (let at = text.indexOf("@"); at !== -1; at = text.indexOf("@", index)) {
+		const name = names.find((candidate) => matchesMentionAt(text, at, candidate));
+		const queue = name ? (queues.get(name) ?? []) : [];
+		const ordinal = name ? (used.get(name) ?? 0) : 0;
+		const mention =
+			queue[ordinal] ??
+			(queue.length > 0 && queue.every((item) => sameTarget(item, queue[0]))
+				? queue[0]
+				: undefined);
+
+		if (!name || !mention) {
+			index = at + 1;
+			continue;
+		}
+
+		used.set(name, ordinal + 1);
+		index = at + 1 + name.length;
+		found.push({ start: at, end: index, mention });
+	}
+
+	return found;
+}
+
+/** `@Tên` của những người/page đã chọn → token theo đúng thứ tự; `@chữ` khác giữ nguyên. */
+export function displayToTokens(text: string, mentions: MentionRef[]): string {
+	let result = "";
+	let index = 0;
+
+	for (const { start, end, mention } of findDisplayMentions(text, mentions)) {
+		result += text.slice(index, start) + toToken(mention);
+		index = end;
+	}
+
+	return result + text.slice(index);
+}
+
+export function markDisplayMentions(
+	text: string,
+	mentions: MentionRef[],
+): { text: string; mention: boolean }[] {
+	const parts: { text: string; mention: boolean }[] = [];
+	let index = 0;
+
+	for (const { start, end } of findDisplayMentions(text, mentions)) {
+		if (start > index) parts.push({ text: text.slice(index, start), mention: false });
+		parts.push({ text: text.slice(start, end), mention: true });
+		index = end;
+	}
+
+	if (index < text.length) parts.push({ text: text.slice(index), mention: false });
+
+	return parts;
 }
 
 /** `@abc` ngay trước con trỏ (đầu dòng hoặc sau khoảng trắng). */

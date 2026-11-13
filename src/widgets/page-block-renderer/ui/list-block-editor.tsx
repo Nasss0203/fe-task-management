@@ -153,6 +153,10 @@ export function ListBlockEditor({ block, shareToken }: ListBlockEditorProps) {
 			/>
 
 			<div className='relative min-w-0 flex-1'>
+				{mentions.highlight(
+					"text-[15px] leading-6 text-secondary-foreground dark:text-foreground",
+					!inlineMarks.textareaClassName,
+				)}
 				<textarea
 					ref={textareaRef}
 					value={value}
@@ -176,6 +180,7 @@ export function ListBlockEditor({ block, shareToken }: ListBlockEditorProps) {
 					}}
 					className={cn(
 						`block min-h-6 w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-[15px] leading-6 text-secondary-foreground dark:text-foreground outline-none placeholder:text-muted-foreground/40 focus-visible:ring-0`,
+						mentions.fieldClassName,
 						inlineMarks.textareaClassName,
 					)}
 				/>

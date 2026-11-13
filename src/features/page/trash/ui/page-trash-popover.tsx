@@ -22,6 +22,7 @@ import {
 	usePagesByWorkspace,
 	useTrashPages,
 } from "@/entities/page/model/page.queries";
+import { useWorkspaceAccess } from "@/entities/workspace/model/workspace.queries";
 
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
@@ -68,6 +69,10 @@ export function PageTrashPopover({
 	const { data: workspacePages = [] } = usePagesByWorkspace(
 		open ? workspaceId : undefined,
 	);
+
+	const { data: access } = useWorkspaceAccess(workspaceId);
+	const canDeletePermanently =
+		access?.permissions.includes("page.permanent_delete") ?? false;
 
 	const isLoading = isPagesLoading || isDatabasesLoading;
 
@@ -349,19 +354,21 @@ export function PageTrashPopover({
 										</Button>
 
 										{/* Delete permanently */}
-										<Button
-											type='button'
-											variant='ghost'
-											size='icon-sm'
-											className='text-muted-foreground hover:text-destructive'
-											disabled={isDeleting}
-											title='Delete permanently'
-											onClick={() => {
-												setItemPendingDelete(item);
-											}}
-										>
-											<Trash2 className='size-3.5' />
-										</Button>
+										{canDeletePermanently && (
+											<Button
+												type='button'
+												variant='ghost'
+												size='icon-sm'
+												className='text-muted-foreground hover:text-destructive'
+												disabled={isDeleting}
+												title='Delete permanently'
+												onClick={() => {
+													setItemPendingDelete(item);
+												}}
+											>
+												<Trash2 className='size-3.5' />
+											</Button>
+										)}
 									</div>
 								</div>
 							))}
@@ -370,8 +377,9 @@ export function PageTrashPopover({
 					{/* Footer */}
 					<div className='flex shrink-0 items-center gap-1.5 border-t px-2.5 pb-0.5 pt-2 text-xs leading-[17px] text-faint'>
 						<TriangleAlert className='size-3.5 shrink-0' />
-						Pages and databases in Trash can be restored or
-						permanently deleted.
+						{canDeletePermanently
+							? "Pages and databases in Trash can be restored or permanently deleted."
+							: "Pages and databases in Trash can be restored. Only workspace owners can delete them permanently."}
 					</div>
 				</PopoverContent>
 			</Popover>

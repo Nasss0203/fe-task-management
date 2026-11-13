@@ -149,7 +149,7 @@ describe("TextBlockEditor mentions", () => {
 });
 
 describe("HeadingBlockEditor mentions", () => {
-	it("shows a saved mention as a highlighted name until the heading is focused", async () => {
+	it("keeps a saved mention highlighted after the heading is focused", async () => {
 		const user = userEvent.setup();
 		const block = {
 			...textBlock(`Plan @[Lan](user:${LAN})`),
@@ -168,7 +168,8 @@ describe("HeadingBlockEditor mentions", () => {
 
 		await user.click(chip);
 		expect(screen.getByRole("combobox")).toHaveFocus();
-		expect(screen.queryByText("@Lan", { selector: "span" })).toBeNull();
+		expect(screen.getByRole("combobox")).toHaveClass("text-transparent");
+		expect(screen.getByText("@Lan", { selector: "span" })).toHaveClass("text-ring");
 	});
 
 	it("suggests people after @ and saves the pick as a token", async () => {

@@ -396,6 +396,10 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 		>
 			<PopoverAnchor asChild>
 				<div className='relative w-full'>
+					{mentions.highlight(
+						"text-[15px] leading-6 text-secondary-foreground dark:text-foreground",
+						!inlineMarks.textareaClassName,
+					)}
 					<textarea
 						ref={textareaRef}
 						value={value}
@@ -428,6 +432,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 		        focus:placeholder:text-muted-foreground/50
 		        focus-visible:ring-0
 		      `,
+					mentions.fieldClassName,
 					inlineMarks.textareaClassName,
 				)}
 					/>

@@ -211,6 +211,10 @@ export function HeadingBlockEditor({ block, shareToken }: HeadingBlockEditorProp
 
 	return (
 		<div className='relative w-full'>
+		{mentions.highlight(
+			`whitespace-pre ${headingClass}`,
+			!inlineMarks.textareaClassName,
+		)}
 		<input
 			ref={inputRef}
 			id={`block-${block.id}`}
@@ -239,6 +243,7 @@ export function HeadingBlockEditor({ block, shareToken }: HeadingBlockEditorProp
                 focus-visible:ring-0
 
                 ${headingClass}
+                ${mentions.fieldClassName ?? ""}
                 ${inlineMarks.textareaClassName ?? ""}
             `}
 		/>

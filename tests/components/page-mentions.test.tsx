@@ -152,6 +152,8 @@ describe("TextBlockEditor page mentions", () => {
 
 		await user.keyboard("{Enter}");
 		expect(textarea).toHaveValue("See @Plan ");
+		expect(screen.getByText("@Plan", { selector: "span" })).toHaveClass("text-ring");
+		expect(textarea).toHaveClass("text-transparent");
 
 		fireEvent.blur(textarea);
 		await waitFor(() =>
@@ -187,6 +189,72 @@ describe("TextBlockEditor page mentions", () => {
 
 		fireEvent.blur(screen.getByRole("combobox"));
 		expect(http.patch).not.toHaveBeenCalled();
+	});
+
+	it("keeps two pages with the same title apart when the new one is picked before the old one", async () => {
+		const OTHER = "55555555-5555-4555-8555-555555555555";
+		const base = http.get.getMockImplementation();
+		http.get.mockImplementation(async (url: string, config?: unknown) =>
+			url === "/page/workspace/ws-1/search"
+				? { data: { data: [{ pageId: OTHER, title: "Plan Q4", icon: null }] } }
+				: base?.(url, config),
+		);
+		const user = userEvent.setup();
+		renderEditor(textBlock(`x @[page](page:${PLAN})`));
+
+		const textarea = screen.getByRole("combobox");
+		await waitFor(() => expect(textarea).toHaveValue("x @Plan Q4"));
+		await user.type(textarea, "@pl", { initialSelectionStart: 0, initialSelectionEnd: 0 });
+		await user.click(await screen.findByRole("option", { name: /Plan Q4/ }));
+		expect(textarea).toHaveValue("@Plan Q4 x @Plan Q4");
+
+		fireEvent.blur(textarea);
+		await waitFor(() =>
+			expect(http.patch).toHaveBeenCalledWith(
+				"/pageBlock/block-1",
+				{ content: { text: `@[page](page:${OTHER}) x @[page](page:${PLAN})` } },
+				expect.anything(),
+			),
+		);
+	});
+
+	it("keeps every mention when the same page is picked again before it", async () => {
+		const OTHER = "55555555-5555-4555-8555-555555555555";
+		const base = http.get.getMockImplementation();
+		http.get.mockImplementation(async (url: string, config?: { params?: { ids?: string } }) => {
+			if (url === "/page/workspace/ws-1/search") {
+				return { data: { data: [{ pageId: PLAN, title: "Plan Q4", icon: null }] } };
+			}
+			if (url === "/page/workspace/ws-1/mention-titles") {
+				const ids = (config?.params?.ids ?? "").split(",");
+				return {
+					data: {
+						data: Object.fromEntries(ids.map((id) => [id, { pageId: id, title: "Plan Q4", icon: null }])),
+					},
+				};
+			}
+			return base?.(url, config);
+		});
+		const user = userEvent.setup();
+		renderEditor(textBlock(`x @[page](page:${PLAN}) y @[page](page:${OTHER})`));
+
+		const textarea = screen.getByRole("combobox");
+		await waitFor(() => expect(textarea).toHaveValue("x @Plan Q4 y @Plan Q4"));
+		await user.type(textarea, "@pl", { initialSelectionStart: 0, initialSelectionEnd: 0 });
+		await user.click(await screen.findByRole("option", { name: /Plan Q4/ }));
+
+		fireEvent.blur(textarea);
+		await waitFor(() =>
+			expect(http.patch).toHaveBeenCalledWith(
+				"/pageBlock/block-1",
+				{
+					content: {
+						text: `@[page](page:${PLAN}) x @[page](page:${PLAN}) y @[page](page:${OTHER})`,
+					},
+				},
+				expect.anything(),
+			),
+		);
 	});
 
 	it("does not look titles up on a shared link", () => {

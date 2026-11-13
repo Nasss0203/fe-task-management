@@ -170,6 +170,10 @@ export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 			<div className='mr-3.5 w-[3px] shrink-0 rounded-full bg-foreground' />
 
 			<div className='relative min-w-0 flex-1'>
+				{mentions.highlight(
+					"text-base leading-[26px] text-secondary-foreground",
+					!inlineMarks.textareaClassName,
+				)}
 				<textarea
 					ref={textareaRef}
 					value={value}
@@ -201,6 +205,7 @@ export function QuoteBlockEditor({ block, shareToken }: QuoteBlockEditorProps) {
 	          placeholder:text-muted-foreground/40
 	          focus-visible:ring-0
 	        `,
+						mentions.fieldClassName,
 						inlineMarks.textareaClassName,
 					)}
 				/>

@@ -219,6 +219,10 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 			/>
 
 			<div className='relative min-w-0 flex-1'>
+				{mentions.highlight(
+					cn("text-[15px] leading-6", textTone),
+					!inlineMarks.textareaClassName,
+				)}
 				<textarea
 					ref={textareaRef}
 					value={text}
@@ -250,6 +254,7 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 	          focus-visible:ring-0
 	        `,
 						textTone,
+						mentions.fieldClassName,
 						inlineMarks.textareaClassName,
 					)}
 				/>
