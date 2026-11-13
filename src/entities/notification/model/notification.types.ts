@@ -20,6 +20,7 @@ export type NotificationType =
 	| "workspace.member_joined"
 	| "workspace.member_removed"
 	| "teamspace.invitation_received"
+	| "teamspace.ownership_transferred"
 	| "page.access.requested"
 	| "page.access.approved"
 	| "page.access.rejected"

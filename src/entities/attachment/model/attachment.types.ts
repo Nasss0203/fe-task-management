@@ -1,7 +1,6 @@
 export interface Attachment {
 	id: string;
 	workspaceId: string;
-	taskId: string | null;
 	commentId: string | null;
 	pageBlockId: string | null;
 	uploadedBy: string;
