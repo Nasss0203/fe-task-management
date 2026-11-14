@@ -67,6 +67,7 @@ function createSubscription(
 		currentPeriodStart: null,
 		currentPeriodEnd: null,
 		cancelAtPeriodEnd: false,
+		accessEndsAt: null,
 	};
 }
 

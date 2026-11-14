@@ -10,6 +10,32 @@ import {
 } from "@/entities/page-block/lib/toggle-inline-mark";
 
 describe("parseInlineMarks", () => {
+	it("parses a page mention token by id only", () => {
+		const plan = "33333333-3333-4333-8333-333333333333";
+		expect(parseInlineMarks(`See @[page](page:${plan.toUpperCase()})!`)).toEqual([
+			{ type: "text", text: "See " },
+			{ type: "page-mention", pageId: plan },
+			{ type: "text", text: "!" },
+		]);
+		expect(parseInlineMarks("@[page](page:abc)")).toEqual([
+			{ type: "text", text: "@[page](page:abc)" },
+		]);
+	});
+
+	it("parses a mention token, also inside other marks", () => {
+		const lan = "11111111-1111-4111-8111-111111111111";
+		expect(parseInlineMarks(`Hi @[Lan](user:${lan}) **@[Lan](user:${lan})**`)).toEqual([
+			{ type: "text", text: "Hi " },
+			{ type: "mention", name: "Lan", userId: lan },
+			{ type: "text", text: " " },
+			{ type: "bold", children: [{ type: "mention", name: "Lan", userId: lan }] },
+		]);
+		expect(hasInlineMarks(`@[Lan](user:${lan})`)).toBe(true);
+		expect(parseInlineMarks("mail @[Lan](user:abc)")).toEqual([
+			{ type: "text", text: "mail @[Lan](user:abc)" },
+		]);
+	});
+
 	it("parses bold, italic, strike, code and links", () => {
 		expect(
 			parseInlineMarks(

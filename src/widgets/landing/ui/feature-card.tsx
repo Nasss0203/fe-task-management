@@ -20,30 +20,29 @@ export function FeatureCard({ feature, href }: FeatureCardProps) {
 	const getIcon = () => {
 		switch (feature.iconName) {
 			case "file-text":
-				return <FileText className='h-4 w-4 text-foreground' />;
+				return <FileText className='h-4 w-4' />;
 			case "database":
-				return <Database className='h-4 w-4 text-foreground' />;
+				return <Database className='h-4 w-4' />;
 			case "users":
-				return <Users className='h-4 w-4 text-foreground' />;
+				return <Users className='h-4 w-4' />;
 			case "shield":
-				return <Shield className='h-4 w-4 text-foreground' />;
+				return <Shield className='h-4 w-4' />;
 			case "globe":
-				return <Globe className='h-4 w-4 text-foreground' />;
+				return <Globe className='h-4 w-4' />;
 			case "layout-template":
-				return <LayoutTemplate className='h-4 w-4 text-foreground' />;
+				return <LayoutTemplate className='h-4 w-4' />;
 			case "sparkles":
-				return <Sparkles className='h-4 w-4 text-foreground' />;
 			default:
-				return <Sparkles className='h-4 w-4 text-foreground' />;
+				return <Sparkles className='h-4 w-4' />;
 		}
 	};
 
 	const cardContent = (
-		<div className='group relative h-full flex flex-col justify-between rounded-xl border border-border bg-card p-6 hover:border-foreground/20 transition-colors'>
-			{/* Top Row: Icon Container Left + Badge Right */}
-			<div>
+		<div className='group relative h-full flex flex-col justify-between rounded-2xl border border-border/80 bg-muted/30 p-1.5 transition-colors hover:border-border'>
+			<div className='h-full rounded-xl border border-border/70 bg-card p-5 shadow-2xs transition-colors group-hover:border-foreground/15'>
+				{/* Top Row: Icon Container Left + Badge Right */}
 				<div className='flex items-center justify-between'>
-					<div className='h-9 w-9 rounded-lg border border-border/80 bg-secondary/70 text-foreground flex items-center justify-center shrink-0'>
+					<div className='h-9 w-9 rounded-lg border border-border bg-muted/50 text-foreground flex items-center justify-center shrink-0 transition-colors group-hover:border-[#5e6ad2] group-hover:bg-[#5e6ad2] group-hover:text-white'>
 						{getIcon()}
 					</div>
 

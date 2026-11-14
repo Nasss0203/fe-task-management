@@ -19,11 +19,11 @@ export function AiChatHeader({
 		<div className='flex items-center justify-end py-1'>
 			<Button
 				type='button'
-				variant='ghost'
+				variant='outline'
 				size='sm'
 				onClick={onNewChat}
 				disabled={!hasMessages}
-				className='h-7 gap-1.5 px-2 text-xs font-medium text-muted-foreground hover:bg-accent/50 hover:text-foreground disabled:opacity-40'
+				className='h-7 gap-1.5 rounded-[6px] border-input bg-background px-2.5 text-[13px] font-medium text-foreground shadow-none hover:bg-accent/50 disabled:opacity-40'
 			>
 				<Plus className='size-3.5' />
 				<span>New chat</span>

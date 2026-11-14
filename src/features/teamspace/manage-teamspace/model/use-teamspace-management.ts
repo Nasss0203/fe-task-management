@@ -34,12 +34,7 @@ export function useTeamspaceManagement(teamspace: Teamspace, enabled: boolean) {
 			peopleById.get(member.workspaceMemberId)?.user_id === currentUserId,
 	);
 
-	// Mirrors the backend: a workspace owner acts as a teamspace owner.
-	// The backend still enforces every action; this only decides what to show.
-	const canManage = Boolean(
-		accessQuery.data?.roles.includes("OWNER") ||
-			myMembership?.roleName === "OWNER",
-	);
+	const canManage = myMembership?.roleName === "OWNER";
 
 	return {
 		membersQuery,

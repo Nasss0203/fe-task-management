@@ -1,3 +1,5 @@
+import type { BillingFeature, BillingPlan, BillingPrice } from "@/entities/billing/model/billing.types";
+
 export interface FeatureItem {
 	id: string;
 	title: string;
@@ -475,98 +477,55 @@ export const AI_CAPABILITIES: AiCapability[] = [
 	},
 ];
 
-export interface PricingPlan {
-	id: string;
-	code: string;
-	name: string;
-	badge?: string;
-	priceMonthly: string;
-	priceYearly: string;
-	period: string;
-	description: string;
-	popular?: boolean;
-	features: { name: string; included: boolean }[];
-	cta: string;
-	ctaVariant: "default" | "outline";
-}
+const fallbackFeatures = (
+	plan: string,
+	members: number,
+	teamspaces: number,
+	storageMb: number,
+	publicPage: boolean,
+): BillingFeature[] => [
+	{ id: `${plan}-members`, featureId: "MAX_MEMBERS", code: "MAX_MEMBERS", name: "Members", description: "", valueType: "NUMBER", value: members },
+	{ id: `${plan}-teamspaces`, featureId: "MAX_TEAMSPACES", code: "MAX_TEAMSPACES", name: "Teamspaces", description: "", valueType: "NUMBER", value: teamspaces },
+	{ id: `${plan}-storage`, featureId: "MAX_STORAGE_MB", code: "MAX_STORAGE_MB", name: "Storage", description: "", valueType: "NUMBER", value: storageMb },
+	{ id: `${plan}-public-page`, featureId: "PUBLIC_PAGE", code: "PUBLIC_PAGE", name: "Public page", description: "", valueType: "BOOLEAN", value: publicPage },
+];
 
-export const MARKETING_PRICING_PLANS: PricingPlan[] = [
+const fallbackPrices = (plan: string, monthly: number, yearly: number): BillingPrice[] => [
+	{ id: `${plan}-monthly`, billingInterval: "MONTHLY", currency: "VND", amount: monthly, provider: "SEPAY" },
+	{ id: `${plan}-yearly`, billingInterval: "YEARLY", currency: "VND", amount: yearly, provider: "SEPAY" },
+];
+
+export const MARKETING_PRICING_PLANS: BillingPlan[] = [
 	{
 		id: "plan-free",
 		code: "FREE",
 		name: "Free",
-		priceMonthly: "0đ",
-		priceYearly: "0đ",
-		period: "forever",
-		description: "For individuals and small squads organizing notes and structured knowledge.",
-		features: [
-			{ name: "Up to 5 team members", included: true },
-			{ name: "1 Teamspace", included: true },
-			{ name: "100 MB file storage", included: true },
-			{ name: "Unlimited pages, documents & blocks", included: true },
-			{ name: "Database Table & List views", included: true },
-			{ name: "Community support", included: true },
-			{ name: "Public page publishing", included: false },
-			{ name: "AI Assistant credits", included: false },
-			{ name: "Workspace & page permissions", included: false },
-		],
-		cta: "Get started free",
-		ctaVariant: "outline",
+		description: "For individuals and small teams getting started.",
+		features: fallbackFeatures("free", 5, 1, 500, false),
+		prices: [],
 	},
 	{
-		id: "plan-pro",
-		code: "PRO",
-		name: "Pro",
-		badge: "Most Popular",
-		priceMonthly: "99.000đ",
-		priceYearly: "79.000đ",
-		period: "per user / month",
-		description: "For growing teams that need multi-view databases, public sites, and AI.",
-		popular: true,
-		features: [
-			{ name: "Up to 25 team members", included: true },
-			{ name: "5 Teamspaces", included: true },
-			{ name: "10 GB file storage", included: true },
-			{ name: "Unlimited pages & documents", included: true },
-			{ name: "Full Database Views (Table, Board, Calendar)", included: true },
-			{ name: "Public page publishing with custom subdomain", included: true },
-			{ name: "Taskmanly AI Assistant included", included: true },
-			{ name: "Workspace & page permissions", included: true },
-			{ name: "Priority email & chat support", included: true },
-		],
-		cta: "Start 14-day Pro trial",
-		ctaVariant: "default",
+		id: "plan-plus",
+		code: "PLUS",
+		name: "Plus",
+		description: "For growing teams that need higher usage limits.",
+		features: fallbackFeatures("plus", 25, 10, 10240, true),
+		prices: fallbackPrices("plus", 99000, 990000),
 	},
 	{
-		id: "plan-team",
-		code: "TEAM",
-		name: "Team",
-		badge: "Scale & Control",
-		priceMonthly: "249.000đ",
-		priceYearly: "199.000đ",
-		period: "per user / month",
-		description: "For larger organizations requiring unlimited scale, security, and dedicated guidance.",
-		features: [
-			{ name: "Unlimited team members", included: true },
-			{ name: "Unlimited Teamspaces", included: true },
-			{ name: "100 GB file storage", included: true },
-			{ name: "Workspace & page permissions (owner, member, guest)", included: true },
-			{ name: "Unlimited public published sites", included: true },
-			{ name: "Unlimited AI Assistant usage", included: true },
-			{ name: "Audit logs & workspace activity history", included: true },
-			{ name: "Dedicated customer success manager", included: true },
-			{ name: "99.9% uptime SLA", included: true },
-		],
-		cta: "Get started with Team",
-		ctaVariant: "outline",
+		id: "plan-business",
+		code: "BUSINESS",
+		name: "Business",
+		description: "For larger teams that need expanded capacity.",
+		features: fallbackFeatures("business", 100, 50, 102400, true),
+		prices: fallbackPrices("business", 249000, 2490000),
 	},
 ];
-
 export const PRICING_FAQS = [
 	{
 		question: "Can I try Taskmanly before committing to a paid plan?",
 		answer:
-			"Yes! The Free plan is completely free forever with no credit card required. You can also start a 14-day free trial of the Pro plan at any time.",
+			"Yes! The Free plan is completely free forever with no credit card required. Upgrade to Plus or Business whenever your workspace needs higher limits.",
 	},
 	{
 		question: "What happens when I publish a page to the web?",

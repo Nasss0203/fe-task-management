@@ -2,6 +2,8 @@ import instance from "@/shared/api/api-client";
 
 import { ApiResponse } from "@/shared/api";
 import type {
+	CalendarFeed,
+	GoogleCalendarSyncStatus,
 	Database,
 	DatabasePerson,
 	DatabaseProperty,
@@ -408,4 +410,74 @@ export const databaseApi = {
 
 		return response.data.data;
 	},
+
+	getCalendarFeed: async (databaseId: string): Promise<CalendarFeed | null> => {
+		const response = await instance.get<ApiResponse<CalendarFeed | null>>(
+			`${DATABASE_API}/${databaseId}/calendar-feed`,
+		);
+
+		return response.data.data;
+	},
+
+	upsertCalendarFeed: async (
+		databaseId: string,
+		datePropertyId: string,
+	): Promise<CalendarFeed> => {
+		const response = await instance.put<ApiResponse<CalendarFeed>>(
+			`${DATABASE_API}/${databaseId}/calendar-feed`,
+			{ datePropertyId },
+		);
+
+		return response.data.data;
+	},
+
+	revokeCalendarFeed: async (databaseId: string): Promise<void> => {
+		await instance.delete(`${DATABASE_API}/${databaseId}/calendar-feed`);
+	},
+
+	getGoogleCalendarSync: async (
+		databaseId: string,
+	): Promise<GoogleCalendarSyncStatus> => {
+		const response = await instance.get<ApiResponse<GoogleCalendarSyncStatus>>(
+			`${DATABASE_API}/${databaseId}/google-calendar-sync`,
+		);
+
+		return response.data.data;
+	},
+
+	upsertGoogleCalendarSync: async (
+		databaseId: string,
+		body: { datePropertyId: string; assignedToMeOnly?: boolean },
+	): Promise<GoogleCalendarSyncStatus> => {
+		const response = await instance.put<ApiResponse<GoogleCalendarSyncStatus>>(
+			`${DATABASE_API}/${databaseId}/google-calendar-sync`,
+			body,
+		);
+
+		return response.data.data;
+	},
+
+	deleteGoogleCalendarSync: async (databaseId: string): Promise<void> => {
+		await instance.delete(`${DATABASE_API}/${databaseId}/google-calendar-sync`);
+	},
+
+	runGoogleCalendarSync: async (databaseId: string): Promise<void> => {
+		await instance.post(`${DATABASE_API}/${databaseId}/google-calendar-sync/run`);
+	},
+
+	getGoogleCalendarAuthorizeUrl: async (returnTo: string): Promise<string> => {
+		const response = await instance.post<ApiResponse<{ url: string }>>(
+			"/integrations/google-calendar/authorize-url",
+			{ returnTo },
+		);
+
+		return response.data.data.url;
+	},
+
+	disconnectGoogleCalendar: async (): Promise<void> => {
+		await instance.delete("/integrations/google-calendar");
+	},
 };
+
+export const calendarFeedUrl = (token: string) =>
+	`${process.env.NEXT_PUBLIC_API_URL}/calendar-feeds/${token}.ics`;

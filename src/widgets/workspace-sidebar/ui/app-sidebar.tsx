@@ -52,6 +52,7 @@ import { useUnreadNotificationCount } from "@/entities/notification/model/notifi
 import { InboxSidebar } from "./inbox-sidebar";
 import { NavSharedPages } from "./nav-shared-pages";
 import { NavTeamspaces } from "./nav-teamspaces";
+import { PlanExpiredBanner } from "./plan-expired-banner";
 
 /**
  * Phải khớp với permission mà:
@@ -361,6 +362,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 					{isMember && currentWorkspaceId && (
 						<PageSearchDialog workspaceId={currentWorkspaceId} />
 					)}
+
+					{isMember &&
+						workspacePermissions.includes("workspace.update") &&
+						workspaceSubscription?.status === "PAST_DUE" &&
+						workspaceSubscription.workspaceId === currentWorkspaceId && (
+							<PlanExpiredBanner subscription={workspaceSubscription} />
+						)}
 
 					{isGuest && (
 						<NavMain

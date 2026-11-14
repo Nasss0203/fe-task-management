@@ -10,6 +10,7 @@ import type {
 	WorkspaceInviteRole,
 } from "@/entities/workspace-invite/model/workspace-invite.types";
 
+import { isPlanLimitError, usePlanLimitNotifier } from "@/features/workspace-billing";
 import { Button } from "@/shared/ui/button";
 
 import {
@@ -54,6 +55,7 @@ export function InviteWorkspaceMembersDialog({
 	>([]);
 
 	const inviteMutation = useInviteWorkspaceMembers();
+	const notifyPlanLimit = usePlanLimitNotifier(workspaceId);
 	/**
 	 * Debounce search để tránh gọi API
 	 * ở mỗi lần gõ phím.
@@ -167,6 +169,7 @@ export function InviteWorkspaceMembersDialog({
 
 					onOpenChange(false);
 				},
+				onError: notifyPlanLimit,
 			},
 		);
 	};
@@ -346,7 +349,7 @@ export function InviteWorkspaceMembersDialog({
 					</div>
 
 					<div className='space-y-2'>
-						{inviteMutation.isError && (
+						{inviteMutation.isError && !isPlanLimitError(inviteMutation.error) && (
 							<p
 								role='alert'
 								className='text-sm text-destructive'

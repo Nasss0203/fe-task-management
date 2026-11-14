@@ -19,6 +19,8 @@ import {
 } from "@/widgets/page-block-editor/ui/page-block-editor-context";
 import { cn } from "@/shared/lib/utils";
 import { useInlineMarks } from "@/widgets/page-block-renderer/model/use-inline-marks";
+import { useBlockMentions } from "@/widgets/page-block-renderer/model/use-block-mentions";
+import { tokensToDisplay } from "@/entities/comment/lib/mention-text";
 
 interface TodoBlockEditorProps {
 	block: PageBlockNode;
@@ -51,7 +53,9 @@ function getTodoContent(block: PageBlockNode) {
 export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 	const initial = getTodoContent(block);
 
-	const [text, setText] = useState(initial.text);
+	const [text, setText] = useState(
+		() => tokensToDisplay(initial.text).text,
+	);
 
 	const [checked, setChecked] = useState(initial.checked);
 
@@ -59,10 +63,19 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 	const textTone = checked
 		? "text-faint line-through"
 		: "text-secondary-foreground dark:text-foreground";
+	const mentions = useBlockMentions({
+		pageId: block.page_id,
+		enabled: !shareToken,
+		storedText: initial.text,
+		value: text,
+		setValue: setText,
+	});
 	const inlineMarks = useInlineMarks(
 		text,
 		setText,
 		cn("text-[15px] leading-6", textTone),
+		mentions.toStored(text),
+		mentions.pageTitles,
 	);
 
 	const updateBlock = useUpdatePageBlock(shareToken);
@@ -74,7 +87,7 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 	useEffect(() => {
 		const content = getTodoContent(block);
 
-		setText(content.text);
+		setText(tokensToDisplay(content.text).text);
 		setChecked(content.checked);
 	}, [block]);
 
@@ -94,6 +107,7 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 
 	const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setText(event.target.value);
+		mentions.track(event.target);
 
 		resizeTextarea(event.target);
 	};
@@ -106,7 +120,7 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 			pageId: block.page_id,
 
 			content: {
-				text,
+				text: mentions.toStored(text),
 				checked: nextChecked,
 			},
 		});
@@ -115,7 +129,10 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 	const handleBlur = () => {
 		const oldContent = getTodoContent(block);
 
-		if (text === oldContent.text && checked === oldContent.checked) {
+		if (
+			mentions.toStored(text) === oldContent.text &&
+			checked === oldContent.checked
+		) {
 			return;
 		}
 
@@ -124,7 +141,7 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 			pageId: block.page_id,
 
 			content: {
-				text,
+				text: mentions.toStored(text),
 				checked,
 			},
 		});
@@ -133,6 +150,7 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 	const handleKeyDown = async (
 		event: React.KeyboardEvent<HTMLTextAreaElement>,
 	) => {
+		if (mentions.handleKeyDown(event)) return;
 		if (inlineMarks.handleKeyDown(event)) return;
 
 		if (event.key !== "Enter" || event.shiftKey) {
@@ -159,7 +177,7 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 			pageId: block.page_id,
 
 			content: {
-				text: before,
+				text: mentions.toStored(before),
 				checked,
 			},
 		});
@@ -175,7 +193,7 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 			type: PageBlockType.TEXT,
 
 			content: {
-				text: after,
+				text: mentions.toStored(after),
 			},
 
 			styleConfig: {},
@@ -201,6 +219,10 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 			/>
 
 			<div className='relative min-w-0 flex-1'>
+				{mentions.highlight(
+					cn("text-[15px] leading-6", textTone),
+					!inlineMarks.textareaClassName,
+				)}
 				<textarea
 					ref={textareaRef}
 					value={text}
@@ -208,9 +230,11 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 					placeholder='To-do'
 					onChange={handleChange}
 					onKeyDown={handleKeyDown}
+					{...mentions.comboboxProps}
 					onFocus={inlineMarks.onFocus}
 					onBlur={() => {
 						inlineMarks.onBlur();
+					mentions.close();
 						handleBlur();
 					}}
 					className={cn(
@@ -230,10 +254,12 @@ export function TodoBlockEditor({ block, shareToken }: TodoBlockEditorProps) {
 	          focus-visible:ring-0
 	        `,
 						textTone,
+						mentions.fieldClassName,
 						inlineMarks.textareaClassName,
 					)}
 				/>
 				{inlineMarks.preview}
+				{mentions.menu}
 			</div>
 		</div>
 	);

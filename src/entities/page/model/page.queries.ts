@@ -29,6 +29,9 @@ export const pageKeys = {
 
 	search: (workspaceId: string, query: string) =>
 		["pages", "search", workspaceId, query] as const,
+
+	mentionTitles: (workspaceId: string, pageIds: string[]) =>
+		["pages", "mention-titles", workspaceId, ...pageIds] as const,
 };
 
 export function usePageSearch(
@@ -41,6 +44,21 @@ export function usePageSearch(
 		queryFn: ({ signal }) => pageApi.search(workspaceId!, query, signal),
 		enabled: Boolean(workspaceId) && enabled,
 		placeholderData: keepPreviousData,
+		staleTime: 30_000,
+	});
+}
+
+export function usePageMentionTitles(
+	workspaceId: string | undefined,
+	pageIds: string[],
+	enabled = true,
+) {
+	const ids = [...pageIds].sort();
+
+	return useQuery({
+		queryKey: pageKeys.mentionTitles(workspaceId ?? "", ids),
+		queryFn: ({ signal }) => pageApi.mentionTitles(workspaceId!, ids, signal),
+		enabled: Boolean(workspaceId) && ids.length > 0 && enabled,
 		staleTime: 30_000,
 	});
 }

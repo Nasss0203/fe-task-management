@@ -25,6 +25,8 @@ import { Popover, PopoverAnchor, PopoverContent } from "@/shared/ui/popover";
 import { usePageBlockEditor } from "@/widgets/page-block-editor/ui/page-block-editor-context";
 import { cn } from "@/shared/lib/utils";
 import { useInlineMarks } from "@/widgets/page-block-renderer/model/use-inline-marks";
+import { useBlockMentions } from "@/widgets/page-block-renderer/model/use-block-mentions";
+import { tokensToDisplay } from "@/entities/comment/lib/mention-text";
 
 interface TextBlockEditorProps {
 	block: PageBlockNode;
@@ -55,13 +57,24 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 	const wrapInSection = useWrapInSection(shareToken);
 	const createForm = useCreateForm();
 
-	const [value, setValue] = useState(() => getText(block));
+	const [value, setValue] = useState(
+		() => tokensToDisplay(getText(block)).text,
+	);
 
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	const mentions = useBlockMentions({
+		pageId: block.page_id,
+		enabled: !shareToken,
+		storedText: getText(block),
+		value: value,
+		setValue: setValue,
+	});
 	const inlineMarks = useInlineMarks(
 		value,
 		setValue,
 		"text-[15px] leading-6 text-secondary-foreground dark:text-foreground",
+		mentions.toStored(value),
+		mentions.pageTitles,
 	);
 	const [commandOpen, setCommandOpen] = useState(false);
 	const [slashIndex, setSlashIndex] = useState<number | null>(null);
@@ -80,7 +93,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 	};
 
 	useEffect(() => {
-		setValue(getText(block));
+		setValue(tokensToDisplay(getText(block)).text);
 	}, [block]);
 
 	useEffect(() => {
@@ -96,7 +109,10 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 			blockId: block.id,
 			pageId: block.page_id,
 			type,
-			content,
+			content:
+				content && typeof content.text === "string"
+					? { ...content, text: mentions.toStored(content.text) }
+					: content,
 			styleConfig,
 		});
 
@@ -111,6 +127,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 		const cursor = textarea.selectionStart;
 
 		setValue(nextValue);
+		mentions.track(textarea);
 
 		resizeTextarea(textarea);
 
@@ -152,11 +169,11 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 			setSlashIndex(null);
 			const text = value.slice(0, slashIndex) + value.slice(slashIndex + 1);
 			setValue(text);
-			if (text !== getText(block)) {
+			if (mentions.toStored(text) !== getText(block)) {
 				await updateBlock.mutateAsync({
 					blockId: block.id,
 					pageId: block.page_id,
-					content: { text },
+					content: { text: mentions.toStored(text) },
 				});
 			}
 			const { section } = await createForm.mutateAsync({
@@ -174,11 +191,11 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 			setSlashIndex(null);
 			const text = value.slice(0, slashIndex) + value.slice(slashIndex + 1);
 			setValue(text);
-			if (text !== getText(block)) {
+			if (mentions.toStored(text) !== getText(block)) {
 				await updateBlock.mutateAsync({
 					blockId: block.id,
 					pageId: block.page_id,
-					content: { text },
+					content: { text: mentions.toStored(text) },
 				});
 			}
 			await wrapInSection.mutateAsync({
@@ -195,11 +212,11 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 			// This block (without the "/") becomes the first column.
 			const text = value.slice(0, slashIndex) + value.slice(slashIndex + 1);
 			setValue(text);
-			if (text !== getText(block)) {
+			if (mentions.toStored(text) !== getText(block)) {
 				await updateBlock.mutateAsync({
 					blockId: block.id,
 					pageId: block.page_id,
-					content: { text },
+					content: { text: mentions.toStored(text) },
 				});
 			}
 			await createColumns.mutateAsync({
@@ -241,7 +258,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 				type === PageBlockType.DIVIDER
 					? null
 					: {
-							text: nextValue,
+							text: mentions.toStored(nextValue),
 						},
 
 			styleConfig: styleConfig ?? null,
@@ -259,7 +276,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 
 		const oldValue = getText(block);
 
-		if (value === oldValue) {
+		if (mentions.toStored(value) === oldValue) {
 			return;
 		}
 
@@ -268,7 +285,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 			pageId: block.page_id,
 
 			content: {
-				text: value,
+				text: mentions.toStored(value),
 			},
 		});
 	};
@@ -276,6 +293,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 	const handleKeyDown = async (
 		event: React.KeyboardEvent<HTMLTextAreaElement>,
 	) => {
+		if (mentions.handleKeyDown(event)) return;
 		if (inlineMarks.handleKeyDown(event)) return;
 
 		if (event.key === "Backspace" && value.length === 0) {
@@ -320,7 +338,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 			pageId: block.page_id,
 
 			content: {
-				text: before,
+				text: mentions.toStored(before),
 			},
 		});
 
@@ -334,7 +352,7 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 			type: PageBlockType.TEXT,
 
 			content: {
-				text: after,
+				text: mentions.toStored(after),
 			},
 
 			styleConfig: {},
@@ -378,6 +396,10 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 		>
 			<PopoverAnchor asChild>
 				<div className='relative w-full'>
+					{mentions.highlight(
+						"text-[15px] leading-6 text-secondary-foreground dark:text-foreground",
+						!inlineMarks.textareaClassName,
+					)}
 					<textarea
 						ref={textareaRef}
 						value={value}
@@ -385,9 +407,11 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 						placeholder="Type '/' for commands"
 						onChange={handleChange}
 						onKeyDown={handleKeyDown}
+				{...mentions.comboboxProps}
 						onFocus={inlineMarks.onFocus}
 				onBlur={() => {
 					inlineMarks.onBlur();
+				mentions.close();
 					handleBlur();
 				}}
 						className={cn(
@@ -408,10 +432,12 @@ export function TextBlockEditor({ block, shareToken }: TextBlockEditorProps) {
 		        focus:placeholder:text-muted-foreground/50
 		        focus-visible:ring-0
 		      `,
+					mentions.fieldClassName,
 					inlineMarks.textareaClassName,
 				)}
 					/>
 					{inlineMarks.preview}
+					{mentions.menu}
 				</div>
 			</PopoverAnchor>
 

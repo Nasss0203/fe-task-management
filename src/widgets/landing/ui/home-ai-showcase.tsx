@@ -49,12 +49,11 @@ export function HomeAiShowcase() {
 
 	return (
 		<section className='py-20 sm:py-28 relative overflow-hidden'>
-
 			<div className='mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'>
 				{/* Section Header */}
 				<div className='mx-auto max-w-2xl text-center mb-14 sm:mb-16'>
-					<div className='inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground mb-4'>
-						<Sparkles className='h-3.5 w-3.5' />
+					<div className='inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground shadow-2xs mb-4'>
+						<span className='h-1.5 w-1.5 rounded-full bg-[#5e6ad2]' />
 						Workspace Intelligence
 					</div>
 					<h2 className='text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground'>
@@ -66,123 +65,131 @@ export function HomeAiShowcase() {
 				</div>
 
 				<div className='grid grid-cols-1 lg:grid-cols-12 gap-10 items-center'>
-					{/* Left: Interactive Chat UI Mockup (7 cols) */}
-					<div className='lg:col-span-7 rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-soft relative overflow-hidden'>
-						{/* Top chat header */}
-						<div className='flex items-center justify-between pb-4 border-b border-border/60 text-xs'>
-							<div className='flex items-center gap-2'>
-								<div className='h-7 w-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center'>
-									<Sparkles className='h-4 w-4' />
-								</div>
-								<div>
-									<div className='font-semibold text-foreground'>Taskmanly Assistant</div>
-									<div className='text-[10px] text-muted-foreground'>Document & Knowledge Copilot</div>
-								</div>
-							</div>
-							<Badge variant='outline' className='text-[10px] text-muted-foreground bg-muted border-border'>
-								Live Context
-							</Badge>
-						</div>
-
-						{/* Dialogue thread */}
-						<div className='my-5 space-y-4 text-xs'>
-							{/* User query */}
-							<div className='flex justify-end'>
-								<div className='rounded-2xl rounded-tr-none bg-primary px-4 py-2.5 text-xs text-primary-foreground max-w-[85%] font-medium shadow-xs'>
-									Draft an architecture review page for our new database sync engine.
-								</div>
-							</div>
-
-							{/* AI Response Card */}
-							<div className='flex items-start gap-3'>
-								<div className='h-7 w-7 rounded-lg bg-muted text-muted-foreground flex items-center justify-center shrink-0 mt-0.5 ring-1 ring-border'>
-									<Sparkles className='h-3.5 w-3.5' />
-								</div>
-								<div className='flex-1 rounded-2xl rounded-tl-none border border-border/80 bg-muted/30 p-4 space-y-3 shadow-xs'>
+					{/* Left: Interactive Chat UI Mockup (7 cols - Double-bezel frame) */}
+					<div className='lg:col-span-7 rounded-2xl border border-border/80 bg-muted/35 p-2 shadow-xs'>
+						<div className='rounded-xl border border-border/80 bg-card p-5 sm:p-6 shadow-2xs relative overflow-hidden'>
+							{/* Top chat header */}
+							<div className='flex items-center justify-between pb-4 border-b border-border/60 text-xs'>
+								<div className='flex items-center gap-2.5'>
+									<div className='h-7 w-7 rounded-lg bg-[#eeeffc] text-[#5e6ad2] dark:bg-indigo-500/20 dark:text-indigo-300 flex items-center justify-center'>
+										<Sparkles className='h-4 w-4' />
+									</div>
 									<div>
-										<div className='text-xs font-bold text-foreground'>
-											Architecture RFC: Database Sync Engine
-										</div>
-										<div className='text-[11px] text-muted-foreground mt-0.5'>
-											Structured proposal with core design decisions and implementation checklist.
-										</div>
+										<div className='font-semibold text-foreground'>Taskmanly Assistant</div>
+										<div className='text-[10px] text-muted-foreground'>Document & Knowledge Copilot</div>
 									</div>
+								</div>
+								<Badge variant='outline' className='text-[10px] border-border bg-muted/50 text-foreground gap-1.5'>
+									<span className='h-1.5 w-1.5 rounded-full bg-emerald-500' />
+									Live Context
+								</Badge>
+							</div>
 
-									{/* Proposed Checklist */}
-									<div className='space-y-1.5 pt-1'>
-										<div className='flex items-center justify-between p-2 rounded-lg bg-background/80 border border-border/60'>
-											<span className='font-medium text-foreground'>
-												Define WebSocket connection lifecycle & heartbeat protocols
-											</span>
-											<Badge variant='outline' className='text-[9px] text-muted-foreground border-border'>
-												P0 High
-											</Badge>
-										</div>
-										<div className='flex items-center justify-between p-2 rounded-lg bg-background/80 border border-border/60'>
-											<span className='font-medium text-foreground'>
-												Implement client-side conflict resolution with CRDT timestamps
-											</span>
-											<Badge variant='outline' className='text-[9px] text-muted-foreground border-border'>
-												P0 High
-											</Badge>
-										</div>
-										<div className='flex items-center justify-between p-2 rounded-lg bg-background/80 border border-border/60'>
-											<span className='font-medium text-foreground'>
-												Add exponential backoff retry for network reconnects
-											</span>
-											<Badge variant='outline' className='text-[9px] text-muted-foreground border-border'>
-												P1 Med
-											</Badge>
-										</div>
-										<div className='flex items-center justify-between p-2 rounded-lg bg-background/80 border border-border/60'>
-											<span className='font-medium text-foreground'>
-												Automated unit test suite for multi-client concurrent edits
-											</span>
-											<Badge variant='outline' className='text-[9px] text-muted-foreground border-border'>
-												P2 Low
-											</Badge>
-										</div>
+							{/* Dialogue thread */}
+							<div className='my-5 space-y-4 text-xs'>
+								{/* User query (matches Figma Ask AI user bubble) */}
+								<div className='flex justify-end'>
+									<div className='rounded-2xl rounded-tr-xs bg-muted px-4 py-2.5 text-xs text-foreground max-w-[85%] font-normal border border-border/60'>
+										Draft an architecture review page for our new database sync engine.
 									</div>
+								</div>
 
-									{/* Action Footer */}
-									<div className='pt-2 flex items-center gap-2'>
-										<Button
-											size='sm'
-											onClick={() => setApplied(true)}
-											className={`h-8 rounded-lg text-xs font-semibold transition-all ${
-												applied
-													? "bg-emerald-600 text-white hover:bg-emerald-600"
-													: "bg-primary text-primary-foreground hover:bg-primary/90"
-											}`}
-										>
-											{applied ? (
-												<>
-													<Check className='mr-1.5 h-3.5 w-3.5' />
-													Applied to Workspace!
-												</>
-											) : (
-												"Apply to Workspace"
-											)}
-										</Button>
-										<span className='text-[10px] text-muted-foreground'>
-											Automatically inserts 4 structured blocks into your page
-										</span>
+								{/* AI Response Card */}
+								<div className='flex items-start gap-3'>
+									<div className='h-7 w-7 rounded-lg bg-[#eeeffc] text-[#5e6ad2] dark:bg-indigo-500/20 dark:text-indigo-300 flex items-center justify-center shrink-0 mt-0.5'>
+										<Sparkles className='h-3.5 w-3.5' />
+									</div>
+									<div className='flex-1 rounded-xl border border-border/80 bg-muted/20 p-4 space-y-3'>
+										<div className='flex items-start justify-between gap-2'>
+											<div>
+												<div className='text-[10px] font-semibold uppercase tracking-wider text-muted-foreground'>
+													New Page Draft
+												</div>
+												<div className='text-xs font-bold text-foreground mt-0.5'>
+													Architecture RFC: Database Sync Engine
+												</div>
+											</div>
+											<Badge variant='outline' className='text-[10px] border-[#5e6ad2]/25 bg-[#eeeffc]/70 text-[#5e6ad2] dark:bg-indigo-500/15 dark:text-indigo-300'>
+												4 blocks
+											</Badge>
+										</div>
+
+										{/* Proposed Checklist */}
+										<div className='space-y-1.5 pt-1'>
+											<div className='flex items-center justify-between p-2 rounded-lg bg-card border border-border/60'>
+												<span className='font-medium text-foreground'>
+													Define WebSocket connection lifecycle & heartbeat protocols
+												</span>
+												<span className='font-mono text-[10px] text-muted-foreground px-1.5 py-0.5 rounded bg-muted'>
+													P0
+												</span>
+											</div>
+											<div className='flex items-center justify-between p-2 rounded-lg bg-card border border-border/60'>
+												<span className='font-medium text-foreground'>
+													Implement client-side conflict resolution with CRDT timestamps
+												</span>
+												<span className='font-mono text-[10px] text-muted-foreground px-1.5 py-0.5 rounded bg-muted'>
+													P0
+												</span>
+											</div>
+											<div className='flex items-center justify-between p-2 rounded-lg bg-card border border-border/60'>
+												<span className='font-medium text-foreground'>
+													Add exponential backoff retry for network reconnects
+												</span>
+												<span className='font-mono text-[10px] text-muted-foreground px-1.5 py-0.5 rounded bg-muted'>
+													P1
+												</span>
+											</div>
+											<div className='flex items-center justify-between p-2 rounded-lg bg-card border border-border/60'>
+												<span className='font-medium text-foreground'>
+													Automated unit test suite for multi-client concurrent edits
+												</span>
+												<span className='font-mono text-[10px] text-muted-foreground px-1.5 py-0.5 rounded bg-muted'>
+													P2
+												</span>
+											</div>
+										</div>
+
+										{/* Action Footer */}
+										<div className='pt-2 flex items-center gap-2.5'>
+											<Button
+												size='sm'
+												onClick={() => setApplied(true)}
+												className={`h-8 rounded-lg text-xs font-medium transition-all ${
+													applied
+														? "bg-emerald-600 text-white hover:bg-emerald-600"
+														: "bg-primary text-primary-foreground hover:bg-primary/90"
+												}`}
+											>
+												{applied ? (
+													<>
+														<Check className='mr-1.5 h-3.5 w-3.5' />
+														Applied to Workspace
+													</>
+												) : (
+													"Apply to Workspace"
+												)}
+											</Button>
+											<span className='text-[11px] text-muted-foreground'>
+												Inserts 4 structured blocks into your page
+											</span>
+										</div>
 									</div>
 								</div>
 							</div>
-						</div>
 
-						{/* Mock Composer */}
-						<div className='flex items-center gap-2 rounded-xl border border-border/80 bg-background/80 p-1.5 px-3 shadow-xs'>
-							<input
-								type='text'
-								readOnly
-								value='Summarize the last 3 team standup decisions...'
-								className='flex-1 bg-transparent text-xs text-muted-foreground outline-none cursor-default'
-							/>
-							<Button size='icon' className='h-7 w-7 rounded-lg bg-primary text-primary-foreground shrink-0'>
-								<Send className='h-3 w-3' />
-							</Button>
+							{/* Mock Composer */}
+							<div className='flex items-center gap-2 rounded-xl border border-border/80 bg-background/80 p-1.5 px-3 shadow-2xs'>
+								<input
+									type='text'
+									readOnly
+									value='Summarize the last 3 team standup decisions...'
+									className='flex-1 bg-transparent text-xs text-muted-foreground outline-none cursor-default'
+								/>
+								<Button size='icon' className='h-7 w-7 rounded-full bg-primary text-primary-foreground shrink-0'>
+									<Send className='h-3 w-3' />
+								</Button>
+							</div>
 						</div>
 					</div>
 
@@ -202,8 +209,8 @@ export function HomeAiShowcase() {
 								const Icon = cap.icon;
 								return (
 									<div key={cap.title} className='flex items-start gap-3'>
-										<div className='h-7 w-7 rounded-lg bg-muted/70 text-foreground flex items-center justify-center shrink-0 mt-0.5 ring-1 ring-border/50'>
-											<Icon className='h-3.5 w-3.5 text-primary' />
+										<div className='h-7 w-7 rounded-lg border border-border bg-muted/50 text-foreground flex items-center justify-center shrink-0 mt-0.5'>
+											<Icon className='h-3.5 w-3.5 text-[#5e6ad2]' />
 										</div>
 										<div>
 											<div className='text-xs font-semibold text-foreground'>{cap.title}</div>
@@ -218,7 +225,7 @@ export function HomeAiShowcase() {
 
 						<div className='pt-3'>
 							<Link href='/ai'>
-								<Button className='rounded-lg bg-primary text-primary-foreground font-medium group'>
+								<Button variant='outline' className='rounded-lg font-medium group'>
 									Explore Taskmanly AI
 									<ArrowRight className='ml-2 h-4 w-4 transition-transform group-hover:translate-x-1' />
 								</Button>

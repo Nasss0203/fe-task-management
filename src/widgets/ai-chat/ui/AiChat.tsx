@@ -186,7 +186,13 @@ export function AiChat({ showHeader = false, currentPageId, pageAccess }: AiChat
 	};
 
 	return (
-		<div className='mx-auto flex h-full w-full max-w-3xl flex-col px-4 sm:px-6'>
+		<div
+			className={
+				currentPageId
+					? "mx-auto flex h-full min-h-0 w-full max-w-3xl flex-col overflow-hidden px-4 sm:px-6"
+					: "mx-auto -my-10 flex h-[calc(100svh-2.75rem)] min-h-0 w-full max-w-3xl flex-col overflow-hidden px-4 sm:px-6"
+			}
+		>
 			{(currentPageId || showHeader) && (
 				<div className='flex shrink-0 items-center justify-end gap-1 pt-3'>
 					{currentPageId && (
@@ -220,14 +226,14 @@ export function AiChat({ showHeader = false, currentPageId, pageAccess }: AiChat
 			)}
 
 			{(isLoadingDraft || visibleDraft) && (
-				<div className="mt-3 max-h-[45%] shrink-0 overflow-y-auto rounded-xl border border-border/60 bg-muted/20 p-3">
+				<div className="mt-3 max-h-[45%] shrink-0 overflow-y-auto rounded-[10px] border border-border bg-muted/20 p-3">
 					{isLoadingDraft ? (
 						<p className="flex items-center gap-2 text-xs text-muted-foreground">
-							<Loader2 className="size-4 animate-spin" /> Loading draft...
+							<Loader2 className="size-4 animate-spin text-[#5e6ad2]" /> Loading draft...
 						</p>
 					) : visibleDraft ? (
 						<>
-							<div className="mb-3 flex items-center justify-between gap-2">
+							<div className="mb-2.5 flex items-center justify-between gap-2">
 								<p className="text-xs font-medium text-muted-foreground">Saved generation preview</p>
 								<Button variant="ghost" size="icon-xs" onClick={() => setDraftPreview(null)}
 									aria-label="Close preview" title="Close preview"
@@ -259,11 +265,11 @@ export function AiChat({ showHeader = false, currentPageId, pageAccess }: AiChat
 
 			{isHistoryLoading && (
 				<p role="status" className="flex flex-1 items-center justify-center gap-2 text-sm text-muted-foreground">
-					<Loader2 className="size-4 animate-spin" /> Restoring conversation...
+					<Loader2 className="size-4 animate-spin text-[#5e6ad2]" /> Restoring conversation...
 				</p>
 			)}
 			{selectedConversationId && (messagesQuery.isError || generationsQuery.isError) && (
-				<p role="alert" className="mt-3 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
+				<p role="alert" className="mt-3 rounded-[8px] bg-[#fdecec] px-3 py-2.5 text-[12.5px] leading-[18px] text-[#e5484d] dark:bg-red-500/15 dark:text-red-300">
 					Unable to restore this conversation. Select another chat or start a new one.
 				</p>
 			)}

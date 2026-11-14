@@ -27,7 +27,24 @@ export const teamspaceKeys = {
 
 	archived: (workspaceId: string) =>
 		["teamspaces", "archived", workspaceId] as const,
+
+	privateSummaries: (workspaceId: string) =>
+		["teamspaces", "private", workspaceId] as const,
 };
+
+export function usePrivateTeamspaceSummaries(
+	workspaceId: string,
+	enabled = true,
+) {
+	return useQuery({
+		queryKey: teamspaceKeys.privateSummaries(workspaceId),
+
+		queryFn: ({ signal }) =>
+			teamspaceApi.getPrivateSummaries(workspaceId, signal),
+
+		enabled: Boolean(workspaceId) && enabled,
+	});
+}
 
 export function useArchivedTeamspaces(workspaceId: string, enabled = true) {
 	return useQuery({

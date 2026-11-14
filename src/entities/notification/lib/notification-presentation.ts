@@ -2,6 +2,7 @@ import {
 	AtSign,
 	Bell,
 	CheckCircle2,
+	Crown,
 	KeyRound,
 	MessageCircle,
 	UserMinus,
@@ -128,7 +129,17 @@ export function getNotificationPresentation(
 				tone: "teamspace",
 			};
 
+		case "teamspace.ownership_transferred":
+			return {
+				icon: Crown,
+				title: notification.title,
+				description: notification.message,
+				category: "teamspace",
+				tone: "teamspace",
+			};
+
 		case "comment.mentioned":
+		case "page.mentioned":
 			return {
 				icon: AtSign,
 				title: notification.title,

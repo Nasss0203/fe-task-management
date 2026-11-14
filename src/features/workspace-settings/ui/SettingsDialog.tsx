@@ -1,4 +1,6 @@
 import { X } from "lucide-react";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 import {
 	Dialog,
@@ -11,9 +13,35 @@ import {
 import { useSettingsDialog } from "../model/use-settings-dialog";
 import SettingsSidebar from "./SettingsSidebar";
 import BillingSection from "./sections/BillingSection";
+import ConnectionsSection from "./sections/ConnectionsSection";
 import MembersSection from "./sections/MembersSection";
 import ProfileSection from "./sections/ProfileSection";
+import StorageSection from "./sections/StorageSection";
 import WorkspaceSection from "./sections/WorkspaceSection";
+
+const SLACK_PARAM = "slack";
+
+function useSlackRedirectToast() {
+	const { setOpen, setSection } = useSettingsDialog();
+
+	useEffect(() => {
+		const url = new URL(window.location.href);
+		const result = url.searchParams.get(SLACK_PARAM);
+
+		if (!result) return;
+
+		if (result === "connected") {
+			toast.success("Slack connected", { id: SLACK_PARAM });
+		} else {
+			toast.error("Couldn't connect Slack", { id: SLACK_PARAM });
+		}
+
+		setSection("connections");
+		setOpen(true);
+		url.searchParams.delete(SLACK_PARAM);
+		window.history.replaceState(window.history.state, "", url.toString());
+	}, [setOpen, setSection]);
+}
 
 interface SettingsDialogProps {
 	workspaceId: string;
@@ -31,6 +59,7 @@ const SettingsDialog = ({
 	canRemoveMember = false,
 }: SettingsDialogProps) => {
 	const { open, setOpen, section } = useSettingsDialog();
+	useSlackRedirectToast();
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
@@ -61,6 +90,16 @@ const SettingsDialog = ({
 					{section === "billing" && (
 						<div className='mx-auto w-full max-w-[860px] px-5 py-8 sm:px-8 lg:px-[70px]'>
 							<BillingSection workspaceId={workspaceId} />
+						</div>
+					)}
+					{section === "storage" && (
+						<div className='mx-auto w-full max-w-[860px] px-5 py-8 sm:px-8 lg:px-[70px]'>
+							<StorageSection workspaceId={workspaceId} />
+						</div>
+					)}
+					{section === "connections" && (
+						<div className='mx-auto w-full max-w-[860px] px-5 py-8 sm:px-8 lg:px-[70px]'>
+							<ConnectionsSection />
 						</div>
 					)}
 					{section === "members" && (

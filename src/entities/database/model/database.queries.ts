@@ -36,6 +36,11 @@ export const databaseKeys = {
 
 	sharedRows: (databaseId: string, shareToken: string) =>
 		["databases", databaseId, "shared-rows", shareToken] as const,
+
+	calendarFeed: (databaseId: string) =>
+		["databases", databaseId, "calendar-feed"] as const,
+	googleCalendarSync: (databaseId: string) =>
+		["databases", databaseId, "google-calendar-sync"] as const,
 };
 
 export function useDatabase(databaseId?: string, enabled = true) {
@@ -49,6 +54,26 @@ export function useDatabase(databaseId?: string, enabled = true) {
 		retry: (failureCount, error) =>
 			!(isAxiosError(error) && error.response?.status === 403) &&
 			failureCount < 3,
+	});
+}
+
+export function useCalendarFeed(databaseId: string, enabled = true) {
+	return useQuery({
+		queryKey: databaseKeys.calendarFeed(databaseId),
+
+		queryFn: () => databaseApi.getCalendarFeed(databaseId),
+
+		enabled: Boolean(databaseId) && enabled,
+	});
+}
+
+export function useGoogleCalendarSync(databaseId: string, enabled = true) {
+	return useQuery({
+		queryKey: databaseKeys.googleCalendarSync(databaseId),
+
+		queryFn: () => databaseApi.getGoogleCalendarSync(databaseId),
+
+		enabled: Boolean(databaseId) && enabled,
 	});
 }
 

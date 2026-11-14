@@ -148,7 +148,8 @@ describe("useTeamspaceManagement.canManage (mirrors backend authorization)", () 
 	it.each([
 		["a teamspace owner", { myRole: "OWNER" as const }, true],
 		["a teamspace member", { myRole: "MEMBER" as const }, false],
-		["a workspace owner outside the teamspace", { workspaceOwner: true }, true],
+		["a workspace owner outside the teamspace", { workspaceOwner: true }, false],
+		["a workspace owner who is a teamspace member", { workspaceOwner: true, myRole: "MEMBER" as const }, false],
 		["a workspace member outside the teamspace", {}, false],
 	])("is %s → %s", async (_label, options, expected) => {
 		arrange(options);

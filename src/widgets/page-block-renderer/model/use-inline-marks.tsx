@@ -8,6 +8,7 @@ import {
 	toggleInlineMark,
 } from "@/entities/page-block/lib/toggle-inline-mark";
 import { ReadOnlyRichText } from "@/entities/page-block/ui/read-only-block-content";
+import type { PageMentionTitles } from "@/entities/page/model/page.types";
 import { cn } from "@/shared/lib/utils";
 
 /**
@@ -19,9 +20,11 @@ export function useInlineMarks(
 	value: string,
 	setValue: (value: string) => void,
 	previewClassName?: string,
+	previewText: string = value,
+	pageTitles?: Partial<PageMentionTitles>,
 ) {
 	const [focused, setFocused] = useState(false);
-	const showPreview = !focused && hasInlineMarks(value);
+	const showPreview = !focused && hasInlineMarks(previewText);
 
 	/** Returns true when the key was a formatting shortcut. */
 	const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -45,7 +48,9 @@ export function useInlineMarks(
 
 	// The preview sits next to its textarea, so no ref has to be shared.
 	const focusAtEnd = (preview: HTMLElement) => {
-		const textarea = preview.parentElement?.querySelector("textarea");
+		const textarea = preview.parentElement?.querySelector<
+			HTMLTextAreaElement | HTMLInputElement
+		>("textarea, input");
 		if (!textarea) return;
 		setFocused(true);
 		textarea.focus();
@@ -72,7 +77,7 @@ export function useInlineMarks(
 					focusAtEnd(event.currentTarget);
 				}}
 			>
-				<ReadOnlyRichText text={value} />
+				<ReadOnlyRichText text={previewText} pageTitles={pageTitles} />
 			</div>
 		) : null,
 	};

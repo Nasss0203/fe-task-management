@@ -10,6 +10,7 @@ import {
 import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-tree";
 import { useUpdatePageBlock } from "@/entities/page-block/model/page-block.mutations";
 import { usePage } from "@/entities/page/model/page.queries";
+import { isPlanLimitError, usePlanLimitNotifier } from "@/features/workspace-billing";
 
 interface VideoBlockEditorProps {
 	block: PageBlockNode;
@@ -139,6 +140,7 @@ export function VideoBlockEditor({ block, shareToken }: VideoBlockEditorProps) {
 	const { data: page } = usePage(block.page_id, !shareToken);
 
 	const uploadAttachment = useUploadAttachment();
+	const notifyPlanLimit = usePlanLimitNotifier(page?.workspace_id);
 	const createDownloadUrl = useCreateAttachmentDownloadUrl();
 	const updateBlock = useUpdatePageBlock(shareToken);
 
@@ -208,6 +210,8 @@ export function VideoBlockEditor({ block, shareToken }: VideoBlockEditorProps) {
 				mimeType: attachment.mimeType,
 				caption: "",
 			});
+		} catch (error) {
+			notifyPlanLimit(error);
 		} finally {
 			event.target.value = "";
 		}
@@ -339,7 +343,7 @@ export function VideoBlockEditor({ block, shareToken }: VideoBlockEditorProps) {
 					</p>
 				)}
 
-				{uploadAttachment.isError && (
+				{uploadAttachment.isError && !isPlanLimitError(uploadAttachment.error) && (
 					<p className='mt-2 text-xs text-destructive'>
 						Upload video failed.
 					</p>

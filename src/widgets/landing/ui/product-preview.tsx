@@ -27,7 +27,7 @@ export function ProductPreview() {
 				{/* Workspace Switcher */}
 				<div className='flex items-center justify-between p-2 rounded-lg bg-card border border-border/60 shadow-xs'>
 					<div className='flex items-center gap-2 min-w-0'>
-						<div className='h-6 w-6 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-semibold text-xs'>
+						<div className='h-6 w-6 rounded-md bg-[#5e6ad2] text-white flex items-center justify-center font-semibold text-xs'>
 							T
 						</div>
 						<div className='truncate'>
@@ -37,7 +37,7 @@ export function ProductPreview() {
 							<div className='text-[10px] text-muted-foreground'>Pro Plan</div>
 						</div>
 					</div>
-					<Badge variant='outline' className='text-[9px] px-1.5 py-0 h-4 border-border bg-secondary text-muted-foreground'>
+					<Badge variant='outline' className='text-[9px] px-1.5 py-0 h-4 border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'>
 						Active
 					</Badge>
 				</div>
@@ -49,11 +49,11 @@ export function ProductPreview() {
 						onClick={() => setActiveView("doc")}
 						className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md transition-colors text-left ${
 							activeView === "doc"
-								? "bg-secondary text-foreground font-medium"
+								? "bg-secondary text-foreground font-semibold"
 								: "hover:bg-muted/60 hover:text-foreground"
 						}`}
 					>
-						<FileText className='h-3.5 w-3.5 text-muted-foreground' />
+						<FileText className={`h-3.5 w-3.5 ${activeView === "doc" ? "text-[#5e6ad2]" : "text-muted-foreground"}`} />
 						<span>Document Page</span>
 					</button>
 
@@ -62,11 +62,11 @@ export function ProductPreview() {
 						onClick={() => setActiveView("table")}
 						className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md transition-colors text-left ${
 							activeView === "table"
-								? "bg-secondary text-foreground font-medium"
+								? "bg-secondary text-foreground font-semibold"
 								: "hover:bg-muted/60 hover:text-foreground"
 						}`}
 					>
-						<Table className='h-3.5 w-3.5 text-muted-foreground' />
+						<Table className={`h-3.5 w-3.5 ${activeView === "table" ? "text-[#5e6ad2]" : "text-muted-foreground"}`} />
 						<span>Database Table</span>
 					</button>
 
@@ -75,11 +75,11 @@ export function ProductPreview() {
 						onClick={() => setActiveView("board")}
 						className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md transition-colors text-left ${
 							activeView === "board"
-								? "bg-secondary text-foreground font-medium"
+								? "bg-secondary text-foreground font-semibold"
 								: "hover:bg-muted/60 hover:text-foreground"
 						}`}
 					>
-						<LayoutGrid className='h-3.5 w-3.5 text-muted-foreground' />
+						<LayoutGrid className={`h-3.5 w-3.5 ${activeView === "board" ? "text-[#5e6ad2]" : "text-muted-foreground"}`} />
 						<span>Database Board</span>
 					</button>
 
@@ -88,11 +88,11 @@ export function ProductPreview() {
 						onClick={() => setActiveView("ai")}
 						className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md transition-colors text-left ${
 							activeView === "ai"
-								? "bg-secondary text-foreground font-medium"
+								? "bg-secondary text-foreground font-semibold"
 								: "hover:bg-muted/60 hover:text-foreground"
 						}`}
 					>
-						<Sparkles className='h-3.5 w-3.5 text-muted-foreground' />
+						<Sparkles className={`h-3.5 w-3.5 ${activeView === "ai" ? "text-[#5e6ad2]" : "text-muted-foreground"}`} />
 						<span>AI Assistant</span>
 					</button>
 				</div>
@@ -105,21 +105,21 @@ export function ProductPreview() {
 					<div className='space-y-0.5 text-xs text-muted-foreground'>
 						<div className='flex items-center justify-between px-2.5 py-1 rounded-md bg-secondary/60 text-foreground font-medium'>
 							<span className='flex items-center gap-2 truncate'>
-								<span className='h-1.5 w-1.5 rounded-full bg-foreground' />
+								<span className='h-1.5 w-1.5 rounded-full bg-indigo-500' />
 								Engineering
 							</span>
 							<span className='text-[10px] text-muted-foreground'>12 docs</span>
 						</div>
 						<div className='flex items-center justify-between px-2.5 py-1 rounded-md hover:bg-muted/40'>
 							<span className='flex items-center gap-2 truncate'>
-								<span className='h-1.5 w-1.5 rounded-full bg-muted-foreground/60' />
+								<span className='h-1.5 w-1.5 rounded-full bg-sky-500' />
 								Product Specs
 							</span>
 							<span className='text-[10px] text-muted-foreground'>8 docs</span>
 						</div>
 						<div className='flex items-center justify-between px-2.5 py-1 rounded-md hover:bg-muted/40'>
 							<span className='flex items-center gap-2 truncate'>
-								<span className='h-1.5 w-1.5 rounded-full bg-muted-foreground/60' />
+								<span className='h-1.5 w-1.5 rounded-full bg-amber-500' />
 								Company Handbook
 							</span>
 							<span className='text-[10px] text-muted-foreground'>6 docs</span>
@@ -221,8 +221,8 @@ export function ProductPreview() {
 							</p>
 
 							{/* Callout box */}
-							<div className='rounded-lg border border-border bg-secondary/50 p-3.5 text-xs text-foreground flex gap-3 items-start'>
-								<Sparkles className='h-4 w-4 shrink-0 mt-0.5 text-muted-foreground' />
+							<div className='rounded-lg border border-[#5e6ad2]/25 bg-[#eeeffc]/60 dark:border-indigo-400/25 dark:bg-indigo-500/12 p-3.5 text-xs text-foreground flex gap-3 items-start'>
+								<Sparkles className='h-4 w-4 shrink-0 mt-0.5 text-[#5e6ad2] dark:text-indigo-300' />
 								<div>
 									<span className='font-semibold'>Shared with team:</span> Members can comment on blocks, tables, and nested pages.
 								</div>
@@ -242,7 +242,7 @@ export function ProductPreview() {
 								</div>
 								<div className='space-y-1.5 text-xs'>
 									<div className='flex items-center gap-2.5 text-foreground'>
-										<div className='h-4 w-4 rounded bg-primary text-primary-foreground flex items-center justify-center text-[10px]'>
+										<div className='h-4 w-4 rounded bg-[#5e6ad2] text-white flex items-center justify-center text-[10px]'>
 											<Check className='h-3 w-3' />
 										</div>
 										<span className='line-through text-muted-foreground'>
@@ -250,7 +250,7 @@ export function ProductPreview() {
 										</span>
 									</div>
 									<div className='flex items-center gap-2.5 text-foreground'>
-										<div className='h-4 w-4 rounded bg-primary text-primary-foreground flex items-center justify-center text-[10px]'>
+										<div className='h-4 w-4 rounded bg-[#5e6ad2] text-white flex items-center justify-center text-[10px]'>
 											<Check className='h-3 w-3' />
 										</div>
 										<span className='line-through text-muted-foreground'>
@@ -284,10 +284,14 @@ export function ProductPreview() {
 								<tbody className='divide-y divide-border/50 text-foreground'>
 									<tr className='hover:bg-muted/20 transition-colors'>
 										<td className='py-3 px-3 font-medium flex items-center gap-2'>
-											<FileText className='h-3.5 w-3.5 text-muted-foreground' />
+											<FileText className='h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400' />
 											Engineering Onboarding Guide
 										</td>
-										<td className='py-3 px-3 text-muted-foreground'>Handbook</td>
+										<td className='py-3 px-3'>
+											<span className='rounded-md bg-indigo-500/10 px-2 py-0.5 text-[10px] font-medium text-indigo-700 dark:text-indigo-300'>
+												Handbook
+											</span>
+										</td>
 										<td className='py-3 px-3'>
 											<Badge variant='secondary' className='text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-none'>
 												Published
@@ -298,12 +302,16 @@ export function ProductPreview() {
 									</tr>
 									<tr className='hover:bg-muted/20 transition-colors'>
 										<td className='py-3 px-3 font-medium flex items-center gap-2'>
-											<Database className='h-3.5 w-3.5 text-muted-foreground' />
+											<Database className='h-3.5 w-3.5 text-sky-600 dark:text-sky-400' />
 											API Authentication Specs
 										</td>
-										<td className='py-3 px-3 text-muted-foreground'>Specs</td>
 										<td className='py-3 px-3'>
-											<Badge variant='secondary' className='text-[10px] bg-secondary text-foreground border-none'>
+											<span className='rounded-md bg-sky-500/10 px-2 py-0.5 text-[10px] font-medium text-sky-700 dark:text-sky-300'>
+												Specs
+											</span>
+										</td>
+										<td className='py-3 px-3'>
+											<Badge variant='secondary' className='text-[10px] bg-amber-500/10 text-amber-700 dark:text-amber-300 border-none'>
 												In Review
 											</Badge>
 										</td>
@@ -312,10 +320,14 @@ export function ProductPreview() {
 									</tr>
 									<tr className='hover:bg-muted/20 transition-colors'>
 										<td className='py-3 px-3 font-medium flex items-center gap-2'>
-											<Globe className='h-3.5 w-3.5 text-muted-foreground' />
+											<Globe className='h-3.5 w-3.5 text-amber-600 dark:text-amber-400' />
 											Public Subdomain Documentation
 										</td>
-										<td className='py-3 px-3 text-muted-foreground'>Publishing</td>
+										<td className='py-3 px-3'>
+											<span className='rounded-md bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-700 dark:text-amber-300'>
+												Publishing
+											</span>
+										</td>
 										<td className='py-3 px-3'>
 											<Badge variant='secondary' className='text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-none'>
 												Published
@@ -326,10 +338,14 @@ export function ProductPreview() {
 									</tr>
 									<tr className='hover:bg-muted/20 transition-colors'>
 										<td className='py-3 px-3 font-medium flex items-center gap-2'>
-											<Shield className='h-3.5 w-3.5 text-muted-foreground' />
+											<Shield className='h-3.5 w-3.5 text-violet-600 dark:text-violet-400' />
 											Team Access &amp; Permission Policy
 										</td>
-										<td className='py-3 px-3 text-muted-foreground'>Security</td>
+										<td className='py-3 px-3'>
+											<span className='rounded-md bg-violet-500/10 px-2 py-0.5 text-[10px] font-medium text-violet-700 dark:text-violet-300'>
+												Security
+											</span>
+										</td>
 										<td className='py-3 px-3'>
 											<Badge variant='secondary' className='text-[10px] bg-muted text-muted-foreground border-none'>
 												Draft
@@ -351,14 +367,14 @@ export function ProductPreview() {
 						<div className='w-64 shrink-0 flex flex-col gap-2.5'>
 							<div className='flex items-center justify-between px-1 text-xs font-semibold text-muted-foreground'>
 								<span className='flex items-center gap-1.5'>
-									<span className='h-2 w-2 rounded-full bg-muted-foreground/50' />
+									<span className='h-2 w-2 rounded-full bg-slate-400' />
 									Drafting
 								</span>
 								<span className='text-[11px] font-mono'>1</span>
 							</div>
 
 							<div className='p-3.5 rounded-xl border border-border/80 bg-card shadow-xs space-y-2'>
-								<Badge variant='outline' className='text-[10px] text-muted-foreground bg-secondary border-border'>
+								<Badge variant='outline' className='text-[10px] text-violet-700 dark:text-violet-300 bg-violet-500/10 border-violet-500/20'>
 									Security
 								</Badge>
 								<div className='text-xs font-semibold text-foreground leading-snug'>
@@ -366,7 +382,7 @@ export function ProductPreview() {
 								</div>
 								<div className='flex items-center justify-between pt-1 text-[11px] text-muted-foreground'>
 									<span>Updated today</span>
-									<div className='h-5 w-5 rounded-full bg-secondary text-foreground text-[10px] font-semibold flex items-center justify-center border border-border'>
+									<div className='h-5 w-5 rounded-full bg-violet-500/15 text-violet-700 dark:text-violet-300 text-[10px] font-semibold flex items-center justify-center border border-violet-500/25'>
 										AV
 									</div>
 								</div>
@@ -377,14 +393,14 @@ export function ProductPreview() {
 						<div className='w-64 shrink-0 flex flex-col gap-2.5'>
 							<div className='flex items-center justify-between px-1 text-xs font-semibold text-muted-foreground'>
 								<span className='flex items-center gap-1.5'>
-									<span className='h-2 w-2 rounded-full bg-foreground/70' />
+									<span className='h-2 w-2 rounded-full bg-amber-500' />
 									In Review
 								</span>
 								<span className='text-[11px] font-mono'>1</span>
 							</div>
 
 							<div className='p-3.5 rounded-xl border border-border/80 bg-card shadow-xs space-y-2'>
-								<Badge variant='outline' className='text-[10px] text-muted-foreground bg-secondary border-border'>
+								<Badge variant='outline' className='text-[10px] text-sky-700 dark:text-sky-300 bg-sky-500/10 border-sky-500/20'>
 									Specifications
 								</Badge>
 								<div className='text-xs font-semibold text-foreground leading-snug'>
@@ -392,7 +408,7 @@ export function ProductPreview() {
 								</div>
 								<div className='flex items-center justify-between pt-1 text-[11px] text-muted-foreground'>
 									<span>2 reviewers</span>
-									<div className='h-5 w-5 rounded-full bg-secondary text-foreground text-[10px] font-semibold flex items-center justify-center border border-border'>
+									<div className='h-5 w-5 rounded-full bg-sky-500/15 text-sky-700 dark:text-sky-300 text-[10px] font-semibold flex items-center justify-center border border-sky-500/25'>
 										NN
 									</div>
 								</div>
@@ -410,7 +426,7 @@ export function ProductPreview() {
 							</div>
 
 							<div className='p-3.5 rounded-xl border border-border/80 bg-card shadow-xs space-y-2'>
-								<Badge variant='outline' className='text-[10px] text-muted-foreground bg-secondary border-border'>
+								<Badge variant='outline' className='text-[10px] text-indigo-700 dark:text-indigo-300 bg-indigo-500/10 border-indigo-500/20'>
 									Handbook
 								</Badge>
 								<div className='text-xs font-semibold text-foreground leading-snug'>
@@ -423,7 +439,7 @@ export function ProductPreview() {
 							</div>
 
 							<div className='p-3.5 rounded-xl border border-border/80 bg-card shadow-xs space-y-2'>
-								<Badge variant='outline' className='text-[10px] text-muted-foreground bg-secondary border-border'>
+								<Badge variant='outline' className='text-[10px] text-amber-700 dark:text-amber-300 bg-amber-500/10 border-amber-500/20'>
 									Publishing
 								</Badge>
 								<div className='text-xs font-semibold text-foreground leading-snug'>
@@ -444,14 +460,14 @@ export function ProductPreview() {
 						<div className='space-y-4'>
 							{/* User query bubble */}
 							<div className='flex items-start gap-2.5 justify-end'>
-								<div className='rounded-xl rounded-tr-none bg-primary px-3.5 py-2.5 text-xs text-primary-foreground max-w-[85%] font-medium'>
+								<div className='rounded-xl rounded-tr-none bg-[#5e6ad2] px-3.5 py-2.5 text-xs text-white max-w-[85%] font-medium'>
 									Draft an architecture spec for public page publishing with subdomains.
 								</div>
 							</div>
 
 							{/* AI Response bubble */}
 							<div className='flex items-start gap-2.5'>
-								<div className='h-6 w-6 rounded-md bg-secondary text-foreground flex items-center justify-center shrink-0 border border-border'>
+								<div className='h-6 w-6 rounded-md bg-[#eeeffc] text-[#5e6ad2] dark:bg-indigo-500/20 dark:text-indigo-300 flex items-center justify-center shrink-0 border border-[#5e6ad2]/25'>
 									<Sparkles className='h-3.5 w-3.5' />
 								</div>
 								<div className='rounded-xl rounded-tl-none border border-border/80 bg-muted/30 p-4 text-xs text-foreground space-y-2.5 max-w-[90%] shadow-xs'>
@@ -463,20 +479,20 @@ export function ProductPreview() {
 									</p>
 									<ul className='space-y-1.5 text-[11px] text-foreground'>
 										<li className='flex items-center gap-2'>
-											<span className='h-1.5 w-1.5 rounded-full bg-foreground' />
+											<span className='h-1.5 w-1.5 rounded-full bg-[#5e6ad2]' />
 											<strong>Overview:</strong> Edge proxy mapping hostnames to page records
 										</li>
 										<li className='flex items-center gap-2'>
-											<span className='h-1.5 w-1.5 rounded-full bg-foreground' />
+											<span className='h-1.5 w-1.5 rounded-full bg-[#5e6ad2]' />
 											<strong>Security:</strong> Read-only filter guaranteeing isolation from drafts
 										</li>
 										<li className='flex items-center gap-2'>
-											<span className='h-1.5 w-1.5 rounded-full bg-foreground' />
+											<span className='h-1.5 w-1.5 rounded-full bg-[#5e6ad2]' />
 											<strong>Data Model:</strong> Page publication state and recursive child flag
 										</li>
 									</ul>
 									<div className='pt-2 flex items-center gap-2'>
-										<Button size='sm' className='h-7 text-[11px] rounded-md bg-primary text-primary-foreground'>
+										<Button size='sm' className='h-7 text-[11px] rounded-md bg-[#5e6ad2] text-white hover:bg-[#525ec4]'>
 											Insert into Document
 										</Button>
 										<Button size='sm' variant='outline' className='h-7 text-[11px] rounded-md'>
@@ -495,7 +511,7 @@ export function ProductPreview() {
 								className='flex-1 bg-transparent text-xs text-foreground placeholder:text-muted-foreground outline-none'
 								readOnly
 							/>
-							<Button size='icon' className='h-7 w-7 rounded-md bg-primary text-primary-foreground shrink-0'>
+							<Button size='icon' className='h-7 w-7 rounded-md bg-[#5e6ad2] text-white hover:bg-[#525ec4] shrink-0'>
 								<Send className='h-3.5 w-3.5' />
 							</Button>
 						</div>

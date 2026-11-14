@@ -76,31 +76,34 @@ export function AiModificationActionDialog({ action, workspaceId, currentPageId,
 
   return (
     <AlertDialog open={Boolean(action)} onOpenChange={(open) => { if (!open && !pending) onClose(); }}>
-      <AlertDialogContent>
+      <AlertDialogContent className="sm:max-w-[460px] rounded-[12px]">
         <AlertDialogHeader>
-          <AlertDialogTitle>{action?.kind === "apply" ? "Apply page changes?" : "Discard AI draft?"}</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogTitle className="text-[16px] font-semibold">{action?.kind === "apply" ? "Apply page changes?" : "Discard AI draft?"}</AlertDialogTitle>
+          <AlertDialogDescription className="text-[13px] leading-5">
             {action?.kind === "apply" ? "This action writes the proposed changes to the target Page. Review the target and operations before continuing." : "This discards the saved draft without changing the Page."}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        {action && <div className="space-y-2 rounded-md border p-3 text-sm">
-          <div>Target Page: <Link href={`/page/${action.pageId}`} className="break-all text-primary underline">{targetPageName}</Link></div>
-          {loading && <p role="status" className="flex items-center gap-2"><Loader2 className="size-4 animate-spin" />Verifying draft...</p>}
-          {error && <p role="alert" className="text-destructive">{error}</p>}
+        {action && <div className="space-y-2 rounded-[8px] border border-border bg-muted/20 p-3.5 text-[13px]">
+          <div className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
+            <span>Target Page:</span>
+            <Link href={`/page/${action.pageId}`} className="break-all font-medium text-foreground underline underline-offset-2 hover:text-primary">{targetPageName}</Link>
+          </div>
+          {loading && <p role="status" className="flex items-center gap-2 text-[12.5px] text-muted-foreground"><Loader2 className="size-3.5 animate-spin text-[#5e6ad2]" />Verifying draft...</p>}
+          {error && <p role="alert" className="text-[12.5px] text-destructive">{error}</p>}
           {visibleState && <>
-            <p className="whitespace-pre-wrap">{visibleState.summary}</p>
-            <p className="text-muted-foreground">{visibleState.counts}</p>
-            {visibleState.deletes > 0 && <p role="alert" className="text-destructive">
+            <p className="whitespace-pre-wrap text-foreground">{visibleState.summary}</p>
+            <p className="text-[12.5px] text-muted-foreground">{visibleState.counts}</p>
+            {visibleState.deletes > 0 && <p role="alert" className="text-[12.5px] text-destructive">
               {visibleState.deletes} {visibleState.deletes === 1 ? "block" : "blocks"}
               {visibleState.nestedDeletes > 0 && ` (and ${visibleState.nestedDeletes} nested ${visibleState.nestedDeletes === 1 ? "block" : "blocks"})`}
               {" will be removed. You can undo this for 24 hours."}
             </p>}
           </>}
-          {pending && <p role="status">Processing request...</p>}
+          {pending && <p role="status" className="text-[12.5px] text-muted-foreground">Processing request...</p>}
         </div>}
         <AlertDialogFooter>
-          <Button variant="outline" disabled={pending} onClick={onClose}>Cancel</Button>
-          <Button variant={action?.kind === "discard" ? "destructive" : "default"} disabled={!visibleState || loading || pending || Boolean(error)} onClick={onConfirm}>
+          <Button variant="outline" size="sm" disabled={pending} onClick={onClose} className="h-8 rounded-[6px] text-[13px]">Cancel</Button>
+          <Button variant={action?.kind === "discard" ? "destructive" : "default"} size="sm" disabled={!visibleState || loading || pending || Boolean(error)} onClick={onConfirm} className="h-8 rounded-[6px] text-[13px]">
             {action?.kind === "apply" ? "Confirm apply" : "Confirm discard"}
           </Button>
         </AlertDialogFooter>

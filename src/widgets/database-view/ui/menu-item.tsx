@@ -10,6 +10,7 @@ interface MenuItemProps extends ComponentProps<"button"> {
 	/** Shows a chevron: the item opens a sub-page. */
 	submenu?: boolean;
 	destructive?: boolean;
+	active?: boolean;
 }
 
 /** One row of a Notion-style settings menu. */
@@ -18,6 +19,7 @@ export function MenuItem({
 	hint,
 	submenu,
 	destructive,
+	active,
 	className,
 	children,
 	...props
@@ -27,7 +29,8 @@ export function MenuItem({
 			type='button'
 			{...props}
 			className={cn(
-				"flex h-[30px] w-full items-center gap-[9px] rounded-md px-2 text-left text-[13.5px] outline-none transition-colors hover:bg-accent focus-visible:bg-accent disabled:pointer-events-none disabled:opacity-50",
+				"flex h-8 w-full items-center gap-2.5 rounded-lg px-2.5 text-left text-[13px] font-medium outline-none transition-colors hover:bg-accent/80 focus-visible:bg-accent disabled:pointer-events-none disabled:opacity-50",
+				active && "bg-[#5e6ad2]/10 text-foreground hover:bg-[#5e6ad2]/15",
 				destructive && "text-destructive hover:bg-destructive/10",
 				className,
 			)}
@@ -35,14 +38,18 @@ export function MenuItem({
 			{Icon && (
 				<Icon
 					className={cn(
-						"size-[15px] shrink-0",
-						destructive ? "text-destructive" : "text-muted-foreground",
+						"size-4 shrink-0 transition-colors",
+						destructive
+							? "text-destructive"
+							: active
+								? "text-[#5e6ad2] dark:text-indigo-400"
+								: "text-muted-foreground",
 					)}
 				/>
 			)}
 			<span className='min-w-0 flex-1 truncate'>{children}</span>
 			{hint && (
-				<span className='max-w-[45%] truncate text-xs text-faint'>
+				<span className='max-w-[50%] shrink-0 truncate text-xs text-faint'>
 					{hint}
 				</span>
 			)}

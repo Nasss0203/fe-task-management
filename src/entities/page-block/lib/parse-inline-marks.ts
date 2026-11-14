@@ -2,10 +2,14 @@ export type InlineNode =
 	| { type: "text"; text: string }
 	| { type: "code"; text: string }
 	| { type: "bold" | "italic" | "strike"; children: InlineNode[] }
-	| { type: "link"; href: string; children: InlineNode[] };
+	| { type: "link"; href: string; children: InlineNode[] }
+	| { type: "mention"; name: string; userId: string }
+	| { type: "page-mention"; pageId: string };
 
 const ESCAPABLE = "\\*~`[]()_";
 const LINK = /^\[([^\]]+)]\(((?:https?:\/\/|mailto:)[^\s)]+)\)/i;
+const MENTION = /^@\[([^\]\n]{1,100})\]\(user:([0-9a-f-]{36})\)/i;
+const PAGE_MENTION = /^@\[[^\]\n]{1,100}\]\(page:([0-9a-f-]{36})\)/i;
 const AUTOLINK = /^(?:https?:\/\/|mailto:)[^\s<>]+[^\s<>.,;:!?)\]'"]/i;
 
 const WRAPPERS = [
@@ -61,6 +65,24 @@ export function parseInlineMarks(text: string): InlineNode[] {
 					),
 				});
 				index = close + wrapper.marker.length;
+				continue;
+			}
+		}
+
+		if (char === "@") {
+			const mention = MENTION.exec(rest);
+			if (mention) {
+				flush();
+				nodes.push({ type: "mention", name: mention[1], userId: mention[2] });
+				index += mention[0].length;
+				continue;
+			}
+
+			const pageMention = PAGE_MENTION.exec(rest);
+			if (pageMention) {
+				flush();
+				nodes.push({ type: "page-mention", pageId: pageMention[1].toLowerCase() });
+				index += pageMention[0].length;
 				continue;
 			}
 		}

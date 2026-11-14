@@ -13,6 +13,7 @@ import {
 } from "@/entities/page-publication/model/page-publication.mutations";
 import { usePagePublication, usePagePublications } from "@/entities/page-publication/model/page-publication.queries";
 import { usePage } from "@/entities/page/model/page.queries";
+import { usePlanLimitNotifier } from "@/features/workspace-billing";
 import { getFriendlyApiErrorMessage } from "@/shared/lib/api-error-message";
 import {
 	AlertDialog,
@@ -44,6 +45,7 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 	const statusQuery = usePagePublication(pageQuery.data?.parent_page_id ? pageId : undefined);
 
 	const publishPage = usePublishPage(pageId);
+	const notifyPlanLimit = usePlanLimitNotifier(pageQuery.data?.workspace_id);
 	const unpublishPage = useUnpublishPage(pageId);
 	const republishPage = useRepublishPage(pageId);
 	const updateVisibility = useUpdatePageVisibility(pageId);
@@ -154,7 +156,9 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 		try {
 			await updateVisibility.mutateAsync(checked);
 		} catch (error) {
-			setFormError(getErrorMessage(error, "Unable to update page visibility."));
+			if (!notifyPlanLimit(error)) {
+				setFormError(getErrorMessage(error, "Unable to update page visibility."));
+			}
 		}
 	};
 
@@ -169,7 +173,9 @@ export function PagePublishTab({ pageId }: { pageId: string }) {
 				});
 			}
 		} catch (error) {
-			setFormError(getErrorMessage(error, "Unable to publish this page."));
+			if (!notifyPlanLimit(error)) {
+				setFormError(getErrorMessage(error, "Unable to publish this page."));
+			}
 		}
 	};
 

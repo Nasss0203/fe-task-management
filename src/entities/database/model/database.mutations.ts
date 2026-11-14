@@ -7,6 +7,8 @@ import { databaseKeys } from "./database.queries";
 import {
 	DatabaseViewType,
 	PropertyType,
+	type CalendarFeed,
+	type GoogleCalendarSyncStatus,
 	type Database,
 	type DatabaseRow,
 	type DatabaseViewDetail,
@@ -261,6 +263,95 @@ export function useRenameDatabase(databaseId: string) {
 			);
 			await queryClient.invalidateQueries({ queryKey: ["pages", "workspace"] });
 		},
+	});
+}
+
+export function useUpsertCalendarFeed(databaseId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (datePropertyId: string) =>
+			databaseApi.upsertCalendarFeed(databaseId, datePropertyId),
+
+		onSuccess: (feed) => {
+			queryClient.setQueryData<CalendarFeed | null>(
+				databaseKeys.calendarFeed(databaseId),
+				feed,
+			);
+		},
+	});
+}
+
+export function useRevokeCalendarFeed(databaseId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: () => databaseApi.revokeCalendarFeed(databaseId),
+
+		onSuccess: () => {
+			queryClient.setQueryData<CalendarFeed | null>(
+				databaseKeys.calendarFeed(databaseId),
+				null,
+			);
+		},
+	});
+}
+
+export function useConnectGoogleCalendar() {
+	return useMutation({
+		mutationFn: (returnTo: string) =>
+			databaseApi.getGoogleCalendarAuthorizeUrl(returnTo),
+	});
+}
+
+export function useDisconnectGoogleCalendar() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: () => databaseApi.disconnectGoogleCalendar(),
+
+		onSuccess: () =>
+			queryClient.invalidateQueries({
+				predicate: ({ queryKey }) =>
+					queryKey[0] === "databases" && queryKey[2] === "google-calendar-sync",
+			}),
+	});
+}
+
+export function useUpsertGoogleCalendarSync(databaseId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (body: { datePropertyId: string; assignedToMeOnly?: boolean }) =>
+			databaseApi.upsertGoogleCalendarSync(databaseId, body),
+
+		onSuccess: (status) => {
+			queryClient.setQueryData<GoogleCalendarSyncStatus>(
+				databaseKeys.googleCalendarSync(databaseId),
+				status,
+			);
+		},
+	});
+}
+
+export function useDeleteGoogleCalendarSync(databaseId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: () => databaseApi.deleteGoogleCalendarSync(databaseId),
+
+		onSuccess: () => {
+			queryClient.setQueryData<GoogleCalendarSyncStatus>(
+				databaseKeys.googleCalendarSync(databaseId),
+				(status) => (status ? { ...status, sync: null } : status),
+			);
+		},
+	});
+}
+
+export function useRunGoogleCalendarSync(databaseId: string) {
+	return useMutation({
+		mutationFn: () => databaseApi.runGoogleCalendarSync(databaseId),
 	});
 }
 

@@ -1,8 +1,11 @@
 import { FileText, LockKeyhole } from "lucide-react";
 import { useState } from "react";
 
+import { findPageMentionIds } from "@/entities/comment/lib/mention-text";
 import type { PageBlockNode } from "@/entities/page-block/lib/build-page-block-tree";
 import { PageBlockType } from "@/entities/page-block/model/page-block.types";
+import { PageMentionTitlesContext } from "@/entities/page-block/ui/page-mention-chip";
+import { usePage, usePageMentionTitles } from "@/entities/page/model/page.queries";
 
 import { ReadOnlyPageBlockRenderer } from "@/widgets/page-block/ui/read-only-page-block-renderer";
 import { BlockCommentsButton } from "@/widgets/page-comments/ui/block-comments-button";
@@ -94,35 +97,49 @@ export function PageBlockList({
 }: PageBlockListProps) {
 	useScrollToBlockHash(blocks.length > 0);
 
+	const lookUpMentions = !canEdit && !shareToken;
+	const { data: page } = usePage(pageId, lookUpMentions);
+	const mentionTitles = usePageMentionTitles(
+		page?.workspace_id,
+		findPageMentionIds(JSON.stringify(blocks)),
+		lookUpMentions,
+	);
+	const readOnlyTitles =
+		lookUpMentions && !mentionTitles.isError
+			? (mentionTitles.data ?? {})
+			: undefined;
+
 	if (!canEdit) {
 		return (
-			<div className='w-full min-w-0 max-w-full space-y-1'>
-				{blocks.map((block) => (
-					<ReadOnlyBlockRow
-						key={block.id}
-						block={block}
-						shareToken={shareToken}
-					/>
-				))}
+			<PageMentionTitlesContext.Provider value={readOnlyTitles}>
+				<div className='w-full min-w-0 max-w-full space-y-1'>
+					{blocks.map((block) => (
+						<ReadOnlyBlockRow
+							key={block.id}
+							block={block}
+							shareToken={shareToken}
+						/>
+					))}
 
-				{blocks.length === 0 && (
-					<div className='flex min-h-32 w-full flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/80 bg-muted/15 px-6 text-center'>
-						<div className='flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground'>
-							<FileText className='size-5' />
+					{blocks.length === 0 && (
+						<div className='flex min-h-32 w-full flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/80 bg-muted/15 px-6 text-center'>
+							<div className='flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground'>
+								<FileText className='size-5' />
+							</div>
+
+							<div className='space-y-1'>
+								<p className='text-sm font-medium text-foreground/80'>
+									Trang này chưa có nội dung
+								</p>
+
+								<p className='text-xs text-muted-foreground'>
+									Bạn đang xem trang ở chế độ chỉ đọc.
+								</p>
+							</div>
 						</div>
-
-						<div className='space-y-1'>
-							<p className='text-sm font-medium text-foreground/80'>
-								Trang này chưa có nội dung
-							</p>
-
-							<p className='text-xs text-muted-foreground'>
-								Bạn đang xem trang ở chế độ chỉ đọc.
-							</p>
-						</div>
-					</div>
-				)}
-			</div>
+					)}
+				</div>
+			</PageMentionTitlesContext.Provider>
 		);
 	}
 

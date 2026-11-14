@@ -1,7 +1,14 @@
 "use client";
 
 import { isAxiosError } from "axios";
-import { Check, CreditCard, Loader2, QrCode, RotateCw } from "lucide-react";
+import {
+	Check,
+	ChevronRight,
+	CreditCard,
+	Loader2,
+	QrCode,
+	RotateCw,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -26,10 +33,20 @@ import {
 } from "@/shared/ui/dialog";
 import { Skeleton } from "@/shared/ui/skeleton";
 
+import { formatMegabytes } from "../lib/plan-limit";
 import {
 	BILLING_DIALOG_PARAM,
 	useBillingDialog,
 } from "../model/use-billing-dialog";
+
+const HIDDEN_FEATURE_CODES = new Set(["AI_REQUESTS_MONTHLY"]);
+
+const PAYMENT_METHODS = {
+	SEPAY: { label: "Chuyển khoản QR", provider: "SePay", Icon: QrCode },
+	STRIPE: { label: "Thẻ Visa/Mastercard", provider: "Stripe test", Icon: CreditCard },
+} as const;
+
+const PROVIDER_ORDER = ["SEPAY", "STRIPE"];
 
 function formatPrice(amount: number, currency: string): string {
 	return new Intl.NumberFormat("vi-VN", {
@@ -48,7 +65,7 @@ export function formatFeature(feature: BillingFeature): string {
 		case "MAX_TEAMSPACES":
 			return `Tối đa ${value} teamspace`;
 		case "MAX_STORAGE_MB":
-			return `${Number(value).toLocaleString("vi-VN")} MB lưu trữ`;
+			return `${formatMegabytes(Number(value))} lưu trữ`;
 		case "PUBLIC_PAGE":
 			return value
 				? "Cho phép xuất bản trang công khai"
@@ -193,7 +210,7 @@ function BillingPlans({
 			</div>
 
 			{isPending ? (
-				<div className='grid gap-4 md:grid-cols-3'>
+				<div className='grid gap-4 lg:grid-cols-3'>
 					{Array.from({ length: 3 }, (_, index) => (
 						<Skeleton key={index} className='h-80 rounded-xl' />
 					))}
@@ -212,13 +229,23 @@ function BillingPlans({
 					</Button>
 				</div>
 			) : (
-				<div className='grid gap-4 md:grid-cols-3'>
+				<div className='grid gap-4 lg:grid-cols-3'>
 					{data?.items.map((plan) => {
-						const prices = plan.prices.filter(
-							(price) => price.billingInterval === interval,
-						);
+						const prices = plan.prices
+							.filter((price) => price.billingInterval === interval)
+							.sort(
+								(a, b) =>
+									PROVIDER_ORDER.indexOf(a.provider) -
+									PROVIDER_ORDER.indexOf(b.provider),
+							);
 						const isFree = plan.code === "FREE";
 						const isCurrent = plan.code === currentPlanCode;
+						const lowestPrice = prices.reduce<BillingPrice | null>(
+							(lowest, price) =>
+								!lowest || price.amount < lowest.amount ? price : lowest,
+							null,
+						);
+						const pricesDiffer = new Set(prices.map((price) => price.amount)).size > 1;
 
 						return (
 							<section
@@ -241,8 +268,25 @@ function BillingPlans({
 									{plan.description}
 								</p>
 
+								<p className='mt-4 flex items-baseline gap-1'>
+									<span className='text-2xl font-semibold tracking-tight'>
+										{isFree
+											? "Miễn phí"
+											: lowestPrice
+												? `${pricesDiffer ? "Từ " : ""}${formatPrice(lowestPrice.amount, lowestPrice.currency)}`
+												: "—"}
+									</span>
+									{!isFree && lowestPrice && (
+										<span className='text-sm text-muted-foreground'>
+											{interval === "MONTHLY" ? "/ tháng" : "/ năm"}
+										</span>
+									)}
+								</p>
+
 								<ul className='my-5 flex flex-col gap-2 text-sm'>
-									{plan.features.map((feature) => (
+									{plan.features
+										.filter((feature) => !HIDDEN_FEATURE_CODES.has(feature.code))
+										.map((feature) => (
 										<li key={feature.id} className='flex gap-2'>
 											<Check
 												aria-hidden
@@ -263,41 +307,46 @@ function BillingPlans({
 											Chưa có giá cho kỳ hạn này.
 										</p>
 									) : (
-										prices.map((price) => {
-											const isStripe = price.provider === "STRIPE";
-											const Icon = isStripe ? CreditCard : QrCode;
-											return (
-												<button
-													key={price.id}
-													type='button'
-													disabled={loadingPriceId !== null}
-													onClick={() => void handleCheckout(price)}
-													className='flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors hover:border-foreground/30 hover:bg-secondary/60 disabled:cursor-not-allowed disabled:opacity-50'
-												>
-													{loadingPriceId === price.id ? (
-														<Loader2 className='size-4 shrink-0 animate-spin' />
-													) : (
-														<Icon
+										<>
+											<p className='text-xs font-medium text-muted-foreground'>
+												Thanh toán bằng
+											</p>
+											{prices.map((price) => {
+												const method = PAYMENT_METHODS[price.provider];
+												const isLoading = loadingPriceId === price.id;
+												return (
+													<button
+														key={price.id}
+														type='button'
+														disabled={loadingPriceId !== null}
+														onClick={() => void handleCheckout(price)}
+														className='group flex h-14 w-full items-center gap-3 rounded-lg border px-3 text-left transition-colors hover:border-foreground/30 hover:bg-secondary/60 disabled:cursor-not-allowed disabled:opacity-50'
+													>
+														<span className='flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground'>
+															{isLoading ? (
+																<Loader2 className='size-4 animate-spin' />
+															) : (
+																<method.Icon aria-hidden className='size-4' />
+															)}
+														</span>
+														<span className='min-w-0 flex-1'>
+															<span className='block truncate text-sm font-medium'>
+																{isLoading ? "Đang chuyển đến thanh toán..." : method.label}
+															</span>
+															<span className='block truncate text-xs text-muted-foreground'>
+																{method.provider}
+																{pricesDiffer &&
+																	` · ${formatPrice(price.amount, price.currency)}`}
+															</span>
+														</span>
+														<ChevronRight
 															aria-hidden
-															className='size-4 shrink-0 text-muted-foreground'
+															className='size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5'
 														/>
-													)}
-													<span className='min-w-0 flex-1'>
-														<span className='block text-sm font-medium'>
-															{loadingPriceId === price.id
-																? "Đang chuyển đến thanh toán..."
-																: isStripe
-																	? "Thẻ Visa/Mastercard · Stripe test"
-																	: "Chuyển khoản QR · SePay"}
-														</span>
-														<span className='block text-xs text-muted-foreground'>
-															{formatPrice(price.amount, price.currency)}
-															{interval === "MONTHLY" ? " / tháng" : " / năm"}
-														</span>
-													</span>
-												</button>
-											);
-										})
+													</button>
+												);
+											})}
+										</>
 									)}
 								</div>
 							</section>

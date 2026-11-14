@@ -21,14 +21,14 @@ export function BrowserMockup({
 			{/* Top Browser Header Bar */}
 			<div className='flex h-10 items-center justify-between border-b border-border/60 bg-muted/40 px-4 select-none shrink-0'>
 				<div className='flex items-center gap-1.5 w-20'>
-					<div className='h-2.5 w-2.5 rounded-full bg-border' />
-					<div className='h-2.5 w-2.5 rounded-full bg-border' />
-					<div className='h-2.5 w-2.5 rounded-full bg-border' />
+					<div className='h-2.5 w-2.5 rounded-full bg-rose-400/80 dark:bg-rose-400/70' />
+					<div className='h-2.5 w-2.5 rounded-full bg-amber-400/80 dark:bg-amber-400/70' />
+					<div className='h-2.5 w-2.5 rounded-full bg-emerald-400/80 dark:bg-emerald-400/70' />
 				</div>
 
 				{/* URL bar */}
 				<div className='flex h-6.5 flex-1 max-w-sm sm:max-w-md items-center justify-center gap-2 rounded-md border border-border/60 bg-background px-3 text-xs text-muted-foreground'>
-					<Lock className='h-3 w-3 text-muted-foreground' />
+					<Lock className='h-3 w-3 text-emerald-600 dark:text-emerald-400' />
 					<span className='font-mono text-[11px] truncate tracking-tight text-foreground/80'>
 						{url}
 					</span>

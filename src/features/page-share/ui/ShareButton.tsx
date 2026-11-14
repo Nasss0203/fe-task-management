@@ -14,6 +14,8 @@ import {
 } from "@/entities/page-share/model/page-share.queries";
 
 import type { PageShareMember } from "@/entities/page-share/model/page-share.types";
+import { usePage } from "@/entities/page/model/page.queries";
+import { useTeamspaces } from "@/entities/teamspace/model/teamspace.queries";
 
 import { PagePublishTab } from "@/features/page-publish/ui/PagePublishTab";
 
@@ -62,6 +64,21 @@ export default function ShareButton({ pageId }: ShareButtonProps) {
 	const updateShareAccess = useUpdatePageShareAccess(pageId);
 
 	const updateSetting = useUpdatePageShareSetting(pageId);
+
+	const { data: page } = usePage(pageId, canReadShares);
+
+	const teamspaceId = page?.teamspace_id ?? null;
+
+	const { data: teamspaces } = useTeamspaces(
+		page?.workspace_id ?? "",
+		canReadShares && teamspaceId !== null,
+	);
+
+	const privateTeamspace =
+		teamspaceId !== null &&
+		teamspaces !== undefined &&
+		teamspaces.find((teamspace) => teamspace.id === teamspaceId)
+			?.visibility !== "OPEN";
 
 	/**
 	 * VIEWER / COMMENTER
@@ -123,6 +140,8 @@ export default function ShareButton({ pageId }: ShareButtonProps) {
 							{/* General Access */}
 							<GeneralAccessSection
 								setting={shareSetting}
+								teamspacePage={teamspaceId !== null}
+								privateTeamspace={privateTeamspace}
 								canManage={canManageShares}
 								isPending={isSettingPending}
 								isError={isSettingError}

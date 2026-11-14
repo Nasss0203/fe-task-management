@@ -371,18 +371,18 @@ function OperationSection({
 	return (
 		<details
 			open={defaultOpen}
-			className='group overflow-hidden rounded-lg border border-border/60'
+			className='group overflow-hidden rounded-[10px] border border-border'
 		>
-			<summary className='flex cursor-pointer list-none items-center gap-2.5 px-3 py-2.5 hover:bg-muted/40 [&::-webkit-details-marker]:hidden'>
-				<span className='flex size-7 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground'>
+			<summary className='flex cursor-pointer list-none items-center gap-2.5 bg-muted/30 px-3 py-2.5 transition-colors hover:bg-muted/50 [&::-webkit-details-marker]:hidden'>
+				<span className='flex size-6 shrink-0 items-center justify-center rounded-md bg-background text-muted-foreground shadow-2xs'>
 					{icon}
 				</span>
 
 				<span className='min-w-0 flex-1'>
-					<span className='block text-xs font-medium text-foreground'>
+					<span className='block text-[13px] font-semibold text-foreground'>
 						{title}
 					</span>
-					<span className='mt-0.5 block truncate text-[11px] text-muted-foreground'>
+					<span className='mt-0.5 block truncate text-[12px] text-muted-foreground'>
 						{subtitle}
 					</span>
 				</span>
@@ -390,7 +390,7 @@ function OperationSection({
 				<ChevronDown className='size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180' />
 			</summary>
 
-			<div className='border-t border-border/50 bg-background/40'>
+			<div className='border-t border-border/60 bg-card'>
 				{children}
 			</div>
 		</details>
@@ -870,13 +870,13 @@ export function AiModificationPlanPreview({
 	return (
 		<div
 			className={cn(
-				"min-w-0 overflow-hidden rounded-xl border border-border/60 bg-card",
+				"min-w-0 overflow-hidden rounded-[12px] border border-border bg-card",
 				status === "discarded" && "opacity-75",
 			)}
 		>
 			{/* Header */}
 			<div className='flex items-start gap-3 p-4'>
-				<div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+				<div className='flex size-9 shrink-0 items-center justify-center rounded-[8px] bg-[#eeeffc] text-[#5e6ad2] dark:bg-indigo-500/15 dark:text-indigo-300'>
 					<ListChecks className='size-4' />
 				</div>
 
@@ -912,7 +912,7 @@ export function AiModificationPlanPreview({
 			{/* Proposed changes */}
 			{plan.status === "PLAN_READY" && (
 				<div className='space-y-2 px-4 pb-4'>
-					<p className='text-xs font-medium text-muted-foreground'>
+					<p className='text-xs font-semibold text-muted-foreground'>
 						Proposed changes
 					</p>
 
@@ -966,23 +966,23 @@ export function AiModificationPlanPreview({
 			{/* More context required */}
 			{plan.status === "NEED_MORE_CONTEXT" && (
 				<div className='px-4 pb-4'>
-					<div className='space-y-3 rounded-lg border border-warning/30 bg-warning/5 p-3'>
-						<p className='flex items-center gap-2 text-xs font-medium text-foreground'>
-							<AlertCircle className='size-4 text-warning' />
+					<div className='space-y-2.5 rounded-[8px] border border-amber-500/20 bg-[#fbf3db] p-3 text-[#b07b00] dark:bg-amber-500/15 dark:text-amber-300'>
+						<p className='flex items-center gap-2 text-[13px] font-medium'>
+							<AlertCircle className='size-4 shrink-0' />
 							AI needs more information to continue
 						</p>
 
 						{plan.contextRequests.map((request, index) => (
 							<div
 								key={`${request.reason}-${index}`}
-								className='space-y-1 border-t border-warning/20 pt-2 first:border-t-0 first:pt-0'
+								className='space-y-1 border-t border-amber-500/20 pt-2 first:border-t-0 first:pt-0'
 							>
-								<p className='text-xs leading-relaxed text-muted-foreground'>
+								<p className='text-[12.5px] leading-[18px] opacity-90'>
 									{request.description}
 								</p>
 
 								{request.question && (
-									<p className='text-sm leading-relaxed text-foreground'>
+									<p className='text-sm font-medium leading-relaxed text-foreground'>
 										{request.question}
 									</p>
 								)}
@@ -994,8 +994,8 @@ export function AiModificationPlanPreview({
 
 			{/* Footer */}
 			{isCompleted && !previewOnly && (
-				<div className='flex flex-wrap items-center justify-between gap-2 border-t border-border/50 bg-muted/30 px-4 py-2.5'>
-					<p className='text-xs text-muted-foreground'>
+				<div className='flex flex-wrap items-center justify-between gap-2 border-t border-border bg-muted/25 px-4 py-2.5'>
+					<p className='text-[12.5px] text-muted-foreground'>
 						{isStale
 							? "The page changed after this draft was created. Send your request again to get a new draft."
 							: plan.status === "PLAN_READY"
@@ -1007,12 +1007,12 @@ export function AiModificationPlanPreview({
 						<Button
 							type='button'
 							size='sm'
-							variant='ghost'
+							variant='outline'
 							disabled={disabled}
 							onClick={() => onDiscard(generation.id)}
-							className='text-muted-foreground hover:text-foreground'
+							className='h-[30px] rounded-[6px] border-input bg-background px-3 text-[13px] font-medium text-foreground shadow-none hover:bg-accent/50'
 						>
-							<Trash2 className='size-4' />
+							<Trash2 className='size-3.5' />
 							Discard
 						</Button>
 
@@ -1022,8 +1022,9 @@ export function AiModificationPlanPreview({
 								size='sm'
 								disabled={disabled || plan.operations.length === 0}
 								onClick={() => onConfirm(generation.id, plan.pageId)}
+								className='h-[30px] rounded-[6px] px-3 text-[13px]'
 							>
-								<Check className='size-4' />
+								<Check className='size-3.5' />
 								Apply changes
 							</Button>
 						)}

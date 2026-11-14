@@ -1,7 +1,13 @@
 // features/workspace-settings/model/use-settings-dialog.ts
 import { create } from "zustand";
 
-export type SettingsSection = "profile" | "workspace" | "members" | "billing";
+export type SettingsSection =
+	| "profile"
+	| "workspace"
+	| "members"
+	| "billing"
+	| "storage"
+	| "connections";
 
 interface SettingsDialogState {
 	open: boolean;

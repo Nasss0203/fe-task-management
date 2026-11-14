@@ -5,6 +5,7 @@ import { useEffect, useId, useRef, useState } from "react";
 
 import {
 	displayToTokens,
+	findMentionQuery,
 	type MentionRef,
 	splitDisplayMentions,
 	tokensToDisplay,
@@ -28,16 +29,6 @@ interface CommentComposerProps {
 	className?: string;
 	onSubmit: (body: string) => Promise<unknown>;
 	onCancel?: () => void;
-}
-
-/** `@abc` ngay trước con trỏ (đầu dòng hoặc sau khoảng trắng). */
-function findMentionQuery(
-	text: string,
-	caret: number,
-): { start: number; search: string } | null {
-	const match = text.slice(0, caret).match(/(?:^|\s)@([^\s@]{0,30})$/);
-
-	return match ? { start: caret - match[1].length - 1, search: match[1] } : null;
 }
 
 export function CommentComposer({
