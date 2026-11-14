@@ -1,3 +1,4 @@
+import { formatDistanceToNow } from "date-fns";
 import { LogIn, Unlink } from "lucide-react";
 import { toast } from "sonner";
 
@@ -36,6 +37,22 @@ const ConnectionsSection = () => {
 			? "Slack access was revoked. Reconnect to keep receiving messages."
 			: `Sending notifications to ${status.slackTeamName ?? "Slack"}.`;
 
+	const lastFailedAt = status?.lastDeliveryFailedAt ? new Date(status.lastDeliveryFailedAt) : null;
+	const lastDeliveredAt = status?.lastDeliveredAt ? new Date(status.lastDeliveredAt) : null;
+	const lastDeliveryFailed =
+		lastFailedAt !== null && (lastDeliveredAt === null || lastFailedAt > lastDeliveredAt);
+
+	const deliveryNote =
+		!status?.connected || revoked
+			? null
+			: lastDeliveryFailed
+				? status.lastDeliveryError === "RATE_LIMITED"
+					? "Couldn't deliver the last message: Slack is limiting requests."
+					: "Couldn't deliver the last message."
+				: lastDeliveredAt
+					? `Last message sent ${formatDistanceToNow(lastDeliveredAt, { addSuffix: true })}.`
+					: null;
+
 	return (
 		<div>
 			<SettingsHeader
@@ -44,7 +61,10 @@ const ConnectionsSection = () => {
 			/>
 
 			<SettingsGroup title='Notifications'>
-				<SettingsRow label='Slack' description={description}>
+				<SettingsRow
+					label='Slack'
+					description={deliveryNote ? `${description} ${deliveryNote}` : description}
+				>
 					<div className='flex gap-2'>
 						{(!status?.connected || revoked) && (
 							<Button variant='outline' disabled={busy} onClick={connect}>

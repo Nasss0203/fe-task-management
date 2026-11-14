@@ -17,6 +17,9 @@ const status = (overrides: Partial<SlackConnectionStatus> = {}): SlackConnection
 	connected: true,
 	slackTeamName: "Acme",
 	connectionError: null,
+	lastDeliveredAt: null,
+	lastDeliveryFailedAt: null,
+	lastDeliveryError: null,
 	...overrides,
 });
 
@@ -58,6 +61,47 @@ describe("ConnectionsSection", () => {
 
 		expect(await screen.findByRole("button", { name: "Connect" })).toBeInTheDocument();
 		expect(slack.disconnect).toHaveBeenCalled();
+	});
+
+	it("shows when the last message reached Slack", async () => {
+		slack.getStatus.mockResolvedValue(
+			status({ lastDeliveredAt: new Date(Date.now() - 5 * 60_000).toISOString() }),
+		);
+		renderWithClient(<ConnectionsSection />);
+
+		expect(
+			await screen.findByText("Sending notifications to Acme. Last message sent 5 minutes ago."),
+		).toBeInTheDocument();
+	});
+
+	it("warns when the last message failed after the last delivery", async () => {
+		slack.getStatus.mockResolvedValue(
+			status({
+				lastDeliveredAt: "2026-11-14T08:00:00.000Z",
+				lastDeliveryFailedAt: "2026-11-14T09:00:00.000Z",
+				lastDeliveryError: "RATE_LIMITED",
+			}),
+		);
+		renderWithClient(<ConnectionsSection />);
+
+		expect(
+			await screen.findByText(/Couldn't deliver the last message: Slack is limiting requests/),
+		).toBeInTheDocument();
+		expect(screen.queryByText(/Last message sent/)).not.toBeInTheDocument();
+	});
+
+	it("keeps showing the delivery once a later message went through", async () => {
+		slack.getStatus.mockResolvedValue(
+			status({
+				lastDeliveredAt: new Date().toISOString(),
+				lastDeliveryFailedAt: new Date(Date.now() - 60 * 60_000).toISOString(),
+				lastDeliveryError: "DELIVERY_FAILED",
+			}),
+		);
+		renderWithClient(<ConnectionsSection />);
+
+		expect(await screen.findByText(/Last message sent/)).toBeInTheDocument();
+		expect(screen.queryByText(/Couldn't deliver/)).not.toBeInTheDocument();
 	});
 
 	it("asks to reconnect when Slack access was revoked", async () => {

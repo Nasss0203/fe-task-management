@@ -21,6 +21,9 @@ export function useDisconnectSlack() {
 				connected: false,
 				slackTeamName: null,
 				connectionError: null,
+				lastDeliveredAt: null,
+				lastDeliveryFailedAt: null,
+				lastDeliveryError: null,
 			});
 		},
 	});
